@@ -1,0 +1,507 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCampaign>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models
+@using Web.Helpers
+@using Umbraco.Web.Models
+@using System.Text.RegularExpressions
+
+@{
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var children = Model.Children;
+
+    // Get specific Children
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+
+    var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
+
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+
+    var testimonialTab = children?.Where(c => c.ContentType.Alias.ToLower() == "testimonials").FirstOrDefault();
+
+
+
+    // Get the (generic Open Now that will be used throughout the page) button from the Hero Shoulder
+    IEnumerable<IPublishedContent> bodyButtons = (IEnumerable<IPublishedContent>)heroBody.Children.Where(c => c is ContentModels.EbankItabstractButton);
+    ContentModels.EbankItabstractButton openNowButton = null;
+    ContentModels.EbankItabstractButton learnMoreButton = null;
+    ContentModels.EbankItabstractButton androidDownloadNow = null;
+    ContentModels.EbankItabstractButton iosDownloadNow = null;
+    ContentModels.EbankItabstractButton downloadNow = null;
+  
+
+    foreach (var button in bodyButtons)
+    { 
+        if (button.Value("EbankItbuttonText").ToString().Contains("Register / Login"))
+        {
+            openNowButton = (ContentModels.EbankItabstractButton)button;
+        }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("Learn More"))
+        {
+            learnMoreButton = (ContentModels.EbankItabstractButton)button;
+            
+        }
+       
+        else if (button.Value("EbankItbuttonText").ToString().Contains("Android"))
+        {
+            androidDownloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("iOS"))
+        {
+            iosDownloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+        else
+        {
+            downloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+    }
+
+    var openNowButtonLink = "#";
+    openNowButtonLink = string.IsNullOrEmpty(openNowButton?.EbankItbuttonInternalLink?.Url) ?
+    openNowButton?.EbankItbuttonExternalLink :
+    openNowButton.EbankItbuttonInternalLink?.Url;
+    openNowButtonLink = (string.IsNullOrEmpty(openNowButtonLink)) ? "#" : openNowButtonLink;
+
+    var learnMoreButtonLink = "#";
+    learnMoreButtonLink = string.IsNullOrEmpty(learnMoreButton?.EbankItbuttonInternalLink?.Url) ?
+    learnMoreButton?.EbankItbuttonExternalLink :
+    learnMoreButton.EbankItbuttonInternalLink?.Url;
+    learnMoreButtonLink = (string.IsNullOrEmpty(learnMoreButtonLink)) ? "#" : learnMoreButtonLink;
+
+    // End get generic shoulder button
+
+    var chestTitle = heroChest?.Value("chestTitle").ToString();
+    var chestDescription = heroChest?.Value("chestDescription").ToString();
+    var chestCards = heroChest?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+
+    var campaignBankingItemsModel = new CustomModels.Benefits
+    {
+        Header = chestTitle,
+        Description = chestDescription,
+        BenefitCards = chestCards.Select(c => c as Card).ToList(),
+
+    };
+
+    //Create your won world of banking
+ 
+    var tabs = (IEnumerable<IPublishedContent>)heroBody?.Children.Where(c => c.ContentType.Alias.ToLower() == "tabbody").ToList();
+
+    ContentModels.TabBody newWaysOfBanking = null;
+    ContentModels.TabBody createOwnWorldOfBanking = null;
+    ContentModels.TabBody myWorldTermsAndConditions = null;
+    
+    
+    ContentModels.TabBody panel1 = null;
+    ContentModels.TabBody panel2 = null;
+    ContentModels.TabBody panel3 = null;
+    ContentModels.TabBody panel4 = null;
+    
+    tabs.ToList().ForEach(x =>
+    {
+        var partialName = x.Value("PartialViewName");
+        
+        switch(partialName.ToString())
+        {
+            @*case "panel1":
+                panel1 = (TabBody)x;
+                break;*@
+            case "panel2":
+                panel2 = (TabBody)x;
+                break;
+            case "panel3":
+                panel3 = (TabBody)x;
+                break;
+            case "panel4":
+                panel4 = (TabBody)x;
+                break;
+        }
+        
+        
+    });
+    
+    @*var panelItem1 = (IEnumerable<IPublishedContent>)panel1.TabBodyContent.Where(c => c.DocumentTypeAlias == "nCTabGenericContent").FirstOrDefault().GetPropertyValue("sectionContent"); *@
+    
+    var panelItem2 = (IEnumerable<IPublishedElement>)panel2.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+    var panelItem3 = (IEnumerable<IPublishedElement>)panel3.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+    var panelItem4 = (IEnumerable<IPublishedElement>)panel4.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+    
+    var buttonRegisterControl = panel4.Children.Where(x => x.ContentType.Alias.ToString().ToLower() == "ebankititem2").FirstOrDefault();
+    
+    Umbraco.Web.Models.Link registerLink = null;
+    foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)buttonRegisterControl.Value("sectionLink"))
+    {
+        registerLink = link;
+        break;
+    }
+    
+    int idIterator = 0;
+    //var ownWorldItems = (IEnumerable<IPublishedContent>)createOwnWorldOfBanking.TabBodyContent.Where(c => c.DocumentTypeAlias == "nCTabGenericContent").FirstOrDefault().GetPropertyValue("sectionContent");
+    //var newWaysItems = (IEnumerable<IPublishedContent>)newWaysOfBanking.TabBodyContent.Where(c => c.DocumentTypeAlias == "nCTabGenericContent").FirstOrDefault().GetPropertyValue("sectionContent");
+    //var myWorldTAndCs = (IEnumerable<IPublishedContent>)myWorldTermsAndConditions.TabBodyContent.Where(c => c.DocumentTypeAlias == "nCTabGenericContent").FirstOrDefault().GetPropertyValue("sectionContent");
+
+    
+    //IPublishedContent CurrentPage = UmbracoContext.Current.PublishedContentRequest.PublishedContent;
+    var CurrentPage = Umbraco.AssignedContentItem;
+    var viewName = CurrentPage.Name.Replace(" ", "");
+    var btnRegisterNow = viewName + "_RegisterNow_" + "banking-247";
+    
+    var headerImage_large = heroHeader?.Value<IPublishedContent>("image")?.Url;
+    var headerImage_medium = heroHeader?.Value<IPublishedContent>("imageMedium")?.Url;
+    var headerImage_small = heroHeader?.Value<IPublishedContent>("imageSmall")?.Url;
+    
+    var breadcrumbItems = heroHeader?.Value("breadcrumb")?.ToString()?.Split(',')?.ToList();
+    
+    var feedData = heroBody?.Children.ToList().Last();
+    var imageItem = feedData.Value<IPublishedContent>("cardIcon");
+    
+}
+
+<style>
+    body
+    {
+        background-color:#FBFBFB;
+    }
+    
+    .button.primary {
+        background-color: #c4d832 !important;
+    }
+    .button {
+        color: #09036f !important;
+    }
+    .panel3Title  {
+        color: #c4d832 !important;
+    }
+    .hero-static-title {
+        color: #c4d832 !important;
+    }
+    .registerLogin {
+        width:unset;
+        text-align:right;
+    }
+    .hero-static-caption
+    {
+        background-color: #002B60;
+    }
+    .hero-static-title
+    {
+        
+        color:#95B70B;
+    }
+    
+    .hero-static-caption .hero-static-title, .hero-static-caption
+    {
+        
+       font-size:1.6em; 
+    }
+    
+    .TestimonialName
+    {
+        color:#002B60;
+        font-size:2em;
+        font-weight:bold;
+    }
+    
+    .testimonials-carousel .carousel .item .testimonial .descr
+    {
+          font-size:1.2em;
+    }
+    
+    .testimonials-carousel .carousel-indicators 
+    {
+        bottom: 46px;
+    }
+    
+    .campaign-myworld-container2
+    {
+       background-image: none;
+       background-color:none;
+       padding: 25px 0px 25px 0px;
+        
+    }
+    .campaign-myworld-container
+    {
+        background-image: none;
+        background-color:#EDEEF4;
+        padding: 35px 0px 35px 0px;
+        
+    }
+    .payments-section 
+    {
+        border-radius:8px;
+    }
+    .myworld-campaign-section-container 
+    {
+        border-radius:8px;
+    }
+    .blue-button2
+    {
+        background-color: none;
+        color:black;
+    }
+    .blue-button3
+    {
+        background-color: #fbfbfb;
+        color: #002B60;
+    }
+    .noShadow
+    {
+        box-shadow: none;
+    }
+    .testimonials-container
+    {
+       padding-bottom: 30px; 
+    }
+    .hero-static-caption
+    {
+        display:block;
+    }
+</style>
+
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+<br />
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xd-12">
+            @Html.Raw(@heroBody.Value("richTextBox"))
+        </div>
+    </div>
+ </div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xd-12">
+            @{
+                if (imageItem != null)
+                {
+                    <img style="width: 100%;" src="@imageItem.Url" alt="Banking 247 Twitter Feeds" />                
+                }
+            }
+        </div>        
+    </div>
+</div>
+
+
+<div class="container">
+    <div class="internet-banking-container full image-full">
+
+        @if (campaignBankingItemsModel.BenefitCards != null && campaignBankingItemsModel.BenefitCards.Any())
+        {
+            int iterator = 0;
+
+            <div class="row eq-height @(campaignBankingItemsModel.BenefitCards.Count > 4 ? "card-slider" : "") ">
+                @{
+                    int imgIterator = 0;
+                    foreach (Card benefit in campaignBankingItemsModel.BenefitCards)
+                    {
+                        String cardIdTag = "card" + iterator.ToString();
+                        String cardId = benefit.Name.Replace(" ", "").ToString() + imgIterator.ToString();
+                        <div class="col-sm-12">
+                            <div class="image center-align">
+                                @if (benefit.CardIcon != null)
+                                {
+                                    <a href="#@cardId">
+                                        <img class="myWorld-campaign-images" style="width:72%;" src="@benefit.CardIcon.Url" alt="@benefit.Value("altTag")" />
+                                    </a>
+                                }
+                            </div>
+                            <div class="title text-uppercase">@benefit.CardTitle</div>
+                            <p class="descr">@benefit.CardDescription</p>
+                        </div>
+                        ++iterator;
+                        ++imgIterator;
+                    }
+               }
+            </div>
+        }
+    </div>
+</div>
+
+<br/>
+
+<div class="campaign-myworld-container2">
+    <div class="container payments-section full blue-button2">
+        <div class="visible-xs"></div>
+        <div class="row myworld-campaign-section-container noShadow">
+            @{
+                foreach (var item in panelItem2)
+                {
+                    var cardTitle = item.Value<string>("nCcardTitle");
+                    var cardTitleId = cardTitle.Trim().ToString().Replace(" ", "").ToString() + idIterator.ToString();
+                    var cardDesc = item.Value<string>("nCcardDescription");
+                    var icon = item.Value<IPublishedContent>("nCcardIcon");
+                    <div class="col-sm-12 margin-bottom-20 hero-title">
+                        <div class="text-left white-link-color richtextbox-blue-bg">
+                            <p id="@cardTitleId" class="title font-size-30" style="font-weight:bold;color:#002B60">@cardTitle</p>
+                            <p>@cardDesc</p>
+                        </div>
+                    </div>
+ 
+                    <div class="col-sm-12" style="color:#002B60">
+                        @Html.Raw(@item.Value("mainDescription"))
+                    </div>
+                    idIterator += 1;
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<div class="campaign-myworld-container2">
+    <div class="container payments-section full blue-button">
+        <div class="margin-top-20 visible-xs"></div>
+        <div class="row myworld-campaign-section-container noShadow">
+            @{
+                foreach (var item in panelItem3)
+                {
+                    var cardTitle = item.Value<string>("nCcardTitle");
+                    var cardTitleId = cardTitle.Trim().ToString().Replace(" ", "").ToString() + idIterator.ToString();
+                    var cardDesc = item.Value<string>("nCcardDescription");
+                    var icon = item.Value<IPublishedContent>("nCcardIcon");
+                    <div class="col-sm-12 margin-bottom-20 hero-title">
+                        <div class="text-left white-link-color richtextbox-blue-bg">
+                            <p id="@cardTitleId" class="title panel3Title green-color font-size-30" style="font-weight:bold">@cardTitle</p>
+                            <p>@cardDesc</p>
+                        </div>
+                    </div>
+ 
+                    <div class="col-sm-12">
+                        @Html.Raw(@item.Value("mainDescription"))
+                    </div>
+                    idIterator += 1;
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<div class="campaign-myworld-container2">
+    <div class="container payments-section full blue-button3">
+        <div class="margin-top-20 visible-xs"></div>
+        <div class="row myworld-campaign-section-container noShadow">
+            @{
+                foreach (var item in panelItem4)
+                {
+                    var cardTitle = item.Value<string>("nCcardTitle");
+                    var cardTitleId = cardTitle.Trim().ToString().Replace(" ", "").ToString() + idIterator.ToString();
+                    var cardDesc = item.Value<string>("nCcardDescription");
+                    var icon = item.Value<IPublishedContent>("nCcardIcon");
+                    <div class="col-sm-12 text-center margin-bottom-20 hero-title">
+                        <div class="white-link-color richtextbox-blue-bg">
+                            <p id="@cardTitleId" class="title font-size-30" style="font-weight:bold; color:#002B60">@cardTitle</p>
+                            <p >@cardDesc</p>
+                        </div>
+                    </div>
+ 
+                    <div class="col-sm-12 text-center" style="color:#002B60">
+                        @Html.Raw(@item.Value("mainDescription"))
+                        
+                        <a class="button clearfix" style="background-color:#002b60;color: white !important;" href="@registerLink.Url">
+                            @registerLink.Name
+                        </a>
+                    </div>
+                    
+
+                    
+                    idIterator += 1;
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<!-- TESTIMONIALS -->
+<div class="testimonials-container white-bg">
+    <div class="container">
+        <h3 class="text-center margin-top-60">Everybody is Somebody</h3>
+        <div class="testimonials-carousel">
+            <div id="testimonials" class="carousel slide" data-ride="carousel" data-interval="false">
+                <!-- Indicators -->
+                @if (testimonialTab != null)
+                {
+                    var testimonies = (IEnumerable<StructureAvatarNameStory>)testimonialTab.Value("testimonialItems");
+                    <ol class="carousel-indicators">
+                        @{
+                            if (testimonies != null)
+                            {
+                                int counter = 0;
+                                foreach (var testimonyItem in testimonies)
+                                {
+                                    <li data-target="#hero-banner" data-slide-to="@counter" class="@((counter == 0) ? "active" : "")"></li>
+                                    counter++;
+                                }
+                            }
+                        }
+                    </ol>
+                    <!-- Wrapper for slides -->
+                    <div class="carousel-inner">
+                        @{
+                            int newCounter = 0;
+                            if (testimonies != null)
+                            {
+                                foreach (var testimonyItem in testimonies)
+                                {
+                                    var Avatar = testimonyItem.Value<IPublishedContent>("testimonialAvatar");
+                                    <div class="item @((newCounter == 0) ? "active" : "")">
+                                        <div class="testimonial">
+                                            <div class="avatar">
+                                                <img src="@Avatar.Url" alt="@Avatar.Value("altTag")">
+                                                
+                                            </div>
+                                             <br/>
+                                            <div class="descr">
+                                                <div class="TestimonialName">@testimonyItem.Value("testimonialName")</div>
+                                                @testimonyItem.Value("testimonialStory")
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                    newCounter++;
+                                }
+                            }
+                        }
+                    </div>
+                }
+                <!-- Controls -->
+                <a class="left carousel-control" href="#testimonials" role="button" data-slide="prev">
+                    <span class="icon-arrow-left"></span>
+                </a>
+                <a class="right carousel-control" href="#testimonials" role="button" data-slide="next">
+                    <span class="icon-arrow-right"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Testimonial end -->
+
+
+@section scripts
+{
+    <script>
+    $(document).ready(function () {
+        var imageBgCss = "url('" + "@headerImage_large" + "')";
+        var imageMdCss = "url('" + "@headerImage_medium" + "')";
+        var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_medium : headerImage_small)" + "')";
+        var CheckScreenSize;
+        (CheckScreenSize = function () {
+            var _width = $(window).outerWidth();
+            var _height = $(window).outerHeight();
+            if (_width <= 511) {
+                $("#heroHeader").css("background-image", imageSmCss);
+            }
+            else {
+                $("#heroHeader").css("background-image", imageBgCss);
+            }
+        })();
+        $(window).resize(CheckScreenSize);
+    });
+
+</script> 
+}

@@ -1,0 +1,503 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers
+@using CustomModels = Web.Models;
+@using System.Collections.Generic;
+
+@{
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var children = Model.Children;
+
+    // Get specific Children
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochestinvestments").FirstOrDefault();
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+
+    var infoGraphic = heroBody.Children.Last().Children.FirstOrDefault();
+    TabBody tabInfoGraphicData = (TabBody)heroBody.Children.Last(); // based on the child item node on the parent list
+    var buttonLinkData = tabInfoGraphicData.Children.Where(x => x.ContentType.Alias.ToString().ToLower() == "ebankititem2").FirstOrDefault();
+    var imageUrlString = ((ContentModels.Image)((IPublishedContent)infoGraphic.Value("ebankITImage"))).Url;
+    var altTagImageUrl = ((ContentModels.Image)((IPublishedContent)infoGraphic.Value("ebankITImage"))).AltTag;
+
+    var heroKnees = children?.Where(c => c.ContentType.Alias.ToLower() == "heroknees").FirstOrDefault();
+    var testimonialTab = children?.Where(c => c.ContentType.Alias.ToLower() == "testimonials").FirstOrDefault();
+    var homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+
+    var viewName = Path.GetFileNameWithoutExtension(Server.MapPath(VirtualPath));
+
+    // Get Specific grand children
+
+    var bodyCards = heroBody?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+    var bodyButton = heroBody?.Children?.Where(c => c.ContentType.Alias == "ebankITAbstractButton").FirstOrDefault();
+
+  
+
+    var benefitsHeader = heroChest?.Value("benefitsTitle")?.ToString();
+    var benefitsDescription = heroChest?.Value("benefitsDescription")?.ToString();
+    var ratesTerms = heroChest?.Value<IEnumerable<string>>("ratesTerms");
+    var calculatorIntro = heroChest?.Value("calculatorIntro")?.ToString();
+    var calculatorButtonLabel = heroChest?.Value("calculatorButtonLabel")?.ToString();
+
+    var bodyTitle = heroBody?.Value("bodyTitle").ToString();
+    var bodyDescription = heroBody?.Value("bodyDescription").ToString();
+
+    var applyDocs = bodyCards.Select(c => c as Card).ToList();
+
+    var headerImage_large = heroHeader?.Value<IPublishedContent>("image")?.Url;
+    var headerImage_medium = heroHeader?.Value<IPublishedContent>("imageMedium")?.Url;
+    var headerImage_small = heroHeader?.Value<IPublishedContent>("imageSmall")?.Url;
+
+}
+
+<style>
+
+    .card-shadow.rate-card {
+        max-width: 230px !important;
+    }
+
+    .col-md-offset-1 {
+        margin-left: 0.33% !important;
+    }
+
+    .card-shadow {
+        padding: 20px 10px !important;
+    }
+
+
+
+    .control-label {
+        text-align: left !important;
+        width: 100%;
+    }
+
+    #calculator {
+        top: unset;
+        padding-bottom: 0px;
+    }
+
+    #fixedDepositInvestmentAmount {
+        width: 90% !important;
+    }
+
+    .select.area {
+        width: 90% !important;
+    }
+
+    .campaign-product-container {
+        top: unset;
+    }
+
+    #fixedDeposit-calculator-container {
+        background-color: #f7f7f7;
+    }
+
+    .card-shadow.rate-card-fixed-deposit-offer {
+        margin: unset;
+        text-align: unset;
+    }
+
+    #fixedResults {
+        margin-top: -300px;
+    }
+
+    .btnCalc {
+        padding-top: 25px;
+    }
+
+    .resultbtn {
+        padding: 16px 16px;
+    }
+
+    .background-interest-selected {
+        background-color: #4c6a8f;
+        color: #fff !important;
+        border-bottom-color: #f8f8f800 !important;
+        border-top-color: #f8f8f800 !important;
+    }
+
+    .rightboarder {
+        border-right: 1px solid #001f44;
+    }
+
+    .spacePush {
+        background-color: #002b60;
+        color: #002b60;
+        border: none;
+    }
+
+    .table > tbody > tr > th {
+        padding: 12px !important;
+    }
+
+    @@media (min-width: 1023px) and (max-width: 1024px) {
+
+        .col-md-offset-1 {
+            margin-left: 8.33% !important;
+        }
+
+
+        .col-md-2, .col-sm-6, .col-lg-6 {
+            width: 30%;
+        }
+    }
+
+    @@media (max-width: 767px) {
+        .btnCalc {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        #form-preloader {
+            top: -30em;
+            position: relative;
+        }
+    }
+
+    @@media (max-width: 425px) {
+
+        .resultbtn {
+            padding: 16px 14px;
+        }
+
+        .table > tbody > tr.green > td {
+            color: #88bc47;
+            font-size: 15px;
+            font-weight: 600;
+        }
+    }
+
+
+
+    @@media (max-width: 320px) {
+
+        .resultbtn {
+            font-size: 12px;
+        }
+    }
+</style>
+
+
+
+
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+<!-- HERO CONTINUED-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+
+<div class="container infographic">
+    <div class="row">
+
+        <div class="col-md-4">
+            <img class="info-img" src="@imageUrlString" alt="@altTagImageUrl">
+        </div>
+        <div class="col-md-8 info-button">
+            @infoGraphic.Value("ebankItContent")
+            @{
+                if (buttonLinkData != null)
+                {
+                    Umbraco.Web.Models.Link buttonDocumentLink = null;
+                    if (buttonLinkData.Value("sectionLink") != null)
+                    {
+                        foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)buttonLinkData.Value("sectionLink"))
+                        {
+                            buttonDocumentLink = link;
+                            break;
+                        }
+                        if (buttonDocumentLink != null)
+                        {
+                            var _buttonText = buttonDocumentLink.Name;
+                            var btnId = viewName + "_" + _buttonText.ToString().Replace(" ", "") + "_" + "African Bank Fixed deposit";
+
+                            <a class="button primary clearfix" href="@buttonDocumentLink.Url" id="@btnId">
+                                @_buttonText
+                            </a>
+                        }
+                    }
+                }
+            }
+        </div>
+    </div>
+</div>
+<!-- POPULAR RATES -->
+@{
+    // Get Properties from children
+    var benefitCards = heroChest?.Value<IEnumerable<IPublishedElement>>("benefitCards");
+    //var cards = benefitCards?.Select(c => c as NCcard).ToList();
+     var cards = new CustomModels.Benefits
+     {
+        Header = benefitsHeader,
+        Description = benefitsDescription,
+        BenefitCards1 = benefitCards.Select(c => c as NCcard).ToList()
+     };
+
+    var ratesAndBenefitsModel = new CustomModels.InvestmentRatesAndBenefits
+    {
+        RatesTermsAndConditions = ratesTerms,
+        CalculatorButtonText = calculatorButtonLabel,
+        CalculatorIntroduction = calculatorIntro,
+        Benefits =  cards
+
+    };
+
+    }
+    @Html.Partial("_investmentRatesAndBenefitsSection", ratesAndBenefitsModel)
+
+<!-- INVESTMENT CALCULATOR -->
+@Html.Partial("_calculatorStructure", "calculatorfixed-form")
+
+<br />
+
+<!-- HOW TO APPLY-->
+@Html.Partial("_howToApplySection", new CustomModels.HowToApplyDataContainer(bodyTitle, bodyDescription, bodyButton as IEbankItabstractButton, applyDocs))
+
+<!-- CAMPAIGN MORE INFO -->
+@Html.Partial("_heroKneeTabs", heroKnees as ContentModels.HeroKnees)
+
+<!-- TESTIMONIALS -->
+@Html.Partial("_testimonials", testimonialTab as Testimonials)
+
+<!-- CALL BACK FORM -->
+@{
+    var _floatingFormViewModel = children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+    @Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)
+}
+
+<!-- POPUP DIALOG -->
+@Html.Partial("_ebankITModal")
+
+@section scripts
+{
+
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/handlebars-v4.0.5.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/jquery.xdomainrequest.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculator.js?ver=2.1")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculator1.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculatorHandler.min.js")"></script>
+    <script type="text/javascript">
+
+   $(document).ready(function () {
+        var imageBgCss = "url('" + "@headerImage_large" + "')";
+        var imageMdCss = "url('" + "@headerImage_medium" + "')";
+        var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_medium : headerImage_small)" + "')";
+        var CheckScreenSize;
+        (CheckScreenSize = function () {
+            var _width = $(window).outerWidth();
+            var _height = $(window).outerHeight();
+            if (_width <= 511) {
+                $("#heroHeader").css("background-image", imageSmCss);
+            }
+            else {
+                $("#heroHeader").css("background-image", imageBgCss);
+            }
+        })();
+        $(window).resize(CheckScreenSize);
+    });
+
+    $(function () {
+        $(".area_buttons_calculate").hide();
+        var hasError = true;
+        var data = {
+            product: 'Fixed',
+            rateContainer: '#rates-container',
+            calcFormContainer: '#calculatorfixed-form',
+            serviceUrl: '@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.Mobile.URL"]',
+            headers: [
+                   ['ITSAPP-DEVICE', '@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.ITSAPP-DEVICE"]'],
+                   ['ITSAPP-LANG', 'en-GB'],
+                   ['Content-type', 'application/json']
+            ],
+            translations: {
+                amount: '@ResourceHelper.GetResource("OnceOffInvestmentAmount")',
+                monthlyInterestRateIncrease: '@ResourceHelper.GetResource("MonthlyInterestRateIncrease")',
+                period: '@ResourceHelper.GetResource("Period")',
+                interestRatePa: '@ResourceHelper.GetResource("InterestRatePerAnnum")',
+                interestEarned: '@ResourceHelper.GetResource("InterestEarned")',
+                totalPayout: '@ResourceHelper.GetResource("TotalPayout")',
+                interestPayoutExpiry: '@ResourceHelper.GetResource("InterestPayoutOnExpiry")',
+                semiAnnualInterestPayout: '@ResourceHelper.GetResource("SemiAnnualInterestPayout")',
+                annualInterestPayout: '@ResourceHelper.GetResource("AnnualInterestPayout")',
+                minInvestAmount: '@ResourceHelper.GetResource("MinimumInvestmentAmount")',
+                monthlyInterPayout: '@ResourceHelper.GetResource("MonthlyInterestPayout")',
+                terms: '@ResourceHelper.GetResource("Terms",1)',
+                term: '@ResourceHelper.GetResource("Term",2)',
+                interestPayoutFrequency: '@ResourceHelper.GetResource("InterestPayoutFrequency")',
+                interestPayoutFreq: '@ResourceHelper.GetResource("InterestPayoutFreq")',
+                AmountMandatory: '@ResourceHelper.GetResource("InvestmentAmountIsMandatory")',
+                investmentReturns: '@ResourceHelper.GetResource("InvestmentReturns")',
+                after: '@ResourceHelper.GetResource("After")',
+                months: '@ResourceHelper.GetResource("Months")',
+                years: '@ResourceHelper.GetResource("Years")',
+                onceOffInvestmentAmountIsMandatory: '@ResourceHelper.GetResource("OnceOffInvestmentAmountIsMandatory")',
+                amountCannotBeLessThan: '@ResourceHelper.GetResource("AmountCannotBeLessThan")',
+                interestPayoutFrequency: '@ResourceHelper.GetResource("InterestPayoutFrequency")',
+                investmentReturnsMessage: '@ResourceHelper.GetResource("InvestmentReturnsMessage")',
+                ourOfferAmount: '@ResourceHelper.GetResource("OurOfferAmount")',
+                accept: '@ResourceHelper.GetResource("Accept")',
+                cancel: '@ResourceHelper.GetResource("Cancel")',
+                increaseCapital: '@ResourceHelper.GetResource("IncreaseCapital")',
+                fixedDescription: '@ResourceHelper.GetResource("FixedDescription")',
+                payoutFreqErrorMessage: '@ResourceHelper.GetResource("PayoutFreqErrorMessage")',
+                monthlyInvestmentThereafter: '@ResourceHelper.GetResource("MonthlyInvestmentThereafter")',
+                increaseOnceOff: '@ResourceHelper.GetResource("IncreaseOnceOff")',
+                changeInterestOption: '@ResourceHelper.GetResource("ChangeInterestOption")'
+            }
+        };
+        $(window).on('CalculatorLoading', function (e) {
+
+
+                var isMobileheaderHide = document.getElementsByClassName('tbl-header-selected');
+                if (isMobileheaderHide.length > 0) {
+                    $('#calculatorfixed-form table thead th.tbl-header-selected').addClass('hidden-xs');
+                    $('#calculatorfixed-form table thead th.background-interest-selected').removeClass('hidden-xs');
+                    $('#calculatorfixed-form table tbody td.tbl-header-selected').addClass('hidden-xs');
+                    $('#calculatorfixed-form table tbody td.background-interest-selected').removeClass('hidden-xs');
+                }
+                var isMobilebodyHide = document.getElementsByClassName('value_calculatorformate');
+                if (isMobilebodyHide.length > 0) {
+                    $('#calculatorfixed-form table tbody tr td.value_calculatorformate').addClass('hidden-xs');
+                    $('#calculatorfixed-form table tbody tr td.background-interest-selected').removeClass('hidden-xs');
+                }
+
+            df=e;
+            var _state = e.state;
+            var _target = e.target;
+
+            $(".errorcalculatores").hide();
+
+            if (_target !== 'rates') {
+                if (_state) {
+                    $("#form-preloader").show();
+                    // $("#calculatorfixed-form").hide();
+                    $("#calculator-container").hide();
+
+                    ChangePageControls(false);
+                } else {
+                    $("#form-preloader").hide();
+                    if (hasError) {
+                        $(".errorcalculatores").show();
+                        // $("#calculatorfixed-form").hide();
+                        $("#calculator-container").hide();
+                    } else {
+                        $(".errorcalculatores").hide();
+                        // $("#calculatorfixed-form").show();
+                        $("#calculator-container").show();
+                        $('.money').autoNumeric('init', { aSep: ' ', aDec: '.', aSign: 'R' });
+                    }
+
+                    ChangePageControls(Calculator.isCalculatorValid('Fixed'));
+                }
+            } else {
+                if (_state) {
+                    $("#rates-form-preloader").show();
+                    $('.rate-table').show();
+                } else {
+                    $("#rates-form-preloader").hide();
+                    $('.rate-table').show();
+                }
+            }
+
+        });
+
+        //$(window).on('CalculatorValidationHandler', function (e) {
+        //    var _state = e.state;
+
+        //    ChangePageControls(_state);
+
+        //});
+
+        $(window).on('Error', function (e) {
+
+            var _target = e.target;
+
+            if (_target) {
+                if (_target === 'rates') {
+                    if (!e.errorDescription) {
+                        $(".rate-table").show();
+                        $("#rates-form-preloader").hide();
+
+                        return;
+                    }
+
+                    $(".rate-table").hide();
+                    $("#rates-form-preloader").hide();
+                    $(".errorrates").show();
+                } else {
+
+                    if (!e.errorDescription) {
+                        hasError = false;
+
+                        $("#form-preloader").hide();
+                        // $("#calculatorfixed-form").show();
+                        $("#calculator-container").show();
+                        ChangePageControls(false);
+
+                        $(".errorcalculatores").hide();
+
+                        return;
+                    } else {
+
+                        hasError = true;
+                        $("#form-preloader").hide();
+                        // $("#calculatorfixed-form").hide();
+                        $("#calculator-container").hide();
+                        $(".errorcalculatores").show();
+                        ChangePageControls(false);
+                    }
+                }
+            }
+        });
+
+        function ChangePageControls(enabled) {
+            $(".area_buttons_calculate").hide();
+            if (enabled) {
+                $("#buttonPrint").removeClass("disabledbutton");
+                $(".area_buttons_calculate").show();
+            }
+            else {
+                $("#buttonPrint").addClass("disabledbutton");
+
+            }
+        }
+
+      //  console.log("pepe " ,JSON.stringify(data,null,2));
+        Calculator.init(data);
+        $("#buttonPrint").click(function () {
+            CalculatorHandler.printRatesDoc(data);
+        });
+
+    });
+
+     $(function () {
+                $(window).on('CalculatorLoading', function (e) {
+                    var _state = e.state;
+                    var _target = e.target;
+                    if (_state) {
+                        if (_target === 'rates') {
+                            $("#rates-form-preloader").show();
+                        }
+                    } else {
+                        if (_target === 'rates') {
+                            $("#rates-form-preloader").hide();
+                        }
+                    }
+                })
+            });
+
+    $(document).on('click', '#calculateFixedDeposit', function (event) {
+        $('#fixedResultsMobile').css('height', '280px');
+    });
+
+
+    $(".btn_ok_modal").click(function () {
+
+      //  window.open($("#linkib").val(), "_blank");
+        $('#myModal').modal('hide');
+    });
+
+    </script>
+}

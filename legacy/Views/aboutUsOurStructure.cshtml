@@ -1,0 +1,24 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageAboutUs>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@{
+    Layout = "Master.cshtml";
+    var Children = Model.Children;
+    // Get specific Children
+    var heroHeader = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+}
+<!-- HERO HEADER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+<!-- HERO SHOULDER-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+<!-- PRODUCT INFORMATION-->
+<div class="container margin-bottom-minus-50">
+    <div class="campaign-product-container full text-center">
+        <div class="margin-top-20 visible-xs"></div>
+        <div class="row">
+            <div class="col-sm-10 col-sm-offset-1">
+                <img src="/images/ab-our-structure.jpg" alt="african-bank-our-structure" class="width-100" />
+            </div>
+        </div>
+    </div>
+</div>

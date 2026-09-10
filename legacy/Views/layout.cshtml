@@ -1,0 +1,39 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@{
+	Layout = null;
+}
+@RenderBody() 
+
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Retrospect by TEMPLATED</title>
+        
+        @* <!--START Meta Config--> *@
+        <meta name="Author" content="" />
+        <meta name="Robots" content="" />
+        @* <!--END Meta Config--> *@
+        
+        @* <!--START OG:Meta Config--> *@
+        <meta property="og:title" content="The Rock" />
+        <meta property="og:type" content="video.movie" />
+        <meta property="og:url" content="http://www.imdb.com/title/tt0117500/" />
+        <meta property="og:image" content="http://ia.media-imdb.com/images/rock.jpg" />
+        @* <!--END OG:Meta Config--> *@
+        
+        @* <!--START Twitter:Meta Config--> *@
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:site" content="nytimesbits" />
+        <meta name="twitter:creator" content="nickbilton" />
+        <meta name="twitter:url" content="http://bits.blogs.nytimes.com/2011/12/08/a-twitter-for-my-sister/" />
+        <meta name="twitter:title" content="A Twitter for My Sister" />
+        <meta name="twitter:description" content="In the early days, Twitter grew so quickly that it was almost impossible to add new features because engineers spent their time trying to keep the rocket ship from stalling." />
+        <meta name="twitter:image" content="http://graphics8.nytimes.com/images/2011/12/08/technology/bits-newtwitter/bits-newtwitter-tmagArticle.jpg" />
+        @* <!--END Twitter:Meta Config--> *@
+    </head>
+    <body>      
+        @RenderBody()
+    </body>
+</html>

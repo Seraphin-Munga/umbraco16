@@ -1,0 +1,215 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageManageYourAccount>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models;
+@using Web.Helpers
+@using Umbraco.Web.Models
+@using System.Collections.Generic;
+@using System.Text.RegularExpressions
+@{
+
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var Children = Model.Children;
+
+    // Get specific Children
+    var heroHeader = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+
+    var _heroBody = Children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+
+    var bodyBlurpDescription = _heroBody.Value("richTextBox");
+    var footBlurpDescription = _heroBody.Value("bodyFooterTitle");
+
+    var tabGroup = _heroBody.Children(x => x.ContentType.Alias.ToLower() == "tabgroup").FirstOrDefault();
+
+    var tabHeader = tabGroup.Children(xx => xx.ContentType.Alias.ToLower() == "tabheader").FirstOrDefault();
+
+    var tabBody = (TabBody)tabHeader.Children(cc => cc.ContentType.Alias.ToLower() == "tabbody").FirstOrDefault();
+
+    var heroChest = (HeroChestFaq)Children?.Where(c => c.ContentType.Alias.ToLower() == "herochestfaq").FirstOrDefault();
+
+    var sectionContent = (ICollection<IPublishedElement>)tabBody.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+
+    var questionGroups = sectionContent.Where(c => c.ContentType.Alias == "nCHeroBodyFaq").FirstOrDefault().Value("nCquestionGroups");
+    //var dts = ApplicationContext.Current.Services.DataTypeService;
+
+    var searchString = Request["searchstring"];
+
+    var categoriesDropdownId = 18428;
+
+    int isShowingCookie = 0;
+    var viewName = Umbraco.AssignedContentItem.Name.Replace(" ", "");
+    if (viewName == "CookiePolicy")
+    {
+        isShowingCookie = 1;
+    }
+}
+
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+<!-- HERO CONTINUED-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+
+<!-- HERO CHEST -->
+<div class="container">
+
+    @*@{
+            if (isShowingCookie == 1) {
+                @Html.Raw(bodyBlurpDescription)
+            } else
+            {
+                 <div class="margin-top-100 hidden-xs"></div>
+            }
+
+        }*@
+
+    @*@{
+        if (isShowingCookie < 1) {
+
+         if (heroChest.HasSearchContentTextbox) {
+
+                <div class="row filter margin-top-10">
+                    <div class="col-sm-4 col-sm-offset-1">
+                        <div class="content-padding-15 align-center">
+                            @{
+                                var categories = dts.GetPreValuesCollectionByDataTypeId(categoriesDropdownId).FormatAsDictionary();
+
+                                if (categories.Any())
+                                {
+                                    <select id="cmbCategories" class="form-control">
+                                        <option value="">@ResourceHelper.GetResource("Faq_Categories_Placeholder")</option>
+                                        @foreach (var item in categories)
+                                        {
+                                            <option value="@item.Value.Value.Replace(" ", string.Empty).ToLower()">@item.Value.Value</option>
+                                        }
+                                    </select>
+                                }
+                            }
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-sm-offset-1">
+                        <div class="content-padding-15 align-center">
+                            @{
+                                if (searchString != null)
+                                {
+                                    @Html.Partial("_searchInput", searchString)
+                                }
+                                else
+                                {
+                                    @Html.Partial("_searchInput")
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+                }
+            }
+        }*@
+
+
+    <div class="margin-top-100 hidden-xs"></div>
+
+    <!-- HERO BODY-->
+
+    <div class="margin-bottom-minus-60" ng-controller="ReportsAndArchievesController">
+        <div class="campaign-product-container faq-section full">
+            <div class="margin-top-20 visible-xs"></div>
+            @{
+                var groups = (IEnumerable<QuestionGroup>)questionGroups;
+                var sections = groups.Select(x => x.Value("groupName")).ToList();
+
+                foreach (var group in groups)
+                {
+                    var name = group.Value("groupName")?.ToString() ?? string.Empty;
+                    var questions = group.Value<IEnumerable<IPublishedElement>>("questionsAndAnswers") ?? new List<IPublishedContent>();
+                    var Id = Regex.Replace(name.Replace("African Bank", string.Empty), @"[^0-9a-zA-Z]+", string.Empty);
+
+                    <div id="@name.Replace(" ", string.Empty).ToLower()" class="row sectionHeading">
+                        <h3 id="@Id" class="main-title @name.Replace(" ", string.Empty).ToLower() searchItemHeader">
+                            @name
+                        </h3>
+
+                        @foreach (var question in questions)
+                        {
+                            var Q = question.Value("question");
+                            var A = question.Value("answer");
+
+                            <div class="faq-item searchItemList" ng-show="stringContains('@Q', searchTerm)">
+                                <div class="item-content">
+                                    <h4 class="title text-uppercase">
+                                        @Q
+                                    </h4>
+                                    <div class="faq content">
+                                        @A
+                                    </div>
+                                </div>
+                                @*<div class="download-icon faq-button" onclick="toggleFAQ(this)"><i class="fa fa-long-arrow-down" aria-hidden="true"></i></div>*@
+
+                                <div class="download-icon faq-button"><i class="fas fa-long-arrow-alt-down" aria-hidden="true"></i></div>
+                            </div>
+                        }
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    @*@{
+            if (isShowingCookie == 1) {
+                @Html.Raw(footBlurpDescription)
+            }
+        }*@
+
+</div>
+@section scripts
+{
+    <script>
+        @*$(".faq-button").click(function(){
+
+            $(this).siblings(".item-content").children(".content").toggle(200);
+
+            if ($(this).parent().hasClass("active")) {
+                $(this).parent().removeClass("active");
+            } else {
+                $(this).parent().addClass("active");
+            }
+
+        });*@
+
+        $(".faq-item").click(function(){
+            $(this).siblings(".faq-item").removeClass("active");
+            $(this).addClass("active");
+            $(this).siblings(".faq-item").children(".item-content").children(".content:visible").toggle(200);
+            $(this).siblings(".faq-item").children(".download-icon").children(".fa-long-arrow-up").removeClass("fa-long-arrow-up").addClass("fa-long-arrow-down");
+            $(this).children(".item-content").children(".content").toggle(200);
+            $(this).children(".download-icon").children(".fa-long-arrow-up").removeClass("fa-long-arrow-up").addClass("fa-long-arrow-down");
+
+        });
+        $(document).ready(function () {
+            $("#cmbCategories").change(function () {
+                //var anchor = "." + $("#cmbCategories option:selected").val();
+                //scroll to the achor
+                //$("html, body").animate({ scrollTop: $($(anchor)).offset().top }, 500);
+                var selected = $("#cmbCategories option:selected").val();
+                $('.sectionHeading').each(function () {
+                    if (selected == 'allcategories' || selected == '') { // show all categories
+                        $(this).show();
+                    }
+                    else {
+                        if ($(this).context.id == selected) {
+                            $(this).show();
+                        }
+                        else {
+                            $(this).hide();
+                        }
+                    }
+                });
+
+            });
+        })
+    </script>
+}
+
+

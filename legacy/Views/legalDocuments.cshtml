@@ -1,0 +1,351 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageBottomLinks>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using System.Linq;
+
+@{
+    Layout = "Master.cshtml";
+    var Children = Model.Children;
+    // Get specific Children
+    var heroHeader = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroBody = (HeroBody)Children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    var bodyChildren = (IEnumerable<IPublishedContent>)heroBody?.Children;
+    var complianceData = (HeroBody)bodyChildren.Where(c => c.Name.ToLower() == "compliance").FirstOrDefault();
+    var insuranceData = (HeroBody)bodyChildren.Where(c => c.Name.ToLower() == "insurance").FirstOrDefault();
+    var legalData = (HeroBody)bodyChildren.Where(c => c.Name.ToLower() == "legal").FirstOrDefault();
+    var disclosureData = (HeroBody)bodyChildren.Where(c => c.Name.ToLower() == "disclosure").FirstOrDefault();
+    var additionData = (HeroBody)bodyChildren.Where(c => c.Name.ToLower() == "addition").FirstOrDefault();
+}
+
+<style type="text/css">
+    @@media only screen and (min-width: 768px) {
+        .campaign-list .download-item {
+            font-weight: 400;
+            padding: 5px 0px;
+            border-bottom: 1px solid #e4e5ec;
+            display: -webkit-box;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: -webkit-flex;
+            display: flex;
+            -ms-flex-align: center;
+            -webkit-align-items: center;
+            align-items: center;
+        }
+
+        .download-descr {
+            padding-right: 20px;
+        }
+        .campaign-list .download-btn {
+            padding: 9px 10px;
+            border-radius: 100px;
+            background-color: #88bc47;
+            color: #fff;
+            font-weight: 400;
+            font-size: 12px;
+            display: inline-block;
+            float: right;
+        }
+    }
+</style>
+
+</style>
+
+<!-- HERO HEADER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+<!-- HERO SHOULDER-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+<div class="container margin-bottom-minus-60">
+    <div class="campaign-product-container full">
+        <div class="margin-top-20 visible-xs"></div>
+        <h3 class="text-center">Compliance</h3>
+        <div class="margin-top-30 visible-xs"></div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="campaign-list mobile-styling">
+                    <ul>
+                        @{
+                            int index = 0;
+                            foreach (var item in complianceData.Documents)
+                            {
+                                var description = item.Value("Title").ToString();
+                                var downloadlink = ((ContentModels.File)item.Value("file")).Url;
+                                <li>
+                                    <div class="row no-gutter download-item first">
+                                        <div class="col-sm-9">
+                                            <div class="download-descr">@description</div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <a href="@downloadlink" target="_blank" class="download-btn">Download</a>
+                                        </div>
+                                    </div>
+                                </li>
+                                if (++index == 6)
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    </ul>
+               </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="campaign-list mobile-styling">
+                    <ul>
+                        @{
+                            index = 0;
+                            foreach (var item in complianceData.Documents.Skip(6))
+                            {
+                                var description = item.Value("Title").ToString();
+                                var downloadlink = ((ContentModels.File)item.Value("file")).Url;
+                                <li>
+                                    <div class="row no-gutter download-item first">
+                                        <div class="col-sm-9">
+                                            <div class="download-descr">@description</div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <a href="@downloadlink" target="_blank" class="download-btn">Download</a>
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                         }
+                  </ul>
+              </div>
+            </div>
+        </div>
+        <div class="row margin-top-20">
+            <div class="col-sm-10 col-sm-offset-1">
+                <p class="body-content text-center">
+                    @insuranceData.Value("bodyDescription")
+                </p>
+            </div>
+        </div>
+        <div class="row margin-top-20">
+            <div class="col-sm-6">
+                <div class="campaign-list mobile-styling">
+                    <ul>
+                        @{
+                            index = 0;
+                            foreach (var item in insuranceData.Documents)
+                            {
+                                var description = item.Value("Title").ToString();
+                                var downloadlink = ((ContentModels.File)item.Value("file")).Url;
+                                <li>
+                                    <div class="row no-gutter download-item first">
+                                        <div class="col-sm-9">
+                                            <div class="download-descr">@description</div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <a href="@downloadlink" target="_blank" class="download-btn">Download</a>
+                                        </div>
+                                    </div>
+                                </li>
+                                if (++index == 6)
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="campaign-list mobile-styling">
+                    <ul>
+                        @{
+                            index = 0;
+                            foreach (var item in insuranceData.Documents.Skip(6))
+                            {
+                                var description = item.Value("Title").ToString();
+                                var downloadlink = ((ContentModels.File)item.Value("file")).Url;
+                                <li>
+                                    <div class="row no-gutter download-item first">
+                                        <div class="col-sm-9">
+                                            <div class="download-descr">@description</div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <a href="@downloadlink" target="_blank" class="download-btn">Download</a>
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="margin-top-30 visible-xs"></div>
+        <h3 class="text-center margin-top-20">Legal</h3>
+        <div class="margin-top-30 visible-xs"></div>
+        <div class="row margin-top-20">
+            <div class="col-sm-6">
+                <div class="campaign-list mobile-styling">
+                    <ul>
+                        @{
+                            index = 0;
+                            foreach (var item in legalData.Documents)
+                            {
+                                var description = item.Value("Title").ToString();
+                                var downloadlink = ((ContentModels.File)item.Value("file")).Url;
+                                <li>
+                                    <div class="row no-gutter download-item first">
+                                        <div class="col-sm-9">
+                                            <div class="download-descr">@description</div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <a href="@downloadlink" target="_blank" class="download-btn">Download</a>
+                                        </div>
+                                    </div>
+                                </li>
+                                if (++index == 3)
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="campaign-list mobile-styling">
+                    <ul>
+                        @{
+                            index = 0;
+                            foreach (var item in legalData.Documents.Skip(3).ToList())
+                            {
+                                var description = item.Value("Title").ToString();
+                                var downloadlink = ((ContentModels.File)item.Value("file")).Url;
+                                <li>
+                                    <div class="row no-gutter download-item first">
+                                        <div class="col-sm-9">
+                                            <div class="download-descr">@description</div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <a href="@downloadlink" target="_blank" class="download-btn">Download</a>
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="margin-top-30 visible-xs"></div>
+        <h3 class="text-center margin-top-20">Disclosure</h3>
+        <div class="margin-top-30 visible-xs"></div>
+        <div class="row margin-top-20">
+            <div class="col-sm-6">
+                <div class="campaign-list mobile-styling">
+                    <ul>
+                        @{
+                            index = 0;
+                            foreach (var item in disclosureData.Documents)
+                            {
+                                var description = item.Value("Title").ToString();
+                                var downloadlink = ((ContentModels.File)item.Value("file")).Url;
+                                <li>
+                                    <div class="row no-gutter download-item first">
+                                        <div class="col-sm-9">
+                                            <div class="download-descr">@description</div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <a href="@downloadlink" target="_blank" class="download-btn">Download</a>
+                                        </div>
+                                    </div>
+                                </li>
+                                if (++index == 2)
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="campaign-list mobile-styling">
+                    <ul>
+                        @{
+                            index = 0;
+                            foreach (var item in disclosureData.Documents.Skip(2))
+                            {
+                                var description = item.Value("Title").ToString();
+                                var downloadlink = ((ContentModels.File)item.Value("file")).Url;
+                                <li>
+                                    <div class="row no-gutter download-item first">
+                                        <div class="col-sm-9">
+                                            <div class="download-descr">@description</div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <a href="@downloadlink" target="_blank" class="download-btn">Download</a>
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="margin-top-30 visible-xs"></div>
+        <h3 class="text-center margin-top-20">Addition</h3>
+        <div class="margin-top-30 visible-xs"></div>
+        <div class="row margin-top-20">
+            <div class="col-sm-6">
+                <div class="campaign-list mobile-styling">
+                    <ul>
+                        @{
+                            index = 0;
+                            foreach (var item in additionData.Documents)
+                            {
+                                var description = item.Value("Title").ToString();
+                                var downloadlink = ((ContentModels.File)item.Value("file")).Url;
+                                <li>
+                                    <div class="row no-gutter download-item first">
+                                        <div class="col-sm-9">
+                                            <div class="download-descr">@description</div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <a href="@downloadlink" target="_blank" class="download-btn">Download</a>
+                                        </div>
+                                    </div>
+                                </li>
+                                if (++index == 3)
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="campaign-list mobile-styling">
+                    <ul>
+                        @{
+                            index = 0;
+                            foreach (var item in additionData.Documents.Skip(3))
+                            {
+                                var description = item.Value("Title").ToString();
+                                var downloadlink = ((ContentModels.File)item.Value("file")).Url;
+                                <li>
+                                    <div class="row no-gutter download-item first">
+                                        <div class="col-sm-9">
+                                            <div class="download-descr">@description</div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <a href="@downloadlink" class="download-btn">Download</a>
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="margin-top-100"></div>
+    </div>
+</div>

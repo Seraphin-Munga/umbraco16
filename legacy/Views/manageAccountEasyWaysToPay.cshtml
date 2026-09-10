@@ -1,0 +1,42 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageManageYourAccount>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using System.Text.RegularExpressions
+
+@{
+    Layout = "Master.cshtml";
+    // All Current Page Children
+    var Children = Model.Children;
+    // Get specific Children
+    var heroHeader = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroBody = Children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    var tabGroup = heroBody.Children(x => x.ContentType.Alias.ToLower() == "tabgroup").FirstOrDefault();
+    var tabHeader = tabGroup.Children(xx => xx.ContentType.Alias.ToLower() == "tabheader").FirstOrDefault();
+    var tabBody = (TabBody)tabHeader.Children(cc => cc.ContentType.Alias.ToLower() == "tabbody").FirstOrDefault();
+}
+
+<style type="text/css">
+    @@media only screen and (max-width:991px) {
+        .payments-description-section .row .description {
+            max-width: 100%;
+            padding-left: 0px;
+        }
+
+        .card-plain {
+            border-radius: 4px;
+            background-color: #fff;
+            padding: 12px;
+            text-align: center;
+            height: 100%;
+            max-width: 370px;
+            margin: 0 auto;
+        }
+    }
+</style>
+
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+<!-- HERO CONTINUED-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+<!-- HERO BODY -->
+@Html.Partial("_cardRenderDescribedCards", tabBody as ContentModels.TabBody)

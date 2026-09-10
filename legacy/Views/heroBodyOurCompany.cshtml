@@ -1,0 +1,1323 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage<ContentModels.QuickLoans>
+@using ContentModels = Umbraco.Web.PublishedContentModels;
+@using AfricanBank.Cms.Portal.Helpers;
+@using Umbraco.Core;
+@using AcfAfricanbank.Core.Utilities
+@using acf_africanbankv1.Helpers
+@using System.Web.Optimization
+@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+<style>
+
+    .quick-loan {
+        background: #002b60;
+        margin-bottom: 12px;
+    }
+
+    .sw-toolbar-bottom {
+        width: auto;
+        position: absolute;
+        bottom: -27%;
+        text-align: center;
+        z-index: 1;
+        left: 0;
+        right: 0px;
+    }
+
+    #quick-background {
+        background-repeat: no-repeat;
+        position: absolute;
+        width: 100%;
+        height: 80%;
+        z-index: -1;
+    }
+
+    .wizad-container {
+        height: 670px;
+        position: relative;
+    }
+
+        .wizad-container i.form-control-feedback {
+            right: -30px !important;
+        }
+
+    .sw-container.tab-content {
+        height: 57vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        min-height: unset !important;
+    }
+
+    .form-field.row {
+        margin: 0px;
+    }
+
+    #ui-datepicker-div {
+        background: grey !important;
+    }
+
+    .form-field-hide {
+        display: none;
+    }
+
+    .form-field {
+        width: 100%;
+    }
+
+    .otp-btn {
+        background: none;
+        border-radius: 2px;
+        border-color: #7289A6;
+        font-size: 14px;
+        margin-top: 7%;
+    }
+
+    .form-field label {
+        color: black;
+        font-weight: 300;
+        margin: 8px 0px 3px 0px;
+        display: inline-block;
+    }
+
+    .form-field .col-md-3 {
+        margin-right: 5%;
+    }
+
+    #smartwizard .nav-tabs > li > a,
+    #smartwizard .nav-tabs > li.active > a,
+    #smartwizard .nav-tabs > li.active > a:hover,
+    #smartwizard .nav-tabs > li.active > a:focus,
+    #smartwizard .nav-tabs > li > a:hover {
+        background: none;
+        border: none;
+        padding-top: 0px;
+        padding-bottom: 0px;
+        text-align: left;
+        float: left;
+    }
+
+    #step-1, #step-2, #step-3 {
+        padding: 0px 26px 0px 26px;
+    }
+
+    .sw-theme-arrows > ul.step-anchor > li {
+        width: 20%;
+        padding: 5px;
+        border-bottom: 1px solid #ddd;
+        margin-right: 0%;
+        text-align: center;
+    }
+
+    .btn-toolbar.mr-2 {
+        position: relative;
+        width: 100% !important;
+        display: inline-block;
+        float: right;
+    }
+
+    .nav-item.done {
+        border-bottom: solid 5px #88bc47 !important;
+    }
+
+    .step-anchor {
+        border: none;
+    }
+
+        .step-anchor .active p {
+            color: #88bc47;
+            font-weight: 600;
+        }
+
+        .step-anchor .active {
+            border-bottom: solid 5px #88bc47 !important;
+            padding: 5px !important;
+        }
+
+    #bank-search, #employer-search {
+        background: white;
+        position: absolute;
+        width: 100%;
+        z-index: 3;
+        height: 150px;
+        overflow: auto;
+        padding-top: 5px;
+        border: solid 1px gainsboro;
+        margin-top: 2px;
+        box-shadow: 0px 0px 11px -4px #000000;
+        display: none;
+    }
+
+        #bank-search ul, #employer-search ul {
+            list-style: none;
+            margin: 0px;
+            padding: 0px;
+        }
+
+            #bank-search ul li, #employer-search ul li {
+                border-bottom: solid 1px gainsboro;
+                padding-left: 10px;
+                cursor: pointer;
+            }
+
+    #call_me_back {
+        float: left;
+        display: inline-block;
+        width: 90%;
+    }
+
+    .sw-btn-next, .sw-btn-prev {
+        background-color: #4C6A8F;
+        padding: 15px;
+        color: white;
+        display: inline-block;
+        float: right !important;
+        border-radius: 0px;
+        font-size: 16px;
+        text-align: center;
+        font-weight: normal;
+        box-shadow: 0 20px 40px 0 rgba(0, 0, 0, .2);
+        -webkit-font-smoothing: antialiased;
+        transition: all 1s ease;
+        display: inline-block;
+        cursor: pointer;
+        width: 165px;
+    }
+
+    .sw-btn-next {
+        text-align: left;
+        padding-left: 15px;
+        padding-right: 5px;
+    }
+
+    .sw-btn-prev {
+        padding-left: 5px;
+        padding-right: 15px;
+        text-align: right;
+    }
+
+    .sw-btn-next:after {
+        font-family: FontAwesome;
+        content: "\f054";
+        float: right;
+    }
+
+    #terminate-quick-loan span {
+        width: 3px;
+        height: 47px;
+        margin-left: 5px;
+        display: inline-block;
+        background: grey;
+    }
+
+    #terminate-quick-loan {
+        width: 220px;
+        display: inline-block;
+        float: right;
+    }
+
+    .sw-btn-prev:before {
+        font-family: FontAwesome;
+        content: "\f053";
+        float: left;
+    }
+
+    .quick-parallelogram {
+        height: 111px;
+        transform: skew(20deg);
+        left: -98px;
+        border-top: solid 10px #88bc47;
+        background-color: #002b60;
+    }
+
+    #quick-flat-bottom {
+        position: fixed;
+        left: -50px;
+        width: 100%;
+        bottom: 0px;
+    }
+
+    .quick-content .badge {
+        padding: 8px;
+        border-radius: 50%;
+        width: 35px;
+        background-color: #88bc47;
+        font-size: 16px;
+        margin: 0px 9px;
+    }
+
+    .quick-content h1 {
+        font-size: 25px;
+    }
+
+    .quick-content {
+        top: 0px;
+        text-align: center;
+        margin-left: -18PX;
+        color: white;
+        transform: skew(-20deg);
+        padding-left: -15%;
+    }
+
+    .wizard {
+        width: 100%;
+        box-shadow: 0 2px 6px 0 rgba(69,73,91,.08);
+        margin-top: 10px;
+        height: inherit;
+        position: relative;
+    }
+
+    #quick-drop-off {
+        position: absolute;
+        z-index: 1;
+        background-color: #002b60;
+        width: inherit;
+        height: inherit;
+        padding-top: 10%;
+        display: none;
+    }
+
+        #quick-drop-off, #quick-drop-off h4,
+        #quick-drop-off, #quick-drop-off label {
+            color: white;
+        }
+
+    #terminate-process {
+        text-align: center;
+    }
+
+    #terminate-process,
+    #terminate-to-call-me {
+        width: 70%;
+        margin: auto;
+        display: none;
+    }
+
+    .step-anchor {
+        height: auto;
+        width: 100%;
+        position: relative;
+        display: block;
+    }
+
+        .step-anchor .badge {
+            padding: 7px;
+            height: 40px;
+            border-radius: 50%;
+            width: 40px;
+            font-size: 20px;
+        }
+
+        .step-anchor .nav-item span.badge-done {
+            background: #88bc47;
+            color: white;
+        }
+
+        .step-anchor .nav-item a, .step-anchor .nav-item p {
+            display: inline-block;
+        }
+
+        .step-anchor .nav-item span {
+            background: white;
+            color: #88bc47;
+            border: solid;
+            margin-right: 5px;
+        }
+
+        .step-anchor .nav-item p {
+            margin-top: 15px;
+            font-size: 14px;
+            width: 140px;
+        }
+
+    .badge-done {
+        background-color: #88bc47;
+    }
+
+    .quick-offer {
+        box-shadow: 0px 0px 10px -3px #000000;
+        width: 350px;
+        text-align: center;
+        height: 135px;
+        border-radius: 8px;
+        margin: auto;
+        margin-top: 5%;
+        margin-bottom: 5%;
+    }
+
+    .quick-offer-content .form-group {
+        margin-bottom: 5%;
+    }
+
+    .quick-offer-option span {
+        background: white;
+        color: black;
+        display: block;
+        margin-top: 69px;
+        text-align: center;
+        position: absolute;
+        left: -25px;
+        padding: 5px;
+        font-size: 25px;
+    }
+
+    .quick-offer-option {
+        display: inline-block;
+        background: #E6E6E6;
+        height: 200px;
+        width: 1%;
+        float: left;
+        position: relative;
+    }
+
+    .quick-offer-smile {
+        margin-bottom: 5%;
+        margin-left: 5%;
+    }
+
+    .option-register {
+        margin-left: 40px;
+    }
+
+    .option-signin {
+        margin-right: 6px;
+    }
+
+        .option-register a, .option-signin a {
+            width: 145px;
+        }
+
+        .option-signin p, .option-register p {
+            line-height: 1.9;
+        }
+
+    .quick-offer-content {
+        width: 55%;
+        margin: auto;
+        text-align: center;
+        padding-top: 3%;
+    }
+
+    .quick-offer p, .quick-offer h5 {
+        line-height: 1.5;
+    }
+
+    .quick-offer h3 {
+        padding-top: 10px;
+        color: #88bc47;
+        font-weight: bold;
+    }
+
+    .expense-modal .modal-content {
+        border-radius: 0px !important;
+    }
+
+    .expense-modal .modal-header {
+        background: none !important;
+    }
+
+        .expense-modal .modal-header h4 {
+            font-size: 30px !important;
+            text-align: left !important;
+            color: #BCBCBC !important;
+            font-weight: 900 !important;
+        }
+
+    .expense-modal .help-block {
+        text-align: left !important;
+    }
+
+    .expense-modal label {
+        color: #858585;
+        display: block !important;
+        text-align: left;
+        font-weight: 400;
+    }
+
+    .expense-modal .modal-footer {
+        background: #002B60 !important;
+        color: white !important;
+    }
+
+        .expense-modal .modal-footer button {
+            background: #003B84 !important;
+        }
+
+    #quick-total-block {
+        font-size: 25px;
+    }
+
+    .expense-modal {
+        margin-top: 5%;
+    }
+
+    #quick-total {
+        font-size: 34px;
+        font-weight: 900;
+        margin-left: 5%;
+    }
+
+    .form-field.row {
+        margin: 0px;
+    }
+
+    .form-field-hide {
+        display: none;
+    }
+
+    .form-field {
+        width: 100%;
+    }
+
+    .pause-form .loader {
+        margin-top: 10%;
+    }
+
+    .form-preloader-title {
+        color: white;
+    }
+
+    .pause-form {
+        top: 0px;
+        left: 0px;
+        background: #002b60;
+        opacity: 0.8;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        z-index: 3;
+        display: none;
+    }
+
+    .form-group {
+        margin-bottom: 20px !important;
+    }
+
+    #frmStep2_2 .form-control {
+        width: 85%;
+    }
+
+    #frmStep2_2 .form-group i {
+        right: 10px !important;
+    }
+
+    .sw-btn-next:hover, .sw-btn-prev:hover, #call_me_back:hover {
+        background: #858585;
+        color: white;
+    }
+
+    .sw-btn-prev {
+        display: none;
+    }
+
+    input:focus {
+        border-color: #88bc47 !important;
+        box-shadow: inset 0 0px 0px #88bc47, 0 0 0px #88bc47 !important
+    }
+
+    .wizad-container i.form-control-feedback.glyphicon-remove {
+        color: #a94442 !important;
+    }
+
+    .wizad-container i.form-control-feedback.glyphicon-ok {
+        color: #88bc47 !important;
+    }
+
+    .form-field input::placeholder {
+        color: #C1C1C2 !important;
+    }
+
+    .form-field .glyphicon {
+        top: 34px !important;
+        color: #C1C1C1;
+    }
+
+    .help-block {
+        margin-top: 1px !important;
+        background: none !important;
+        color: #a94442 !important;
+        padding: 0px 7px 15px 9px !important;
+    }
+
+    @@media only screen and (max-width: 1366px),screen and (max-height: 736px) {
+        .quick-content h1 {
+            font-size: 22px;
+            margin-top: 10px;
+        }
+
+        .sw-container.tab-content {
+            height: 54vh;
+        }
+
+        .btn-toolbar.mr-2 {
+            width: 45%;
+        }
+    }
+    /*#region Extra large devices (large desktops, 1200px and up)*/
+    @@media (min-width: 1200px) {
+    }
+    /*#endregion*/
+
+    /*#region Large devices (desktops, 992px and up)*/
+    @@media (min-width: 992px) and (max-width: 1199.98px) {
+        /*#region --quick loans page*/
+        .nav-tabs > li > a {
+            text-align: center;
+        }
+
+        .step-anchor .nav-item p {
+            margin-top: 5px;
+            padding-left: 0px;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .step-anchor .nav-item span {
+            display: inline-block;
+            float: none;
+        }
+
+        .quick-content {
+            margin-left: 7%;
+        }
+
+        #quick-background {
+            background: none !important;
+        }
+
+        .sw-container.tab-content {
+            height: 46vh;
+        }
+
+        .quick-offer-content {
+            width: 66%;
+        }
+        /*#endregion*/
+    }
+    /*#endregion*/
+
+    /*#region Medium devices (tablets, 768px and up)*/
+    @@media (max-width: 768px) {
+        /*#region --quick loans page*/
+        .quick-offer-content .button {
+            box-shadow: 0 3px 10px 0 rgba(0,0,0,.2);
+        }
+
+        .quick-offer-smile {
+            margin-left: 0px;
+        }
+
+        .quick-offer-option {
+            display: inline-block;
+            width: 100%;
+            height: 1px;
+            margin-top: 35px;
+            margin-bottom: 30px;
+        }
+
+            .quick-offer-option span {
+                display: inline-block;
+                margin-top: -20px;
+                text-align: center;
+                position: relative;
+                left: unset;
+                padding: 5px;
+                font-size: 25px;
+            }
+
+        .btn-toolbar.mr-2 {
+            width: 50%;
+        }
+
+        .sw-container.tab-content {
+            height: 75vh;
+        }
+
+        .sw-toolbar-bottom {
+            margin-left: 0%;
+            bottom: -18%;
+        }
+
+        .quick-content h1 {
+            font-size: 20px;
+        }
+
+        .quick-content {
+            margin-left: 9%;
+        }
+
+        .step-anchor .nav-item p {
+            display: none;
+        }
+
+        .sw-theme-arrows > ul.step-anchor > li {
+            width: 17%;
+        }
+
+            .sw-theme-arrows > ul.step-anchor > li.active a {
+                text-align: left;
+            }
+
+            .sw-theme-arrows > ul.step-anchor > li.active p {
+                width: auto;
+                display: initial;
+            }
+
+            .sw-theme-arrows > ul.step-anchor > li.active {
+                width: 30%;
+            }
+
+        .sw-btn-next, .sw-btn-prev {
+            width: 115px;
+        }
+
+        .quick-parallelogram {
+            width: 320px;
+        }
+
+        #terminate-quick-loan {
+            width: 150px;
+        }
+
+        #call_me_back {
+            width: 90%;
+            padding-left: 0px;
+            padding-right: 0px;
+        }
+        /*#endregion*/
+    }
+    /*#endregion*/
+
+    /*#regionSmall devices (landscape phones, 576px and up)*/
+    @@media(max-width: 576px) {
+        /*#region --quick loans page*/
+        .wizad-container {
+            padding: 0px;
+        }
+
+        .step-anchor {
+            position: fixed;
+            background: white;
+            z-index: 1;
+        }
+
+        .quick-offer {
+            width: 270px;
+        }
+
+        .wizard {
+            margin-top: 0px;
+            box-shadow: none;
+        }
+
+        .quick-offer-item .item {
+            padding-left: 20px;
+        }
+
+        .quick-offer-item li {
+            width: 210px;
+        }
+
+        #quick-flat-bottom {
+            left: 0px;
+            width: 100%;
+            background: #002b60;
+            border-top: none;
+            background-color: #002b60;
+            height: 75px;
+        }
+
+        .sw-container.tab-content {
+            padding-top: 15%
+        }
+
+        .quick-parallelogram {
+            display: none;
+        }
+
+        .quick-content h1 {
+            font-size: 17px;
+        }
+
+        .quick-content {
+            margin-left: 1%;
+            width: 200px;
+        }
+
+        .sw-toolbar-bottom {
+            width: 100%;
+            bottom: 10px;
+            text-align: center;
+            margin-left: 0px;
+            position: fixed;
+        }
+
+        .sw-btn-next, .sw-btn-prev {
+            width: 125px;
+        }
+
+        .sw-theme-arrows > ul.step-anchor > li {
+            width: 12%;
+        }
+
+            .sw-theme-arrows > ul.step-anchor > li.active a {
+                padding-bottom: 2px;
+            }
+
+            .sw-theme-arrows > ul.step-anchor > li a {
+                padding-right: 0px;
+                padding-bottom: 7px;
+            }
+
+            .sw-theme-arrows > ul.step-anchor > li.active p {
+                font-size: 14px;
+                padding-left: 0px;
+            }
+
+        .step-anchor .nav-item span {
+            margin-right: 0px;
+        }
+
+        .btn-toolbar.mr-2 {
+            margin-right: 2%;
+        }
+
+        .sw-theme-arrows > ul.step-anchor > li.active {
+            width: 50%;
+        }
+
+        #terminate-quick-loan {
+            width: 138px;
+        }
+
+            #terminate-quick-loan span {
+                display: none;
+            }
+
+        #call_me_back {
+            width: 100%;
+        }
+
+        .option-register {
+            margin-left: 0px;
+        }
+
+        .step-anchor .badge {
+            padding: 10px;
+            border-radius: 50%;
+            width: 40px;
+            font-size: 14px;
+        }
+        /*#endregion*/
+    }
+    /*#endregion*/
+
+    /*#region portrait Extra small devices (portrait phones, less than 576px)*/
+    @@media (max-width: 575.98px) {
+        /*#region --quick loans page*/
+        .wizad-container {
+            height: 580px;
+        }
+
+        .sw-btn-next, .sw-btn-prev {
+            width: 103px;
+        }
+
+        #terminate-quick-loan {
+            width: 130px;
+        }
+        /*#endregion*/
+        .quick-offer-content {
+            width: 82%;
+        }
+
+        .chest-images {
+            width: 100%;
+        }
+        /*#endregion*/
+    }
+    /*#endregion*/
+</style>
+@{
+    Layout = "MasterHeaderOnly.cshtml";
+
+    var Children = Model.Content.Children;
+
+    // Get specific Children
+    var HeroHeader = Children?.Where(c => c.DocumentTypeAlias.ToLower() == "heroheader").FirstOrDefault();
+    var dropOff = Children?.Where(c => c.DocumentTypeAlias.ToLower() == "pagepopup").FirstOrDefault();
+    var heroBody = Children?.Where(c => c.DocumentTypeAlias.ToLower() == "herobody").FirstOrDefault();
+    var login = heroBody.Children.Where(c => c.Name == "Login").FirstOrDefault() as Link;
+    var register = heroBody.Children.Where(c => c.Name == "Register").FirstOrDefault() as Link;
+    var quickTitle = heroBody.GetPropertyValue("bodyTitle");
+    var quickBody = heroBody.GetPropertyValue("richTextBox"); ;
+
+    var dts = ApplicationContext.Current.Services.DataTypeService;
+
+    var salaryFrequencyDropdownId = 5389;
+    var bankDropdownId = 5390;
+    var bankStatementsDropdownId = 5391;
+    var employmentSectorDropdownId = 5382;
+    var childMaintenanceDropdownId = 5395;
+
+    var terminateProcess = dropOff.Children.Where(c => c.Name == "Terminate process").FirstOrDefault() as DocumentTypeTitleAndDescription;
+    var terminateToCall = dropOff.Children.Where(c => c.Name == "Call me back").FirstOrDefault() as DocumentTypeTitleAndDescription; ;
+
+    var heroHeaderImage = HeroHeader.GetPropertyValue<IPublishedContent>("image")?.Url;
+
+    @*foreach (var data in dropOff.Children)
+        {
+            <span>Child name @data</span>
+        }*@
+}
+<!-- BODY -->
+<div class="wizad-container container">
+    <!--Start-------------drop off popup------------------->
+    <div id="quick-drop-off">
+        <div id="terminate-process">
+            <h4>@terminateProcess.BodyTitle</h4>
+            <p>@terminateProcess.BodyDescription</p>
+            <a class="button secondary" href="/">Find Branch</a>
+        </div>
+
+        <div id="terminate-to-call-me">
+            <p>@terminateToCall.BodyDescription</p>
+            <form>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="call-id">SOUTH AFRICAN ID</label>
+                            <input type="text" class="form-control" id="call-id">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="call-number">CELLPHONE NUMBER</label>
+                            <input type="text" class="form-control" id="call-number">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+    <!--END-------------drop off popup------------------->
+
+    @{ var quickLoanForm = Model.Content; }
+    <div ng-cosdsdntroller="Expense">
+        <!--START-----------Submition pause---------------->
+        <section id="form-preloader" class="pause-form">
+            <div class="loader" id="form-preloader-loader">
+                <div class="loader-img"></div>
+            </div>
+            <h4 class="form-preloader-title align-center">Please wait...</h4>
+        </section>
+        <!--END-------------Submittion pause--------------->
+        <!-- SmartWizard html -->
+        <div id="smartwizard" class="wizard">
+            <ul>
+                <li>
+                    <a href="#step-1">
+                        <span class="badge">@quickLoanForm.GetPropertyValue("step1Name")</span>
+                        <p>@quickLoanForm.GetPropertyValue("step1ShortDescription")</p>
+                    </a>
+                </li>
+                <li><a href="#step-2"><span class="badge">@quickLoanForm.GetPropertyValue("step2Name")</span><p>@quickLoanForm.GetPropertyValue("step2ShortDescription")</p></a></li>
+                <li><a href="#step-3"><span class="badge">@quickLoanForm.GetPropertyValue("step3Name")</span><p>@quickLoanForm.GetPropertyValue("step3ShortDescription")</p></a></li>
+                <li><a href="#step-4"><span class="badge">@quickLoanForm.GetPropertyValue("step4Name")</span><p>@quickLoanForm.GetPropertyValue("step4ShortDescription")</p></a></li>
+                <li><a href="#step-5"><span class="badge">@quickLoanForm.GetPropertyValue("step5Name")</span><p>@quickLoanForm.GetPropertyValue("step5ShortDescription")</p></a></li>
+            </ul>
+
+            <div>
+
+
+                <div id="step-1">
+                    @*<small class="border-bottom border-gray pb-2">@quickLoanForm.GetPropertyValue("step1Heading")</small>*@
+                    <div class="form-field row">
+                        <form id="frmStep1">
+                            @Html.AntiForgeryToken()
+                            <div class="form-field row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansIDNumber").ToString())</label>
+                                        <input type="text" id="idNumber" name="idNumber" class="form-control" placeholder="@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansIDNumber").ToString())">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansCellphoneNo").ToString())</label>
+                                        <input type="text" id="telephoneNumber" name="telephoneNumber" class="form-control" placeholder="@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansCellphoneNo").ToString())"
+                                               required maxlength="12">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <form id="frmStep1_1">
+                            @Html.AntiForgeryToken()
+                            <div class="form-field row form-field-hide">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource("title")</label>
+                                        <select id="title" name="title" class="form-control">
+                                            <option selected value="">Select title</option>
+                                            <option value="MR">Mr</option>
+                                            <option value="Mrs">Mrs</option>
+                                            <option value="MISS">Miss</option>
+                                        </select>
+                                        <span class="glyphicon glyphicon-menu-down form-control-feedback"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansName").ToString())</label>
+                                        <input type="text" id="firstName" name="firstName" class="form-control" placeholder="@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansName").ToString())">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-field row form-field-hide">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansSurname").ToString())</label>
+                                        <input type="text" id="surname" name="surname" class="form-control" placeholder="@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansSurname").ToString())">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansEmail").ToString())</label>
+                                        <input type="email" id="email" name="email" class="form-control" placeholder="@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansEmail").ToString())">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-field row">
+                                <div class="form-field row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <input id="cbx" name="frmStep1.cbx" class="cbx-cover" type="checkbox" />
+                                            <label class="cbx" for="cbx"></label>
+                                            <label class="lbl" for="cbx">@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansProductMarketInfo").ToString()) </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div id="step-2">
+                    @*<small class="border-bottom border-gray pb-2">@quickLoanForm.GetPropertyValue("step3Heading")</small>*@
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p id="otp-sucess"><span id="quick-otp"></span></p>
+                            <p>@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansOneTimePinMessage").ToString())</p>
+                        </div>
+                        <form id="frmStep2">
+                            @Html.AntiForgeryToken()
+                            <div class="form-field row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansOneTimePIN").ToString())</label>
+                                        <input type="text" id="oneTimePIN" name="oneTimePIN" class="form-control" placeholder="@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansOneTimePIN").ToString())">
+                                    </div>
+                                    <small class="error-message incorrect-otp">Please enter the correct OTP</small>
+                                </div>
+                            </div>
+                            <div class="form-field row ">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <button id="resend-otp" class="btn btn-lg otp-btn">Resend OTP</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div id="step-3" ng-cosdsdntroller="Expense">
+                    @*<small class="border-bottom border-gray pb-2">@quickLoanForm.GetPropertyValue("step2Heading")</small>*@
+                    <div class="row">
+                        <form id="frmStep3">
+                            @Html.AntiForgeryToken()
+                            <div class="form-field row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansEmploymentSector").ToString())</label>
+
+                                        <select id="employeeType" name="employeeType" class="form-control">
+                                            <option selected value="RET">Private</option>
+                                            <option value="PER">Persal</option>
+                                        </select>
+                                        <span class="glyphicon glyphicon-menu-down form-control-feedback"></span>
+
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansEmployer").ToString())</label>
+                                        <input type="text" id="employerName" name="employerName" class="form-control search" data-search="#employerName,#employeeType*/umbraco/surface/QuickLoans/SearchEmployer*#employer-result*employee*name*employer_selection*#employer-search">
+                                        <input type="hidden" id="employerReference"/>
+                                        <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                                        <div id="employer-search">
+                                            <ul id="employer-result"></ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource("EmploymentStatus")</label>
+                                        <select id="occupationStatus" name="occupationStatus" class="form-control">
+                                            <option value="">Selecet occupation status </option>
+                                            <option value="Ful">Full time</option>
+                                            <option value="PT">Part time</option>
+                                        </select>
+                                        <span class="glyphicon glyphicon-menu-down form-control-feedback"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-field row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansEmploymentStartDate").ToString())</label>
+                                        <input type="text" id="start-date" name="employmentStartDate" class="form-control" placeholder="@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansEmploymentStartDate").ToString())">
+                                        <span class="glyphicon glyphicon-calendar form-control-feedback"></span>
+                                    </div>
+                                </div>
+                                <div id="emp-end-date" class="col-md-3 form-field-hide">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource("EmploymentEndDate").ToString()</label>
+                                        <input type="text" id="end-date" name="employmentEndDate" class="form-control" placeholder="@ResourceHelper.GetResource("EmploymentEndDate").ToString()">
+                                        <span class="glyphicon glyphicon-calendar form-control-feedback"></span>
+
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansSalaryFrequencyLabel").ToString())</label>
+                                        <select id="wageType" name="wageType" class="form-control">
+                                            <option value="">Select wage type</option>
+                                            <option value="M">Monthly</option>
+                                            <option value="W">Weekly</option>
+                                        </select>
+                                        <span class="glyphicon glyphicon-menu-down form-control-feedback"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-field row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansBankLabel").ToString())</label>
+                                        <input type="text" id="bank" name="bank" class="form-control search" data-search="#bank*/umbraco/surface/QuickLoans/SearchBank*#bank-result*bankBranches*bankName*bank_selection*#bank-search">
+                                        <input type="hidden" id="bankCode" />
+                                        <input type="hidden" id="branchCode" />
+                                        <div id="bank-search">
+                                            <ul id="bank-result"></ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-field row">
+                                <div id="get-statement" class="col-md-3 form-field-hide">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansBankStatementLabel").ToString())</label>
+                                        <select id="bankStatement" name="bankStatement" class="form-control">
+                                            <option value="">Bank statement</option>
+                                            <option value="Yes">Yes</option>
+                                            <option value="No">No</option>
+                                        </select>
+                                        <span class="glyphicon glyphicon-menu-down form-control-feedback"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansGrossSalaryBeforeTax").ToString())</label>
+                                        <input type="text" id="GrossSalaryBeforeTaxInput" name="grossSalaryBeforeTax" class="form-control" placeholder="@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansGrossSalaryBeforeTax").ToString())"
+                                               required maxlength="20">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansNetIncome").ToString())</label>
+                                        <input type="text" id="NetIncomeInput" name="netIncome" class="form-control" placeholder="@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansNetIncome").ToString())"
+                                               required maxlength="20">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansLivingExpense").ToString())</label>
+                                        <input type="text" id="livingExpense" name="livingExpense" class="form-control" placeholder="@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansLivingExpense").ToString())">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-field row">
+                                <div class="col-md-12">
+                                    @quickLoanForm.GetPropertyValue("quickLoansReferenceCheckWarning")
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div id="step-4">
+                    <div class="row">
+                        <form id="frmStep3">
+                            @Html.AntiForgeryToken()
+                            <div class="quick-offer-content">
+                                <p>
+                                    Thanks <span class="customer-name">Shaun</span>. Your estimated credit offer is shown below.<br /> The final offer
+                                    might change depending on a full credit evaluation process.
+                                </p>
+                                <div class="quick-offer">
+                                    <h3>R <span id="amount"></span></h3>
+                                    <h5>
+                                        Repayment<br /> Only R<span id="installment"></span> per month
+                                        <br />for <span id="term"></span> months
+                                    </h5>
+                                </div>
+                                <div class="form-group">
+                                    <input id="terms" class="cbx-cover" type="checkbox">
+                                    <label class="cbx" for="terms"></label>
+                                    <label class="lbl" for="terms">Accept terms and conditions</label>
+                                </div>
+                                <div class="form-group">
+                                    <a href="#accept" id="index_offer" class="button primary">Accept offer</a>
+                                </div>
+                                <div class="form-group">
+                                    <a href="#">Not right now</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div id="step-5">
+                    <div class="quick-offer-content">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <span class="fa fa-smile-o fa-5x quick-offer-smile"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="option-signin">
+                                    <p>
+                                        @login.PageSection
+                                    </p>
+                                    <a class="button secondary" href="@login.UrlLink.FirstOrDefault().Link">@login.Text</a>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="quick-offer-option">
+                                    <span>OR</span>
+                                </div>
+                                <div class="option-register">
+                                    <p>
+                                        @register.PageSection
+                                    </p>
+                                    <a class="button primary" href="@register.UrlLink.FirstOrDefault().Link">@register.Text</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div id="quick-flat-bottom">
+        <div class="row">
+            <div class="col-md-5">
+                <div class="quick-parallelogram">
+                    <div class="quick-content">
+                        <h1>@quickTitle</h1>
+                        @quickBody
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @Html.Partial("_renderPopUpContent", new ContainerViewModel()
+    {
+        HTMLContent = @<text>
+            <div class="modal-body">
+                <form id="frmStep2_2">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="label">@ResourceHelper.GetResource("RentAccommodation")</label>
+                                <input type="text" id="rentAccomodation" name="rentAccomodation" class="form-control expense-add " placeholder="0.00">
+                            </div>
+                            <div class="form-group">
+                                <label class="label">@ResourceHelper.GetResource("Education")</label>
+                                <input type="text" id="education" name="education" class="form-control expense-add" placeholder="0.00">
+                            </div>
+                            <div class="form-group">
+                                <label class="label">@ResourceHelper.GetResource("FoodGroceries")</label>
+                                <input type="text" id="foodGroceries" name="foodGroceries" class="form-control expense-add" placeholder="0.00">
+                            </div>
+                            <div class="form-group">
+                                <label class="label">@ResourceHelper.GetResource("Transportation")</label>
+                                <input type="text" id="transporation" name="transporation" class="form-control expense-add" placeholder="0.00">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="label">@ResourceHelper.GetResource("MedicalExpenses")</label>
+                                <input type="text" id="medicalExpense" name="medicalExpense" class="form-control expense-add" placeholder="0.00">
+                            </div>
+                            <div class="form-group">
+                                <label class="label">@ResourceHelper.GetResource("Other")</label>
+                                <input type="text" id="other" name="other" class="form-control expense-add" placeholder="0.00">
+                            </div>
+                            <div class="form-group">
+                                <label class="label">@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansChildMaintenanceLabel").ToString())</label>
+                                <select id="ChildMaintenanceInput" name="childMaintenance" class="form-control">
+                                    <option selected value="no">No</option>
+                                    <option value="yes">Yes</option>
+                                </select>
+                                <span class="glyphicon glyphicon-menu-down form-control-feedback"></span>
+                            </div>
+                            <div class="form-group" id="childMaintenanceAmountDiv">
+                                <label class="label">@ResourceHelper.GetResource(quickLoanForm.GetPropertyValue("quickLoansChildMaintenanceExpenses").ToString())</label>
+                                <input type="text" id="ChildMaintenanceExpensesInput" name="childMaintenanceExpenses" class="form-control expense-add" placeholder="0.00">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p id="quick-total-block">Total<span id="quick-total"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <a id="quick-save" class="button primary">Save</a>
+                    </div>
+                </div>
+            </div>
+        </text>
+})
+</div>
+<script src="~/Umbraco/lib/moment/moment-with-locales.js"></script>
+<script src="~/Umbraco/lib/datetimepicker/bootstrap-datetimepicker.js"></script>
+
+<script src="~/scripts/smartWizard/jquery.smartWizard.js"></script>
+<script src="~/scripts/jquery-ui.js"></script>
+<script src="~/javascripts/reuse/form_validation.js"></script>
+<script src="~/javascripts/reuse/data_mangement.js"></script>
+<script src="~/javascripts/reuse/date_picker.js"></script>
+<script src="~/javascripts/quick_loan.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.5/validator.min.js"></script>
+
+
+
+<script>
+
+    $(document).ready(function () {
+
+        $(".expense-add").keyup(function () {
+            var sum = 0;
+            $('.expense-add').each(function () {
+                sum += Number($(this).val());
+            });
+            $('#quick-total').html("R " + sum.toString());
+            
+        });
+    });
+    
+
+</script>

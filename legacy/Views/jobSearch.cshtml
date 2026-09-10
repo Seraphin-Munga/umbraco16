@@ -1,0 +1,53 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.JobSearch>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers
+@{
+    Layout = "Master.cshtml";
+    var altTextImage = Model.Value("alternateImageText");
+}
+
+<style>
+    .job-search {
+        width: 100% !important;
+    }
+</style>
+
+<!-- HERO BANNER -->
+<div class="hero-static-container">
+    <div class="container-fluid">
+        <div class="row no-gutter">
+            <div class="col-sm-12">
+                <div class="hero-static-banner" style="background-image: url('/images/hero/ABW1802_001_New_Web_Image_Update_028.jpg');">
+                    <ol class="breadcrumb">
+                        <li class="active">More > Others > Job search</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- HERO CONTINUED-->
+<div class="container">
+    <div class="hero-static-caption">
+        <h1 class="hero-static-title margin-bottom-0">African Bank Careers</h1>
+    </div>
+</div>
+
+<div class="investment-calculator">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8 col-sm-offset-2 text-center">
+                <h2>Job Search</h2>
+                <p class="body-content margin-top-30">
+                    African Bank is made up of people who make a difference in everyday life. We offer extensive possibilities for talented and innovative people to enjoy career paths filled with success and personal growth. Professionals in fields of administration, finance & accounting, project management, legal collections, call centre, sales, information technology, human resources, marketing, auditing, risk management, credit analysis, economics and many more are the core of our excellence.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="margin-top-40 hidden-xs"></div>
+<div class="container margin-top-10">
+    <div class="job-search">
+        <iframe src="https://afb.outsourcefocus.co.za/Careers/" width="100%" height="1100" frameborder="0" style="border:0" allowfullscreen=""></iframe>
+    </div>
+</div>

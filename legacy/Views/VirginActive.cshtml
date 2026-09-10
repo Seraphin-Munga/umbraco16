@@ -1,0 +1,664 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCampaign>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models;
+@using Web.Helpers;
+@{
+    Layout = "Master.cshtml";
+    var children = Model.Children;
+    var viewName = Path.GetFileName(Request.Url.AbsolutePath);
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    ContentModels.TabBody surveyQuestionData = null;
+    ContentModels.TabBody bankingCardData = null;
+    ContentModels.TabBody tabWaysToBank = null;
+    ContentModels.TabBody myWorldTermsAndConditions = null;
+
+    var tabBodyItems = heroBody.Children.OfType<TabBody>
+        ();
+    tabBodyItems.ToList().ForEach(x =>
+    {
+        if (x.Name == "Survey Questions")
+        {
+            surveyQuestionData = (TabBody)x;
+        }
+        else if (x.Value("partialViewName").ToString() == "partialHeroChest")
+        {
+            tabWaysToBank = (TabBody)x;
+        }
+        else if (x.Value("partialViewName").ToString() == "_renderPDFData")
+        {
+            myWorldTermsAndConditions = (TabBody)x;
+        }
+        else
+        {
+            bankingCardData = (TabBody)x;
+        }
+    });
+
+    var sectionCardsContent = (IEnumerable<IPublishedElement>)tabWaysToBank.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+    //var sectionCardsContent = (ICollection<IPublishedContent>)tabWaysToBank.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+
+    var myWorldTAndCs = (IEnumerable<IPublishedElement>)myWorldTermsAndConditions.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+
+    var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
+    var chestTitle = heroChest?.Value("chestTitle").ToString();
+    var chestDescription = heroChest?.Value("chestDescription").ToString();
+    var chestCards = heroChest?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+
+    var _bankingItemsModel = new CustomModels.Benefits
+    {
+        Header = chestTitle,
+        Description = chestDescription,
+        BenefitCards = sectionCardsContent.Select(c => c as Card).ToList()
+    };
+
+    IEnumerable<IPublishedContent>
+        bodyButtons = (IEnumerable<IPublishedContent>
+            )heroBody.Children.Where(c => c is ContentModels.EbankItabstractButton);
+    ContentModels.EbankItabstractButton openNowButton = null;
+    ContentModels.EbankItabstractButton registerNowButton = null;
+    ContentModels.EbankItabstractButton androidDownloadNow = null;
+    ContentModels.EbankItabstractButton iosDownloadNow = null;
+    ContentModels.EbankItabstractButton downloadNow = null;
+
+    foreach (var button in bodyButtons)
+    {
+        if (button.Value("EbankItbuttonText").ToString().Contains("Register / Login"))
+        {
+            openNowButton = (ContentModels.EbankItabstractButton)button;
+        }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("Register Now"))
+        {
+            registerNowButton = (ContentModels.EbankItabstractButton)button;
+
+        }
+
+        else if (button.Value("EbankItbuttonText").ToString().Contains("Android"))
+        {
+            androidDownloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("iOS"))
+        {
+            iosDownloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+        else
+        {
+            downloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+    }
+
+    var openNowButtonLink = "#";
+    openNowButtonLink = string.IsNullOrEmpty(openNowButton?.EbankItbuttonInternalLink?.Url) ?
+    openNowButton?.EbankItbuttonExternalLink :
+    openNowButton.EbankItbuttonInternalLink?.Url;
+    openNowButtonLink = (string.IsNullOrEmpty(openNowButtonLink)) ? "#" : openNowButtonLink;
+
+    var registerNowButtonLink = "#";
+    registerNowButtonLink = string.IsNullOrEmpty(registerNowButton?.EbankItbuttonInternalLink?.Url) ?
+    registerNowButton?.EbankItbuttonExternalLink :
+    registerNowButton.EbankItbuttonInternalLink?.Url;
+    registerNowButtonLink = (string.IsNullOrEmpty(registerNowButtonLink)) ? "#" : registerNowButtonLink;
+
+    var onlineButtonText = registerNowButton.Value("EbankItbuttonText");
+
+    var popupAppTitle = "Download African App using one of the following";
+    var popQRCode = "/media/51852/image001.png";
+    var popAndroidApp = "/media/pt2b4b3q/GooglePlayStoreDownloadImageLink.png";
+    var popIOsApp = "/media/pejn1h1x/appstoredownloadimagelink.png";
+}
+<style type="text/css">
+    .margin-bottom-20 {
+        margin-bottom: 20px !important;
+    }
+
+    .has-feedback label ~ .form-control-feedback {
+        top: 6px;
+    }
+
+    .error {
+        color: red;
+    }
+
+    /*#sendOptOut {
+                                background-color: #88bc47;
+                                border: none;
+                            }*/
+
+    .form-horizontal .control-label {
+        text-align: unset;
+    }
+
+    .hang-tight {
+        display: none;
+    }
+
+    .hero-description {
+        display: none !important;
+    }
+
+    .switch-content-view > p {
+        display: block;
+        font-size: 28px;
+        font-weight: 800;
+    }
+
+    label {
+        text-transform: none;
+    }
+
+    .campaign-button {
+        padding: 16px 35px;
+        font-size: 16px;
+        color: #88bc47;
+        text-align: center;
+        font-weight: normal;
+        -webkit-font-smoothing: antialiased;
+        transition: all 1s ease;
+        display: inline-block;
+        cursor: pointer;
+        background: none;
+        text-decoration: underline;
+    }
+
+        .campaign-button:hover {
+            color: white;
+        }
+
+    .title-text {
+        margin-top: 14px;
+        margin-bottom: 40px;
+        text-align: center;
+        font-size: 32px;
+        font-weight: 500;
+    }
+
+    .campaign-textarea-color {
+        color: #002b60;
+    }
+
+    li:hover {
+        transition: 0.3s;
+        color: #88bc47;
+        font-size: large;
+    }
+
+    li {
+        transition: 0.3s;
+    }
+
+    .dropdown-styleset {
+        text-align: center;
+        padding: unset;
+    }
+
+    .hr-styleset {
+        margin: 5px 0px 5px 5px;
+        text-align: center;
+        margin-right: 6%;
+        margin-left: 6%;
+        border-color: #1717175c;
+    }
+
+    .wrapper-dropdown-3 {
+        position: relative;
+        margin: 0 auto;
+        padding: 10px;
+        background: #001e44;
+        border-radius: 7px;
+        border: 1px solid rgba(0,0,0,0.15);
+        box-shadow: 0 1px 1px rgba(50,50,50,0.1);
+        cursor: pointer;
+        outline: none;
+        font-weight: bold;
+        color: #ffffff;
+        right: 0px;
+    }
+
+        .wrapper-dropdown-3 .dropdown {
+            position: absolute;
+            top: 140%;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: #507096;
+            color: #f1f3f0;
+            border-radius: inherit;
+            border: 1px solid rgba(0, 0, 0, 0.24);
+            box-shadow: 1px 2px 10px rgba(0,0,0,0.5);
+            font-weight: normal;
+            -webkit-transition: all 0.5s ease-in;
+            -moz-transition: all 0.5s ease-in;
+            -ms-transition: all 0.5s ease-in;
+            -o-transition: all 0.5s ease-in;
+            transition: all 0.5s ease-in;
+            list-style: none;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+            .wrapper-dropdown-3 .dropdown:after {
+                content: "";
+                width: 0px;
+                height: 0px;
+                position: absolute;
+                bottom: 100%;
+                right: 54px;
+                border-width: 0px 9px 13px 8px;
+                border-style: solid;
+                border-color: #507096 transparent;
+            }
+
+            .wrapper-dropdown-3 .dropdown:before {
+            }
+
+            .wrapper-dropdown-3 .dropdown li a {
+                display: block;
+                padding: 10px;
+                text-decoration: none;
+                color: #8aa8bd;
+                border-bottom: 1px solid #e6e8ea;
+                box-shadow: inset 0 1px 0 rgba(255,255,255,1);
+                -webkit-transition: all 0.3s ease-out;
+                -moz-transition: all 0.3s ease-out;
+                -ms-transition: all 0.3s ease-out;
+                -o-transition: all 0.3s ease-out;
+                transition: all 0.3s ease-out;
+            }
+
+            .wrapper-dropdown-3 .dropdown li i {
+                float: right;
+                color: inherit;
+            }
+
+            .wrapper-dropdown-3 .dropdown li:first-of-type a {
+                border-radius: 7px 7px 0 0;
+            }
+
+            .wrapper-dropdown-3 .dropdown li:last-of-type a {
+                border: none;
+                border-radius: 0 0 7px 7px;
+            }
+            /* Hover state */
+            .wrapper-dropdown-3 .dropdown li:hover a {
+                background: #f3f8f8;
+            }
+        /* Active state */
+        .wrapper-dropdown-3.active .dropdown {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    /* No CSS3 support */
+    .no-opacity .wrapper-dropdown-3 .dropdown,
+    .no-pointerevents .wrapper-dropdown-3 .dropdown {
+        display: none;
+        opacity: 1; /* If opacity support but no pointer-events support */
+        pointer-events: auto; /* If pointer-events support but no pointer-events support */
+    }
+
+    .no-opacity .wrapper-dropdown-3.active .dropdown,
+    .no-pointerevents .wrapper-dropdown-3.active .dropdown {
+        display: block;
+    }
+
+    @@media (max-width: 360px) {
+        .switch-content-view > p {
+            font-size: 15px;
+        }
+
+        .switch-mobi-view {
+            text-align: center;
+        }
+    }
+</style>
+
+<!-- HERO Header -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+<!-- HERO Shoulder-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+<!-- HERO Chest-->
+<!-- HERO Body-->
+@Html.Partial("_virginActiveForm", surveyQuestionData as ContentModels.TabBody)
+
+<div class="green-pointer-banking-campaign"></div>
+<div class="hover-block"></div>
+<div class="container">
+    <div class="row"></div>
+</div>
+<div class="container">
+    <div class="mega-tabs" style="margin-top:-42px">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs eq-height" role="tablist">
+            <li role="presentation" class="online-banking-li">
+                The new way of banking
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="container payments-section full margin-bottom-30">
+    <div class="margin-top-20 visible-xs"></div>
+    <div class="row">
+        <h4 class="container margin-bottom-20 align-center">@tabWaysToBank.Value("partialViewClassName")</h4>
+        @{
+            int cardIterator = 0;
+            bool increaseCardHeight = false;
+
+            foreach (var item in sectionCardsContent)
+            {
+
+                if (cardIterator == (int)sectionCardsContent.Count() - 1)
+                {
+                    increaseCardHeight = true;
+                }
+                var cardTitle = item.Value<string>
+                    ("NCcardTitle");
+                var cardDesc = item.Value<string>
+                    ("NCcardDescription");
+                var icon = item.Value<IPublishedContent>
+                    ("NCcardIcon");
+                <div class="col-sm-4 margin-bottom-20">
+                    <div class="@(increaseCardHeight ? " cellphone-button-banking-campaign" : "" )">
+                        <div class="text-left center-align white-link-color richtextbox-blue-bg">
+                            <img src="@icon.Url" alt="@icon.Value(" altTag")" class="image-center-resizer" />
+                            <p class="title blue-color font-size-20">@cardTitle</p>
+                            <p>@cardDesc</p>
+                        </div>
+                    </div>
+                    @{
+                        if (!cardTitle.Contains("App"))
+                        {
+                            <div class="col-md-4 center-align margin-bottom-20 margin-right-50 banking-options-buttons">
+                                <a href="@registerNowButtonLink" class="button span-buttons green-button" id="">
+                                    @onlineButtonText
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-md-4 center-align margin-bottom-20 margin-left-50 banking-options-buttons">
+                                <span class="button span-buttons green-button view_OnlineApps downloadNow" data-item="@popupAppTitle*@popQRCode*@popAndroidApp*@popIOsApp" target="_blank">@downloadNow.EbankItbuttonText</span>
+                            </div>
+                        }
+                    }
+                </div>
+                cardIterator += 1;
+            }
+        }
+    </div>
+</div>
+
+<!-- NUMBER TO CALL -->
+<div class="number-to-call">
+    <p style="text-align: center;">1 <span>Number to call</span></p>
+    <h4 class="bolder" style="text-align: center;">0861 123 456</h4>
+    @{
+        int pipeIterator = 0;
+        foreach (var item in myWorldTAndCs)
+        {
+            if (!item.Value("NCcategoryName").ToString().Contains("Pricing Guide"))
+            {
+                var linkString = ((ContentModels.File)item.Value("NCebankITDocument")).Url;
+                <a rel="noopener noreferrer" href="@linkString" target="_blank" class="tAndC">
+                    @item.Value("NCebankITTitle").ToString()
+                </a>
+                @*if (pipeIterator <= 1)
+                    {
+                    <span>&#124;</span>
+                    }*@
+            }
+            pipeIterator += 1;
+        }
+    }
+</div>
+
+@Html.Partial("_renderPopUpContent2", new ContainerViewModel()
+{
+HTMLContent2 = @<text>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-15">
+                    <a href="@androidDownloadNow.Value("ebankITButtonExternalLink")" target="_blank">
+                        <img width="200" id="popUpAndroid" alt="google-play-store-african-bank-android-app" />
+                    </a>
+                    <br /><br />
+                    <a href="@iosDownloadNow.Value("ebankITButtonExternalLink")" target="_blank">
+                        <img width="200" id="popUpIOS" alt="ios-african-bank-app" />
+                    </a>
+                </div>
+            </div>
+        </div>
+</text>
+})
+
+@Html.Partial("_renderPopUpContent", new ContainerViewModel()
+{
+HTMLContent = @<text>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-md-12">
+                    Your Opt-Out has been submitted.
+                </div>
+                <br />
+                <br />
+
+            </div>
+        </div>
+</text>
+})
+@section Scripts
+                        {
+    <script>
+
+        $('#frmVirginActive').bootstrapValidator({
+                feedbackIcons: {
+                    valid: 'glyphicon glyphicon-ok-sign',
+                    invalid: 'glyphicon glyphicon-remove-sign',
+                    validating: 'glyphicon glyphicon-refresh'
+                },
+                fields: {
+                    'firstName': {
+                        message: 'Value inserted is not valid',
+                        validators: {
+                            notEmpty: {
+                                message: 'Name is required'
+                            },
+                            regexp: {
+                                regexp: /^[a-zA-Z]/,
+                                message: 'Please insert a valid name'
+                            }, stringLength: {
+                                max: 30,
+                                message: 'Please make sure that the name is 30 max characters long.'
+                            }
+                        }
+                    },
+                    'surName': {
+                        message: 'Value inserted is not valid',
+                        validators: {
+                            notEmpty: {
+                                message: 'Surname is required'
+                            },
+                            regexp: {
+                                regexp: /^[a-zA-Z]/,
+                                message: 'Please insert a valid name'
+                            }, stringLength: {
+                                max: 30,
+                                message: 'Please make sure that the surname is 30 max characters long.'
+                            }
+                        }
+                    },
+                     'southAfricanID': {
+                        message: 'South African ID number entered is not valid',
+                        validators: {
+                            notEmpty: {
+                                message: 'The ID / Passport Number is required and cannot be empty'
+                            },
+                            regexp: {
+                                regexp: /^[0-9]{1,13}$/,
+                                message: 'The ID / PASSPORT NUMBER can only consist of alphanumeric characters'
+                            },
+                            stringLength: {
+                                max: 13,
+                                message: 'The ID / Passport Number can only be a 13 or less digit sequence'
+                            },
+                            callback: {
+                                callback: function (value, validator, $field) {
+                                    var idNumber = value;
+
+                                    if (null === idNumber || 0 === idNumber.length) return !1;
+                                    var correct = !0;
+                                    if (13 !== idNumber.length || isNaN(parseFloat(idNumber)) && isFinite(idNumber)) return !1;
+                                    var yob = parseInt(idNumber.substring(0, 2));
+                                    var d = new Date();
+                                    var currentYear = d.getFullYear();
+                                    if (yob + 2000 < currentYear) {
+                                        yob = 2000 + yob
+                                    } else { yob = yob + 1900; }
+
+                                    var tempDate = new Date(idNumber.substring(0, 2), idNumber.substring(2, 4) - 1, idNumber.substring(4, 6)),
+                                        id_date = tempDate.getDate(),
+                                        id_month = tempDate.getMonth();
+                                    if (currentYear - yob >= 70 || currentYear - yob < 18) {
+                                        return {
+                                            valid: false,
+                                            message: 'Your age should be between 18 and 69'
+                                        }
+                                    } // make sure the applicant is not over 70 years of age or younger than 18
+                                    (tempDate.getYear() != idNumber.substring(0, 2) || id_month != idNumber.substring(2, 4) - 1 || id_date != idNumber.substring(4, 6)) && (correct = !1);
+                                    for (var tempTotal = 0, checkSum = 0, multiplier = 1, i = 0; 13 > i; ++i) tempTotal = parseInt(idNumber.charAt(i)) * multiplier, tempTotal > 9 && (tempTotal = parseInt(tempTotal.toString().charAt(0)) + parseInt(tempTotal.toString().charAt(1))), checkSum += tempTotal, multiplier = multiplier % 2 === 0 ? 1 : 2;
+                                    return checkSum % 10 !== 0 && (correct = !1), correct
+
+                                }
+                            }
+                        }
+                    },
+                    'cellPhone': {
+                        message: 'Cellphone number entered is not valid',
+                        validators: {
+                            notEmpty: {
+                                message: 'Cellphone number is required'
+                            },
+                            numeric: {
+                                message: 'Only numeric values allowed'
+                            },
+                            stringLength: {
+                                min: 10,
+                                max: 10,
+                                message: 'Cellphone number can only be 10 digits only'
+                            },
+                            callback: {
+                                callback: function (value, validator, $field) {
+                                    if (value != "") {
+                                        var cellNumber = value;
+                                        if (null === cellNumber || 0 === cellNumber.length || 10 !== cellNumber.length || cellNumber === '0000000000') return !1; // not 0000000
+                                        if ('0' !== cellNumber.substring(0, 1)) return !1; // starts with 0
+                                        return !0;
+                                    }
+                                    return true;
+                                }
+                            }
+                        }
+                    },
+                    'email': {
+                        message: 'Value inserted is not valid',
+                        validators: {
+                            notEmpty: {
+                                message: 'Email is required'
+                            },
+                            regexp: {
+                                regexp: /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i,
+                                message: 'Please enter a valid email address.'
+                            }, stringLength: {
+                                max: 30,
+                                message: 'Email address can only be 30 characters long.'
+                            }
+                        }
+                    },
+                    'referenceNumber': {
+                        message: 'Reference number entered is not valid',
+                        validators: {
+                            notEmpty: {
+                                message: 'Reference number is required'
+                            },
+                            numeric: {
+                                message: 'Only numeric values allowed'
+                            },
+                            stringLength: {
+                                min: 10,
+                                max: 10,
+                                message: 'Reference number can only be 10 digits only'
+                            },
+                            callback: {
+                                callback: function (value, validator, $field) {
+                                    if (value != "") {
+                                        var cellNumber = value;
+                                        if (null === cellNumber || 0 === cellNumber.length || 10 !== cellNumber.length || cellNumber === '0000000000') return !1; // not 0000000
+                                        if ('0' !== cellNumber.substring(0, 1)) return !1; // starts with 0
+                                        return !0;
+                                    }
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+        function form_validation_revalidate(form_id) {
+            var validator = $(form_id).data('bootstrapValidator');
+            var n = validator.validate().getInvalidFields().length;
+            if (n === 0) {
+                return true;
+            } else {
+
+                return false;
+            }
+
+        }
+
+        $(document).ready(function () {
+            $('#sendVAForm').on('click', function (e) {
+                e.preventDefault();
+                var bootstrapValidator = $("#frmVirginActive").data('bootstrapValidator');
+                bootstrapValidator.validate();
+                if (bootstrapValidator.isValid()) {
+                    var marketingObj = new Object();
+                        marketingObj.Name = $('#firstName').val(),
+                        marketingObj.Surname = $('#surName').val(),
+                        marketingObj.IdNumber =$('#southAfricanID').val(),
+                        marketingObj.Email = $('#email').val(),
+                        marketingObj.Cellphone = $('#cellPhone').val(),
+                        marketingObj.ReferenceNumber = $('#referenceNumber').val()
+
+                    $('.hang-tight').show('slow');
+                    var token = $('input[name="__RequestVerificationToken"]')[0].value;
+                    $.ajax({
+                        headers: { '__RequestVerificationToken': token },
+                        type: "POST",
+                        url: '@Url.Action("SaveVirginActive", "Custom")',
+                        data: JSON.stringify(marketingObj),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (data) {
+                            $('#generic')[0].children[0].children[0].children[0].children[1].innerHTML = 'Thank you!';
+                            $('#generic').modal('show');
+                            debugger;
+                            call_me("#frmVirginActive", 1, "Virgin Active", "contact_type");
+                        },
+                        error: function (error) {
+                            console.log(error);
+                            //$('.pause-form').hide();
+                            //instance.terminate_process("process");
+                        }
+                    });
+                }
+
+            });
+            $('.close').on('click', function (e) {
+                $('#frmVirginActive').bootstrapValidator('resetForm', true);
+                $('#frmVirginActive')[0].reset();
+            });
+        });
+    </script>
+}

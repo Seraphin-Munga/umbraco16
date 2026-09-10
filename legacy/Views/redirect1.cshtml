@@ -1,0 +1,5 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@{
+	Layout = null;
+	Response.Redirect(Model.Value("ebankITRedirectUrl").ToString());
+}

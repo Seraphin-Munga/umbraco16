@@ -1,0 +1,266 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage<ContentModels.BlogDetail>
+@using ContentModels = Umbraco.Web.PublishedContentModels;
+@{
+    Layout = "Master.cshtml";
+    var blogDetailHeader = Model.Content.Children.FirstOrDefault().Children.Where(c => c.DocumentTypeAlias == "heroHeaderBlogDetail").FirstOrDefault();
+    var blogDetailBody = Model.Content.Children.FirstOrDefault().Children.Where(c => c.DocumentTypeAlias == "heroBodyBlogDetail").FirstOrDefault();
+    var blogDetailFeet = Model.Content.Children.FirstOrDefault().Children.Where(c => c.DocumentTypeAlias == "heroFeetBlogDetail").FirstOrDefault();
+    var articles = CurrentPage.Parent.Children;
+    
+    var blogKeyword = Model.Content.GetPropertyValue("keywords_tag")?.ToString() ?? "";
+ 
+    var blogImage = (IPublishedContent)blogDetailHeader.GetPropertyValue("image");
+    var blogTitle = blogDetailBody.GetPropertyValue("title");
+    var blogDate = Convert.ToDateTime(blogDetailBody.GetPropertyValue("blogDate")).ToString("d");
+    var blogIntroDescription = blogDetailBody.GetPropertyValue("introductionDescription");
+    var blogBody = blogDetailBody.GetPropertyValue("blogBody");
+    
+    var blogBlurpDescription = blogDetailBody.GetPropertyValue("blogBlurpDescription");
+    
+    int contentCount = articles.Count();
+    string[] _items = new string[contentCount];
+    int index = 0;
+    bool previousPageIsEllipsis = false;
+    
+    var viewPath = Request.Url.ToString();
+    
+    var coreUrl = HttpContext.Current.Request.Url;
+    
+    var jsonBlogUrl = "https://www.africanbank.co.za" + blogImage.Url;
+    var jsonBlogDate = blogDate;
+    string[] words = blogBody.ToString().Split(' ');
+    var _blogWordCount = words.Length;
+    
+}
+
+
+<!-- HERO BANNER -->
+<div class="hero-static-container darker">
+    <div class="container-fluid">
+        <div class="row no-gutter">
+            <div class="col-md-12 col-sm-12">
+                <div class="hero-static-banner less-height" style="background-image: url('@blogImage.Url');"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="campaign-product-container full top-0">
+        <div class="margin-top-20 visible-xs"></div>
+        <div class="row">
+            <div class="col-sm-9 col-xs-offset-1 col-sm-offset-0 col-xs-10">
+                <h1 class="blue-highlight margin-bottom-20 text-left">@blogTitle</h1>
+                <p class="body-content text-left">@blogDate</p>
+                <div class="body-content margin-top-10 text-left">
+                    @blogBody
+                </div>
+            </div>
+            <div class="col-sm-3 col-xs-offset-1 col-sm-offset-0 col-xs-10">
+                <div class="margin-top-50"></div>
+                <p class="body-content bold text-uppercase text-left text-18 margin-bottom-10">Recent Posts</p>
+                <ul class="unstyled-list no-bullet">
+                    @foreach (var item in articles.Take(10))
+                    {
+                        <li class="margin-bottom-10">
+                            <a href="@item.Url">
+                                @foreach (var itemContent in item.Children.FirstOrDefault().Children)
+                                {
+                                    if (itemContent.GetPropertyValue("title") != null)
+                                    {
+                                        @itemContent.GetProperty("title")
+                                        _items[index] = itemContent.GetPropertyValue("title");
+                                        ++index;
+                                    }
+                                }
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="campaign-product-container full top-0">
+        <div class="margin-top-20 visible-xs"></div>
+        <div class="row">
+            <div class="col-sm-9">
+                <h3 class="blue-highlight">Up Next</h3>
+                @{
+                    var pageSize = 5;
+                    var page = 1; int.TryParse(Request.QueryString["page"], out page);
+                    var totalPages = (int)Math.Ceiling((double)_items.Count() / (double)pageSize);
+                    if (page > totalPages)
+                    {
+                        page = totalPages;
+                    }
+                    else if (page < 1)
+                    {
+                        page = 1;
+                    }
+                    var _selection = Model.Content.Parent.Children;
+                    foreach (var item in _selection.Skip((page - 1) * pageSize).Take(pageSize))
+                    {
+                        var blogHeader = item.Children.FirstOrDefault().Children.Where(c => c is HeroHeaderBlogDetail).FirstOrDefault();
+                        var _parentBlogBody = item.Children.FirstOrDefault().Children.Where(c => c is HeroBodyBlogDetail).FirstOrDefault();
+                        var blogFeet = item.Children.FirstOrDefault().Children.Where(c => c is HeroFeetBlogDetail).FirstOrDefault();
+                        var image = blogHeader.GetPropertyValue("image"); 
+                        String url = null;
+                        if (image != null) { url = ((IPublishedContent)image).Url; }
+                        <div class="article-card margin-top-30">
+                            <div class="row eq-height">
+                                <div class="col-sm-7 col-md-push-5">
+                                    @if (url != null)
+                                    {
+                                        <div class="image" style="background-image: url('@url')"></div>
+                                    }
+                                </div>
+                                <div class="col-sm-5 col-md-pull-7">
+                                    <div class="article-content">
+                                        <div class="article-title">@_parentBlogBody.GetPropertyValue("title")</div>
+                                        <div class="body-content">
+                                            @_parentBlogBody.GetPropertyValue("introductionDescription")
+                                        </div>
+                                        <br />
+                                        <b class="date-output">Publish Date: @Convert.ToDateTime(_parentBlogBody.GetPropertyValue("blogDate")).ToShortDateString()</b><br />
+                                        <a href="@item.Url">Read more</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    if (totalPages > 1)
+                    {
+                        <div class="pagination" style="margin-left: 50% !important">
+                                <ul class="pagination" role="menubar" aria-label="Pagination">
+                                    @{var totalPagesRange = Enumerable.Range(1, (int)totalPages); }
+                                    @foreach (var item in totalPagesRange)
+                                    {
+                                        if (item == 1)
+                                        {
+                                            if (item == page || 0 == page)
+                                            {
+                                                <li class="arrow unavailable" aria-disabled="true"><a href="#">&laquo; Previous</a></li>
+                                            }
+                                            else
+                                            {
+                                                <li class="arrow"><a href="?page=@(page - 1)" title="Previous Page">&laquo; Previous</a></li>
+                                            }
+                                        }
+                                        if (item == page
+                                            || item == 1
+                                            || item == page - 2
+                                            || item == page - 1
+                                            || item == page + 1
+                                            || item == page + 2
+                                            || item == totalPages)
+                                        {
+                                            string current = (item == page) ? "current" : String.Empty;
+
+                                            if ((item == 1) && (page == 1))
+                                            {
+                                                <li class="@current unavailable" aria-disabled="true">
+                                                    <a href="?page=@item" title="Go to page @item">@item</a>
+                                                </li>
+                                            }
+                                            else
+                                            {
+                                                <li class="@current">
+                                                    <a href="?page=@item" title="Go to page @item">@item</a>
+                                                </li>
+                                            }
+                                            previousPageIsEllipsis = false;
+                                        }
+                                        else
+                                        {
+                                            if (previousPageIsEllipsis)
+                                            {
+                                                continue;
+                                            }
+                                            else
+                                            {
+                                                <li class="unavailable" aria-disabled="true">&hellip;</li>
+                                                previousPageIsEllipsis = true;
+                                            }
+                                        }
+                                        if (item == totalPages)
+                                        {
+                                            if (item == page)
+                                            {
+                                                <li class="arrow unavailable" aria-disabled="true"><a href="">Next &raquo;</a></li>
+                                            }
+                                            else
+                                            {
+                                                <li class="arrow"><a href="?page=@(page + 1)" title="Next Page">Next &raquo;</a></li>
+                                            }
+                                        }
+                                    }
+                                </ul>
+                        </div>
+                    }
+                }
+            </div>
+            <div class="col-sm-3 col-xs-offset-1 col-sm-offset-0">
+                <div class="margin-top-50 visible-xs"></div>
+                <p class="body-content bold text-uppercase text-left">About African Bank</p>
+                <p class="body-content text-left">
+                    Our mission is to be a successful Retail Bank offering a wide range of products and services to the consumers of South Africa. The people who work for African Bank represent the diverse population of South Africa; therefore we are a reflection of you, of all South Africans. We seek to provide value - more than our consumers expect of us. We promise to live our purpose 'humanity through banking' in all that we do and we are confident that we can, because 'We are You'.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    @*<script type="application/ld+json"> 
+        { 
+             "@@context": "https://schema.org", 
+             "@@type": "BlogPosting",
+             "headline": "@blogTitle",
+             "image": "@jsonBlogUrl",
+             
+             "editor": "African Bank Social Media Team", 
+             "genre": "@blogTitle", 
+             
+             "keywords": "@blogKeyword", 
+             "wordcount": "@_blogWordCount",
+             "publisher": "African Bank",
+             "url": "@viewPath",
+             "datePublished": "@jsonBlogDate",
+             "dateCreated": "@jsonBlogDate",
+             "dateModified": "@jsonBlogDate",
+             "description": "@blogIntroDescription",
+             "articleBody": "@blogBlurpDescription",
+               "author": {
+                "@@type": "African Bank",
+                "name": "African Bank Social Media Team"
+              }
+         }
+    </script>*@
+    <script type="application/ld+json">
+        {
+        "@@context": "https://schema.org",
+        "@@type": "BlogPosting",
+        "headline": "@TupleCurrentBlog.Item3",
+        "image": "@jsonBlogUrl",
+
+        "editor": "African Bank Social Media Team",
+        "genre": "@TupleCurrentBlog.Item3",
+
+        "keywords": "@jsonBlogKeywords",
+        "wordcount": "@_blogWordCount",
+        "publisher": "African Bank",
+        "url": "@viewPath",
+        "datePublished": "@jsonBlogDate",
+        "dateCreated": "@jsonBlogDate",
+        "dateModified": "@jsonBlogDate",
+        "description": "@TupleCurrentBlog.Item4",
+        "articleBody": "@TupleCurrentBlog.Item3",
+        "author": {
+        "@@type": "African Bank",
+        "name": "African Bank Social Media Team"
+        }
+        }
+    </script>
+}

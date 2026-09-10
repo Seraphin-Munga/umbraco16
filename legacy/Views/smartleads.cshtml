@@ -1,0 +1,368 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+@using AfricanBank.Cms.Portal.Helpers;
+
+@{ //Layout = "Master.cshtml";
+    Layout = "MasterHeaderOnly.cshtml";
+
+    var utm_source = Request.Params["utm_source"];
+    var utm_medium = Request.Params["utm_medium"];
+    var utm_campaign = Request.Params["utm_campaign"]; @*var testimoniesPropertyName = "campaignTestimonials";
+        var testimonies = Model.Content.GetPropertyValue<IEnumerable<IPublishedContent>>(testimoniesPropertyName);
+        var featuredProductPropertyName = "featuredProducts";
+        var featuredProducts = Model.Content.GetPropertyValue<IEnumerable<IPublishedContent>>(featuredProductPropertyName);
+        var downloadPropertyName = "downloadFiles";
+        var downloadFilename = "file name";
+        var downloadLink = "file link";
+        var creditInsuredRelatedLinkPropertyName = "creditInsuredOptions";
+        var campaignPropertyName = "campaignProductInfo";
+        var campaignHeroImage = Model.Content.GetPropertyValue<IPublishedContent>("campaignHeroImage");
+        var campaignHeroDescription = Model.Content.GetPropertyValue<IPublishedContent>("campaignHeroDescription");
+        var campaignHeroButtonLabel = Model.Content.GetPropertyValue<IPublishedContent>("campaignHeroButtonLabel");
+        var campaignHeroButtonRedirectLink = Umbraco.Field("campaignHeroButtonRedirectLink");
+        var campaignHeroHeadline = Model.Content.GetPropertyValue<IPublishedContent>("campaignHeroHeadline");
+
+        if (@Model.Content.HasProperty(campaignPropertyName) && !string.IsNullOrEmpty(@Model.Content.GetProperty(campaignPropertyName).Value.ToString()))
+        {
+            var campaignProductInfo = Model.Content.GetPropertyValue<IEnumerable<IPublishedContent>>("campaignProductInfo");
+            foreach (var campaign in campaignProductInfo)
+            {
+                var campaignProductImage = campaign.GetPropertyValue<IPublishedContent>("campaignProductImage");
+                var campaignProductTitle = campaign.GetPropertyValue("campaignProductTitle").ToString();
+                var campaignProductDescription = campaign.GetPropertyValue("campaignProductDescription").ToString();
+                var campaignProductHighlight = campaign.GetPropertyValue("campaignProductHighlight").ToString();
+                var campaignProductLearnMoreButtonLabel = campaign.GetPropertyValue("campaignProductLearnMoreButtonLabel").ToString();
+                var campaignProductLearnMoreButtonRedirectLink = campaign.GetPropertyValue("campaignProductLearnMoreButtonRedirectLink").ToString();
+                var campaignProductApplyNowButtonLabel = campaign.GetPropertyValue("campaignProductApplyNowButtonLabel").ToString();
+                var campaignProductApplyNowButtonRedirectLink = campaign.GetPropertyValue("campaignProductApplyNowButtonRedirectLink").ToString();
+                var campaignProductBenefits = campaign.GetPropertyValue<IEnumerable<IPublishedContent>>("structureProductBenefit");
+            }
+        }*@ }
+
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script src="/Scripts/GoogleCharts/highcharts.js"></script>
+<script src="~/javascripts/reuse/form_validation.js"></script>
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;400;500;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.12.1/polyfill.min.js"></script>
+
+<script>
+    var data = {
+        serviceUrl: '@System.Configuration.ConfigurationManager.AppSettings["ebankit.calculators.URL"]',
+        headers: [
+               ['ITSAPP-DEVICE', '@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.ITSAPP-DEVICE"]'],
+               ['ITSAPP-LANG', 'en-GB'],
+               ['Content-type', 'application/json']
+        ],
+    };
+    var getFetchAttr = function getFetchAttr() {
+      return data;
+    };
+</script>
+<style type="text/css">
+    #form_fields {
+        display:block;
+    }
+</style>
+
+
+
+
+
+
+<body>
+    <div id="call_me_form">
+        <form id="frmCallMeBack">
+            @Html.AntiForgeryToken()
+            <input id="sessionId" type="hidden" value="@(Guid.NewGuid().ToString())" />
+            <input id="processID" type="hidden" value="" />
+            <div id="form_fields row">
+                <div class="col-sm-7">
+                    <div class="form-group callme-inputs">
+                        <label>First Name</label>
+                        <input type="text" id="FirstNameInput" name="FormFields.firstName" placeholder="@ResourceHelper.GetResource("Name")" maxlength="30">
+                    </div>
+                    <div class="form-group callme-inputs">
+                        <label>Last Name</label>
+                        <input type="text" id="LastNameInput" name="FormFields.lastName" placeholder="@ResourceHelper.GetResource("Surname")" required maxlength="30">
+                    </div>
+                    <div class="form-group callme-inputs">
+                        <label>Email Address</label>
+                        <input type="email" id="EmailInput" name="FormFields.email" placeholder="@ResourceHelper.GetResource("Email")" required maxlength="50">
+                    </div>
+                    <div class="form-group callme-inputs">
+                        <label>Identity Number</label>
+                        <input hidden id="utmSource" value="@utm_source" />
+                        <input hidden id="utmCampaign" value="@utm_campaign" />
+                        <input hidden id="utmMedium" value="@utm_medium" />
+
+                        <input type="text" id="SAIDInput" name="FormFields.identityNumber" placeholder="@ResourceHelper.GetResource("Identity Number")" required
+                               minlength="13" maxlength="13">
+                    </div>
+                    <div class="form-group callme-inputs">
+                        <label>@ResourceHelper.GetResource("Cell Phone Number")</label>
+                        <input type="text" id="CellPhoneInput" name="FormFields.mobileNumber" placeholder="@ResourceHelper.GetResource("Cell Phone Number")" required maxlength="12">
+                    </div>
+                    <div class="form-group callme-inputs">
+                        <input type="hidden" id="MessageInput" name="FormFields.message" placeholder="Message*" value="Pepe"
+                               required minlength="90">
+                    </div>
+                    <div class="btn_holder">
+                        <button type="button" id="st-panel-submit1" href="#" onclick="call_btn_clicked()" class="call-me btn-hover-blue primary-btn">Call Me Back</button>
+                    </div>
+                </div>
+                <div class="col-sm-5 right-sidebar" style="border-left: 1px solid #e1e1e1;">
+                    <h4 style="color: #07011e;font-weight: bolder;">Need Help?</h4>
+                    <p>Call Us: <span style="color: #07011e;font-weight: bolder;">0861 123 456</span></p>
+                    <p>Monday to Friday from 8am to 5pm, Saturday from 9am to 1pm</p>
+                    We are here for you during the National
+                    Lockdown. As an essential service, we are doing
+                    everything we can to maintain the level of
+                    customer service you expect from us. However,
+                    you may experience some delays. Please accept
+                    our sincere apologies.
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="call_me_success">
+        <center>
+            <img src="/media/53197/check.png" class="call_me_success_img" alt="Check" />
+        </center>
+        <center>
+            <div style="width:300px;text-align:center;align-self:center">
+                Thank you for using our call me back<br>
+                    option. We will be in touch soon<br><br>
+                    From the bank where Everybody is Somebody.
+            </div>
+        </center>
+    </div>
+</body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            addFormValidation();
+
+            $(".expense-add").keyup(function () {
+                var sum = 0;
+                $('.expense-add').each(function () {
+                    sum += Number($(this).val());
+                });
+                $('#quick-total').html("R " + sum.toString());
+
+            });
+
+            function addFormValidation() {
+                $('.form-horizontal').bootstrapValidator({
+                    feedbackIcons: {
+                        valid: 'glyphicon glyphicon-ok-sign',
+                        invalid: 'glyphicon glyphicon-remove-sign',
+                        validating: 'glyphicon glyphicon-refresh'
+                    },
+                    fields: {
+                        'idNumber': {
+                            validators: {
+                                notEmpty: {
+                                    message: 'The ID / Passport Number is required and cannot be empty'
+                                },
+                                regexp: {
+                                    regexp: /^[0-9]{1,13}$/,
+                                    message: 'The ID / PASSPORT NUMBER can only consist of alphanumeric characters'
+                                },
+                                stringLength: {
+                                    max: 13,
+                                    message: 'The ID / Passport Number can only be a 13 or less digit sequence'
+                                },
+                                callback: {
+                                    callback: function (value, validator, $field) {
+                                        var idNumber = value;
+
+                                        if (null === idNumber || 0 === idNumber.length) return !1;
+                                        var correct = !0;
+                                        if (13 !== idNumber.length || isNaN(parseFloat(idNumber)) && isFinite(idNumber)) return !1;
+                                        var yob = parseInt(idNumber.substring(0, 2));
+                                        var d = new Date();
+                                        var currentYear = d.getFullYear();
+                                        if (yob + 2000 < currentYear) {
+                                            yob = 2000 + yob
+                                        } else { yob = yob + 1900; }
+
+                                        var tempDate = new Date(idNumber.substring(0, 2), idNumber.substring(2, 4) - 1, idNumber.substring(4, 6)),
+                                            id_date = tempDate.getDate(),
+                                            id_month = tempDate.getMonth();
+                                        if (currentYear - yob >= 70 || currentYear - yob < 18) {
+                                            return {
+                                                valid: false,
+                                                message: 'Your age should be between 18 and 69'
+                                            }
+                                        } // make sure the applicant is not over 70 years of age or younger than 18
+                                        (tempDate.getYear() != idNumber.substring(0, 2) || id_month != idNumber.substring(2, 4) - 1 || id_date != idNumber.substring(4, 6)) && (correct = !1);
+                                        for (var tempTotal = 0, checkSum = 0, multiplier = 1, i = 0; 13 > i; ++i) tempTotal = parseInt(idNumber.charAt(i)) * multiplier, tempTotal > 9 && (tempTotal = parseInt(tempTotal.toString().charAt(0)) + parseInt(tempTotal.toString().charAt(1))), checkSum += tempTotal, multiplier = multiplier % 2 === 0 ? 1 : 2;
+                                        return checkSum % 10 !== 0 && (correct = !1), correct
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            $(".wizard").show();
+        });
+        function isNumber(evt) {
+            var charCode = evt.which ? evt.which : event.keyCode;
+            if (charCode != 46 && charCode > 31 && (charCode < 48 || charCode > 57)) return false;
+            return true;
+        }
+        $(document).on("click", ".call-me-back-btn", function (e) {
+
+            call_btn_clicked();
+            setTimeout(() => {
+                window.location = "https://www.africanbank.co.za/en/home/"
+            }, 4000);
+        });</script>
+    <style>
+        body {
+            background: #EFEFEF;
+            background-size: contain;
+            width: 100%;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .callme-inputs {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+            .callme-inputs label {
+                font-size: 14px;
+                font-weight: 500;
+                color: #757575;
+                margin-bottom: 0px;
+                text-align: right;
+                width: 200px;
+                margin-right: 15px;
+            }
+
+            .callme-inputs > input::placeholder {
+                font-size: 14px;
+                font-weight: 500;
+            }
+
+            .callme-inputs > input {
+                padding: 0px 10px;
+                border-radius: 25px;
+                border: none;
+                outline: none;
+                -webkit-outline: none;
+                width: 300px;
+                height: 45px;
+                font-size: 16px;
+                font-weight: 500;
+            }
+
+        .help-block {
+            width: 300px;
+            margin-top: 5px;
+            margin-left: 325px;
+            background: none;
+            color: red !important;
+            padding: 0px;
+        }
+
+        .glyphicon-remove-sign, .form-control-feedback, .glyphicon {
+            margin-top: -20px;
+            margin-right: 80px;
+        }
+
+        small {
+            color: red !important;
+        }
+
+        .call-me-btn {
+            padding: 0px 10px;
+            width: 300px;
+            height: 45px;
+        }
+
+        .callme-inputs > input:focus {
+            transition: 0.5s;
+            border: 2px solid #259CD8;
+        }
+
+        .primary-btn {
+            width: 220px;
+            transition: 0.5s;
+            background: #88BC47;
+            padding: 15px 25px;
+            height: 50px;
+            border-radius: 25px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            color: #fff;
+            outline: none;
+            border: 1px solid #88BC47;
+        }
+
+            .primary-btn:hover {
+                transition: 0.5s;
+                background: #65922B;
+            }
+
+        .btn_holder {
+            text-align: end;
+            width: 625px;
+        }
+        .call_me_success_img{
+            width:20%;
+        }
+        @@media (max-width: 992px) {
+            .callme-inputs {
+                text-align: left;
+            }
+
+                .callme-inputs label {
+                    text-align: left;
+                    width: 100%;
+                }
+
+            .container {
+                margin-top: 0px;
+            }
+
+            .btn_holder {
+                text-align: center;
+                width: 100%;
+            }
+
+            .callme-inputs > input {
+                width: 100%;
+            }
+
+            .right-sidebar {
+                margin-top: 45px;
+            }
+
+            .help-block {
+                width: 100%;
+                margin-top: 5px;
+                padding: 1%;
+                margin-left: 0px;
+            }
+
+            .glyphicon-remove-sign, .form-control-feedback, .glyphicon {
+                margin-top: 0px;
+                margin-right: 0px;
+            }
+            .call_me_success_img{
+                width:50%;
+            }
+        }
+    </style>
+
+
+

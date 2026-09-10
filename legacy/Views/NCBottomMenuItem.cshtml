@@ -1,0 +1,1304 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCampaign>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models;
+@{
+    Layout = "Master.cshtml";
+    // All Current Page Children
+    var children = Model.Children;
+    // Get specific Children
+    var chest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
+    var heroBody = (HeroBody)children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    
+    TabBody surveyQuestionData = null;
+    TabBody surveyPDFData = null;
+    var tabBodyItems = heroBody.Children.OfType<TabBody>();
+    tabBodyItems.ToList().ForEach(x =>
+    {
+        if (x.Name == "Survey Questions")
+        {
+            surveyQuestionData = (TabBody)x;
+        }
+        else
+        {
+            surveyPDFData = (TabBody)x;
+        }
+    });
+    
+    var heroBodyTabGroup = heroBody.Children?.Where(c => c.ContentType.Alias.ToLower() == "tabgroup").FirstOrDefault();
+    var videoLanding = heroBodyTabGroup.Children?.Where(c => c.ContentType.Alias.ToLower() == "tabheader").FirstOrDefault();
+    var videoItem = videoLanding.Children.Where(c => c.ContentType.Alias.ToLower() == "tabbody").FirstOrDefault();
+
+    var video_card = heroBody.Children?.Where(c => c.Name == "Video card").FirstOrDefault();
+    var styleAtt = "";
+    if (video_card != null)
+    {
+        styleAtt = video_card.Children.Where(c => c.Name == "Style").FirstOrDefault().Value("text").ToString();
+    }
+
+    var CurrentPage = Umbraco.AssignedContentItem;
+    var viewName = CurrentPage.Name.Replace(" ", ""); //used mainly to identify the page
+    TabGroup tabGroup = null;
+    if (viewName == "growforit1")
+    {
+        var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+        tabGroup = (TabGroup)heroHeader.Children?.Where(c => c.Name == "Partial").FirstOrDefault() as ContentModels.TabGroup;
+    }
+
+    bool isGrowForIt1 = false;
+}
+<style>
+    .grow-icons {
+        float: unset !important;
+    }
+    .mobi-stories-image {
+        height: 100%;
+        width: 100%;
+    }
+
+    .slick-prev {
+        top: 50%;
+        left: -50px;
+        background-color: #002b60;
+    }
+
+    .slick-next {
+        top: 50%;
+        right: -50px;
+        background-color: #002b60;
+    }
+
+    .slick-prev:hover, .slick-next:hover {
+        outline: none;
+        background: #88bc47;
+        color: transparent;
+    }
+
+    .card-plain {
+        background-color: unset;
+        padding: unset;
+    }
+
+    .video_list_item .vid_list_item .vid_list_item_campaign {
+        transition: 0.3s;
+        box-shadow: 0px 1px 20px rgba(0,0,0,0.125);
+        cursor: pointer;
+    }
+    
+    #grow-disclaimer {
+        width: 100%;
+        bottom: 0px;
+        padding-bottom: 9px;
+        padding-top: 7px;
+    }
+
+    .hero-static-banner {
+        height:38em;
+    }
+    .influencers {
+        height: 430px;
+        background-color: #002b60;
+        margin-bottom: 20px;
+    }
+
+    .vid-list-play-botton i {
+        color: white;
+        opacity: 0.9;
+    }
+
+    .vid-list:hover .vid-list-play-botton i {
+        color: #95D03A;
+    }
+
+    .vid-list-play-botton {
+        position: absolute;
+        width: inherit;
+        text-align: center;
+        top: 20%;
+    }
+
+    #video-header-thumb {
+        border-radius: 5px;
+    }
+
+    .video-body p {
+        font-size: 25px;
+        font-weight: 600;
+        color: #464855
+    }
+#the-difference-is-in-you .video-body p {
+    font-size: 20px;
+    font-weight: 300;
+    color: #464855;
+}
+    #grow-for-it.video-section {
+        background: #EDEEF4;
+        padding-top: 20px;
+    }
+
+    #grow-for-it #video-header {
+        margin-top: 0px;
+    }
+
+    #grow-for-it .video-title {
+        color: #88BC47;
+    }
+    #the-difference-is-in-you .video-title {
+        color: #88BC47;
+    }
+    /*Will still merge with Custom_main.css at a later stage*/
+    .css-color-change {
+        color: #002b60;
+        /*color: #2E0554;*/
+    }
+
+    .css-background-change {
+        background: #88bc47;
+        /*background: #2E0554;*/
+    }
+
+    .video-item-img {
+        height: 193px;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+    }
+
+    .video-container {
+        margin-top: 0px;
+        margin: auto;
+    }
+
+    #video-header {
+        height: 60vh;
+        margin-top: 24px !important;
+        margin-bottom: 20px;
+        box-shadow: 0px 1px 20px rgba(0,0,0,0.125);
+    }
+
+    /*.video-item-description {
+        font-size: 14px;
+        height: 75px;
+        overflow-y: hidden;
+    }*/
+
+    .video-item-description {
+        font-family: 'Montserrat', sans-serif;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        font-size: 14px;
+    }
+
+    .video-item {
+        background: #f6f6f6;
+        box-shadow: 0px 1px 20px rgba(0,0,0,0.125);
+        height: 360px;
+        margin-bottom: 25px;
+        margin-top: 0px;
+        padding-left: unset;
+        padding-right: unset;
+    }
+
+    .video-body {
+        font-size: 16px;
+        margin-bottom: 30px;
+    }
+
+    .video-title {
+        font-weight: 900;
+        font-size: 40px;
+    }
+
+    .video-citation-box {
+        transition: 0.3s;
+        cursor: pointer;
+        position: absolute;
+        bottom: 15px;
+        margin: auto;
+        padding: 0px 25px;
+    }
+
+    /*Font Styling*/
+
+    .landing-video-title {
+        transition: 0.3s;
+        font-size: 42px;
+        font-weight: 800;
+        background: rgba(0,0,0,0.3);
+        padding: 15px;
+        width: fit-content;
+        max-width: 800px;
+        line-height: 42px;
+    }
+
+    .landing-video-description {
+        margin: 10px 0px;
+        max-width: 800px;
+    }
+
+
+        .landing-video-description > p {
+            background: #002b60;
+            padding: 10px;
+            width: fit-content;
+        }
+
+    .main-click {
+        cursor: pointer;
+        transition: 0.3s;
+        border-radius: 100%;
+        padding: 2px;
+        text-align: center;
+        width: 55px;
+        height: 55px;
+        font-size: 50px !important;
+    }
+
+    .video-item-title {
+        font-size: 18px;
+    }
+
+    .main-click:hover {
+        transition: 0.3s;
+        box-shadow: 0px 1px 25px rgba(0,0,0,0.425);
+        margin-top: -2px;
+    }
+
+    .video-citation-box:hover .landing-video-title {
+        background: #88bc47;
+        transition: 0.3s;
+        box-shadow: 0px 1px 25px rgba(0,0,0,0.4);
+        margin-top: -2px;
+        margin-left: 5px;
+    }
+    #the-difference-is-in-you .video-citation-box:hover .landing-video-title {
+        background: none;
+        transition: 0.3s;
+        box-shadow: 0px 1px 25px rgba(0,0,0,0.4);
+        margin-top: -2px;
+        margin-left: 5px;
+    }
+    
+    .vid_list_item:hover .vid_list_item_campaign:hover {
+        cursor:pointer;
+    }
+    
+
+    .vid-list .video_list_item .vid_list_item .vid_list_item_campaign {
+        border-radius: 5px;
+    }
+
+    .video_list_item .vid_list_item .vid_list_item_campaign {
+        transition: 0.3s;
+        box-shadow: 0px 1px 20px rgba(0,0,0,0.125);
+        cursor: pointer;
+    }
+
+        .video_list_item:hover {
+            transition: 0.3s;
+            box-shadow: 0px 1px 25px rgba(0,0,0,0.425);
+            margin-left: -2px;
+        }
+                                    
+    .video_list_item:hover .main-click {
+        transition: 0.3s;
+        opacity: 1;
+    }
+
+    .vid_list_item:hover {
+        transition: 0.3s;
+        box-shadow: 0px 1px 25px rgba(0,0,0,0.425);
+        margin-left: -2px;
+        cursor:pointer;
+    }
+    .vid_list_item:hover .main-click {
+        transition: 0.3s;
+        opacity: 1;
+    }
+    .vid_list_item_campaign:hover {
+        transition: 0.3s;
+        box-shadow: 0px 1px 25px rgba(0,0,0,0.425);
+        margin-left: -2px;
+        cursor:pointer;
+    }
+    .vid_list_item_campaign:hover .main-click {
+        transition: 0.3s;
+        opacity: 1;
+    }
+
+    .sharethis-inline-share-buttons {
+        position: absolute;
+        bottom: 0;
+        margin-bottom: 10px;
+        right: 15px;
+        z-index: 10 !important;
+    }
+    .carousel-header-style {
+        padding-top: 5em;
+        padding-left: 7em;
+        font-size: 34px;
+    }
+
+
+    @@media (max-width: 480px) {
+
+        .mobi-stories-image {
+            width: 106px;
+        }
+
+        .video-item-content {
+            padding: 0px 25px 0 25px;
+        }
+
+        .video-item-title {
+            font-size: 14px;
+        }
+
+        .hero-caption {
+            padding-top: 34px;
+            margin-top: -28px;
+            padding: 0px;
+            color: #fff;
+            height: 350px;
+            position: absolute;
+            width: 100% !important;
+            right: 0px !important;
+        }
+        .hero-description {
+            display:none;
+        }
+        .influencers {
+            height: 860px;
+        }        
+        #video-header {
+            margin-top: unset;
+        }
+        .video-container {
+            width: unset;
+        }
+
+        .video-title {
+            font-size: 34px;
+        }
+
+        .video-item {
+            box-shadow: none;
+            /*height: 125px;*/
+            height: 170px;
+            margin-bottom: 10px;
+        }
+
+        .video-item-title {
+            bottom: unset;
+        }
+
+        .sharethis-inline-share-buttons {
+            right: unset;
+        }
+
+        .video-item-img {
+            height: 100%;
+        }
+        /*.header {
+        height: 46px;
+    }*/
+        .main-video-thumbnail {
+            border: none;
+        }
+
+        .sub-video-thumnail {
+            background: url("../img/african-bank-video-placeholder-mobile.png");
+            background-size: cover;
+            width: 30%;
+            float: left;
+            height: 120px;
+        }
+
+        .sub-video-text {
+            width: 70%;
+            display: inline-block;
+            height: 120px;
+            margin-bottom: 10px;
+        }
+
+        .sub-videos-row {
+            margin-bottom: 0px;
+        }
+
+        .video-item-description {
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            /*height: 70px;*/
+        }
+
+        .episode-click {
+            margin: 40px auto;
+        }
+
+        .video-citation-box {
+            position: absolute;
+            /*top: 0;*/
+            bottom: 0;
+            /*height: 70%;*/
+            margin: auto;
+            padding: 20px;
+            left: 0;
+        }
+
+        .video-header-thumb {
+            margin-top: 0px;
+            margin-left: -15px;
+            width: 110%;
+        }
+
+        .landing-video-title {
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 30px;
+            padding: 10px;
+        }
+
+        .sub-videos {
+        }
+
+        .sub-video-container {
+            box-shadow: 0px 1px 20px rgba(0,0,0,0)
+        }
+
+        .landing-video-description {
+            /*margin: 10px 0px;
+        background: #000;
+        padding: 10px;*/
+            width: 90%;
+        }
+
+        .vid-list-play-botton i {
+            margin-left: 7%;
+        }
+
+        .vid-list-play-botton {
+            text-align: left;
+        }
+    }
+
+    @@media (min-width: 480px )and (max-width: 768px) {
+        .video-item {
+            height:194px;
+        }
+        
+        .slick-prev {
+            left: -5px;
+        }
+
+        .slick-next {
+            right: -5px;
+        }
+        
+        .carousel-header-style {
+            padding-top: 0em;
+        }
+
+        .hero-caption {
+            width: 275px;
+            margin-top: 34px;
+            right: 5px !important;
+            margin-top: 33px !important;
+            width: 321px !important;
+        }
+        .hero-description {
+            display: none;
+        }
+        .hero-caption .hero-title {
+            font-size: 16px;
+        }
+
+        .cap-title {
+            font-size: 26px;
+        }
+
+        .hero-static-banner {
+            background-size: contain;
+            height: 19em !important;
+        }
+        .vid-list-play-botton i {
+            margin-left: 7%;
+        }
+
+        .vid-list-play-botton {
+            text-align: left;
+        }
+
+        #video-header {
+            margin-top: unset;
+        }
+
+        .video-item {
+            box-shadow: none;
+        }
+
+        .landing-video-title {
+            font-size: 32px;
+            font-weight: 800;
+        }
+        /*.video-citation-box {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        height: 25%;
+        margin: auto;
+        max-width: 700px;
+    }*/
+        .video-citation-box {
+            position: absolute;
+            /*top: 0;*/
+            bottom: 0;
+            /*height: 70%;*/
+            margin: auto;
+            padding: 20px;
+            left: 0;
+        }
+        /*.video-item-img {
+        height: 100%;
+    }*/
+        .sub-video-text {
+            background: #f6f6f6;
+            height: 220px;
+            padding-top: 10px;
+        }
+    }
+
+    @@media (min-width: 769px )and (max-width: 1024px) {
+        
+        .slick-prev {
+            left: -15px;
+        }
+
+        .slick-next {
+            right: -15px;
+        }
+        
+        .carousel-header-style {
+            padding-top: 1em;
+        }
+
+        .hero-caption .hero-title {
+            font-size: 17px;
+        }
+
+        .cap-title {
+            padding-right: 6px;
+            font-size: 27px;
+        }
+        .hero-caption {
+            padding-top: 34px !important;
+            margin-top: 56px !important;
+            padding: 14px !important;
+            color: #fff;
+            height: 350px !important;
+            position: absolute;
+            width: 330px !important;
+            right: -100px;
+        }
+
+        .hero-static-banner {
+            background-size: contain;
+            height: 26em;
+        }
+
+        #video-header {
+            margin-top: unset;
+        }
+
+        .video-item-description {
+            height: unset;
+        }
+
+        #video-body > .row {
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        .video-item {
+            box-shadow: none;
+            height: 330px;
+        }
+
+        .landing-video-title {
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+        .video-container {
+            width: unset;
+        }
+        /*.landing-video-description {
+        max-width: 60%;
+    }*/
+        /*.video-citation-box {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        height: 15%;
+        margin: auto;
+    }*/
+        .video-citation-box {
+            position: absolute;
+            /*top: 0;*/
+            bottom: 0;
+            /*height: 70%;*/
+            margin: auto;
+            padding: 20px;
+            left: 0;
+        }
+
+        .sub-video-text {
+            background: #f6f6f6;
+            height: 200px;
+            padding-top: 10px;
+        }
+    }
+
+    @@media (min-width: 1025px) and (max-width:1440px) {
+        .hero-static-banner {
+            height: 35em;
+        }
+    }
+
+    @@media (min-width:1023px) and (max-width:1439px) {
+        .hero-caption {
+            margin-top: -66px;
+            right: -74px;
+        }
+    }
+
+    @@media (min-width:1441px) and (max-width: 2560px) {
+
+        .hero-caption {
+            width: 524px !important;
+            right: -137px !important;
+            margin-top: -10px !important;
+        }
+    }
+
+</style>
+
+@if (tabGroup != null)
+{
+    isGrowForIt1 = true;
+    foreach (var partialName in tabGroup.Children)
+    {
+        @Html.Partial(partialName.Name.ToString(), partialName as TabHeader);
+    }
+}
+<div id="@styleAtt" class="video-section">
+    @{
+        if (tabGroup != null) // Grow for it 1
+        {
+            <div class="container css-color-change mobi-padding text-center" style="font-size: 22px">
+               <b>Get ready to grow! Watch our video to get started.</b>
+            </div>
+            <div class="container mobi-padding">
+                @*@Html.Partial("_pageHeaderVideo", videoLanding as TabHeader)*@
+            
+                @*Start *@
+                @{
+                    var title = videoLanding.Value("ebankITIconTitle");
+                    var thumb_img = videoLanding.Value<IPublishedContent>("ebankITIcon").Url;
+                    var description = videoLanding.Value("ebankITIconContent");
+                    var initial_video = videoLanding.Value("iconClass");
+                
+                    var content = videoItem.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+                    var videos = content.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+                    var x = 1;
+                
+                }
+    
+                <div id="video-header" class="vid_list_item_campaign" data-video="@initial_video">
+                    <div id="video-header-thumb" style="background-image:url('@thumb_img'); background-position: right;">
+                        <iframe width="100%" height="100%" id="video-ytd" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                        <section id="video-loader">
+                            <div class="loader" id="form-preloader-loader">
+                                <div class="loader-img"></div>
+                            </div>
+                        </section>
+                        <div class="video-citation-box">
+                            <div class="video-citation">
+                                <div class="landing-video-title vid_list_item_campaign" data-video="@initial_video">@title</div>
+                            </div>
+                            <div class="video-play-button spacer">
+                                <span class="vid_list_item_campaign" data-video="@initial_video"><i class="fa fa-play-circle fa-3x main-click play-icon css-background-change"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                @*Finish *@
+                <div class="video-content">
+                    <div class="video-body">
+                        <h1 class=" video-title css-color-change">@heroBody.Value("bodyTitle")</h1>
+                    </div>
+                </div>
+                @*@Html.Partial("_pageBodyVideo", videoItem as TabBody)*@
+                
+                @{
+                    var _content = videoItem.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+                    var _videos = _content.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+                    var videoIterator = 1;
+                }
+                <div id="video-body">
+                    <div class="row">
+                        @foreach (var videoData in _videos)
+                        {
+                
+                            var _title = "Episode " + videoIterator;
+                            var _description = videoData.Value("nCcardDescription");
+                            var _img = videoData.Value<IPublishedContent>("nCcardIcon").Url;
+                            var _videoUrl = videoData.Value("nCcardTitle");
+                            <div id="item-@videoIterator" class="col-md-3 col-sm-6 vid-list">
+                                <div data-video="@_videoUrl*@_title*@_description" class="video-item vid_list_item_campaign">
+                                    <div class="vid-list-play-botton"><i class="fa fa-play-circle fa-5x"></i></div>
+                                    <div class="video-item-img" style="background-image:url(@_img)"></div>
+                                    <div class="video-item-content">
+                                        <div class="video-description-box">
+                                            <p class="video-item-description">@_description</p>
+                                        </div>
+                                            <span class="video-item-title css-color-change">@_title</span>
+                                            <div class="sharethis-inline-share-buttons" data-url="@Request.Url.AbsoluteUri#@_videoUrl"></div>
+                                        </div>
+                                    </div>
+                            </div>
+                            videoIterator+=1;
+                        }
+                    </div>
+                </div>
+                                
+                                
+                
+                <!-- HERO BODY-->
+                <div class="video-content">
+                    <div class="video-body">
+                        @*<p>@heroBody.GetPropertyValue("bodyDescription")</p>
+                          <p> @Html.Raw(heroBody.RichTextBox)</p>*@
+                    </div>
+                </div>
+        
+                <div class="video-content">
+                    <div class="video-body">
+                        <div id="grow-disclaimer">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="grow-disclaimer-text"><p><span>Unsure of how you can save? We've got all the tips and tricks you need! Follow us:</span></p></div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="grow-icons">
+                                        <a href="https://www.facebook.com/africanbank/" target="_blank">
+                                            <div class="growit-social">
+                                                <span class="font-sizer fa fa-facebook"></span>
+                                            </div>
+                                        </a>
+                                        <a href="https://twitter.com/AfricanBank" target="_blank">
+                                            <div class="growit-social">
+                                                <span class="font-sizer fa fa-twitter"></span>
+                                            </div>
+                                        </a>
+                                        <a href="https://www.youtube.com/user/africanbanktv/featured" target="_blank">
+                                            <div class="growit-social">
+                                                <span class="font-sizer fa fa-youtube-play"></span>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        
+            </div>
+            <div class="influencers">
+                <div class="video-content">
+                    <div class="video-body" style="padding-top:30px">
+                        <h4><b class="text-white">THESE GUYS ARE GETTING IT RIGHT, YOU CAN TOO!</b></h4>
+                    </div>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                                <div class="row">
+                                    <img class="margin-bottom-20" width="150" src="~/media/nvlp2tqh/brent_lindeque.jpg" alt="alternative text">
+
+                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-white">
+                                        <p><b>Brent Lindeque</b></p>
+                                        <p>AKA The Good Thing Guy</p>
+                                        <br>
+                                        <p>"I'm making a little, change, that will add up to a big one!"</p>
+                                        <br>
+                                        <a href="https://twitter.com/BrentLindeque" target="_blank"><p class="video-title" style="font-size: 15px;">
+                                        &#64;brentlindeque</p></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                                <div class="row">
+                                    <img class="margin-bottom-20" width="150" src="~/media/chvjpwrm/precious_planner.jpg" alt="alternative text">
+                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-white">
+                                        <p><b>PRECIOUS THE PLANNER</b></p>
+                                        <p>AKA Blooms by Precious</p>
+                                        <br>
+                                        <p>"Check out this really great tool by African Bank that I used to put my #GamePlan together"</p>
+                                        <br>
+                                        <a href="https://twitter.com/preciousplanner" target="_blank"><p class="video-title" style="font-size: 15px;">
+                                            &#64;preciousplanner
+                                        </p></a>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                     </div>
+                </div>
+            </div>
+        }
+        else // Grow For it - no campaign
+        {
+            <div class="container">
+                
+                @*@Html.Partial("_pageHeaderVideo", videoLanding as TabHeader)*@
+            
+                @*Start *@
+                @{
+                    var title = videoLanding.Value("ebankITIconTitle");
+                    var thumb_img = videoLanding.Value<IPublishedContent>("ebankITIcon").Url;
+                    var description = videoLanding.Value("ebankITIconContent");
+                    var initial_video = videoLanding.Value("iconClass");
+                
+                    var content = videoItem.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+                    var videos = content.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedContent>>("sectionContent");
+                    var x = 1;
+                
+                }
+    
+                <div id="video-header" class="vid_list_item" data-video="@initial_video">
+                    <div id="video-header-thumb" style="background-image:url('@thumb_img'); background-position: right;">
+                        <iframe width="100%" height="100%" id="video-ytd" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                        <section id="video-loader">
+                            <div class="loader" id="form-preloader-loader">
+                                <div class="loader-img"></div>
+                            </div>
+                        </section>
+                        <div class="video-citation-box">
+                            <div class="video-citation">
+                            @if(@title!=""){
+                                <div class="landing-video-title vid_list_item" data-video="@initial_video">@title</div>
+                                }
+                            </div>
+                            <div class="video-play-button spacer">
+                                <span class="vid_list_item" data-video="@initial_video"><i class="fa fa-play-circle fa-3x main-click play-icon css-background-change"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                @*Finish *@
+                
+                <div class="video-content">
+                    <h1 class=" video-title css-color-change">@heroBody.Value("bodyTitle")</h1>
+                    <div class="video-body">
+                        <p>@heroBody.Value("bodyDescription")</p>
+                        <p> @Html.Raw(heroBody.RichTextBox)</p>
+                    </div>
+                </div>
+                <!-- HERO BODY -->
+                @*@Html.Partial("_pageBodyVideo", videoItem as TabBody) *@
+                
+                @{
+                    var noCampcontent = videoItem.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+                    var noCampvideos = noCampcontent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+                    var noCampx = 1;
+                }
+                <div id="video-body">
+                    <div class="row">
+                        @foreach (var videoData in noCampvideos)
+                        {
+                
+                            title = "Episode " + noCampx;
+                            description = videoData.Value("nCcardDescription");
+                            var img = videoData.Value<IPublishedContent>("nCcardIcon").Url;
+                            var videoUrl = videoData.Value("nCcardTitle");
+                            <div id="item-@noCampx" class="col-md-4 col-sm-6 vid-list">
+                                <div data-video="@videoUrl*@title*@description" class="video-item vid_list_item">
+                                    <div class="vid-list-play-botton"><i class="fa fa-play-circle fa-5x"></i></div>
+                                    <div class="video-item-img" style="background-image:url(@img)"></div>
+                                    <div class="video-item-content">
+                                        <div class="video-description-box">
+                                            <p class="video-item-description">@description</p>
+                                        </div>
+                                            <span class="video-item-title css-color-change">@title</span>
+                                            <div class="sharethis-inline-share-buttons" data-url="@Request.Url.AbsoluteUri#@videoUrl"></div>
+                                        </div>
+                                    </div>
+                            </div>
+                            noCampx++;
+                        }
+                    </div>
+                </div>
+                
+                <!-- HERO BODY-->
+
+
+            </div>
+        }
+    }
+</div>
+
+<div class="container @(isGrowForIt1 ? "mobi-padding" : "")">
+
+    <div class="@styleAtt">
+        <div class="video-content">
+            <div class="video-body">
+                <h3>@heroBody.Value("bodyTitle")</h3>
+            </div>
+        </div>
+
+        @if (video_card != null)
+        {
+            int iterator = 0;
+            var videoCardData = video_card.Value<IEnumerable<IPublishedElement>>("cardItemDetail");
+            <div class="hidden-xs row eq-height @(videoCardData.ToList().Count > 3 ? "card-slider" : "") margin-top-50">
+                @foreach (NCcard benefit in videoCardData)
+                {
+                    <div class="col-md-4 col-sm-3 col-xs-2 video-item list_item" style="margin: 20px">
+                        <div class="card-plain showTitleAndDescriptionModal" data-item="@benefit.NCcardTitle*@benefit.NCcardDescription">
+                            <div class="center-icon-text">
+                                <div class="image">
+                                    @if (benefit.NCcardIcon != null)
+                                    {
+                                        <img style="height:100%;width:100%;" 
+                                             class="showTitleAndDescriptionModal" data-item="@benefit.NCcardTitle*@benefit.NCcardDescription" src="@benefit.NCcardIcon.Url" alt="@benefit.NCcardIcon.Value("altTag")" />
+                                    }
+                                </div>
+                                <p style="padding-left:10px; padding-right:10px;" 
+                                   class="descr showTitleAndDescriptionModal" data-item="@benefit.NCcardTitle*@benefit.NCcardDescription">@benefit.NCcardTitle</p>
+                            </div>
+                        </div>
+                    </div>
+                    ++iterator;
+                }
+            </div>
+
+
+            <div class="row hidden-sm hidden-md hidden-lg col-xs-12">
+                @foreach (NCcard videoData in videoCardData)
+                {
+                    String description = videoData.Value("NCcardDescription").ToString();
+                    var img = videoData.NCcardIcon.Url;
+                    String storyTitle = videoData.Value("NCcardTitle").ToString();
+                    String popupimage = videoData.NCcardIcon.ToString();
+                    <div class="col-md-3 col-sm-6 vid-list">
+                        <div class="row showTitleAndDescriptionModal" data-item="@storyTitle*@description">
+                            <div class="col-xs-4">
+                                <img class="mobi-stories-image showTitleAndDescriptionModal" data-item="@storyTitle*@description" src="@videoData.NCcardIcon.Url" alt="@videoData.NCcardIcon.Value("altTag")">
+                            </div>
+                            <div class="col-xs-8">
+                                <div class="video-item-content">
+                                    <span class="video-item-title css-color-change showTitleAndDescriptionModal" data-item="@storyTitle*@description">@videoData.NCcardTitle</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+    
+</div>
+    @if (surveyPDFData != null) 
+    {
+            <div class="number-to-call">
+                <p style="text-align: center;">1 <span>Number to call</span></p>
+                <a class="onenumbercall" style="text-align: center;" href="tel:0861123456">0861 123 456</a> <br/>
+                @{
+
+                    var pdfs = (ICollection<IPublishedElement>)surveyPDFData.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+                    if (pdfs != null)
+                    {
+                        foreach (var item in pdfs)
+                        {
+                            var linkString = ((ContentModels.File)item.Value("nCebankITDocument")).Url;
+                            <a rel="noopener noreferrer" href="@linkString" target="_blank" class="tAndC">
+                                @item.Value("nCebankITTitle").ToString()
+                            </a>
+                        }
+                    }
+                }
+           </div> 
+    }
+
+     @section scripts{
+        <script src="~/scripts/jquery-ui.js"></script>
+        <script src="~/javascripts/reuse/form_validation.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.5/validator.min.js"></script>
+        <script type="text/javascript">
+
+
+            /* Grow for it */
+
+
+            $(document).ready(function () {
+                MediaHashVideo();
+
+                $(".vid_list_item").click(function (e) {
+                    moveHtmlView(50, e);
+                });
+                
+                $(".vid_list_item_campaign").click(function (e) {
+                    moveHtmlView(1250, e);
+                });
+                
+
+
+                $('.money').autoNumeric('init', { aSep: ' ', aDec: '.', aSign: 'R' });
+
+                function moveHtmlView(position, control) {
+                    var selected_video = control.currentTarget.dataset.video.split("*");
+                
+                    //checking if there is any video
+                    if (selected_video[0] !== null && selected_video[0] !== undefined && selected_video[0] != "")
+                    {
+                        //-->show video loader
+                        $("#video-loader").show();
+                        $("#video-header-thumb").addClass("video-thumb-none");
+                        $("#video-ytd").removeClass("video-ytd-show");
+                        $(".video-content").hide();
+                
+                        //--> header title description
+                        if (selected_video.length==3)
+                        {
+                            $(".landing-video-title").text(selected_video[1]);
+                            $(".landing-video-description p").text(selected_video[2]);
+                
+                        }
+                        $("#video-ytd")[0].src = selected_video[0];
+                        
+                        $("html, body").animate({ scrollTop: position }, 2000);
+                        
+                        setTimeout(function () {
+                            $('#video-ytd')[0].src += "?autoplay=1";
+                            $("#video-ytd").addClass("video-ytd-show");
+                            $("#video-loader").hide();
+                            
+                        }, 5000);
+                       
+                    }
+                }
+
+                function addFormValidation() {
+                    $('.form-horizontal').bootstrapValidator({
+                        feedbackIcons: {
+                            valid: 'glyphicon glyphicon-ok-sign',
+                            invalid: 'glyphicon glyphicon-remove-sign',
+                            validating: 'glyphicon glyphicon-refresh'
+                        },
+                        fields: {
+                            'firstName': {
+                                message: 'Value inserted is not valid',
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Name is required'
+                                    },
+                                    regexp: {
+                                        regexp: /^[a-zA-Z]/,
+                                        message: 'Please insert a valid name'
+                                    }, stringLength: {
+                                        max: 30,
+                                        message: 'Please make sure that the name is 30 max characters long.'
+                                    }
+                                }
+                            },
+                            'itemName': {
+                                message: 'Value inserted is not valid',
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Item name required'
+                                    },
+                                    regexp: {
+                                        regexp: /^[a-zA-Z]/,
+                                        message: 'Please insert a valid item you are saving for'
+                                    }, stringLength: {
+                                        max: 30,
+                                        message: 'Please make sure that the item is name 30 max characters long.'
+                                    }
+                                }
+                            },
+                            'email': {
+                                message: 'Value inserted is not valid',
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Enter a valid email address'
+                                    },
+                                    regexp: {
+                                        regexp: /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i,
+                                        message: 'Please enter a valid email address'
+                                    }, stringLength: {
+                                        max: 30,
+                                        message: 'Please make sure only number is inserted.'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                function isFormValid() {
+                    var isControlEmpty = false;
+                    $('.form-horizontal input').each(function () {
+                        if ($(this).val() === "") {
+                            isControlEmpty = false;
+                            return isControlEmpty;
+                        } else {
+                            isControlEmpty = true;
+                        }
+                    });
+                    return isControlEmpty;
+                }
+
+                $('#grow-create-certificate').on('click', function (e) {
+                    if (isFormValid()) {
+                        $('.hang-tight').show('slow');
+                        $('#video-header').css("margin-top", "-19px");
+                        setTimeout(function () {
+                            $('.hang-tight').hide('slow');
+                            $('#video-header').css("margin-top", "-62px");
+                            $('#generic')[0].children[0].children[0].children[0].children[1].innerHTML = 'Thank you!';
+                            $('#generic').modal('show');
+                            if ($('#grow-create-certificate').attr('disabled') === 'disabled') {
+                                $('#grow-create-certificate').removeAttr('disabled');
+                            }
+                        }, 5000);
+                    }
+
+                    $("form.form-horizontal").bootstrapValidator("destroy");
+                    addFormValidation();
+                });
+
+                addFormValidation();
+
+                $(".allownumericwithdecimal").on("keypress keyup blur", function (event) {
+                    $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
+                    if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+                        event.preventDefault();
+                    }
+                    if ($(this).val().indexOf('.') > 5) {
+                        var currentVal = parseInt($(this).val());
+                        if (!isNaN(currentVal) && currentVal > 0) {
+                            $(this).val("");
+                        }
+                    }
+                });
+
+                var step =
+                {
+                    fromGrowIt:
+                        [
+                            { name: "amount", control: "worth" },
+                            { name: "name", control: "firstName" },
+                            { name: "decision", control: "period" },
+                            { name: "email", control: "email" },
+                            { name: "string", control: "itemName" }
+                        ]
+                };
+
+                Object.keys(step).forEach(function (form) {
+                    var fields = form_validation_setup(step[form]);
+                    initialize_form_validation("#" + form, fields);
+                });
+
+                function DropDown(el) {
+                    this.dd = el;
+                    this.placeholder = this.dd.children('span');
+                    this.opts = this.dd.find('ul.dropdown > li');
+                    this.val = '';
+                    this.index = -1;
+                    this.initEvents();
+                }
+                DropDown.prototype = {
+                    initEvents: function () {
+                        var obj = this;
+
+                        obj.dd.on('click', function (event) {
+                            $(this).toggleClass('active');
+                            $(this).children('input')[0].innerText = $(this)[0].children[1].innerText;
+                            // loop through this: $(this)[0].children[1].children and find a innerHTML = $(this)[0].children[0].innerText + grab i item > $(this)[0].children[1].children[i].dataset.value from there
+                            for (var i = 0; i < $(this)[0].children[2].children.length; ++i) {
+                                if ($(this)[0].children[1].innerText === $(this)[0].children[2].children[i].innerText) {
+                                    $("#period")[0].value = $(this)[0].children[2].children[i].dataset.value;
+                                }
+                            }
+
+
+                            return false;
+                        });
+
+
+                        obj.opts.on('click', function () {
+                            var opt = $(this);
+                            obj.val = opt.text();
+                            obj.index = opt.index();
+                            obj.placeholder.text(obj.val);
+                        });
+                    },
+                    getValue: function () {
+                        return this.val;
+                    },
+                    getIndex: function () {
+                        return this.index;
+                    }
+                }
+
+                $(function () {
+
+                    var dd = new DropDown($('#dd'));
+
+                    $(document).click(function () {
+                        // all dropdowns
+                        $('.wrapper-dropdown-3').removeClass('active');
+                    });
+
+                });
+
+
+            });
+
+
+
+
+            function onPage(name) {
+                var path = window.location.pathname;
+                return name == path.substring(path.lastIndexOf('/') + 1);
+            }
+            if (onPage('moja-love')) {
+                $('.css-background-change').css('background', '#2E0554');
+                $('.css-color-change').css('color', '#2E0554');
+            };
+            $(".main-click").click(function () {
+                $(".video-citation-box").hide();
+                $("#video-header").css({ 'height': '75vh' });
+            });
+
+            function MediaHashVideo() {
+                var selected_video = window.location.hash.replace('#', '');
+                if (selected_video !== null && selected_video !== undefined && selected_video != "") {
+                    //-->show video loader
+                    $("#video-loader").show();
+                    $(".video-citation-box").hide();
+                    //}
+                    $("#video-ytd")[0].src = selected_video;
+                    setTimeout(function () {
+                        $('#video-ytd')[0].src += "?autoplay=1";
+                        $("#video-ytd").addClass("video-ytd-show");
+                        $("#video-loader").hide();
+                    }, 5000);
+                }
+            }
+        </script>
+
+    }

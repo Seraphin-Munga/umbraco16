@@ -1,0 +1,494 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using AcfAfricanbank.Core.Models.Forms
+@using Umbraco.Web.Models
+@using ContentModels = Umbraco.Web.PublishedModels;
+@{
+    Layout = "Master.cshtml";
+
+    var children = Model.Children;
+    var testimoniesPropertyName = "campaignTestimonials";
+    var testimonies = Model.Value<IEnumerable<IPublishedElement>>(testimoniesPropertyName);
+    var featuredProductPropertyName = "featuredProducts";
+    var featuredProducts = Model.Value<IEnumerable<IPublishedElement>>(featuredProductPropertyName);
+    var downloadPropertyName = "downloadFiles";
+    var downloadFilename = "file name";
+    var downloadLink = "file link";
+    var creditInsuredRelatedLinkPropertyName = "creditInsuredOptions";
+    var campaignPropertyName = "campaignProductInfo";
+    var campaignHeroImage = Model.Value<IPublishedContent>("campaignHeroImage");
+    var campaignHeroDescription = Model.Value<IPublishedContent>("campaignHeroDescription");
+    var campaignHeroButtonLabel = Model.Value<IPublishedContent>("campaignHeroButtonLabel");
+    var campaignHeroButtonRedirectLink = Model.Value("campaignHeroButtonRedirectLink");
+    var campaignHeroHeadline = Model.Value<IPublishedContent>("campaignHeroHeadline");
+
+    Umbraco.Web.Models.Link itemLink = null;
+
+    if (@Model.HasProperty(campaignPropertyName) && !string.IsNullOrEmpty(@Model.GetProperty(campaignPropertyName).ToString()))
+    {
+        var campaignProductInfo = Model.Value<IEnumerable<IPublishedElement>>("campaignProductInfo");
+
+        foreach (var campaign in campaignProductInfo)
+        {
+            var campaignProductImage = campaign.Value<IPublishedContent>("campaignProductImage");
+
+            var campaignProductTitle = campaign.Value("campaignProductTitle").ToString();
+            var campaignProductDescription = campaign.Value("campaignProductDescription").ToString();
+            var campaignProductHighlight = campaign.Value("campaignProductHighlight").ToString();
+            var campaignProductLearnMoreButtonLabel = campaign.Value("campaignProductLearnMoreButtonLabel").ToString();
+            var campaignProductLearnMoreButtonRedirectLink = campaign.Value("campaignProductLearnMoreButtonRedirectLink").ToString();
+            var campaignProductApplyNowButtonLabel = campaign.Value("campaignProductApplyNowButtonLabel").ToString();
+            var campaignProductApplyNowButtonRedirectLink = campaign.Value("campaignProductApplyNowButtonRedirectLink").ToString();
+            var campaignProductBenefits = campaign.Value<IEnumerable<IPublishedContent>>("structureProductBenefit");
+        }
+    }
+}
+
+<style type="text/css">
+
+    .campaign-apply {
+        padding: 0 50px 11px 50px;
+    }
+</style>
+
+<!-- HERO BANNER -->
+<div class="hero-static-container">
+    <div class="container-fluid">
+        <div class="row no-gutter">
+            <div class="col-sm-12">
+                @if (@Model.HasProperty("campaignProductInfo") && !string.IsNullOrEmpty(@Model.GetProperty("campaignProductInfo").ToString()))
+                {
+                    <div class="hero-static-banner" style="background-image: url('@campaignHeroImage.Url');">
+                        <ol class="breadcrumb">
+                            <li>Products</li>
+                            <li class="active">Campaign</li>
+                        </ol>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- HERO CONTINUED-->
+<div class="container">
+    <div class="hero-static-caption">
+        <h1 class="hero-static-title">@Model.Value("campaignHeroHeadline")</h1>
+        <div class="row">
+            <div class="col-sm-12 col-md-9">
+                <div class="hero-static-description">@Model.Value("campaignHeroDescription")</div>
+            </div>
+            <div class="col-sm-12 col-md-3"><a href="@campaignHeroButtonRedirectLink" class="button primary">@Model.Value("campaignHeroButtonLabel")</a></div>
+        </div>
+    </div>
+</div>
+
+<!-- PRODUCT INFORMATION-->
+<div class="container">
+    <div class="campaign-product-container">
+        <div id="dece-offer">
+            <div class="row">
+                <div class="col-md-4"><img class="dece-img" src="~/media/cfbc4why/camp_block1.jpg" alt="web-campaign-page-blocks1"></div>
+                <div class="col-md-4"><img class="dece-img" src="~/media/o2kb0lul/camp_block2.jpg" alt="web-campaign-page-blocks2"></div>
+                <div class="col-md-4"><img class="dece-img" src="~/media/mgtdbnuu/camp_block3.jpg" alt="web-campaign-page-blocks3"></div>
+            </div>
+        </div>
+
+        <!-- HOW TO APPLY-->
+        <div class="no-padding">
+            <div class="campaign-apply">
+                <h2>How to does it work?</h2>
+                <div class="row margin-top-20">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <div class="body-content">
+                            <ol>
+                                <li>Apply for an African Bank Loan and submit all your documents – see the checklist below.</li>
+                                <li>Receive a follow-up SMS and follow the prompts to receive your voucher!</li>
+                                <li>Enjoy something nyana this season! </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="campaign-apply">
+                <h2>@Model.Value("howToApplyTitle")</h2>
+                <div class="row margin-top-20">
+
+                    <div class="col-sm-6">
+                        <div class="body-content">@Model.Value("applicationDescription") </div>
+                        <div class="margin-top-40">
+                            <a href="@campaignHeroButtonRedirectLink" class="button primary hidden-xs" trigger-contact-form>@Model.Value("applyNowButtonLabel")</a>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 text-center">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <img src="~/images/apply-payslip.svg" alt="apply-payslip" height="80" />
+                                <p class="body-content margin-top-20">Latest original pay slip</p>
+                            </div>
+                            <div class="col-sm-6">
+                                <img src="~/images/apply-residence.svg" alt="apply-residence" height="80" />
+                                <p class="body-content margin-top-20">Proof of residence</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <img src="~/images/apply-id.svg" alt="apply-id" height="80" />
+                                <p class="body-content margin-top-20">Identity document</p>
+                            </div>
+                            <div class="col-sm-6">
+                                <img src="~/images/apply-statement.svg" alt="apply-statement" height="80" />
+                                <p class="body-content margin-top-20">Latest bank statement reflecting 3 salary deposits</p>
+                            </div>
+                        </div>
+                        <div>
+                            <a href="" class="button primary visible-xs">@Model.Value("applyNowButtonLabel")</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (@Model.HasProperty(campaignPropertyName) && !string.IsNullOrEmpty(@Model.GetProperty(campaignPropertyName).ToString()))
+        {
+            var campaignProductInfo = Model.Value<IEnumerable<IPublishedElement>>("campaignProductInfo");
+
+            foreach (var campaign in campaignProductInfo)
+            {
+                var campaignProductImage = campaign.Value<IPublishedContent>("campaignProductImage");
+
+                <div class="product-info">
+                    <div class="row eq-height">
+                        <div class="col-sm-12 col-md-4 col-md-push-8">
+                            <div class="image" style="background-image: url(@campaignProductImage.Url)">
+                                <img src="@campaignProductImage.Url" alt="@campaignProductImage.Value("altTag")" class="hidden-lg hidden-md" />
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4 col-md-pull-4">
+                            <div class="intro">
+                                <div class="title">@campaign.Value("campaignProductTitle").ToString()</div>
+                                <p class="body-content">@campaign.Value("campaignProductDescription").ToString()</p>
+                                <div class="floating-highlight">
+                                    <div class="icon">
+                                        <span class="icon-repayment"></span>
+                                    </div>
+                                    <div>
+                                        <p class="bold">@campaign.Value("campaignProductHighlight").ToString()</p>
+                                        <p>@campaign.Value("campaignHighlightDescription").ToString()</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4 col-md-pull-4">
+                            <div class="benefits">
+                                <p class="bold">BENEFITS</p>
+                                <ul>
+                                    @if (campaign.HasProperty("campaignProductBenefit") && !string.IsNullOrEmpty(campaign.Value("campaignProductBenefit").ToString()))
+                                    {
+                                        var productBenefits = campaign.Value<IEnumerable<IPublishedElement>>("campaignProductBenefit");
+
+                                        foreach (var benefit in productBenefits.Where(i => i != null))
+                                        {
+                                            <li>@benefit.Value("loanBenefitDescription").ToString()</li>
+                                        }
+                                    }
+                                </ul>
+                                <div class="floating-buttons">
+                                     @{
+                                        var learnMore = campaign.Value<IEnumerable<Umbraco.Web.Models.Link>>("learnMoreButtonLink");
+                                        foreach (var links in learnMore)
+                                        {
+
+                                            <a href="@links.Url" class="button primary small">Bathong @campaign.Value("campaignProductLearnMoreButtonLabel").ToString()</a>
+                                        }
+                                     }
+                                    @if (campaign.HasProperty("inPageLinking"))
+                                    {
+                                        var pageLinkData = campaign.Value("inPageLinking");
+                                        if (pageLinkData != null)
+                                        {
+                                            foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)pageLinkData)
+                                            {
+                                                itemLink = link;
+                                                break;
+                                            }
+                                            <a href="@itemLink.Url" target="_blank" class="button secondary small">@itemLink.Name</a>
+                                        }
+                                        else
+                                        {
+                                            <a href="@campaignHeroButtonRedirectLink" class="button secondary small">@campaign.Value("campaignProductApplyNowButtonLabel").ToString()</a>
+                                        }
+                                    }
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<!-- HOW TO APPLY-->
+<div class="container no-padding">
+    <div class="campaign-apply">
+        <h2>@Model.Value("howToApplyTitle")</h2>
+        <div class="row margin-top-20">
+
+            <div class="col-sm-6">
+                <div class="body-content">@Model.Value("applicationDescription") </div>
+                <div class="margin-top-40">
+                    <a href="@campaignHeroButtonRedirectLink" class="button primary hidden-xs" trigger-contact-form>@Model.Value("applyNowButtonLabel")</a>
+                </div>
+            </div>
+
+            <div class="col-sm-6 text-center">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <img src="~/images/apply-payslip.svg" alt="apply-payslip" height="80" />
+                        <p class="body-content margin-top-20">Latest original pay slip</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <img src="~/images/apply-residence.svg" alt="apply-residence" height="80" />
+                        <p class="body-content margin-top-20">Proof of residence</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <img src="~/images/apply-id.svg" alt="apply-id" height="80" />
+                        <p class="body-content margin-top-20">Identity document</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <img src="~/images/apply-statement.svg" alt="apply-statement" height="80" />
+                        <p class="body-content margin-top-20">Latest bank statement reflecting 3 salary deposits</p>
+                    </div>
+                </div>
+                <div>
+                    <a href="" class="button primary visible-xs">@Model.Value("applyNowButtonLabel")</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="margin-top-40 visible-xs"></div>
+
+<!-- CAMPAIGN MORE INFO -->
+<div class="campaign-more-container">
+    <div class="hover-block"></div>
+    <div class="container">
+        <div class="mega-tabs">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs eq-height" role="tablist">
+                <!--  <li role="presentation" class="active campaign-more">
+                      <a href="#info" aria-controls="home" role="tab" data-toggle="tab">
+                          Your credit is insured
+                      </a>
+                  </li> -->
+                <li role="presentation" class="active campaign-more" style="width:100%;">
+                    <a href="#downloads" aria-controls="profile" role="tab" data-toggle="tab">
+                        TERMS AND CONDITIONS
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Tab panes -->
+        @*<div class="tab-content">
+             <div role="tabpanel" class="tab-pane active" id="info">
+                 <div class="row">
+                     <div class="col-sm-10 col-sm-offset-1">
+                         <p class="text-center">
+                             @Model.Value("creditInsuredDescription")
+                         </p>
+                         <div class="row eq-height margin-top-30">
+                             <div class="col-sm-6">
+                                 <div class="campaign-list text-only">
+
+                                     @if (@Model.HasProperty(creditInsuredRelatedLinkPropertyName) && !string.IsNullOrEmpty(@Model.GetProperty(creditInsuredRelatedLinkPropertyName).ToString()))
+                                     {
+                                         var creditInsuredLinks = Model.Value<IEnumerable<Umbraco.Web.Models.Link>>("creditInsuredOptions");
+                                         if (creditInsuredLinks.Any())
+                                         {
+                                             <ul>
+                                                 @foreach (var item in creditInsuredLinks)
+                                                 {
+                                                     //var linkTarget = (item.Target) ? "_blank" : null;
+                                                     <li class="download-item"> @item.Name </li>
+                                                 }
+                                             </ul>
+                                         }
+                                     }
+                                 </div>
+                             </div>
+                             <div class="col-sm-6">
+                                 <div class="campaign-more-info-img">
+                                     @{
+                                         var CreditInsuredImage = Model.Value<IPublishedContent>("creditInsuredImage");
+                                         <div style="background-image: url('@CreditInsuredImage.Url');"></div>
+                                     }
+                                 </div>
+                             </div>
+                         </div>
+
+                     </div>
+                 </div>
+                 <div class="margin-top-80 hidden-xs"></div>
+                 <div class="row eq-height">
+                     <div class="col-sm-4">
+                         <div class="campaign-more-highlights">
+                             Payment options range from 9-72 months.
+                         </div>
+                     </div>
+                     <div class="col-sm-4">
+                         <div class="campaign-more-highlights">
+                             Interest rate (APR)  from 15% to 27.75%
+                         </div>
+                     </div>
+                     <div class="col-sm-4">
+                         <div class="campaign-more-highlights">
+                             Insurance rate from 5.04% to 5.4%
+                         </div>
+                     </div>
+                 </div>
+
+                 <div class="margin-top-30 campaign-terms">
+                     @Model.Value("creditInsuredLegalStatement")
+                 </div>
+             </div> *@
+            <div role="tabpanel" class="tab-pane active" id="downloads">
+                <div class="row">
+                    <div class="col-sm-10 col-sm-offset-1">
+                        <div class="campaign-list">
+                            <p class="text-center">
+                                @Model.Value("downloadDescription")
+                            </p>
+
+                            @if (@Model.HasProperty(downloadPropertyName) && !string.IsNullOrEmpty(@Model.GetProperty(downloadPropertyName).ToString()))
+                            {
+                                <ul>
+                                    @{
+                                        var files = Model.Value<IEnumerable<IPublishedElement>>(downloadPropertyName);
+
+                                        foreach (var file in files)
+                                        {
+                                            var downloadFilename2 = file.Value("downloadTextDescription").ToString();
+                                            var downloadLink2 = file.Value<IPublishedContent>("downloadButtonRedirectLink2");
+
+                                            <li>
+                                                <div class="row no-gutter download-item">
+                                                    <div class="col-sm-9">
+                                                        <div class="download-descr">@downloadFilename2</div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <a href="@downloadLink2.Url" target="_blank" class="download-btn">Download</a>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        }
+                                    }
+                                </ul>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row eq-height">
+                    <div class="col-sm-4">
+                        <div class="campaign-more-highlights">
+                            Payment options range from 9-72 months.
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="campaign-more-highlights">
+                            Interest rate (APR)  from 15% to 27.75%
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="campaign-more-highlights">
+                            Insurance rate from 5.04% to 5.4%
+                        </div>
+                    </div>
+                </div>
+
+                <div class="margin-top-30 campaign-terms">
+                    @Model.Value("downloadLegalStatement")
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- TESTIMONIALS -->
+<div class="testimonials-container white-bg">
+    <div class="container">
+        <h3 class="text-center margin-top-60">What our customers are saying</h3>
+        <div class="testimonials-carousel">
+            <div id="testimonials" class="carousel slide" data-ride="carousel" data-interval="false">
+                <!-- Indicators -->
+                @if (@Model.HasProperty(testimoniesPropertyName) && !string.IsNullOrEmpty(@Model.GetProperty(testimoniesPropertyName).ToString()))
+                {
+                    <ol class="carousel-indicators">
+                        @{
+                            int counter = 0;
+
+                            foreach (var testimonyItem in testimonies)
+                            {
+                                <li data-target="#hero-banner" data-slide-to="@counter" class="@((counter == 0) ? "active" : "")"></li>
+
+                                counter++;
+                            }
+                        }
+                    </ol>
+
+                    <!-- Wrapper for slides -->
+                    <div class="carousel-inner">
+                        @{
+                            int newCounter = 0;
+
+                            foreach (var testimonyItem in testimonies)
+                            {
+                                var Avatar = testimonyItem.Value<IPublishedContent>("testimonialAvatar");
+
+                                <div class="item @((newCounter == 0) ? "active" : "")">
+                                    <div class="testimonial">
+                                        <div class="avatar">
+                                            <img src="@Avatar.Url" alt="@Avatar.Value("altTag")">
+                                        </div>
+                                        <div class="descr">
+                                            @testimonyItem.Value("testimonialStory")
+                                        </div>
+                                        <div class="name">@testimonyItem.Value("testimonialName")</div>
+                                    </div>
+                                </div>
+
+                                newCounter++;
+                            }
+                        }
+                    </div>
+                }
+                <!-- Controls -->
+                <a class="left carousel-control" href="#testimonials" role="button" data-slide="prev">
+                    <span class="icon-arrow-left"></span>
+                </a>
+                <a class="right carousel-control" href="#testimonials" role="button" data-slide="next">
+                    <span class="icon-arrow-right"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- CALL BACK FORM -->
+@{
+    var _floatingFormViewModel = children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+    @Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)
+}

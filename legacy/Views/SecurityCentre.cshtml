@@ -1,0 +1,1256 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.BlogLanding>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models;
+@using Web.Helpers;
+@using System.Configuration;
+@using Io = System.IO
+@using System.Drawing
+@using ImageProcessor
+@{
+    Layout = "Master.cshtml";
+    // All Current Page Children
+    var children = Model.Children;
+    ContainerViewModel containerViewModel = new ContainerViewModel();
+
+    // Get specific Children
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    var heroBodyTabGroup = heroBody.Children?.Where(c => c.ContentType.Alias.ToLower() == "tabgroup").FirstOrDefault();
+
+    var x = 1;
+    //Get specific properties
+    var headerImage = heroHeader?.Value<IPublishedContent>
+        ("image")?.Url;
+    var heroShoulderTitle = heroShoulder?.Value("shoulderTitle").ToString();
+    var heroShoulderDescription = heroShoulder?.Value("shouderDescription").ToString();
+    //Get blog elements
+    var TupleBlogs = new List<Tuple<int, string, string, string, string, DateTime, string>>();
+    var TupleVideos = new List<Tuple<int, string, string, string, string, DateTime, string>>();
+    // var BlogLanding = (IEnumerable<IPublishedContent>)children?.Where(c => c.DocumentTypeAlias.ToLower() == "blogdetail").FirstOrDefault();
+    foreach (var item in children)
+    {
+        if (item.Id == 41927)
+        {
+            break;
+        }
+        if (item.ContentType.Alias == "blogDetail")
+        {
+            var blogHeader = item.Children.FirstOrDefault().Children.Where(c => c is HeroHeaderBlogDetail).FirstOrDefault();
+            var blogBody = item.Children.FirstOrDefault().Children.Where(c => c is HeroBodyBlogDetail).FirstOrDefault();
+            var image = blogHeader.Value<int>("image");
+            var videoItems = blogHeader.Value<int>("HeroHeaderVideo");
+            //if (videoItems == 0)
+            //{
+            TupleBlogs.Add(new Tuple<int, string, string, string, string, DateTime, string>(
+                    item.Id,
+                    ((IPublishedContent)blogHeader.Value("image")).Url?.ToString() ?? "",
+                    (blogBody.Value("title"))?.ToString() ?? "",
+                    (blogBody.Value("introductionDescription"))?.ToString() ?? "",
+                    ((IPublishedContent)blogHeader.Value("HeroHeaderVideo")).Url?.ToString() ?? "",
+                    Convert.ToDateTime(blogBody.Value("blogDate")),
+                    (blogBody.Value("blogBody"))?.ToString() ?? ""
+                    ));
+            //}
+            //else
+            //{
+            //    TupleVideos.Add(new Tuple<int, string, string, string, string, DateTime, string>(
+            //            item.Id,
+            //            ((IPublishedContent)blogHeader.GetPropertyValue("image")).Url?.ToString() ?? "",
+            //            (blogBody.GetPropertyValue("title"))?.ToString() ?? "",
+            //            (blogBody.GetPropertyValue("introductionDescription"))?.ToString() ?? "",
+            //            ((IPublishedContent)item).Url,
+            //            Convert.ToDateTime(blogBody.GetPropertyValue("blogDate")),
+            //            (blogBody.GetPropertyValue("blogBody"))?.ToString() ?? ""
+            //            ));
+            //}
+
+        }
+
+    }
+    //Video section
+    //var domainDirectory = System.Web.HttpContext.Current.Request.Url.AbsoluteUri.Replace(System.Web.HttpContext.Current.Request.Url.AbsolutePath, "");
+    //string currentDirectory = domainDirectory;
+    //var videoLanding = heroBodyTabGroup.Children?.Where(c => c.DocumentTypeAlias.ToLower() == "tabheader").FirstOrDefault();
+    //var pageBlurp = videoLanding.GetPropertyValue("ebankITIconContent");
+    //var _schemaDescriptionBody = System.Text.RegularExpressions.Regex.Replace(pageBlurp.ToString(), "<.*?>", String.Empty);
+    //var videoItem = videoLanding.Children.Where(c => c.DocumentTypeAlias.ToLower() == "tabbody").FirstOrDefault();
+
+    //var video_card = heroBody.Children?.Where(c => c.Name == "Video card").FirstOrDefault();
+    //var styleAtt = "";
+    // if (video_card != null)
+    //{
+    //    styleAtt = video_card.Children.Where(c => c.Name == "Style").FirstOrDefault().GetPropertyValue("text").ToString();
+    //}
+    //var content = videoItem.GetPropertyValue<IEnumerable<IPublishedContent>>("tabBodyContent");
+    //var videos = content.Where(c => c.DocumentTypeAlias == "nCTabGenericContent").FirstOrDefault().GetPropertyValue<IEnumerable<IPublishedContent>>("sectionContent");
+    // Take 1 vid and send it to Schema
+    //var _schemaCarddescription = videos.FirstOrDefault().GetPropertyValue("cardDescription");
+    //var _schemaCardDescriptionFriendly = System.Text.RegularExpressions.Regex.Replace(_schemaCarddescription.ToString(), "<.*?>", String.Empty);
+    //var _schemaDescription = videos.FirstOrDefault().GetPropertyValue("cardDescription");
+    //var _schemaIimg = videos.FirstOrDefault().GetPropertyValue<IPublishedContent>("cardIcon").Url;
+    //String _schemaImgString = currentDirectory + _schemaIimg.ToString();
+    //var _schemaMetaData = videos.FirstOrDefault().GetPropertyValue("cardMetaData");
+    //var _schemaVideoUrl = currentDirectory + videos.FirstOrDefault().GetPropertyValue("cardTitle").ToString();
+    //String videoUrl = "";
+
+}
+<link rel="stylesheet" href="../../css/style-customer-engagement.css">
+
+<link href="~/css/Blog.css" rel="stylesheet" />
+<style>
+    #heroHeader {
+        top: -16px;
+        background-repeat: no-repeat;
+        background-size: cover;
+        padding-bottom: 40px;
+        z-index: -2;
+    }
+
+    .para-secure {
+        font-size: 18px;
+    }
+
+    @@media (max-width: 1400px) and (min-width: 1024px) {
+        .hero-static-banner {
+            margin-top: 110px;
+        }
+    }
+
+    .welcome-text h2 {
+        background: #C5D42D;
+        color: #002b60;
+        padding: 30px;
+        font-size: 34px;
+        font-weight: bold;
+        padding-bottom: 20px;
+    }
+
+    .para-secure {
+        margin-top: -240px;
+    }
+
+    .welcome-text {
+        background: #C5D42D;
+        border-radius: 5px 5px 5px 5px;
+        box-shadow: 0px 7px 20px rgba(0,0,0,0.16);
+        margin-top: -50px;
+        overflow: hidden;
+        text-align: center;
+        /*padding-bottom: 20px;*/
+        font-size: 16px;
+        height: 200px;
+        margin-bottom: 120px;
+    }
+
+    /*.welcome-text p {
+            padding: 10px 20px 0px;
+        }*/
+
+    .ab-videos-grid {
+        margin-top: 25px;
+    }
+
+        .ab-videos-grid > div {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+    .ab-video {
+        box-shadow: 0px 7px 20px rgba(0,0,0,0.16);
+        border-radius: 0px 0px 10px 10px;
+        overflow: hidden;
+        margin-bottom: 25px;
+        transition: 0.5s;
+    }
+
+    .ab-big-video-thumbnail {
+        height: 200px;
+        background: url(../img/register-for-online-banking-anywhere-anytime_desktop.jpg)left no-repeat;
+        background-size: cover;
+    }
+
+    .ab-big-video-title {
+        padding: 20px;
+        color: black;
+        background: #fff;
+        min-height: 140px;
+    }
+
+        .ab-big-video-title p {
+            font-weight: 500;
+        }
+
+    .ab-video:hover > * .ab-big-video-playbtn {
+        color: #1D74B4;
+        text-shadow: 0px 3px 15px rgba(28,115,178,0.8);
+        transition: 0.5s;
+        color: #fff;
+    }
+
+    .ab-big-video-playbtn {
+        color: #fff;
+        text-align: center;
+        padding-top: 65px;
+    }
+
+    .ab-video:hover > .ab-big-video-title {
+        background: #426BAE;
+        transition: 0.5s;
+        color: #fff;
+    }
+
+    .italic-footer {
+        padding-top: 10px;
+        color: gray
+    }
+
+    .ab-video:hover > .ab-big-video-title > .italic-footer {
+        color: #fff;
+    }
+
+    .card-header {
+        color: #002b60;
+    }
+
+    .ab-video:hover > .ab-big-video-title > .card-header {
+        color: #fff;
+    }
+
+    body {
+        background-color: #fbfbfb;
+    }
+
+    .resulting-span {
+        font-weight: 400;
+        color: #88bc47;
+    }
+
+    .hr-line {
+        width: 70%;
+    }
+
+    .stories-container {
+        background-color: #fff;
+        padding-top: 25px;
+    }
+
+    .press-release-container {
+        background-color: #fbfbfb;
+        padding-top: 5px;
+    }
+
+    * {
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+
+    .pagination {
+        margin: 0px 0px 20px 0px;
+    }
+
+    .header {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 16 !important;
+    }
+
+    .fixed-sub-menu-bar {
+        overflow: hidden;
+        position: absolute;
+        top: 102px;
+        width: 100%;
+        /*height: 74px;*/
+        z-index: 3 !important;
+        background-color: #fff;
+    }
+
+    /*.share-listed-blogs {
+        font-size: 32px;
+        float: right;
+        margin-top: -35px;
+        position: relative;
+        color: #a39d9d;
+        bottom: 187px;
+        background-color: #100f0f;
+        width: 32px;
+        padding: 5px;
+    }*/
+
+    /*.share-listed-main-blog {
+        font-size: 32px;
+        float: right;
+        position: relative;
+        color: #dfdcdc;
+        bottom: 1px;
+        z-index: 2;
+        background-color: #100f0f;
+        width: 32px;
+        padding: 5px;
+        margin-right: -1px;
+    }*/
+    #divMainBlog .sharethis-inline-share-buttons {
+        position: absolute;
+        top: 15px;
+        margin-bottom: 10px;
+        left: 93.5%;
+        z-index: 2 !important;
+    }
+
+    .sharethis-inline-share-buttons {
+        position: absolute;
+        top: 15px;
+        margin-bottom: 10px;
+        left: 86.8%;
+        z-index: 2 !important;
+    }
+
+    #divNextblogs .sharethis-inline-share-buttons {
+        position: absolute;
+        top: 15px;
+        margin-bottom: 10px;
+        left: 24.5%;
+        z-index: 2 !important;
+    }
+
+    .st-btn:hover {
+        opacity: unset !important;
+        top: 0 !important;
+    }
+
+    @@media (min-width:768px) and (max-width:1024px) {
+
+        .welcome-text {
+            height: 260px;
+        }
+
+        .para-secure {
+            margin-top: -268px;
+        }
+
+        #divMainBlog .sharethis-inline-share-buttons {
+            position: absolute;
+            top: 15px;
+            margin-bottom: 10px;
+            left: 94.8%;
+            z-index: 2 !important;
+        }
+
+        .sharethis-inline-share-buttons {
+            position: absolute;
+            top: 15px;
+            margin-bottom: 10px;
+            left: 84.4%;
+            z-index: 2 !important;
+        }
+    }
+    /*@@media (max-width: 480px) {
+        .sharethis-inline-share-buttons {
+            right: unset;
+        }
+    }*/
+
+    .padding-to-right {
+        padding-right: 15px;
+    }
+
+    .sub-menu-items-bold {
+        font-weight: 900;
+    }
+
+    p {
+        margin: 0;
+    }
+
+    .video_list_item {
+        transition: 0.5s;
+    }
+
+    .blog-image {
+        overflow: hidden;
+    }
+
+        .blog-image > .image {
+            transition: 0.5s;
+        }
+
+    .video_list_item:hover > .blog-image > .image {
+        transition: 0.5s;
+        transform: scale(1.1);
+    }
+
+    .blog-image:hover > .ahref > .image {
+        transition: 0.8s;
+        transform: scale(1.1);
+    }
+
+    .blog-image > .ahref > .image {
+        transition: 0.8s;
+    }
+
+    #divMainBlog:hover #descriptionMain {
+        background-color: #002b60;
+    }
+
+    #divMainBlog #descriptionMain {
+        background-color: rgba(0, 74, 140, 0.75);
+    }
+
+    .video_list_item:hover {
+        transition: 0.5s;
+        box-shadow: 0px 0px 25px rgba(0,0,0,0.325) !important;
+        padding-top: 0px;
+        background-color: #002b60;
+    }
+
+        .video_list_item:hover .article-title, .video_list_item:hover .body-content {
+            color: #fff;
+        }
+
+    .pr-card:hover {
+        color: #fff;
+    }
+
+    .category-header > div > p {
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    #searchstring {
+        width: 100%;
+        border: 2px solid #e4e6e3;
+        border-right: none;
+        padding: 5px;
+        height: 40px;
+        border-radius: 2px 0 0 2px;
+        outline: none;
+        padding-left: 20px;
+    }
+
+    .searchButton {
+        width: 60px;
+        height: 40px;
+        border: 1px solid #ececec;
+        background: #cbcbcb;
+        text-align: center;
+        color: #fff;
+        border-radius: 0 2px 2px 0;
+        cursor: pointer;
+        font-size: 20px;
+        outline: none;
+    }
+
+    .date-range-search {
+        border-left: 1px solid #ccc;
+        border-right: 1px solid #ccc;
+        text-align: center;
+    }
+
+    .wrap {
+        padding-left: 10px;
+    }
+
+    #divNextblogs {
+        padding-right: 0px;
+    }
+
+    #divRemainingBlogs {
+        padding-right: 0px;
+        margin-top: 9px;
+    }
+
+    .submenu > li {
+        padding: 10px;
+    }
+
+    .navbar-submenu ul > li > a {
+        padding: 10px 5px;
+    }
+
+    .navbar-submenu ul {
+        /*display: flex;*/
+        justify-content: space-between;
+        list-style-type: none;
+    }
+
+        .navbar-submenu ul > li {
+            margin: 0 1em;
+        }
+
+    .navbar-submenu .li-css:hover {
+        background-color: #f1ecec00;
+    }
+
+    .navbar-submenu .li-css > a:hover {
+        background-color: #f1ecec00;
+    }
+
+    .navbar-submenu .li-css a:after {
+        content: '';
+        border-bottom: 2px solid #88bc47;
+        left: 50%;
+        position: absolute;
+        top: 50px;
+        transition: all .2s ease-in-out;
+        width: 0;
+    }
+
+    .navbar-submenu .li-css a:hover:after {
+        left: 0;
+        width: 100%;
+    }
+
+    .pipe-borders {
+        border-right: 1px solid #e4e4e4;
+        border-left: 1px solid #e4e4e4;
+        padding-right: 14px !important;
+        padding-left: 14px !important;
+    }
+
+    .light-grey-color-a {
+        color: #5d5757;
+    }
+
+    .topics-li {
+        background-color: #f1ecec00 !important;
+        content: '';
+        border-bottom: none;
+        left: 0px;
+        position: absolute;
+        top: 0px;
+        transition: none;
+    }
+
+        .topics-li:hover {
+            content: '';
+            border-bottom: none !important;
+            /* left: 50%; */
+            /* position: absolute; */
+            /* top: 0px; */
+            /* transition: none; */
+            /* width: 0; */
+        }
+
+            .topics-li:hover:after {
+                content: '';
+                border-bottom: none !important;
+                left: 50%;
+                position: absolute;
+                top: 50px;
+                transition: all .2s ease-in-out;
+                width: 0;
+            }
+
+    .icons:hover {
+        color: #88bc47 !important;
+    }
+
+    .fa-lightbulb-o:before {
+        color: #88bc47;
+    }
+
+    .fa-calendar:before {
+        color: #88bc47;
+    }
+
+    .icons:hover:after {
+        color: #88bc47 !important;
+    }
+
+    .topics-li > li a:hover:after {
+        content: '';
+        border-bottom: none !important;
+        left: 50%;
+        position: absolute;
+        top: 50px;
+        transition: all .2s ease-in-out;
+        width: 0;
+    }
+
+    .navbar-submenu .topics-li > li a:hover:after {
+        content: '';
+        border-bottom: none !important;
+        left: 50%;
+        position: absolute;
+        top: 50px;
+        transition: all .2s ease-in-out;
+        width: 0;
+    }
+
+    .main-container {
+        margin-top: 183px;
+    }
+
+    .li-disabled {
+        pointer-events: none;
+        opacity: 0.6;
+    }
+
+    .sub-menu-padding {
+        padding: 4px 0 4px 0;
+    }
+
+    @@media (min-width:768px) and (max-width:1025px) {
+        .main-container {
+            margin-top: 255px;
+        }
+        /*.fixed-sub-menu-bar {
+            top: 160px;
+        }*/
+        .navbar-submenu ul > li {
+            margin: 0 .2em;
+        }
+    }
+
+    @@media (min-width:320px) and (max-width: 425px) {
+        #divNextblogs {
+            display: block;
+        }
+
+            #divNextblogs .sharethis-inline-share-buttons {
+                position: absolute;
+                top: 15px;
+                margin-bottom: 10px;
+                left: 24.8%;
+                z-index: 2 !important;
+            }
+
+        .li-disabled {
+            opacity: 1.6;
+        }
+
+        .main-container {
+            margin-top: 104px;
+        }
+
+        .fixed-sub-menu-bar {
+            /*height: 52px;*/
+        }
+
+        .navbar-submenu ul {
+            /*display:flex;*/
+        }
+
+        .navbar-submenu > .content-padding-10 {
+            padding: 0px;
+        }
+
+        .sub-menu-padding {
+            padding: unset;
+        }
+
+        .pipe-borders {
+            border-right: none;
+            border-left: none;
+            padding-right: none;
+            padding-left: none;
+        }
+
+        .sub-menu-shadow {
+            /*box-shadow:none;*/
+        }
+
+        #divMainBlog {
+            padding-left: 0px;
+            padding-right: 0px;
+        }
+    }
+
+    @@media (min-width:320px) and (max-width:767px) {
+
+        .welcome-text {
+            height: 500px;
+        }
+
+        .para-secure {
+            margin-top: -465px !important;
+        }
+
+        .mobi-items {
+            display: block;
+            padding-left: 20px;
+        }
+
+        #searchstring {
+            border-radius: 20px 0 0 20px;
+            border: 1px solid #e4e6e3;
+            border-right: none;
+        }
+
+        .searchButton {
+            background: #fff;
+            color: #cbcbcb;
+            border-radius: 0 20px 20px 0;
+            border-left: none !important;
+            border: 1px solid #e4e6e3;
+        }
+
+        .li-disabled {
+            opacity: 1.6;
+        }
+
+        .date-range-search {
+            border-left: 0px;
+            border-right: 0px;
+            text-align: unset;
+        }
+
+            .date-range-search > p {
+                padding: none !important;
+                text-align: unset;
+            }
+
+        .wrap {
+            padding-left: 0px;
+        }
+
+        .fixed-sub-menu-bar {
+            top: 60px;
+        }
+
+        .navbar-submenu > .content-padding-10 {
+            padding: 0px;
+        }
+
+        .sub-menu-padding {
+            padding: unset;
+        }
+
+        .pipe-borders {
+            border-right: none;
+            border-left: none;
+            padding-right: none;
+            padding-left: none;
+        }
+
+        .sub-menu-shadow {
+            /*box-shadow:none;*/
+        }
+
+        .dropdown-toggle > .nav > li > a:hover, .nav > li > a:focus {
+            background-color: #fff;
+        }
+
+        .dropdown-toggle > .nav .open > a, .nav .open > a:hover, .nav .open > a:focus {
+            background-color: #fff;
+        }
+
+        #divMainBlog .sharethis-inline-share-buttons {
+            position: absolute;
+            /*top: 51px!important;*/
+            margin-bottom: 10px;
+            left: 90% !important;
+            z-index: 2 !important;
+        }
+
+        .sharethis-inline-share-buttons {
+            position: absolute;
+            top: 15px;
+            margin-bottom: 10px;
+            left: 24.8%;
+            z-index: 2 !important;
+        }
+    }
+
+    #divRemainingblogs {
+        padding-right: 0;
+    }
+
+    @@media (min-width:768px) and (max-width:1023px) {
+        #divMainBlog .sharethis-inline-share-buttons {
+            position: absolute;
+            top: 15px;
+            margin-bottom: 10px;
+            left: 93.2%;
+            z-index: 2 !important;
+        }
+
+        .sharethis-inline-share-buttons {
+            position: absolute;
+            top: 15px;
+            margin-bottom: 10px;
+            left: 86.7%;
+            z-index: 2 !important;
+        }
+    }
+
+    .st-btn {
+        border-radius: 0px !important;
+    }
+
+        .st-btn[data-network='facebook'] {
+            display: none !important;
+        }
+
+    .date-lg > i {
+        font-size: smaller;
+    }
+
+    .article-content:hover {
+        color: #fff;
+    }
+    /*Video item css*/
+    #video-body {
+        position: relative;
+        top: -426px;
+    }
+
+    .video-cards {
+        position: relative;
+        top: -250px;
+    }
+
+    .overlay-header {
+        position: relative;
+        top: -440px;
+    }
+
+    .box {
+        border-radius: 10px;
+        display: inline-block;
+        transition: all 1.3s;
+        cursor: pointer;
+    }
+
+    .box_container:hover .box {
+        transform: translateY(-15%);
+    }
+
+    .video_listItem {
+        transition: 0.4s ease-in-out;
+        box-shadow: 0px 1px 20px rgba(0,0,0,0.125);
+        cursor: pointer;
+    }
+
+    /*.video_list_item:hover {
+        transform: translateY(-4%);
+    }*/
+    #generic > div > div > div.modal-header > button > b {
+        font-size: 40px;
+        font-weight: 100;
+        color: #fff8f8;
+        padding-top: 2px;
+    }
+
+    .close > b {
+        background: #606061;
+        color: #FFFFFF;
+        line-height: 25px;
+        position: absolute;
+        right: -20px;
+        text-align: center;
+        top: -16px;
+        width: 27px;
+        height: 27px;
+        text-decoration: none;
+        font-weight: bold;
+        -webkit-border-radius: 12px;
+        -moz-border-radius: 12px;
+        border-radius: 15px;
+        -moz-box-shadow: 1px 1px 3px #000;
+        -webkit-box-shadow: 1px 1px 3px #000;
+        box-shadow: 1px 1px 3px #000;
+    }
+
+    .modal .modal-dialog .modal-content .modal-header {
+        background-color: #fff;
+    }
+
+    .modal-header {
+        border-radius: 5px;
+    }
+
+    .modal-dialog {
+        width: 70%;
+    }
+
+    .modal-content {
+        position: relative !important;
+        background-color: transparent !important;
+        border: none !important;
+        border: none !important;
+        border-radius: none !important;
+        -webkit-box-shadow: none !important;
+        box-shadow: none !important;
+        background-clip: none !important;
+        outline: none !important;
+    }
+
+    .modal-header {
+        padding: 0px;
+        background: transparent !important;
+        border-radius: 5px;
+    }
+
+    #generic > div > div > div.modal-header > button > b {
+        font-size: 40px;
+        font-weight: 100;
+        color: #fff8f8;
+        padding-top: 2px;
+    }
+
+    .close > b {
+        background: #000000;
+        border: 1px solid #C5C5C5;
+        color: #FFFFFF;
+        line-height: 22px;
+        position: absolute;
+        right: -6px;
+        text-align: center;
+        top: 12px;
+        width: 27px;
+        height: 27px;
+        text-decoration: none;
+        font-weight: bold;
+        -webkit-border-radius: 12px;
+        -moz-border-radius: 12px;
+        border-radius: 15px;
+        -moz-box-shadow: 1px 1px 3px #000;
+        -webkit-box-shadow: 1px 1px 3px #000;
+        box-shadow: 1px 1px 3px #000;
+        z-index: 999;
+    }
+
+    @@media (max-width:767px) {
+        p {
+            font-weight: 500;
+        }
+
+        .article-card .article-title {
+            font-size: 16px;
+            font-weight: 600;
+            line-height: normal;
+            margin-bottom: 14px;
+            color: #002b60;
+            padding-top: 1px;
+            margin-left: 0px;
+        }
+    }
+</style>
+<div class="hero-static-banner" id="heroHeader" style="background-image: url('@headerImage');">
+    @*<ol class="breadcrumb">
+            @if (breadcrumbItems != null)
+            {
+                foreach (string breadcrumItem in breadcrumbItems)
+                {
+                    var cssClass = breadcrumItem == breadcrumbItems.Last() ? "active" : string.Empty;
+                    <li class="@cssClass">@breadcrumItem</li>
+                }
+            }
+        </ol>*@
+</div>
+<div class="container main-content">
+    <div class="welcome-text">
+        <h2>@heroShoulderTitle</h2>
+
+    </div>
+    <p class="para-secure" style="padding: 10px 20px 0px;">@heroShoulderDescription</p>
+    <div class="row">
+        @if (TupleBlogs.Count() != 0)
+        {
+            <div id="divMainBlog" class="col-lg-8 col-xs-12 ">
+                <div class="article-card">
+                    <div class="video-item video_list_item" style="margin-top: 0px !important;height:100%;">
+                        <div class="blog-image">
+                            <a class="blogHeaderLink" href="" data-pdf="@TupleBlogs.First().Item5">
+                                <div id="imgMain" class="image" style="background-image: url('@TupleBlogs.First().Item2');"></div>
+                                <div style="height: 0px !important;">
+                                    <div id="titleMain" class="article-title">
+                                        @TupleBlogs.First().Item3
+                                    </div>
+                                    <div id="descriptionMain" class="body-content">
+                                        @TupleBlogs.First().Item4
+                                    </div>
+                                    <div id="divMainReadMore">
+                                        <div class="readMoreLink">
+                                            <a href="@TupleBlogs.First().Item5"></a>
+                                        </div>
+                                        <div class="publishDate">
+                                            <span class="date-output"><i>Publish Date: @TupleBlogs.First().Item6.ToShortDateString()</i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sharethis-inline-share-buttons" data-url="@TupleBlogs.First().Item5"></div>
+            </div>
+            <div id="divNextblogs" class="col-md-4 col-lg-4 col-xs-12">
+                <h6 style="color:#002b60; font-weight: bold">Latest reads</h6>
+                <div class="row">
+                    @foreach (var blog in TupleBlogs.Skip(1).Take(2))
+                    {
+                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-12">
+                            <a class="blogHeaderLink" data-pdf="@blog.Item5">
+                                <div class="article-card video-item video_list_item" style="cursor:pointer;">
+                                    <div style="display:flex;" class="row">
+                                        <div class="col-md-4 hidden-md hidden-sm hidden-xs" style="padding-right: 1px;">
+                                            <div class="image" style="background-image: url('@blog.Item2')"></div>
+                                        </div>
+                                        <div class="col-xs-12 col-lg-8">
+                                            <div class="row">
+                                                <div class="col-xs-4 hidden-lg hidden-sm hidden-md">
+                                                    <div class="image remainingBlogImage hidden-lg " style=" height:220px; position: relative; background-image: url('@blog.Item2')"></div>
+                                                </div>
+                                                <div class="col-xs-8 hidden-sm hidden-md hidden-lg">
+                                                    <div class="article-content">
+                                                        <div class="article-title ">@blog.Item3</div>
+                                                        <div class="body-content article-body-content">
+                                                            @blog.Item4
+                                                        </div>
+                                                    </div>
+                                                    <div class="article-content">
+                                                        <div class="pull-right hidden-lg"><i>Publish Date: @blog.Item6.ToShortDateString()</i></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="image remainingBlogImage hidden-lg hidden-xs " style=" height:220px; position: relative; background-image: url('@blog.Item2')"></div>
+                                            <div class="article-content hidden-xs">
+                                                <div class="article-title ">@blog.Item3</div>
+                                                <div class="body-content article-body-content">
+                                                    @blog.Item4
+                                                </div>
+                                                <div class="article-content hidden-xs">
+                                                    <div class="date-lg"><i>Publish Date: @blog.Item6.ToShortDateString()</i></div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                            <div class="sharethis-inline-share-buttons" data-url="@blog.Item5"></div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+    <div id="divRemainingblogs" class="col-sm-12 responsiveMove" style="margin-top:9px">
+        <div class="row">
+            @if (TupleBlogs.Count() != 0)
+            {
+                //var pageSize = 6;
+                //var page = 1; int.TryParse(Request.QueryString["page"], out page);
+                //var totalPages = (int)Math.Ceiling((double)(TupleBlogs.Count - 4) / (double)pageSize);
+                //if (page > totalPages)
+                //{
+                //    page = totalPages;
+                //}
+                //else if (page < 1)
+                //{
+                //    page = 1;
+                //}
+                foreach (var blog in TupleBlogs.Skip(3))
+                {
+                    <div class="col-xs-12 col-sm-6 col-md-4 desktop-items margin-bottom-10">
+                        <a class="blogHeaderLink" id="blogHeaderLink" data-pdf="@blog.Item5">
+                            <div class="article-card remainingBlogItem video-item video_list_item" style="cursor:pointer;">
+                                <div class="blog-image">
+                                    <div class="image remainingBlogImage" style=" height:220px; position: relative; background-image: url('@blog.Item2')"></div>
+                                </div>
+                                <div class="article-content" style="padding:10px">
+                                    <div class="article-title">@blog.Item3</div>
+                                    <div class="body-content article-body-content">
+                                        @blog.Item4
+                                        <br />
+                                        <br />
+                                    </div>
+                                    <div class="article-content margin-top-10" style="font-size:11px;color: #cacaca">
+                                        <div class="pull-left"><i>Publish Date: @blog.Item6.ToShortDateString()</i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="sharethis-inline-share-buttons" data-url="@blog.Item5"></div>
+                    </div>
+                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-12 mobi-items">
+                        <a class="blogHeaderLink" href="@blog.Item5">
+                            <div class="article-card video-item video_list_item" style="cursor:pointer;">
+                                <div style="display:flex;" class="row">
+                                    <div class="col-md-4 hidden-md hidden-sm hidden-xs hidden-lg">
+                                        <div class="image" style="background-image: url('@blog.Item2')"></div>
+                                    </div>
+                                    <div class="col-xs-12 col-lg-8">
+                                        <div class="row">
+                                            <div class="col-xs-4 hidden-lg hidden-sm hidden-md hidden-lg">
+                                                <div class="image remainingBlogImage hidden-lg " style=" height:220px; position: relative; background-image: url('@blog.Item2')"></div>
+                                            </div>
+                                            <div class="col-xs-8 hidden-sm hidden-md hidden-lg">
+                                                <div class="article-content">
+                                                    <div class="article-title ">@blog.Item3</div>
+                                                    <div class="body-content article-body-content">
+                                                        @blog.Item4
+                                                    </div>
+                                                </div>
+                                                <div class="article-content">
+                                                    <div class="pull-right hidden-lg"><i>Publish Date: @blog.Item6.ToShortDateString()</i></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="sharethis-inline-share-buttons" data-url="@blog.Item5"></div>
+                    </div>
+                }
+                @*if (totalPages > 1)
+                    {
+                        <div class="col-xs-12 col-sm-12 col-md-12">
+                            <div class="container hr-line">
+                                <hr>
+                            </div>
+                            <div id="_pageBlogLanding">
+                                <ul class="pagination pull-right" role="menubar" aria-label="Pagination">
+                                    @{var totalPagesRange = Enumerable.Range(1, (int)totalPages); }
+                                    @if (page != 1)
+                                    {
+                                        <li class="arrow"><a href="?page=@(page - 1)" title="Previous Page"> <i class="fa fa-angle-left" style="font-weight:900; padding-right: 5px"></i> Previous</a></li>
+                                    }
+                                    @for (int item = 1; item < totalPages; item++)
+                                    {
+                                        if (page > 1 && item < page && item > (page - 3) && item != page)
+                                        {
+                                            <li class="hidden-xs">
+                                                <a href="?page=@item" title="Go to page @item">@item</a>
+                                            </li>
+                                        }
+
+                                        if (page == item)
+                                        {
+                                            <li aria-disabled="true">
+                                                <a href="?page=@item" title="Go to page @item"><strong>@item</strong></a>
+                                            </li>
+                                        }
+
+                                        if (page < totalPages && item > page && item < (page + 3) && item != page)
+                                        {
+                                            <li class="hidden-xs">
+                                                <a href="?page=@item" title="Go to page @item">@item</a>
+                                            </li>
+                                        }
+                                    }
+                                    @if (page != totalPages)
+                                    {
+                                        <li class="arrow"><a href="?page=@(page + 1)" title="Next Page">Next <i class="fa fa-angle-right" style="font-weight:900; padding-left: 5px"></i></a></li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    }*@
+            }
+        </div>
+    </div>
+    @*<div class="row ab-videos-grid">
+            @if (TupleVideos.Count() != 0)
+            {
+                foreach (var videoData in TupleVideos.Take(3))
+                {
+                    <div id="iem-@x" class="col-sm-4 col-md-4 col-lg-4">
+                        <a class="ahref" href="@videoData.Item5">
+                            <div data-video="@videoData.Item5" class="ab-video">
+                                <div class="ab-big-video-thumbnail" style="background-image:url(@videoData.Item2)">
+                                </div>
+                                <div class="ab-big-video-title">
+                                    <p class="card-header"><strong>@videoData.Item3</strong></p>
+                                    <p>@videoData.Item4</p>
+                                    <div class="italic-footer">
+                                        <p style="font-size: smaller"><i>Publish Date:@videoData.Item6.ToShortDateString()</i></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="sharethis-inline-share-buttons" data-url="@videoData.Item5"></div>
+                    </div>
+                    x++;
+                }
+            }
+
+        </div>*@
+</div>
+@Html.Partial("_renderPopUpContent", new ContainerViewModel()
+    {
+        HTMLContent = @<text>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="text-center">
+                        @*
+                            <embed id="pdfFile" src="" frameborder="0" width="100%" height="500px">
+                            <video autoplay="" class="videoPlatformPlayer" width="100%" controls="controls">
+                                <source class="video-source" src="">
+                                Your browser does not support the video tag.
+                            </video>
+                        *@
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        </text>
+})
+
+@section scripts{
+    @*<script type="application/ld+json">
+            {
+            "@@context": "https://schema.org",
+            "@@type": "VideoObject",
+            "name": "@_schemaCardDescriptionFriendly",
+            "description": "@_schemaDescriptionBody",
+            "thumbnailUrl": [ "@_schemaImgString" ],
+            "uploadDate": "2020-08-31T08:00:00+08:00",
+            "duration": "PT2M40S",
+            "contentUrl": "@_schemaVideoUrl",
+            "interactionStatistic": {
+            "@@type": "InteractionCounter",
+            "interactionType": { "@@type": "http://schema.org/WatchAction" },
+            "userInteractionCount": 56
+            }
+            }
+        </script>*@
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.blogHeaderLink').on("click", function () {
+                $('#pdfFile').remove();
+                var pdffile = $(this).attr('data-pdf');
+
+                $('.modal-body').append("<embed id='pdfFile' src=" + pdffile + " frameborder='0' width=100%' height='500px'>");
+
+               //  $('#generic #pdfFile').attr('src',pdffile);
+                $('#generic').modal('show');
+            });
+            @*$(".fa-play").on("click", function (e) {
+                if (e.originalEvent.path !== "") {
+                    var video = $('.videoPlatformPlayer')[0];
+                    var videoPath = null;
+                    videoPath = e.originalEvent.path[3].dataset.video.split("*")[0];
+                    var path = '@currentDirectory' + videoPath.trim() + '?autoplay=1';
+                    video.src = path;
+                    video.load();
+                    video.play();
+                    $('#generic').modal('show');
+                }
+
+                $('#generic').on('hide.bs.modal', function () {
+                    var video = $('.videoPlatformPlayer')[0];
+                    var videoPath = e.originalEvent.path[3].dataset.video.split("*")[0];
+                    var path = '@currentDirectory' + videoPath.trim();
+                    video.src = path;
+                    video.pause();
+                })
+            });*@
+            //$('.box').click(function (e) {
+            //    /*assignImageFlip(e);*/
+            //});
+        });
+    </script>
+    <script src="~/scripts/jquery-ui.js"></script>
+    <script src="~/javascripts/reuse/form_validation.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.5/validator.min.js"></script>
+}
+

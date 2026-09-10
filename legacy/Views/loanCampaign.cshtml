@@ -1,0 +1,177 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage<ContentModels.PageLoans>
+@using AcfAfricanbank.Core.Models.Forms;
+@using ContentModels = Umbraco.Web.PublishedContentModels;
+@using CustomModels = acf_africanbankv1.Models;
+
+@{
+    Layout = "Master.cshtml";
+    // All Current Page Children
+    var children = Model.Content.Children;
+
+    // Get specific Children
+    var heroHeader = children?.Where(c => c.DocumentTypeAlias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.DocumentTypeAlias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroChest = children?.Where(c => c.DocumentTypeAlias.ToLower() == "herochest").FirstOrDefault();
+    var heroBody = children?.Where(c => c.DocumentTypeAlias.ToLower() == "herobody").FirstOrDefault();
+    var heroKnees = children?.Where(c => c.DocumentTypeAlias.ToLower() == "heroknees").FirstOrDefault();
+    var testimonialTab = children?.Where(c => c.DocumentTypeAlias.ToLower() == "testimonials").FirstOrDefault();
+    var homePageElements = (HomePageElements)Model.Content.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+    
+    var tabs = (IEnumerable<IPublishedContent>)heroBody?.Children.Where(c => c.DocumentTypeAlias.ToLower() == "tabbody").ToList();
+    ContentModels.TabBody newWaysOfBanking = null;
+    tabs.ToList().ForEach(x =>
+    {
+        var partialName = x.GetProperty("PartialViewName");
+
+        if (partialName.Value.ToString() == "_pageRenderCardWithoutCaption")
+        {
+            newWaysOfBanking = (TabBody)x;
+        }
+    });
+    
+    var newWaysItems = (IEnumerable<IPublishedContent>
+        )newWaysOfBanking.TabBodyContent.Where(c => c.DocumentTypeAlias == "nCTabGenericContent").FirstOrDefault().GetPropertyValue("sectionContent");
+    
+    
+    // Get Specific grand children
+    var chestCards = heroChest?.Children?.Where(c => c.DocumentTypeAlias.ToLower() == "card");
+    var bodyCards = heroBody?.Children?.Where(c => c.DocumentTypeAlias.ToLower() == "card");
+    var bodyButton = heroBody?.Children?
+         .Where(c => c.DocumentTypeAlias == "ebankITAbstractButton").FirstOrDefault();
+
+    ContentModels.EbankItabstractButton ebankItAbstr = (ContentModels.EbankItabstractButton) bodyButton;
+    var openNowButtonLink = "#";
+    openNowButtonLink = string.IsNullOrEmpty(ebankItAbstr?.EbankItbuttonInternalLink?.Url) ?
+    ebankItAbstr?.EbankItbuttonExternalLink :
+    ebankItAbstr.EbankItbuttonInternalLink?.Url;
+    openNowButtonLink = (string.IsNullOrEmpty(openNowButtonLink)) ? "#" : openNowButtonLink;
+    var buttonText = ebankItAbstr.EbankItbuttonText;
+
+    // Get Properties from children
+    var chestTitle = heroChest?.GetPropertyValue("chestTitle").ToString();
+    var chestDescription = heroChest?.GetPropertyValue("chestDescription").ToString();
+    var bodyTitle = heroBody?.GetPropertyValue("bodyTitle").ToString();
+    var bodyDescription = heroBody?.GetPropertyValue("bodyDescription").ToString();
+    var applyDocs = bodyCards.Select(c => c as Card).ToList();
+
+    var benefitsModel = new CustomModels.Benefits
+    {
+        Header = chestTitle,
+        Description = chestDescription,
+        BenefitCards = chestCards.Select(c => c as Card).ToList()
+    };    
+    
+    var campaignBankingItemsModel = new CustomModels.Benefits
+    {
+        Header = chestTitle,
+        Description = chestDescription,
+        BenefitCards = newWaysItems.Select(c => c as Card).ToList()
+    };
+    
+    var headerImage_large = heroHeader?.GetPropertyValue<IPublishedContent>("image")?.Url;
+    var headerImage_medium = heroHeader?.GetPropertyValue<IPublishedContent>("imageMedium")?.Url;
+    var headerImage_small = heroHeader?.GetPropertyValue<IPublishedContent>("imageSmall")?.Url;
+    
+ }
+ 
+ <style>
+    .onenumbercall {
+        text-align: center;
+        font-weight: 900;
+        font-size: 24px;
+        color: #464855;
+        margin-top: 0;
+        margin-bottom: 10px;
+        line-height: 1.1;
+        display: block;
+    }
+    .myWorld-campaign-images {
+        width: 100%;
+    }
+    .descr {
+        font-size: 18px;
+        padding-top: 15px;
+        text-align: center;
+    }
+</style>
+ 
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+
+@* Add a new section *@
+<br>
+<div class="container">
+    <div class="internet-banking-container full image-full">
+
+        @if (campaignBankingItemsModel.BenefitCards != null && campaignBankingItemsModel.BenefitCards.Any())
+        {
+            int iterator = 0;
+
+            <div class="row eq-height @(campaignBankingItemsModel.BenefitCards.Count > 3 ? " card-slider" : "" ) ">
+                @foreach (Card benefit in campaignBankingItemsModel.BenefitCards)
+                {
+                    String cardIdTag = " card" + iterator.ToString();
+                    <div class="col-xs-12 col-sm-8">
+                        <div class="image">
+                            @if (benefit.CardIcon != null)
+                            {
+                                <img class="myWorld-campaign-images" src="@benefit.CardIcon.Url" alt="@benefit.GetPropertyValue("altTag")" />
+                            }
+                        </div>
+                        <div class="title text-uppercase">@benefit.CardTitle</div>
+                        <p class="descr">@benefit.CardDescription</p>
+                    </div>
+                    ++iterator;
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<div class="center-align margin-bottom-30 margin-top-20">
+    @* id="@btnId" *@
+    <a href="@openNowButtonLink" class="button span-buttons green-button" >
+        @buttonText
+    </a>
+</div>
+
+<div class="container">
+    <div class="campaign-product-container full">
+        @Html.Partial("_benefitsSection", benefitsModel)
+    </div>
+</div>
+@* @Html.Partial("_howToApplySection", new CustomModels.HowToApplyDataContainer(bodyTitle, bodyDescription, bodyButton as IEbankItabstractButton, applyDocs)) *@
+<!-- CAMPAIGN MORE INFO -->
+@Html.Partial("_heroKneeTabs", heroKnees as ContentModels.HeroKnees)
+
+@Html.Partial("_testimonials", testimonialTab as Testimonials)
+
+@{
+    var _floatingFormViewModel = children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+    @Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)
+}
+
+@section scripts 
+{
+  <script>
+    $(document).ready(function () {
+        var imageBgCss = "url('" + "@headerImage_large" + "')";
+        var imageMdCss = "url('" + "@headerImage_medium" + "')";
+        var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_medium : headerImage_small)" + "')";
+        var CheckScreenSize;
+        (CheckScreenSize = function () {
+            var _width = $(window).outerWidth();
+            var _height = $(window).outerHeight();
+            if (_width < 511) {
+                $("#heroHeader").css("background-image", imageSmCss);
+            }
+            else {
+                $("#heroHeader").css("background-image", imageBgCss);
+            }
+        })();
+        $(window).resize(CheckScreenSize);
+    });
+
+</script>  
+}

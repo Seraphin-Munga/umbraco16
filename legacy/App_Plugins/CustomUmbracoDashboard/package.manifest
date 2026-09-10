@@ -1,0 +1,30 @@
+﻿{
+  "sections": [
+    {
+      "alias": "customUmbracoDashboard",
+      "name": "Site Setup"
+    }
+  ],
+  "dashboards": [
+    {
+      "alias": "customUmbracoDashboard",
+      "view": "/App_Plugins/CustomUmbracoDashboard/Views/shared/index.html", // "/App_Plugins/CustomUmbracoDashboard/Views/_callMeBackForm.cshtml", // 
+      "sections": [ "CustomUmbracoDashboard" ],
+      "access": [
+        { "grant": "admin" }
+      ],
+      "weight": -10
+    }
+  ]
+}
+//{
+//  "$schema": "https://json.schemastore.org/package.manifest",
+//  "dashboards": [
+//    {
+//      "alias": "welcomeDashboard",
+//      "view": "/App_Plugins/CustomUmbracoDashboard/WelcomeDashboard.html",
+//      "sections": [ "content", "member", "settings" ],
+//      "weight": -10
+//    }
+//  ]
+//}

@@ -1,0 +1,83 @@
+[
+  {
+    "Name": "isAuthenticatedUrl",
+    "UrlList": [
+      // { "Url": "http://api.int.africanbank.net/rest/abPsParameters/parameters/banks/list" },
+      { "Url": "http://api.int.africanbank.net/rest/abPsApplications/applications/offers" },
+
+
+      { "Url": "http://api.int.africanbank.net/rest/abPsEbankITQuickQuoteService/clients/validate" },
+      { "Url": "http://api.int.africanbank.net/rest/abPsEbankITQuickQuoteService/clients/getOffer" },
+      { "Url": "http://api.int.africanbank.net/rest/abPsEbankITQuickQuoteService/clients/saveOffer" },
+
+      { "Url": "http://api.int.africanbank.net/v1/ia-questions" }
+    ]
+  },
+  {
+    "Name": "ValidateClient",
+    "UrlList": [
+      { "Url": "https://api.stg.africanbank.net/rest/abPsEbankITQuickQuoteService/clients/validate" }
+    ]
+  },
+
+  {
+    "Name": "ValidateClient2",
+    "UrlList": [
+      { "Url": "https://api.stg.africanbank.net/rest/abPsEbankITQuickQuoteService/clients/validate" }
+    ]
+  },
+
+
+  {
+    "Name": "GetOffer",
+    "UrlList": [
+      { "Url": "https://api.stg.africanbank.net/rest/abPsEbankITQuickQuoteService/clients/getOffer" } 
+    ]
+  },
+
+  /* {
+    "Name": "QuestionnaireForID",
+    "UrlList": [
+      { "Url": "http://api.int.africanbank.net/v1/ia-questions" }
+    ]
+  },
+  */
+  {
+    "Name": "OtpCallBack", // Gets the offer based on the OTP supplied
+    "UrlList": [
+      { "Url": "https://api.stg.africanbank.net/rest/abPsEbankITQuickQuoteService/clients/getOffer" }
+    ]
+  },
+  {
+    "Name": "SaveOffer",
+    "UrlList": [
+      { "Url": "http://api.int.africanbank.net/rest/abPsEbankITQuickQuoteService/clients/saveOffer" }
+    ]
+  },
+
+
+  {
+    "Name": "SearchEmployer",
+    "UrlList": [
+      { "Url": "http://api.int.africanbank.net/rest/abPsParameters/parameters/employer/search" }
+    ]
+  },
+  {
+    "Name": "GetEmploymentTypes",
+    "UrlList": [
+      { "Url": "http://api.int.africanbank.net/rest/abPsParameters/parameters/employment-type" }
+    ]
+  },
+  {
+    "Name": "GetOccupationTypes",
+    "UrlList": [
+      { "Url": "http://api.int.africanbank.net/rest/abPsParameters/parameters/occupation-status-" }
+    ]
+  },
+  {
+    "Name": "SearchBank",
+    "UrlList": [
+      { "Url": "http://api.int.africanbank.net/rest/abPsParameters/parameters/banks/list" }
+    ]
+  }
+]

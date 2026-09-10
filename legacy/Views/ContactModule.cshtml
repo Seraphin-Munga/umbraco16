@@ -1,0 +1,80 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage<ContentModels.PageCampaign>
+@using AcfAfricanbank.Core.Models.Forms;
+@using ContentModels = Umbraco.Web.PublishedContentModels;
+@using CustomModels = acf_africanbankv1.Models;
+@{
+    Layout = "Master.cshtml";
+    // All Current Page Children
+    var children = Model.Content.Children;
+    // Get specific Children
+    var heroHeader = children?.Where(c => c.DocumentTypeAlias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.DocumentTypeAlias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroBody = (HeroBody)children?.Where(c => c.DocumentTypeAlias.ToLower() == "herobody").FirstOrDefault();
+    var stories = heroBody.Children.Where(c => c.Name.ToLower() == "stories").FirstOrDefault() ;
+    var stories_data = stories.GetPropertyValue<IEnumerable<IPublishedContent>>("cardItemDetail");
+    @*foreach (var item in stories)
+        {
+            < span > @item </ span >
+
+    }*@
+    //  var stories_conten = stories.;
+
+    //  var data = stories.GetPropertyValue<IEnumerable<IPublishedContent>>("cardItemDetail") ;
+
+}
+    <!-- HERO BANNER -->
+    @Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+    <!-- HERO CONTINUED-->
+    @Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+    <div class="container margin-bottom-minus-60">
+        <div class="campaign-product-container full" style="top:-70px !important">
+            <div class="margin-top-20 visible-xs"></div>
+            <div class="row">
+                <div class="col-xs-10 col-xs-offset-1">
+
+                    <div id="grow-video">
+                        @Html.Raw(@heroBody.BodyDescription)
+                        @heroBody.RichTextBox
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="container margin-bottom-minus-60">
+        <div class="campaign-product-container press-release-section full">
+            <div class="margin-top-20 visible-xs"></div>
+            <div class="tab-content">
+                <h3 style="text-align:center;">Other stories</h3>
+                <div class="row">
+                    <ul>
+                            @foreach (var stroy_detail in stories_data)
+                            {
+                                var image = stroy_detail.GetPropertyValue<IPublishedContent>("cardIcon").Url;
+                                <li>
+                                    <div class="story_block">
+                                        <div class="row no-gutter">
+
+                                            <div class="col-sm-5">
+                                                <div class="story_image_block">
+                                                    <div class="story_image" style="background-image:url(@image);">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-7">
+                                                <div class="story_content">
+                                                    <h4 class="story_title">@stroy_detail.GetPropertyValue("cardTitle")</h4>
+                                                    <p class="story_description">@stroy_detail.GetPropertyValue("cardDescription")</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>

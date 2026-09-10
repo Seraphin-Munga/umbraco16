@@ -1,0 +1,182 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using ContentModels = Umbraco.Web.PublishedModels
+@using Web.Helpers
+@{
+    Layout = "Master.cshtml";
+    var Children = Model.Children;
+
+    // Get specific Children
+    var heroHeader = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroBody = Children?.Where(c => c.ContentType.Alias.ToLower() == "herobodyourcompany").FirstOrDefault();
+
+    var anchorButtonText = heroShoulder?.Value("anchorButton")?.ToString();
+
+    var textblock = heroBody.Value("textBlock");
+    var carousel = heroBody.Value("carousel");
+
+    var employeesA = heroBody.Value("employeesA");
+    var employeesB = heroBody.Value("employeesB");
+
+    var textblockB = heroBody.Value("textBlockB");
+    var theBoardDesc = heroBody.Value<IPublishedElement>("bottomContent");
+
+    var sectionSettings = Children?.Where(c => c.ContentType.Alias.ToLower() == "pagepopup").FirstOrDefault();
+
+    ContainerViewModel containerViewModel = new ContainerViewModel();
+
+    var description = theBoardDesc.Value("title");
+
+    foreach (var prop in heroBody.Properties)
+    {
+
+        //<span>@prop.Value</span>
+    }
+}
+
+<style type="text/css">
+    .our-mission p {
+        width: 100% !important;
+    }
+
+    .padded-grey {
+        padding: 20px 0px 50px !important;
+    }
+
+    @@media (max-width: 767px) {
+        .carousel-inner {
+            bottom: 20px;
+        }
+    }
+</style>
+<!-- HERO HEADER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+<!-- HERO SHOULDER-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+
+
+<!-- PRODUCT INFORMATION-->
+<div class="container margin-bottom-minus-60">
+    <div class="campaign-product-container full">
+        <div class="margin-top-20 visible-xs"></div>
+        @Html.Raw(textblock)
+    </div>
+</div>
+
+
+@if (carousel != null)
+{
+    var _carousel = (NCtextstringRtes)carousel;
+    var isFirstItem = true;
+    <!-- AFRICAN BANK STORIES -->
+    <div id="OurValues" class="bank-story-container no-margin">
+        <div class="bank-story-intro">
+            <p class="title">@_carousel.Title</p>
+        </div>
+        <div class="pull-up">
+            <div class="bank-story-carousel">
+                <div id="bank-story" class="carousel slide" data-ride="carousel" data-interval="false">
+
+                    <!-- Wrapper for slides -->
+                    <div class="carousel-inner">
+                        @foreach (var item in _carousel.Items)
+                        {
+                            <div class="item @(isFirstItem ? "active" : "")">
+                                <div class="bank-story-img"></div>
+                                <div class="bank-story-caption">
+                                    @Html.Raw(item.Value<string>("content"))
+                                </div>
+                            </div>
+                            isFirstItem = false;
+                        }
+                    </div>
+                    <!-- Controls -->
+
+                    <a class="left carousel-control" href="#bank-story" role="button" data-slide="prev">
+                        <span class="icon-arrow-left"></span>
+                    </a>
+                    <a class="right carousel-control" href="#bank-story" role="button" data-slide="next">
+                        <span class="icon-arrow-right"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div id="OurMission" class="container our-mission">
+    <div class="text-center padded-white">
+        <div class="margin-top-40 hidden-xs"></div>
+        @Html.Raw(textblockB)
+    </div>
+</div>
+
+
+
+
+
+@Html.Partial("_renderPopUpContent", new ContainerViewModel()
+{
+    HTMLContent = @<text>
+
+        @*<div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <span>This is the content from the span control</span>
+            </div>*@
+
+
+        <div class="modal-header">
+            @*<button type="button" class="close" data-dismiss="modal">&times;</button>*@
+            <h4 class="modal-title" id="profile_title"> </h4>
+        </div>
+        <div class="modal-body exe_profile">
+            <div class="row">
+                <div class="col-md-6">
+                    <img src="" id="profile_img" alt="profile image">
+                </div>
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4 class="profile_lable ">Name</h4>
+                            <span class="profile_text" id="profile_name"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4 class="profile_lable">Age</h4>
+                            <span class="profile_text" id="profile_age"></span>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4 class="profile_lable">Certification</h4>
+                            <p class="profile_text" id="profile_certification"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="profile_details">
+                    <div id="gen_croller">
+                        <p id="profile_about"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </text>
+})
+@section scripts{
+
+    <script>
+        $(".btn_ok_modal").click(function () {
+            $('#generic').modal('hide');
+        });
+    </script>
+
+}
+
+
+
+

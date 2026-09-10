@@ -1,0 +1,355 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+@using AcfAfricanbank.Core.Models.Forms
+@using Umbraco.Web.Models
+@{
+    Layout = "Master.cshtml";
+    var testimoniesPropertyName = "campaignTestimonials";
+    var testimonies = Model.Content.GetPropertyValue<IEnumerable<IPublishedContent>>(testimoniesPropertyName);
+    var featuredProductPropertyName = "featuredProducts";
+    var featuredProducts = Model.Content.GetPropertyValue<IEnumerable<IPublishedContent>>(featuredProductPropertyName);
+    var downloadPropertyName = "downloadFiles";
+    var downloadFilename = "file name";
+    var downloadLink = "file link";
+    var creditInsuredRelatedLinkPropertyName = "creditInsuredOptions";
+    var campaignPropertyName = "campaignProductInfo";
+    var campaignHeroImage = Model.Content.GetPropertyValue<IPublishedContent>("campaignHeroImage");
+    var campaignHeroDescription = Model.Content.GetPropertyValue<IPublishedContent>("campaignHeroDescription");
+    var campaignHeroButtonLabel = Model.Content.GetPropertyValue<IPublishedContent>("campaignHeroButtonLabel");
+    var campaignHeroButtonRedirectLink = Umbraco.Field("campaignHeroButtonRedirectLink");
+    var campaignHeroHeadline = Model.Content.GetPropertyValue<IPublishedContent>("campaignHeroHeadline");
+
+    if (@Model.Content.HasProperty(campaignPropertyName) && !string.IsNullOrEmpty(@Model.Content.GetProperty(campaignPropertyName).Value.ToString()))
+    {
+        var campaignProductInfo = Model.Content.GetPropertyValue<IEnumerable<IPublishedContent>>("campaignProductInfo");
+        foreach (var campaign in campaignProductInfo)
+        {
+            var campaignProductImage = campaign.GetPropertyValue<IPublishedContent>("campaignProductImage");
+            var campaignProductTitle = campaign.GetPropertyValue("campaignProductTitle").ToString();
+            var campaignProductDescription = campaign.GetPropertyValue("campaignProductDescription").ToString();
+            var campaignProductHighlight = campaign.GetPropertyValue("campaignProductHighlight").ToString();
+            var campaignProductLearnMoreButtonLabel = campaign.GetPropertyValue("campaignProductLearnMoreButtonLabel").ToString();
+            var campaignProductLearnMoreButtonRedirectLink = campaign.GetPropertyValue("campaignProductLearnMoreButtonRedirectLink").ToString();
+            var campaignProductApplyNowButtonLabel = campaign.GetPropertyValue("campaignProductApplyNowButtonLabel").ToString();
+            var campaignProductApplyNowButtonRedirectLink = campaign.GetPropertyValue("campaignProductApplyNowButtonRedirectLink").ToString();
+            var campaignProductBenefits = campaign.GetPropertyValue<IEnumerable<IPublishedContent>>("structureProductBenefit");
+        }
+    }
+}
+<!-- HERO BANNER -->
+<div class="hero-static-container">
+    <div class="container-fluid">
+        <div class="row no-gutter">
+            <div class="col-sm-offset-2 col-sm-10">
+                @if (@Model.Content.HasProperty("campaignProductInfo") && !string.IsNullOrEmpty(@Model.Content.GetProperty("campaignProductInfo").Value.ToString()))
+                {
+                    <div class="hero-static-banner" style="background-image: url('@campaignHeroImage.Url');">
+                        <ol class="breadcrumb">
+                            <li>Products</li>
+                            <li class="active">Campaign</li>
+                        </ol>
+                        <img class="pattern" src="/images/footer-pattern.svg" alt="footer-pattern">
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<!-- HERO CONTINUED-->
+<div class="container">
+    <div class="hero-static-caption">
+        <h1 class="hero-static-title">@Umbraco.Field("campaignHeroHeadline")</h1>
+        <div class="row">
+            <div class="col-sm-12 col-md-9">
+                <div class="hero-static-description">@Umbraco.Field("campaignHeroDescription")</div>
+            </div>
+            <div class="col-sm-12 col-md-3"><a href="@campaignHeroButtonRedirectLink" class="button primary">@Umbraco.Field("campaignHeroButtonLabel")</a></div>
+        </div>
+    </div>
+</div>
+<!-- PRODUCT INFORMATION-->
+<div class="container">
+    <div class="campaign-product-container">
+        @if (@Model.Content.HasProperty(campaignPropertyName) && !string.IsNullOrEmpty(@Model.Content.GetProperty(campaignPropertyName).Value.ToString()))
+        {
+            var campaignProductInfo = Model.Content.GetPropertyValue<IEnumerable<IPublishedContent>>("campaignProductInfo");
+            foreach (var campaign in campaignProductInfo)
+            {
+                var campaignProductImage = campaign.GetPropertyValue<IPublishedContent>("campaignProductImage");
+                <div class="product-info">
+                    <div class="row eq-height">
+                        <div class="col-sm-12 col-md-4 col-md-push-8">
+                            <div class="image" style="background-image: url(@campaignProductImage.Url)">
+                                <img src="@campaignProductImage.Url" class="hidden-lg hidden-md" />
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4 col-md-pull-4">
+                            <div class="intro">
+                                <div class="title">@campaign.GetPropertyValue("campaignProductTitle").ToString()</div>
+                                <p class="body-content">@campaign.GetPropertyValue("campaignProductDescription").ToString()</p>
+                                <div class="floating-highlight">
+                                    <div class="icon">
+                                        <span class="icon-repayment"></span>
+                                    </div>
+                                    <div>
+                                        <p class="bold">@campaign.GetPropertyValue("campaignProductHighlight").ToString()</p>
+                                        <p>@campaign.GetPropertyValue("campaignHighlightDescription").ToString()</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4 col-md-pull-4">
+                            <div class="benefits">
+                                <p class="bold">BENEFITS</p>
+                                <ul>
+                                    @if (campaign.HasProperty("structureProductBenefit") && !string.IsNullOrEmpty(campaign.GetProperty("structureProductBenefit").Value.ToString()))
+                                    {
+                                        var productBenefits = campaign.GetPropertyValue<IEnumerable<IPublishedContent>>("structureProductBenefit");
+                                        foreach (var benefit in productBenefits.Where(i => i != null))
+                                        {
+                                            <li>@benefit.GetPropertyValue("loanBenefitDescription").ToString()</li>
+                                        }
+                                    }
+                                </ul>
+                                <div class="floating-buttons">
+                                    <a href="@Umbraco.NiceUrl(campaign.GetPropertyValue<int>("campaignProductLearnMoreButtonRedirectLink"))" class="button primary small">@campaign.GetPropertyValue("campaignProductLearnMoreButtonLabel").ToString()</a>
+                                    <a href="@campaignHeroButtonRedirectLink" class="button secondary small">@campaign.GetPropertyValue("campaignProductApplyNowButtonLabel").ToString()</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+<!-- HOW TO APPLY-->
+<div class="container no-padding">
+    <div class="campaign-apply">
+        <h2>@Umbraco.Field("howToApplyTitle")</h2>
+        <div class="row margin-top-20">
+            <div class="col-sm-6">
+                <div class="body-content">@Umbraco.Field("applicationDescription") </div>
+                <div class="margin-top-40">
+                    <a href="@campaignHeroButtonRedirectLink" class="button primary hidden-xs" trigger-contact-form>@Umbraco.Field("applyNowButtonLabel")</a>
+                </div>
+            </div>
+            <div class="col-sm-6 text-center">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <img src="~/images/apply-payslip.svg" height="80" />
+                        <p class="body-content margin-top-20">Latest original pay slip</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <img src="~/images/apply-residence.svg" height="80" />
+                        <p class="body-content margin-top-20">Proof of residence</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <img src="~/images/apply-id.svg" height="80" />
+                        <p class="body-content margin-top-20">Identity document</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <img src="~/images/apply-statement.svg" height="80" />
+                        <p class="body-content margin-top-20">Latest bank statement reflecting 3 salary deposits</p>
+                    </div>
+                </div>
+                <div>
+                    <a href="" class="button primary visible-xs">@Umbraco.Field("applyNowButtonLabel")</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="margin-top-40 visible-xs"></div>
+<!-- CAMPAIGN MORE INFO -->
+<div class="campaign-more-container">
+    <div class="hover-block"></div>
+    <div class="container">
+        <div class="mega-tabs">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs eq-height" role="tablist">
+                <li role="presentation" class="active campaign-more">
+                    <a href="#info" aria-controls="home" role="tab" data-toggle="tab">
+                        Your credit is insured
+                    </a>
+                </li>
+                <li role="presentation" class="campaign-more">
+                    <a href="#downloads" aria-controls="profile" role="tab" data-toggle="tab">
+                        Downloads
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="info">
+                <div class="row">
+                    <div class="col-sm-10 col-sm-offset-1">
+                        <p class="text-center">
+                            @Umbraco.Field("creditInsuredDescription")
+                        </p>
+                        <div class="row eq-height margin-top-30">
+                            <div class="col-sm-6">
+                                <div class="campaign-list text-only">
+                                    @if (@Model.Content.HasProperty(creditInsuredRelatedLinkPropertyName) && !string.IsNullOrEmpty(@Model.Content.GetProperty(creditInsuredRelatedLinkPropertyName).Value.ToString()))
+                                    {
+                                        var creditInsuredLinks = Model.Content.GetPropertyValue<RelatedLinks>("creditInsuredOptions");
+                                        if (creditInsuredLinks.Any())
+                                        {
+                                            <ul>
+                                                @foreach (var item in creditInsuredLinks)
+                                                {
+                                                    var linkTarget = (item.NewWindow) ? "_blank" : null;
+                                                    <li class="download-item"> @item.Caption </li>
+                                                }
+                                            </ul>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="campaign-more-info-img">
+                                    @{
+                                        var CreditInsuredImage = Model.Content.GetPropertyValue<IPublishedContent>("creditInsuredImage");
+                                        <div style="background-image: url('@CreditInsuredImage.Url');"></div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="margin-top-80 hidden-xs"></div>
+                <div class="row eq-height">
+                    <div class="col-sm-4">
+                        <div class="campaign-more-highlights">
+                            Payment options range from 9-72 months.
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="campaign-more-highlights">
+                            Interest rate (APR)  from 15% to 27.75%
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="campaign-more-highlights">
+                            Insurance rate from 5.04% to 5.4%
+                        </div>
+                    </div>
+                </div>
+                <div class="margin-top-30 campaign-terms">
+                    @Umbraco.Field("creditInsuredLegalStatement")
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="downloads">
+                <div class="row">
+                    <div class="col-sm-10 col-sm-offset-1">
+                        <div class="campaign-list">
+                            <p class="text-center">
+                                @Umbraco.Field("downloadDescription")
+                            </p>
+                            @if (@Model.Content.HasProperty(downloadPropertyName) && !string.IsNullOrEmpty(@Model.Content.GetProperty(downloadPropertyName).Value.ToString()))
+                            {
+                                <ul>
+                                    @{
+                                        var files = Model.Content.GetPropertyValue<IEnumerable<IPublishedContent>>(downloadPropertyName);
+                                        foreach (var file in files)
+                                        {
+                                            var downloadFilename2 = file.GetPropertyValue("downloadTextDescription").ToString();
+                                            var downloadLink2 = file.GetPropertyValue<IPublishedContent>("downloadButtonRedirectLink2");
+                                            <li>
+                                                <div class="row no-gutter download-item">
+                                                    <div class="col-sm-9">
+                                                        <div class="download-descr">@downloadFilename2</div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <a href="@downloadLink2.Url" target="_blank" class="download-btn">Download</a>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        }
+                                    }
+                                </ul>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="row eq-height">
+                    <div class="col-sm-4">
+                        <div class="campaign-more-highlights">
+                            Payment options range from 9-72 months.
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="campaign-more-highlights">
+                            Interest rate (APR)  from 15% to 27.75%
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="campaign-more-highlights">
+                            Insurance rate from 5.04% to 5.4%
+                        </div>
+                    </div>
+                </div>
+                <div class="margin-top-30 campaign-terms">
+                    @Umbraco.Field("downloadLegalStatement")
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- TESTIMONIALS -->
+<div class="testimonials-container white-bg">
+    <div class="container">
+        <h3 class="text-center margin-top-60">What our customers are saying</h3>
+        <div class="testimonials-carousel">
+            <div id="testimonials" class="carousel slide" data-ride="carousel" data-interval="false">
+                <!-- Indicators -->
+                @if (@Model.Content.HasProperty(testimoniesPropertyName) && !string.IsNullOrEmpty(@Model.Content.GetProperty(testimoniesPropertyName).Value.ToString()))
+                {
+                    <ol class="carousel-indicators">
+                        @{
+                            int counter = 0;
+                            foreach (var testimonyItem in testimonies)
+                            {
+                                <li data-target="#hero-banner" data-slide-to="@counter" class="@((counter == 0) ? "active" : "")"></li>
+                                counter++;
+                            }
+                        }
+                    </ol>
+                    <!-- Wrapper for slides -->
+                    <div class="carousel-inner">
+                        @{
+                            int newCounter = 0;
+                            foreach (var testimonyItem in testimonies)
+                            {
+                                var Avatar = testimonyItem.GetPropertyValue<IPublishedContent>("testimonialAvatar");
+                                <div class="item @((newCounter == 0) ? "active" : "")">
+                                    <div class="testimonial">
+                                        <div class="avatar">
+                                            <img src="@Avatar.Url" alt="">
+                                        </div>
+                                        <div class="descr">
+                                            @testimonyItem.GetPropertyValue("testimonialStory")
+                                        </div>
+                                        <div class="name">@testimonyItem.GetPropertyValue("testimonialName")</div>
+                                    </div>
+                                </div>
+                                newCounter++;
+                            }
+                        }
+                    </div>
+                }
+                <!-- Controls -->
+                <a class="left carousel-control" href="#testimonials" role="button" data-slide="prev">
+                    <span class="icon-arrow-left"></span>
+                </a>
+                <a class="right carousel-control" href="#testimonials" role="button" data-slide="next">
+                    <span class="icon-arrow-right"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- CALL BACK FORM -->
+@Html.Partial("_FloatingForm", new FloatingFormViewModel())

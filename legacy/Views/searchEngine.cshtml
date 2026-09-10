@@ -1,0 +1,1353 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageManageYourAccount>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using System.Text.RegularExpressions
+@using Web.Helpers
+
+@{
+    Layout = "Master.cshtml";
+    var children = Model.Children;
+
+    var myModel = new Web.Models.KnowledgeCentreModels.SearchResultsModel()
+    {
+        DisplayResults = new List<Web.Models.KnowledgeCentreModels.DisplayResults>()
+    };
+
+    var heroHeader = children.Where(c => c is HeroHeader).FirstOrDefault();
+    var heroShoulder = (HeroShoulder)children.Where(c => c is HeroShoulder).FirstOrDefault();
+    ContentModels.CardItem cardItem = null;
+    if (heroShoulder.Children != null)
+    {
+        cardItem = (CardItem)heroShoulder.Children.Where(c => c is CardItem).FirstOrDefault();
+    }
+
+    var heroBody = (HeroBody)children.Where(c => c is HeroBody).FirstOrDefault();
+
+    ContentModels.Card homeCardItem = null;
+    if (heroBody.Children != null)
+    {
+        homeCardItem = (Card)heroBody.Children.Where(c => c is Card).FirstOrDefault();
+    }
+    String homeCardItemPath = ((Umbraco.Core.Models.PublishedContent.PublishedContentWrapped)homeCardItem.Value("cardIcon")).Url.ToString();
+    String homeCardItemAltTag = ((Umbraco.Core.Models.PublishedContent.PublishedContentWrapped)homeCardItem.Value("cardIcon")).Value("altTag").ToString();
+    var tabGroup = heroBody.Children(x => x.ContentType.Alias.ToLower() == "tabgroup").FirstOrDefault();
+
+    ImageItem faqsImageItem = null;
+    TabBody tabBodyVideos = null;
+    TabBody tabBodyPDFs = null;
+    TabBody tabBody = null;
+
+    //foreach (var item in tabGroup.Children.ToList())
+    //{
+    //    var t = item.Value("tabHeader");
+    //    tabBody = (TabBody) t;
+
+    //}
+
+    tabGroup.Children.ToList().ForEach(x =>
+    {
+        if (x.Children != null)
+        {
+            x.Children.ToList().ForEach(xx =>
+            {
+                if (xx.ContentType.Alias.ToLower() == "imageitem")
+                {
+                    faqsImageItem = (ImageItem)xx;
+                }
+                else if (xx.ContentType.Alias.ToLower() == "tabbody")
+                {
+                    if (xx.Name == "Video Archive")
+                    {
+                        tabBodyVideos = (TabBody)xx;
+                    }
+                    else if (xx.Name == "PDF Archive")
+                    {
+                        tabBodyPDFs = (TabBody)xx;
+                    }
+                    else
+                    {
+                        tabBody = (TabBody)xx;
+                    }
+                }
+            });
+        }
+    });
+
+    String faqImagePath = ((ContentModels.Image)faqsImageItem.Children.FirstOrDefault().Value("ebankITImage")).Url;
+
+    var sectionContent = (ICollection<QuestionGroup>)tabBody.Children.Where(c => c.ContentType.Alias == "heroBodyFaq").FirstOrDefault().Value("questionGroups");
+    String sectionHeaderTitle = tabBody.Value("partialViewName").ToString();
+    List<Umbraco.Web.PublishedModels.File> pdfFiles = new List<ContentModels.File>();
+    Dictionary<string, List<string>> _pdfFields = new Dictionary<string, List<string>>();
+    Dictionary<string, List<string>> _videoFields = new Dictionary<string, List<string>>();
+    Dictionary<string, List<string>> _pagesFields = new Dictionary<string, List<string>>();
+
+    List<string> shoulderButtonColors = new List<string>()
+{
+    "#98d150", "#466b8b", "#39b7b9"
+    };
+    String pathUsed = "";
+
+    bool isHowTo = false;
+    bool isAskAbby = false;
+    bool isFAQ = false;
+    int colorItem = 0;
+
+    var values = "Advanced Search";
+
+}
+
+<style type="text/css">
+
+    #umbracoPreviewBadge {
+        display: none;
+    }
+
+    .button {
+        box-shadow: none;
+    }
+
+    .open-table {
+        padding: 14px 17px;
+    }
+
+    #btnFeaturesTable {
+        display: block;
+    }
+
+    #pager {
+        display: inline-block;
+    }
+
+        #pager a {
+            color: black;
+            float: left;
+            padding: 8px 16px;
+            text-decoration: none;
+        }
+
+    #pager-unselected {
+        color: black;
+        float: left;
+        padding: 8px 16px;
+        text-decoration: none;
+    }
+
+    .pager-selected {
+        background-color: #002b60;
+        color: white !important;
+        border-radius: 5px;
+    }
+
+    #pager a:hover:not(.active) {
+        background-color: #ddd;
+        border-radius: 5px;
+    }
+
+    .search-engine-shoulder {
+        /*padding: 25px 40px 0 0;*/
+        color: #ffffff;
+        border-radius: 8px 7px 0 0;
+        position: relative;
+        top: -80px;
+        text-align: center;
+    }
+
+    .myTabs {
+        padding-left: unset;
+        padding-right: unset;
+        text-align: center;
+        margin-top: -80px;
+        margin-bottom: 30px;
+    }
+
+    .myTab {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+
+    .myCard {
+        height: 154px;
+        padding-top: 10px;
+    }
+
+    .cardTitle {
+        font-weight: 800;
+        font-size: x-large;
+    }
+
+
+    #results-wait-loader {
+        position: absolute;
+        z-index: 1;
+        display: none;
+        top: 66%;
+    }
+
+    .faq-section-header-title {
+        font-size: 50px;
+        color: #88bc47;
+        font-weight: bold;
+    }
+
+    .result-button {
+        font-size: 25px;
+        color: white;
+    }
+
+    .checka {
+        font-weight: 700;
+        color: white;
+        font-size: large;
+    }
+
+    .triangle-nav.collapsed:before {
+        content: '▶';
+        display: block;
+        width: 15px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        transition: all linear 0.25s;
+    }
+
+    .triangle-nav:before {
+        content: '▼';
+        display: block;
+        width: 15px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        transition: all linear 0.25s;
+    }
+
+    .sublink-collapsables {
+        color: #002b60;
+        font-weight: 600;
+        font-size: larger;
+        display: flex;
+        cursor: pointer;
+    }
+
+    .faq-link-pointer {
+        font-weight: 700;
+        color: white;
+        font-size: large;
+        display: flex;
+        cursor: pointer;
+    }
+
+    .sublink-pointer {
+        cursor: pointer;
+    }
+
+    .shoulder-buttons {
+        font-weight: 600 !important;
+        font-size: -webkit-xxx-large;
+    }
+
+    .shoulder-button-size {
+        padding: 19px 0 12px 0px;
+        height: 154px;
+        width: 220px;
+    }
+
+    .middle-banner-faq {
+        position: absolute;
+        left: 64%;
+        margin-top: 5%;
+        font-weight: 700;
+        color: white;
+        font-size: x-large;
+    }
+
+    .mobi-table {
+        display: none;
+    }
+
+    /*#region side nav styling */
+    .vertical-tab {
+        display: table;
+        width: 100%;
+    }
+
+        .vertical-tab .nav-tabs {
+            min-width: 28%;
+            border: none;
+            position: relative;
+        }
+
+            .vertical-tab .nav-tabs li {
+                float: none;
+                vertical-align: top;
+            }
+
+                .vertical-tab .nav-tabs li a {
+                    background-color: #98d150;
+                    color: white;
+                    font-size: 18px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    text-align: center;
+                    padding: 30px 50px;
+                    margin: 0 10px 10px 0;
+                    border-radius: 0;
+                    display: block;
+                    overflow: hidden;
+                    position: relative;
+                    z-index: 1;
+                    transition: all 0.3s ease 0s;
+                }
+
+                    .vertical-tab .nav-tabs li a:hover,
+                    .vertical-tab .nav-tabs li.active a,
+                    .vertical-tab .nav-tabs li.active a:hover {
+                        background-color: #002b60;
+                        color: white;
+                    }
+
+                    .vertical-tab .nav-tabs li a:before,
+                    .vertical-tab .nav-tabs li a:after {
+                        content: '';
+                        height: 10px;
+                        width: 10px;
+                        border-radius: 50%;
+                        position: absolute;
+                        left: -100%;
+                        bottom: 3px;
+                        z-index: -1;
+                        transition: all 0.3s ease 0s;
+                    }
+
+                    .vertical-tab .nav-tabs li a:after {
+                        left: auto;
+                        right: -100%;
+                    }
+
+                    .vertical-tab .nav-tabs li.active a:before,
+                    .vertical-tab .nav-tabs li a:hover:before {
+                        left: 52%;
+                    }
+
+                    .vertical-tab .nav-tabs li.active a:after,
+                    .vertical-tab .nav-tabs li a:hover:after {
+                        right: 52%;
+                    }
+
+        .vertical-tab .tab-content {
+            font-size: 10px 20px;
+            text-align: justify;
+            line-height: 23px;
+            vertical-align: top;
+            padding: 15px 18px 0;
+            display: table-cell;
+        }
+
+            .vertical-tab .tab-content h3 {
+                font-size: 24px;
+                margin: 0 0 5px 0;
+            }
+
+    .kh-header {
+        font-weight: 500;
+        font-size: x-large;
+        color: white;
+    }
+
+    .kh-header-desc {
+        font-size: large;
+        font-weight: 600;
+        color: white;
+    }
+
+    .kh-search-engine {
+        margin-top: 70px;
+    }
+
+    .search-engine-mobi-shoulder {
+        display: none;
+    }
+
+    .kh-h1-margin {
+        font-weight: bold;
+        color: #88bc47;
+    }
+
+    .askAbby {
+        font-size: large;
+        font-weight: 600;
+        color: white;
+        margin-top: 60px;
+    }
+
+    .show_modal {
+        width: 16% !important;
+        left: 69% !important;
+    }
+
+    .wrap {
+        width: 21%;
+        position: absolute;
+        top: 61%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .listed-item-color {
+        color: #002b60;
+        font-size: large;
+        font-weight: 500;
+    }
+
+    .how-to-value {
+        font-weight: 600;
+        font-size: x-large;
+        margin-left: 25px;
+        color: #98d150;
+    }
+
+    @@media (max-width: 767px) {
+        .adv-headers {
+            font-size: 20px !important;
+        }
+
+        .myTabs {
+            margin-top: -50px !important;
+            margin-bottom: 20px;
+            top: 0px;
+        }
+
+        .hide-xs {
+            visibility: hidden;
+            height: 0px;
+        }
+
+        .myCard {
+            height: 95px;
+        }
+
+        .cardTitle {
+            font-size: small;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .adv-headers {
+            font-size: 20px !important;
+        }
+
+        .kh-search-engine {
+            margin-top: 30px;
+        }
+
+        .wrap {
+            width: 40%;
+            position: absolute;
+            top: 52%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    }
+
+    @@media (min-width:769px) and (max-width:1024px) {
+        .wrap {
+            width: 35%;
+            position: absolute;
+            top: 61%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    }
+
+    @@media (max-width: 2560px) {
+        .middle-banner-faq {
+            margin-top: 3%;
+            left: 54%;
+        }
+    }
+
+    @@media (max-width:320px) {
+        .adv-headers {
+            font-size: 20px !important;
+        }
+
+        .wrap {
+            width: 60%;
+            position: absolute;
+            top: 70%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    }
+
+    @@media (max-width: 360px) {
+        .kh-header {
+            padding-top: 82px;
+        }
+
+        .kh-header-desc {
+            font-size: large;
+            font-weight: 600;
+            color: white;
+            padding-top: 14px;
+        }
+    }
+
+    @@media (max-width: 425px) {
+
+        .adv-headers {
+            font-size: 20px;
+        }
+
+        .kh-header {
+            padding-top: 80px;
+            font-weight: 500;
+            font-size: x-large;
+            color: white;
+        }
+
+        .wrap {
+            width: 59%;
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    }
+
+    @@media (max-width: 480px) {
+
+        .adv-headers {
+            font-size: 20px !important;
+        }
+
+        .wrap {
+            width: 68%;
+            position: absolute;
+            top: 70%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #results-wait-loader {
+            position: absolute;
+            left: 40%;
+        }
+
+        .how-to-value {
+            font-weight: 600;
+            font-size: medium;
+            margin-left: 25px;
+            color: #98d150;
+        }
+
+        .faq-section-header-title {
+            font-size: 50px;
+            color: #88bc47;
+            font-weight: bold;
+        }
+
+        .middle-banner-faq {
+            position: absolute;
+            font-weight: 700;
+            color: white;
+            left: unset;
+            font-size: large;
+            padding: 20px;
+        }
+
+        .column {
+            column-count: 3;
+            -moz-column-count: 3;
+            -webkit-column-count: 3;
+            text-align: center;
+            margin-bottom: 5%;
+        }
+
+        .column-data {
+            background-color: #98d150;
+            padding: 20px;
+        }
+
+        .faq-height {
+            height: 92px;
+        }
+
+        .inner:nth-child(3n+1) {
+            clear: left;
+        }
+
+        .listed-item-color {
+            color: #002b60;
+            font-size: large;
+            font-weight: 500;
+        }
+
+        .askAbby {
+            font-size: large;
+            font-weight: 600;
+            color: white;
+            margin-top: 90px;
+        }
+
+        .wrap {
+            width: 59%;
+            position: absolute;
+            top: 64%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .mobi-table {
+            display: block;
+        }
+
+        .kh-h1-margin {
+            font-weight: bold;
+            color: #88bc47;
+            font-size: x-large;
+            margin-top: unset;
+            padding-top: 16px;
+        }
+
+        .kh-search-engine {
+            margin-top: unset;
+        }
+
+        .breadcrumb {
+            display: none;
+        }
+
+        .faq-section .main-title {
+            font-size: 47px;
+            margin-left: unset;
+        }
+
+        .shoulder-buttons {
+            font-weight: 600 !important;
+            font-size: x-large;
+        }
+
+        .search-engine-mobi-shoulder {
+            display: block;
+            margin-top: -3%;
+            font-size: 0px;
+        }
+
+        .search-engine-shoulder {
+            display: none;
+        }
+
+        .knowledge-hub-components {
+            display: none;
+        }
+
+        #btnFeaturesTable {
+            display: block;
+        }
+
+        #video-header {
+            margin-top: unset;
+        }
+
+        .video-container {
+            width: unset;
+        }
+
+        .video-title {
+            font-size: 34px;
+        }
+
+        .video-item {
+            box-shadow: none;
+            height: 170px;
+            margin-bottom: 10px;
+        }
+
+        .video-item-title {
+            bottom: unset;
+        }
+
+        .sharethis-inline-share-buttons {
+            right: unset;
+        }
+
+        .video-item-img {
+            height: 100%;
+        }
+
+        .main-video-thumbnail {
+            border: none;
+        }
+
+        .sub-video-thumnail {
+            background: url("../img/african-bank-video-placeholder-mobile.png");
+            background-size: cover;
+            width: 30%;
+            float: left;
+            height: 120px;
+        }
+
+        .sub-video-text {
+            width: 70%;
+            display: inline-block;
+            height: 120px;
+            margin-bottom: 10px;
+        }
+
+        .sub-videos-row {
+            margin-bottom: 0px;
+        }
+
+        .video-item-description {
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .episode-click {
+            margin: 40px auto;
+        }
+
+        .video-citation-box {
+            position: absolute;
+            bottom: 0;
+            margin: auto;
+            padding: 20px;
+            left: 0;
+        }
+
+        .video-header-thumb {
+            margin-top: 0px;
+            margin-left: -15px;
+            width: 110%;
+        }
+
+        .landing-video-title {
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 30px;
+            padding: 10px;
+        }
+
+        .sub-videos {
+        }
+
+        .sub-video-container {
+            box-shadow: 0px 1px 20px rgba(0,0,0,0)
+        }
+
+        .landing-video-description {
+            width: 90%;
+        }
+    }
+
+    @@media only screen and (max-width: 479px) {
+        .vertical-tab .nav-tabs {
+            display: block;
+            width: 100%;
+            border-right: none;
+        }
+
+            .vertical-tab .nav-tabs li a {
+                padding: 10px;
+                margin: 0 0 10px;
+            }
+
+        .vertical-tab .tab-content {
+            display: block;
+            padding: 20px 15px 5px;
+            border-radius: 0 0 10px 10px;
+        }
+
+            .vertical-tab .tab-content h3 {
+                font-size: 18px;
+            }
+    }
+    /*#endregion*/
+</style>
+
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+<!--End-->
+<div class="container">
+    <!-- HERO SHOULDER -->
+    @if (cardItem != null)
+    {
+        <div class="row">
+            <div class="col-md-2 col-sm-0"></div>
+            <div class="col-md-8 col-sm-12">
+                <div class="col-xs-12 myTabs">
+                    @{
+                        var cardList = (ICollection<NCcard>)cardItem.Value("cardItemDetail");
+                        foreach (var item in cardList)
+                        {
+
+                            string anchorValue = item.Value("nCcardTitle").ToString().Trim().Replace("'", "");
+                            string anchorValueClick = "";
+                            if (anchorValue == "ASK KARABO")
+                            {
+                                anchorValueClick = " onclick=javascript:document.getElementById('custom-care-button').click()";
+                            }
+                            if (item.Value("nCcardTitle").ToString().Contains("ASK KARABO")) { isAskAbby = true; }
+                            @*<img id="cropperImage"  src="@Url.GetCropUrl(item, propertyAlias: "image", cropAlias: "banner", useCropDimensions:true, furtherOptions: "&format=webp&quality=80")" />*@
+
+                            var imagePath = ((Umbraco.Core.Models.PublishedContent.PublishedContentWrapped)(@item.Value("nCcardIcon"))).Url;
+                            var imageData = ((Umbraco.Core.Models.PublishedContent.PublishedContentWrapped)(item.Value("nCcardIcon")));
+                            <div class="col-xs-4 myTab">
+                                <a href="#@anchorValue" @anchorValueClick>
+                                    <div style="background-color: @shoulderButtonColors[colorItem].ToString();" class="myCard">
+                                        <div class="text-white">
+                                            <div class="cardTitle" style="">@item.Value("nCcardTitle")</div>
+                                            <h5 class="hide-xs">@item.Value("nCcardDescription")</h5>
+                                            <img src="@imagePath" width="40" alt="@imageData.Value("altTag")" style="padding-bottom:10px;" />
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            colorItem += 1;
+
+                        }
+                    }
+                </div>
+            </div>
+            <div class="col-md-2 col-sm-0"></div>
+        </div>
+    }
+    <div id="results-wait-loader" class="container">
+        <div class="loader" id="loader-rates-form-preloader">
+            <div class="loader-img"></div>
+        </div>
+    </div>
+
+    @*Advanced Search*@
+
+
+
+    <div id="accordion">
+        <div style="margin-top:-1%">
+            <button type="button" class="open-table accordion-toggle" id="btnFeaturesTable" style="outline:none">
+                <i id="iTag" class="fa fa-filter" aria-hidden="true" style="font-size: 30px;"></i>
+            </button>
+        </div>
+        <div class="accordion-content" style="display: none;">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="row margin-bottom-30">
+                        <div class="col-sm-12 col-md-12">
+                            <form id="frmAdvancedSearchOptions">
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-8 col-md-6">
+                                        <p class="adv-headers">Search Sources</p>
+                                        <div class="form-group" style="float: left; ">
+                                            <div class="row">
+                                                @{
+                                                    Dictionary<string, string> keyValuePairs = SearchHelper.ReturnJSONSearchNodes();
+                                                    foreach (var valuePair in keyValuePairs)
+                                                    {
+                                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                                            <span style="float:left;">
+                                                                <input type="checkbox" id="@valuePair.Key.Trim(" ").ToString()" value="@valuePair.Value" name="@valuePair.Key.Trim(" ").ToString()"> @valuePair.Key<br>
+                                                            </span>
+                                                        </div>
+                                                    }
+                                                }
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    <div class="col-xs-12 col-sm-4 col-md-4 margin-top-20" style="text-align:center">
+                                        <a id="advance-search" class="button primary">Apply Filter(s)</a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+    @*Andvanced Search end*@
+    <div id="box" class="margin-top-30">
+        @*@Html.Partial("_pageSearchKnowledgeHubResult", myModel)*@
+    </div>
+    <div id="pager"></div>
+    <div class="container">
+        <div class="row">
+            <div class="selected-button-value shoulder-buttons">
+                <div id="@homeCardItem.Value("cardTitle").ToString().Trim().Replace("'", "").ToString()" style="margin-bottom: 32px;color:#002b60;">
+                    @homeCardItem.Value("cardTitle") <img style="margin-bottom: 17px;" src="@homeCardItemPath" width="50" alt="@homeCardItemAltTag">
+                    <span class="how-to-value" id="@homeCardItem.Value("cardDescription")">@homeCardItem.Value("cardDescription")</span>
+                </div>
+            </div>
+        </div>
+        <!--start mobi knowledge hub components-->
+        <div class="row">
+            @{
+                int mobiIterator = 1;
+                string mobiAccordionName = null;
+
+                var mobiTabHeader = tabGroup.Children.Where(x => x.ContentType.Alias.ToLower() == "tabheader").Skip(1).Take(1).FirstOrDefault();
+                foreach (var group in mobiTabHeader.Children)
+                {
+                    if ((group.Name != "Video Archive") && (group.Name != "PDF Archive"))
+                    {
+                        var groupData = group.Value("ebankITTitle");
+                        var id = Regex.Replace(groupData.ToString(), @"[^0-9a-zA-Z]+", "");
+                        var cssClass = group.Equals(mobiTabHeader.Children.First()) ? "active" : string.Empty;
+                        int mobiHeadingLandingId = 0;
+                        var mobiTabHeaderSub = group;
+                        mobiAccordionName = "accordion" + mobiIterator.ToString();
+                        <div class="mobi-table" style="width:  100%;padding: 0px;left:  0;">
+                            <div data-toggle="collapse" data-target=".@mobiAccordionName" class="text-white clickable tr-category">
+                                <div class="arrow-container">
+                                    @{ var mobiIconName = "mobiIcon" + @mobiIterator.ToString(); }
+                                    <i id="@mobiIconName" style="float: right;"><span class="fa fa-arrow-down"></span></i>
+                                </div>
+                                <b>@groupData</b>
+                            </div>
+
+                            @foreach (var bankingDetail in group.Children)
+                            {
+                                string tabStringHeader = "mobiTabHeadingLanding" + mobiHeadingLandingId + mobiIterator;
+                                string headingSting = "mobiHeadingLanding" + mobiHeadingLandingId + mobiIterator;
+
+                                <ul class="@mobiAccordionName" style="list-style: none; margin-bottom:0px">
+                                    <li>
+                                        <hr style="margin-bottom:unset; margin-top:unset; border-color: darkgrey" />
+                                        <div class="row" style="padding: 10px;">
+                                            <div class="col-sm-12">
+                                                <div class="card-header" role="tab" id="@tabStringHeader">
+                                                    <h5>
+                                                        <span class="triangle-nav collapsed sublink-collapsables title text-uppercase" data-toggle="collapse" href="#@headingSting" aria-expanded="false" aria-controls="collapseThree">
+                                                            &nbsp;&nbsp;
+                                                            @bankingDetail.Name
+                                                        </span>
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @{
+                                            if (bankingDetail.Children != null)
+                                            {
+                                                <div id="@headingSting" class="collapse" role="tabpanel" aria-labelledby="@tabStringHeader" data-parent="#accordion">
+                                                    <div style="margin-left: 2%; margin-bottom: 3%" class="margin-left-50 text-white faq content card-body">
+                                                        <ul>
+                                                            @foreach (var bankingDetailChild in bankingDetail.Children)
+                                                            {
+                                                                Umbraco.Web.Models.Link itemLink = null;
+                                                                foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)((Link)bankingDetailChild).UrlLink)
+                                                                {
+                                                                    itemLink = link;
+                                                                    if (itemLink != null)
+                                                                    {
+                                                                        pathUsed = pathUsed + "/" + itemLink.Name;
+                                                                        string linkStringValue = itemLink.Url + "?path=Knowledge Centre/~" + pathUsed + "/" + bankingDetailChild.Name + "&selected=" + bankingDetailChild.Name;
+                                                                        <li class="listed-item-color sublink-pointer"><a href="@linkStringValue">@bankingDetailChild.Name</a></li>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <li class="listed-item-color sublink-pointer"><a href="@itemLink.Url">@bankingDetailChild.Name</a></li>
+                                                                    }
+                                                                    pathUsed = "";
+                                                                }
+                                                            }
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                    </li>
+                                </ul>
+                                mobiHeadingLandingId += 1;
+                            }
+
+                        </div>
+                        ++mobiIterator;
+                    }
+                }
+            }
+            <!--end mobu knowledge hub components-->
+            <div class="knowledge-hub-components">
+                <div class="vertical-tab" role="tabpanel">
+                    <ul class="nav nav-tabs" role="tablist">
+                        @{
+                            var tabHeader = tabGroup.Children.Where(x => x.ContentType.Alias.ToLower() == "tabheader").Skip(1).Take(1).FirstOrDefault();
+                            foreach (var group in tabHeader.Children)
+                            {
+                                if ((group.Name != "Video Archive") && (group.Name != "PDF Archive"))
+                                {
+                                    var groupData = group.Value("ebankITTitle");
+                                    var id = Regex.Replace(groupData.ToString(), @"[^0-9a-zA-Z]+", "");
+                                    var cssClass = group.Equals(tabHeader.Children.First()) ? "active" : string.Empty;
+                                    <li role="presentation" class="@cssClass"><a href="#@id" aria-controls="@groupData" role="tab" data-toggle="tab">@groupData</a></li>
+                                }
+                            }
+                        }
+                    </ul>
+                    <div class="tab-content tabs" style="width: 100%;padding: unset;">
+                        @{
+                            var tabHeaderSub = tabGroup.Children.Where(x => x.ContentType.Alias.ToLower() == "tabheader").Skip(1).Take(1).FirstOrDefault();
+                            int headingLandingId = 0;
+                            foreach (var linkedValues in tabHeaderSub.Children)
+                            {
+                                var links = linkedValues.Children;
+                                var id = Regex.Replace(linkedValues.Name.ToString(), @"[^0-9a-zA-Z]+", "");
+                                var cssClass = linkedValues.Equals(tabHeaderSub.Children.First()) ?
+                                                            "tab-pane fade in active" :
+                                                            "tab-pane fade";
+                                <div role="tabpanel" class="@cssClass" id="@id">
+                                    <div class="card">
+
+                                        @{
+                                            if (linkedValues.Children.Count() == 0)
+                                            {
+                                                <p class="text-center" style="font-size:18px;color:#002b60;padding: 177px;">(Coming Soon...)</p>
+                                            }
+                                            else
+                                            {
+                                                foreach (var link in links)
+                                                {
+                                                    var headingSting = "headingLanding" + headingLandingId.ToString();
+                                                    var tabStringHeader = "tabHeadingLanding" + headingLandingId.ToString();
+                                                    <ul style="list-style: none; margin-bottom:0px">
+                                                        <li>
+                                                            <hr style="margin-bottom:unset; margin-top:unset; border-color: darkgrey" />
+                                                            <div class="row" style="padding: 10px;">
+                                                                <div class="col-sm-12">
+                                                                    <div class="card-header" role="tab" id="@tabStringHeader">
+                                                                        <h5>
+                                                                            <span class="triangle-nav collapsed sublink-collapsables title text-uppercase" data-toggle="collapse" href="#@headingSting" aria-expanded="false" aria-controls="collapseThree">
+                                                                                &nbsp;&nbsp;@link.Name
+                                                                            </span>
+                                                                        </h5>
+                                                                    </div>
+                                                                    <div id="@headingSting" class="collapse" role="tabpanel" aria-labelledby="@tabStringHeader" data-parent="#accordion">
+                                                                        <div style="margin-left: 2%" class="margin-left-50 text-white faq content card-body">
+                                                                            @{
+                                                                                if (link.Children.Count() == 0)
+                                                                                {
+                                                                                    <p style="color:#002b60;">(Coming Soon...)</p>
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <ul>
+                                                                                        @{
+                                                                                            foreach (var sublink in link.Children)
+                                                                                            {
+                                                                                                Umbraco.Web.Models.Link itemLink = null;
+                                                                                                foreach (var _link in (IEnumerable<Umbraco.Web.Models.Link>)((Link)sublink).UrlLink)
+                                                                                                {
+                                                                                                    itemLink = _link;
+
+                                                                                                    if (itemLink != null)
+                                                                                                    {
+                                                                                                        pathUsed = pathUsed + "/" + itemLink.Name;
+                                                                                                        string linkStringValue = itemLink.Url + "?path=Knowledge Centre/~" + pathUsed + "/" + link.Name + "&selected=" + itemLink.Name;
+                                                                                                        <li class="listed-item-color sublink-pointer"><a href="@linkStringValue">@itemLink.Name</a></li>
+                                                                                                    }
+                                                                                                    else
+                                                                                                    {
+                                                                                                        <li class="listed-item-color sublink-pointer"><a href="@itemLink.Url">@itemLink.Name</a></li>
+                                                                                                    }
+                                                                                                    pathUsed = "";
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    </ul>
+                                                                                }
+                                                                            }
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                    headingLandingId += 1;
+                                                }
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="faq-section full" ng-controller="ReportsAndArchievesController">
+                <div class="margin-top-20 visible-xs"></div>
+                @{
+                    var groups = (IEnumerable<QuestionGroup>)sectionContent;
+                    var sections = groups.Select(x => x.Value("groupName")).ToList();
+
+                    foreach (var group in groups)
+                    {
+                        var name = group.Value("groupName")?.ToString() ?? string.Empty;
+                        var questions = group.Value<IEnumerable<IPublishedElement>>("questionsAndAnswers") ?? new List<IPublishedElement>();
+                        var Id = tabBody.Value("partialViewName").ToString().Trim().Replace("'", "");
+                        int headingId = 0;
+
+                        <div id="@name.Replace(" ", string.Empty).ToLower()">
+                            <div id="@Id" class="main-title @name.Replace(" ", string.Empty).ToLower() searchItemHeader"
+                                 style="background-image: url(@faqImagePath);height: 201px;background-position: 40%;background-repeat: no-repeat;margin-bottom: 5px;">
+                                <span class="middle-banner-faq">
+                                    <h3 class="faq-section-header-title">@sectionHeaderTitle</h3>
+                                    @name
+                                </span>
+                            </div>
+                            <div style="background-color:#002b60cc;padding: 10px; margin-bottom:5px;" id="accordion" role="tablist">
+                                <div style="margin:10px">
+                                    @foreach (var question in questions)
+                                    {
+                                        var Q = question.Value("question");
+                                        var A = question.Value("answer");
+                                        var headingSting = "heading" + headingId.ToString();
+                                        var tabStringHeader = "tabHeading" + headingId.ToString();
+
+                                        <div style="border: solid #7e7e7e;border-width: 1px 1px;padding:5px" class="searchItemList" ng-show="stringContains('@Q', searchTerm)">
+
+                                            <div class="item-content">
+                                                <div class="card">
+                                                    <div class="card-header" role="tab" id="@tabStringHeader">
+                                                        <h5>
+                                                            <span class="triangle-nav faq-link-pointer collapsed" data-toggle="collapse" data-target="#@headingSting">
+                                                                &nbsp;&nbsp;
+                                                                @Q
+                                                            </span>
+                                                        </h5>
+                                                    </div>
+                                                    <div id="@headingSting" class="collapse" role="tabpanel" aria-labelledby="@tabStringHeader" data-parent="#accordion">
+                                                        <div style="margin-left: 5%" class="margin-left-50 text-white faq content card-body">
+                                                            @A
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br />
+                                        headingId += 1;
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts
+{
+    <script type="text/javascript">
+        $("#btnFeaturesTable").click(function () {
+            $(".accordion-content").toggle(200);
+            if ($("#iTag").hasClass("fa fa-filter")) {
+                $("#iTag").removeClass("fa fa-filter");
+                $("#iTag").addClass("fa fa-times");
+            } else {
+                $("#iTag").removeClass("fa fa-times");
+                $("#iTag").addClass("fa fa-filter");
+            }
+        });
+    </script>
+    <script type="text/javascript">
+        var _content = $('#searchstring').val();
+
+        $(document).ready(function () {
+            var pageNum = 0;
+            var _allResultPages;
+
+            var _content = $('#searchstring').val();
+            $('.same_viewbtn').on('click', function (e) {
+                getResults();
+            });
+            $('#btnSubmit').on('click', function (e) {
+                getResults();
+            });
+            $(".show_modal").click(function (e) {
+                var item = e.target.dataset.item;
+                var deal_title = item;
+                $("#modal-title").html(deal_title);
+                $('#generic').modal('show');
+            });
+            $('#advance-search').on('click', function (e) {
+                getResults();
+                $('#generic').modal('hide');
+            });
+
+            $(document).on("keyup", "#searchstring", debounce(function (e) {
+                e.preventDefault();
+                getResults();
+            }, 300));
+
+            function populateResults() {
+                $("#box").empty();
+                var maxResultPerPage = 3;
+                var currentResultList = maxResultPerPage * pageNum;
+                var i = 0;
+
+                var htmlResultFound = "<div class='row'><div class='col-md-12' style='margin-bottom:10px'><b>Results found: " + _allResultPages.length + "</b></div></div>";
+
+                $("#box").append(htmlResultFound);
+                while (currentResultList < _allResultPages.length && i < maxResultPerPage) {
+                    var _appendString = $('<div>' +
+                                            '<h4 style="font-weight:500;"><a class="margin-left-20" href="' + $(_allResultPages).eq(currentResultList)[0].ResultLink + '" target="_self">' +
+                                            $(_allResultPages).eq(currentResultList)[0].Header + '</a ></h4> ' +
+                                            '<p>' + $(_allResultPages).eq(currentResultList)[0].Description + '</p>' +
+                                          '</div>');
+                    $("#box").append(_appendString[0].innerHTML + "<br>").hide().fadeIn('slow');
+                    i++;
+                    currentResultList++;
+                }
+                pageNum++;
+                if (currentResultList == _allResultPages.length) {
+                    $("#next").prop("disabled", true);
+                }
+                 implementPaging(1);
+            }
+            function showPage(pageNumber) {
+                if (pageNumber > 0) {
+                    pageNumber = pageNumber - 1;
+                } else {
+                    pageNumber = 0;
+                }
+                $("#box").empty();
+                var maxResultsPerPage = 3;
+                var currentResultList = maxResultsPerPage * pageNumber;
+                var i = 0;
+
+                while (currentResultList < _allResultPages.length && i < maxResultsPerPage) {
+                    var _appendString = $('<div>' +
+                                            '<h4 style="font-weight:500;"><a class="margin-left-20" href="' + $(_allResultPages).eq(currentResultList)[0].ResultLink + '" target="_self">' +
+                                                $(_allResultPages).eq(currentResultList)[0].Header + '</a ></h4> ' +
+                                            '<p>' + $(_allResultPages).eq(currentResultList)[0].Description + '</p>' +
+                                          '</div>');
+                    $("#box").append(_appendString[0].innerHTML + "<br>").hide().fadeIn('slow');;
+                    i++;
+                    currentResultList++;
+                }
+                $("html, body").animate({ scrollTop: $(".myTabs").offset().top }, "slow");
+                implementPaging(pageNumber+1);
+            }
+            function implementPaging(pageNumber) {
+                var pages = Math.ceil($(_allResultPages).length/3);
+                $("#pager").empty();
+
+                if(pageNumber > 1)
+                {
+                     $('#pager').append(' <a class="pageClick" style="cursor:pointer" cpage="'+(pageNumber-1)+'">Previous</a>');
+                }
+                for (var i = 1; i < pages; i++) {
+                    if (pageNumber > 1 && i < pageNumber && i > (pageNumber - 3) && i != pageNumber)
+                    {
+                        $('#pager').append('<a class="hidden-xs pageClick" style="cursor:pointer" cpage="'+ i +'">' + i + '</a> ');
+                    }
+                    if(i == pageNumber)
+                    {
+                        $('#pager').append('<a class="pager-selected"style="cursor:pointer" cpage="'+ i +'">' + i + '</a> ');
+                    }
+                    if (pageNumber < pages && i > pageNumber && i < (pageNumber + 3) && i != pageNumber)
+                    {
+                          $('#pager').append('<a class="hidden-xs pageClick" style="cursor:pointer" cpage="'+ i +'">' + i + '</a> ');
+                    }
+
+                }
+                if(pageNumber != pages)
+                {
+                    $("#pager").append('<a  id="next" style="cursor:pointer" class="pageClick" cpage="'+(pageNumber+1)+'" >Next</a> ');
+                }
+                $('.pageClick').on('click', function (e) {
+                    showPage($(this).attr("cpage"));
+                });
+            }
+
+            function getResults() {
+                var _advancedSearch = JSON.stringify('frmAdvancedSearchOptions');
+                var _data = {
+                    searchTerm: $("#searchstring").val(),
+                    pagingGroupSize: 3,
+                    pageSize: 20,
+                    whichPlatforms: null
+                }
+                var _whichPlatforms = [];
+                $('#frmAdvancedSearchOptions').find('input:checkbox:checked').each(function () {
+                    _whichPlatforms.push($(this)[0].name);
+                });
+                _data.whichPlatforms = _whichPlatforms;
+
+                $('#results-wait-loader').show();
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SubmitSearchForm", "SearchSurface", new { searchTerm = Request["searchstring"],  pagingGroupSize = 3, pageSize = 20 })',
+                    dataType: 'json',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(_data), // JSON.stringify({ form: $('form').serialize() }),
+                }).done(function (data) {
+                    $('#results-wait-loader').hide();
+
+                    currentResultList = 0;
+                    maxResultPerPage = 0;
+                    pageNum = 0;
+
+                    _allResultPages = data.results
+                    if (data.results != null) {
+
+                        if (data.results.length > 0) {
+                            populateResults();
+                            //implementPaging(1);
+                            $('.pageClick').on('click', function (e) {
+                                showPage($(this).attr('cpage'));
+                            });
+                        }
+                        else {
+                            clearValues();
+                        }
+                    } else {
+                       clearValues()
+                    }
+                }).fail(function (e) {
+                    $('#results-wait-loader').hide();
+                    console.log(e.responseText);
+                });
+            }
+            function clearValues() {
+                $("#box").empty();
+                $('#pager').empty();
+                currentResultList = 0;
+                $("#box").append("<p> No results to display </p>");
+            }
+            function debounce(func, wait, immediate) {
+                var timeout;
+                return function () {
+                    var context = this, args = arguments;
+                    var later = function () {
+                        timeout = null;
+                        if (!immediate) func.apply(context, args);
+                    };
+                    var callNow = immediate && !timeout;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                    if (callNow) func.apply(context, args);
+                };
+            }
+
+
+            function beginPaging(args) {
+                // Animate
+                $('#box').fadeOut('normal');
+            }
+            function successPaging() {
+                // Animate
+                $('#box').fadeIn('normal');
+                $('a').tooltip();
+            }
+            function failurePaging() {
+                alert("Could not retrieve list.");
+            }
+
+        });
+    </script>
+}

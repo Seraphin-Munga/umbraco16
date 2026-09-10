@@ -1,0 +1,926 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageHome>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Umbraco.Web.Models
+@{
+    Layout = "Master.cshtml";
+    var homePageElements = (HomePageElements)Model.Children.Where(o => o is HomePageElements).FirstOrDefault();
+    var heroFeet = homePageElements?.Children.Where(c => c is HeroFeet).FirstOrDefault();
+    var bottomNavigation = (BottomNavigation)homePageElements.Children.Where(c => c is BottomNavigation).FirstOrDefault();
+    var testimonials = (Testimonials)heroFeet?.Children.Where(c => c is Testimonials).FirstOrDefault();
+
+    var heroBodyBlog = (HeroBody)homePageElements.Children.Where(x => x is HeroBody).FirstOrDefault();
+    var heroBodyBlogLink = heroBodyBlog.Children.Where(x => x.ContentType.Alias.ToLower() == "link").FirstOrDefault();
+    var lightbox = heroBodyBlog.Value("richTextBox").ToString();
+
+    var tabs = (IEnumerable<IPublishedContent>)heroBodyBlog?.Children.Where(c => c.ContentType.Alias.ToLower() == "tabbody").ToList();
+    ContentModels.TabBody panelWarning = null;
+    tabs.ToList().ForEach(x =>
+    {
+        var partialName = x.Value("partialViewName");
+
+        switch (partialName.ToString())
+        {
+            case "panelWarning":
+                panelWarning = (TabBody)x;
+                break;
+        }
+    });
+    var panelItemWarning = (IEnumerable<IPublishedElement>)panelWarning.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+
+    var whatsNew = homePageElements.Children.Where(x => x.ContentType.Alias.ToString().ToLower() == "ebankititem2").FirstOrDefault();
+
+    Umbraco.Web.Models.Link itemLink = null;
+    foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)heroBodyBlogLink.Value("UrlLink"))
+    {
+        itemLink = link;
+        break;
+    }
+
+    var heroFeetHome = (HeroFeetHome)heroFeet?.Children.Where(c => c is HeroFeetHome).FirstOrDefault();
+
+    // var disclaimersData = homePageElements.Children.Where(o => o.ContentType.Alias == "ebankITListSectionText").ToList();
+
+    // var disclaimers = disclaimersData.FirstOrDefault().Children;
+    //IPublishedContent disclaimerValue = null;
+    //foreach (var content in disclaimers)
+    //{
+    //    if (HttpContext.Current.Request.Path.ToString().Contains("/banking"))
+    //    {
+    //        if (content.Value("ebankITTitle").ToString().Contains("Banking"))
+    //        {
+    //            disclaimerValue = content;
+    //        }
+    //    }
+    //    else
+    //    {
+    //        disclaimerValue = content;
+    //        break;
+    //    }
+    //}
+
+    var viewName = Path.GetFileNameWithoutExtension(Server.MapPath(VirtualPath)); //used mainly to identify the page
+}
+
+<style type="text/css">
+
+
+    .center {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+    }
+
+    #lightbox {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #00000095;
+        text-align: center;
+        display: none;
+        z-index: 2147483648;
+    }
+
+    #lb-content {
+        color: #222;
+        background-color: #fff;
+        position: relative;
+        text-align: center;
+        display: none;
+    }
+
+    #lb-close {
+        transition: 0.5s;
+        display: block;
+        background: rgba(34, 34, 34, 0.582);
+        color: #fff;
+        position: absolute;
+        top: 0px;
+        right: -15px;
+        cursor: pointer;
+        text-align: center;
+        padding: 9px;
+    }
+
+        #lb-close:hover {
+            transition: 0.5s;
+            background: #222;
+        }
+
+    .lightBox-image {
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+    }
+
+    .lightBox-copy > h1 {
+        font-size: 26px;
+        font-weight: 900;
+        color: #002b60;
+    }
+
+    .lightBox-copy {
+        background: #fafafa;
+        padding-top: 15px;
+        padding-bottom: 25px;
+    }
+
+    #lb-content {
+        width: 80%;
+    }
+
+    .i_image {
+        width: 100%;
+        height: 203px;
+    }
+
+    .whatsnew-sibling {
+        display: block;
+    }
+
+    .bank-story-caption {
+        margin-left: 0px;
+    }
+
+    .whatsnew-title {
+        font-size: 30px;
+        font-weight: 200;
+        line-height: 1.18;
+        letter-spacing: -.7px;
+        margin-top: 10px;
+    }
+
+    .whatsnew-copy {
+        color: white;
+    }
+
+    .whatsnew {
+        text-align: center;
+        width: unset;
+        background: none;
+        margin-left: unset !important;
+        width: 50%;
+    }
+
+    @@media (min-width: 768px) {
+        #lb-content {
+            width: 500px;
+        }
+
+        .i_image {
+            height: 300px;
+        }
+    }
+    /* 1440 update */
+    @@media (min-width:768px) and (max-width:1025px) {
+        .whatsnew-sibling {
+            display: none !important;
+        }
+
+        .whatsnew {
+            width: 100%;
+        }
+    }
+
+    @@media only screen and (max-width: 767px) {
+        .top_extend {
+            background: linear-gradient(to top right, #555658, #939498) !important;
+        }
+
+        .whatsnew {
+            width: 100%
+        }
+
+        .bank-story-img {
+            position: absolute;
+            height: 450px;
+            background-size: cover;
+        }
+
+        .bank-story-caption {
+            margin-left: 0px;
+        }
+    }
+
+    @@media (max-width:900px) and (min-width:768px) {
+        .hero-container .carousel .item {
+            background-position: 100% 0%;
+        }
+    }
+
+    @@media (min-width: 1025px) and (max-width: 1239px) {
+        .bank-story-caption {
+            width: 50% !important;
+        }
+
+        .whatsnew {
+            width: 50%;
+        }
+    }
+
+    @@media (max-width: 1439px) and (min-width: 768px) {
+        .hero-caption {
+            width: 329px;
+        }
+
+        .top-header {
+            height: 400px;
+        }
+
+        .hero-caption {
+            margin-top: 92px;
+        }
+
+        .cap-title {
+            font-size: 25px;
+            line-height: normal;
+        }
+
+        .hero-caption .hero-title {
+            font-size: 17px;
+        }
+    }
+
+    @@media (max-width: 1400px) and (min-width: 530px) {
+        .hero-container .carousel .item {
+            height: 100%;
+            background-position: 80% 57%;
+        }
+    }
+
+    @@media (max-width: 1442px) and (min-width: 1440px) {
+        .hero-caption {
+            right: 119px;
+            width: 416px;
+        }
+
+        .hero-container .carousel .item {
+            background-size: contain;
+        }
+
+        .top-header {
+            height: 500px;
+        }
+
+        .hero-caption {
+            margin-top: 160px;
+        }
+
+        .cap-title {
+            font-size: 39px;
+        }
+    }
+
+    @@media (min-width: 768px) and (max-width: 1000px) {
+
+        .covidheader {
+            margin-top: 0px;
+        }
+    }
+
+    @@media (min-width: 1000px) and (max-width: 1200px) {
+
+        .covidheader {
+            margin-top: 0px;
+        }
+    }
+
+    @@media (min-width: 1200px) and (max-width: 1700px) {
+
+        .covidheader {
+            margin-top: 0px;
+        }
+    }
+
+    @@media only screen and (min-width: 1824px) {
+
+        .hero-caption {
+            padding-top: 34px;
+            margin-top: 236px;
+            padding: 36px;
+            color: #fff;
+            height: 565px;
+            position: absolute;
+            width: 489px;
+            right: 88px;
+        }
+    }
+    /* 1440 update */
+    @@media (max-width: 767px) {
+        .whatsnew-copy {
+            color: white;
+        }
+
+        .whatsnew {
+            width: unset;
+        }
+    }
+
+    @@media (min-width: 413px) and (max-width: 767px) {
+        background: grey !important;
+    }
+
+    @@media only screen and (max-width: 768px) {
+        .whatsnew {
+            width: unset;
+        }
+    }
+
+    @@media (max-width: 412px) {
+        .whatsnew-copy {
+            color: unset;
+        }
+
+        .whatsnew {
+            width: unset;
+        }
+    }
+
+    @@media (max-width: 360px) {
+        .whatsnew-copy {
+            color: white;
+        }
+
+        .whatsnew {
+            width: unset;
+        }
+    }
+</style>
+@*<input type="checkbox" class="theme-switch" id="theme-switch" />*@
+<input type="radio" class="theme-switch" name="theme-switch" id="theme-switch1">
+<label for="theme-switch1" class="switch-label">Light</label>
+<input type="radio" class="theme-switch" name="theme-switch" id="theme-switch2">
+<label for="theme-switch2" class="switch-label">Dark</label>
+
+<div id="myLittleForm">
+    <form action="#" method="post">
+        <input id="ename" type="text" />
+        <input id="submitInfo" type="submit" value="Submit" />
+    </form>
+</div>
+
+
+<div id="page">
+    <div id="content">
+        <main>
+            <div>
+                @{
+                    @Html.Raw(panelItemWarning.First().Value("nCbodyDescription"))
+                }
+            </div>
+            <div class="top-header">
+                <div class="hero-container top_extend">
+                    <div class="container-fluid top_extend">
+                        <div class="row no-gutter top_extend">
+                            <div class="top_extend">
+                                <div id="hero-banner" class="carousel slide top_extend" data-ride="carousel" data-interval="7000">
+                                    <img class="pattern hidden-xs" src="~/images/footer-pattern.svg" alt="footer-pattern" style="display:none">
+                                    @{
+                                        var heroHeader = (HeroHeaderHome)homePageElements.Children.Where(o => o is HeroHeaderHome).FirstOrDefault();
+                                        if (heroHeader != null)
+                                        {
+                                            <!-- Indicators -->
+                                            <ol class="carousel-indicators">
+                                                @{
+                                                    int counter = 0;
+                                                    foreach (var items in heroHeader.Items)
+                                                    {
+                                                        <li data-target="#hero-banner" data-slide-to="@counter" class="@((counter == 0) ? "active" : "")"></li>
+                                                        counter++;
+                                                    }
+                                                }
+                                            </ol>
+                                            <!-- Wrapper for slides -->
+                                            <div class="carousel-inner top_extend">
+                                                @{
+                                                    int myCounter = 0;
+                                                    foreach (var heroItem in heroHeader.Items)
+                                                    {
+                                                        //var Avatar = heroItem.Value<IPublishedContent>("heroImage");
+                                                        var Avatar = ((ContentModels.Image)((IPublishedContent)heroItem.Value("heroImage"))).Url;
+                                                        <div class="top_extend item @((myCounter == 0) ? "active" : "") lazyimage" style="background-image: url(@Avatar);" data-image-path="background-image: url(@Avatar);">
+
+                                                            <div class="hero-caption">
+                                                                @if (myCounter == 0)
+                                                                {
+                                                                    <h1 class="hero-title"><span class="cap-title">@heroItem.Value("heroProductDescription")</span><br>@heroItem.Value("heroTitle")</h1>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <h2 class="hero-title"><span class="cap-title">@heroItem.Value("heroProductDescription")</span><br>@heroItem.Value("heroTitle")</h2>
+                                                                }
+                                                                <p class="hero-description">@heroItem.Value("heroTitleDescription")</p>
+                                                                <br />
+                                                                @{
+                                                                    var redirect_links = (IEnumerable<Umbraco.Web.Models.Link>)heroItem.Value("heroRedirectAction");
+
+                                                                    if (redirect_links.Any())
+                                                                    {
+                                                                        foreach (var links in redirect_links)
+                                                                        {
+                                                                            var buttonText = heroItem.Value("heroButtonLabel");
+                                                                            var btnId = viewName + "_" + buttonText.ToString().Replace(" ", "") + "_" + "HeroHeader";
+                                                                            <a class="button primary clearfix" style="@heroItem.Value("buttonStyler")" href="@links.Url" id="@btnId">
+                                                                                @buttonText
+                                                                            </a>
+                                                                        }
+                                                                    }
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                        myCounter++;
+                                                    }
+                                                }
+
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- HERO SHOULDER -->
+            @{
+                var heroShoulder = (HeroShoulderHome)homePageElements.Children.Where(o => o is HeroShoulderHome).FirstOrDefault();
+                if (heroShoulder != null)
+                {
+                    <div class="loan-summary-container">
+                        <div class="container">
+                            <div class="mega-tabs">
+                                <!-- Nav tabs -->
+                                <ul id="go_to_tab_content" class="nav nav-tabs eq-height" role="tablist">
+                                    @{
+                                        var isFirstRow = true;
+                                        foreach (var item in heroShoulder.Items)
+                                        {
+                                            var tab = (HomeShoulderItem)item;
+                                            <li role="presentation" class="@(isFirstRow ? "active" : "") loan-summary ">
+                                                <a href="#@tab.TabId.Replace(" ", "")" aria-controls="profile " role="tab" data-toggle="tab">
+                                                    <img loading="lazy" src="@tab.TabIcon.Url" width="36" alt="@tab.TabIcon.Value("altTag")" /> <span class="hidden-xs">@tab.TabName</span>
+                                                </a>
+                                            </li>
+                                            isFirstRow = false;
+                                        }
+                                    }
+                                </ul>
+                            </div>
+                            <!-- Tab panes -->
+                            <div class="tab-content">
+                                @{
+                                    bool isFirstTab = true;
+                                    int tabCount = 0;
+                                    foreach (var item in heroShoulder.Items)
+                                    {
+                                        string linkValue = null;
+                                        var tab = (HomeShoulderItem)item;
+                                        <div role="tabpanel" class="tab-pane @(isFirstTab ? "active" : "")" id="@tab.TabId.Replace(" ", "")">
+                                            <div class="tab-category">
+                                                @tab.TabName
+                                            </div>
+                                            <h2 class="text-center">
+                                                @tab.TabHeading
+                                            </h2>
+                                            <div class="row">
+                                                @{
+                                                    if (tab.Items.Count() == 2)
+                                                    {
+                                                        <div class="col-md-3"></div>
+                                                    }
+                                                }
+                                                @foreach (var subI in tab.Items)
+                                                {
+                                                    var subItem = (StructureBeCardDescription)subI;
+                                                    <div class="col-sm-6 col-md-3">
+                                                        <div class="loan-summary">
+                                                            <div class="image">
+                                                                @if ((subItem.FormatIcon) && (subItem.Link != null))
+                                                                {
+                                                                    <a href="@subItem.Link.Url">
+                                                                        <div class="img-bg" style="background-image: url(@subItem.BenefitCardIcon.Url);"></div>
+                                                                    </a>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <a href="@subItem.Link.Url">
+                                                                        <div class="img-bg" style="background-image: url(@subItem.BenefitCardIcon.Url);"></div>
+                                                                    </a>
+                                                                }
+                                                            </div>
+                                                            <div class="title">
+                                                                @if (tabCount == 1)
+                                                                {
+                                                                    string bookMarkValue = subItem.BenefitCardTitle.ToString();
+                                                                    bookMarkValue = bookMarkValue.Replace(" ", "");
+                                                                    linkValue = subItem.Link.Url + "#" + bookMarkValue;
+                                                                }
+                                                                else
+                                                                {
+                                                                    linkValue = subItem.Link.Url;
+                                                                }
+                                                                @if (subItem.Link != null)
+                                                                {
+                                                                    <a href="@linkValue">
+                                                                        @subItem.BenefitCardTitle
+                                                                    </a>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <a href="@subItem.Link.Url">
+                                                                        @subItem.BenefitCardTitle
+                                                                    </a>
+                                                                }
+
+                                                            </div>
+                                                            <div class="loan-desc">@subItem.BenefitCardDescription</div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                            <div class="margin-top-80 hidden-xs"></div>
+                                        </div>
+                                        isFirstTab = false;
+                                        tabCount += 1;
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            <!-- AFRICAN BANK STORIES -->
+            <div class="bank-story-container">
+                <div class="pull-up">
+                    <div class="bank-story-carousel">
+                        <div id="bank-story" class="carousel slide" data-ride="carousel" data-interval="false">
+                            <!-- Wrapper for slides -->
+                            <div class="carousel-inner">
+                                @{
+                                    var blogParent = Umbraco.Content(2855); //Umbraco.TypedContentSingleAtXPath("//blogLanding");
+
+                                    if (blogParent != null)
+                                    {
+                                        int myCounter = 0;
+
+
+                                        foreach (var blog in blogParent.Children.OrderByDescending(x => x.Children.First().Children.Where(c => c.ContentType.Alias == "heroBodyBlogDetail").First().Value("blogdate")))
+                                        {
+                                            if (blog.Children.Any())
+                                            {
+                                                foreach (var blogElement in blog.Children.FirstOrDefault().Children)
+                                                {
+                                                    if (blogElement.Value("title") != null)
+                                                    {
+                                                        <div class="item @((myCounter == 0) ? "active" : "")">
+
+                                                            @{
+
+                                                                if ((whatsNew != null) && (myCounter == 0))
+                                                                {
+                                                                    Umbraco.Web.Models.Link whatsNewLink = null;
+                                                                    foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)whatsNew.Value("sectionLink"))
+                                                                    {
+                                                                        whatsNewLink = link;
+                                                                        break;
+                                                                    }
+                                                                    //var whatsNewImageUrl = ((ContentModels.Image)((IPublishedContent)whatsNew.Value("ebankITImage"))).Url;
+                                                                    <div class="bank-story-img" style="background-image: url('/Media/ymiaoysk/backgroundnew.jpg');"></div>//@PlaceImageBackground("background.jpg")
+                                                                    <div class="bank-story-caption whatsnew col-md-6">
+                                                                        <a href="@whatsNewLink.Url">
+                                                                            <div class="whatsnew-title whatsnew-copy">
+                                                                                <p>@whatsNew.Value("ebankITTitle")</p>
+                                                                            </div>
+
+
+                                                                            <div class="bank-story-description whatsnew-copy">
+                                                                                @whatsNew.Value("ebankITContent")
+                                                                            </div>
+                                                                        </a>
+                                                                        <div class="bank-story-read-more" style="margin-top:5%">
+                                                                            <a href="@whatsNewLink.Url"></a>
+                                                                            <a class="button primary clearfix" style="background-color:#88bc47" href="@whatsNewLink.Url">
+                                                                                @whatsNewLink.Name
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
+                                                                    <br />
+                                                                    <div class="bank-story-caption col-md-6 whatsnew-sibling" style="margin-left: unset !important;">
+                                                                        <span class="bank-story-tag">The Blog</span>
+                                                                        <div class="bank-story-title">
+                                                                            @blogElement.Value("title")
+                                                                        </div>
+                                                                        <div class="bank-story-description">
+                                                                            @blogElement.Value("introductionDescription")
+                                                                        </div>
+                                                                        <div class="bank-story-read-more">
+                                                                            <a class="button primary clearfix" href="@blog.Url">
+                                                                                Read more
+                                                                            </a>
+                                                                        </div>
+                                                                        <div class="bank-story-author">
+                                                                            @(blogElement.Value<DateTime>("blogDate").ToShortDateString())
+                                                                        </div>
+                                                                    </div>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <div class="bank-story-img" style="background-image:url(/media/xmlmnwsy/blog_patterns_1.jpg)"></div>
+                                                                    <a href="~/en/home/blog-landing/">
+                                                                        <div class="bank-story-caption">
+                                                                            <span class="bank-story-tag">The Blog</span>
+                                                                            <div class="bank-story-title">
+                                                                                @blogElement.Value("title")
+                                                                            </div>
+                                                                            <div class="bank-story-description">
+                                                                                @blogElement.Value("introductionDescription")
+                                                                            </div>
+                                                                            <div class="bank-story-read-more">
+                                                                                <a class="button primary clearfix" href="@blog.Url">Read more</a>
+                                                                            </div>
+                                                                            <div class="bank-story-author">@(blogElement.Value<DateTime>("blogDate").ToShortDateString())</div>
+                                                                        </div>
+                                                                    </a>
+                                                                }
+
+
+
+                                                            }
+
+
+                                                        </div>
+                                                        myCounter++;
+                                                    }
+                                                }
+
+                                            }
+
+
+                                        }
+                                    }
+                                }
+                            </div>
+                            <!-- Controls -->
+                            <a class="left carousel-control" href="#bank-story" role="button" data-slide="prev">
+                                <span class="icon-arrow-left"></span>
+                            </a>
+                            <a class="right carousel-control" href="#bank-story" role="button" data-slide="next">
+                                <span class="icon-arrow-right"></span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="margin-top-40 visible-xs"></div>
+
+            <!-- HERO BODY -->
+            <div class="testimonials-container">
+                <div class="container">
+                    <div class="testimonials-carousel">
+                        <div id="testimonials" class="carousel slide" data-ride="carousel" data-interval="false">
+                            <!-- Indicators -->
+                            @{
+                                if (testimonials != null)
+                                {
+                                    <ol class="carousel-indicators">
+                                        @{
+                                            int counter = 0;
+                                            foreach (var testimonyItem in testimonials.TestimonialItems)
+                                            {
+                                                <li data-target="#hero-banner" data-slide-to="@counter" class="@((counter == 0) ? "active" : "")"></li>
+                                                counter++;
+                                            }
+                                        }
+                                    </ol>
+                                    <!-- Wrapper for slides -->
+                                    <div class="carousel-inner">
+                                        @{
+                                            int newCounter = 0;
+                                            foreach (var testimonyItem in testimonials.TestimonialItems)
+                                            {
+                                                var Avatar = testimonyItem.Value<IPublishedContent>("testimonialAvatar");
+                                                <div class="item @((newCounter == 0) ? "active" : "")">
+                                                    <div class="testimonial">
+                                                        <div class="avatar"><img src="@Avatar.Url" alt="@Avatar.Value("altTag")"></div>
+                                                        <div class="descr">@testimonyItem.Value("testimonialStory")</div>
+                                                        <div class="name">@testimonyItem.Value("testimonialName")</div>
+                                                    </div>
+                                                </div>
+                                                newCounter++;
+                                            }
+                                        }
+                                    </div>
+                                }
+                                <!-- Controls -->
+                                <a class="left carousel-control" href="#testimonials" role="button" data-slide="prev"><span class="icon-arrow-left"></span></a>
+                                <a class="right carousel-control" href="#testimonials" role="button" data-slide="next"><span class="icon-arrow-right"></span></a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- HERO FEET -->
+        @{
+            if (heroFeetHome != null)
+            {
+                var isFirstRow = true;
+                <div class="help-container" id="find-us">
+                    <div class="container">
+                        <h2 class="text-center">@heroFeetHome.Heading</h2>
+                        <div class="mega-tabs margin-top-40">
+                            <!-- Nav tabs -->
+                            <ul class="nav nav-tabs" role="tablist">
+                                @foreach (var link in heroFeetHome.Links)
+                                {
+                                    var tab = (FeetItem)link;
+                                    <li role="presentation" class="@(isFirstRow ? "active" : "") branch-tab" style="width:100%">
+                                        <a href="#@tab.Value("Id")" aria-controls="faq" role="tab" data-toggle="tab"><img loading="lazy" src="@tab.TabIcon.Url" alt="@tab.TabIcon.Value("altTag")" width="30" />@tab.TabName</a>
+                                    </li>
+                                    isFirstRow = false;
+                                }
+                            </ul>
+                        </div>
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+                            @{
+                                bool isFirstTab = true;
+                                foreach (var link in heroFeetHome.Links)
+                                {
+                                    var tab = (FeetItem)link;
+                                    <div role="tabpanel" class="tab-pane @(isFirstTab ? "active" : "")" id="@tab.TabId.Replace(" ", "")">
+                                        <div class="row">
+                                            <div class="col-sm-10 col-sm-offset-1">
+                                                <div class="campaign-list">
+                                                    <ul>
+                                                        @foreach (var subI in tab.Items)
+                                                        {
+                                                            var linkItem = (LinkItem)subI;
+                                                            <li>
+                                                                <div class="row no-gutter download-item">
+                                                                    <div class="col-sm-9"><div class="download-descr">@linkItem.Value("text")</div></div>
+                                                                    <div class="col-sm-3">
+                                                                        <a href="@linkItem.InternalLink.Url?#@linkItem.Value("anchorLink")" class="download-btn">@linkItem.Value("buttonText")</a>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+                                                        }
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                isFirstTab = false;
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<!-- CALL BACK FORM -->
+@{
+    @*Used for popup START*@
+    var _floatingFormViewModel = homePageElements.Children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+    // @Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)
+}
+@section scripts
+    {
+    <script type="text/javascript">
+        var lazyImages = {
+            init: function () {
+                revealNextImage();
+
+                function replaceThisLazyImage(element, bgImage) {
+                    if (element != null && element != undefined) {
+                        var imagePath = $(element).attr("data-image-path");
+                        var image = new Image();
+                        $(image)
+                            .load(function () {
+                                if (bgImage) {
+                                    $(element).css("background-image", "url(" + imagePath + ")");
+                                }
+                                else {
+                                    $(element).attr("src", + "../" + imagePath);
+                                }
+                                $(element).removeClass('lazyimage');
+                                revealNextImage();
+                            })
+                            // .attr('src', imagePath)
+                            .css("background-image", "url(" + imagePath + ")");
+                    }
+                }
+
+                function revealNextImage() {
+                    replaceThisLazyImage($('.lazyimage:not(img):first')[0], true);
+                    replaceThisLazyImage($('img.lazyimage:first')[0], false);
+                }
+            }
+        }; $(window).load(lazyImages.init);</script>
+
+    <script>
+        $(document).ready(function () {
+
+
+            $('#submitInfo').click(function () {
+                //var ename = $('#ename').val();
+                //alert(ename);
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("CreateSupplierInfo", "Enterprise")',
+                    data: '{EnterpriseName: ' + JSON.stringify("Value") + '}',
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function () {
+                        alert("success");
+                    },
+                    error: function (request, status, error) {
+                        alert("failed");
+                    }
+                });
+            });
+
+
+
+            lightBox.fadeIn(function () {
+                lightBoxContent.show();
+            });
+            positionLightbox();
+        });
+
+        var lightBox = $('#lightbox'),
+            lightBoxContent = $('#lb-content');
+
+        var positionLightbox = function () {
+            var viewWidth = $(window).width(),
+                lbContentMargin = (viewWidth / 2),
+                lbContent = $('#lb-content');
+
+            //lbContent.css({'top' : $(window).scrollTop() + 50 + 'px'});
+        };
+
+        $('#lb-close').click(function () {
+            lightBox.fadeOut(1000);
+            lightBoxContent.fadeOut(1000);
+        });
+
+        $('#lb-content').click(function () {
+            lightBox.fadeOut(1000);
+            lightBoxContent.fadeOut(1000);
+        });</script>
+}
+
+@functions
+    {
+    private static bool CanBrowserHandleWebPImages()
+    {
+        HttpRequest httpRequest = HttpContext.Current.Request;
+        HttpBrowserCapabilities browser = httpRequest.Browser;
+
+        if (browser.Type.Contains("Chrome") || browser.Type.Contains("Opera") || browser.Type.Contains("Android"))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static MvcHtmlString PlaceImageBackground(string imageUrl)
+    {
+        if (CanBrowserHandleWebPImages())
+        {
+            // Get the file type
+            string fileType = Path.GetExtension(imageUrl);
+            if (fileType != null)
+            {
+                imageUrl = imageUrl.Replace(fileType, ".webp");
+            }
+
+            return new MvcHtmlString(String.Format("url('{0}') ", imageUrl));
+        }
+
+        return new MvcHtmlString(String.Format("url('{0}') ", imageUrl));
+    }
+
+    public static MvcHtmlString PlaceImage(string imageUrl, string alt, string cssStyle)
+    {
+        if (CanBrowserHandleWebPImages())
+        {
+            // Get the file type
+            string fileType = Path.GetExtension(imageUrl);
+            if (fileType != null)
+            {
+                imageUrl = imageUrl.Replace(fileType, ".webp");
+            }
+
+            return new MvcHtmlString(String.Format("<img src=\"{0}\" " + "alt=\"{1}\" " + "style=\"{2}\"  />", imageUrl, alt, cssStyle));
+        }
+
+        return new MvcHtmlString(String.Format("<img src=\"{0}\" " + "alt=\"{1}\" " + "style=\"{2}\"/>", imageUrl, alt, cssStyle));
+    }
+}

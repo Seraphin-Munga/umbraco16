@@ -1,0 +1,60 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageManageYourAccount>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@{
+    Layout = "Master.cshtml";
+    // All Current Page Children
+    var children = Model.Children;
+    // Get specific Children
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroBody = (HeroBody)children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+}
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+<!-- HERO CONTINUED-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+<div class="container margin-bottom-minus-60">
+    <div class="campaign-product-container full" style="top:-70px !important">
+        <div class="margin-top-20 visible-xs"></div>
+        <div class="row">
+            <div class="col-xs-10 col-xs-offset-1">
+                @heroBody.RichTextBox
+            </div>
+        </div>
+        <div class="margin-top-100"></div>
+    </div>
+</div>
+<style>
+    @@media (max-width: 767px)
+    {
+        .hero-static-caption .hero-static-title, .hero-static-caption h1 
+        {
+            font-size: 36px;
+            
+        }
+        .hero-static-caption .hero-static-description, .hero-static-caption p 
+        {
+            font-size: 14px;
+            font-weight: 200;
+            line-height: 1.5;
+        }
+        .campaign-product-container.full {
+            margin: 0 -15px;
+            padding: 10px;
+        
+        }
+        .campaign-product-container {
+            padding: 0;
+            margin: 8px -7px 0 -7px;
+            top: 0;
+            overflow: hidden;
+        }
+    }
+    @@media screen and (max-width: 850px)
+    {
+        .faq-section .main-title {
+            font-size: 47px;
+            margin-left: 15px;
+        }
+    }
+</style>

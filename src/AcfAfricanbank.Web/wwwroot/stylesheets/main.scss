@@ -1,0 +1,38 @@
+@import "variables";
+@import "custom-mixins";
+@import "global";
+@import "footer";
+@import "header";
+@import "utility";
+@import "icomoon-fonts";
+@import "hero";
+@import "button";
+@import "loan-summary";
+@import "bank-story";
+@import "st.action-panel";
+@import "form";
+@import "testimonials";
+@import "branch-locator";
+@import "mega-tabs";
+@import "hero-static";
+@import "campaign-more-info";
+@import "campaign-apply";
+@import "campaign-product-info";
+@import "search";
+@import "card";
+@import "table";
+@import "slick";
+@import "breadcrumb";
+@import "investment-calculator";
+@import "thumbnail-card";
+@import "more";
+@import "investors";
+@import "article";
+@import "pricing-table";
+@import "tech-deals";
+@import "404";
+@import "others";
+
+
+// keep at the end of the line
+@import "overrides";

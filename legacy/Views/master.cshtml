@@ -1,0 +1,1707 @@
+﻿<!DOCTYPE html>
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using ContentModels = Umbraco.Web.PublishedModels
+@using Umbraco.Core
+@using Web.Helpers;
+@using System.Web.Optimization
+
+@{
+
+    string CacheVersion = "V1.1";
+    Layout = null;
+    // Get basic design settings from the homepage
+    ContentModels.PageHome home = Model.Root() as ContentModels.PageHome;
+    var colorTheme = "#002b60";
+    var font = "arial";
+    var allKids = Model.Children.ToList();
+    ContentModels.CallMeBack floatingForm = null;
+    var currentPage = Umbraco.AssignedContentItem;
+
+    if (allKids.Where(c => c is ContentModels.CallMeBack).Any())
+    {
+        @*All pages except home*@
+        floatingForm = (ContentModels.CallMeBack)allKids.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+    }
+    else
+    {
+        @*
+            var _home = Model.Parent;
+            var homePageElementItems = _home.Children.Where(c => c is ContentModels.HomePageElements).FirstOrDefault();
+            if (homePageElementItems != null)
+            {
+                floatingForm = (ContentModels.CallMeBack)homePageElementItems.Children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+            }
+        *@
+        foreach (var t in allKids)
+        {
+
+            if (t.Children.Where(c => c is ContentModels.CallMeBack).Any())
+            {
+                floatingForm = (ContentModels.CallMeBack)t.Children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+                break;
+            }
+        }
+    }
+
+    @*<!--if (allKids.Where(c => c is ContentModels.CallMeBack).Any())
+        {-->
+        All pages except home
+            <!--floatingForm = (ContentModels.CallMeBack)allKids.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+            }
+            else
+            {
+                foreach (var t in allKids)
+                {
+                    if (t.Children.Where(c => c is ContentModels.CallMeBack).Any() && currentPage.Id == 2808)
+                    {
+                        floatingForm = (ContentModels.CallMeBack)t.Children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+                        break;
+                    }
+
+                }
+            }-->*@
+
+var call_me_subject = floatingForm?.Value("ProductSubject") ?? "";
+var call_me_contact_type = floatingForm?.Value("contactType") ?? "";
+var prodID = floatingForm?.Value("productID") ?? "";
+var check_open = floatingForm?.Value<bool>("callMeBackDifferentLocation");
+
+HomePageElements homePageElements = null;
+if (Model.Children.Where(o => o is HomePageElements).FirstOrDefault() != null)
+{
+    homePageElements = (HomePageElements)Model.Children.Where(o => o is HomePageElements).FirstOrDefault();
+}
+else if (Model.Parent.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault() != null)
+{
+    homePageElements = (HomePageElements)Model.Parent.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+}
+else
+{
+    homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+}
+
+// var disclaimersData = homePageElements.Children.Where(o => o.ContentType.Alias == "ebankITListSectionText").ToList();
+//var disclaimers = disclaimersData.FirstOrDefault().Children;
+//IPublishedContent disclaimerValue = null;
+//foreach (var content in disclaimers)
+//{
+//    if (HttpContext.Current.Request.Path.ToString().Contains("/banking"))
+//    {
+//        if (content.Value("ebankITTitle").ToString().Contains("Banking"))
+//        {
+//            disclaimerValue = content;
+//        }
+//    }
+//    else
+//    {
+//        disclaimerValue = content;
+//        break;
+//    }
+//}
+
+
+var heroBodyBlog = (HeroBody)homePageElements.Children.Where(x => x is HeroBody).FirstOrDefault();
+var heroBodyBlogLink = heroBodyBlog.Children.Where(x => x.ContentType.Alias.ToLower() == "link").FirstOrDefault();
+
+Umbraco.Web.Models.Link itemLink = null;
+foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)((Link)heroBodyBlogLink).UrlLink)
+{
+    itemLink = link;
+    break;
+}
+
+var bottomNavigation = (BottomNavigation)homePageElements.Children.Where(c => c is BottomNavigation).FirstOrDefault();
+//var CacheVersion = "ver=" + AfricanBank.Cms.Portal.Helpers.CacheFactory.CacheVersion();
+var seo_title = Model.Value("title_tag"); //Umbraco.Field("title_tag");
+var seo_description = Model.Value("descrition_tag");
+var seo_keywords = Model.Value("keywords_tag");
+var seo_robots = Model.Value("robots_tag");
+var seo_googlebot = Model.Value("googlebot_tag");
+String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
+    @*media/52775/abw1808_002_heritage_logo.png*@
+    @*media/51288/ab-logo_icon_blue_30x30-2.png*@
+
+    if (Model.Value<IPublishedContent>
+        ("image") != null)
+    {
+        twitter_default_image = Model.Value("image").ToString();
+    }
+    //check if blog image exist
+    if (Model.Children.Where(c => c is BlogDetailsElements).FirstOrDefault() != null)
+    {
+        var headerItem = Model.Children.Where(c => c is BlogDetailsElements).FirstOrDefault().Children.Where(x => x is HeroHeaderBlogDetail).FirstOrDefault();
+
+        ContentModels.Image imageData = (ContentModels.Image)headerItem.Value("Image");
+        if (imageData != null)
+        {
+            twitter_default_image = ((ContentModels.Image)headerItem.Value("Image")).Url;
+        }
+    }
+
+    var url = Request.Url.OriginalString.Trim();
+    var uri = new Uri(url);
+
+    var query = HttpUtility.ParseQueryString(uri.Query);
+
+    var userSettings = "";
+    if (Request.Cookies["AfricanBank"] != null)
+    {
+        userSettings = Request.Cookies["AfricanBank"]["Value"];
+    }
+
+    var utm_source = Request.Params["utm_source"];
+    var utm_medium = Request.Params["utm_medium"];
+    var utm_campaign = Request.Params["utm_campaign"];
+}
+
+
+<html ng-app="africanBankApp">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#002b60">
+    @if (!string.IsNullOrEmpty(query.ToString()))
+    {
+        <title>African Bank</title>
+        <meta name="robots" content="noindex,follow">
+        <meta name="googlebot" content="noindex">
+    }
+    else
+    {
+        <title>@seo_title</title>
+        <meta name="description" content="@seo_description">
+        <meta name="keywords" content="@seo_keywords">
+        <meta name="robots" content="@seo_robots">
+        <meta name="author" content="African Bank">
+    }
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@Html.Raw("@")AfricanBank" />
+    <meta name="twitter:creator" content="@Html.Raw("@")AfricanBank" />
+    <meta name="twitter:title" content="African Bank | @seo_title.ToString()" />
+    <meta name="twitter:description" content="@seo_description" />
+    <meta name="twitter:image" content="@System.Configuration.ConfigurationManager.AppSettings["site_domain"]@twitter_default_image" />
+
+    <meta property="og:title" content="African Bank | @seo_title.ToString()" />
+    <meta property="og:type" content="article" />
+
+
+    <meta property="og:url" content="@Model.Url(mode: UrlMode.Absolute)" />
+    <meta property="og:description" content="@seo_description" />
+    <meta property="og:image" content="@System.Configuration.ConfigurationManager.AppSettings["site_domain"]@twitter_default_image" />
+
+
+    <!-- Google Tag Manager -->
+    <script>
+        (function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-WPMR64S');
+    </script>
+    <!-- End Google Tag Manager -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-21394042-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-21394042-1', { 'optimize_id': 'GTM-T7N9LBL' });
+    </script>
+
+    @* @RenderSection("Header", required: false) *@
+
+    @if (url.EndsWith("/"))
+    {
+        <link rel="canonical" href="@url" />
+    }
+    else
+    {
+        <link rel="canonical" href="@url/" />
+    }
+
+    <link rel="shortcut icon" type="image/png" href="/favicon.png?@CacheVersion" />
+    <link rel="stylesheet" href="/css/style_unlimited.css">
+
+    <style>
+        .cookieimg {
+            height: 50px;
+        }
+
+        .cookie-btn {
+            background-color: #fff;
+            border: 1px solid #fff;
+            color: #002b60;
+            padding: 4px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 0px;
+            font-size: 12px;
+            margin: 1px 1px;
+            position: absolute;
+            font-weight: bold;
+            width: 90%;
+            font-size: 75%;
+        }
+
+        .reject-cookie {
+            background-color: #fff;
+            border: 1px solid #fff;
+            color: #002b60;
+            padding: 4px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 0px;
+            font-size: 12px;
+            margin: 1px 1px;
+            position: absolute;
+            right: 10px;
+            top: 15px;
+            font-weight: bold;
+        }
+
+
+        .decline {
+            background-color: #fff;
+            border: 1px solid #fff;
+            color: #002b60;
+            padding: 4px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 0px;
+            font-size: 12px;
+            margin: 1px 1px;
+            position: absolute;
+            right: 118px;
+            top: 15px;
+            font-weight: bold;
+        }
+
+        .settings-cookie {
+            position: absolute;
+            background: no-repeat;
+            border: none;
+            color: #002b60 !important;
+            font-weight: bold;
+            width: 100%;
+            font-size: 80%;
+            margin-top: 8px;
+        }
+
+        .settings-cookie1 {
+            position: absolute;
+            background: no-repeat;
+            border: none;
+            color: #002b60 !important;
+            font-weight: bold;
+            width: 100%;
+            font-size: 80%;
+            margin-top: 7px;
+            margin-left: -20px;
+        }
+
+
+
+        .cookie-consent > img {
+            height: 35px;
+            float: left;
+            opacity: 0.45;
+            margin-top: 11px;
+            margin-right: 10px;
+        }
+
+        .cookie-consent {
+            position: fixed;
+            top: 0px;
+            width: 100%;
+            height: 63px;
+            color: #fff;
+            line-height: 20px;
+            padding-left: 10px;
+            padding-right: 10px;
+            font-size: 75%;
+            background: #b2bfcf;
+            z-index: 120;
+            border-radius: 0px;
+            display: inline-block;
+            box-shadow: 0px 5px 5px #00000035;
+            padding-top: 12px;
+        }
+
+
+        .ml-1 {
+            color: #002b60 !important;
+            font-weight: bold;
+        }
+
+        .message {
+            margin-top: 23px;
+        }
+
+        .policy {
+            position: absolute;
+            right: 90px;
+            top: 23px;
+        }
+
+
+        @@media (min-width: 768px) {
+            #lb-content {
+                width: 500px;
+            }
+
+            .i_image {
+                height: 300px;
+            }
+        }
+    </style>
+
+
+    @if (userSettings == "")
+    {
+
+        <style>
+         @@media (min-width: 280px) and (max-width: 653px) {
+            .cookie-consent {
+                height: 155px !important;
+                font-size: 80%;
+            }
+
+            .dropdown-container .navbar-header {
+                margin-top: 140px;
+            }
+
+            .decline {
+                top: 78px;
+            }
+            .policy {
+                top: 83px;
+            }
+                .padding-top-15 {
+                    padding-top: 20px;
+                }
+
+                .cookieimg {
+                    height: 30px;
+                }
+
+                .cookie-btn {
+                    font-size: 60%;
+                }
+
+                .settings-cookie {
+                    font-size: 60%;
+                }
+            }
+
+            @@media (min-width: 360px) and (max-width: 640px) {
+                .cookieimg {
+                    height: 30px;
+                }
+
+              @*  .cookie-consent > img {
+                    display: none;
+                }*@
+
+                .decline {
+                    top: 95px;
+                    right: 90px;
+                }
+
+                .policy {
+                    position: absolute;
+                    right: 170px;
+                    top: 102px;
+                }
+
+                .cookie-consent {
+                    height: 140px !important;
+                   @* padding-left: 20px;
+                    padding-right: 20px;
+                    text-align: center; *@
+                }
+
+                .dropdown-container .navbar-header {
+                    margin-top: 140px;
+                }
+
+                .dropdown-container.navbar-default .navbar-collapse {
+                    margin-top: 140px;
+                }
+            }
+
+            @@media (min-width: 411px) and (max-width: 731px) {
+                .cookieimg {
+                    height: 30px;
+                }
+
+               @* .cookie-consent > img {
+                    display: none;
+                }*@
+
+
+                .decline {
+                    top: 88px;
+                    right: 115px;
+                }
+
+                .policy {
+                    position: absolute;
+                    right: 190px;
+                    top: 95px;
+                }
+            }
+
+
+
+            @@media (min-width: 768px) and (max-width: 1024px) {
+                .cookieimg {
+                    height: 30px;
+                }
+
+
+
+                .message {
+                    text-align: center;
+                }
+
+                .decline {
+                    top: 48px;
+                }
+
+                .policy {
+                    position: absolute;
+                    right: 90px;
+                    top: 55px;
+                }
+
+                .cookie-consent {
+                    height: 100px !important;
+                    padding-left: 20px;
+                    padding-right: 20px;
+                }
+
+                .dropdown-container .navbar-header {
+                    margin-top: 80px;
+                }
+
+                .dropdown-container.navbar-default .navbar-collapse {
+                    margin-top: 0px;
+                }
+
+                .dropdown-container .navbar-right {
+                    margin-top: 80px;
+                }
+            }
+
+            @@media (min-width: 1024px) and (max-width: 1366px) {
+                .cookieimg {
+                    height: 30px;
+                }
+                .policy {
+                    top: 25px;
+                }
+                    .message {
+                    width: 80%;
+                    text-align: center;
+                }
+
+                .decline {
+                    top: 18px;
+                }
+
+                .dropdown-container .navbar-header {
+                    margin-top: 40px;
+                }
+
+                .dropdown-container.navbar-default .navbar-collapse {
+                    margin-top: 40px;
+                }
+
+                .cookie-consent {
+                    height: 65px !important;
+                    padding-left: 20px;
+                    padding-right: 20px;
+                }
+
+                .dropdown-container .navbar-right {
+                    margin-top: 40px;
+                }
+            }
+        </style>
+
+    }
+    @{
+        if (currentPage.Id == 2808)
+        {
+            <style>
+                /*Ipad  potrait*/
+                @@media only screen and (max-width: 768px) {
+                    .right-bottom {
+                        bottom: 13em;
+                    }
+                }
+                /*Ipad  landscape*/
+                @@media only screen and (max-width: 1024px) and (orientation: landscape) {
+                    .top-header {
+                        height: 65%;
+                    }
+                }
+
+
+                /*Iphone x 812  potrait */
+                @@media only screen and (max-width: 812px) {
+                    /*START-----------------------------------------call me back-----------------------------------------*/
+                    .st-panel {
+                        height: auto;
+                    }
+
+                    .right-bottom {
+                        bottom: 1em;
+                    }
+                    /*END-----------------------------------------call me back-----------------------------------------*/
+                }
+
+                /*Iphone 7  414 potrait */
+                @@media only screen and (max-width: 414px) {
+                    /*START-----------------------------------------call me back-----------------------------------------*/
+                    .st-panel {
+                        height: auto;
+                    }
+
+                    .right-bottom {
+                        bottom: 1em;
+                    }
+                    /*END-----------------------------------------call me back-----------------------------------------*/
+                }
+
+                /*Nexus 5X 412 potrait*/
+                @@media (max-width: 412px) {
+
+                    .area_search {
+                        margin-top: 0%;
+                    }
+                    /*START-----------------------------------------call me back-----------------------------------------*/
+                    .st-panel {
+                        height: auto;
+                    }
+
+                    .right-bottom {
+                        bottom: 1em;
+                    }
+                    /*END-----------------------------------------call me back-----------------------------------------*/
+                }
+                /*landscape for Nexus 5X   412*/
+                @@media only screen and (max-width: 736px) and (orientation: landscape) {
+                    /*START-----------------------------------------call me back-----------------------------------------*/
+                    .right-bottom {
+                        bottom: 1em;
+                    }
+                    /*END-----------------------------------------call me back-----------------------------------------*/
+                }
+
+                @@media only screen and (max-width: 360px) {
+                    .right-bottom {
+                        bottom: 1em;
+                    }
+                }
+
+                @@media only screen and (max-width: 640px) and (orientation: landscape) {
+                    .top-header {
+                        height: 58%;
+                    }
+
+                    .right-bottom {
+                        bottom: 2em;
+                    }
+                }
+            </style>
+        }
+    }
+
+    <link rel="stylesheet" href="/css/font-awesome-5.15.3.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:200,300,400,600,700&font-display=swap" rel="stylesheet">
+
+    <link href="/css/cookieconsent.css" rel="stylesheet" />
+    <style amp-boilerplate>
+        body {
+            -webkit-animation: -amp-start 8s steps(1,end) 0s 1 normal both;
+            -moz-animation: -amp-start 8s steps(1,end) 0s 1 normal both;
+            -ms-animation: -amp-start 8s steps(1,end) 0s 1 normal both;
+            animation: -amp-start 8s steps(1,end) 0s 1 normal both
+        }
+
+        @@-webkit-keyframes -amp-start {
+            from {
+                visibility: hidden
+            }
+
+            to {
+                visibility: visible
+            }
+        }
+
+        @@-moz-keyframes -amp-start {
+            from {
+                visibility: hidden
+            }
+
+            to {
+                visibility: visible
+            }
+        }
+
+        @@-ms-keyframes -amp-start {
+            from {
+                visibility: hidden
+            }
+
+            to {
+                visibility: visible
+            }
+        }
+
+        @@-o-keyframes -amp-start {
+            from {
+                visibility: hidden
+            }
+
+            to {
+                visibility: visible
+            }
+        }
+
+        @@keyframes -amp-start {
+            from {
+                visibility: hidden
+            }
+
+            to {
+                visibility: visible
+            }
+        }
+    </style>
+    <noscript>
+        <style amp-boilerplate>
+            body {
+                -webkit-animation: none;
+                -moz-animation: none;
+                -ms-animation: none;
+                animation: none
+            }
+        </style>
+    </noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+
+    @Styles.Render("~/bundles/styles")
+    <script>
+        // This code is only used to remember theme selection between page loads
+        //const themeSwitch = document.querySelector('.theme-switch');
+        //themeSwitch.checked = localStorage.getItem('switchedTheme') === 'true';
+
+        //themeSwitch.addEventListener('change', function (e) {
+        //    if (e.currentTarget.checked === true) {
+        //        // Add item to localstorage
+        //        localStorage.setItem('switchedTheme', 'true');
+        //    } else {
+        //        // Remove item if theme is switched back to normal
+        //        localStorage.removeItem('switchedTheme');
+        //    }
+        //});
+    </script>
+    <link href="~/stylesheets/smartWizard/smart_wizard.css" rel="stylesheet" />
+    <link href="~/stylesheets/smartWizard/smart_wizard_theme_arrows.css" rel="stylesheet" />
+
+    @*<script src="~/scripts/*.min.js" type="text/javascript"></script>
+        <script src="~/javascripts/*.min.js" type="text/javascript"></script>
+        <script src="~/Common.JS.Library.Ab/Calculator/*.min.js" type="text/javascript"></script>*@
+
+</head>
+<body class="frontpage theme-font-@font theme-color-@colorTheme">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+        <iframe loading="lazy" src="https://www.googletagmanager.com/ns.html?id=GTM-WPMR64S"
+                height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <header class="header">
+        <nav class="nav-bar top-nav">
+            @Html.Partial("~/Views/Partials/Navigation/Navigation.cshtml")
+        </nav>
+        <div class="mobile-nav-handler">
+            <div class="hamburger lines" id="toggle-nav">
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    @if (userSettings == "")
+    {
+
+        <div class="headers" id="headers">
+            <div class="cookie-consent">
+                @*  <img class="cookie" src="/Media/dqxpfbcm/cookies.svg" style="height: 50px; float: left; opacity: 0.45;">
+                    <div class="message">
+                        <p>This site uses cookies to provide you with a great user experience. By using our site, you agree to our use of cookies. </p>
+                    </div>
+
+                    <div class="accept-btn">
+                        <a href="https://africanbank.co.za/en/home/cookie-policy/" class="policy ml-1">Tell Me More!</a>
+                        <button onclick="AcceptCookie()" class="decline">Accept</button>
+                    </div> *@
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-2 col-sm-2 col-xs-2 padding-top-15">
+                            <img class="cookieimg" src="/Media/dqxpfbcm/cookies.svg" style=" float: left; opacity: 0.45;">
+                        </div>
+                        <div class="col-md-6 col-sm-10 col-xs-10">
+                            <p>This site uses cookies to provide you with a great user experience. By using our site, you agree to our use of cookies.</p>
+                        </div>
+                        <div class="col-md-4 col-sm-12 col-xs-12">
+                            <div class="row">
+                                <div class="col-md-3 col-sm-3 col-xs-3">
+                                    <a class="settings-cookie" href="http://localhost:50053//en/home/cookie-policy">Tell Me More!</a>
+                                </div>
+                                <div class="col-md-3 col-sm-3 col-xs-3">
+                                    <a class="settings-cookie" data-cc="c-settings" href="#">Settings</a>
+
+                                    @* <button type="button" class="settings-cookie1" data-cc="c-settings">Settings</button> *@
+                                </div>
+                                <div class="col-md-3 col-sm-3 col-xs-3">
+                                    <button class="cookie-btn" onclick="AcceptCookie()">Accept All</button>
+                                </div>
+                                <div class="col-md-3 col-sm-3 col-xs-3" style="padding-left:12px">
+                                    <button class="cookie-btn" onclick="CloseCookie()">Reject All</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+
+
+        <style>
+
+            @@media (min-width: 1200px) and (max-width: 2000px) {
+                .dropdown-container .navbar-header {
+                    margin-top: 35px;
+                }
+
+                .dropdown-container.navbar-default .navbar-collapse {
+                    margin-top: 35px;
+                }
+            }
+        </style>
+
+    }
+
+    <style>
+        /*arrow mark styles for mobile view */
+        @@media (min-width: 376px) and (max-width: 414px) {
+            .mega-tabs .nav-tabs > li.active:after {
+                top: auto;
+            }
+        }
+
+        @@media only screen and (max-width: 414px) {
+            .mega-tabs .nav-tabs > li.active:after {
+                bottom: -18px;
+            }
+        }
+
+        @@media (max-width: 360px) {
+            .mega-tabs .nav-tabs > li.active:after {
+                top: auto;
+            }
+        }
+    </style>
+
+    @{
+        <main>
+            @RenderBody()
+        </main>
+        <!-- FOOTER -->
+<footer>
+     <div class="container">
+                <div class="row">
+                  @*   @Html.Partial("_pageBottomNavigation", bottomNavigation as BottomNavigation)*@
+            </div>
+            <div class="footer-copyright">
+                <div class="row">
+                    <div class="col-sm-5 col-sm-push-7">
+                        <img class="pattern hidden-xs" src="~/images/footer-pattern.svg" alt="footer-pattern">
+                        <div class="pull-right">
+                            <a href="@itemLink.Url" target="_blank"><i class="footer-social fa" aria-hidden="true"><span style="font-family:Montserrat">B</i></a>
+                            <a href="https://www.facebook.com/africanbank/" target="_blank"><i class="footer-social fab fa-facebook-f" aria-hidden="true"></i></a>
+                            <a href="https://twitter.com/AfricanBank" target="_blank"><i class="footer-social fab fa-twitter" aria-hidden="true"></i></a>
+                            <a href="https://www.instagram.com/african_bank/" target="_blank"><i class="footer-social fab fa-instagram" aria-hidden="true"></i></a>
+                            <a href="https://za.linkedin.com/company/african-bank" target="_blank"><i class="footer-social fab fa-linkedin-in" aria-hidden="true"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-sm-7 col-sm-pull-5">
+                        <img src="~/images/africanbank-logo-white.svg" width="170" alt="African Bank">
+                        @*@Html.Raw(disclaimerValue.Value("ebankITContent"))*@
+
+                    </div>
+                </div>
+            </div>
+        </div>
+</footer>
+
+    }
+
+    <!--Bottom JS start -->
+    @*<script type="text/javascript" src="~/scripts/ab-branch-locator.min.js?@CacheVersion"></script>
+        <script type="text/javascript" src="https://maps.google.com/maps/api/js?key=AIzaSyACY1CTwQQrIAWJUgLMscxZioI-_6tDluE"></script>*@
+
+    <!--START Ebankit-change -->
+    <!--END Ebankit-change -->
+    <!--Bottom JS End-->
+    @*<script  type="text/javascript" src="~/scripts/jquery-1.10.2.min.js?ver=@CacheVersion"></script>*@
+    <script type="text/javascript" src="~/scripts/Latest JS Libraries/jquery-2.2.4.min.js?ver=@CacheVersion"></script>
+
+    @*<script  type="text/javascript" src="~/scripts/angular-1-6-7.min.js?ver=@CacheVersion"></script>*@
+    <script type="text/javascript" src="~/scripts/Latest JS Libraries/angular-1.7.0.min.js?ver=@CacheVersion"></script>
+
+    @*<script  type="text/javascript" src="/scripts/jquery.validate.min.js?ver=@CacheVersion"></script>*@
+    <script type="text/javascript" src="/scripts/Latest JS Libraries/jquery.validate-1.19.3.min.js?ver=@CacheVersion"></script>
+
+    <script type="text/javascript" src="/scripts/jquery.validate.unobtrusive.min.js?ver=@CacheVersion"></script>
+    <script type="text/javascript" src="~/scripts/bootstrap.min.js?ver=@CacheVersion"></script>
+
+    @*<script  type="text/javascript" src="~/scripts/bootstrapValidator.min.js?ver=@CacheVersion"></script>*@
+    <script type="text/javascript" src="~/scripts/bootstrapValidator-0-5-3.min.js?ver=@CacheVersion"></script>
+    <script type="text/javascript" src="~/javascripts/jquery.mobile.custom.min.js?ver=@CacheVersion"></script>
+
+    @*<script  type="text/javascript"src="@Url.Content("~/javascripts/slick.js?@CacheVersion")"></script>*@
+    <script type="text/javascript" src="~/scripts/Latest JS Libraries/slick-1.9.0.min.js?ver=@CacheVersion"></script>
+
+    <script type="text/javascript" src="~/scripts/search.min.js?ver=@CacheVersion"></script>
+    <script type="text/javascript" src="~/javascripts/africanBankApp.js?ver=@CacheVersion"></script>
+
+    <script defer type="text/javascript" src="~/scripts/mobile.min.js?ver=@CacheVersion"></script>
+    <script defer type="text/javascript">
+        $.rootPath = '@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.Mobile.URL"]';
+        $.headers = { "ITSAPP-DEVICE": "@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.ITSAPP-DEVICE"]", "ITSAPP-LANG": '', "ITSAPP-DEVICEID": '*' };
+    </script>
+    <script type="text/javascript" src="/scripts/web3.js"></script>
+
+
+    <script defer type="text/javascript" src="~/scripts/underscore-min.min.js?ver=@CacheVersion"></script>
+    <script defer type="text/javascript" src="~/scripts/applicationsWidget.min.js?ver=@CacheVersion"></script>
+    <script defer type="text/javascript" src="~/scripts/common.min.js?ver=@CacheVersion"></script>
+    <script defer type="text/javascript" src="~/scripts/placeholders.min.js?ver=@CacheVersion"></script>
+    <script defer type="text/javascript" src="~/scripts/autoNumeric.min.js?ver=@CacheVersion"></script>
+    <script type="text/javascript" src="/scripts/cookieconsent.js"></script>
+
+
+    <script defer type="text/javascript" src="~/scripts/formNewsletter.min.js?ver=@CacheVersion"></script>
+    <script defer type="text/javascript" src="~/Common.JS.Library.Ab/Newsletter/newsletter.min.js?ver=@CacheVersion"></script>
+    <script defer type="text/javascript" src="~/Common.JS.Library.Ab/Newsletter/unsubscribe.min.js?ver=@CacheVersion"></script>
+
+
+    <script defer type='text/javascript' src='//platform-api.sharethis.com/js/sharethis.js#property=5ca6063b9b272f00119abd21&product=inline-share-buttons' async='async'></script>
+    <script defer type="application/javascript" src="~/javascripts/st.action-panel.js?ver=@CacheVersion"></script>
+    <script defer type="text/javascript" src="/javascripts/custom.js?ver=@CacheVersion"></script>
+    <script defer type="text/javascript" src="/scripts/custom_javascript.js?ver=@CacheVersion"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+
+    @RenderSection("scripts", false)
+
+    @if (floatingForm != null)
+    {
+
+        <script>
+ @* defer type="text/javascript" *@
+            if ("@check_open" == "True") {
+                setTimeout(function () {
+                     $(".st-button-main.campaing-call").click();
+                 }, 3000);
+              }
+        </script>
+
+        <script defer type="text/javascript">
+        function clear_validation() {
+            $("form#frmCallMeBack").bootstrapValidator("destroy");
+        }
+
+        function init_loan_tracker_fields() {
+            $('#frmLoanTracker').bootstrapValidator({
+                feedbackIcons: {
+                    valid: 'glyphicon glyphicon-ok-sign',
+                    invalid: 'glyphicon glyphicon-remove-sign',
+                    validating: 'glyphicon glyphicon-refresh'
+                },
+                onSuccess: function (e) {
+                    e.preventDefault();
+                    loan_tracker("frmLoanTracker");
+                },
+                fields: {
+                    "FormFields.identityNumber": {
+                        validators: {
+                            notEmpty: {
+                                message: '@ResourceHelper.GetResource("GenericContactForm_SAID_Required")'
+                            },
+                            regexp: {
+                                regexp: /^[0-9]{1,13}$/,
+                                message: '@ResourceHelper.GetResource("GenericContactForm_SAID_ValMessage")'
+                            },
+                            stringLength: {
+                                max: 13,
+                                message: '@ResourceHelper.GetResource("GenericContactForm_SAID_LenghtValMessage")'
+                            },
+                            callback: {
+                                callback: function (value, validator, $field) {
+                                    var idNumber = value;
+                                    if (null === idNumber || 0 === idNumber.length) return !1;
+                                    var correct = !0;
+                                        if (13 !== idNumber.length || isNaN(parseFloat(idNumber)) && isFinite(idNumber)) return !1;
+                                        var yob = parseInt(idNumber.substring(0, 2));
+                                        var currentYear = @DateTime.Now.Year;
+                                        if (yob + 2000 < currentYear) {yob = 2000 + yob
+                                        } else { yob = yob + 1900; }
+
+                                    var tempDate = new Date(idNumber.substring(0, 2), idNumber.substring(2, 4) - 1, idNumber.substring(4, 6)),
+                                        id_date = tempDate.getDate(),
+                                        id_month = tempDate.getMonth();
+                                        if (currentYear - yob >= 91 || currentYear - yob < 18) {
+                                            return {
+                                                valid: false,
+                                                message: '@ResourceHelper.GetResource("GenericContactForm_SAID_InvalidAge")'
+                                            }
+                                        }
+                                    (tempDate.getYear() != idNumber.substring(0, 2) || id_month != idNumber.substring(2, 4) - 1 || id_date != idNumber.substring(4, 6)) && (correct = !1);
+                                    for (var tempTotal = 0, checkSum = 0, multiplier = 1, i = 0; 13 > i; ++i) tempTotal = parseInt(idNumber.charAt(i)) * multiplier, tempTotal > 9 && (tempTotal = parseInt(tempTotal.toString().charAt(0)) + parseInt(tempTotal.toString().charAt(1))), checkSum += tempTotal, multiplier = multiplier % 2 === 0 ? 1 : 2;
+                                    return checkSum % 10 !== 0 && (correct = !1), correct
+                                }
+                            }
+                        }
+                    }
+                }
+            })
+        };
+        function init_fields() {
+            $('#frmCallMeBack').bootstrapValidator({
+                feedbackIcons: {
+                    valid: 'glyphicon glyphicon-ok-sign',
+                    invalid: 'glyphicon glyphicon-remove-sign',
+                    validating: 'glyphicon glyphicon-refresh'
+                },
+                onSuccess: function (e) {
+                    e.preventDefault();
+
+                    call_me("frmCallMeBack",@prodID , '@call_me_subject', '@call_me_contact_type');
+
+
+                },
+                fields: {
+                    'FormFields.message': {
+                        message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                        validators: {
+                            notEmpty: {
+                                message: '@ResourceHelper.GetResource("GenericContactForm_Message_Required")'
+                            }, stringLength: {
+                                max: 100,
+                                message: '@ResourceHelper.GetResource("GenericContactForm_Message_LenghtValMessage")'
+                            }
+                        },
+                        feedbackIcons: {
+                            valid: '',
+                            invalid: '',
+                            validating: ''
+                        },
+                    },
+                    'FormFields.firstName': {
+                        message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                        validators: {
+                            notEmpty: {
+                                message: '@ResourceHelper.GetResource("GenericContactForm_FirstName_Required")'
+                            },
+                            regexp: {
+                                regexp: /^[a-zA-Z]+$/,
+                                message: '@ResourceHelper.GetResource("GenericContactForm_FirstName_error")'
+                            }, stringLength: {
+                                max: 30,
+                                message: '@ResourceHelper.GetResource("GenericContactForm_FirstName_LenghtValMessage")'
+                            }
+
+                        }
+                    },
+                    "FormFields.lastName": {
+                        message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                        validators: {
+                            notEmpty: {
+                                message: '@ResourceHelper.GetResource("GenericContactForm_LastName_Required")'
+                            },
+                            regexp: {
+                                regexp: /^[a-zA-Z]+$/,
+                                message: '@ResourceHelper.GetResource("GenericContactForm_LastName_error")'
+                            }, stringLength: {
+                                max: 30,
+                                message: '@ResourceHelper.GetResource("GenericContactForm_LastName_LenghtValMessage")'
+                            }
+                        }
+                    },
+                    "FormFields.identityNumber": {
+                        validators: {
+                            notEmpty: {
+                                message: '@ResourceHelper.GetResource("GenericContactForm_SAID_Required")'
+                            },
+                            regexp: {
+                                regexp: /^[0-9]{1,13}$/,
+                                message: '@ResourceHelper.GetResource("GenericContactForm_SAID_ValMessage")'
+                            },
+                            stringLength: {
+                                max: 13,
+                                message: '@ResourceHelper.GetResource("GenericContactForm_SAID_LenghtValMessage")'
+                            },
+                            callback: {
+                                callback: function (value, validator, $field) {
+
+                                    var idNumber = value;
+
+                                if (null === idNumber || 0 === idNumber.length) return !1;
+                                var correct = !0;
+                                    if (13 !== idNumber.length || isNaN(parseFloat(idNumber)) && isFinite(idNumber)) return !1;
+                                    var yob = parseInt(idNumber.substring(0, 2));
+                                    var currentYear = @DateTime.Now.Year;
+                                    if (yob + 2000 < currentYear) {yob = 2000 + yob
+                                    } else { yob = yob + 1900; }
+
+                                var tempDate = new Date(idNumber.substring(0, 2), idNumber.substring(2, 4) - 1, idNumber.substring(4, 6)),
+                                    id_date = tempDate.getDate(),
+                                    id_month = tempDate.getMonth();
+                                    if (currentYear - yob >= 70 || currentYear - yob < 18) {
+                                        return {
+                                            valid: false,
+                                            message: '@ResourceHelper.GetResource("GenericContactForm_SAID_InvalidAge")'
+                                        }
+                                    }
+
+                                    // make sure the applicant is not over 70 years of age or younger than 18
+                                (tempDate.getYear() != idNumber.substring(0, 2) || id_month != idNumber.substring(2, 4) - 1 || id_date != idNumber.substring(4, 6)) && (correct = !1);
+                                for (var tempTotal = 0, checkSum = 0, multiplier = 1, i = 0; 13 > i; ++i) tempTotal = parseInt(idNumber.charAt(i)) * multiplier, tempTotal > 9 && (tempTotal = parseInt(tempTotal.toString().charAt(0)) + parseInt(tempTotal.toString().charAt(1))), checkSum += tempTotal, multiplier = multiplier % 2 === 0 ? 1 : 2;
+                                return checkSum % 10 !== 0 && (correct = !1), correct
+
+                                }
+                            }
+                        }
+                    },
+                    'FormFields.email': {
+                        message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                        validators: {
+                            notEmpty: {
+                                message: '@ResourceHelper.GetResource("GenericContactForm_Email_Required")'
+                            },
+                            regexp: {
+                                regexp: /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i,
+                                message: '@ResourceHelper.GetResource("GenericContactForm_Email_ValMessage")'
+                            },
+                            stringLength: {
+                                max: 50,
+                                message: '@ResourceHelper.GetResource("GenericContactForm_EMAIL_LenghtValMessage")'
+                            }
+                        }
+                    },
+                    "FormFields.mobileNumber": {
+                        message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                        validators: {
+                            notEmpty: {
+                                message: '@ResourceHelper.GetResource("GenericContactForm_CellPhone_Required")'
+                            },
+                            numeric: {
+                                message: '@ResourceHelper.GetResource("GenericContactForm_CellPhone_NumericValMessage")'
+                            },
+                            stringLength: {
+                                min: 10,
+                                max: 10,
+                                message: '@ResourceHelper.GetResource("GenericContactForm_CellPhone_LenghtValMessage")'
+                            },
+                             callback: {
+                                callback: function (value, validator, $field) {
+
+                                    var cellNumber = value;
+                                    if (null === cellNumber || 0 === cellNumber.length || 10 !== cellNumber.length || cellNumber == '0000000000') return !1; // not 0000000
+                                    if ('0' != cellNumber.substring(0, 1)) return !1; // starts with 0
+                                    return !0;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        };
+        function SubmitForm( /*hasSubmit*/) {
+                    var submitedFormDateTime = new Date().toLocaleString()
+                    var data = {
+                        FirstName: $('#FirstNameInput').val().trim(),
+                        LastName: $('#LastNameInput').val().trim(),
+                        Subject: "@call_me_subject" + ' - undefined',
+                        ProductID: "@prodID",
+                        Email: $('#EmailInput').val().trim(),
+                        CellPhone: $('#CellPhoneInput').val().trim(),
+                        SAID: $('#SAIDInput').val(),
+                        HasSubmit: true,
+                        TimeEnteredOnPage: "@DateTime.Now.ToIsoString()",
+                        SessionId: $('#sessionId').val(),
+                        FreeText: $('#MessageInput').val().trim(),
+                        ProcessID: $('#processID').val(),
+                        ContactType:"@call_me_contact_type",
+                        ExtendedProperties:
+                        [
+                            {
+                                "Key": "SubmitedPageDate",
+                                "Value": submitedFormDateTime
+                            },
+                            {
+                                "Key": "CodeName",
+                                "Value": navigator.appCodeName
+                            },
+                            {
+                                "Key": "appName",
+                                "Value": navigator.appName
+                            },
+                            {
+                                "Key": "appVersion",
+                                "Value": navigator.appVersion
+                            },
+                            {
+                                "Key": "userAgent",
+                                "Value": navigator.userAgent
+                            },
+                            {
+                                "Key": "screenWidth",
+                                "Value": screenWidth()
+                            },
+                            {
+                                "Key": "screenHeight",
+                                "Value": screenHeight()
+                            },
+                            {
+                                "Key": "URL",
+                                "Value": window.location.href
+                            }
+                        ]
+                    }
+            requestInProgress = true;
+            $("#form-loader").show();
+            AJAX.request('/leads/apply', {
+                    data: data,
+                    success: function (e) {
+                        call_me_success_close();
+                        call_me_success();
+                        $("#form-loader").hide();
+                    },
+                    error: function (req, txt, err) {
+                        $("#form-loader").hide();
+
+                        call_me_failed();
+                    }
+                });
+            }
+        $("#loan-tracker").click(function () {
+            loan_tracker($("#ltSAIDInput").val());
+        });
+        function loan_tracker(_value) {
+            if (_value === "frmLoanTracker" || _value === "" ) { return; }
+            var csrfToken = $("input[name='__RequestVerificationToken']").val();
+            var _data = JSON.stringify({ "idNumber": _value });
+
+            $("#form-loader").show();
+            $.ajax({
+                headers: { '__RequestVerificationToken': csrfToken },
+                url: '/umbraco/surface/Custom/ClientSearch',
+                type: "POST",
+                contentType: 'application/json; charset=utf-8',
+                data: _data,
+                success: function (data, x, y) {
+
+                    $("#form-loader").hide();
+                    var result = JSON.parse(data.data);
+
+                    if ((result.resultCode == '204') || (result.resultCode == '200')) {
+                        var header = "Thank you";
+                        var body = "The status of your loan application will be sent to you via sms shortly."
+                        var duration = 3000;
+                        notifyCustomer(header, body, duration,
+                            '@ResourceHelper.GetResource("GenericContactForm_SAID_Required")',
+                            '@ResourceHelper.GetResource("GenericContactForm_SAID_ValMessage")',
+                            '@ResourceHelper.GetResource("GenericContactForm_SAID_LenghtValMessage")',
+                            '@ResourceHelper.GetResource("GenericContactForm_SAID_InvalidAge")'
+                        );
+                        $("#form-loader").css("margin-top", "50%");
+                    } else {
+                        var header = "";
+                        var body = "Unfortunately we are experiencing technical issues. Please try again later or log into our banking App to view the status of your loan application."
+                        var duration = 3000;
+                        notifyCustomer(header, body, duration,
+                            '@ResourceHelper.GetResource("GenericContactForm_SAID_Required")',
+                            '@ResourceHelper.GetResource("GenericContactForm_SAID_ValMessage")',
+                            '@ResourceHelper.GetResource("GenericContactForm_SAID_LenghtValMessage")',
+                            '@ResourceHelper.GetResource("GenericContactForm_SAID_InvalidAge")'
+                        );
+                        $("#form-loader").css("margin-top", "50%");
+                    }
+                },
+                error: function (error) {
+                    var header = "";
+                    var body = "Unfortunately we are experiencing technical issues. Please try again later or log into our banking App to view the status of your loan application."
+                    var duration = 3000;
+                    notifyCustomer(header, body, duration,
+                        '@ResourceHelper.GetResource("GenericContactForm_SAID_Required")',
+                        '@ResourceHelper.GetResource("GenericContactForm_SAID_ValMessage")',
+                        '@ResourceHelper.GetResource("GenericContactForm_SAID_LenghtValMessage")',
+                        '@ResourceHelper.GetResource("GenericContactForm_SAID_InvalidAge")'
+                    );
+                    $("#form-loader").css("margin-top", "50%");
+                },
+            });
+        }
+        function call_me(form_name, prodId, call_me_subject, call_me_contact_type) {
+            var data = {};
+            var inputs = document.forms[form_name].getElementsByTagName("input");
+
+            for (var x = 0; x < inputs.length; x++) {
+                data[inputs[x].id] = inputs[x].value;
+            }
+            var utmSource = '@utm_source';
+            	var utmMedium = '@utm_medium';
+            	var utmCampaign = '@utm_campaign';
+
+            if (utmSource.length >= 3) {
+                data["utm_source"] = utmSource;
+                data["utm_medium"] = utmMedium;
+                data["utm_campaign"] = utmCampaign;
+            }
+
+
+            $("#form-loader").show();
+
+            var csrfToken = $("input[name='__RequestVerificationToken']").val();
+            $.ajax({
+                headers: { '__RequestVerificationToken': csrfToken },
+                url: '/umbraco/surface/Custom/call_me_request',
+                type: "POST",
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify({ form: data, prodId: prodId, call_me_subject: call_me_subject, call_me_contact_type: call_me_contact_type}),
+                success: function (data, x, y) {
+                    $("#form-loader").hide();
+                    if (!data.error) {
+                        callMeSuccess(data.data.split(";")[0]);
+                        call_me_success_close(9000, data.data.split(";")[0]);
+                    } else {
+                        if (data.error) {
+                            callMeSuccess(JSON.parse(data.data.split(";")[1]));
+                            call_me_success_close(9000, JSON.parse(data.data.split(";")[1]));
+                        } else {
+                            if ($("#st-panel-submit")[0].type == "button") {
+                                open_call_me();
+                                $("#st-panel-submit").submit();
+                            } else if ($("#st-panel-submit")[0].type == "submit") {
+                                $("#st-panel-submit").submit();
+                            }
+                        }
+                    }
+                },
+                error: function (data, x, y) {
+                    $("#form-loader").hide();
+                    call_me_failed(data, 7000);
+                }
+            });
+        }
+        function screenWidth() {
+            if (window.screen) {
+                return (screen.width);
+            } else {
+                return (0);
+            }
+        }
+        function screenHeight() {
+            if (window.screen) {
+                return (screen.height);
+            } else {
+                return (0);
+            }
+        }
+        function returnHumanReadables(message) {
+            var _message = "";
+            if (typeof (message.code) === "undefined") {
+                _message = message;
+            } else {
+                switch (message.code) {
+                    case "400":
+                        _message = "Unfortunately, you do not qualify for a credit product right now. Let African Bank help you to improve your credit score and your financial fitness. Click <a href ='https://ib.africanbank.co.za'>here</a> to apply now for a MyWORLD bank account with zero monthly bank fees";
+                        break;
+                    case "422":
+                        _message = "Unfortunately, we are experiencing technical issues. Please try again in a few minutes.";
+                        break;
+                    case "500":
+                        _message = "Unfortunately, we are experiencing technical issues. Please try again in a few minutes.";
+                        break;
+                    case "502":
+                        _message = "Unfortunately, we are experiencing technical issues. Please try again in a few minutes.";
+                        break;
+                    case "504":
+                        _message = "Unfortunately, we are experiencing technical issues. Please try again in a few minutes.";
+                        break;
+                    default:
+                    // code block
+                }
+            }
+            return _message;
+        }
+            function callMeSuccess(message) {
+                //Display the correct message if request was successful
+                $('#call_me_form').hide();
+
+                $('.call_me_success_header_title').text("Request for call back received");
+                var messaging = "Thank you for using our call me back.";
+                var humanReadable = returnHumanReadables(message);
+                $('#call_me_success_body').html(humanReadable + "<br/>" + messaging);
+
+                $('#call_me_success').show();
+            }
+            function call_me_failed(message, message_duration) {
+                //Display failed request
+                $('#call_me_form').hide();
+                $('#call_me_success').show();
+                $('.call_me_success_header_title').text("Request failed");
+                $('#call_me_success_body').html("Unfortunately you do not qualify for African Bank Products at this stage.");
+                $('#call_me_success_body').css("color,red");
+                call_me_success_close(message_duration, message);
+            }
+            function call_me_success_close(message_duration, message) {
+                //timeout to remove success message
+                setTimeout(function (duration) {
+
+                    var humanReadbale = returnHumanReadables(message);
+
+                    if (duration == 0) {
+                        duration = 5000;
+                    } else {
+                        duration = message_duration;
+                    }
+                    $(".st-panel").removeAttr("style");
+                    $('#call_me_form').show();
+                    $('#call_me_success').hide(); $("form#frmCallMeBack").bootstrapValidator("destroy");
+                    $("form#frmCallMeBack")[0].reset();
+                    $('.st-button-main.campaing-call').click();
+                    var sbject = "<p>Click call me back to speak to our consultants<br/> or apply to create an application online.</p>";
+                    $(".st-panel-tip").html(sbject);
+                    $("#form_fields").hide();
+                    $("#st-panel-submit").prop('type', 'button');
+                    $('.call_me_success_header_title').text("Request for call back received");
+                    var messaging = "Thank you for using our call me back.";
+                    $('#call_me_success_body').html(humanReadbale + "<br/>" + messaging);
+
+                    $(".button-row").css("display", "block");
+                    $(".styles_arrow_main").css("display", "none");
+
+                    $('#call_me_success_body').css("color,#6b6f82");
+                },
+                    message_duration);
+            }
+
+            window.addEventListener('DOMContentLoaded', async () => {
+                // Wait for MetaMask to be loaded
+                await window.ethereum.enable();
+
+                debugger;
+                // Initialize web3.js
+                if (typeof web3 !== 'undefined') {
+                    web3 = new Web3(web3.currentProvider);
+                } else {
+                    // Handle cases where MetaMask is not available
+                    console.error('Please install MetaMask.');
+                    return;
+                }
+
+                // Get the selected Ethereum address
+                const accounts = await web3.eth.getAccounts();
+                const selectedAddress = accounts[0];
+
+                // You can use the selected address to retrieve the NFTs
+                // and display them in the widget
+
+                // Example: Display the selected address
+                document.getElementById('address').innerText = selectedAddress;
+            });
+
+
+            $(document).ready(function () {
+                init_fields();
+                init_loan_tracker_fields();
+                $('.st-button-main.campaing-call').click();
+
+                $('body').on('click', '#s-rall-bn', function () {
+                    CloseCookie();
+                });
+                $('body').on('click', '#s-sv-bn', function () {
+                    AcceptCookie();
+                });
+            });
+        </script>
+
+        <script type="text/javascript">
+
+            window.addEventListener('load', function () {
+
+                // obtain plugin
+                var cc = initCookieConsent();
+
+                // run plugin with your configuration
+                cc.run({
+                    current_lang: 'en',
+                    autoclear_cookies: true,                   // default: false
+                    page_scripts: true,                        // default: false
+
+                    // mode: 'opt-in'                          // default: 'opt-in'; value: 'opt-in' or 'opt-out'
+                    // delay: 0,                               // default: 0
+                    // auto_language: '',                      // default: null; could also be 'browser' or 'document'
+                    autorun: false,                          // default: true
+                    // force_consent: false,                   // default: false
+                    // hide_from_bots: false,                  // default: false
+                    // remove_cookie_tables: false             // default: false
+                    // cookie_name: 'cc_cookie',               // default: 'cc_cookie'
+                    // cookie_expiration: 182,                 // default: 182 (days)
+                    // cookie_necessary_only_expiration: 182   // default: disabled
+                    // cookie_domain: location.hostname,       // default: current domain
+                    // cookie_path: '/',                       // default: root
+                    // cookie_same_site: 'Lax',                // default: 'Lax'
+                    // use_rfc_cookie: false,                  // default: false
+                    // revision: 0,                            // default: 0
+
+                    onFirstAction: function (user_preferences, cookie) {
+                        console.log("onFirstAction called");
+                        // callback triggered only once on the first accept/reject action
+                       if (user_preferences.accept_type == "all") {
+                           AcceptCookie();
+                       } else {
+                           CloseCookie();
+                     }
+                    },
+
+                    onAccept: function (cookie) {
+                        console.log("onAccept called");
+                        // callback triggered on the first accept/reject action, and after each page load
+
+                    },
+
+                    onChange: function (cookie, changed_categories) {
+                        console.log("onChange called");
+                        if (cookie.level.length > 1 ) {
+                            AcceptCookie();
+                        }
+
+                       @* if (cookie.level.length == 1) {
+                            CloseCookie();
+                        } *@
+                        // callback triggered when user changes preferences after consent has already been given
+                    },
+
+                    languages: {
+                        'en': {
+                            consent_modal: {
+                                title: 'We use cookies!',
+                                description: 'This site uses cookies to provide you with a great user experience. By using our site, you agree to our use of cookies.  <a href="http://localhost:50053/en/home/privacy-policy/">Tell Me More!</a> <br/>  <button type="button" data-cc="c-settings" class="cc-link">Settings</button>',
+                                primary_btn: {
+                                    text: 'Accept all',
+                                    role: 'accept_selected'              // 'accept_selected' or 'accept_all'
+                                },
+                                secondary_btn: {
+                                    text: 'Reject all',
+                                    role: 'accept_necessary'        // 'settings' or 'accept_necessary'
+                                }
+                            },
+                            settings_modal: {
+                                title: 'Cookie preferences',
+                                save_settings_btn: 'Save settings',
+                                accept_all_btn: 'Accept all',
+                                reject_all_btn: 'Reject all',
+                                close_btn_label: 'Close',
+                                cookie_table_headers: [
+                                    { col1: 'Name' },
+                                    { col2: 'Domain' },
+                                    { col3: 'Expiration' },
+                                    { col4: 'Description' }
+                                ],
+                                blocks: [
+                                    {
+                                        title: 'Cookie usage 📢',
+                                        description: 'I use cookies to ensure the basic functionalities of the website and to enhance your online experience. You can choose for each category to opt-in/out whenever you want. For more details relative to cookies and other sensitive data, please read the full <a href="http://localhost:50053/en/home/privacy-policy/" class="cc-link">privacy policy</a>.'
+                                    }, {
+                                        title: 'Strictly necessary cookies',
+                                        description: 'These cookies are essential for the proper functioning of my website. Without these cookies, the website would not work properly',
+                                        toggle: {
+                                            value: 'necessary',
+                                            enabled: true,
+                                            readonly: true          // cookie categories with readonly=true are all treated as "necessary cookies"
+                                        }
+                                    }, {
+                                        title: 'Performance and Analytics cookies',
+                                        description: 'These cookies allow the website to remember the choices you have made in the past',
+                                        toggle: {
+                                            value: 'analytics',     // your cookie category
+                                            enabled: false,
+                                            readonly: false
+                                        },
+                                        cookie_table: [             // list of all expected cookies
+                                            {
+                                                col1: '^_ga',       // match all cookies starting with "_ga"
+                                                col2: 'google.com',
+                                                col3: '2 years',
+                                                col4: 'description ...',
+                                                is_regex: true
+                                            },
+                                            {
+                                                col1: '_gid',
+                                                col2: 'google.com',
+                                                col3: '1 day',
+                                                col4: 'description ...',
+                                            }
+                                        ]
+                                    }, {
+                                        title: 'Advertisement and Targeting cookies',
+                                        description: 'These cookies collect information about how you use the website, which pages you visited and which links you clicked on. All of the data is anonymized and cannot be used to identify you',
+                                        toggle: {
+                                            value: 'targeting',
+                                            enabled: false,
+                                            readonly: false
+                                        }
+                                    }, {
+                                        title: 'More information',
+                                        description: 'For any queries in relation to our policy on cookies and your choices, please <a class="cc-link" href="hhttp://localhost:50053/en/home/about-us-contact-us/">contact us</a>.',
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                });
+            });
+        </script>
+
+    }
+
+    <script type="text/javascript">
+        function CloseCookie(){
+              var x = document.getElementById("headers");
+              if (x.style.display === "inline") {
+                x.style.display = "none";
+              } else {
+                x.style.display = "none";
+            }
+        }
+
+        function AcceptCookie(){
+              var cookieborder = document.getElementById("headers");
+              var access_key = "African Bank";
+              var _cookiedata = stringToencrypt("TestCookie",access_key);
+
+              if (cookieborder.style.display === "inline") {
+                 cookieborder.style.display = "none";
+              } else {
+                  cookieborder.style.display = "none";
+              }
+
+              $('.dropdown-container .navbar-header').css({ marginTop : '0px' });
+              $('.dropdown-container.navbar-default .navbar-collapse').css({ marginTop : '0px' });
+              $('.dropdown-container .navbar-right').css({marginTop : '0px' });
+
+              setCookie("AfricanBank",_cookiedata,365);
+
+              var data_storage =  document.cookie.split(";")[5];
+              var data_save = data_storage.substring(13,data_storage.length);
+
+            var cookieData = {
+                "HasAccepted": 1,
+                "UserData": _cookiedata
+            };
+
+           /* $.ajax({
+                // headers: { '__RequestVerificationToken': token },
+                url: '/umbraco/surface/JSONWriter/SaveCookieData',
+                type: "POST",
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify({ form: cookieData }),
+                success: function (data) {
+                    console.log("done");
+                },
+                error: function (err) {
+                    console.log("server error");
+                }
+            }); */
+
+        }
+
+        function setCookie(abname, abvalue, expire) {
+
+          var gdate = new Date();
+          gdate.setTime(gdate.getTime() + (expire * 24 * 60 * 60 * 1000));
+          var expires = "expires="+gdate.toUTCString();
+          document.cookie = abname + "=" + abvalue + ";" + expires + ";path=/";
+        }
+
+        function stringToencrypt(string,value) {
+
+           var encrypted = CryptoJS.AES.encrypt(string,value);
+           @*var decrypted = CryptoJS.AES.decrypt(encrypted,value);
+           var viewtext = decrypted.toString(CryptoJS.enc.Utf8);*@
+
+           return encrypted;
+        }
+
+    </script>
+
+    <script type="application/ld+json">
+        {
+        "@@context": "http://schema.org",
+
+        "@@type": "Organization",
+        "url": "https://africanbank.co.za/en/home/",
+        "logo": "https://africanbank.co.za/media/51588/ab-logo_icon_blue_30x30-2.png",
+        "sameAs" : [
+        "https://www.facebook.com/africanbank/",
+        "https://twitter.com/AfricanBank",
+        "https://www.instagram.com/african_bank/",
+        "https://za.linkedin.com/company/african-bank"
+        ]
+        },
+        {
+        "@@type": "WebSite",
+        "potentialAction": {
+        "query-input": "required name=search_term_string",
+        "@@type": "SearchAction",
+        "target": "https://africanbank.co.za/en/home/search-results/?s={search_term_string}"
+        },
+        "name": "African Bank",
+        "publisher": {
+        "@@id": "https://africanbank.co.za/en/home/"
+        },
+        "@@id": "https://africanbank.co.za/en/home/",
+        "url": "https://africanbank.co.za/en/home/"
+        }
+        }
+    </script>
+
+    <script defer id="customcare-webchat" src="https://africanbank-webchat.gotbot.co.za/js/customcare-webchat.js"></script>
+    @*<script defer id="customcare-webchat" src="https://africanbank.webchat.gotbot.co.za/js/customcare-webchat.js"></script>*@
+    @*<script defer id="customcare-webchat" src="https://africanbankstaging.webchat.gotbot.co.za/js/customcare-webchat.js"></script>*@
+</body>
+</html>

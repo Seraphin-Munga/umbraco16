@@ -1,0 +1,196 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage<ContentModels.BlogLanding>
+@using ContentModels = Umbraco.Web.PublishedContentModels;
+@{
+    Layout = "Master.cshtml";
+}
+
+@{
+    var selection = CurrentPage.Children("blogDetail");
+    IPublishedContent featuredBlogHeader = null;
+    IPublishedContent featuredBlogBody = null;
+    IPublishedContent featuredBlogFeet = null;
+    if (selection == null)
+    {
+        <div class="article-title"> No blog articles added in umbraco back office. Please ask you content administrator to add blog articles.</div>
+    }
+    @*var contents = Model.Content.Children.OrderBy(x=>x.CreateDate);*@
+    var contents = Model.Content.Children.OrderByDescending(x => x.Children.First().Children.Where(c => c.DocumentTypeAlias == "heroBodyBlogDetail").First().GetPropertyValue("blogdate"));
+    foreach (var content in contents)
+    {
+        if ((bool)((BlogDetailsElements)content.Children.FirstOrDefault()).IsBlogFeatured)
+        {
+            featuredBlogHeader = content.Children.FirstOrDefault().Children.Where(c => c.DocumentTypeAlias == "heroHeaderBlogDetail").FirstOrDefault();
+            featuredBlogBody = content.Children.FirstOrDefault().Children.Where(c => c.DocumentTypeAlias == "heroBodyBlogDetail").FirstOrDefault();
+            featuredBlogFeet = content.Children.FirstOrDefault().Children.Where(c => c.DocumentTypeAlias == "heroFeetBlogDetail").FirstOrDefault();
+            break;
+        }
+    }
+    var blogDetail = Model.Content.Children.Where(c => c.DocumentTypeAlias == "blogDetail").FirstOrDefault();
+    var blogElements = blogDetail.Children.Where(c => c.DocumentTypeAlias == "blogDetailsElements").FirstOrDefault();
+    int contentCount = contents.Count();
+    int index = 0;
+    var previousPageIsEllipsis = false;
+}
+
+<!-- HERO BANNER -->
+<div class="hero-static-container darker">
+    <div class="container-fluid">
+        <div class="row no-gutter">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="hero-static-banner less-height" style="background-image: url('/media/51294/2abw1804_002_blog_banners-1.jpg');"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="campaign-product-container full top-0">
+        <div class="margin-top-20 visible-xs"></div>
+        <h3 class="blue-highlight">More articles</h3>
+        <div class="row margin-top-30">
+            <div class="col-sm-9">
+                @{
+                    var pageSize = 5;
+                    var page = 1; int.TryParse(Request.QueryString["page"], out page);
+                    var totalPages = (int)Math.Ceiling((double)contentCount / (double)pageSize);
+                    if (page > totalPages)
+                    {
+                        page = totalPages;
+                    }
+                    else if (page < 1)
+                    {
+                        page = 1;
+                    }
+                    @*var _selection = Model.Content.Children.OrderByDescending(x=>x.CreateDate);*@
+                    var _selection = Model.Content.Children.OrderByDescending(x => x.Children.First().Children.Where(c => c.DocumentTypeAlias == "heroBodyBlogDetail").First().GetPropertyValue("blogdate"));
+                    foreach (var item in _selection.Skip((page - 1) * pageSize).Take(pageSize))
+                    {
+                        var blogHeader = item.Children.FirstOrDefault().Children.Where(c => c is HeroHeaderBlogDetail).FirstOrDefault();
+                        var blogBody = item.Children.FirstOrDefault().Children.Where(c => c is HeroBodyBlogDetail).FirstOrDefault();
+                        var blogFeet = item.Children.FirstOrDefault().Children.Where(c => c is HeroFeetBlogDetail).FirstOrDefault();
+                        var image = blogHeader.GetPropertyValue("image"); 
+                        String url = null;
+                        if (image != null) { url = ((IPublishedContent)image).Url; }
+                        <div class="article-card margin-top-30">
+                            <div class="row eq-height">
+                                <div class="col-sm-7 col-md-push-5">
+                                    @if (url != null)
+                                    {
+                                        <div class="image" style="background-image: url('@url')"></div>
+                                    }
+                                </div>
+                                <div class="col-sm-5 col-md-pull-7">
+                                    <div class="article-content">
+                                        <div class="article-title">@blogBody.GetPropertyValue("title")</div>
+                                        <div class="body-content">
+                                            @blogBody.GetPropertyValue("introductionDescription")
+                                        </div>
+                                        <br />
+                                        <b class="date-output">Publish Date: @Convert.ToDateTime(blogBody.GetPropertyValue("blogDate")).ToShortDateString()</b><br />
+                                        <a href="@item.Url">Read more</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    if (totalPages > 1)
+                    {
+                        <div class="pagination" style="margin-left: 25% !important">
+                            <ul class="pagination" role="menubar" aria-label="Pagination">
+                                @{var totalPagesRange = Enumerable.Range(1, (int)totalPages); }
+                                @foreach (var item in totalPagesRange)
+                                {
+                                    if (item == 1)
+                                    {
+                                        if (item == page || 0 == page)
+                                        {
+                                            <li class="arrow unavailable" aria-disabled="true"><a href="#">&laquo; Previous</a></li>
+                                        }
+                                        else
+                                        {
+                                            <li class="arrow"><a href="?page=@(page - 1)" title="Previous Page">&laquo; Previous</a></li>
+                                        }
+                                    }
+                                    if (item == page
+                                        || item == 1
+                                        || item == page - 2
+                                        || item == page - 1
+                                        || item == page + 1
+                                        || item == page + 2
+                                        || item == totalPages)
+                                    {
+                                        string current = (item == page) ? "current" : String.Empty;
+
+                                        if ((item == 1) && (page == 1))
+                                        {
+                                            <li class="@current unavailable" aria-disabled="true">
+                                                <a href="?page=@item" title="Go to page @item">@item</a>
+                                            </li>
+                                        }
+                                        else
+                                        {
+                                            <li class="@current">
+                                                <a href="?page=@item" title="Go to page @item">@item</a>
+                                            </li>
+                                        }
+                                        previousPageIsEllipsis = false;
+                                    }
+                                    else
+                                    {
+                                        if (previousPageIsEllipsis)
+                                        {
+                                            continue;
+                                        }
+                                        else
+                                        {
+                                            <li class="unavailable" aria-disabled="true"><a href="">&hellip;</a></li>
+                                            previousPageIsEllipsis = true;
+                                        }
+                                    }
+                                    if (item == totalPages)
+                                    {
+                                        if (item == page)
+                                        {
+                                            <li class="arrow unavailable" aria-disabled="true"><a href="">Next &raquo;</a></li>
+                                        }
+                                        else
+                                        {
+                                            <li class="arrow"><a href="?page=@(page + 1)" title="Next Page">Next &raquo;</a></li>
+                                        }
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    }
+                }
+            </div>
+            <div class="col-sm-3 col-xs-offset-1 col-sm-offset-0">
+                <div class="margin-top-50 visible-xs"></div>
+                <p class="body-content bold text-uppercase text-left no-margin">Recent Posts</p>
+                <ul class="unstyled-list no-bullet margin-top-20">
+                    @foreach (var item in selection.Take(10))
+                    {
+                        foreach (var blogElement in item.Children.FirstOrDefault().Children)
+                        {
+                            if (blogElement.GetPropertyValue("title") != null)
+                            {
+                                <li class="margin-bottom-10">
+                                    <a href="@item.Url">
+                                        @blogElement.GetPropertyValue("title")
+                                    </a>
+                                </li>
+                            }
+                        }
+                    }
+                </ul>
+            </div>
+            <div class="margin-top-20 visible-xs"></div>
+            <div class="col-sm-3 col-xs-offset-1 col-sm-offset-0">
+                <div class="margin-top-50 visible-xs"></div>
+                <p class="body-content bold text-uppercase text-left">About African Bank</p>
+                <p class="body-content text-left">
+                    Our mission is to be a successful Retail Bank offering a wide range of products and services to the consumers of South Africa. The people who work for African Bank represent the diverse population of South Africa; therefore we are a reflection of you, of all South Africans. We seek to provide value - more than our consumers expect of us. We promise to live our purpose 'humanity through banking' in all that we do and we are confident that we can, because 'We are You'.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

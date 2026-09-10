@@ -1,0 +1,396 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCampaign>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = acf_africanbankv1.Models
+@using AfricanBank.Cms.Portal.Helpers;
+@using acf_africanbankv1.Helpers
+@{
+    Layout = "Master.cshtml";
+    var children = Model.Content.Children;
+    var heroHeader = children?.Where(c => c.DocumentTypeAlias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.DocumentTypeAlias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroChest = children?.Where(c => c.DocumentTypeAlias.ToLower() == "herochest").FirstOrDefault();
+
+    var chestTitle = heroChest?.GetPropertyValue("chestTitle").ToString();
+    var chestDescription = heroChest?.GetPropertyValue("chestDescription").ToString();
+    var chestCards = heroChest?.Children?.Where(c => c.DocumentTypeAlias.ToLower() == "card");
+
+    var viewName = Path.GetFileNameWithoutExtension(Server.MapPath(VirtualPath)); //used mainly to identify the page
+
+    var campaignSowetanSurveyItemsModel = new CustomModels.Benefits
+    {
+        Header = chestTitle,
+        Description = chestDescription,
+        BenefitCards = chestCards.Select(c => c as Card).ToList(),
+
+    };
+
+    var heroBody = children?.Where(c => c.DocumentTypeAlias.ToLower() == "herobody").FirstOrDefault();
+    TabBody surveyQuestionData = null;
+    TabBody surveyPDFData = null;
+    var tabBodyItems = heroBody.Children.OfType<TabBody>();
+    tabBodyItems.ToList().ForEach(x =>
+    {
+        if (x.Name == "Survey Questions")
+        {
+            surveyQuestionData = (TabBody)x;
+        }
+        else
+        {
+            surveyPDFData = (TabBody)x;
+        }
+    });
+
+    // var surveyQuestions = (ICollection<IPublishedContent>)surveyQuestionData.TabBodyContent.Where(c => c.DocumentTypeAlias == "nCTabGenericContent").FirstOrDefault().GetPropertyValue("sectionContent");
+
+    var campaignFooter = surveyQuestionData?.Children(c => c.DocumentTypeAlias.ToLower() == "ebankititem2").FirstOrDefault();
+}
+
+<style type="text/css">
+    .margin-bottom-20 {
+        margin-bottom: 20px !important;
+    }
+    #sendSurvey {
+        background-color: #88bc47;
+        border: none;
+    }
+    .form-horizontal .control-label {
+        text-align: unset;
+    }
+    .hang-tight {
+        display: none;
+    }
+
+    .hero-description {
+        display: none !important;
+    }
+
+    .switch-content-view > p {
+        display: block;
+        font-size: 28px;
+        font-weight: 800;
+    }
+
+    label {
+        text-transform: none;
+    }
+
+    .campaign-button {
+        padding: 16px 35px;
+        font-size: 16px;
+        color: #88bc47;
+        text-align: center;
+        font-weight: normal;
+        -webkit-font-smoothing: antialiased;
+        transition: all 1s ease;
+        display: inline-block;
+        cursor: pointer;
+        background: none;
+        text-decoration: underline;
+    }
+
+        .campaign-button:hover {
+            color: white;
+        }
+
+    .title-text {
+        margin-top: 14px;
+        margin-bottom: 40px;
+        text-align: center;
+        font-size: 32px;
+    }
+
+    .campaign-textarea-color {
+        color: #002b60;
+    }
+
+    li:hover {
+        transition: 0.3s;
+        color: #88bc47;
+        font-size: large;
+    }
+
+    li {
+        transition: 0.3s;
+    }
+
+    .dropdown-styleset {
+        text-align: center;
+        padding: unset;
+    }
+
+    .hr-styleset {
+        margin: 5px 0px 5px 5px;
+        text-align: center;
+        margin-right: 6%;
+        margin-left: 6%;
+        border-color: #1717175c;
+    }
+
+    .wrapper-dropdown-3 {
+        position: relative;
+        margin: 0 auto;
+        padding: 10px;
+        background: #001e44;
+        border-radius: 7px;
+        border: 1px solid rgba(0,0,0,0.15);
+        box-shadow: 0 1px 1px rgba(50,50,50,0.1);
+        cursor: pointer;
+        outline: none;
+        font-weight: bold;
+        color: #ffffff;
+        right: 0px;
+    }
+
+        .wrapper-dropdown-3 .dropdown {
+            position: absolute;
+            top: 140%;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: #507096;
+            color: #f1f3f0;
+            border-radius: inherit;
+            border: 1px solid rgba(0, 0, 0, 0.24);
+            box-shadow: 1px 2px 10px rgba(0,0,0,0.5);
+            font-weight: normal;
+            -webkit-transition: all 0.5s ease-in;
+            -moz-transition: all 0.5s ease-in;
+            -ms-transition: all 0.5s ease-in;
+            -o-transition: all 0.5s ease-in;
+            transition: all 0.5s ease-in;
+            list-style: none;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+            .wrapper-dropdown-3 .dropdown:after {
+                content: "";
+                width: 0px;
+                height: 0px;
+                position: absolute;
+                bottom: 100%;
+                right: 54px;
+                border-width: 0px 9px 13px 8px;
+                border-style: solid;
+                border-color: #507096 transparent;
+            }
+
+            .wrapper-dropdown-3 .dropdown:before {
+            }
+
+            .wrapper-dropdown-3 .dropdown li a {
+                display: block;
+                padding: 10px;
+                text-decoration: none;
+                color: #8aa8bd;
+                border-bottom: 1px solid #e6e8ea;
+                box-shadow: inset 0 1px 0 rgba(255,255,255,1);
+                -webkit-transition: all 0.3s ease-out;
+                -moz-transition: all 0.3s ease-out;
+                -ms-transition: all 0.3s ease-out;
+                -o-transition: all 0.3s ease-out;
+                transition: all 0.3s ease-out;
+            }
+
+            .wrapper-dropdown-3 .dropdown li i {
+                float: right;
+                color: inherit;
+            }
+
+            .wrapper-dropdown-3 .dropdown li:first-of-type a {
+                border-radius: 7px 7px 0 0;
+            }
+
+            .wrapper-dropdown-3 .dropdown li:last-of-type a {
+                border: none;
+                border-radius: 0 0 7px 7px;
+            }
+            /* Hover state */
+            .wrapper-dropdown-3 .dropdown li:hover a {
+                background: #f3f8f8;
+            }
+        /* Active state */
+        .wrapper-dropdown-3.active .dropdown {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    /* No CSS3 support */
+    .no-opacity .wrapper-dropdown-3 .dropdown,
+    .no-pointerevents .wrapper-dropdown-3 .dropdown {
+        display: none;
+        opacity: 1; /* If opacity support but no pointer-events support */
+        pointer-events: auto; /* If pointer-events support but no pointer-events support */
+    }
+
+    .no-opacity .wrapper-dropdown-3.active .dropdown,
+    .no-pointerevents .wrapper-dropdown-3.active .dropdown {
+        display: block;
+    }
+
+    @@media (max-width: 360px) {
+        .switch-content-view > p {
+            font-size: 15px;
+        }
+
+        .switch-mobi-view {
+            text-align: center;
+        }
+    }
+</style>
+
+<!-- HERO Header -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+<!-- HERO Shoulder-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+<!-- HERO Chest-->
+<!-- HERO Body-->
+@Html.Partial("_surveyMailSend", surveyQuestionData as ContentModels.TabBody)
+
+<!--bottom MyWORLD upsell start -->
+@{
+    if (campaignFooter != null)
+    {
+        var imageUrlString = ((ContentModels.Image)((IPublishedContent)campaignFooter.GetPropertyValue("ebankITImage"))).Url;
+        var buttonLinkData = campaignFooter.GetPropertyValue("sectionLink");
+        var campaignFooterLink = campaignFooter.GetPropertyValue<Umbraco.Web.Models.RelatedLinks>("sectionLink");
+
+
+        <div class="top_extend item" style="background-size: cover;background: url('/media/52450/landing2.jpg')no-repeat;background-position: 40% 25%;">
+            <div class="container">
+                <div class="col-md-8"></div>
+                <div class="col-md-4" style="padding-top: 83px;padding-bottom: 133px;">
+                    <h2 class="hero-title">
+                        <span class="cap-title">@campaignFooter.GetPropertyValue("ebankITTitle")</span><br>
+                        <span class="switch-content-view">@campaignFooter.GetPropertyValue("ebankITContent")</span>
+                    </h2>
+                    <div class="hero-description">
+                        @campaignFooter.GetPropertyValue("ebankITContent")
+                    </div>
+                    @{
+                        if (campaignFooterLink.Any())
+                        {
+                            foreach (var links in campaignFooterLink)
+                            {
+                                var buttonText = links.Caption;
+                                var btnId = viewName + "_" + buttonText.ToString().Replace(" ", "") + "_" + "SowetanLiveCampaign";
+                                <div class="switch-mobi-view">
+                                    <a class="button primary clearfix" href="@links.Link" id="@btnId">
+                                        @buttonText
+                                    </a>
+                                </div>
+                            }
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
+
+<!--1 Number to call start-->
+<div class="number-to-call">
+    <p style="text-align: center;">1 <span>Number to call</span></p>
+    <h4 class="bolder" style="text-align: center;">0861 123 456</h4>
+    @{
+        var pdfs = (ICollection<IPublishedContent>)surveyPDFData.TabBodyContent.Where(c => c.DocumentTypeAlias == "nCTabGenericContent").FirstOrDefault().GetPropertyValue("sectionContent");
+        if (pdfs != null)
+        {
+            foreach (var item in pdfs)
+            {
+
+                var linkString = ((ContentModels.File)item.GetPropertyValue("ebankITDocument")).Url;
+                <a rel="noopener noreferrer" href="@linkString" target="_blank" class="tAndC">
+                    @item.GetPropertyValue("ebankITTitle").ToString()
+                </a>
+            }
+        }
+    }
+</div>
+<!--1 Number to call end-->
+<!--bottom MyWORLD upsell end-->
+
+
+@Html.Partial("_renderPopUpContent", new ContainerViewModel()
+{
+    HTMLContent = @<text>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-md-12">
+                    Your Survey has been submitted.
+                </div>
+                <br />
+                <br />
+
+            </div>
+        </div>
+    </text>
+})
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        function OnSuccess(data) { }
+        function OnFailure(data) { }
+
+        function DropDown(el) {
+            this.dd = el;
+            this.placeholder = this.dd.children('span');
+            this.opts = this.dd.find('ul.dropdown > li');
+            this.val = '';
+            this.index = -1;
+            this.initEvents();
+        }
+        DropDown.prototype = {
+            initEvents: function () {
+                var obj = this;
+
+                obj.dd.on('click', function (event) {
+                    $(this).toggleClass('active');
+                    $(this).children('input')[0].innerText = $(this)[0].children[1].innerText;
+                    if ($("#sendSurvey").attr("disabled") === "disabled") {
+                        $("#sendSurvey").attr("disabled", false);
+                    }
+                    if ($(this)[0].id === "dd0") {
+                        $("#validSelection0").css("display", "none");
+                        $("#ddInputResult0")[0].value = $(this)[0].children[1].innerText;
+                    } else if ($(this)[0].id === "dd1") {
+                        $("#validSelection1").css("display", "none");
+                        $("#ddInputResult1")[0].value = $(this)[0].children[1].innerText;
+                    } else if ($(this)[0].id === "dd2") {
+                        $("#validSelection2").css("display", "none");
+                        $("#ddInputResult2")[0].value = $(this)[0].children[1].innerText;
+                    } else if ($(this)[0].id === "dd3") {
+                        $("#validSelection3").css("display", "none");
+                        $("#ddInputResult3")[0].value = $(this)[0].children[1].innerText;
+                    }
+                    return false;
+                });
+
+                obj.opts.on('click', function () {
+                    var opt = $(this);
+                    obj.val = opt.text();
+                    obj.index = opt.index();
+                    obj.placeholder.text(obj.val);
+                });
+            },
+            getValue: function () {
+                return this.val;
+            },
+            getIndex: function () {
+                return this.index;
+            }
+        }
+
+        $(function () {
+            var dd = new DropDown($('#dd0'));
+            var dd1 = new DropDown($('#dd1'));
+            var dd2 = new DropDown($('#dd2'));
+            var dd3 = new DropDown($('#dd3'));
+            $(document).click(function () {
+                // all dropdowns
+                $('.wrapper-dropdown-3').removeClass('active');
+            });
+
+        });
+    });
+</script>

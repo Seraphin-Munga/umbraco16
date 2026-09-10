@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="34px" height="25px" viewBox="0 0 34 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 44.1 (41455) - http://www.bohemiancoding.com/sketch -->
+    <title>Credit002</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icons-Export" transform="translate(-11435.000000, -657.000000)" stroke="#002B60" stroke-width="1.5">
+            <g id="Credit002" transform="translate(11436.000000, 658.000000)">
+                <path d="M28.7557604,22.8571429 L2.94930876,22.8571429 C1.32045043,22.8571429 0,21.5366937 0,19.9078341 L0,2.94930876 C0,1.32045058 1.32045043,0 2.94930876,0 L28.7557604,0 C30.3846199,0 31.7050691,1.32045058 31.7050691,2.94930876 L31.7050691,19.9078341 C31.7050691,21.5366937 30.3846199,22.8571429 28.7557604,22.8571429 Z" id="Shape" stroke-linecap="round"></path>
+                <path d="M0,5 L31.7050691,5" id="Shape" stroke-linecap="round"></path>
+                <path d="M0,11 L31.7050691,11" id="Shape" stroke-linecap="round"></path>
+                <path d="M17,8.11059908 L17,8.84792627" id="Shape" stroke-linecap="square"></path>
+                <path d="M20,8.11059908 L20,8.84792627" id="Shape" stroke-linecap="square"></path>
+                <path d="M23,8.11059908 L23,8.84792627" id="Shape" stroke-linecap="square"></path>
+                <path d="M26,8.11059908 L26,8.84792627" id="Shape" stroke-linecap="square"></path>
+            </g>
+        </g>
+    </g>
+</svg>

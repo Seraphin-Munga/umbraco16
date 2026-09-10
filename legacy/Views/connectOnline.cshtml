@@ -1,0 +1,45 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageBottomLinks>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models;
+@using Web.Helpers
+@using Umbraco.Web.Models
+@using System.Text.RegularExpressions
+
+@{
+    Layout = "Master.cshtml";
+    var Children = Model.Children;
+    // Get specific Children
+    var heroHeader = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroBody = (HeroBody)Children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    var tabBodyItems = (ICollection<IPublishedContent>)heroBody.Children(x => x.ContentType.Alias.ToLower() == "tabbody").ToList();
+    var upperCardArchive = tabBodyItems.Where(c => c.Name == "Upper Card Archive").FirstOrDefault();
+    var middleCardArchive = tabBodyItems.Where(c => c.Name == "Middle Card Archive").FirstOrDefault();
+    var lowerCardArchive = tabBodyItems.Where(c => c.Name == "Lower Card Archive").FirstOrDefault();
+    var middleContent = (ICollection<IPublishedElement>)middleCardArchive.Value("nCtabBodyContent");
+    var HeroChestElementItem = Children?.Where(c => c.ContentType.Alias.ToLower() == "herochestelementitem").FirstOrDefault();
+}
+
+<!-- HERO HEADER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+<!-- HERO SHOULDER -->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+<div class="container margin-bottom-minus-60">
+    <div class="campaign-product-container full">
+        <div class="margin-top-20 visible-xs"></div>
+        <h2 class="text-center">@heroBody.BodyDescription</h2>
+    </div>
+</div>
+@Html.Partial("_pageRenderCardWithIconClass", upperCardArchive as ContentModels.TabBody)
+<!-- What does it cost-->
+<div class="cost-container no-padding">
+    <div class="campaign-apply">
+        <div class="row">
+            <div class="col-sm-12">
+                @Html.Raw(heroBody.RichTextBox)
+            </div>
+            @Html.Partial("_pageRenderCardWithoutCaption", middleCardArchive as ContentModels.TabBody)
+        </div>
+    </div>
+</div>
+@Html.Partial("_pageRenderCardOnTabsWithIconClass", lowerCardArchive as ContentModels.TabBody)

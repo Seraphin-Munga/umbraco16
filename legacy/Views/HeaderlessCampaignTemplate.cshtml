@@ -1,0 +1,1140 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCampaign>
+@using AcfAfricanbank.Core.Models.Forms;
+@using ContentModels = Umbraco.Web.PublishedModels;
+
+@{
+    Layout = "Master.cshtml";
+    // All Current Page Children
+    var children = Model.Children;
+    // Get specific Children
+    var chest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
+    var heroBody = (HeroBody)children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    var heroBodyTabGroup = heroBody.Children?.Where(c => c.ContentType.Alias.ToLower() == "tabgroup").FirstOrDefault();
+    var videoLanding = heroBodyTabGroup.Children?.Where(c => c.ContentType.Alias.ToLower() == "tabheader").FirstOrDefault();
+    var videoItem = videoLanding.Children.Where(c => c.ContentType.Alias.ToLower() == "tabbody").FirstOrDefault();
+
+    var video_card = heroBody.Children?.Where(c => c.Name == "Video card").FirstOrDefault();
+    var styleAtt = "";
+    if (video_card != null)
+    {
+        styleAtt = video_card.Children.Where(c => c.Name == "Style").FirstOrDefault().Value("text").ToString();
+    }
+
+    TabBody tabWaysToBank = null;
+    TabBody myWorldPDFData = null;
+
+    var tabBodyItems = heroBody.Children.OfType<TabBody>();
+    tabBodyItems.ToList().ForEach(xx =>
+    {
+        if (xx.Value("partialViewName").ToString() == "partialHeroChest")
+        {
+            tabWaysToBank = (TabBody)xx;
+        }
+        else if (xx.Value("partialViewName").ToString() == "_renderPDFData")
+        {
+            myWorldPDFData = (TabBody)xx;
+        }
+    });
+
+    @*foreach (var tab in heroBody.Children)
+        {
+            if (tab.ContentType.Alias.ToLower() == "tabbody")
+            {
+                if (tab.Value("partialViewName").ToString() == "partialHeroChest")
+                {
+                    tabWaysToBank = (TabBody)tab;
+                }
+                else if (tab.Value("partialViewName").ToString() == "_renderPDFData")
+                {
+                    myWorldPDFData = (TabBody)tab;
+                }
+            }
+        }*@
+
+    var sectionCardsContent = (IEnumerable<IPublishedElement>)tabWaysToBank.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+    var myWorldPDFs = (IEnumerable<IPublishedElement>)myWorldPDFData.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+
+    var lastBlurb = videoLanding.Value("ebankITIconContent");
+
+    var disclaimer = heroBody.Children(xx => xx.ContentType.Alias.ToLower() == "richtexteditor").Last();
+
+    IPublishedContent CurrentPage = UmbracoContext.PublishedRequest.PublishedContent;
+    var viewName = CurrentPage.Name.Replace(" ", ""); //used mainly to identify the page
+    TabGroup tabGroup = null;
+     
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    
+    if (viewName == "growforit1")
+    {
+         heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+         tabGroup = (TabGroup)heroHeader.Children?.Where(c => c.Name == "Partial").FirstOrDefault() as ContentModels.TabGroup;
+    }
+
+    bool isGrowForIt1 = false;
+
+    
+    var headerImage_large = videoLanding.Value<IPublishedContent>("ebankITIcon").Url;
+    var headerImage_medium = heroHeader?.Value<IPublishedContent>("imageSmall")?.Url;
+    var headerImage_small = heroHeader?.Value<IPublishedContent>("imageSmall")?.Url;
+
+}
+<style type="text/css">
+
+    .tAndC {
+        font-size: 16px;
+        font-weight: 400;
+        margin-bottom: 5px;
+    }
+
+    .myworld-campaign-section-container {
+        background: #f6f6f6;
+        box-shadow: 0px 1px 20px rgba(0,0,0,0.125);
+    }
+
+    .loan-summary .image .img-bg {
+        width: 160px;
+        height: 161px;
+        border-radius: 80px;
+    }
+
+    .circular-images {
+        border-radius: 50%;
+        width: 200px;
+        background-color: #efeffa;
+    }
+
+    .descr {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .spacer {
+        padding-top: 14px;
+    }
+
+    .grow-icons {
+        float: unset !important;
+    }
+
+    .mobi-stories-image {
+        height: 100%;
+        width: 100%;
+    }
+
+    .slick-prev {
+        top: 50%;
+        left: -50px;
+        background-color: #002b60;
+    }
+
+    .slick-next {
+        top: 50%;
+        right: -50px;
+        background-color: #002b60;
+    }
+
+        .slick-prev:hover, .slick-next:hover {
+            outline: none;
+            background: #88bc47;
+            color: transparent;
+        }
+
+    .card-plain {
+        background-color: unset;
+        padding: unset;
+    }
+
+    .video_list_item .vid_list_item .vid_list_item_campaign {
+        transition: 0.3s;
+        box-shadow: 0px 1px 20px rgba(0,0,0,0.125);
+        cursor: pointer;
+    }
+
+    #grow-disclaimer {
+        width: 100%;
+        bottom: 0px;
+        padding-bottom: 9px;
+        padding-top: 7px;
+    }
+
+    .hero-static-banner {
+        height: 38em;
+    }
+
+    .influencers {
+        height: 430px;
+        background-color: #002b60;
+        margin-bottom: 20px;
+    }
+
+    .vid-list-play-botton i {
+        color: white;
+        opacity: 0.9;
+    }
+
+    .vid-list:hover .vid-list-play-botton i {
+        color: #95D03A;
+    }
+
+    .vid-list-play-botton {
+        position: absolute;
+        width: inherit;
+        text-align: center;
+        top: 20%;
+    }
+
+    #video-header-thumb {
+        border-radius: 5px;
+    }
+
+    .video-body p {
+        font-size: 25px;
+        font-weight: 600;
+        color: #464855
+    }
+
+    #grow-for-it.video-section {
+        background: #EDEEF4;
+        padding-top: 20px;
+    }
+
+    #grow-for-it #video-header {
+        margin-top: 0px;
+    }
+
+    #grow-for-it .video-title {
+        color: #88BC47;
+    }
+    /*Will still merge with Custom_main.css at a later stage*/
+    .css-color-change {
+        color: #002b60;
+        /*color: #2E0554;*/
+    }
+
+    .css-background-change {
+        background: #88bc47;
+        /*background: #2E0554;*/
+    }
+
+    .video-item-img {
+        height: 230px;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+    }
+
+    .video-container {
+        margin-top: 0px;
+        margin: auto;
+    }
+
+    #video-header {
+        height: 60vh;
+        margin-top: 24px !important;
+        margin-bottom: 20px;
+        box-shadow: 0px 1px 20px rgba(0,0,0,0.125);
+    }
+
+    /*.video-item-description {
+        font-size: 14px;
+        height: 75px;
+        overflow-y: hidden;
+    }
+    overflow: hidden;
+    */
+
+    .video-item-description {
+        font-family: 'Montserrat', sans-serif;
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        font-size: 14px;
+    }
+
+    .video-item {
+        background: #f6f6f6;
+        box-shadow: 0px 1px 20px rgba(0,0,0,0.125);
+        height: 380px;
+        margin-bottom: 25px;
+        margin-top: 0px;
+        padding-left: unset;
+        padding-right: unset;
+    }
+
+    .video-body {
+        font-size: 16px;
+        margin-bottom: 30px;
+    }
+
+    .video-title {
+        font-weight: 900;
+        font-size: 40px;
+    }
+
+    .video-citation-box {
+        transition: 0.3s;
+        cursor: pointer;
+        position: absolute;
+        bottom: 15px;
+        margin: auto;
+        padding: 0px 25px;
+    }
+
+    /*Font Styling*/
+
+    .landing-video-title {
+        transition: 0.3s;
+        font-size: 42px;
+        font-weight: 800;
+        background: rgba(0,0,0,0.3);
+        padding: 15px;
+        width: fit-content;
+        max-width: 800px;
+        line-height: 42px;
+    }
+
+    .landing-video-description {
+        margin: 10px 0px;
+        max-width: 800px;
+    }
+
+
+        .landing-video-description > p {
+            background: #002b60;
+            padding: 10px;
+            width: fit-content;
+        }
+
+    .main-click {
+        cursor: pointer;
+        transition: 0.3s;
+        border-radius: 100%;
+        padding: 2px;
+        text-align: center;
+        width: 55px;
+        height: 55px;
+        font-size: 50px !important;
+    }
+
+    .video-item-title {
+        font-size: 18px;
+    }
+
+    .main-click:hover {
+        transition: 0.3s;
+        box-shadow: 0px 1px 25px rgba(0,0,0,0.425);
+        margin-top: -2px;
+    }
+
+    .video-citation-box:hover .landing-video-title {
+        background: #88bc47;
+        transition: 0.3s;
+        box-shadow: 0px 1px 25px rgba(0,0,0,0.4);
+        margin-top: -2px;
+        margin-left: 5px;
+    }
+
+    .vid-list .video_list_item .vid_list_item .vid_list_item_campaign {
+        border-radius: 5px;
+    }
+
+    .video_list_item .vid_list_item .vid_list_item_campaign {
+        transition: 0.3s;
+        box-shadow: 0px 1px 20px rgba(0,0,0,0.125);
+        cursor: pointer;
+    }
+
+    .video_list_item:hover {
+        transition: 0.3s;
+        box-shadow: 0px 1px 25px rgba(0,0,0,0.425);
+        margin-left: -2px;
+    }
+
+        .video_list_item:hover .main-click {
+            transition: 0.3s;
+            opacity: 1;
+        }
+
+    .vid_list_item:hover {
+        cursor: pointer;
+        transition: 0.3s;
+        box-shadow: 0px 1px 25px rgba(0,0,0,0.425);
+        margin-left: -2px;
+    }
+
+        .vid_list_item:hover .main-click {
+            transition: 0.3s;
+            opacity: 1;
+        }
+
+    .vid_list_item_campaign:hover {
+        transition: 0.3s;
+        box-shadow: 0px 1px 25px rgba(0,0,0,0.425);
+        margin-left: -2px;
+    }
+
+        .vid_list_item_campaign:hover .main-click {
+            transition: 0.3s;
+            opacity: 1;
+        }
+
+    .sharethis-inline-share-buttons {
+        position: absolute;
+        bottom: 0;
+        margin-bottom: 10px;
+        right: 15px;
+        z-index: 10 !important;
+    }
+
+    .carousel-header-style {
+        padding-top: 5em;
+        padding-left: 7em;
+        font-size: 34px;
+    }
+
+    .video-item-content {
+        padding: 10px 18px 0 18px;
+    }
+
+    @@media (max-width: 480px) {
+
+        .video-card {
+            top: 5px;
+        }
+
+        .mobi-stories-image {
+            width: 106px;
+        }
+
+        .video-item-content {
+            padding: 25px 25px 0 25px;
+        }
+
+        .video-item-title {
+            font-size: 14px;
+        }
+
+        .hero-caption {
+            padding-top: 34px;
+            margin-top: -28px;
+            padding: 0px;
+            color: #fff;
+            height: 350px;
+            position: absolute;
+            width: 100% !important;
+            right: 0px !important;
+        }
+
+        .hero-description {
+            display: none;
+        }
+
+        .influencers {
+            height: 860px;
+        }
+
+        #video-header {
+            margin-top: unset;
+        }
+
+        .video-container {
+            width: unset;
+        }
+
+        .video-title {
+            font-size: 34px;
+        }
+
+        .video-item {
+            box-shadow: none;
+            /*height: 125px;*/
+            height: 170px;
+            margin-bottom: 10px;
+        }
+
+        .video-item-title {
+            bottom: unset;
+        }
+
+        .sharethis-inline-share-buttons {
+            right: unset;
+        }
+
+        .video-item-img {
+            height: 100%;
+        }
+
+        .main-video-thumbnail {
+            border: none;
+        }
+
+        .sub-video-thumnail {
+            background: url("../img/african-bank-video-placeholder-mobile.png");
+            background-size: cover;
+            width: 30%;
+            float: left;
+            height: 120px;
+        }
+
+        .sub-video-text {
+            width: 70%;
+            display: inline-block;
+            height: 120px;
+            margin-bottom: 10px;
+        }
+
+        .sub-videos-row {
+            margin-bottom: 0px;
+        }
+
+        .video-item-description {
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            -webkit-line-clamp: 6;
+        }
+
+        .episode-click {
+            margin: 40px auto;
+        }
+
+        .video-citation-box {
+            position: absolute;
+            /*top: 0;*/
+            bottom: 0;
+            /*height: 70%;*/
+            margin: auto;
+            padding: 20px;
+            left: 0;
+        }
+
+        .video-header-thumb {
+            margin-top: 0px;
+            margin-left: -15px;
+            width: 110%;
+        }
+
+        .landing-video-title {
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 30px;
+            padding: 10px;
+        }
+
+        .video-item-img {
+            border-top-right-radius: 0px;
+            border-bottom-left-radius: 5px;
+        }
+
+        .sub-video-container {
+            box-shadow: 0px 1px 20px rgba(0,0,0,0)
+        }
+
+        .landing-video-description {
+            width: 90%;
+        }
+
+        .vid-list-play-botton i {
+            margin-left: 7%;
+        }
+
+        .vid-list-play-botton {
+            text-align: left;
+        }
+    }
+
+    @@media (min-width: 0px) and (max-width: 320px) {
+        .mobile-description-view {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 5;
+            -webkit-box-orient: vertical;
+            padding-left: 30px;
+        }
+    }
+
+    @@media (min-width: 321px) and (max-width:479px) {
+
+        .mobile-description-view {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 6;
+            -webkit-box-orient: vertical;
+            padding-left: 12px;
+        }
+    }
+
+    @@media (min-width: 480px )and (max-width: 768px) {
+
+        .mobile-description-view {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 6;
+            -webkit-box-orient: vertical;
+            font-size: 14px;
+        }
+
+        .video-cards {
+            top: 10px !important;
+        }
+
+        .video-item {
+            height: 290px;
+        }
+
+        .video-item-img {
+            height: 290px;
+            border-top-right-radius: 0px;
+            border-bottom-left-radius: 5px;
+        }
+
+        .slick-prev {
+            left: -5px;
+        }
+
+        .slick-next {
+            right: -5px;
+        }
+
+        .carousel-header-style {
+            padding-top: 0em;
+        }
+
+        .hero-caption {
+            width: 275px;
+            margin-top: 34px;
+            right: 5px !important;
+            margin-top: 33px !important;
+            width: 321px !important;
+        }
+
+        .hero-description {
+            display: none;
+        }
+
+        .hero-caption .hero-title {
+            font-size: 16px;
+        }
+
+        .cap-title {
+            font-size: 26px;
+        }
+
+        .hero-static-banner {
+            background-size: contain;
+            height: 19em !important;
+        }
+
+        .vid-list-play-botton i {
+            margin-left: 7%;
+        }
+
+        .vid-list-play-botton {
+            text-align: left;
+        }
+
+        #video-header {
+            margin-top: unset;
+        }
+
+        .video-item {
+            box-shadow: none;
+        }
+
+        .landing-video-title {
+            font-size: 32px;
+            font-weight: 800;
+        }
+        /*.video-citation-box {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        height: 25%;
+        margin: auto;
+        max-width: 700px;
+    }*/
+        .video-citation-box {
+            position: absolute;
+            /*top: 0;*/
+            bottom: 0;
+            /*height: 70%;*/
+            margin: auto;
+            padding: 20px;
+            left: 0;
+        }
+
+        .sub-video-text {
+            background: #f6f6f6;
+            height: 220px;
+            padding-top: 10px;
+        }
+    }
+
+    @@media (min-width: 769px )and (max-width: 1024px) {
+
+        .slick-prev {
+            left: -15px;
+        }
+
+        .slick-next {
+            right: -15px;
+        }
+
+        .carousel-header-style {
+            padding-top: 1em;
+        }
+
+        .hero-caption .hero-title {
+            font-size: 17px;
+        }
+
+        .cap-title {
+            padding-right: 6px;
+            font-size: 27px;
+        }
+
+        .hero-caption {
+            padding-top: 34px !important;
+            margin-top: 56px !important;
+            padding: 14px !important;
+            color: #fff;
+            height: 350px !important;
+            position: absolute;
+            width: 330px !important;
+            right: -100px;
+        }
+
+        .hero-static-banner {
+            background-size: contain;
+            height: 26em;
+        }
+
+        #video-header {
+            margin-top: unset;
+        }
+
+        .video-item-description {
+            height: unset;
+        }
+
+        #video-body > .row {
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        .video-item {
+            box-shadow: none;
+            height: 406px;
+        }
+
+        .landing-video-title {
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+        .video-container {
+            width: unset;
+        }
+        /*.landing-video-description {
+        max-width: 60%;
+    }*/
+        /*.video-citation-box {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        height: 15%;
+        margin: auto;
+    }*/
+        .video-citation-box {
+            position: absolute;
+            /*top: 0;*/
+            bottom: 0;
+            /*height: 70%;*/
+            margin: auto;
+            padding: 20px;
+            left: 0;
+        }
+
+        .sub-video-text {
+            background: #f6f6f6;
+            height: 200px;
+            padding-top: 10px;
+        }
+    }
+
+    @@media (min-width: 1025px) and (max-width:1440px) {
+        .hero-static-banner {
+            height: 35em;
+        }
+    }
+
+    @@media (min-width:1023px) and (max-width:1439px) {
+        .hero-caption {
+            margin-top: -66px;
+            right: -74px;
+        }
+    }
+
+    @@media (min-width:1441px) and (max-width: 2560px) {
+
+        .hero-caption {
+            width: 524px !important;
+            right: -137px !important;
+            margin-top: -10px !important;
+        }
+    }
+</style>
+
+<div id="@styleAtt" class="video-section">
+
+    <div class="container">
+
+        @*@Html.Partial("_pageHeaderVideo", videoLanding as TabHeader)*@
+
+        @*Start *@
+        @{
+            var title = videoLanding.Value("ebankITIconTitle");
+            var thumb_img = videoLanding.Value<IPublishedContent>("ebankITIcon").Url;
+            var description = videoLanding.Value("ebankITIconContent");
+            var initial_video = videoLanding.Value("iconClass");
+
+            var content = videoItem.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+            var videos = content.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+            var x = 1;
+
+        }
+
+        <div id="video-header" class="vid_list_item" data-video="@initial_video">
+            <div id="video-header-thumb" style="background-image:url('@thumb_img'); background-position: right;">
+                <iframe width="100%" height="100%" id="video-ytd" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                <section id="video-loader">
+                    <div class="loader" id="form-preloader-loader">
+                        <div class="loader-img"></div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+        @*Finish *@
+
+        <div class="video-content">
+            <h1 class=" video-title css-color-change">@heroBody.Value("bodyTitle")</h1>
+            <div class="video-body">
+                <p>@heroBody.Value("bodyDescription")</p>
+            </div>
+
+            <div class="row">
+                <div class="row">
+                    <div class="col-xs-12 col-md-12 col-lg-12" style="color: #857e7e;margin-bottom: 20px;">
+                        @Html.Raw(heroBody.RichTextBox)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="video-body">
+            <div class="row">
+                @foreach (var videoData in videos)
+                {
+                    var titleEpisode = "Episode " + x;
+                    var descriptionEpisode = videoData.Value("NCcardDescription");
+                    var imgEpisode = videoData.Value<IPublishedContent>("NCcardIcon").Url;
+                    var videoUrl = videoData.Value("NCcardTitle");
+
+                    <div id="item-@x" class="col-md-4 col-sm-6 vid-list">
+                        <div data-video="@videoUrl*@titleEpisode*@descriptionEpisode" class="video-item vid_list_item">
+                            <div class="vid-list-play-botton">
+                                <i class="fa fa-play-circle fa-5x"></i>
+                            </div>
+                            <div class="video-item-img" style="background-position:bottom; background-image:url(@imgEpisode)"></div>
+                            <div class="video-item-content">
+                                <div class="video-description-box">
+                                    <p class="video-item-description">@descriptionEpisode</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    x++;
+                }
+            </div>
+        </div>
+        <!-- HERO BODY-->
+
+    </div>
+
+</div>
+
+<div class="container @(isGrowForIt1 ? "mobi-padding" : "")">
+
+    <div class="@styleAtt">
+        <hr />
+        <div class="video-content">
+            <div class="row myworld-campaign-section-container">
+                <div class="row">
+                    <div class="col-xs-12 col-md-12 col-lg-12" style="color: #857e7e;">
+                        @Html.Raw(lastBlurb)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (video_card != null)
+        {
+            int iterator = 0;
+            var videoCardData = video_card.Value<IEnumerable<IPublishedElement>>("CardItemDetail");
+            <div class="hidden-xs row eq-height @(videoCardData.ToList().Count > 3 ? "card-slider" : "") margin-top-50">
+                @foreach (NCcard benefit in videoCardData)
+                {
+                    <div class="col-md-4 col-sm-3 col-xs-2 video-item list_item" style="margin: 20px">
+                        <div class="card-plain showTitleAndDescriptionModal" data-item="@benefit.NCcardTitle*@benefit.NCcardDescription">
+                            <div class="center-icon-text">
+                                <div class="image">
+                                    @if (benefit.NCcardIcon != null)
+                                    {
+                                        <img style="height:100%;width:100%;"
+                                             class="showTitleAndDescriptionModal" data-item="@benefit.NCcardTitle*@benefit.NCcardDescription" src="@benefit.NCcardIcon.Url" alt="@benefit.NCcardIcon.Value("altTag")" />
+                                    }
+                                </div>
+                                <p class="descr showTitleAndDescriptionModal"
+                                   data-item="@benefit.NCcardTitle*@benefit.NCcardDescription">
+                                    @benefit.NCcardTitle
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    ++iterator;
+                }
+            </div>
+        }
+
+        @if (video_card != null)
+        {
+            int iterator = 0;
+            var videoCardData = video_card.Value<IEnumerable<IPublishedElement>>("CardItemDetail");
+
+            <div class="row hidden-sm hidden-md hidden-lg col-xs-12">
+                @foreach (NCcard imageData in videoCardData)
+                {
+                    String imageDescription = imageData.Value("NCcardDescription").ToString();
+                    var img = imageData.NCcardIcon.Url;
+                    String storyTitle = imageData.Value("NCcardTitle").ToString();
+                    String popupimage = imageData.NCcardIcon.ToString();
+                    <div class="col-md-3 col-sm-6 vid-list">
+                        <div class="row showTitleAndDescriptionModal">
+                            <div class="col-xs-4">
+                                <img class="mobi-stories-image showTitleAndDescriptionModal" src="@imageData.NCcardIcon.Url" alt="@imageData.NCcardIcon.Value("altTag")">
+                            </div>
+                            <div class="col-xs-8">
+                                <span class="mobile-description-view css-color-change showTitleAndDescriptionModal">@imageData.NCcardTitle</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    
+
+
+</div>
+
+<div class="container payments-section full">
+    <div class="margin-top-20 visible-xs"></div>
+    <div class="container row">
+        <hr />
+        <h4 class="align-center">@tabWaysToBank.Value("partialViewClassName")</h4>
+        @{
+            int cardIterator = 0;
+            bool increaseCardHeight = false;
+
+            foreach (var item in sectionCardsContent)
+            {
+                var cardTitle = item.Value<string>("NCcardTitle");
+                var cardDesc = item.Value<string>("NCcardDescription");
+                var icon = item.Value<IPublishedContent>("NCcardIcon");
+                <div class="col-sm-4 col-md-4">
+                    <div class="loan-summary">
+                        <div class="image">
+                            <a href="@cardDesc">
+                                <div class="img-bg" style="background-image: url('@icon.Url')"></div>
+                            </a>
+                        </div>
+                        <div class="title">
+                            <a href="@cardDesc">
+                                @cardTitle
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @*foreach (var item in sectionCardsContent)
+                {
+                    if (cardIterator == (int)sectionCardsContent.Count() - 1)
+                    {
+                        increaseCardHeight = true;
+                    }
+                    var cardTitle = item.GetPropertyValue<string>("cardTitle");
+                    var cardDesc = item.GetPropertyValue<string>("cardDescription");
+                    var icon = item.GetPropertyValue<IPublishedContent>("cardIcon");
+
+
+                    <div class="col-sm-4 margin-bottom-20">
+                        <div class="@(increaseCardHeight ? "cellphone-button-banking-campaign" : "")">
+                            <div class="text-left center-align white-link-color richtextbox-blue-bg">
+                                <img src="@icon.Url" alt="@icon.GetPropertyValue("altTag")" class="circular-images" />
+                                <p class="title blue-color font-size-20">@cardTitle</p>
+                                <p>@cardDesc</p>
+                            </div>
+                        </div>
+                        @{
+                            if (!cardTitle.Contains("App"))
+                            {
+                                <div class="col-md-4 center-align margin-bottom-20 margin-right-50 banking-options-buttons">
+                                    <a class="button span-buttons green-button learn-more-banking " href="~/en/home/online-banking/" target="_blank">Learn More</a>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col-md-4 center-align margin-bottom-20 margin-left-50 banking-options-buttons">
+                                    <a class="button span-buttons green-button learn-more-banking " href="~/en/home/online-banking/" target="_blank">Learn More</a>
+                                </div>
+                            }
+                        }
+                    </div>
+                    cardIterator += 1;
+                }*@
+        }
+    </div>
+</div>
+<div class="number-to-call">
+    @{
+        int pipeIterator = 0;
+        foreach (var item in myWorldPDFs)
+        {
+            if (!item.Value("nCcategoryName").ToString().Contains("Pricing Guide"))
+            {   
+                var linkString = ((ContentModels.File)item.Value("nCebankITDocument")).Url;
+                <a rel="noopener noreferrer" href="@linkString" target="_blank" class="tAndC">
+                    @item.Value("nCebankITTitle").ToString()
+                </a>
+            }
+        }
+    }
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                @Html.Raw(disclaimer.Value("textEditor"))
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/scripts/jquery-ui.js"></script>
+    <script src="~/javascripts/reuse/form_validation.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.5/validator.min.js"></script>
+    <script type="text/javascript">
+
+            /* Grow for it */
+
+            $(document).ready(function () {
+
+                var imageBgCss = "url('" + "@headerImage_large" + "')";
+                var imageMdCss = "url('" + "@headerImage_medium" + "')";
+                var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_medium : headerImage_small)" + "')";
+                var CheckScreenSize;
+                (CheckScreenSize = function () {
+                    var _width = $(window).outerWidth();
+                    var _height = $(window).outerHeight();
+                    if (_width <= 511) {
+                        $("#video-header-thumb").css("background-image", imageSmCss);
+                    }
+                    else {
+                        $("#video-header-thumb").css("background-image", imageBgCss);
+                    }
+                })();
+                $(window).resize(CheckScreenSize);
+
+                MediaHashVideo();
+
+                $(".vid_list_item").click(function (e) {
+                    moveHtmlView(50, e);
+                });
+
+                $(".vid_list_item_campaign").click(function (e) {
+                    moveHtmlView(1250, e);
+                });
+
+                $('.money').autoNumeric('init', { aSep: ' ', aDec: '.', aSign: 'R' });
+
+                function moveHtmlView(position, control) {
+                    var selected_video = control.currentTarget.dataset.video.split("*");
+
+                    //checking if there is any video
+                    if (selected_video[0] !== null && selected_video[0] !== undefined && selected_video[0] != "")
+                    {
+                        //-->show video loader
+                        $("#video-loader").show();
+                        $("#video-header-thumb").addClass("video-thumb-none");
+                        $("#video-ytd").removeClass("video-ytd-show");
+                        $(".video-content").hide();
+
+                        //--> header title description
+                        if (selected_video.length==3)
+                        {
+                            $(".landing-video-title").text(selected_video[1]);
+                            $(".landing-video-description p").text(selected_video[2]);
+
+                        }
+                        $("#video-ytd")[0].src = selected_video[0];
+
+                        $("html, body").animate({ scrollTop: position }, 2000);
+
+                        setTimeout(function () {
+                            $('#video-ytd')[0].src += "?autoplay=1";
+                            $("#video-ytd").addClass("video-ytd-show");
+                            $("#video-loader").hide();
+
+                        }, 5000);
+
+                    }
+                }
+            });
+
+            function onPage(name) {
+                var path = window.location.pathname;
+                return name == path.substring(path.lastIndexOf('/') + 1);
+            }
+            if (onPage('moja-love')) {
+                $('.css-background-change').css('background', '#2E0554');
+                $('.css-color-change').css('color', '#2E0554');
+            };
+            $(".main-click").click(function () {
+                $(".video-citation-box").hide();
+                $("#video-header").css({ 'height': '75vh' });
+            });
+
+            function MediaHashVideo() {
+                var selected_video = window.location.hash.replace('#', '');
+                if (selected_video !== null && selected_video !== undefined && selected_video != "") {
+                    //-->show video loader
+                    $("#video-loader").show();
+                    $(".video-citation-box").hide();
+                    //}
+                    $("#video-ytd")[0].src = selected_video;
+                    setTimeout(function () {
+                        $('#video-ytd')[0].src += "?autoplay=1";
+                        $("#video-ytd").addClass("video-ytd-show");
+                        $("#video-loader").hide();
+                    }, 5000);
+                }
+            }
+    </script>
+
+}
+
+

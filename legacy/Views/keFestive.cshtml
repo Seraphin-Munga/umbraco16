@@ -1,0 +1,579 @@
+﻿
+
+
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using AcfAfricanbank.Core.Models.Forms
+@using Umbraco.Web.Models
+@using ContentModels = Umbraco.Web.PublishedModels;
+
+@{
+    Layout = "Master.cshtml";
+
+
+    var children = Model.Children;
+
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    var heroHeader = children.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var blogsItems = Model.Parent.Children.Where(c => c.Name == "Blog Landing").FirstOrDefault();
+    var blogsItem = blogsItems.Children.FirstOrDefault();
+    var blogs = heroBody.Children.Where(c => c.Name.ToLower() == "blogs").FirstOrDefault();
+    var video = heroBody.Children.Where(c => c.Name.ToLower() == "video").FirstOrDefault();
+    var youtubeVideo = video.Children.FirstOrDefault();
+    var blog_data = blogs.Value<IEnumerable<IPublishedElement>>("cardItemDetail");
+
+
+
+    var headerImage_large = heroHeader?.Value<IPublishedContent>
+        ("image")?.Url;
+    var headerImage_medium = heroHeader?.Value<IPublishedContent>
+        ("imageMedium")?.Url;
+    var headerImage_small = heroHeader?.Value<IPublishedContent>
+        ("imageSmall")?.Url;
+}
+
+@* the fun starts here *@
+
+
+
+<style>
+
+    #festive-img-2 {
+        background: url("@headerImage_medium");
+        background-repeat: no-repeat;
+        background-size: cover;
+        padding-bottom: 40px;
+    }
+
+    .blog-header{
+        margin-top: 40px;
+
+    }
+
+    .text-description-fest {
+        float: right;
+        font-size: 24px;
+        width: 433px;
+        text-align: left;
+        font: normal normal medium 23px/28px Montserrat;
+        letter-spacing: 0px;
+        color: #F8FBFD;
+        margin-top: 60px;
+        opacity: 1;
+    }
+
+
+      .mobile-play-video{
+         display: none;
+      }
+
+
+    .button-play {
+        background: #ffd23e;
+        border-radius: 53px;
+        margin-top: 50px;
+        width: 326px;
+        height: 56px;
+    }
+
+    .fa-play-circle {
+        float: left;
+        color: #002b60;
+    }
+
+    .btn-play-text {
+        font-size: 25px;
+        position: relative;
+        top: 4px;
+        font-weight: 900;
+    }
+
+    
+
+    body {
+        margin: 2rem;
+    }
+
+    .modal-dialog {
+        max-width: 800px;
+        margin: 30px auto;
+    }
+
+
+   .story-description{
+       margin-top: 46px;
+       margin-bottom: 38px;
+   }
+
+    .modal-body {
+        position: relative;
+        padding: 0px;
+    }
+
+    .close {
+        position: absolute;
+        right: -30px;
+        top: 0;
+        z-index: 999;
+        font-size: 2rem;
+        font-weight: normal;
+        color: #fff;
+        opacity: 1;
+    }
+
+    .mobile-description{
+
+        display: none;
+    }
+
+    .card {
+
+        border-radius: 8px;
+        box-shadow: 0 40px 44px 0 rgba(69, 73, 91, 0.08);
+        margin-bottom: 7px;
+    }
+
+    .card-img {
+        width: 100%;
+    }
+
+    h3 {
+        margin-top: 20px
+    }
+
+    .blog-title {
+        font-size: 32px;
+        color: #002b60;
+    }
+
+    .facebook-icon{
+        margin-top: 130px;
+    }
+
+
+    .festive-social-blog {
+
+        border-radius: 4px;
+        border: solid 1px #fff;
+        box-shadow: 0 2px 1px 0 rgba(0, 0, 0, 0.03);
+        color: #fff;
+        padding: 6px;
+        margin-left: 0px;
+        text-align: center;
+        font-size: 14px;
+        background: #002b60;
+        position: absolute;
+
+    }
+    @@media (min-width: 280px) and (max-width: 320px) {
+
+        #festive-img-2 {
+            height: 240px !important;
+        }
+
+        .mobile-button {
+            display: none !important;
+        }
+
+        .blog-title {
+            text-align: -webkit-left;
+        }
+
+        .btn-play-text {
+            top: -3px !important;
+        }
+
+
+        .button-play {
+            background: #ffd23e;
+            border-radius: 53px;
+            margin-top: 50px;
+            width: 316px;
+            height: 46px;
+        }
+
+        .text-description {
+            font-size: 60px;
+            position: static !important;
+            font-size: 48px !important;
+            text-align: center !important;
+        }
+    }
+
+    @@media (min-width: 330px) and (max-width: 360px) {
+
+        #festive-img-2 {
+            height: 240px !important;
+        }
+
+        .mobile-play-video {
+            display: block !important;
+            margin-top: 138px;
+        }
+
+        .btn-play-text {
+            top: -3px !important;
+        }
+
+
+        .blog-title {
+            text-align: -webkit-left;
+        }
+
+        .button-play {
+            background: #ffd23e;
+            border-radius: 53px;
+            margin-top: 50px;
+            width: 316px;
+            height: 46px;
+        }
+
+        .text-description {
+            font-size: 60px;
+            position: static !important;
+            font-size: 48px !important;
+            text-align: center !important;
+        }
+    }
+    @@media (min-width: 360px) and (max-width: 375px) {
+        .play-video {
+            text-align: end;
+        }
+
+        .text-description {
+            margin-left: -180px;
+            font-size: 30px !important;
+        }
+
+        .text-body {
+            font-size: 22px;
+            margin-left: 150px;
+        }
+
+        .btn-play-text {
+        top: -3px !important;
+        }
+
+
+      .button-play {
+        background: #ffd23e;
+        border-radius: 53px;
+        margin-top: 50px;
+        width: 316px;
+        height: 46px;
+    
+        }
+
+        #img-growit{
+        width: 100% !important;
+        }
+
+        .facebook-icon{
+           display: none;
+        }
+
+        .text-description-fest{
+          display: none;
+
+        }
+
+        .mobile-play-video{
+           display: block !important;
+           margin-top: 110px;
+
+        }
+
+           #festive-img-2 {
+
+        height: 240px !important;
+        }
+
+          .text-description{
+            right: 150px !important;
+        }
+
+        .text-description {
+            font-size: 60px;
+            position: static !important;
+            font-size: 48px !important;
+            text-align: center !important;
+        }
+    }
+
+
+   @@media (min-width: 375px) and (max-width: 428px){
+      #festive-img-2 {
+
+        height: 240px !important;
+        }
+
+      .mobile-play-video{
+           display: block !important;
+        margin-top: 138px;
+        }
+
+          .blog-title{
+            text-align: -webkit-left;
+          }
+
+        .btn-play-text {
+            top: -3px !important;
+        }
+
+
+        .button-play {
+            background: #ffd23e;
+            border-radius: 53px;
+            margin-top: 50px;
+            width: 316px;
+            height: 46px;
+        }
+
+        .text-description {
+            font-size: 60px;
+            position: static !important;
+            font-size: 48px !important;
+            text-align: center !important;
+        }
+
+   }
+
+    @@media (max-width: 768px) {
+
+        .play-video {
+            text-align: end;
+        }
+
+        .text-description {
+            top: 0 !important;
+        }
+
+        .blog-title {
+            text-align: -webkit-left;
+        }
+
+        .btn-play-text {
+            top: -3px !important;
+        }
+
+
+        .button-play {
+            background: #ffd23e;
+            border-radius: 53px;
+            margin-top: 50px;
+            width: 316px;
+            height: 46px;
+        }
+
+
+        .mobile-description {
+            display: block !important;
+            font: normal normal medium 14px/18px Montserrat;
+            background: #1E2E5F 0% 0% no-repeat padding-box;
+            padding-left: 24px;
+            margin-bottom: 20px;
+            margin-top: 0 !important;
+            width: 100%;
+        }
+
+        .text-follow-social {
+            position: relative;
+            font-size: 16px !important;
+            left: 0 !important;
+            top: -5px;
+        }
+
+        .facebook-icon {
+            display: none;
+        }
+
+        #img-growit {
+            width: 100% !important;
+        }
+
+        .text-body {
+            font-size: 22px;
+            margin-left: 150px;
+        }
+
+        .text-description-fest {
+            display: none;
+        }
+
+        .mobile-play-video {
+            display: block !important;
+            margin-top: 138px;
+        }
+
+        .text-description {
+            right: 150px !important;
+        }
+
+        .
+
+        #festive-img-2 {
+            height: 240px !important;
+        }
+
+        .text-description {
+            font-size: 60px;
+            position: static !important;
+            font-size: 48px !important;
+            text-align: center !important;
+        }
+    }
+</style>
+
+
+
+
+@{
+
+    @Html.Partial("_PageHeaderKeFestive", heroHeader as ContentModels.HeroHeader)
+}
+
+
+
+
+<div id="festive-img-2">
+    <div class="container ">
+        <div class="mobile-button text-description-fest">
+            @Html.Raw(heroBody.Value("richTextBox"))
+
+            <div class="play-video">
+                <button class="btn btn-primary button-play video-btn" data-toggle="modal" data-src="@youtubeVideo.Value("IconClass")" data-target="#myModal">
+
+                    <i class="fa fa-play-circle fa-3x"></i>
+                    <span class="btn-play-text">  Play Video</span>
+                </button>
+            </div>
+
+
+        </div>
+
+        <div class="play-video mobile-play-video">
+            <button class="btn btn-primary button-play video-btn" data-toggle="modal" data-src="@youtubeVideo.Value("IconClass")" data-target="#myModal">
+
+                <i class="fa fa-play-circle fa-2x"></i>
+                <span class="btn-play-text">  Play Video</span>
+            </button>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="mobile-back-ground">
+
+    <div class="mobile-description text-description-fest">
+        @Html.Raw(heroBody.Value("richTextBox"))
+    </div>
+</div>
+
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+
+            <div class="modal-body">
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <!-- 16:9 aspect ratio -->
+                <div class="embed-responsive embed-responsive-16by9">
+                    <iframe class="embed-responsive-item" src="" id="video" allowscriptaccess="always" allow="autoplay"></iframe>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div id="blog-container">
+    <div class="container">
+
+        <div class="story-description">
+            <h3 class="blog-title">@heroBody.Value("bodyTitle")</h3>
+        </div>
+
+        @{
+
+
+
+            <div class="row">
+                <div class="col-md-4 card">
+                    <div class="card-body card">
+                        <img class="card-img" src="#" />
+                    </div>
+
+                </div>
+
+                <div class="col-md-5">
+                    <div class="blog-header">
+                        <h5 class="blog-title"> @blogsItem.Value("title_tag")</h5>
+                    </div>
+
+                    <div>
+                        <h5> @blogsItem.Value("Description_tag")</h5>
+                    </div>
+
+                    <div class="facebook-icon">
+                        <a href="https://www.facebook.com/africanbank/" target="_blank"><i class="festive-social-blog fab fa-facebook-f" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+
+            </div>
+
+        }
+
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+<script>
+
+    $(document).ready(function () {
+
+        // Gets the video src from the data-src on each button
+
+        var $videoSrc;
+        $('.video-btn').click(function () {
+            $videoSrc = $(this).data("src");
+        });
+        console.log($videoSrc);
+
+
+
+        // when the modal is opened autoplay it
+        $('#myModal').on('shown.bs.modal', function (e) {
+            debugger;
+
+            // set the video src to autoplay and not to show related video. Youtube related video is like a box of chocolates... you never know what you're gonna get
+            $("#video").attr('src', $videoSrc + "?autoplay=1&amp;modestbranding=1&amp;showinfo=0");
+
+        })
+
+
+
+        // stop playing the youtube video when I close the modal
+        $('#myModal').on('hide.bs.modal', function (e) {
+            // a poor man's stop video
+            $("#video").attr('src', $videoSrc);
+        })
+
+
+        // document ready
+    });
+
+</script>

@@ -1,0 +1,986 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@{
+	Layout = "Master.cshtml";
+}
+
+<style>
+    .member-error {
+  color: red;
+  font-size: 0.85em;
+  margin-top: 4px;
+}
+</style>
+
+
+              <!DOCTYPE html>
+<!-- saved from url=(0060)https://www.africanbank.co.za/en/home/product-funeral-cover/ -->
+@*<html ng-app="africanBankApp" class="ng-scope"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">*@
+    
+
+    <link rel="shortcut icon" type="ico" href="https://africanbank.co.za/media/cnulovsw/favicon.ico">
+
+    <!-- icons  -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined">
+
+    
+   
+
+    <meta name="twitter:card" content="summary_large_image">
+
+    <meta name="twitter:title" content="African Bank | African Bank Insurance | Affordable Funeral Cover">
+    <meta name="twitter:description" content="Affordable funeral insurance from African bank guarantees 24-hour pay out &amp; funeral cover that increases every 6 months while your payment remains the same. Enquire now!">
+    <meta name="twitter:image" content="http://cmsdev1.africanbank.net/media/51288/ab-logo_icon_blue_30x30-2.png">
+
+    <meta property="og:title" content="African Bank | African Bank Insurance | Affordable Funeral Cover">
+    <meta property="og:type" content="article">
+
+
+    <meta property="og:url" content="https://www.africanbank.co.za/en/home/product-funeral-cover/">
+    <meta property="og:description" content="Affordable funeral insurance from African bank guarantees 24-hour pay out &amp; funeral cover that increases every 6 months while your payment remains the same. Enquire now!">
+    <meta property="og:image" content="http://cmsdev1.africanbank.net/media/51288/ab-logo_icon_blue_30x30-2.png">
+    <script src="/African Bank Insurance _ Affordable Funeral Cover_files/jquery.min.js.download" type="text/javascript"></script>
+    
+
+    <link href="/African Bank Insurance _ Affordable Funeral Cover_files/bootstrap.min.css" rel="stylesheet">
+    <link href="/African Bank Insurance _ Affordable Funeral Cover_files/main.min.css" rel="stylesheet">
+    <link href="/African Bank Insurance _ Affordable Funeral Cover_files/custom_main.min.css" rel="stylesheet">
+    <link href="/African Bank Insurance _ Affordable Funeral Cover_files/smart_wizard.css" rel="stylesheet">
+    <link href="/African Bank Insurance _ Affordable Funeral Cover_files/smart_wizard_theme_arrows.css" rel="stylesheet">
+    <link href="/African Bank Insurance _ Affordable Funeral Cover_files/cookieconsent.css" rel="stylesheet">
+
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+   <link rel="stylesheet" href="/css/projectmagic.css"/>
+<link href="/css/investment1.css" rel="stylesheet">
+
+ <body>
+    <section class="container pb-40 pt-40" id="funeral-calculator">
+    <div class="row d-md-flex justify-content-center align-items-center">
+        <div class="col-md-6">
+            <div class="calculator-section">
+                <h1 class="color-brand-1 mb-3">Funeral Calculator</h1>
+                <div class="mb-3">
+                    <label for="funeralType" class="form-label">Funeral Type:</label>
+                    <select id="funeralType" class="form-select" onchange="updateFamilyButtonLabels()" fdprocessedid="osfy5">
+                        <option value="Enhanced">Enhanced</option>
+                        <option value="Staff">Staff</option>
+                        <option value="Foreign">Foreign</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3" style="margin-top: 8px;">
+                    <label for="" class="form-label">Main Member details</label>
+                
+                    <div class="extended-family-row">
+    <select id="personal-gender" class="form-select">
+        <option value="" disabled selected hidden>Gender</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+    </select>
+   <div id="personal-dob-input">
+    <input type="text" id="personal-dob" class="dob-input" placeholder="DOB" />
+<span class="dob-icon glyphicon glyphicon-calendar" style="right: 20px; cursor: pointer;"></span>
+  </div>
+</div>
+ <div class="error-message" id="gender-error" style="color:red; font-size: 0.9em;"></div>
+  <div class="error-message" id="dob-error" style="color:red; font-size: 0.9em;"></div>
+                     @**@
+                    
+                </div>
+
+                <div class="mb-3" style=" margin-top: 8px;">
+                    <label for="coverAmount" class="form-label">Cover Amount:</label>
+                    <select id="coverAmount" class="form-select" fdprocessedid="s6rzob">
+                        <option value="5000">R5,000</option>
+                        <option value="10000">R10,000</option>
+                        <option value="15000">R15,000</option>
+                        <option value="20000">R20,000</option>
+                        <option value="25000">R25,000</option>
+                        <option value="30000">R30,000</option>
+                        <option value="50000">R50,000</option>
+                        <option value="100000">R100,000</option>
+                    </select>
+                </div>
+
+                
+                <!-- Add spouse / ext family / Parent / children buttons -->
+                <div id="addFamilyOptions" class="mb-3" style=" margin-top: 8px;">
+                    <label class="form-label">Add family member(s):</label>
+                    <div id="addFamilyContainer">
+                        <div class="extended-family1-row">
+                            <div class="family-button" data-label="Child" onclick="openDialog('addModal', 'Child')">
+                              <div class="icon">
+                                <svg viewBox="0 0 24 24">
+                                  <path d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z"/>
+                                </svg>
+                              </div>
+                               <span>Child</span> 
+                            </div>
+    
+                            <div class="family-button" data-label="Parent" onclick="openDialog('addModal', 'Parent')">
+                                <div class="icon">
+                                  <svg viewBox="0 0 24 24">
+                                    <path d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z"/>
+                                  </svg>
+                                </div>
+                                <span>Parent</span>
+                              </div>
+                          
+                            <div class="family-button" data-label="Extended Family" onclick="openDialog('addModal', 'Extended Family')">
+                              <div class="icon">
+                                <svg viewBox="0 0 24 24">
+                                  <path d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z"/>
+                                </svg>
+                              </div>
+                              <span>Extended Family</span>
+                            </div>
+                          
+                            <div class="family-button" data-label="Spouse" onclick="openDialog('addModal', 'Spouse')">
+                              <div class="icon">
+                                <svg viewBox="0 0 24 24">
+                                  <path d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z"/>
+                                </svg>
+                              </div>
+                              <span>Spouse</span> 
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    
+                </div>
+                 <div class="combo-btn">
+                    <div class="mt-50 text-start column1">
+                    <p class="combo-btn-text primary">
+                        <button onclick="calculatePremium()" class="cal-btn btn  btn-brand-1 hover-up" fdprocessedid="bxrc2m">Calculate</button>
+                        </p>
+                    </div>
+                    </div>
+                
+                
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="image-section">
+                <img id="defaultImage" src="/media/ysxhravg/loan-calc.png" alt="Funeral Image" loading="lazy">
+                <div id="premium-display" class="premium-container" style="display: none;">
+                    <h3 class="text-center">Estimated Total Premium</h3>
+                    <p class="premium-amount mt-10 text-center">R<span id="premium-value">0.00</span></p>
+                    <div class="mt-30 mb-30 inline-checklist">
+                        <h4 class="text-center">Benefits:</h4>
+                        <ul class="list-ticks list-ticks-2 mt-30">
+                            <li>Get cover up to R100 000 each for the main and spouse.</li>
+                            <li>Cover up to R20 000, each, for up to 8 children under the age of 21 years.</li>
+                            <li>Cover up to R50 000, each, for up to 8 extended family.</li>
+                        </ul>
+                    </div>
+                    <button id="apply-now" class="apply-btn" onclick="window.location.href='https://ib.africanbank.co.za/SignIn.aspx'">Apply Now</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="addModal" class="modal_overlay hidden">
+        <div class="modal_dialog">
+            <!-- heading  -->
+            <div class="modal_header">
+                <div class="close_modal">
+                    <i class="material-icons close-icon"  onclick="closeDialog('addModal')">close</i>
+                </div>
+                
+                <div class="heading">
+                    <h2></h2>
+                    <div class="member-count-display"></div>
+                </div>
+
+            </div>
+            <!-- body  -->
+            <div class="modal_body">
+                
+                <div id="extendedFamilyContainer"></div>
+                <div id="addExtendedButton" onclick="addMemberRow()">
+                    <div class="icon">
+                                <svg viewBox="0 0 24 24">
+                                  <path d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z"></path>
+                                </svg>
+                         Add Member
+                    </div>
+                </div>
+            </div>
+            <!-- footer  -->
+            <div class="modal_footer">
+               @* <button type="button" id="addExtendedButton" onclick="addMemberRow()">
+                    Add Member</button>*@
+                     <div class="combo-btn">
+                    <div class="mt-50 text-start column1">
+                    <p class="combo-btn-text primary">
+                         <button type="button" class="btn  btn-brand-1 hover-up" style="margin-left: 32px;"   onclick="submitModalMembers()">Submit</button>
+                        </p>
+                    </div>
+                    </div>
+                 
+            </div>
+        </div>
+    </div>
+    </section>
+
+ </body>
+    <script src="/African Bank Insurance _ Affordable Funeral Cover_files/bootstrap.bundle.min.js.download"></script>
+
+
+   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+function calculateAge(dob) {
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    return age;
+}
+ document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".dob-input").forEach(input => {
+    const fp = flatpickr(input, {
+      dateFormat: "Y-m-d",
+      disableMobile: true,
+      appendTo: document.body
+    });
+
+    const icon = input.parentElement.querySelector(".dob-icon");
+    if (icon) {
+      icon.addEventListener("click", () => input.focus());
+    }
+  });
+});
+
+</script>
+
+
+ <script>
+ 
+ const labelToKeyMap = {
+  "Spouse": "spouse",
+  "Child": "child",
+  "Parent": "parent",
+  "Extended Family": "extended Family"
+};
+
+ let savedMembers = []
+
+const memberLimits = {
+  Enhanced: { spouse: 3, child: 8, parent: 4, "extended Family": 8 },
+  Staff: { spouse: 3, child: 8, parent: 4, "extended Family": 8 },
+  Foreign: { spouse: 1, child: 8, parent: 0, "extended Family": 0 }
+};
+
+const memberCounts = {
+  spouse: 0,
+  child: 0,
+  parent: 0,
+  "extended Family": 0
+};
+  
+
+function openDialog(modalId, type = "") {
+  const modal = document.getElementById(modalId);
+  if (!modal) return;
+
+   // Show the modal
+   modal.classList.remove("hidden");
+
+  // Update heading dynamically
+  const headingEl = modal.querySelector(".modal_header .heading h2");
+  if (headingEl) {
+      headingEl.textContent = `${type} Details`;
+  }
+
+  const parsedLabel = headingEl?.textContent?.replace(" Details", "").trim();
+  const normalizedType = labelToKeyMap[parsedLabel];
+
+  updateMemberCountDisplay(normalizedType);
+
+  // Clear and update body container dynamically (if needed)
+  const container = modal.querySelector("#extendedFamilyContainer");
+  if (container) {
+    container.innerHTML = "";
+
+     savedMembers = getMembersFromSession(normalizedType);
+    memberCounts[normalizedType] = savedMembers.length;
+
+    updateMemberCountDisplay(normalizedType);
+
+    if (savedMembers.length > 0) {
+      savedMembers.forEach(member => {
+        const wrapper = document.createElement("div");
+wrapper.classList.add("extended-family-wrapper");
+
+const row = document.createElement("div");
+row.classList.add("extended-family-row");
+row.innerHTML = `
+  <select class="form-select">
+    <option value="" disabled hidden ${!member.gender ? "selected" : ""}>Gender</option>
+    <option value="male" ${member.gender === "male" ? "selected" : ""}>Male</option>
+    <option value="female" ${member.gender === "female" ? "selected" : ""}>Female</option>
+  </select>
+  <input type="text" class="dob-input" value="${member.dateOfBirth || ""}" placeholder="DOB" />
+   <span class="dob-icon glyphicon glyphicon-calendar" style="right: 20px; cursor: pointer;"></span>
+      <select class="form-select cover-amount-select">
+    <option value="5000" ${member.coverAmount == 5000 ? "selected" : ""}>R5,000</option>
+    <option value="10000" ${member.coverAmount == 10000 ? "selected" : ""}>R10,000</option>
+    <option value="15000" ${member.coverAmount == 15000 ? "selected" : ""}>R15,000</option>
+    <option value="20000" ${member.coverAmount == 20000 ? "selected" : ""}>R20,000</option>
+    <option value="25000" ${member.coverAmount == 25000 ? "selected" : ""}>R25,000</option>
+    <option value="30000" ${member.coverAmount == 30000 ? "selected" : ""}>R30,000</option>
+    <option value="50000" ${member.coverAmount == 50000 ? "selected" : ""}>R50,000</option>
+    <option value="100000" ${member.coverAmount == 100000 ? "selected" : ""}>R100,000</option>
+  </select>
+  
+`;
+
+const removeContainer = document.createElement("div");
+removeContainer.classList.add("remove-button-container");
+removeContainer.innerHTML = `
+  <button type="button" onclick="removeExtendedFamilyRow(this.closest('.extended-family-wrapper'), '${normalizedType}')" class="remove-button">
+    <span class="remove-text">Remove</span>
+  </button>
+  <i class="material-icons remove-icon" onclick="removeExtendedFamilyRow(this.closest('.extended-family-wrapper'), '${normalizedType}')">delete</i>
+`;
+
+wrapper.appendChild(row);
+wrapper.appendChild(removeContainer);
+container.appendChild(wrapper);
+
+
+
+        flatpickr(row.querySelector('.dob-input'), {
+          dateFormat: "Y-m-d",
+           disableMobile: true,
+          appendTo: document.body,
+          onChange: () => saveMembersToSession(normalizedType)
+        });
+        
+ const dobInput = row.querySelector('.dob-input');
+
+        const calendarIcon = row.querySelector('.dob-icon'); 
+
+
+
+        setupDOBPicker(dobInput, calendarIcon, normalizedType);
+        
+        row.querySelector("select").addEventListener("change", () => {
+          saveMembersToSession(normalizedType);
+        });
+      });
+    } else {
+      const notification = document.createElement("div");
+      notification.classList.add("no-members-message");
+      notification.textContent = "No family members added yet.";
+      notification.style.justifyContent = "center";
+
+      notification.style.textAlign = "center";
+      notification.style.color = "grey";
+      notification.style.marginTop = "1rem";
+      container.appendChild(notification);
+    }
+    toggleNoMembersMessage(normalizedType);
+  }
+}
+function setupDOBPicker(inputEl, iconEl, type = null) {
+
+  const fp = flatpickr(inputEl, {
+
+    dateFormat: "Y-m-d",
+     disableMobile: true,
+    appendTo: document.body,
+
+    onChange: (selectedDates, dateStr) => {
+
+      inputEl.value = dateStr;
+
+      if (type) saveMembersToSession(type);
+
+    }
+
+  });
+
+
+
+  iconEl.addEventListener("click", () => {
+
+    fp.open();
+
+  });
+
+
+ 
+}
+function submitModalMembers() {
+  const headingLabel = document.querySelector(".modal_header .heading h2").textContent.replace(" Details", "").trim();
+  const type = labelToKeyMap[headingLabel];
+  const container = document.getElementById("extendedFamilyContainer");
+  const memberRows = container.querySelectorAll(".extended-family-row");
+
+  let updatedMembers = [];
+  let hasErrors = false;
+
+  const selectedFuneralType = document.getElementById("funeralType").value;
+
+  // Clear previous errors
+  container.querySelectorAll(".member-error").forEach(el => el.remove());
+
+  memberRows.forEach(row => {
+    const gender = row.querySelector("select").value;
+    const dob = row.querySelector(".dob-input").value;
+    const coverAmount = parseInt(row.querySelector(".cover-amount-select").value);
+    const age = calculateAge(dob);
+
+    // Create error message container
+    const errorDiv = document.createElement("div");
+    errorDiv.className = "member-error";
+
+    let isValid = true;
+
+    // Age validation by type and funeral plan
+    if (selectedFuneralType === "Enhanced") {
+      if (type === "child" && (age < 0 || age > 25)) {
+        errorDiv.textContent = "Child must be between 0 and 25 years old.";
+        isValid = false;
+      }
+      if (type === "spouse" && (age < 18 || age > 75)) {
+        errorDiv.textContent = "Spouse must be between 18 and 75 years old.";
+        isValid = false;
+      }
+      if (type === "parent" && (age < 18 || age > 85)) {
+        errorDiv.textContent = "Parent must be between 18 and 85 years old.";
+        isValid = false;
+      }
+      if (type === "extended Family" && (age < 0 || age > 75)) {
+        errorDiv.textContent = "Extended Family must be between 0 and 75 years old.";
+        isValid = false;
+      }
+    }
+if (selectedFuneralType === "Staff") {
+      if (type === "child" && (age < 0 || age > 25)) {
+        errorDiv.textContent = "Child must be between 0 and 25 years old.";
+        isValid = false;
+      }
+      if (type === "spouse" && (age < 18 || age > 65)) {
+        errorDiv.textContent = "Spouse must be between 18 and 65 years old.";
+        isValid = false;
+      }
+      if (type === "parent" && (age < 18 || age > 85)) {
+        errorDiv.textContent = "Parent must be between 18 and 85 years old.";
+        isValid = false;
+      }
+      if (type === "extended Family" && (age < 0 || age > 75)) {
+        errorDiv.textContent = "Extended Family must be between 0 and 75 years old.";
+        isValid = false;
+      }
+    }
+
+    if (selectedFuneralType === "Foreign") {
+      if (type === "child" && (age < 0 || age > 25)) {
+        errorDiv.textContent = "Child must be between 0 and 25 years old.";
+        isValid = false;
+      }
+      if (type === "spouse" && (age < 18 || age > 65)) {
+        errorDiv.textContent = "Spouse must be between 18 and 65 years old.";
+        isValid = false;
+      }
+    }
+
+    if (!isValid) {
+      row.closest(".extended-family-wrapper").after(errorDiv); // Attach error message to the row
+      hasErrors = true;
+    } else {
+      updatedMembers.push({ gender, dateOfBirth: dob, coverAmount });
+    }
+  });
+
+  if (hasErrors) return; // Don't proceed
+
+  // Save to global and session
+  savedMembers = updatedMembers;
+  memberCounts[type] = updatedMembers.length;
+  saveMembersToSession(type);
+  updateMemberCountDisplay(type);
+  toggleNoMembersMessage(type);
+  closeDialog("addModal");
+}
+
+function updateMemberCountDisplay(type) {
+  const selectedFuneralType = document.getElementById("funeralType").value;
+  const limit = memberLimits[selectedFuneralType]?.[type] ?? 0;
+  const count = memberCounts[type];
+
+  const modal = document.querySelector(".modal_overlay:not(.hidden)");
+  const countEl = modal?.querySelector(".member-count-display");
+
+  if (countEl) {
+    countEl.textContent = `Members: ${count}/${limit}`;
+    countEl.style.marginTop = "0.25rem";
+    countEl.style.textAlign = "center";
+     countEl.style.fontWeight =  count === limit ? "bold" : "normal";
+    countEl.style.color = count === limit ? "#52AD00" : "grey";
+  }
+  // Update the family button label
+
+  const label = Object.keys(labelToKeyMap).find(key => labelToKeyMap[key] === type);
+
+  const familyButtons = document.querySelectorAll(`.family-button[data-label="${label}"]`);
+
+  
+
+  familyButtons.forEach(button => {
+
+    const span = button.querySelector("span");
+
+    if (span) {
+
+      const reachedLimit = count === limit;
+
+      span.innerHTML = `${label} <span class="button-member-count ${reachedLimit ? 'limit-reached' : ''}">(${count}/${limit})</span>`;
+
+    }
+
+  });
+}
+
+
+
+function toggleNoMembersMessage(type) {
+  const container = document.getElementById("extendedFamilyContainer");
+  const existingMessage = container.querySelector(".no-members-message");
+
+  if (memberCounts[type] === 0) {
+    if (!existingMessage) {
+      const message = document.createElement("div");
+      message.classList.add("no-members-message");
+      message.textContent = "No family members added yet.";
+      message.style.justifyContent = "center";
+      message.style.textAlign = "center";
+      message.style.color = "grey";
+      message.style.marginTop = "1rem";
+      container.appendChild(message);
+    }
+  } else {
+    if (existingMessage) {
+      container.removeChild(existingMessage);
+    }
+  }
+}
+
+
+
+
+function closeDialog(modalId, event = null) {
+    if (!event || event.target.id === modalId) {
+        document.getElementById(modalId).classList.add("hidden");
+    }
+}
+  
+function addMemberRow() {
+  const label = document.querySelector(".modal_header .heading h2").textContent.replace(" Details", "");
+  const type = labelToKeyMap[label]; // normalize
+  const selectedFuneralType = document.getElementById("funeralType").value;
+  const limit = memberLimits[selectedFuneralType][type];
+   const modalBody = document.querySelector('.modal_body');
+
+    const hasVerticalScrollbar = modalBody.scrollHeight > modalBody.clientHeight;
+    
+  if (memberCounts[type] >= limit) return;
+
+  const container = document.getElementById("extendedFamilyContainer");
+
+  // Remove the "no members" message if it exists
+  const emptyNotification = container.querySelector(".no-members-message");
+  if (emptyNotification) {
+    container.removeChild(emptyNotification);
+  }
+
+  // Create wrapper div
+  const wrapper = document.createElement("div");
+  wrapper.classList.add("extended-family-wrapper");
+
+  // Create the main row
+  const row = document.createElement("div");
+  row.classList.add("extended-family-row");
+  row.innerHTML = `
+    <select class="form-select">
+      <option value="" disabled selected hidden>Gender</option>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
+    <input type="text" class="dob-input" placeholder="DOB" />
+     <span class="dob-icon glyphicon glyphicon-calendar" style="right: 20px; cursor: pointer;"></span>
+    
+    <select class="form-select cover-amount-select" fdprocessedid="s6rzob">
+                        <option value="5000">R5,000</option>
+                        <option value="10000">R10,000</option>
+                        <option value="15000">R15,000</option>
+                        <option value="20000">R20,000</option>
+                        <option value="25000">R25,000</option>
+                        <option value="30000">R30,000</option>
+                        <option value="50000">R50,000</option>
+                        <option value="100000">R100,000</option>
+                    </select>
+  `;
+
+  // Create the remove button outside the row
+  const removeContainer = document.createElement("div");
+  removeContainer.classList.add("remove-button-container");
+  removeContainer.innerHTML = `
+    <button type="button" onclick="removeExtendedFamilyRow(this.closest('.extended-family-wrapper'), '${type}')" class="remove-button">
+      <span class="remove-text">Remove</span>
+    </button>
+    <i class="material-icons remove-icon" onclick="removeExtendedFamilyRow(this.closest('.extended-family-wrapper'), '${type}')">delete</i>
+  `;
+
+  wrapper.appendChild(row);
+  wrapper.appendChild(removeContainer);
+  container.appendChild(wrapper);
+
+  flatpickr(row.querySelector('.dob-input'), {
+    dateFormat: "Y-m-d",
+     disableMobile: true,
+    appendTo: document.body,
+    onChange: () => saveMembersToSession(type) // updated from normalizedType to type
+  });
+
+
+  const dobInput = row.querySelector('.dob-input');
+
+const calendarIcon = row.querySelector('.dob-icon'); 
+
+
+
+setupDOBPicker(dobInput, calendarIcon, type);
+
+
+  row.querySelector("select").addEventListener("change", () => {
+    saveMembersToSession(type); // updated from normalizedType to type
+  });
+  
+  // Listen to cover amount change
+
+row.querySelector(".cover-amount-select").addEventListener("change", () => {
+
+  saveMembersToSession(type);
+
+});
+
+  memberCounts[type]++;
+  saveMembersToSession(type);
+  toggleNoMembersMessage(type);
+
+  if (memberCounts[type] >= limit) {
+    disableAddButton(type);
+  }
+
+  updateMemberCountDisplay(type);
+  // Smooth scroll to bottom if scrollbar is present
+
+    if (hasVerticalScrollbar) {
+
+    modalBody.scrollTo({
+
+        top: modalBody.scrollHeight,
+
+        behavior: 'smooth'
+
+    });
+
+    }
+}
+
+
+
+function removeExtendedFamilyRow(button, type) {
+  const wrapper = button.closest(".extended-family-wrapper");
+  if (wrapper) {
+    wrapper.remove();
+    memberCounts[type]--;
+
+    const selectedFuneralType = document.getElementById("funeralType").value;
+    const limit = memberLimits[selectedFuneralType][type];
+
+    saveMembersToSession(type);
+    toggleNoMembersMessage(type);
+
+    if (memberCounts[type] < limit) {
+      enableAddButton(type);
+    }
+
+    updateMemberCountDisplay(type);
+  }
+}
+
+  function disableAddButton(type) {
+    document.querySelectorAll(".addExtendedButton").forEach(btn => {
+      const label = btn.textContent.trim().split(" ")[0]; // Spouse, Child, etc.
+      if (labelToKeyMap[label] === type) {
+        btn.classList.add("disabled-button");
+        // btn.disabled = true;
+      }
+    });
+  }
+  
+  function enableAddButton(type) {
+    document.querySelectorAll(".addExtendedButton").forEach(btn => {
+      const label = btn.textContent.trim().split(" ")[0]; // Spouse, Child, etc.
+      if (labelToKeyMap[label] === type) {
+        btn.classList.remove("disabled-button");
+        btn.disabled = false;
+      }
+    });
+  }
+
+  function updateFamilyButtonLabels() {
+    const funeralType = document.getElementById("funeralType").value;
+    const limitConfig = memberLimits[funeralType];
+  
+    document.querySelectorAll(".family-button").forEach((btn) => {
+      const label = btn.getAttribute("data-label"); // e.g., "Child"
+      const key = labelToKeyMap[label];
+  
+      if (key && limitConfig[key] !== undefined) {
+        // Find the span inside the button and update its text
+        const labelSpan = btn.querySelector("span");
+        if (labelSpan) {
+          labelSpan.textContent = `${label} (0/${limitConfig[key]})`;
+        }
+  
+        // Handle the disabled-like state for divs
+        if (limitConfig[key] === 0) {
+          btn.classList.add("disabled");
+          btn.style.pointerEvents = "none";
+          btn.style.opacity = "0.5";
+        } else {
+          btn.classList.remove("disabled");
+          btn.style.pointerEvents = "";
+          btn.style.opacity = "";
+        }
+      }
+    });
+  }
+
+   function initializeFlatpickrOnExistingInputs() {
+
+  document.querySelectorAll('.dob-input').forEach(input => {
+
+    const fpInstance = flatpickr(input, {
+
+      dateFormat: "Y-m-d",
+      disableMobile: true,
+      appendTo: document.body,
+
+    });
+
+
+
+    // Try to find the corresponding span/icon in the same parent
+
+    const span = input.parentElement.querySelector('.glyphicon-calendar');
+
+
+
+    if (span) {
+
+      span.style.cursor = 'pointer'; // Optional: make it visually clickable
+
+      span.addEventListener('click', () => {
+
+        fpInstance.open();
+
+      });
+
+    }
+
+  });
+
+}
+  
+  
+
+
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+
+document.getElementById("funeralType").addEventListener("change", () => {
+  Object.keys(memberCounts).forEach(k => memberCounts[k] = 0);
+  
+  updateFamilyButtonLabels();
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  initializeFlatpickrOnExistingInputs();
+ wipeSession();
+});
+
+
+function saveMembersToSession(type) {
+  const container = document.getElementById("extendedFamilyContainer");
+  const rows = container.querySelectorAll(".extended-family-row");
+
+  const members = Array.from(rows).map(row => {
+    const gender = row.querySelector("select").value;
+    const dateOfBirth = row.querySelector("input").value;
+     const coverAmountStr = row.querySelector(".cover-amount-select").value;
+    const coverAmount  = parseInt(coverAmountStr);
+    
+  return { gender, dateOfBirth, coverAmount };
+  });
+
+  memberCounts[type] = members.length;
+
+  const sessionData = JSON.parse(sessionStorage.getItem("familyMembers") || "{}");
+  sessionData[type] = members;
+  sessionStorage.setItem("familyMembers", JSON.stringify(sessionData));
+
+  updateMemberCountDisplay(type); 
+}
+
+function getMembersFromSession(type) {
+  const sessionData = JSON.parse(sessionStorage.getItem("familyMembers") || "{}");
+  return sessionData[type] || [];
+}
+
+function wipeSession() {
+  sessionStorage.removeItem("familyMembers");
+  Object.keys(memberCounts).forEach(k => memberCounts[k] = 0);
+  updateFamilyButtonLabels();
+}
+
+     
+   $(document).ready(function () {
+
+    function collectFormData() {
+        const funeralType = $('#funeralType').val();
+        const coverAmount = $('#coverAmount').val();
+
+        const personalDetails = {
+            gender: $('#personal-gender').val(),
+    dob: $('#personal-dob').val()
+        };
+
+        const familyData = {
+            Child: [],
+            Parent: [],
+            "Extended Family": [],
+            Spouse: []
+        };
+
+        // Loop through each added family member
+        $('#extendedFamilyContainer .member-row').each(function () {
+            const type = $(this).data('type');
+            const gender = $(this).find('.member-gender').val();
+            const dob = $(this).find('.member-dob').val();
+
+            if (type && gender && dob) {
+                familyData[type].push({ gender, dateOfBirth: dob, coverAmount: 90000.00 });
+            }
+        });
+
+        // Construct the final payload object
+        return {
+            type: "insurance",
+            subType: "ab_enhanced_funeral",
+            personalDetails: {
+                idNumber: "",
+                passportNumber: "",
+                surname: "",
+                firstName: "",
+                dateOfBirth: personalDetails.dob,
+                gender: personalDetails.gender
+            },
+            insuranceDetails: {
+                coverAmount: parseFloat(coverAmount) || 110000.00,
+                spouses: getMembersFromSession("spouse"),
+                children: getMembersFromSession("child"),
+                parents: getMembersFromSession("parent"),
+                extendedFamily:getMembersFromSession("extended Family"),
+            }
+        };
+    }
+
+   $('.cal-btn').on('click', function () {
+    let isValid = true;
+
+    // Clear previous error messages
+    $('#gender-error').text('');
+    $('#dob-error').text('');
+    $('#personal-gender').removeClass('input-error');
+    $('#personal-dob-input').removeClass('input-error');
+
+    const personalGender = $('#personal-gender').val();
+    const personalDob = $('#personal-dob').val();
+    const funeralType = $('#funeralType').val();
+
+    if (!personalGender) {
+        $('#gender-error').text('Please select your gender.');
+        $('#personal-gender').addClass('input-error');
+        isValid = false;
+    }
+
+    if (!personalDob) {
+        $('#dob-error').text('Please enter your date of birth.');
+        $('#personal-dob-input').addClass('input-error');
+        isValid = false;
+    }
+
+    // Perform main member age validation based on funeral type
+    if (personalDob) {
+        const age = calculateAge(personalDob);
+
+        if (funeralType === "Enhanced" && (age < 18 || age > 75)) {
+            $('#dob-error').text('Main member must be between 18 and 75 years old for Enhanced funeral cover.');
+            $('#personal-dob-input').addClass('input-error');
+            isValid = false;
+        } else if ((funeralType === "Staff" || funeralType === "Foreign") && (age < 18 || age > 65)) {
+            $('#dob-error').text(`Main member must be between 18 and 65 years old for ${funeralType} funeral cover.`);
+            $('#personal-dob-input').addClass('input-error');
+            isValid = false;
+        }
+    }
+
+    if (!isValid) return;
+
+    const insuranceData = collectFormData(); // get dynamic form data
+
+    $.ajax({
+        url: '/umbraco/Surface/InvestmentCalculator/InvestmentCalculator',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(insuranceData),
+        success: function (res) {
+            console.log(res);
+            $("#premium-value").text(res?.data?.Data?.Premium || "0.00");
+
+            // Hide the image
+            $("#defaultImage").hide();
+
+            // Show the premium display block
+            $("#premium-display").show();
+        },
+        error: function (err) {
+            console.error(err);
+            alert("An error occurred.");
+        }
+    });
+});
+
+
+});
+
+ </script>
+ 

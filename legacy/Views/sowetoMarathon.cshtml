@@ -1,0 +1,1224 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCampaign>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models
+@using Web.Helpers
+
+@{
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var children = Model.Children;
+
+    // Get specific Children
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+
+    var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
+
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+
+    //video code
+    var heroBodyTabGroup = heroBody.Children?.Where(c => c.ContentType.Alias.ToLower() == "tabgroup").FirstOrDefault();
+    var videoLanding = heroBodyTabGroup.Children?.Where(c => c.ContentType.Alias.ToLower() == "tabheader").FirstOrDefault();
+    var videoItem = videoLanding.Children.Where(c => c.ContentType.Alias.ToLower() == "tabbody").FirstOrDefault();
+
+
+
+    @*var buttonLinkData = heroBodyTabGroup.Children.Where(x => x.ContentType.Alias.ToString().ToLower() == "ebankititem2").FirstOrDefault();*@
+    // Get the (generic Open Now that will be used throughout the page) button from the Hero Shoulder
+    IEnumerable<IPublishedContent> bodyButtons = (IEnumerable<IPublishedContent>)heroBody.Children.Where(c => c is ContentModels.EbankItabstractButton);
+    ContentModels.EbankItabstractButton openNowButton = null;
+    ContentModels.EbankItabstractButton learnMoreButton = null;
+    ContentModels.EbankItabstractButton androidDownloadNow = null;
+    ContentModels.EbankItabstractButton iosDownloadNow = null;
+    ContentModels.EbankItabstractButton downloadNow = null;
+    ContentModels.EbankItabstractButton huaweiDownloadNow = null;
+
+    foreach (var button in bodyButtons)
+    {
+        if (button.Value("EbankItbuttonText").ToString().Contains("Register / Login"))
+        {
+            openNowButton = (ContentModels.EbankItabstractButton)button;
+        }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("Learn More"))
+        {
+            learnMoreButton = (ContentModels.EbankItabstractButton)button;
+
+        }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("Android"))
+        {
+            androidDownloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("iOS"))
+        {
+            iosDownloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("Huawei"))
+        {
+            huaweiDownloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+        else
+        {
+            downloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+    }
+
+    var openNowButtonLink = "#";
+    openNowButtonLink = string.IsNullOrEmpty(openNowButton?.EbankItbuttonInternalLink?.Url) ?
+    openNowButton?.EbankItbuttonExternalLink :
+    openNowButton.EbankItbuttonInternalLink?.Url;
+    openNowButtonLink = (string.IsNullOrEmpty(openNowButtonLink)) ? "#" : openNowButtonLink;
+
+    var learnMoreButtonLink = "#";
+    learnMoreButtonLink = string.IsNullOrEmpty(learnMoreButton?.EbankItbuttonInternalLink?.Url) ?
+    learnMoreButton?.EbankItbuttonExternalLink :
+    learnMoreButton.EbankItbuttonInternalLink?.Url;
+    learnMoreButtonLink = (string.IsNullOrEmpty(learnMoreButtonLink)) ? "#" : learnMoreButtonLink;
+
+    var androidButtonLink = "#";
+    androidButtonLink = string.IsNullOrEmpty(androidDownloadNow?.EbankItbuttonInternalLink?.Url) ?
+    androidDownloadNow?.EbankItbuttonExternalLink :
+    androidDownloadNow.EbankItbuttonInternalLink?.Url;
+    androidButtonLink = (string.IsNullOrEmpty(androidButtonLink)) ? "#" : androidButtonLink;
+
+    var iosButtonLink = "#";
+    iosButtonLink = string.IsNullOrEmpty(iosDownloadNow?.EbankItbuttonInternalLink?.Url) ?
+    iosDownloadNow?.EbankItbuttonExternalLink :
+    iosDownloadNow.EbankItbuttonInternalLink?.Url;
+    iosButtonLink = (string.IsNullOrEmpty(iosButtonLink)) ? "#" : iosButtonLink;
+
+    var huaweiButtonLink = "#";
+    huaweiButtonLink = string.IsNullOrEmpty(huaweiDownloadNow?.EbankItbuttonInternalLink?.Url) ?
+    huaweiDownloadNow?.EbankItbuttonExternalLink :
+    huaweiDownloadNow.EbankItbuttonInternalLink?.Url;
+    huaweiButtonLink = (string.IsNullOrEmpty(huaweiButtonLink)) ? "#" : huaweiButtonLink;
+
+    // End get generic shoulder button
+
+    var chestTitle = heroChest?.Value("chestTitle").ToString();
+    var chestDescription = heroChest?.Value("chestDescription").ToString();
+    var chestCards = heroChest?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+
+    var campaignBankingItemsModel = new CustomModels.Benefits
+    {
+        Header = chestTitle,
+        Description = chestDescription,
+        BenefitCards = chestCards.Select(c => c as Card).ToList(),
+
+    };
+
+    //Create your won world of banking
+
+    var tabs = (IEnumerable<IPublishedContent>)heroBody?.Children.Where(c => c.ContentType.Alias.ToLower() == "tabbody").ToList();
+
+    ContentModels.TabBody newWaysOfBanking = null;
+    ContentModels.TabBody createOwnWorldOfBanking = null;
+    ContentModels.TabBody myWorldTermsAndConditions = null;
+    ContentModels.TabBody myWorldBankAccount = null;
+
+    tabs.ToList().ForEach(x =>
+    {
+        var partialName = x.Value("PartialViewName");
+
+        if (partialName.ToString() == "_cardRenderDescribedCards")
+        {
+            createOwnWorldOfBanking = (TabBody)x;
+        }
+        else if (partialName.ToString() == "_renderPDFData")
+        {
+            myWorldTermsAndConditions = (TabBody)x;
+        }
+        else if (partialName.ToString() == "_pageRenderCardWithoutCaption")
+        {
+            newWaysOfBanking = (TabBody)x;
+        }
+        else
+        {
+            myWorldBankAccount = (TabBody)x;
+        }
+    });
+
+    var imageItem = createOwnWorldOfBanking.Children.Where(x => x.ContentType.Alias == "ebankITItem2").FirstOrDefault();
+    var contentItem = imageItem.Value("ebankITContent");
+    var applyNowBtn = imageItem.Value("sectionLink");
+    String imageValuePath = ((ContentModels.Image)((IPublishedContent)imageItem.Value("ebankITImage"))).Url;
+
+    var imageItem1 = myWorldBankAccount.Children.Where(x => x.ContentType.Alias == "ebankITItem2").FirstOrDefault();
+    String imageValuePath1 = ((ContentModels.Image)((IPublishedContent)imageItem1.Value("ebankITImage"))).Url;
+
+    Umbraco.Web.Models.Link buttonDocumentLink = null;
+    if (imageItem1.Value("sectionLink") != null)
+    {
+        foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)imageItem1.Value("sectionLink"))
+        {
+            buttonDocumentLink = link;
+            break;
+        }
+    }
+
+    var ownWorldItems = (IEnumerable<IPublishedElement>)createOwnWorldOfBanking.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+    var myWorldTAndCs = (IEnumerable<IPublishedElement>)myWorldTermsAndConditions.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+    var newWaysItems = (IEnumerable<IPublishedElement>)newWaysOfBanking.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+    var myWorldBankAcc = (IEnumerable<IPublishedElement>)myWorldBankAccount.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+
+    var viewName = Path.GetFileNameWithoutExtension(Server.MapPath(VirtualPath)); //used mainly to identify the page
+    var buttonText = openNowButton.EbankItbuttonText;
+    var mwBankingButtonText = learnMoreButton.EbankItbuttonText;
+    var btnId = viewName + "_" + buttonText.ToString().Replace(" ", "") + "_" + "banking-campaign";
+
+    var btnLearnMoreId = viewName + "_" + mwBankingButtonText.ToString().Replace(" ", "") + "_" + "banking-campaign";
+
+    // Mobile App Modal Data
+    var popupAppTitle = "Download the App using one of the following";
+    var popQRCode = "/media/ylalxyxb/image001.png";
+    var popAndroidApp = "/media/pt2b4b3q/GooglePlayStoreDownloadImageLink.png";
+    var popIOsApp = "/media/pejn1h1x/appstoredownloadimagelink.png";
+    var popHuaweiApp = "/media/di0py4qr/appgallery-logo-2.png";
+
+    var headerImage_large = heroHeader?.Value<IPublishedContent>("image")?.Url;
+    var headerImage_medium = heroHeader?.Value<IPublishedContent>("imageMedium")?.Url;
+    var headerImage_small = heroHeader?.Value<IPublishedContent>("imageSmall")?.Url;
+
+}
+
+<style>
+    .payments-section .heading-text {
+        margin-bottom: 10px;
+        margin-top: 10px;
+    }
+
+    .myworld-campaign-section-container {
+        box-shadow: 0 0 50px rgba(0,0,0,0);
+        padding: 30px
+    }
+
+    .blue-white-color {
+        background-color: #002b60;
+        border-radius: 12px;
+    }
+
+    .campaign-myworld-container {
+        background-color: #fff;
+        padding: 20px 0 0px;
+    }
+
+    .modal .modal-dialog .modal-content .modal-header {
+        background-color: transparent;
+        border-bottom: 1px solid #eee;
+    }
+
+    .registerLogin {
+        width: unset;
+        text-align: right;
+    }
+
+    /* .hero-static-caption {
+        background: #002b60;
+    }
+
+    .button-styler {
+        background-color: #88bc47 !important;
+    }
+
+    .hero-static-title {
+        color: #88bc47;
+    }*/
+    .margin-bottom-60 {
+        margin-bottom: 90px;
+        margin-top: 60px;
+    }
+
+    .descr p {
+        text-align: left !important;
+        margin-top: 15px;
+        margin-left: 12px;
+        font-size: 17px;
+    }
+
+    .online-banking-li {
+        border: 1px solid #e9e5e5 !important;
+        border-radius: 10px;
+    }
+    /*video styles*/
+
+    .video_list_item .vid_list_item .vid_list_item_campaign {
+        transition: 0.3s;
+        box-shadow: 0px 1px 20px rgba(0,0,0,0.125);
+        cursor: pointer;
+    }
+
+    .hero-static-banner {
+        height: 38em;
+    }
+
+    .vid-list-play-botton i {
+        color: white;
+        opacity: 0.9;
+    }
+
+    .vid-list:hover .vid-list-play-botton i {
+        color: #95D03A;
+    }
+
+    .vid-list-play-botton {
+        position: absolute;
+        width: inherit;
+        text-align: center;
+        top: 20%;
+    }
+
+    #video-header-thumb {
+        border-radius: 5px;
+    }
+
+    .video-body p {
+        font-size: 25px;
+        font-weight: 600;
+        color: #464855
+    }
+
+    /*Will still merge with Custom_main.css at a later stage*/
+    .css-color-change {
+        color: #002b60;
+    }
+
+    .css-background-change {
+        background: #88bc47;
+    }
+
+    .video-item-img {
+        height: 193px;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+    }
+
+    .video-container {
+        margin-top: 0px;
+        margin: auto;
+    }
+
+    #video-header {
+        height: 60vh;
+        margin-top: 24px !important;
+        margin-bottom: 20px;
+        box-shadow: 0px 1px 20px rgba(0,0,0,0.125);
+    }
+
+    .video-item-description {
+        font-family: 'Montserrat', sans-serif;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        font-size: 14px;
+    }
+
+    .video-item {
+        background: #f6f6f6;
+        box-shadow: 0px 1px 20px rgba(0,0,0,0.125);
+        height: 360px;
+        margin-bottom: 25px;
+        margin-top: 0px;
+        padding-left: unset;
+        padding-right: unset;
+    }
+
+    .video-body {
+        font-size: 16px;
+        margin-bottom: 30px;
+    }
+
+    .video-title {
+        font-weight: 900;
+        font-size: 40px;
+    }
+
+    .video-citation-box {
+        transition: 0.3s;
+        cursor: pointer;
+        position: absolute;
+        bottom: 15px;
+        margin: auto;
+        padding: 0px 25px;
+    }
+
+    /*Font Styling*/
+
+    .landing-video-title {
+        transition: 0.3s;
+        font-size: 42px;
+        font-weight: 800;
+        background: rgba(0,0,0,0.3);
+        padding: 15px;
+        width: fit-content;
+        max-width: 800px;
+        line-height: 42px;
+    }
+
+    .landing-video-description {
+        margin: 10px 0px;
+        max-width: 800px;
+    }
+
+
+        .landing-video-description > p {
+            background: #002b60;
+            padding: 10px;
+            width: fit-content;
+        }
+
+    .main-click {
+        cursor: pointer;
+        transition: 0.3s;
+        border-radius: 100%;
+        padding: 2px;
+        text-align: center;
+        width: 55px;
+        height: 55px;
+        font-size: 50px !important;
+    }
+
+    .video-item-title {
+        font-size: 18px;
+    }
+
+    .main-click:hover {
+        transition: 0.3s;
+        box-shadow: 0px 1px 25px rgba(0,0,0,0.425);
+        margin-top: -2px;
+    }
+
+    .video-citation-box:hover .landing-video-title {
+        background: #88bc47;
+        transition: 0.3s;
+        box-shadow: 0px 1px 25px rgba(0,0,0,0.4);
+        margin-top: -2px;
+        margin-left: 5px;
+    }
+
+    #the-difference-is-in-you .video-citation-box:hover .landing-video-title {
+        background: none;
+        transition: 0.3s;
+        box-shadow: 0px 1px 25px rgba(0,0,0,0.4);
+        margin-top: -2px;
+        margin-left: 5px;
+    }
+
+    .vid_list_item:hover .vid_list_item_campaign:hover {
+        cursor: pointer;
+    }
+
+
+    .vid-list .video_list_item .vid_list_item .vid_list_item_campaign {
+        border-radius: 5px;
+    }
+
+    .video_list_item .vid_list_item .vid_list_item_campaign {
+        transition: 0.3s;
+        box-shadow: 0px 1px 20px rgba(0,0,0,0.125);
+        cursor: pointer;
+    }
+
+    .video_list_item:hover {
+        transition: 0.3s;
+        box-shadow: 0px 1px 25px rgba(0,0,0,0.425);
+        margin-left: -2px;
+    }
+
+        .video_list_item:hover .main-click {
+            transition: 0.3s;
+            opacity: 1;
+        }
+
+    .vid_list_item:hover {
+        transition: 0.3s;
+        box-shadow: 0px 1px 25px rgba(0,0,0,0.425);
+        margin-left: -2px;
+        cursor: pointer;
+    }
+
+        .vid_list_item:hover .main-click {
+            transition: 0.3s;
+            opacity: 1;
+        }
+
+    .vid_list_item_campaign:hover {
+        transition: 0.3s;
+        box-shadow: 0px 1px 25px rgba(0,0,0,0.425);
+        margin-left: -2px;
+        cursor: pointer;
+    }
+
+        .vid_list_item_campaign:hover .main-click {
+            transition: 0.3s;
+            opacity: 1;
+        }
+
+    .sharethis-inline-share-buttons {
+        position: absolute;
+        bottom: 0;
+        margin-bottom: 10px;
+        right: 15px;
+        z-index: 10 !important;
+    }
+
+    .carousel-header-style {
+        padding-top: 5em;
+        padding-left: 7em;
+        font-size: 34px;
+    }
+
+
+    @@media (max-width: 480px) {
+
+        .video-item-content {
+            padding: 0px 25px 0 25px;
+        }
+
+        .video-item-title {
+            font-size: 14px;
+        }
+
+        #video-header {
+            margin-top: unset;
+        }
+
+        .video-container {
+            width: unset;
+        }
+
+        .video-title {
+            font-size: 34px;
+        }
+
+        .video-item {
+            box-shadow: none;
+            /*height: 125px;*/
+            height: 170px;
+            margin-bottom: 10px;
+        }
+
+        .video-item-title {
+            bottom: unset;
+        }
+
+        .sharethis-inline-share-buttons {
+            right: unset;
+        }
+
+        .video-item-img {
+            height: 100%;
+        }
+
+        .main-video-thumbnail {
+            border: none;
+        }
+
+        .sub-video-thumnail {
+            background: url("../img/african-bank-video-placeholder-mobile.png");
+            background-size: cover;
+            width: 30%;
+            float: left;
+            height: 120px;
+        }
+
+        .sub-video-text {
+            width: 70%;
+            display: inline-block;
+            height: 120px;
+            margin-bottom: 10px;
+        }
+
+        .sub-videos-row {
+            margin-bottom: 0px;
+        }
+
+        .video-item-description {
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            /*height: 70px;*/
+        }
+
+        .episode-click {
+            margin: 40px auto;
+        }
+
+        .video-citation-box {
+            position: absolute;
+            /*top: 0;*/
+            bottom: 0;
+            /*height: 70%;*/
+            margin: auto;
+            padding: 20px;
+            left: 0;
+        }
+
+        .video-header-thumb {
+            margin-top: 0px;
+            margin-left: -15px;
+            width: 110%;
+        }
+
+        .landing-video-title {
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 30px;
+            padding: 10px;
+        }
+
+        .sub-videos {
+        }
+
+        .sub-video-container {
+            box-shadow: 0px 1px 20px rgba(0,0,0,0)
+        }
+
+        .landing-video-description {
+            /*margin: 10px 0px;
+        background: #000;
+        padding: 10px;*/
+            width: 90%;
+        }
+
+        .vid-list-play-botton i {
+            margin-left: 7%;
+        }
+
+        .vid-list-play-botton {
+            text-align: left;
+        }
+    }
+
+    @@media (min-width: 480px )and (max-width: 768px) {
+        .video-item {
+            height: 194px;
+        }
+
+        .slick-prev {
+            left: -5px;
+        }
+
+        .slick-next {
+            right: -5px;
+        }
+
+        .carousel-header-style {
+            padding-top: 0em;
+        }
+
+        .hero-caption {
+            width: 275px;
+            margin-top: 34px;
+            right: 5px !important;
+            margin-top: 33px !important;
+            width: 321px !important;
+        }
+
+
+        .cap-title {
+            font-size: 26px;
+        }
+
+        .hero-static-banner {
+            /*background-size: contain;*/
+            height: 19em !important;
+        }
+
+        .vid-list-play-botton i {
+            margin-left: 7%;
+        }
+
+        .vid-list-play-botton {
+            text-align: left;
+        }
+
+        #video-header {
+            margin-top: unset;
+        }
+
+        .video-item {
+            box-shadow: none;
+        }
+
+        .landing-video-title {
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+        .video-citation-box {
+            position: absolute;
+            /*top: 0;*/
+            bottom: 0;
+            /*height: 70%;*/
+            margin: auto;
+            padding: 20px;
+            left: 0;
+        }
+
+        .sub-video-text {
+            background: #f6f6f6;
+            height: 220px;
+            padding-top: 10px;
+        }
+    }
+
+    @@media (min-width: 769px )and (max-width: 1024px) {
+
+        .slick-prev {
+            left: -15px;
+        }
+
+        .slick-next {
+            right: -15px;
+        }
+
+        .carousel-header-style {
+            padding-top: 1em;
+        }
+
+        .hero-caption .hero-title {
+            font-size: 17px;
+        }
+
+        .cap-title {
+            padding-right: 6px;
+            font-size: 27px;
+        }
+
+        .hero-caption {
+            padding-top: 34px !important;
+            margin-top: 56px !important;
+            padding: 14px !important;
+            color: #fff;
+            height: 350px !important;
+            position: absolute;
+            width: 330px !important;
+            right: -100px;
+        }
+
+        .hero-static-banner {
+            /*background-size: contain;*/
+            height: 26em;
+        }
+
+        #video-header {
+            margin-top: unset;
+        }
+
+        .video-item-description {
+            height: unset;
+        }
+
+        #video-body > .row {
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        .video-item {
+            box-shadow: none;
+            height: 330px;
+        }
+
+        .landing-video-title {
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+        .video-container {
+            width: unset;
+        }
+
+        .video-citation-box {
+            position: absolute;
+            /*top: 0;*/
+            bottom: 0;
+            /*height: 70%;*/
+            margin: auto;
+            padding: 20px;
+            left: 0;
+        }
+
+        .sub-video-text {
+            background: #f6f6f6;
+            height: 200px;
+            padding-top: 10px;
+        }
+    }
+
+    @@media (min-width: 1025px) and (max-width:1440px) {
+        .hero-static-banner {
+            height: 35em;
+        }
+    }
+
+    @@media (min-width:1023px) and (max-width:1439px) {
+        .hero-caption {
+            margin-top: -66px;
+            right: -74px;
+        }
+    }
+
+    @@media (min-width:1441px) and (max-width: 2560px) {
+
+        .hero-caption {
+            width: 524px !important;
+            right: -137px !important;
+            margin-top: -10px !important;
+        }
+    }
+
+    @@media (min-width: 1000px) and (max-width: 10000px) {
+
+        .modal-dialog {
+            width: 900px !important;
+        }
+    }
+
+    @@media (min-width: 768px) and (max-width: 1024px) {
+        .col-sm-6 img {
+            width: 160px;
+        }
+
+        .modal-dialog {
+            width: 790px !important;
+            padding-left: 30px;
+            padding-right: 50px;
+        }
+
+        .app-platform {
+            width: 118px !important;
+            border-radius: 0px !important;
+        }
+    }
+</style>
+
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+<br />
+
+
+<div class="container">
+    <div class="row">
+        <img class="button" src="@imageValuePath" alt="every swipe counts rewards" style="padding:0px 0px;margin-bottom: 5%;border-radius: 8px;width: 100%;" />
+        @if (contentItem != null)
+        {
+            <div class="container">
+                <div class="row">
+                    @Html.Raw(contentItem)
+                    <br />
+                    @applyNowBtn
+
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@*Myworld bank account*@
+<div class="container infographic">
+    <div class="row">
+
+        <div class="col-md-7" style="">
+            <img loading="lazy" class="info-img" src="@imageValuePath1" alt="myworld">
+        </div>
+
+        <div class="col-md-5 info-button">
+            @imageItem1.Value("ebankItContent")
+
+            @if (buttonDocumentLink != null)
+            {
+                var _buttonText = buttonDocumentLink.Name;
+                <a class="button primary clearfix" href="@buttonDocumentLink.Url" target="_blank" style="background-color: #88bc47;">
+                    @_buttonText
+                </a>
+            }
+        </div>
+
+
+    </div>
+</div>
+@* End myworld bank account *@
+
+@* Video code start*@
+<div class="container margin-bottom-20">
+    @{
+        var title = videoLanding.Value("ebankITIconTitle");
+        var thumb_img = videoLanding.Value<IPublishedContent>("ebankITIcon").Url;
+        var description = videoLanding.Value("ebankITIconContent");
+        var initial_video = videoLanding.Value("iconClass");
+
+        var content = videoItem.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+        var videos = content.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedContent>>("sectionContent");
+    }
+
+    <div id="video-header" class="vid_list_item" data-video="@initial_video">
+        <div id="video-header-thumb" style="background-image:url('@thumb_img'); background-position: right;">
+            <iframe width="100%" height="100%" id="video-ytd" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            <section id="video-loader">
+                <div class="loader" id="form-preloader-loader">
+                    <div class="loader-img"></div>
+                </div>
+            </section>
+            <div class="video-citation-box">
+                <div class="video-citation"></div>
+                <div class="video-play-button spacer">
+                    <span class="vid_list_item" data-video="@initial_video"><i class="fa fa-play-circle fa-3x main-click play-icon css-background-change"></i></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    @{
+        var noCampcontent = videoItem.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+        var noCampvideos = noCampcontent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+        var noCampx = 1;
+
+    }
+    <div id="video-body">
+        <div class="row">
+            @foreach (var videoData in noCampvideos)
+            {
+                title = "Episode " + noCampx;
+                description = videoData.Value("nCcardDescription");
+                var img = videoData.Value<IPublishedContent>("nCcardIcon").Url;
+                var videoUrl = videoData.Value("nCcardTitle");
+                <div id="item-@noCampx" class="col-md-4 col-sm-6 vid-list">
+                    <div data-video="@videoUrl*@title*@description" class="video-item vid_list_item">
+                        <div class="vid-list-play-botton"><i class="fa fa-play-circle fa-5x"></i></div>
+                        <div class="video-item-img" style="background-image:url(@img)"></div>
+                        <div class="video-item-content">
+                            <div class="video-description-box">
+                                <p class="video-item-description" style="font-weight:400;">@description</p>
+                            </div>
+
+                            <div class="sharethis-inline-share-buttons" data-url="@Request.Url.AbsoluteUri#@videoUrl"></div>
+                        </div>
+                    </div>
+                </div>
+                noCampx++;
+            }
+        </div>
+    </div>
+
+</div>
+@* Video code end*@
+
+@*Blue Background section code Start*@
+
+<div class="campaign-myworld-container">
+    <div class="container payments-section full green-button blue-white-color">
+        @*<div class="margin-top-20 visible-xs"></div>*@
+        <div class="row myworld-campaign-section-container green-color">
+            @{
+                int idIterator = 0;
+                foreach (var item in ownWorldItems)
+                {
+                    var cardTitle = item.Value<string>("nCcardTitle");
+                    var cardTitleId = cardTitle.Trim().ToString().Replace(" ", "").ToString() + idIterator.ToString();
+                    var cardDesc = item.Value<string>("nCcardDescription");
+                    var icon = item.Value<IPublishedContent>("nCcardIcon");
+                    <div class="col-sm-12 margin-bottom-20 hero-title blue-color" style="font-size:20px">
+                        <div class="text-left blue-color">
+                            <p id="@cardTitleId" class="title heading-text font-size-30" style="font-weight:700;color:#fff;">@cardTitle</p>
+                            <p style="font-weight:350;color:#fff;">@cardDesc</p>
+                        </div>
+                    </div>
+
+                    idIterator += 1;
+                }
+            }
+        </div>
+    </div>
+</div>
+@*Blue Background section code End*@
+@* Hero chest card start *@
+<div class="container margin-bottom-60">
+    <div class="internet-banking-container full image-full">
+
+        @if (campaignBankingItemsModel.BenefitCards != null && campaignBankingItemsModel.BenefitCards.Any())
+        {
+            int iterator = 0;
+
+            <div class="row eq-height @(campaignBankingItemsModel.BenefitCards.Count > 3 ? "card-slider" : "") ">
+                @{
+                    int imgIterator = 0;
+                    foreach (Card benefit in campaignBankingItemsModel.BenefitCards)
+                    {
+                        String cardIdTag = "card" + iterator.ToString();
+                        String cardId = benefit.Name.Replace(" ", "").ToString() + imgIterator.ToString();
+                        <div class="col-sm-12">
+                            <div class="image center-align">
+                                @if (benefit.CardIcon != null)
+                                {
+                                    @*Umbraco.Web.Models.Link campaignImgLink = null;
+                                        foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)benefit.Value("buttonLink"))
+                                        {
+                                            campaignImgLink = link;
+                                            break;
+                                        }
+                                        <a href="@campaignImgLink.Url"></a>*@
+                                    <img class="myWorld-campaign-images" style="width:100%;" src="@benefit.CardIcon.Url" alt="@benefit.Value("altTag")" />
+                                }
+                            </div>
+
+                            <div class="descr">@Html.Raw(benefit.CardDescriptionLongText)</div>
+                        </div>
+                        ++iterator;
+                        ++imgIterator;
+                    }
+                }
+            </div>
+        }
+    </div>
+</div>
+@* Hero chest card end *@
+
+@* The new way of banking code start *@
+<div class="green-pointer-banking-campaign"></div>
+<div class="hover-block"></div>
+<div class="container">
+    <div class="mega-tabs" style="margin-top:-42px">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs eq-height" role="tablist">
+            <li role="presentation" class="online-banking-li">
+                The new way of banking
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="container payments-section full margin-bottom-30">
+    <div class="margin-top-20 visible-xs"></div>
+    <div class="row">
+        <h4 class="container margin-bottom-20 align-center">@newWaysOfBanking.Value("partialViewClassName")</h4>
+        @{
+            int cardIterator = 0;
+            bool increaseCardHeight = false;
+
+            foreach (var item in newWaysItems)
+            {
+
+                if (cardIterator == (int)newWaysItems.Count() - 1)
+                {
+                    increaseCardHeight = true;
+                }
+                var cardTitle = item.Value<string>("nCcardTitle");
+                var cardDesc = item.Value<string>("nCcardDescription");
+                var icon = item.Value<IPublishedContent>("nCcardIcon");
+                <div class="col-sm-4 margin-bottom-20">
+                    <div class="@(increaseCardHeight ? "cellphone-button-banking-campaign" : "")">
+                        <div class="text-left center-align white-link-color richtextbox-blue-bg">
+                            <img src="@icon.Url" alt="@icon.Value("altTag")" class="image-center-resizer" />
+                            <p class="title blue-color font-size-20">@cardTitle</p>
+                            <p>@cardDesc</p>
+                        </div>
+                    </div>
+                    @{
+                        if (!cardTitle.Contains("App"))
+                        {
+                            <div class="col-md-4 center-align margin-bottom-20 margin-right-50 banking-options-buttons">
+                                <a href="@learnMoreButtonLink" class="button span-buttons green-button" id="">
+                                    @mwBankingButtonText
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-md-4 center-align margin-bottom-20 margin-left-50 banking-options-buttons">
+                                <span class="button span-buttons green-button view_OnlineApps downloadNow" data-item="@popupAppTitle*@popQRCode*@popAndroidApp*@popIOsApp" target="_blank">@downloadNow.EbankItbuttonText</span>
+                            </div>
+                        }
+                    }
+                </div>
+                cardIterator += 1;
+            }
+        }
+    </div>
+</div>
+@* The new way of banking code end *@
+
+<!-- NUMBER TO CALL -->
+<div class="number-to-call">
+    <p style="text-align: center;">1 <span>Number to call</span></p>
+    <h4 class="bolder" style="text-align: center;">0861 123 456</h4>
+    @{
+        int pipeIterator = 0;
+        foreach (var item in myWorldTAndCs)
+        {
+            if (!item.Value("nCcategoryName").ToString().Contains("Pricing Guide"))
+            {
+                var linkString = ((ContentModels.File)item.Value("nCebankITDocument")).Url;
+                <a rel="noopener noreferrer" href="@linkString" target="_blank" class="tAndC">
+                    @item.Value("nCebankITTitle").ToString()
+                </a>
+                if (pipeIterator <= 1)
+                {
+                    <span>&#124;</span>
+                }
+            }
+            pipeIterator += 1;
+        }
+    }
+</div>
+
+@*@Html.Partial("_renderPopUpContent2", new ContainerViewModel()
+    {
+        HTMLContent2 = @<text>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-15">
+                        <a href="@androidDownloadNow.Value("ebankITButtonExternalLink")" target="_blank">
+                            <img width="200" id="popUpAndroid" alt="google-play-store-african-bank-android-app" />
+                        </a>
+                        <br /><br />
+                        <a href="@iosDownloadNow.Value("ebankITButtonExternalLink")" target="_blank">
+                            <img width="200" id="popUpIOS" alt="ios-african-bank-app" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </text>
+    })*@
+
+@Html.Partial("_renderPopUpContent2", new ContainerViewModel()
+    {
+        HTMLContent2 = @<text>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-15">
+
+                    <br /><br />
+
+                </div>
+
+                <div class="col-xs-12 col-sm-4">
+                    <a id="AndroidUrl" href="@androidButtonLink">
+                        <img width="200" id="popUpAndroid" />
+                    </a>
+                </div>
+                <div class="col-xs-12 col-sm-4">
+                    <a id="iOSUrl" href="@iosButtonLink">
+                        <img width="200" id="popUpIOS" />
+                    </a>
+                </div>
+                <div class="col-xs-12 col-sm-4">
+                    <a id="HuaweiUrl" href="@huaweiButtonLink">
+                        <img loading="lazy" width="200" id="popUpHuawei" src="@popHuaweiApp" />
+                    </a>
+                </div>
+
+            </div>
+        </div>
+        </text>
+})
+
+@section scripts{
+    <script src="~/scripts/jquery-ui.js"></script>
+    <script src="~/javascripts/reuse/form_validation.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.5/validator.min.js"></script>
+    <script type="text/javascript">
+            $(document).ready(function () {
+                $('#video-header').hide();
+                MediaHashVideo();
+                $(".vid-list").click(function (e) {
+                    $('#video-header').show();
+                });
+                $(".vid_list_item").click(function (e) {
+                    moveHtmlView(50, e);
+                });
+
+                $(".vid_list_item_campaign").click(function (e) {
+                    moveHtmlView(1250, e);
+                });
+
+
+
+                $('.money').autoNumeric('init', { aSep: ' ', aDec: '.', aSign: 'R' });
+
+                function moveHtmlView(position, control) {
+                    var selected_video = control.currentTarget.dataset.video.split("*");
+
+                    //checking if there is any video
+                    if (selected_video[0] !== null && selected_video[0] !== undefined && selected_video[0] != "")
+                    {
+                        //-->show video loader
+                        $("#video-loader").show();
+                        $("#video-header-thumb").addClass("video-thumb-none");
+                        $("#video-ytd").removeClass("video-ytd-show");
+                        $(".video-content").hide();
+
+                        //--> header title description
+                        if (selected_video.length==3)
+                        {
+                            $(".landing-video-title").text(selected_video[1]);
+                            $(".landing-video-description p").text(selected_video[2]);
+
+                        }
+                        $("#video-ytd")[0].src = selected_video[0];
+
+                        //$("html, body").animate({ scrollTop: position }, 2000);
+
+                        setTimeout(function () {
+                            $('#video-ytd')[0].src += "?autoplay=1";
+                            $("#video-ytd").addClass("video-ytd-show");
+                            $("#video-loader").hide();
+
+                        }, 5000);
+
+                    }
+                }
+
+            });
+
+            function onPage(name) {
+                var path = window.location.pathname;
+                return name == path.substring(path.lastIndexOf('/') + 1);
+            }
+            if (onPage('moja-love')) {
+                $('.css-background-change').css('background', '#2E0554');
+                $('.css-color-change').css('color', '#2E0554');
+            };
+            $(".main-click").click(function () {
+                $(".video-citation-box").hide();
+                $("#video-header").css({ 'height': '75vh' });
+            });
+
+            function MediaHashVideo() {
+                var selected_video = window.location.hash.replace('#', '');
+                if (selected_video !== null && selected_video !== undefined && selected_video != "") {
+                    //-->show video loader
+                    $("#video-loader").show();
+                    $(".video-citation-box").hide();
+                    //}
+                    $("#video-ytd")[0].src = selected_video;
+                    setTimeout(function () {
+                        $('#video-ytd')[0].src += "?autoplay=1";
+                        $("#video-ytd").addClass("video-ytd-show");
+                        $("#video-loader").hide();
+                    }, 5000);
+                }
+            }
+    </script>
+    <script>
+        $(document).ready(function () {
+            var imageBgCss = "url('" + "@headerImage_large" + "')";
+            var imageMdCss = "url('" + "@headerImage_medium" + "')";
+            var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_medium : headerImage_small)" + "')";
+            var CheckScreenSize;
+            (CheckScreenSize = function () {
+                var _width = $(window).outerWidth();
+                var _height = $(window).outerHeight();
+                if (_width <= 511) {
+                    $("#heroHeader").css("background-image", imageSmCss);
+                }
+                else {
+                    $("#heroHeader").css("background-image", imageBgCss);
+                }
+            })();
+            $(window).resize(CheckScreenSize);
+        });
+
+    </script>
+}

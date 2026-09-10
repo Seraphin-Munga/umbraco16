@@ -1,0 +1,37 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.BaseModernUI>
+@using CustomModels = Web.Models;
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers
+
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using AcfAfricanbank.Core.Models.Forms
+
+
+
+
+@{
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var Children = Model.Children;
+
+    // Get specific Children
+    var heroHeader = Children?.Where(c => c is HeroHeader).FirstOrDefault();
+
+    // var section1 = Children?.Where(c => c is HeroBody).FirstOrDefault();
+
+    // var headerGroup = heroHeader.Children(x => x.ContentType.Alias.ToLower() == "heroHeader").FirstOrDefault();
+    //(HeroHeader)Children?.Where(c => c.ContentType.Alias.ToLower() == "modernHeader").FirstOrDefault();
+    // var heroTitle = headerGroup?.Value("headerTitle").ToString();
+    //  var heroHeaderTitle = headerGroup?.Value("subHeaderTitle");
+
+
+}
+<style>
+</style>
+@* the fun starts here *@
+@Html.Partial("_pageModernHeader", heroHeader as ContentModels.HeroHeader)
+
+<div class="container">
+    @* <div>   @Html.Raw(heroTitle)</div>*@
+</div>

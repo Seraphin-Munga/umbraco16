@@ -1,0 +1,141 @@
+﻿@using AcfAfricanbank.Core.Models.Forms
+@using Umbraco.Web.Models;
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using System.Configuration;
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers
+@{
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var children = Model.Children;
+
+    // Get specific Children
+    var heroHeader = children?.Where(c => c  is HeroHeader).FirstOrDefault();
+    var heroShoulder = children?.Where(c => c is HeroShoulder).FirstOrDefault();
+    var heroChest = children?.Where(c => c is HeroChestVad).FirstOrDefault();
+    var testimonialTab = children?.Where(c => c is Testimonials).FirstOrDefault();
+    var homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+
+    // Get Specific grand children
+    var mainTabs = heroChest?.Children.Where(c => c is ValueAddedDeal);
+    var techDealsTab = mainTabs.Where(c => c.Value("tabType")?.ToString().ToLower() == "mobile devices").FirstOrDefault();
+    ContainerViewModel containerViewModel = new ContainerViewModel();
+    var headerImage_large = heroHeader?.Value<IPublishedContent>("image")?.Url;
+    var headerImage_medium = heroHeader?.Value<IPublishedContent>("imageMedium")?.Url;
+    var headerImage_small = heroHeader?.Value<IPublishedContent>("imageSmall")?.Url;
+
+}
+<style>
+    .button.primary {
+        border-radius: 90px;
+    }
+    .card-plain {
+        margin-bottom: 50px;
+    }
+    .loan-product-container {
+        top: -110px;
+    }
+    .loan-summary-container {
+        top: 15px;
+    }
+    .margin-bottom-35 {
+        margin-bottom: 35px !important;
+    }
+    .hero-static-banner {
+        height: 550px;
+    }
+
+    @@media only screen and (min-width: 268px) and (max-width: 653px) {
+        .loan-summary-container .container-vad {
+            padding-top: 0;
+        }
+        .loan-product-container {
+            top: 60px;
+        }
+    }
+
+    @@media only screen and (min-width: 268px) and (max-width: 968px) {
+        .loan-summary-container {
+            top: 15px;
+        }
+    }
+</style>
+
+@*HERO BANNER*@
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+@*HERO CONTINUED*@
+@Html.Partial("_PageShoulderCampaign", heroShoulder as ContentModels.HeroShoulder)
+@*LOAN SUMMARY*@
+<div class="container">
+    <div class="loan-product-container">
+        <div class="loan-summary-container">
+            <div class="container-vad">
+                <div class="mega-tabs"></div>
+                @*Tab panes*@
+                <div class="tab-content">
+                    @if (techDealsTab != null)
+                    {
+                        var catalogItems = techDealsTab.Value<IEnumerable<IPublishedElement>>("catalogCards");
+                        var deviceNumber = 1;
+                        <div class="row margin-top-30 margin-bottom-35">
+                            @foreach (var highlight in catalogItems)
+                            {
+                                var img = highlight.Value<IPublishedContent>("vADTechDealImage");
+
+                                var navigate = highlight.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").FirstOrDefault();
+                                var buttonRedirectLink = highlight.Value<IPublishedContent>("vADTechDealButtonRedirectLink2");
+                                var buttonLabel = highlight.Value("vADTechDealButtonLabel").ToString();
+                                var deviceSearch = "Mobile device " + deviceNumber.ToString();
+                                <div class="col-sm-4">
+                                    <div class="card-plain">
+                                        <img loading="lazy" class="width-100" src="@img.Url" alt="@img.Value("altTag")" />
+                                        <div class="margin-top-40">
+                                            <a href="@navigate.Url" class="button primary  view_deal"> @buttonLabel</a>
+                                        </div>
+                                    </div>
+                                </div>
+                             }
+                        </div>
+                        <div class="margin-top-80 hidden-xs"></div>
+                     }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@*TESTIMONIALS*@
+@Html.Partial("_testimonials", testimonialTab as Testimonials)
+
+@*CALL BACK FORM*@
+    @{
+        var _floatingFormViewModel = children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+        @Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)
+    }
+
+    @section scripts
+    {
+        <script type="text/javascript">
+             $(document).ready(function () {
+                    var imageBgCss = "url('" + "@headerImage_large" + "')";
+                    var imageMdCss = "url('" + "@headerImage_medium" + "')";
+                    var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_medium : headerImage_small)" + "')";
+                    var CheckScreenSize;
+                    (CheckScreenSize = function () {
+                        var _width = $(window).outerWidth();
+                        var _height = $(window).outerHeight();
+                        if (_width <= 511) {
+                            $("#heroHeader").css("background-image", imageSmCss);
+                        }
+                        else {
+                            $("#heroHeader").css("background-image", imageBgCss);
+                        }
+                    })();
+                    $(window).resize(CheckScreenSize);
+                });
+
+            $(".btn_ok_modal").click(function () {
+                $('#generic').modal('hide');
+            });
+        </script>
+    }

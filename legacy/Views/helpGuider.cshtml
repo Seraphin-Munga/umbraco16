@@ -1,0 +1,121 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageMediaCenter>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+
+@{
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var Children = Model.Children;
+
+    // Get specific Children
+    var heroHeader = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+
+    var heroBody = Children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+
+    var tabBody = (TabBody)heroBody.Children(x => x.ContentType.Alias.ToLower() == "tabbody").FirstOrDefault();
+    var videoArchive = (IEnumerable<IPublishedElement>)tabBody.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+
+    ICollection<IPublishedElement> videos = new List<IPublishedElement>();
+    foreach (var videoCollection in (ICollection<Object>)videoArchive.Select(x => x.Value("mediaitems")).ToList())
+    {
+        foreach (var _videoData in (ICollection<NChelpGuide>)videoCollection)
+        {
+            videos.Add(_videoData);
+        }
+    }
+}
+
+<style>
+    @@media (max-width: 767px){
+        .hero-static-caption .hero-static-title, .hero-static-caption h1 {
+            font-size: 30px;
+    }
+.hero-static-caption {
+    margin-left: -15px;
+    margin-right: -15px;
+    border-radius: 0;
+    text-align: center;
+    padding: 35px;
+    top: 0;
+}
+}
+</style>
+<!-- HERO HEADER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+<!-- HERO SHOULDER -->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+
+
+<!-- Search Control -->
+<div class="container">
+    <div class="row filter margin-bottom-20 margin-top-10">
+        <div class="col-lg-6 col-lg-offset-3">
+            <div class="content-padding-15 align-center">
+                @Html.Partial("_searchInput")
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="margin-top-60 hidden-xs"></div>
+
+<!-- HERO BODY -->
+@{
+    <div class="container margin-bottom-minus-60" ng-controller="ReportsAndArchievesController">
+        <div class="campaign-product-container faq-section full">
+            @{
+                foreach (var item in videos)
+                {
+                    var question = @item.Value("question").ToString();
+
+                    <div class="row searchItemList" ng-show="stringContains('@question', searchTerm)">
+                        <div class="faq-item">
+                            <div class="item-content">
+                                <div class="title text-uppercase">
+                                    @item.Value("question")
+                                </div>
+                                <div class="faq content">
+                                    <video width="100%" controls="controls">
+
+                                        <source src='@item.Value("answer")' />
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            </div>
+                            <div class="download-icon faq-button">
+                                <i class="fas fa-long-arrow-alt-down" aria-hidden="true"></i>
+                            </div>
+                            @*
+                                 <div class="download-icon faq-button" onclick="toggleFAQ(this)">
+                                    <i class="fa fa-long-arrow-down" aria-hidden="true"></i>
+                                </div>*@
+                        </div>
+                    </div>
+
+
+                }
+
+
+            }
+        </div>
+    </div>
+}
+
+@section scripts
+{
+
+    <script type="text/javascript">
+        $(".faq-item").click(function () {
+
+            $(this).parent().siblings(".searchItemList").children(".faq-item").removeClass("active");
+            $(this).addClass("active");
+            $(this).parent().siblings(".searchItemList").children(".faq-item").children(".item-content").children(".content:visible").toggle(200);
+            $(this).parent().siblings(".searchItemList").children(".faq-item").children(".download-icon").children(".fa-long-arrow-up").removeClass("fa-long-arrow-up").addClass("fa-long-arrow-down");
+            $(this).children(".item-content").children(".content").toggle(200);
+            $(this).children(".download-icon").children(".fa-long-arrow-up").removeClass("fa-long-arrow-up").addClass("fa-long-arrow-down");
+        });
+    </script>
+}

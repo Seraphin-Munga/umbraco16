@@ -1,0 +1,610 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCampaign>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models;
+@using Web.Helpers
+@using Umbraco.Web.Models
+@using System.Collections.Generic;
+@using System.Text.RegularExpressions
+@using Umbraco.Core
+
+@{
+    Layout = "Master.cshtml";
+    var children = Model.Children;
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
+
+    var chestTitle = heroChest?.Value("chestTitle").ToString();
+    var chestDescription = heroChest?.Value("chestDescription").ToString();
+    var chestCards = heroChest?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+
+    var viewName = Path.GetFileNameWithoutExtension(Server.MapPath(VirtualPath)); //used mainly to identify the page
+
+    var campaignSowetanSurveyItemsModel = new CustomModels.Benefits
+    {
+        Header = chestTitle,
+        Description = chestDescription,
+        BenefitCards = chestCards.Select(c => c as Card).ToList(),
+
+    };
+
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    TabBody surveyQuestionData = null;
+    TabBody surveyPDFData = null;
+    var tabBodyItems = heroBody.Children.OfType<TabBody>();
+    tabBodyItems.ToList().ForEach(x =>
+    {
+        if (x.Name == "Survey Questions")
+        {
+            surveyQuestionData = (TabBody)x;
+        }
+        else
+        {
+            surveyPDFData = (TabBody)x;
+        }
+    });
+
+    var surveyQuestions = (ICollection<IPublishedElement>)surveyQuestionData.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+
+    var campaignFooter = surveyQuestionData?.Children(c => c.ContentType.Alias.ToLower() == "ebankititem2").FirstOrDefault();
+
+    var headerImage_large = heroHeader?.Value<IPublishedContent>("image")?.Url;
+    var headerImage_medium = heroHeader?.Value<IPublishedContent>("imageMedium")?.Url;
+    var headerImage_small = heroHeader?.Value<IPublishedContent>("imageSmall")?.Url;
+}
+
+<style type="text/css">
+    .margin-bottom-20 {
+        margin-bottom: 20px !important;
+    }
+
+    #sendSurvey {
+        background-color: #88bc47;
+        border: none;
+    }
+
+    .form-horizontal .control-label {
+        text-align: unset;
+    }
+
+    .hang-tight {
+        display: none;
+    }
+
+    .hero-description {
+        display: none !important;
+    }
+
+    .switch-content-view > p {
+        display: block;
+        font-size: 28px;
+        font-weight: 800;
+    }
+
+    label {
+        text-transform: none;
+    }
+
+    .campaign-button {
+        padding: 16px 35px;
+        font-size: 16px;
+        color: #88bc47;
+        text-align: center;
+        font-weight: normal;
+        -webkit-font-smoothing: antialiased;
+        transition: all 1s ease;
+        display: inline-block;
+        cursor: pointer;
+        background: none;
+        text-decoration: underline;
+    }
+
+        .campaign-button:hover {
+            color: white;
+        }
+
+    .title-text {
+        margin-top: 14px;
+        margin-bottom: 40px;
+        text-align: center;
+        font-size: 32px;
+    }
+
+    .campaign-textarea-color {
+        color: #002b60;
+    }
+
+    li:hover {
+        transition: 0.3s;
+        color: #88bc47;
+        font-size: large;
+    }
+
+    li {
+        transition: 0.3s;
+    }
+
+    .dropdown-styleset {
+        text-align: center;
+        padding: unset;
+    }
+
+    .hr-styleset {
+        margin: 5px 0px 5px 5px;
+        text-align: center;
+        margin-right: 6%;
+        margin-left: 6%;
+        border-color: #1717175c;
+    }
+
+    .wrapper-dropdown-3 {
+        position: relative;
+        margin: 0 auto;
+        padding: 10px;
+        background: #001e44;
+        border-radius: 7px;
+        border: 1px solid rgba(0,0,0,0.15);
+        box-shadow: 0 1px 1px rgba(50,50,50,0.1);
+        cursor: pointer;
+        outline: none;
+        font-weight: bold;
+        color: #ffffff;
+        right: 0px;
+    }
+
+        .wrapper-dropdown-3 .dropdown {
+            position: absolute;
+            top: 140%;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: #507096;
+            color: #f1f3f0;
+            border-radius: inherit;
+            border: 1px solid rgba(0, 0, 0, 0.24);
+            box-shadow: 1px 2px 10px rgba(0,0,0,0.5);
+            font-weight: normal;
+            -webkit-transition: all 0.5s ease-in;
+            -moz-transition: all 0.5s ease-in;
+            -ms-transition: all 0.5s ease-in;
+            -o-transition: all 0.5s ease-in;
+            transition: all 0.5s ease-in;
+            list-style: none;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+            .wrapper-dropdown-3 .dropdown:after {
+                content: "";
+                width: 0px;
+                height: 0px;
+                position: absolute;
+                bottom: 100%;
+                right: 54px;
+                border-width: 0px 9px 13px 8px;
+                border-style: solid;
+                border-color: #507096 transparent;
+            }
+
+            .wrapper-dropdown-3 .dropdown:before {
+            }
+
+            .wrapper-dropdown-3 .dropdown li a {
+                display: block;
+                padding: 10px;
+                text-decoration: none;
+                color: #8aa8bd;
+                border-bottom: 1px solid #e6e8ea;
+                box-shadow: inset 0 1px 0 rgba(255,255,255,1);
+                -webkit-transition: all 0.3s ease-out;
+                -moz-transition: all 0.3s ease-out;
+                -ms-transition: all 0.3s ease-out;
+                -o-transition: all 0.3s ease-out;
+                transition: all 0.3s ease-out;
+            }
+
+            .wrapper-dropdown-3 .dropdown li i {
+                float: right;
+                color: inherit;
+            }
+
+            .wrapper-dropdown-3 .dropdown li:first-of-type a {
+                border-radius: 7px 7px 0 0;
+            }
+
+            .wrapper-dropdown-3 .dropdown li:last-of-type a {
+                border: none;
+                border-radius: 0 0 7px 7px;
+            }
+            /* Hover state */
+            .wrapper-dropdown-3 .dropdown li:hover a {
+                background: #f3f8f8;
+            }
+        /* Active state */
+        .wrapper-dropdown-3.active .dropdown {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    /* No CSS3 support */
+    .no-opacity .wrapper-dropdown-3 .dropdown,
+    .no-pointerevents .wrapper-dropdown-3 .dropdown {
+        display: none;
+        opacity: 1; /* If opacity support but no pointer-events support */
+        pointer-events: auto; /* If pointer-events support but no pointer-events support */
+    }
+
+    .no-opacity .wrapper-dropdown-3.active .dropdown,
+    .no-pointerevents .wrapper-dropdown-3.active .dropdown {
+        display: block;
+    }
+
+    @@media (max-width: 360px) {
+        .switch-content-view > p {
+            font-size: 15px;
+        }
+
+        .switch-mobi-view {
+            text-align: center;
+        }
+    }
+
+    .onenumbercall {
+        text-align: center;
+        font-weight: 900;
+        font-size: 24px;
+        color: #464855;
+        margin-top: 0;
+        margin-bottom: 10px;
+        line-height: 1.1;
+        display: block;
+    }
+</style>
+
+<!-- HERO Header -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+<!-- HERO Shoulder-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+<!-- HERO Chest-->
+<!-- HERO Body-->
+@Html.Partial("_surveyMailSend", surveyQuestionData as ContentModels.TabBody)
+
+<!--bottom MyWORLD upsell start -->
+@{
+    if (campaignFooter != null)
+    {
+        var imageUrlString = ((ContentModels.Image)((IPublishedContent)campaignFooter.Value("ebankITImage"))).Url;
+        var buttonLinkData = campaignFooter.Value("sectionLink");
+        var campaignFooterLink = campaignFooter.Value<IEnumerable<Umbraco.Web.Models.Link>>("sectionLink");
+
+
+        <div class="top_extend item" style="background-size: cover;background: url('/media/2jcjw4xu/landing2.jpg')no-repeat;background-position: 40% 25%;">
+            <div class="container">
+                <div class="col-md-8"></div>
+                <div class="col-md-4" style="padding-top: 83px;padding-bottom: 133px;">
+                    <h2 class="hero-title">
+                        <span class="cap-title">@campaignFooter.Value("ebankITTitle")</span><br>
+                        <span class="switch-content-view">@campaignFooter.Value("ebankITContent")</span>
+                    </h2>
+                    <div class="hero-description">
+                        @campaignFooter.Value("nCebankITContent")
+                    </div>
+                    @{
+                        if (campaignFooterLink.Any())
+                        {
+                            foreach (var links in campaignFooterLink)
+                            {
+                                var buttonText = links.Name;
+                                var btnId = viewName + "_" + buttonText.ToString().Replace(" ", "") + "_" + "SowetanLiveCampaign";
+                                <div class="switch-mobi-view">
+                                    <a class="button primary clearfix"   target="_blank" href="@links.Url" id="@btnId">
+                                       @buttonText
+                                    </a>
+                                </div>
+                            }
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
+
+<!--1 Number to call start-->
+<div class="number-to-call">
+    <p style="text-align: center;">1 <span>Number to call</span></p>
+    <a class="onenumbercall" style="text-align: center;" href="tel:0861123456">0861 123 456</a>
+    @{
+        var pdfs = (ICollection<IPublishedElement>
+            )surveyPDFData.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+        if (pdfs != null)
+        {
+            foreach (var item in pdfs)
+            {
+
+                var linkString = ((ContentModels.File)item.Value("nCebankITDocument")).Url;
+                <a rel="noopener noreferrer" href="@linkString" target="_blank" class="tAndC">
+                    @item.Value("nCebankITTitle").ToString()
+                </a>
+            }
+        }
+    }
+</div>
+<!--1 Number to call end-->
+<!--bottom MyWORLD upsell end-->
+@Html.Partial("_renderPopUpContent", new ContainerViewModel()
+{
+HTMLContent = @<text>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-md-12">
+                    Your Survey has been submitted.
+                </div>
+                <br />
+                <br />
+
+            </div>
+        </div>
+</text>
+})
+@section scripts
+{
+
+    <script>
+        $(document).ready(function () {
+            var imageBgCss = "url('" + "@headerImage_large" + "')";
+            var imageMdCss = "url('" + "@headerImage_medium" + "')";
+            var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_medium : headerImage_small)" + "')";
+            var CheckScreenSize;
+            (CheckScreenSize = function () {
+                var _width = $(window).outerWidth();
+                var _height = $(window).outerHeight();
+                if (_width <= 511) {
+                    $("#heroHeader").css("background-image", imageSmCss);
+                }
+                else {
+                    $("#heroHeader").css("background-image", imageBgCss);
+                }
+            })();
+            $(window).resize(CheckScreenSize);
+        });
+        
+            $(".btnFeaturesTable").click(function () {
+            $("#table-toggle").toggleClass('fa-chevron-up fa-chevron-down');
+            $(".accordion-content ").fadeToggle();
+        });
+    </script> 
+    
+  <script type="text/javascript">
+    $(document).ready(function () {
+
+        function OnSuccess(data) { }
+        function OnFailure(data) { }
+
+        function DropDown(el) {
+            this.dd = el;
+            this.placeholder = this.dd.children('span');
+            this.opts = this.dd.find('ul.dropdown > li');
+            this.val = '';
+            this.index = -1;
+            this.initEvents();
+        }
+        DropDown.prototype = {
+            initEvents: function () {
+                var obj = this;
+
+                obj.dd.on('click', function (event) {
+                    $(this).toggleClass('active');
+                    $(this).children('input')[0].innerText = $(this)[0].children[1].innerText;
+                    if ($("#sendSurvey").attr("disabled") === "disabled") {
+                        $("#sendSurvey").attr("disabled", false);
+                    }
+                    if ($(this)[0].id === "dd0") {
+                        $("#validSelection0").css("display", "none");
+                        $("#ddInputResult0")[0].value = $(this)[0].children[1].innerText;
+                    } else if ($(this)[0].id === "dd1") {
+                        $("#validSelection1").css("display", "none");
+                        $("#ddInputResult1")[0].value = $(this)[0].children[1].innerText;
+                    } else if ($(this)[0].id === "dd2") {
+                        $("#validSelection2").css("display", "none");
+                        $("#ddInputResult2")[0].value = $(this)[0].children[1].innerText;
+                    } else if ($(this)[0].id === "dd3") {
+                        $("#validSelection3").css("display", "none");
+                        $("#ddInputResult3")[0].value = $(this)[0].children[1].innerText;
+                    }
+                    return false;
+                });
+
+                obj.opts.on('click', function () {
+                    var opt = $(this);
+                    obj.val = opt.text();
+                    obj.index = opt.index();
+                    obj.placeholder.text(obj.val);
+                });
+            },
+            getValue: function () {
+                return this.val;
+            },
+            getIndex: function () {
+                return this.index;
+            }
+        }
+
+        $(function () {
+            var dd = new DropDown($('#dd0'));
+            var dd1 = new DropDown($('#dd1'));
+            var dd2 = new DropDown($('#dd2'));
+            var dd3 = new DropDown($('#dd3'));
+            $(document).click(function () {
+                // all dropdowns
+                $('.wrapper-dropdown-3').removeClass('active');
+            });
+
+        });
+        
+        
+        // Mail Send start
+        function addFormValidation() {
+            $('.form-horizontal').bootstrapValidator({
+                feedbackIcons: {
+                    valid: 'glyphicon glyphicon-ok-sign',
+                    invalid: 'glyphicon glyphicon-remove-sign',
+                    validating: 'glyphicon glyphicon-refresh'
+                },
+                fields: {
+                    'howCanBankAddMore': {
+                        message: 'Text entered inserted is not valid',
+                        validators: {
+                            notEmpty: {
+                                message: 'Input required'
+                            },
+                            regexp: {
+                                regexp: /^[a-zA-Z]/,
+                                message: 'Please insert a valid name'
+                            }, stringLength: {
+                                max: 500,
+                                message: 'Please make sure the text entered is 500 characters long.'
+                            }
+                        }
+                    },
+                    'firstName': {
+                        message: 'Value inserted is not valid',
+                        validators: {
+                            notEmpty: {
+                                message: 'Name required'
+                            },
+                            regexp: {
+                                regexp: /^[a-zA-Z]/,
+                                message: 'Please insert a valid name'
+                            }, stringLength: {
+                                max: 30,
+                                message: 'Please make sure that the name is 30 max characters long.'
+                            }
+                        }
+                    },
+                    'cellPhone': {
+                        message: 'Cellphone number entered is not valid',
+                        validators: {
+                            notEmpty: {
+                                message: 'Cellphone number required'
+                            },
+                            numeric: {
+                                message: 'Value entered can only be numeric'
+                            },
+                            stringLength: {
+                                min: 10,
+                                max: 10,
+                                message: 'Cellphone can only be 10 characters long'
+                            }
+                        }
+                    },
+                    'email': {
+                        message: 'Value inserted is not valid',
+                        validators: {
+                            notEmpty: {
+                                message: 'Enter a valid email address'
+                            },
+                            regexp: {
+                                regexp: /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i,
+                                message: 'Please enter a valid email address'
+                            }, stringLength: {
+                                max: 30,
+                                message: 'Please make sure only number is inserted.'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        addFormValidation();
+            
+        $('#sendSurvey').on('click', function (e) {
+            e.preventDefault();
+                $('.hang-tight').show('slow');
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SendSurveyMail", "Custom")',
+                    data: $('.form-horizontal').serialize(),
+                }).done(function (html) {
+                    console.log(html);
+                    }).fail(function (e) {
+                        console.log(e.responseText);
+                });
+                setTimeout(function () {
+                    $('.hang-tight').hide('slow');
+
+                    $('#generic')[0].children[0].children[0].children[0].children[1].innerHTML = 'Thank you!';
+                    $('#generic').modal('show');
+                    if ($('#sendSurvey').attr('disabled') === 'disabled') {
+                        $('#sendSurvey').removeAttr('disabled');
+                    }
+                }, 5000);
+        });
+        function isFormValid() {
+            var isControlEmpty = false;
+            
+            if (typeof($("#ddInputResult0")[0]) !== "undefined") {
+               if ($("#ddInputResult0")[0].value === "[select from options below]") {
+                    isControlEmpty = false;
+                    $("#sendSurvey").attr("disabled", true);
+                    $("#validSelection0").css("display", "block");
+                    return isControlEmpty;
+                } else {
+                    $("#validSelection0").css("display", "none");
+                }
+            }
+            
+            /* if ($("#ddInputResult0")[0].value === "[select from options below]") {
+                isControlEmpty = false;
+                $("#sendSurvey").attr("disabled", true);
+                $("#validSelection0").css("display", "block");
+                return isControlEmpty;
+            } else {
+                $("#validSelection0").css("display", "none");
+            } */
+
+            if ($("#ddInputResult1")[0].value === "[select from options below]") {
+                isControlEmpty = false;
+                $("#sendSurvey").attr("disabled", true);
+                $("#validSelection1").css("display", "block");
+                return isControlEmpty;
+            } else {
+                $("#validSelection1").css("display", "none");
+            }
+
+            if ($("#ddInputResult2")[0].value === "[select from options below]") {
+                isControlEmpty = false;
+                $("#sendSurvey").attr("disabled", true);
+                $("#validSelection2").css("display", "block");
+                return isControlEmpty;
+            } else {
+                $("#validSelection2").css("display", "none");
+            }
+
+            if ($("#ddInputResult3")[0].value === "[select from options below]") {
+                isControlEmpty = false;
+                $("#sendSurvey").attr("disabled", true);
+                $("#validSelection3").css("display", "block");
+                return isControlEmpty;
+            } else {
+                $("#validSelection3").css("display", "none");
+            }
+
+            $('.form-horizontal input').each(function () {
+                if ($(this).val() === "") {
+                    isControlEmpty = false;
+                    return isControlEmpty;
+                } else if ($(this).val() === "[select from options below]") {
+                    isControlEmpty = false;
+                    return isControlEmpty;
+                }
+                else {
+                    isControlEmpty = true;
+                }
+            });
+            return isControlEmpty;
+        }
+        // Mail Send end
+        
+    });
+</script>
+}

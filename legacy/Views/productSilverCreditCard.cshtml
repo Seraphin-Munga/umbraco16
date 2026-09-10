@@ -1,0 +1,151 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage<ContentModels.PageCredit>
+@using ContentModels = Umbraco.Web.PublishedContentModels;
+@using CustomModels = acf_africanbankv1.Models;
+
+@{
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var children = Model.Content.Children;
+
+    // Get specific Children
+    var heroHeader = children?.Where(c => c.DocumentTypeAlias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.DocumentTypeAlias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroChest = children?.Where(c => c.DocumentTypeAlias.ToLower() == "herochest").FirstOrDefault();
+    var heroBody = children?.Where(c => c.DocumentTypeAlias.ToLower() == "herobody").FirstOrDefault();
+    var heroKnees = children?.Where(c => c.DocumentTypeAlias.ToLower() == "heroknees").FirstOrDefault();
+    var testimonialTab = children?.Where(c => c.DocumentTypeAlias.ToLower() == "testimonials").FirstOrDefault();
+    var priceStructure = children?.Where(c => c.DocumentTypeAlias == "priceStructure").FirstOrDefault();
+    var contentLists = children?.Where(c => c.DocumentTypeAlias == "featuresAndFreeServices").ToList();
+    var homePageElements = (HomePageElements)Model.Content.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+
+    var cardInforhomePageElements = homePageElements.Children.Where(c => c.DocumentTypeAlias == "ebankITListSectionText" && c.Name == "Credit Card Info").Last();
+
+    var featureList = contentLists.Where(c =>
+    {
+        var val = c.GetPropertyValue("contentListType")?.ToString() ?? string.Empty;
+        var type = (!string.IsNullOrEmpty(val)) ?
+            umbraco.library.GetPreValueAsString(int.Parse(val)) :
+            string.Empty;
+
+        return type.ToLower() == "features and free services";
+    }).FirstOrDefault();
+
+    // Get Specific Grandchildren
+    var bodyCards = heroBody?.Children?.Where(c => c.DocumentTypeAlias.ToLower() == "card");
+    var bodyButton = heroBody?.Children?
+         .Where(c => c.DocumentTypeAlias == "ebankITAbstractButton").FirstOrDefault();
+
+    // Get Properties
+    var bodyTitle = heroBody?.GetPropertyValue("bodyTitle").ToString();
+    var bodyDescription = heroBody?.GetPropertyValue("bodyDescription").ToString();
+    var applyDocs = bodyCards?.Select(c => c as Card).ToList();
+    var benefitsModel = new CustomModels.Benefits
+    {
+        Header = heroChest?.GetPropertyValue("chestTitle").ToString(),
+        Description = heroChest?.GetPropertyValue("chestDescription").ToString(),
+        BenefitCards = heroChest?.Children?.Where(c => c.DocumentTypeAlias.ToLower() == "card")?.Select(c => c as Card).ToList()
+    };
+    
+    var headerImage_large = heroHeader?.GetPropertyValue<IPublishedContent>("image")?.Url;
+    var headerImage_medium = heroHeader?.GetPropertyValue<IPublishedContent>("imageMedium")?.Url;
+    var headerImage_small = heroHeader?.GetPropertyValue<IPublishedContent>("imageSmall")?.Url;
+    
+}
+
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+<!-- HERO CONTINUED-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+<!-- PRODUCT INFORMATION-->
+<div class="container">
+    <div class="campaign-product-container full">
+        @Html.Partial("_benefitsSection", benefitsModel)
+    </div>
+</div>
+
+@{ 
+    if (cardInforhomePageElements != null)
+    {
+        <div class="container margin-top-20">
+            <div class="row padded-white">
+                @foreach (IPublishedContent item in (ICollection<IPublishedContent>)cardInforhomePageElements.Children)
+                {
+                    if (item != null)
+                    {
+                        <div class="col-sm-6">
+                            <h4>@item.GetPropertyValue("ebankITtitle")</h4>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    @Html.Raw(item.GetPropertyValue("ebankITContent"))
+                                </div>
+                            </div>
+                            @if (item.Children.Count() > 0)
+                            {
+                                foreach (var child in item.Children)
+                                {
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <span style="font-size: 10px">
+                                                @Html.Raw(child.GetPropertyValue("textBox"))
+                                            </span>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    }
+}
+
+<!-- FEATURES & BENEFITS AND FREE ONLINE & MOBILE SERVICE-->
+@if (featureList != null)
+{
+    @Html.Partial("_creditBenefitsAndFreeServices", featureList as ContentModels.FeaturesAndFreeServices)
+}
+<div class="margin-top-40 hidden-xs"></div>
+<!-- HOW TO APPLY-->
+@Html.Partial("_howToApplySection", new CustomModels.HowToApplyDataContainer(bodyTitle, bodyDescription, bodyButton as IEbankItabstractButton, applyDocs))
+<!-- PRICING -->
+@if (priceStructure != null)
+{
+    @Html.Partial("_priceStructure", priceStructure as ContentModels.PriceStructure)
+}
+<!-- CAMPAIGN MORE INFO -->
+@Html.Partial("_heroKneeTabs", heroKnees as ContentModels.HeroKnees)
+<!-- TESTIMONIALS -->
+@Html.Partial("_testimonials", testimonialTab as Testimonials)
+<!-- CALL BACK FORM -->
+@{
+    var _floatingFormViewModel = homePageElements.Children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+    @Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)
+}
+
+
+@section scripts
+{
+   <script>
+        $(document).ready(function () {
+            var imageBgCss = "url('" + "@headerImage_large" + "')";
+            var imageMdCss = "url('" + "@headerImage_medium" + "')";
+            var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_medium : headerImage_small)" + "')";
+            var CheckScreenSize;
+            (CheckScreenSize = function () {
+                var _width = $(window).outerWidth();
+                var _height = $(window).outerHeight();
+                if (_width <= 511) {
+                    $("#heroHeader").css("background-image", imageSmCss);
+                }
+                else {
+                    $("#heroHeader").css("background-image", imageBgCss);
+                }
+            })();
+            $(window).resize(CheckScreenSize);
+        });
+    
+    </script> 
+      
+}

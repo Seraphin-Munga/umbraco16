@@ -1,0 +1,65 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageTalkAndFindUs>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers;
+@{
+    Layout = "Master.cshtml";
+    // All Current Page Children
+    var Children = Model.Children;
+
+    // Get specific Children
+    // var HeroHeader = Children?.Where(c => c.DocumentTypeAlias.ToLower() == "heroheader").FirstOrDefault();
+    var HeroShoulder = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var HeroBody = Children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    var Tabs = HeroBody.Children.ToList();
+    var bodyStyle = ".stick { top: unset; position: unset; z-index: unset; width: unset;}" +
+                    ".navPadding {display: none}" +
+                    ".hero-static-caption { margin-top: 60px; border-radius: 0px 0px 0 0;}";
+}
+<!-- HERO BANNER -->
+<style type="text/css">
+   .number-block {
+        height: 225px;
+    } 
+    @@media (min-width: 162px) and (max-width: 197px) {
+        .number-block {
+            height: 435px;
+        }
+    }
+    @@media (min-width: 197px) and (max-width: 360px) {
+        .number-block {
+            height: 265px;
+        }
+    }
+    @@media (min-width: 360px) and (max-width: 1024px) {
+        .number-block {
+            height: 230px;
+        }
+    }
+    @@media (min-width: 1024px) and (max-width: 1280px) {
+        .number-block {
+            height: 265px;
+        }
+    }
+        @bodyStyle
+</style>
+<!-- HERO CONTINUED-->
+@Html.Partial("_pageShoulder", HeroShoulder as ContentModels.HeroShoulder)
+<!-- PRODUCT INFORMATION-->
+<div class="container margin-bottom-minus-50">
+    <div class="campaign-product-container full">
+
+        <div class="margin-top-20 visible-xs"></div>
+        <div class="tab-content">
+            @{
+                var z = 0;
+
+                foreach (var child in Tabs)
+                {
+                    var partial_view = child.Value("partialViewName").ToString();
+                    @Html.Partial(partial_view, child as TabBody)
+                }
+            }
+        </div>
+   </div>
+ </div>h
+

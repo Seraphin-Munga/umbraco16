@@ -1,0 +1,35 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCorporateInformation>
+@using Web.Utilities
+@using ContentModels = Umbraco.Web.PublishedModels
+
+@{
+    Layout = "Master.cshtml";
+    // All Current Page Children
+    var Children = Model.Children;
+
+    // Get specific Children
+    var HeroHeader = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var HeroShoulder = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroKnees = (HeroKneesInvestor)Children?.Where(c => c.ContentType.Alias.ToLower() == "herokneesinvestor").FirstOrDefault();
+    var heroBody = Children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+
+    var tabBody = (TabBody)heroBody.Children(x => x.ContentType.Alias.ToLower() == "tabbody").FirstOrDefault();
+
+    var categories = Model.Value<IEnumerable<string>>("reportCategories") ?? new List<string>();
+}
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", HeroHeader as ContentModels.HeroHeader)
+
+<!-- HERO CONTINUED-->
+@Html.Partial("_pageShoulder", HeroShoulder as ContentModels.HeroShoulder)
+
+<!-- FAQ INFORMATION-->
+<div class="container margin-bottom-minus-60">
+    <div class="campaign-product-container full">
+
+        <div class="row text-container">
+            @Html.Raw(heroKnees.Description)
+        </div>
+    </div>
+</div>
+@Html.Partial("_pageDocumentView", tabBody as ContentModels.TabBody)

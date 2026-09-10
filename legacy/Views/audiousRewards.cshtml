@@ -1,0 +1,241 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageInvestments>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers;
+@using CustomModels = Web.Models;
+@using System.Collections.Generic;
+@{
+    Layout = "Master.cshtml";
+   
+    // All Current Page Children
+    var children = Model.Children;
+    var heroHeader = children?.Where(c => c is HeroHeader).FirstOrDefault();
+    var heroShoulder1 = children?.Where(c => c is HeroShoulder).FirstOrDefault();
+    var heroBody = (HeroBody)children?.Where(c => c is HeroBody).FirstOrDefault();
+    var cardImageDescriptions = heroBody.Children(x => x is Card).ToList();
+    var bodyCards = heroBody?.Children?.Where(c => c is Card);
+    var applyDocs = bodyCards?.Select(c => c as Card).ToList();
+
+    // Get Properties from children
+    var tableItems = heroBody.Children(x => x is TableChecklist).FirstOrDefault();
+    var tabGroup = heroBody.Children(x => x is TabGroup).FirstOrDefault();
+    var tabHeader = tabGroup.Children(xx => xx is TabHeader).FirstOrDefault();
+    var tabBody = (TabBody)tabHeader.Children(cc => cc is TabBody).FirstOrDefault();
+    var mobileBlurpData = heroBody.Children(x => x is RichTextEditor).FirstOrDefault();
+    var mobileBlurp = mobileBlurpData.Value("TextEditor");
+}
+
+<style type="text/css">
+    .green-pointer {
+       display:none;
+    }
+    .number-to-call {
+        background: #7F95AF 0% 0%;
+    }
+    .onenumbercall {
+        text-align: center;
+        margin-top: 0;
+        margin-bottom: 10px;
+        line-height: 1.1;
+        display: block;
+    }
+    .modal .modal-dialog .modal-content .modal-header {
+        background-color: transparent;
+        border-bottom: 1px solid #eee;
+    }
+    .campaign-more-container {
+        background-color:#ffff;
+    }
+    .button.primary {
+        border-radius: 25px;
+        top: 2172px;
+        left: 499px;
+        width: 230px;
+        height: 50px;
+        background: #8CBE4D 0% 0% no-repeat padding-box;
+        box-shadow: none;
+        opacity: 1;
+    }
+    .check-class-name {
+        background: rgb(246, 246, 246);
+        height:350px;
+    }
+    .check-class-name .campaign-more-container {
+         background: rgb(246, 246, 246);
+     }
+    .loan-summary-container {
+
+        top: -140px;
+    }
+    .online-banking-container {
+        background: none;
+        padding-bottom: 0px;
+    }
+    .mega-tabs .nav-tabs > li {
+        padding: 10px;
+    }
+    .tablename-content {
+        text-align: center;
+        font: normal normal 600 18px/28px Montserrat;
+        letter-spacing: 0px;
+        color: #002B60;
+        opacity: 1;
+        min-height: 94px;
+    }
+    .tableid-content {
+        text-align: center;
+        font: normal normal 600 21px/25px Montserrat;
+        letter-spacing: 0px;
+        color: #89BC47;
+        opacity: 1;
+        min-height: 50px;
+    }
+    .tableheading-content {
+            text-align: left;
+            font: normal normal 300 13px/16px Montserrat;
+            letter-spacing: 0px;
+            color: #333333;
+            opacity: 1;
+    }
+    .audacious-rewards {
+        text-align: center;
+        font: normal normal bold 55px Montserrat;
+        letter-spacing: 0px;
+        color: #1e9ff2;
+    }
+    .container {
+        padding-left: 0px;
+    }
+    .mega-tabs {
+        margin-left: 80px;
+        margin-right: 80px;
+        text-transform: none;
+    }
+    .audacious-reawards-section {
+        background-color: #002B60 !important;
+    }
+
+    @@media (min-width: 280px) and (max-width: 320px) {
+        .audacious-rewards {
+            font: normal normal bold 50px Montserrat !important;
+        }
+    }
+
+    @@media (min-width: 280px) and (max-width: 540px) {
+        .number-to-call {
+            padding: 65px;
+        }
+    }
+
+    @@media(max-width:767px) {
+        .mega-tabs .nav-tabs > li.loan-summary {
+            padding: 0px;
+        }
+
+        .loan-summary-container {
+            top: -140px;
+        }
+    }
+
+    @@media only screen and (max-width: 768px) {
+        .mega-tabs .nav-tabs > li span {
+            display: inline-block;
+        }
+    }
+    @@media (min-width: 280px) and (max-width: 820px) {
+        .mega-tabs {
+            margin-left: 0px;
+            margin-right: 0px;
+        }
+        .container {
+            padding-left: 2px;
+            padding-right: 2px;
+        }
+    }
+    @@media(min-width: 767px) and (max-width: 991px) {
+        .mega-tabs .nav-tabs > li a {
+            min-height: 50px;
+        }
+    }
+    @@media (min-width: 921px) and (max-width: 1024px) {
+        .mega-tabs .nav-tabs > li a {
+            min-height: 50px;
+        }
+    }
+</style>
+<section class="audacious-reawards-section">
+    @*HERO BANNER*@
+    @Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+    @Html.Partial("_pageShoulderNew", heroShoulder1 as ContentModels.HeroShoulder)
+    
+    <div class="campaign-more-container">
+        <div class="container">
+           <div>          
+                    @*HERO SHOULDER*@
+                @{
+                   var heroShoulder = (HeroShoulderHome)children?.Where(c => c is HeroShoulderHome).FirstOrDefault();
+                    if (heroShoulder != null)
+                    {
+                       <div class="loan-summary-container">
+                         <div class="container">
+                           <div class="mega-tabs">
+                                @*Nav tabs*@
+                              <ul id="go_to_tab_content" class="nav nav-tabs eq-height" role="tablist">
+                                @{
+                                    var isFirstRow = true;
+                                    foreach (HomeShoulderItem tab in heroShoulder.Items)
+                                    {
+                                        <li role="presentation" class="@(isFirstRow ? "active" : "") loan-summary ">
+                                            <a href="#@tab.TabId.Replace(" ", "")" aria-controls="profile " role="tab" data-toggle="tab">
+                                                <span class="tablename-content">@tab.TabName</span>                                              
+                                           </a>
+                                            <div> <span class="tableid-content">@tab.TabId</span></div>
+                                            <div><span class="tableheading-content">@tab.TabHeading</span></div>
+                                        </li>
+                                        isFirstRow = false;
+                                    }
+                                }
+                               
+                              </ul>
+                           </div>
+                         </div>
+                       </div>
+                    }
+              }
+          </div>
+        </div>
+    </div>
+
+        @Html.Partial("_pageRenderAudaciousRewards", tabBody as ContentModels.TabBody)
+        <div class="check-class-name">
+            @Html.Raw(mobileBlurp)
+            @Html.Partial("_keyBenefits", new CustomModels.HowToApplyDataContainer("", "", null, applyDocs))
+        </div>
+        <div class="number-to-call">@Html.Raw(@heroBody.Value("richTextBox"))</div>
+
+        @*Global site tag (gtag.js) - Google Analytics*@
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-21394042-6"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag('js', new Date());
+
+            gtag('config', 'UA-21394042-6', { 'optimize_id': 'GTM-T7N9LBL' });
+        </script>
+
+        @*CALL BACK FORM*@
+        @{
+            var _floatingFormViewModel = children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+            @Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)
+        }
+        @section scripts
+{
+
+            <script type="text/javascript">
+                $(".internet-banking-row:even").css("background", "#FFFFFF 0% 0% no-repeat padding-box");
+                $(".internet-banking-row:odd").css("background", "#F6F6F6 0% 0% no-repeat padding-box");
+                $(".borderbottom:even").css("background", "#FFFFFF 0% 0% no-repeat padding-box");
+                $(".borderbottom:odd").css("background", "#F6F6F6 0% 0% no-repeat padding-box");
+
+            </script>
+        }
+</section>

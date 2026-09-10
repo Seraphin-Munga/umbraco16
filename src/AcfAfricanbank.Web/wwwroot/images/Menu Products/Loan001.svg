@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="34px" height="30px" viewBox="0 0 34 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 44.1 (41455) - http://www.bohemiancoding.com/sketch -->
+    <title>Loan001</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icons-Export" transform="translate(-11340.000000, -575.000000)" stroke="#FFFFFF" stroke-width="1.5">
+            <g id="Loan001" transform="translate(11341.000000, 576.000000)">
+                <rect id="Rectangle-path" stroke-linecap="round" x="0" y="6.05550883" width="31.3836568" height="21.5306981"></rect>
+                <rect id="Rectangle-path" stroke-linecap="round" x="2.72901364" y="8.74684609" width="25.9256295" height="16.1480235"></rect>
+                <path d="M6.82253409,8.74684609 C6.82253409,10.9764234 4.98980242,12.783852 2.72901364,12.783852" id="Shape" stroke-linecap="round"></path>
+                <path d="M27.9723898,12.783852 C25.7116003,12.783852 23.8788693,10.9764234 23.8788693,8.74684609" id="Shape" stroke-linecap="round"></path>
+                <path d="M23.8788693,24.8948696 C23.8788693,22.6652923 25.7116003,20.8578638 27.9723898,20.8578638" id="Shape" stroke-linecap="round"></path>
+                <path d="M2.72901364,20.8578638 C4.98980242,20.8578638 6.82253409,22.6652923 6.82253409,24.8948696" id="Shape" stroke-linecap="round"></path>
+                <polyline id="Shape" points="12.2805614 6.05550883 28.0650186 0.0639497393 30.2122648 5.87818987"></polyline>
+                <polyline id="Shape" stroke-linecap="round" points="19.7284939 5.94336955 26.4347014 3.51381066 27.2979701 5.85134197"></polyline>
+                <ellipse id="Oval" stroke-linecap="round" cx="17.2599203" cy="16.8208579" rx="2.53224077" ry="3.36417157"></ellipse>
+                <polyline id="Shape" stroke-linecap="round" points="10.937375 14.1295206 12.3018818 13.4566863 12.3018818 20.1850294"></polyline>
+                <path d="M10.937375,20 L13.6663886,20" id="Shape" stroke-linecap="round"></path>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -96,6 +96,14 @@ Follow-ups for the Web port:
 - callers of `MobileDetection.IsMobileDevice()` must now resolve it from DI (inject into
   controller / `@inject` in views) instead of calling it statically.
 
+### Done — v8 source imported to `legacy/` (reference, not compiled)
+The old `Web/` code lives in `legacy/` so the port happens in this repo. It is **outside
+the solution and does not build** (`System.Web` / .NET Framework). See `legacy/README.md`
+for the folder→port-target map. Static front-end assets (css/js/fonts/images,
+`Common.JS.Library`) were copied into `src/AcfAfricanbank.Web/wwwroot/` and are served
+as-is. ~149 views and ~431 `.cs` files are staged for porting once ModelsBuilder can
+regenerate against the migrated doc types (Steps 5–6).
+
 ### Remaining steps — Option A (DB upgrade chain)
 
 The two tracks run in parallel once the DBA has restored `DTData`; the code track lands

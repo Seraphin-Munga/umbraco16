@@ -1,0 +1,264 @@
+.bank-story-container {
+  background: #edeef4;
+  margin-top: 40px;
+
+  &.white-bg {
+      background: #ffffff;
+  }
+
+  .pull-up {
+    position: relative;
+    top: -90px;
+  }
+}
+
+.bank-story-intro {
+  background: #002b60;
+  padding: 55px 55px 140px;
+  color: #ffffff;
+  text-align: center;
+
+  .title {
+    font-size: 60px;
+    font-weight: 100;
+    line-height: 1.05;
+    -webkit-font-smoothing: antialiased;
+    margin-bottom: 20px;
+  }
+
+  .descr {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+}
+
+.bank-story-carousel {
+  padding: 0 80px;
+
+  .carousel {
+    height: 650px;
+    width: 100%;
+
+    a {
+      text-decoration: none;
+    }
+
+    .carousel-control {
+      text-shadow: none;
+      opacity: 1;
+      top: inherit;
+      font-size: 18px;
+      transition: all 0.25s ease;
+      width: 60px;
+      height: 60px;
+      border-radius: 60px;
+      padding: 18px;
+      background: #f3f3f3;
+      background-image: none;
+      bottom: 80px;
+      -webkit-text-stroke-width: 1px;
+      text-stroke: 1px;
+
+      [class^="icon-"], [class*=" icon-"] {
+        &:before {
+          color: #acacac;
+        }
+      }
+
+      &.left {
+        left: auto;
+        right: 265px;
+      }
+
+      &.right {
+        right: 200px;
+      }
+
+      &:hover,
+      &:focus {
+        background: #88bc47;
+
+        [class^="icon-"], [class*=" icon-"] {
+          &:before {
+            color: #ffffff;
+          }
+        }
+      }
+    }
+
+    .item {
+      height: 650px;
+      padding: 50px;
+    }
+  }
+}
+
+.bank-story-img {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('../images/bank-story-bg.jpg');
+  background-size: cover;
+  background-position: top right;
+  background-repeat: no-repeat;
+}
+
+.bank-story-caption {
+  border-radius: 8px;
+  background-color: #ffffff;
+  padding: 50px;
+  height: 100%;
+  width: 490px;
+  position: relative;
+  margin-left: 150px;
+
+  .bank-story-tag {
+    font-size: 13px;
+    background: #88bc47;
+    padding: 7px 15px;
+    color: #ffffff;
+    text-transform: uppercase;
+  }
+
+  .bank-story-title {
+    font-size: 34px;
+    font-weight: 200;
+    line-height: 1.18;
+    letter-spacing: -0.7px;
+    color: #000000;
+    margin-top: 40px;
+  }
+
+  .bank-story-description {
+    font-size: 18px;
+    font-weight: 300;
+    letter-spacing: -0.4px;
+    margin-top: 30px;
+
+    a {
+        color: #113eff;
+        text-decoration: none;
+
+        &:hover,
+        &:active,
+        &:focus {
+            color: #113eff;
+            text-decoration: none;
+        }
+    }
+  }
+
+  .bank-story-author {
+    position: absolute;
+    bottom: 50px;
+    font-size: 13px;
+    letter-spacing: -0.3px;
+    color: #bbbbbb;
+    text-transform: uppercase;
+  }
+
+  ul {
+      @extend ul.checklist;
+  }
+}
+
+@media (min-width: 767px) and (max-width: 991px) {
+  .bank-story-caption {
+    margin-left: 0;
+    width: 390px;
+  }
+
+  .bank-story-carousel {
+
+    .carousel {
+
+      .carousel-control {
+
+        &.left {
+          left: auto;
+          right: 85px;
+        }
+
+        &.right {
+          right: 20px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 767px) {
+    .bank-story-container {
+        background: #ffffff;
+
+        .pull-up {
+            top: 0;
+        }
+    }
+  .bank-story-intro {
+    padding: 30px;
+
+    .title {
+      font-size: 30px;
+      font-weight: 300;
+      line-height: 1.23;
+    }
+  }
+
+  .bank-story-carousel {
+    position: relative;
+    top: inherit;
+    padding: 0;
+
+    .carousel {
+      height: auto;
+
+      .item {
+        padding: 0;
+        height: auto;
+      }
+
+      .carousel-control {
+        bottom: 0;
+
+        &.left {
+          left: 31%;
+          right: auto;
+        }
+
+        &.right {
+          right: 31%;
+        }
+      }
+    }
+  }
+
+  .bank-story-img {
+    position: relative;
+    height: 250px;
+    background-size: cover;
+  }
+
+  .bank-story-caption {
+    width: 100%;
+    border-radius: 0;
+    margin-left: 0;
+    text-align: center;
+    padding: 30px;
+
+    .bank-story-title {
+      font-size: 30px;
+      font-weight: 300;
+      line-height: 1.17;
+    }
+
+    .bank-story-author {
+      position: relative;
+      bottom: inherit;
+      margin-top: 30px;
+      margin-bottom: 80px;
+    }
+  }
+}

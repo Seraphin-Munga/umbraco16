@@ -1,0 +1,795 @@
+﻿@*@using AcfAfricanbank.Core.Utilities
+@using ContentModels = Umbraco.Web.PublishedContentModels;
+@using Umbraco.Core
+@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+@using System.Web.Optimization*@
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using AcfAfricanbank.Core.Utilities
+@using ContentModels = Umbraco.Web.PublishedModels
+@using Umbraco.Core
+@using Web.Helpers;
+@using System.Web.Optimization
+
+
+@{
+    string CacheVersion = "V1.1";
+    Layout = null;
+    // Get basic design settings from the homepage
+    ContentModels.PageHome home = Model.Root() as ContentModels.PageHome;
+    var colorTheme = " Blue";
+    var font = "arial";
+
+    var allKids = Model.Children.ToList();
+    var currentPage = Umbraco.AssignedContentItem;
+    ContentModels.CallMeBack floatingForm = null;
+    if (allKids.Where(c => c is ContentModels.CallMeBack).Any())
+    {
+        @*All pages except home*@
+    floatingForm = (ContentModels.CallMeBack)allKids.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+}
+else
+{
+    foreach (var t in allKids)
+    {
+        if (t.Children.Where(c => c is ContentModels.CallMeBack).Any() && currentPage.Id == 40240)
+        {
+            floatingForm = (ContentModels.CallMeBack)t.Children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+            break;
+        }
+
+    }
+}
+
+HomePageElements homePageElements = null;
+var call_me_subject = floatingForm?.Value("ProductSubject") ?? "";
+var call_me_contact_type = floatingForm?.Value("contactType") ?? "";
+var prodID = floatingForm?.Value("productID") ?? "";
+var check_open = floatingForm?.Value<bool>("callMeBackDifferentLocation");
+
+if (Model.Children.Where(o => o is HomePageElements).FirstOrDefault() != null)
+{
+    homePageElements = (HomePageElements)Model.Children.Where(o => o is HomePageElements).FirstOrDefault();
+}
+else if (Model.Parent.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault() != null)
+{
+    homePageElements = (HomePageElements)Model.Parent.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+}
+else
+{
+    homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+}
+
+var disclaimersData = homePageElements.Children.Where(o => o.ContentType.Alias == "ebankITListSectionText").ToList();
+
+var disclaimers = disclaimersData.FirstOrDefault().Children;
+IPublishedContent disclaimerValue = null;
+
+foreach (var content in disclaimers)
+{
+    if (HttpContext.Current.Request.Path.ToString().Contains("/banking"))
+    {
+        if (content.Value("ebankITTitle").ToString().Contains("Banking"))
+        {
+            disclaimerValue = content;
+        }
+    }
+    else
+    {
+        disclaimerValue = content;
+        break;
+    }
+}
+
+var heroBodyBlog = (HeroBody)homePageElements.Children.Where(x => x is HeroBody).FirstOrDefault();
+var heroBodyBlogLink = heroBodyBlog.Children.Where(x => x.ContentType.Alias.ToLower() == "link").FirstOrDefault();
+
+//Umbraco.Web.Models.RelatedLink itemLink = null;
+//foreach (var link in (Umbraco.Web.Models.RelatedLinks)((Link)heroBodyBlogLink).UrlLink)
+//{
+//    itemLink = link;
+//    break;
+//}
+var bottomNavigation = (BottomNavigation)homePageElements.Children.Where(c => c is BottomNavigation).FirstOrDefault();
+// var CacheVersion = "ver=" + AfricanBank.Cms.Portal.Helpers.CacheFactory.CacheVersion();
+var seo_title = Model.Value("title_tag");
+var seo_description = Model.Value("descrition_tag");
+var seo_keywords = Model.Value("keywords_tag");
+String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
+
+if (Model.Value<IPublishedContent>("image") != null)
+{
+    twitter_default_image = Model.Value("image").ToString();
+}
+//check if blog image exist
+if (Model.Children.Where(c => c is BlogDetailsElements).FirstOrDefault() != null)
+{
+    var headerItem = Model.Children.Where(c => c is BlogDetailsElements).FirstOrDefault().Children.Where(x => x is HeroHeaderBlogDetail).FirstOrDefault();
+
+    ContentModels.Image imageData = (ContentModels.Image)headerItem.Value("Image");
+    if (imageData != null)
+    {
+        twitter_default_image = ((ContentModels.Image)headerItem.Value("Image")).Url;
+    }
+}
+var utm_source = Request.Params["utm_source"];
+var utm_medium = Request.Params["utm_medium"];
+var utm_campaign = Request.Params["utm_campaign"];
+}
+<!doctype html>
+<html ng-app="africanBankApp">
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    @{
+        var url = Request.Url.OriginalString.Trim();
+        var uri = new Uri(url);
+
+        var query = HttpUtility.ParseQueryString(uri.Query);
+
+        if (url.EndsWith("/"))
+        {
+            <link rel="canonical" href="@url" />
+        }
+        else
+        {
+            <link rel="canonical" href="@url/" />
+        }
+    }
+
+
+    @if (!string.IsNullOrEmpty(query.ToString()))
+    {
+        <title>African Bank</title>
+        <meta name="robots" content="noindex">
+        <meta name="googlebot" content="noindex">
+    }
+    else
+    {
+        <title>@seo_title</title>
+        <meta name="description" content="@seo_description">
+        <meta name="author" content="@seo_keywords">
+    }
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@Html.Raw("@")AfricanBank">
+    <meta name="twitter:creator" content="@Html.Raw("@")AfricanBank">
+    <meta name="twitter:title" content="African Bank | @seo_title.ToString()">
+    <meta name="twitter:description" content="@seo_description">
+    <meta name="twitter:image" content="@System.Configuration.ConfigurationManager.AppSettings["site_domain"]@twitter_default_image">
+
+    <meta property="og:title" content="African Bank | @seo_title.ToString()" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="@Model.Url(mode: UrlMode.Absolute)" />
+    <meta property="og:description" content="@seo_description" />
+    <meta property="og:image" content="@System.Configuration.ConfigurationManager.AppSettings["site_domain"]@twitter_default_image" />
+
+
+
+
+    @RenderSection("Header", required: false)
+
+    <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+
+
+    @{ 
+        if (currentPage.Id == 40240)
+        {
+            <style>
+                /*Ipad  potrait*/
+                @@media only screen and (max-width: 768px) {
+                    .right-bottom {
+                        bottom: 13em;
+                    }
+                }
+                /*Ipad  landscape*/
+                @@media only screen and (max-width: 1024px) and (orientation: landscape) {
+                    .top-header {
+                        height: 65%;
+                    }
+                }
+
+
+                /*Iphone x 812  potrait */
+                @@media only screen and (max-width: 812px) {
+                    /*START-----------------------------------------call me back-----------------------------------------*/
+                    .st-panel {
+                        height: auto;
+                    }
+
+                    .right-bottom {
+                        bottom: 1em;
+                    }
+                    /*END-----------------------------------------call me back-----------------------------------------*/
+                }
+
+
+                /*Iphone 7  414 potrait */
+                @@media only screen and (max-width: 414px) {
+                    /*START-----------------------------------------call me back-----------------------------------------*/
+                    .st-panel {
+                        height: auto;
+                    }
+
+                    .right-bottom {
+                        bottom: 1em;
+                    }
+                    /*END-----------------------------------------call me back-----------------------------------------*/
+                }
+
+
+                /*Nexus 5X 412 potrait*/
+                @@media (max-width: 412px) {
+
+                    .area_search {
+                        margin-top: 0%;
+                    }
+                    /*START-----------------------------------------call me back-----------------------------------------*/
+                    .st-panel {
+                        height: auto;
+                    }
+
+                    .right-bottom {
+                        bottom: 1em;
+                    }
+                    /*END-----------------------------------------call me back-----------------------------------------*/
+                }
+                /*landscape for Nexus 5X   412*/
+                @@media only screen and (max-width: 736px) and (orientation: landscape) {
+                    /*START-----------------------------------------call me back-----------------------------------------*/
+                    .right-bottom {
+                        bottom: 1em;
+                    }
+                    /*END-----------------------------------------call me back-----------------------------------------*/
+                }
+
+
+                @@media only screen and (max-width: 360px) {
+                    .right-bottom {
+                        bottom: 1em;
+                    }
+                }
+
+                @@media only screen and (max-width: 640px) and (orientation: landscape) {
+                    .top-header {
+                        height: 58%;
+                    }
+
+                    .right-bottom {
+                        bottom: 2em;
+                    }
+                }
+
+                @@media (max-width: 767px) {
+                    .right-bottom {
+                        bottom: 7em;
+                    }
+                }
+            </style>
+        }
+    }
+
+</head>
+<body class="frontpage theme-font-@font theme-color-@colorTheme">
+
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WPMR64S"
+                height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    @Styles.Render("~/bundles/preNavCss")
+
+    <header class="header stick">
+        <nav class="nav-bar top-nav">
+            @Html.Partial("~/Views/Partials/Navigation/Navigation.cshtml")
+        </nav>
+        <div class="mobile-nav-handler">
+            <div class="hamburger lines" id="toggle-nav">
+                <span></span>
+            </div>
+        </div>
+    </header>
+    <div class="navPadding"></div>
+
+    @*@Styles.Render("~/bundles/styles")*@
+    <link href="~/css/bootstrap.css" rel="stylesheet" />
+    <link href="~/css/main.css" rel="stylesheet" />
+    <link href="~/css/custom_main.css" rel="stylesheet" />
+    <link href="~/Content/font-awesome.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link href="~/javascripts/datetime/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:200,300,400,600,700" rel="stylesheet">
+
+    <script type="text/javascript" src="~/scripts/jquery-1.10.2.min.js"></script>
+    <script type='text/javascript' src='//platform-api.sharethis.com/js/sharethis.js#property=5ca6063b9b272f00119abd21&product=inline-share-buttons' async='async'></script>
+
+    @{ 
+        if (currentPage.Id == 40240)
+        {
+            <main style="width: 100% ;height: 100%">
+                @RenderBody()
+            </main>
+        }
+    }
+
+
+    <!-- FOOTER -->
+    @{
+        if (currentPage.Id != 40240)
+        {
+            <main>
+
+                @RenderBody()
+            </main>
+        }}
+
+    <!-- adds padding to content on navigations height -->
+    <script>
+        (function () {
+            var h = $(".stick").height();
+            document.getElementsByClassName("navPadding")[0].style.paddingTop = h + "px";
+        })();
+    </script>
+
+    <!-- Google Tag Manager -->
+    <script>
+        (function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-WPMR64S');
+    </script>
+    <!-- End Google Tag Manager -->
+    <!--Test start -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-21394042-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'UA-21394042-1');
+    </script>
+
+    <script type="text/javascript" src="~/scripts/angular-1-6-7.min.js"></script>
+    <script type="text/javascript" src="~/javascripts/africanBankApp.js"></script>
+
+    <script type="text/javascript" src="~/scripts/bootstrap.min.js"></script>
+    <script type="text/javascript" src="~/scripts/bootstrapValidator.min.js"></script>
+
+    <script type="text/javascript" src="~/scripts/underscore-min.min.js"></script>
+    @*<script type="text/javascript" src="@Url.Content("~/Scripts/handlebars-v4.0.5.min.js")"></script>*@
+    <script type="text/javascript" src="~/scripts/applicationsWidget.min.js"></script>
+    <script type="text/javascript" src="~/scripts/mobile.min.js"></script>
+    <script type="text/javascript" src="~/scripts/common.min.js"></script>
+    <script type="text/javascript" src="~/scripts/placeholders.min.js"></script>
+    <script type="text/javascript" src="~/scripts/search.min.js"></script>
+    <script type="text/javascript" src="~/scripts/autoNumeric.min.js"></script>
+    <script type="text/javascript" src="~/scripts/ab-branch-locator.min.js"></script>
+
+
+    <script async type="text/javascript" src="https://maps.google.com/maps/api/js?key=AIzaSyDBmQ2ZZjFw2l6IkoObraDVK-vD6tMW5pI"></script>
+
+    <!--START Hotjar Tracking Code for www.africanbank.co.za -->
+    <script>
+
+
+
+
+
+        (function (h, o, t, j, a, r) {
+            h.hj = h.hj || function () { (h.hj.q = h.hj.q || []).push(arguments) };
+            h._hjSettings = { hjid: 1042070, hjsv: 6 };
+            a = o.getElementsByTagName('head')[0];
+            r = o.createElement('script'); r.async = 1;
+            r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
+            a.appendChild(r);
+        })(window, document, 'https://static.hotjar.com/c/hotjar-', '.js?sv=');
+    </script>
+    <script type='text/javascript'>
+        window.__lo_site_id = 116104;
+        (function () {
+            var wa = document.createElement('script'); wa.type = 'text/javascript'; wa.async = true;
+            wa.src = 'https://urldefense.proofpoint.com/v2/url?u=https-3A__d10lpsik1i8c69.cloudfront.net_w.js&d=DwIGaQ&c=63k7DFQ5NS45K8Wu5uX9Pd1gEa70c_pznLjIw3OxEiE&r=Zyh4_ThHQigQjvFB27NtQRH67lRKrG1rJmZzm7i2X10&m=LFb9TC_qpXCxJhar19d3TGLakNKTlGa2rcNU-BskuzI&s=ic2oMm5QnOQ8NMjbx8XmlZquAJnrPLHwinr-syft_MI&e=';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(wa, s);
+        })();
+    </script>
+    <!--END Hotjar Tracking Code for www.africanbank.co.za -->
+    <!--START Ebankit-change -->
+    <script type="text/javascript">
+        AJAX.rootPath = '@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.Mobile.URL"]';
+        AJAX.headers = {  "ITSAPP-DEVICE": "@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.ITSAPP-DEVICE"]", "ITSAPP-LANG": '' };
+        @*AJAX.headers = { "ITSAPP-DEVICE": "@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.ITSAPP-DEVICE"]", "ITSAPP-LANG": '@AfricanBank.Cms.Portal.Helpers.ResourceHelper.GetCulture(CurrentPage)' };*@
+    </script>
+    <!--END Ebankit-change -->
+    <!--Test End-->
+    <!-- The below file does not bundle !-->
+
+    <script type="text/javascript" src="~/scripts/formNewsletter.min.js"></script>
+    <script type="text/javascript" src="~/Common.JS.Library.Ab/Newsletter/newsletter.min.js"></script>
+    <script type="text/javascript" src="~/Common.JS.Library.Ab/Newsletter/unsubscribe.min.js"></script>
+
+    <script type="text/javascript" src="/scripts/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="/scripts/jquery.validate.unobtrusive.min.js"></script>
+
+    <script type="text/javascript" src="~/javascripts/jquery.mobile.custom.min.js"></script>
+    <script type="text/javascript" src="~/javascripts/slick.min.js"></script>
+
+
+    <!-- CALL BACK SCRIPTS -->
+    <script type="application/javascript" src="~/javascripts/st.action-panel.js"></script>
+    <script type="text/javascript" src="/javascripts/custom.js"></script>
+    <script type="text/javascript" src="~/scripts/custom_javascript.js"></script>
+
+    @if (floatingForm != null)
+    {
+
+        <script defer type="text/javascript">
+            if ("@check_open" == "True") {
+                setTimeout(function () {
+                     $(".st-button-main.campaing-call").click();
+                 }, 3000);
+              }
+        </script>
+
+        <script defer type="text/javascript">
+        function clear_validation() {
+            $("form#frmCallMeBack").bootstrapValidator("destroy");
+        }
+
+        function init_fields() {
+            $('#frmCallMeBack').bootstrapValidator({
+                feedbackIcons: {
+                    valid: 'glyphicon glyphicon-ok-sign',
+                    invalid: 'glyphicon glyphicon-remove-sign',
+                    validating: 'glyphicon glyphicon-refresh'
+                },
+                onSuccess: function (e) {
+                    e.preventDefault();
+
+                    call_me("frmCallMeBack",@prodID , '@call_me_subject', '@call_me_contact_type');
+                },
+                fields: {
+                    'FormFields.message': {
+                        message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                        validators: {
+                            notEmpty: {
+                                message: '@ResourceHelper.GetResource("GenericContactForm_Message_Required")'
+                            }, stringLength: {
+                                max: 100,
+                                message: '@ResourceHelper.GetResource("GenericContactForm_Message_LenghtValMessage")'
+                            }
+                        },
+                        feedbackIcons: {
+                            valid: '',
+                            invalid: '',
+                            validating: ''
+                        },
+                    },
+                    'FormFields.firstName': {
+                        message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                        validators: {
+                            notEmpty: {
+                                message: '@ResourceHelper.GetResource("GenericContactForm_FirstName_Required")'
+                            },
+                            regexp: {
+                                regexp: /^[a-zA-Z-\s]+$/,
+                                message: '@ResourceHelper.GetResource("GenericContactForm_FirstName_error")'
+                            }, stringLength: {
+                                max: 30,
+                                message: '@ResourceHelper.GetResource("GenericContactForm_FirstName_LenghtValMessage")'
+                            }
+
+                        }
+                    },
+                    "FormFields.lastName": {
+                        message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                        validators: {
+                            notEmpty: {
+                                message: '@ResourceHelper.GetResource("GenericContactForm_LastName_Required")'
+                            },
+                            regexp: {
+                                regexp: /^[a-zA-Z-\s]+$/,
+                                message: '@ResourceHelper.GetResource("GenericContactForm_LastName_error")'
+                            }, stringLength: {
+                                max: 30,
+                                message: '@ResourceHelper.GetResource("GenericContactForm_LastName_LenghtValMessage")'
+                            }
+                        }
+                    },
+                    "FormFields.identityNumber": {
+                        validators: {
+                            notEmpty: {
+                                message: '@ResourceHelper.GetResource("GenericContactForm_SAID_Required")'
+                            },
+                            regexp: {
+                                regexp: /^[0-9]{1,13}$/,
+                                message: '@ResourceHelper.GetResource("GenericContactForm_SAID_ValMessage")'
+                            },
+                            stringLength: {
+                                max: 13,
+                                message: '@ResourceHelper.GetResource("GenericContactForm_SAID_LenghtValMessage")'
+                            },
+                            callback: {
+                                callback: function (value, validator, $field) {
+
+                                    var idNumber = value;
+
+                                if (null === idNumber || 0 === idNumber.length) return !1;
+                                var correct = !0;
+                                    if (13 !== idNumber.length || isNaN(parseFloat(idNumber)) && isFinite(idNumber)) return !1;
+                                    var yob = parseInt(idNumber.substring(0, 2));
+                                    var currentYear = @DateTime.Now.Year;
+                                    if (yob + 2000 < currentYear) {yob = 2000 + yob
+                                    } else { yob = yob + 1900; }
+
+                                var tempDate = new Date(idNumber.substring(0, 2), idNumber.substring(2, 4) - 1, idNumber.substring(4, 6)),
+                                    id_date = tempDate.getDate(),
+                                    id_month = tempDate.getMonth();
+                                    if (currentYear - yob >= 70 || currentYear - yob < 18) {
+                                        return {
+                                            valid: false,
+                                            message: '@ResourceHelper.GetResource("GenericContactForm_SAID_InvalidAge")'
+                                        }
+                                    } // make sure the applicant is not over 70 years of age or younger than 18
+                                (tempDate.getYear() != idNumber.substring(0, 2) || id_month != idNumber.substring(2, 4) - 1 || id_date != idNumber.substring(4, 6)) && (correct = !1);
+                                                                    for (var tempTotal = 0, checkSum = 0, multiplier = 1, i = 0; 13 > i; ++i) tempTotal = parseInt(idNumber.charAt(i)) * multiplier, tempTotal > 9 && (tempTotal = parseInt(tempTotal.toString().charAt(0)) + parseInt(tempTotal.toString().charAt(1))), checkSum += tempTotal, multiplier = multiplier % 2 === 0 ? 1 : 2;
+                                return checkSum % 10 !== 0 && (correct = !1), correct
+
+                                }
+                            }
+                        }
+                    },
+                    'FormFields.email': {
+                        message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                        validators: {
+                            notEmpty: {
+                                message: '@ResourceHelper.GetResource("GenericContactForm_Email_Required")'
+                            },
+                            regexp: {
+                                regexp: /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i,
+                                message: '@ResourceHelper.GetResource("GenericContactForm_Email_ValMessage")'
+                            },
+                            stringLength: {
+                                max: 50,
+                                message: '@ResourceHelper.GetResource("GenericContactForm_EMAIL_LenghtValMessage")'
+                            }
+                        }
+                    },
+                    "FormFields.mobileNumber": {
+                        message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                        validators: {
+                            notEmpty: {
+                                message: '@ResourceHelper.GetResource("GenericContactForm_CellPhone_Required")'
+                            },
+                            numeric: {
+                                message: '@ResourceHelper.GetResource("GenericContactForm_CellPhone_NumericValMessage")'
+                            },
+                            stringLength: {
+                                min: 10,
+                                max: 10,
+                                message: '@ResourceHelper.GetResource("GenericContactForm_CellPhone_LenghtValMessage")'
+                            },
+                             callback: {
+                                callback: function (value, validator, $field) {
+
+                                    var cellNumber = value;
+                                    if (null === cellNumber || 0 === cellNumber.length || 10 !== cellNumber.length || cellNumber == '0000000000') return !1; // not 0000000
+                                    if ('0' != cellNumber.substring(0,1)) return !1; // starts with 0
+                                    return !0;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        };
+        function SubmitForm( /*hasSubmit*/) {
+                    var submitedFormDateTime = new Date().toLocaleString()
+                    var data = {
+                        FirstName: $('#FirstNameInput').val().trim(),
+                        LastName: $('#LastNameInput').val().trim(),
+                        Subject: "@call_me_subject" + ' - undefined',
+                        ProductID: "@prodID",
+                        Email: $('#EmailInput').val().trim(),
+                        CellPhone: $('#CellPhoneInput').val().trim(),
+                        SAID: $('#SAIDInput').val(),
+                        HasSubmit: true,
+                        TimeEnteredOnPage: "@DateTime.Now.ToIsoString()",
+                        SessionId: $('#sessionId').val(),
+                        FreeText: $('#MessageInput').val().trim(),
+                        ProcessID: $('#processID').val(),
+                        ContactType:"@call_me_contact_type",
+                        ExtendedProperties:
+                        [
+                            {
+                                "Key": "SubmitedPageDate",
+                                "Value": submitedFormDateTime
+                            },
+                            {
+                                "Key": "CodeName",
+                                "Value": navigator.appCodeName
+                            },
+                            {
+                                "Key": "appName",
+                                "Value": navigator.appName
+                            },
+                            {
+                                "Key": "appVersion",
+                                "Value": navigator.appVersion
+                            },
+                            {
+                                "Key": "userAgent",
+                                "Value": navigator.userAgent
+                            },
+                            {
+                                "Key": "screenWidth",
+                                "Value": screenWidth()
+                            },
+                            {
+                                "Key": "screenHeight",
+                                "Value": screenHeight()
+                            },
+                            {
+                                "Key": "URL",
+                                "Value": window.location.href
+                            }
+                        ]
+                    }
+            requestInProgress = true;
+            $("#form-loader").show();
+            debugger;
+                    //AJAX.request('/public/contacform/submit', {
+            AJAX.request('/leads/apply', {
+                        data: data,
+                        success: function (e) {
+                            debugger;
+                            call_me_success_close();
+                            call_me_success();
+                            $("#form-loader").hide();
+                        },
+                        error: function (req, txt, err) {
+                            debugger;
+                            $("#form-loader").hide();
+
+                            call_me_failed();
+                        }
+                    });
+        }
+        function getUrlValues(inputs)
+        {
+            var vars = [], hash;
+            var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+            for(var i = 0; i < hashes.length; i++)
+            {
+                hash = hashes[i].split('=');
+                vars.push(hash[0]);
+                vars[hash[0]] = hash[1];
+                inputs[hash[0]] = hash[1];
+            }
+            return inputs;
+        }
+        function call_me(form_name, prodId, call_me_subject, call_me_contact_type) {
+            
+	    //test
+
+	    var data = {};
+		if (iterator > 0) { return; }
+            var inputs = document.forms[form_name].getElementsByTagName("input");
+            for (var x = 0; x < inputs.length; x++) {
+                data[inputs[x].id] = inputs[x].value;
+            }
+            var utmSource = '@utm_source';
+            var utmMedium = '@utm_medium';
+            var utmCampaign = '@utm_campaign';
+
+            if (utmSource.length >= 3) {
+                data["utm_source"] = utmSource;
+                data["utm_medium"] = utmMedium;
+                data["utm_campaign"] = utmCampaign;
+            }
+            if (window.location.href.indexOf("utm_source") > -1) {
+              getUrlValues(data);
+            }
+            $("#form-loader").show();
+
+            var csrfToken = $("input[name='__RequestVerificationToken']").val();
+	    ++iterator;
+            $.ajax({
+                headers: { '__RequestVerificationToken': csrfToken },
+                url: '/umbraco/surface/Custom/call_me_request',
+                type: "POST",
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify({ form: data, prodId: prodId, call_me_subject: call_me_subject, call_me_contact_type: call_me_contact_type}),
+                success: function (data) {
+			debugger;
+                    $("#form-loader").hide();
+                    if (!data.error) {
+                        call_me_success_close();
+                        call_me_success();
+                    } else {
+                        //handling errors
+                        if ($("#st-panel-submit")[0].type == "button") {
+                            open_call_me();
+                            $("#st-panel-submit").submit();
+                        } else if ($("#st-panel-submit")[0].type == "submit")
+                        {
+                            $("#st-panel-submit").submit();
+                        }
+                    }
+                },
+                error: function (error) {
+                    $("#form-loader").hide();
+                    //handling bad request
+                    call_me_failed();
+                }
+            });
+        }
+        function screenWidth() {
+            if (window.screen) {
+                return (screen.width);
+            } else {
+                return (0);
+            }
+        }
+        function screenHeight() {
+            if (window.screen) {
+                return (screen.height);
+            } else {
+                return (0);
+            }
+        }
+        function call_me_success() {
+            //Display the correct message if request was successful
+            $('#call_me_form').hide();
+            $('#call_me_success').show();
+        }
+        function call_me_failed() {
+            //Display failed request
+            $('#call_me_form').hide();
+            $('#call_me_success').show();
+            $('.call_me_success_header_title').text("Request failed");
+            $('#call_me_success_body').html("Please try again later.");
+            $('#call_me_success_body').css("color,red");
+            call_me_success_close();
+        }
+        function call_me_success_close() {
+              //timeout to remove success message
+              setTimeout(function () {
+                    $(".st-panel").removeAttr("style");
+                    $('#call_me_form').show();
+                    $('#call_me_success').hide(); $("form#frmCallMeBack").bootstrapValidator("destroy");
+                    $("form#frmCallMeBack")[0].reset();
+                    $('.st-button-main.campaing-call').click();
+                    var sbject = "<p>Click call me back to speak to our consultants.</p>";
+                    $(".st-panel-tip").html(sbject);
+                    $("#form_fields").hide();
+                    $("#st-panel-submit").prop('type', 'button');
+                    $('.call_me_success_header_title').text("Request for call back received");
+                    $('#call_me_success_body').html("Thank you for using our call me <br/>back.We will be in touch soon <br/><br/>From the bank where Everybody is Somebody.");
+                    @*$('#call_me_success_body').html("Thank you for requesting us to call you <br/>back.Your request has been sent <br/>successfully and one of our consultants <br/>will contact you shortly.");*@
+                    $('#call_me_success_body').css("color,#6b6f82");
+					$("#quick-drop-off").hide();
+                }, 5000);
+            }
+	var iterator = 0;
+            $(document).ready(function () {
+                init_fields();
+                $('.st-button-main.campaing-call').click();
+            });
+        </script>
+    }
+
+
+</body>
+
+
+
+</html>

@@ -1,0 +1,26 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCorporateInformation>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@{
+    Layout = "Master.cshtml";
+    // All Current Page Children
+    var Children = Model.Children;
+    // Get specific Children
+    var heroHeader = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroBody = Children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+}
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+<!-- HERO CONTINUED-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+<!-- HERO BODY -->
+<div class="container section_title_description">
+    <div class="campaign-product-container full">
+        <div class="margin-top-20 visible-xs"></div>
+        <div class="row">
+            <div class="col-sm-8 col-sm-offset-2 col-xs-offset-1 col-xs-10 line-height-p">
+                @Html.Raw(heroBody.Value("RichTextBox"))
+            </div>
+        </div>
+    </div>
+</div>

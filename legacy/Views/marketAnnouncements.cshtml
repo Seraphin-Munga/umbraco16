@@ -1,0 +1,21 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@{
+    Layout = "Master.cshtml";
+    // All Current Page Children
+    var Children = Model.Children;
+    // Get specific Children
+    var heroHeader = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroBody = Children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    var tabBody = (TabBody)heroBody.Children(x => x.ContentType.Alias.ToLower() == "tabbody").FirstOrDefault();
+}
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as HeroHeader)
+<!-- HERO CONTINUED-->
+@Html.Partial("_pageShoulder", heroShoulder as HeroShoulder)
+<!-- HERO BODY -->
+@Html.Partial("_pageDocumentView", tabBody as TabBody)
+
+@section scripts{
+    <script src="~/scripts/searchInput.min.js"></script>
+}

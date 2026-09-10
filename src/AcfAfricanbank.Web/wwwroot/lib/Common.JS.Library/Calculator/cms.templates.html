@@ -1,0 +1,938 @@
+﻿<div>
+    <!--Funeral-->
+    <div id="funeralForm">
+        <div class="ajax-form-success ajax-alert alert alert-success square errorcalculatores" style="display: none;">ErrorCalculatores</div>
+        <div class="alert alert_funeral alert-danger" style="display:none"></div>
+        <div id="calculator-funeral-form">
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 col-sm-offset-2">
+                    <div class="calculator">
+                        <div class="row">
+                            <div class="col-sm-12 ">
+                                <div class="alert alert_fixeddeposit alert-danger" style="display:none"></div>
+                            </div>
+                        </div>
+                        <div class="row adjust-row">
+                            <div class="col-xs-12 col-sm-7 calc-label">Who do you want to cover?</div>
+                            <div class="col-xs-12 col-sm-5">
+                                <div class="select-wrapper">
+                                    <select id="selectBoxWhoDoYouWantCover">
+                                        {{#each Result.MainMemberTypes}}
+                                        <option value="{{this.Key}}">{{this.Value}}</option>
+                                        {{/each}}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row adjust-row">
+                            <div class="col-xs-12 col-sm-7 calc-label">How much cover do you need?</div>
+                            <div class="col-xs-12 col-sm-5">
+                                <div class="select-wrapper">
+                                    <select id="selectBoxHowMuchCoverDoYouNeed">
+                                        {{#each  Result.MainMemberBenefits}}
+                                        {{#if this.Key}}
+                                        <option value="{{this.Key}}">{{#formatMoney}}{{this.Value}}{{/formatMoney}}</option>
+                                        {{else}}
+                                        <option value="{{this.Key}}">{{this.Value}}</option>
+                                        {{/if}}
+                                        {{/each}}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row adjust-row">
+                            <div class="col-xs-12 col-sm-7 calc-label">Would you like to add any additional members?</div>
+                            <div class="col-xs-12 col-sm-5">
+                                <div class="select-wrapper">
+                                    <select id="selectBoxAddAddMembers">
+                                        {{#each Result.wouldYouLikeAddAdditionalMembers}}
+                                        <option value="{{this.Key}}">{{this.Value}}</option>
+                                        {{/each}}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="additional-members" style="display:none;">
+                            <div class="row adjust-row">
+                                <div class="col-xs-12 col-sm-7 calc-label">How many additional members?</div>
+                                <div class="col-xs-12 col-sm-5">
+                                    <div class="select-wrapper">
+                                        <select id="selectBoxNumberOfAdditionalMembers">
+                                            {{#each Result.howManyAdditionalMembers}}
+                                            <option value="{{this.Key}}">{{this.Value}}</option>
+                                            {{/each}}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="additionalMembersContainer" style="display:none; width:150%; margin-top: 4rem;">
+                                <div class="row additional-members adjust-row">
+                                    <div class="col-sm-4 header">{{Result.translations.additionalMembers}}</div>
+                                    <div class="col-sm-4 header">{{Result.translations.age}}</div>
+                                    <div class="col-sm-4 header">{{Result.translations.coverAmount}}</div>
+                                </div>
+                                <div id="additionalMembers">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            Calculator1.setFuneralFormBehaviour();
+        </script>
+    </div>
+
+    <div id="funeralCalculator">
+        <div class="investmentReturns">
+            <div class="row totalReturnPeriod margin-top">
+                <div class="col-xs-12 text-center">
+                    Get this cover for
+                </div>
+            </div>
+            <div class="row totalReturn no-margin-top">
+                <div class="col-xs-12 text-center">
+                    {{#formatMoney}}{{Result.TotalPremium}}{{/formatMoney}}
+                </div>
+            </div>
+            <div class="row totalReturnPeriod">
+                <div class="col-xs-12 text-center">Per Month</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="additionalMembersTemplate">
+        {{#repeatPatern }}
+        <div class="row additional-member adjust-row">
+            <div class="col-sm-4 header">{{Result.translations.additionalMember}} {{Result.index}}</div>
+            <div class="col-sm-4">
+                <div class="select-wrapper">
+                    <select id="selectBoxAdditionalMemberAge{{Result.index}}">
+                        {{#each Result.AdditionalMemberTypes}}
+                        <option value="{{this.Key}}">{{this.Value}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="select-wrapper">
+                    <select id="selectBoxAdditionalMemberCoverAmount{{Result.index}}">
+                        {{#each Result.AdditionalMemberBenefits}}
+                        {{#if this.Key}}
+                        <option value="{{this.Key}}"> {{#formatMoney}}{{this.Value}} {{/formatMoney}}</option>
+                        {{else}}
+                        <option value="{{this.Key}}">{{this.Value}}</option>
+                        {{/if}}
+                        {{/each}}
+                    </select>
+                </div>
+            </div>
+        </div>
+        {{/repeatPatern}}
+    </div>
+
+    <!--TxFree-->
+    <div id="txFreeForm">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="calculator">
+                    <div class="row" style="margin: 0;">
+                        <div class="calc-description">{{translations.taxDescription}} </div>
+                    </div>
+                    <div class="row adjust-row">
+                        <div class="col-sm-12 ">
+                            <div class="alert alert_taxfree alert-danger" style="display:none"></div>
+                        </div>
+                    </div>
+
+                    <div class="area_calculate">
+
+                        <div class="metro field field_v2 break adjust-row adapt-row">
+                            <div class="label-wrapper label-row">
+                                <label class="leftField-label left-label">{{translations.amount}} *</label>
+                            </div><div class="centerField-wrapper req">
+                                <div>
+                                    <input id="inputAmount1" type="text" placeholder="R0.00" maxlength="23" class="trx-field money" style="width: 100%;">
+                                </div>
+                            </div><div style="clear:both;"></div>
+                        </div>
+                        <div class="metro field field_v2 break adjust-row adapt-row">
+                            <div class="label-wrapper label-row">
+                                <label class="leftField-label left-label">{{translations.monthlyInvestmentThereafter}}</label>
+                            </div><div class="centerField-wrapper req">
+                                <div>
+                                    <input id="inputAmount2" type="text" placeholder="R0.00" maxlength="23" class="trx-field money" style="width: 100%;">
+                                </div>
+                            </div><div style="clear:both;"></div>
+                        </div>
+                        <div class="field field_v2 metro break dropdown adjust-row adapt-row">
+                            <div class="label-wrapper label-row">
+                                <label class="leftField-label left-label">{{translations.interestPayoutFrequency}} *</label>
+                            </div><div class="centerField-wrapper">
+                                <input type="hidden" name="productcode" value="{{Result.Terms.0.ProductCode}}">
+                                <div class="area{{#lenghtArray  Result.PayoutFrequencies.length}}{{/lenghtArray}}">
+                                    <select id="selectBox" class="cd-select interest-opt {{#lenghtArray  Result.PayoutFrequencies.length}}{{/lenghtArray}}" style="width: 100%; border: solid 1px #C6C6C6">
+                                        {{#each Result.PayoutFrequencies}}
+                                        <option value="{{Key}}">{{Value}}</option>
+                                        {{/each}}
+                                    </select>
+                                </div>
+                            </div><div style="clear:both;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            Calculator.taxFreeInit();
+        </script>
+    </div>
+
+    <div id="txFreeCalculator">
+        <div class="investment-message">{{translations.rateTable}}</div>
+        <div class="row browserCalculator result_rates">
+            <div class="col-xs-12">
+                <div class="investmentReturns">
+                    <div class="returns_table">
+                        <div class="row value-added">
+                            <div class="col-xs-4 tbl-header">{{translations.period}}</div>
+                            {{#each Result.InvestmentReturns}}
+                            <div class="col-xs-2 tbl-header">{{PeriodDescription}}</div>
+                            {{/each}}
+                        </div>
+                        <div class="row value value-added interest-rates-pa">
+                            <div class="col-xs-4 value col_header_calculatorformat">{{translations.interestRatePa}}</div>
+                            {{#each Result.InvestmentReturns}}
+                            <div class="col-xs-2 value_calculatorformate">{{#formatPercent}}{{InterestRate}}{{/formatPercent}}</div>
+                            {{/each}}
+                        </div>
+                        <div class="row value value-added">
+                            <div class="col-xs-4 value col_header_calculatorformat">{{translations.interestEarned}}</div>
+                            {{#each Result.InvestmentReturns}}
+                            <div class="col-xs-2 value_calculatorformate">{{#formatMoney}}{{InterestEarned}}{{/formatMoney}}</div>
+                            {{/each}}
+                        </div>
+                        <div class="row value value-added finalResult">
+                            <div class="col-xs-4 value col_header_calculatorformat">{{translations.totalPayout}}</div>
+                            {{#each Result.InvestmentReturns}}
+                            <div class="col-xs-2 value_calculatorformate">{{#formatMoney}}{{TotalPayout}}{{/formatMoney}}</div>
+                            {{/each}}
+                        </div>
+                        <div class="row amount-message totalReturnBrowser">
+                            <div class="col-xs-12 text-center">
+                                {{translations.ourOfferAmount}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row totalReturn">
+                        <div class="col-xs-12 text-center">
+                            {{#formatMoney}}{{Result.FinalAmount}}{{/formatMoney}}
+                        </div>
+                    </div>
+                    <div class="row totalReturnPeriod">
+                        <div class="col-xs-12 text-center">
+                            {{translations.after}} {{Result.FinalFrequencyTaxFree}}
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-12 nopaddings result_ib_rete_earned">
+                        <div class="col-xs-7 zero-padding-left">
+                            <div class="interest-text">{{translations.interestRatePa}}</div>
+                            <div class="interest-text">{{translations.interestEarned}}</div>
+                        </div>
+                        <div class="col-xs-5 text-right nopaddings">
+                            <div>
+                                <div class="text-nowrap interest-value" id="interestRate6">{{#formatPercent}}{{Result.InvestmentMobile.InterestRate}}{{/formatPercent}}</div>
+                                <div class="text-nowrap interest-value" id="interestEarned6">{{#formatMoney}}{{Result.InvestmentMobile.InterestEarned}}{{/formatMoney}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mobileCalculator">
+            <div class="amount-message">{{translations.ourOfferAmount}}</div>
+            <div class="row totalReturnMobile">
+                <div class="col-xs-12 value-display">
+                    {{#formatMoney}}{{Result.FinalAmount}}{{/formatMoney}}
+                </div>
+            </div>
+            <div class="row months-display">
+                <div class="col-xs-12 text-center">
+                    {{translations.after}} {{Result.FinalFrequencyTaxFree}}
+                </div>
+            </div>
+            <div class="investmentResultTable" style="display:block">
+                <div class="col-xs-12 col-sm-12 col-md-12 nopaddings ">
+                    <div class="col-xs-7 zero-padding-left">
+                        <div class="interest-text">{{translations.interestRatePa}}</div>
+                        <div class="interest-text">{{translations.interestEarned}}</div>
+                    </div>
+                    <div class="col-xs-5 text-right nopaddings">
+                        <div>
+                            <div class="text-nowrap interest-value" id="interestRate6">{{#formatPercent}}{{Result.InvestmentMobile.InterestRate}}{{/formatPercent}}</div>
+                            <div class="text-nowrap interest-value" id="interestEarned6">{{#formatMoney}}{{Result.InvestmentMobile.InterestEarned}}{{/formatMoney}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12">
+                <div class="row buttons">
+                    <div class="show-cms">
+                        <div class="button button_accept" data-toggle="modal" data-target="#myModal">
+                            Accept
+                        </div>
+                    </div>
+                    <div class="show-ib">
+                        <div class="col-xs-6 col-sm-6 button-margin">
+                            <div class="button button-cancel">
+                                {{translations.cancel}}
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 button-margin">
+                            <div class="button button-green buttonAcceptMobile">
+                                {{translations.accept}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Access-->
+    <div id="accessForm">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="calculator">
+                    <div class="row" style="margin: 0;">
+                        <div class="calc-description">{{translations.accessDescription}} </div>
+                    </div>
+
+                    <div class="row adjust-row">
+                        <div class="col-sm-12 ">
+                            <div class="alert alert_acess alert-danger" style="display:none"></div>
+                        </div>
+                    </div>
+
+                    <div class="area_calculate">
+                        <div class="metro field field_v2 break adjust-row adapt-row">
+                            <div class="label-wrapper label-row">
+                                <label class="leftField-label left-label">{{translations.amount}} *</label>
+                            </div><div class="centerField-wrapper req">
+                                <div>
+                                    <input id="inputAmount1" type="text" placeholder="R0.00" maxlength="23" class="trx-field money" style="width: 100%;">
+                                    <!--<label class="error">Cannot be lesser than 2 characters</label>-->
+                                </div>
+                            </div><div style="clear:both;"></div>
+                        </div>
+                        <div class="field field_v2 metro break dropdown adjust-row adapt-row">
+                            <div class="label-wrapper label-row">
+                                <label class="leftField-label left-label">{{translations.interestPayoutFrequency}} *</label>
+                            </div><div class="centerField-wrapper">
+                                <input type="hidden" name="productcode" value="{{Result.Terms.0.ProductCode}}">
+
+                                <div class="area{{#lenghtArray  Result.PayoutFrequencies.length}}{{/lenghtArray}}">
+                                    <select id="selectBox" class="cd-select interest-opt {{#lenghtArray  Result.PayoutFrequencies.length}}{{/lenghtArray}}" style="width: 100%; border: solid 1px #C6C6C6">
+                                        {{#each Result.PayoutFrequencies}}
+                                        <option value="{{Key}}">{{Value}}</option>
+                                        {{/each}}
+                                    </select>
+                                </div>
+                            </div><div style="clear:both;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            Calculator.accessAccumulatorInit();
+        </script>
+    </div>
+
+    <div id="accessCalculator">
+        <div class="investment-message">{{translations.rateTable}}</div>
+        <div class="row browserCalculator result_rates">
+            <div class="col-xs-12">
+                <div class="investmentReturns">
+                    <div class="returns_table">
+                        <div class="row preResultInfo">
+                            <div class="col-xs-12 info"><div class="text">{{translations.monthlyRateIncrease}}</div><div class="result">{{#formatPercent}}{{Result.InterestRateIncrease}}{{/formatPercent}}</div></div>
+                        </div>
+                        <div class="row value-added">
+                            <div class="col-xs-4 tbl-header">{{translations.period}}</div>
+                            {{#each Result.InvestmentReturns}}
+                            <div class="col-xs-2 tbl-header">{{PeriodDescription}}</div>
+                            {{/each}}
+                        </div>
+                        <div class="row value value-added interest-rates-pa">
+                            <div class="col-xs-4 value col_header_calculatorformat">{{translations.interestRatePa}}</div>
+                            {{#each Result.InvestmentReturns}}
+                            <div class="col-xs-2 value_calculatorformate">{{#formatPercent}}{{InterestRate}}{{/formatPercent}}</div>
+                            {{/each}}
+                        </div>
+                        <div class="row value value-added">
+                            <div class="col-xs-4 value col_header_calculatorformat">{{translations.interestEarned}}</div>
+                            {{#each Result.InvestmentReturns}}
+                            <div class="col-xs-2 value_calculatorformate">{{#formatMoney}}{{InterestEarned}}{{/formatMoney}}</div>
+                            {{/each}}
+                        </div>
+                        <div class="row value value-added finalResult">
+                            <div class="col-xs-4 value col_header_calculatorformat">{{translations.totalPayout}}</div>
+                            {{#each Result.InvestmentReturns}}
+                            <div class="col-xs-2 value_calculatorformate">{{#formatMoney}}{{TotalPayout}}{{/formatMoney}}</div>
+                            {{/each}}
+                        </div>
+                        <div class="row amount-message totalReturnBrowser">
+                            <div class="col-xs-12 text-center">
+                                {{translations.ourOfferAmount}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row totalReturn ">
+                        <div class="col-xs-12 text-center">
+                            {{#formatMoney}}{{Result.FinalAmount}}{{/formatMoney}}
+                        </div>
+                    </div>
+                    <div class="row totalReturnPeriod">
+                        <div class="col-xs-12 text-center">
+                            {{translations.after}} {{Result.FinalFrequency}} {{translations.months}}
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-12 nopaddings result_ib_rete_earned">
+                        <div class="col-xs-7 zero-padding-left">
+                            <div class="interest-text">{{translations.interestRatePa}}</div>
+                            <div class="interest-text">{{translations.interestEarned}}</div>
+                        </div>
+                        <div class="col-xs-5 text-right nopaddings">
+                            <div>
+                                <div class="text-nowrap interest-value" id="interestRate6">{{#formatPercent}}{{Result.InvestmentMobile.InterestRate}}{{/formatPercent}}</div>
+                                <div class="text-nowrap interest-value" id="interestEarned6">{{#formatMoney}}{{Result.InvestmentMobile.InterestEarned}}{{/formatMoney}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mobileCalculator">
+
+            <div class="amount-message">{{translations.ourOfferAmount}}</div>
+            <div class="row totalReturnMobile">
+                <div class="col-xs-12 value-display">
+                    {{#formatMoney}}{{Result.FinalAmount}}{{/formatMoney}}
+                </div>
+            </div>
+            <div class="row months-display">
+                <div class="col-xs-12 text-center">
+                    {{translations.after}} {{Result.FinalFrequency}} {{translations.months}}
+                </div>
+            </div>
+            <div class="investmentResultTable" style="display:block">
+                <div class="col-xs-12 col-sm-12 col-md-12 nopaddings ">
+                    <div class="col-xs-7 zero-padding-left">
+                        <div class="interest-text">{{translations.interestRatePa}}</div>
+                        <div class="interest-text">{{translations.interestEarned}}</div>
+                    </div>
+                    <div class="col-xs-5 text-right nopaddings">
+                        <div>
+                            <div class="text-nowrap interest-value" id="interestRate6">{{#formatPercent}}{{Result.InvestmentMobile.InterestRate}}{{/formatPercent}}</div>
+                            <div class="text-nowrap interest-value" id="interestEarned6">{{#formatMoney}}{{Result.InvestmentMobile.InterestEarned}}{{/formatMoney}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12">
+                <div class="row buttons">
+                    <div class="show-cms">
+                        <div class="button button_accept" data-toggle="modal" data-target="#myModal">
+                            Accept
+                        </div>
+                    </div>
+                    <div class="show-ib">
+                        <div class="col-xs-6 col-sm-6 button-margin">
+                            <div class="button button-cancel">
+                                {{translations.cancel}}
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 button-margin">
+                            <div class="button button-green buttonAcceptMobile">
+                                {{translations.accept}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Fixed-->
+    <div id="fixedForm">
+
+        <div id="form-container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="calculator">
+                        <div class="calculator">
+                            <div class="row" style="margin: 0;">
+                                <div class="calc-description">{{translations.fixedDescription}} </div>
+                            </div>
+
+                            <div class="row adjust-row">
+                                <div class="col-sm-12 ">
+                                    <div class="alert alert_fixeddeposit alert-danger" style="display:none"></div>
+                                </div>
+                            </div>
+                            <div class="area_calculate">
+                                <div class="metro field field_v2 break adjust-row adapt-row">
+                                    <div class="label-wrapper label-row">
+                                        <label class="leftField-label left-label">{{translations.amount}} *</label>
+                                    </div><div class="centerField-wrapper req">
+                                        <div>
+                                            <input id="inputAmount1" type="text" placeholder="R0.00" maxlength="23" class="trx-field money" style="width: 100%;">
+                                        </div>
+                                    </div><div style="clear:both;"></div>
+                                </div>
+
+                                <div class="field field_v2 metro break dropdown adjust-row adapt-row">
+                                    <div class="label-wrapper label-row">
+                                        <label class="leftField-label left-label">{{translations.term}} *</label>
+                                    </div><div class="centerField-wrapper">
+
+                                        <div class="area{{#lenghtArray   Result.Terms.length}}{{/lenghtArray}}">
+                                            <select id="selectBox" class="cd-select terms-opt {{#lenghtArray   Result.PayoutFrequencies.length}}{{/lenghtArray}}" style="width: 100%; border: solid 1px #C6C6C6">
+                                                {{#each  Result.Terms}}
+                                                <option value="{{ProductCode}}">{{TermValue}} {{#formatTerm}}{{TimeFrame}}{{/formatTerm}}</option>
+                                                {{/each}}
+                                            </select>
+                                        </div>
+                                    </div><div style="clear:both;"></div>
+                                </div>
+
+                                <div class="field field_v2 metro break dropdown adjust-row adapt-row">
+                                    <div class="label-wrapper label-row">
+                                        <label class="leftField-label left-label">{{translations.interestPayoutFrequency}} *</label>
+                                    </div><div class="centerField-wrapper">
+
+                                        <div class="area{{#lenghtArray  Result.PayoutFrequencies.length}}{{/lenghtArray}}">
+                                            <select id="selectBox" class="cd-select interest-opt {{#lenghtArray  Result.PayoutFrequencies.length}}{{/lenghtArray}}" style="width: 100%; border: solid 1px #C6C6C6">
+                                                {{#each Result.PayoutFrequencies}}
+                                                <option value="{{Key}}">{{Value}}</option>
+                                                {{/each}}
+                                            </select>
+                                        </div>
+                                    </div><div style="clear:both;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                        Calculator.fixedDepositInit();
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="fixedCalculator">
+        <div id="resultcontainer">
+            <div class="investment-message">{{translations.rateTable}}</div>
+            <div class="row browserCalculator result_rates">
+                <div class="col-xs-12">
+                    <div class="investmentReturns">
+                        <div class="returns_table">
+                            <div class="row value-added ">
+                                <div class="col-xs-4 tbl-header">{{translations.interestPayoutFreq}}</div>
+                                {{#each Result.InvestmentReturns}}
+                                <div class="col-xs-2 tbl-header tbl-header-selected {{@index}}" id="{{@index}}">{{PeriodDescription}}</div>
+                                {{/each}}
+                            </div>
+                            <div class="row value value-added interest-rates-pa">
+                                <div class="col-xs-4  value col_header_calculatorformat">{{translations.interestRatePa}}</div>
+                                {{#each Result.InvestmentReturns}}
+                                <div class="col-xs-2 value_calculatorformate {{@index}}" id="{{@index}}">{{#formatPercent}}{{InterestRate}}{{/formatPercent}}</div>
+                                {{/each}}
+                            </div>
+                            <div class="row value value-added">
+                                <div class="col-xs-4 value col_header_calculatorformat">{{translations.interestEarned}}</div>
+                                {{#each Result.InvestmentReturns}}
+                                <div class="col-xs-2 value_calculatorformate {{@index}}" id="{{@index}}">{{#formatMoney}}{{InterestEarned}}{{/formatMoney}}</div>
+                                {{/each}}
+                            </div>
+                            <div class="row value value-added finalResult">
+                                <div class="col-xs-4  value col_header_calculatorformat">{{translations.totalPayout}}</div>
+                                {{#each Result.InvestmentReturns}}
+                                <div class="col-xs-2 value_calculatorformate {{@index}}" id="{{@index}}">{{#formatMoney}}{{TotalPayout}}{{/formatMoney}}</div>
+                                {{/each}}
+                            </div>
+                            <div class="row amount-message totalReturnBrowser">
+                                <div class="col-xs-12 text-center">
+                                    {{translations.ourOfferAmount}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row totalReturn">
+                            <div class="col-xs-12 text-center">
+                                {{#formatMoney}}{{Result.FinalAmount}}{{/formatMoney}}
+                            </div>
+                        </div>
+                        <div class="row totalReturnPeriod">
+                            <div class="col-xs-12 text-center">
+                                {{translations.after}} {{Result.FinalFrequency}} {{translations.months}}
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12 col-sm-12 col-md-12 nopaddings result_ib_rete_earned">
+
+                            <div class="col-xs-7 zero-padding-left">
+                                <div class="interest-text">{{translations.interestRatePa}}</div>
+                                <div class="interest-text">{{translations.interestEarned}}</div>
+                            </div>
+                            <div class="col-xs-5 text-right nopaddings">
+                                <div>
+                                    <div class="text-nowrap interest-value" id="interestRate6">{{#formatPercent}}{{Result.InvestmentMobile.InterestRate}}{{/formatPercent}}</div>
+                                    <div class="text-nowrap interest-value" id="interestEarned6">{{#formatMoney}}{{Result.InvestmentMobile.InterestEarned}}{{/formatMoney}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mobileCalculator">
+
+                <div class="amount-message">{{translations.ourOfferAmount}}</div>
+                <div class="row totalReturnMobile">
+                    <div class="col-xs-12 value-display">
+                        {{#formatMoney}}{{Result.FinalAmount}}{{/formatMoney}}
+                    </div>
+                </div>
+                <div class="row months-display">
+                    <div class="col-xs-12 text-center">
+                        {{translations.after}} {{Result.FinalFrequency}} {{translations.months}}
+                    </div>
+                </div>
+                <div class="investmentResultTable" style="display:block">
+
+                    <div class="col-xs-12 col-sm-12 col-md-12 nopaddings ">
+
+                        <div class="col-xs-7 zero-padding-left">
+                            <div class="interest-text">{{translations.interestRatePa}}</div>
+                            <div class="interest-text">{{translations.interestEarned}}</div>
+                        </div>
+                        <div class="col-xs-5 text-right nopaddings">
+                            <div>
+                                <div class="text-nowrap interest-value" id="interestRate6">{{#formatPercent}}{{Result.InvestmentMobile.InterestRate}}{{/formatPercent}}</div>
+                                <div class="text-nowrap interest-value" id="interestEarned6">{{#formatMoney}}{{Result.InvestmentMobile.InterestEarned}}{{/formatMoney}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-12">
+                    <div class="row buttons">
+                        <div class="show-cms">
+                            <div class="button button_accept" data-toggle="modal" data-target="#myModal">
+                                Accept
+                            </div>
+                        </div>
+                        <div class="show-ib">
+                            <div class="col-xs-6 col-sm-6 button-margin">
+                                <div class="button button-cancel">
+                                    {{translations.cancel}}
+                                </div>
+                            </div>
+                            <div class="col-xs-6 col-sm-6 button-margin">
+                                <div class="button button-green buttonAcceptMobile">
+                                    {{translations.accept}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Notice-->
+    <div id="noticeForm">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="calculator">
+                    <div class="row" style="margin: 0;">
+                        <div class="calc-description">{{translations.noticeDescription}} </div>
+                    </div>
+
+                    <div class="row adjust-row">
+                        <div class="col-sm-12 ">
+                            <div class="alert alert_notice alert-danger" style="display:none"></div>
+                        </div>
+                    </div>
+                    <div class="area_calculate">
+                        <div class="metro field field_v2 break adjust-row adapt-row">
+                            <div class="label-wrapper label-row">
+                                <label class="leftField-label left-label">{{translations.amount}} *</label>
+                            </div><div class="centerField-wrapper req">
+                                <div>
+                                    <input id="inputAmount1" type="text" placeholder="R0.00" maxlength="23" class="trx-field money" style="width: 100%;">
+                                </div>
+                            </div><div style="clear:both;"></div>
+                        </div>
+
+                        <div class="metro field field_v2 break adjust-row adapt-row">
+                            <div class="label-wrapper label-row">
+                                <label class="leftField-label left-label">{{translations.monthly}}</label>
+                            </div><div class="centerField-wrapper req">
+                                <div>
+                                    <input id="inputAmount2" type="text" placeholder="R0.00" maxlength="23" class="trx-field money" style="width: 100%;">
+                                </div>
+                            </div><div style="clear:both;"></div>
+                        </div>
+
+                        <div class="field field_v2 metro break dropdown adjust-row adapt-row">
+                            <div class="label-wrapper label-row">
+                                <label class="leftField-label left-label">{{translations.noticePeriod}} *</label>
+                            </div><div class="centerField-wrapper">
+
+                                <div class="area{{#lenghtArray  Result.Terms.length}}{{/lenghtArray}}">
+                                    <select id="selectBox" class="cd-select notice  {{#lenghtArray  Result.Terms.length}}{{/lenghtArray}}" style="width: 100%; border: solid 1px #C6C6C6">
+                                        {{#each Result.Terms}}
+                                        <option value="{{ProductCode}}">{{TermValue}} {{#formatTerm}}{{TimeFrame}}{{/formatTerm}}</option>
+                                        {{/each}}
+                                    </select>
+                                </div>
+                            </div><div style="clear:both;"></div>
+                        </div>
+
+                        <div class="field field_v2 metro break dropdown adjust-row adapt-row">
+                            <div class="label-wrapper label-row">
+                                <label class="leftField-label left-label">{{translations.interestPayoutFrequency}} *</label>
+                            </div><div class="centerField-wrapper">
+
+                                <div class="area{{#lenghtArray  Result.PayoutFrequencies.length}}{{/lenghtArray}}">
+                                    <select id="selectBox" class="cd-select interest-opt {{#lenghtArray  Result.PayoutFrequencies.length}}{{/lenghtArray}}" style="width: 100%; border: solid 1px #C6C6C6">
+                                        {{#each Result.PayoutFrequencies }}
+                                        <option value="{{Key}}">{{Value}}</option>
+                                        {{/each}}
+                                    </select>
+                                </div>
+                            </div><div style="clear:both;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            Calculator.noticeDepositInit();
+        </script>
+    </div>
+
+    <div id="noticeCalculator">
+        <div class="investment-message">{{translations.rateTable}}</div>
+        <div class="row browserCalculator result_rates">
+            <div class="col-xs-12">
+                <div class="investmentReturns">
+                    <div class="returns_table">
+                        <div class="row value-added">
+                            <div class="col-xs-4 tbl-header">{{translations.periodInvested}}</div>
+                            {{#each Result.InvestmentReturns}}
+                            <div class="col-xs-2 tbl-header tbl-header-selected {{@index}}" id="{{@index}}">{{PeriodDescription}}</div>
+                            {{/each}}
+                        </div>
+                        <div class="row value value-added interest-rates-pa">
+                            <div class="col-xs-4 value col_header_calculatorformat">{{translations.interestRatePa}}</div>
+                            {{#each Result.InvestmentReturns}}
+                            <div class="col-xs-2 value_calculatorformate {{@index}}" id="{{@index}}">{{#formatPercent}}{{InterestRate}}{{/formatPercent}}</div>
+                            {{/each}}
+                        </div>
+                        <div class="row value value-added">
+                            <div class="col-xs-4 value col_header_calculatorformat">{{translations.interestEarned}}</div>
+                            {{#each Result.InvestmentReturns}}
+                            <div class="col-xs-2 value_calculatorformate {{@index}}" id="{{@index}}">{{#formatMoney}}{{InterestEarned}}{{/formatMoney}}</div>
+                            {{/each}}
+                        </div>
+                        <div class="row value value-added finalResult">
+                            <div class="col-xs-4 value col_header_calculatorformat">{{translations.totalPayout}}</div>
+                            {{#each Result.InvestmentReturns}}
+                            <div class="col-xs-2 value_calculatorformate {{@index}}" id="{{@index}}">{{#formatMoney}}{{TotalPayout}}{{/formatMoney}}</div>
+                            {{/each}}
+                        </div>
+                        <div class="row amount-message totalReturnBrowser">
+                            <div class="col-xs-12 text-center">
+                                {{translations.ourOfferAmount}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row totalReturn">
+                        <div class="col-xs-12 text-center">
+                            {{#formatMoney}}{{Result.FinalAmount}}{{/formatMoney}}
+                        </div>
+                    </div>
+                    <div class="row totalReturnPeriod">
+                        <div class="col-xs-12 text-center">
+                            {{translations.after}} {{Result.FinalFrequency}} {{translations.months}}
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-12 nopaddings  result_ib_rete_earned">
+
+                        <div class="col-xs-7 zero-padding-left">
+                            <div class="interest-text">{{translations.interestRatePa}}</div>
+                            <div class="interest-text">{{translations.interestEarned}}</div>
+                        </div>
+                        <div class="col-xs-5 text-right nopaddings">
+                            <div>
+                                <div class="text-nowrap interest-value" id="interestRate6">{{#formatPercent}}{{Result.InvestmentMobile.InterestRate}}{{/formatPercent}}</div>
+                                <div class="text-nowrap interest-value" id="interestEarned6">{{#formatMoney}}{{Result.InvestmentMobile.InterestEarned}}{{/formatMoney}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mobileCalculator">
+            <div class="amount-message">{{translations.ourOfferAmount}}</div>
+            <div class="row totalReturnMobile">
+                <div class="col-xs-12 value-display">
+                    {{#formatMoney}}{{Result.FinalAmount}}{{/formatMoney}}
+                </div>
+            </div>
+            <div class="row months-display">
+                <div class="col-xs-12 text-center">
+                    {{translations.after}} {{Result.FinalFrequency}} {{translations.months}}
+                </div>
+            </div>
+            <div class="investmentResultTable" style="display:block">
+
+                <div class="col-xs-12 col-sm-12 col-md-12 nopaddings ">
+
+                    <div class="col-xs-7 zero-padding-left">
+                        <div class="interest-text">{{translations.interestRatePa}}</div>
+                        <div class="interest-text">{{translations.interestEarned}}</div>
+                    </div>
+                    <div class="col-xs-5 text-right nopaddings">
+                        <div>
+                            <div class="text-nowrap interest-value" id="interestRate6">{{#formatPercent}}{{Result.InvestmentMobile.InterestRate}}{{/formatPercent}}</div>
+                            <div class="text-nowrap interest-value" id="interestEarned6">{{#formatMoney}}{{Result.InvestmentMobile.InterestEarned}}{{/formatMoney}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12">
+                <div class="row buttons">
+                    <div class="show-cms">
+                        <div class="button button_accept" data-toggle="modal" data-target="#myModal">
+                            Accept
+                        </div>
+                    </div>
+                    <div class="show-ib">
+                        <div class="col-xs-6 col-sm-6 button-margin">
+                            <div class="button button-cancel">
+                                {{translations.cancel}}
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 button-margin">
+                            <div class="button button-green buttonAcceptMobile">
+                                {{translations.accept}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Rates-->
+    <div id="ratesForm">
+        <div id="rates-container">
+            <div class="rates-header">
+                <div class="column_rates">
+                    <span class="ab-vertical-align">{{translations.terms}}</span>
+                </div>
+                <div class="column_rates">
+                    <span class="ab-vertical-align">{{translations.monthlyInterPayout}}</span>
+                </div>
+                <div class="column_rates">
+                    <span class="ab-vertical-align">{{translations.annualInterestPayout}}</span>
+                </div>
+                <div class="column_rates">
+                    <span class="ab-vertical-align">{{translations.semiAnnualInterestPayout}}</span>
+                </div>
+                <div class="column_rates">
+                    <span class="ab-vertical-align">{{translations.interestPayoutExpiry}}</span>
+                </div>
+            </div>
+            <div class="rates-rows">
+                <div class="col-xs-12">
+                    <div class="rate-values">
+                        {{#each Result.Rates}}
+                        <div class="row">
+                            <div class="column_rates"><div class="title_mobile hidden-sm hidden-md hidden-lg">{{../translations.terms}}</div><div class="text">{{formatedTerm}}</div></div>
+                            <div class="column_rates"><div class="title_mobile hidden-sm hidden-md hidden-lg">{{../translations.monthlyInterPayout}}</div><div class="text">{{#formatPercent}}{{MonthlyInterestPayout}}{{/formatPercent}}</div></div>
+                            <div class="column_rates"><div class="title_mobile hidden-sm hidden-md hidden-lg">{{../translations.annualInterestPayout}}</div><div class="text">{{#formatPercent}}{{AnnualInterestPayout}}{{/formatPercent}}</div></div>
+                            <div class="column_rates"><div class="title_mobile hidden-sm hidden-md hidden-lg">{{../translations.semiAnnualInterestPayout}}</div><div class="text">{{#formatPercent}}{{SemiAnnualInterestPayout}}{{/formatPercent}}</div></div>
+                            <div class="column_rates"><div class="title_mobile hidden-sm hidden-md hidden-lg">{{../translations.interestPayoutExpiry}}</div><div class="text">{{#formatPercent}}{{InterestPayoutOnExpiry}}{{/formatPercent}}</div></div>
+                        </div>
+                        {{/each}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Insurance Rates-->
+    <div id="insuranceRatesForm">
+        <div id="rates-container" class="row browserCalculator insuranceRatesForm">
+            <div class="row header row-eq-height">
+                <div class="col-sm-2 col-sm-offset-1 header"></div>
+                <div class="col-sm-2 header"></div>
+                <div class="col-sm-1 header">R10 000</div>
+                <div class="col-sm-1 header">R15 000</div>
+                <div class="col-sm-1 header">R20 000</div>
+                <div class="col-sm-1 header">R30 000</div>
+                <div class="col-sm-1 header">R40 000</div>
+                <div class="col-sm-1 header">R50 000</div>
+            </div>
+            {{#each Result.Rates}}
+            <div class="row content row-eq-height">
+                <div class="col-sm-2 col-sm-offset-1">
+                    <div class="align-middle" style="background: url({{Image}}); background-repeat: no-repeat; background-position: center;"></div>
+                </div>
+                <div class="col-sm-2 coverage">
+                    <div class="align-middle">{{CoverOptionName}}</div>
+                </div>
+                {{#each CoverOptionRates}}
+                <div class="col-sm-1">
+                    <div class="align-middle">{{#formatMoney}}{{Premium}}{{/formatMoney}}</div>
+                </div>
+                {{/each}}
+            </div>
+            {{/each}}
+            <div class="row">
+                <div class="col-sm-12">
+                    <h2>{{translations.additionalMembers}}</h2>
+                </div>
+            </div>
+            <div class="row additional-members-rates">
+                <div class="col-sm-4 col-sm-offset-4">
+                    <div class="row header row-eq-height">
+                        <div class="col-sm-3 header"></div>
+                        <div class="col-sm-3 header"></div>
+                        <div class="col-sm-3 header">R10 000</div>
+                        <div class="col-sm-3 header">R15 000</div>
+                    </div>
+                    {{#each Result.AdditionalMembersRates}}
+                    <div class="row content row-eq-height">
+                        <div class="col-sm-3"><div class="align-middle" style="background: url(/Common.JS.Library/Calculator/Images/additional_member_small.png); background-repeat: no-repeat; background-position: center;"></div></div>
+
+                        <div class="col-sm-3 coverage"><div class="align-middle">{{AgeGroupText}}</div></div>
+                        {{#each AgeRates}}
+                        <div class="col-sm-3 result" style="background: url(/Common.JS.Library/Calculator/Images/additional_small.png); background-repeat: no-repeat; background-position: 3px 1px;"><div class="align-middle"><p>{{#formatMoney}}{{Premium}}{{/formatMoney}}</p><p class="note">{{../../translations.additionalFeePerMember}}</p></div></div>
+                        {{/each}}
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+        </div>
+        <div class="row mobileCalculator noprint">
+        </div>
+    </div>
+</div>

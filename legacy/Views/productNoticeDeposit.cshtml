@@ -1,0 +1,404 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers;
+@using System.Configuration;
+@using CustomModels = Web.Models;
+
+@{
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var children = Model.Children;
+
+    // Get specific Children
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochestinvestments").FirstOrDefault();
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    var heroKnees = children?.Where(c => c.ContentType.Alias.ToLower() == "heroknees").FirstOrDefault();
+    var testimonialTab = children?.Where(c => c.ContentType.Alias.ToLower() == "testimonials").FirstOrDefault();
+    var homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+
+    // Get Specific grand children
+
+    var bodyCards = heroBody?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+    var bodyButton = heroBody?.Children?
+         .Where(c => c.ContentType.Alias == "ebankITAbstractButton").FirstOrDefault();
+
+    // Get Properties from children
+    var benefitCards = heroChest?.Value<IEnumerable<IPublishedElement>>("benefitCards");
+    //var cards = benefitCards?.Select(c => c as Card).ToList();
+
+    var benefitsHeader = heroChest?.Value("benefitsTitle")?.ToString();
+    var benefitsDescription = heroChest?.Value("benefitsDescription")?.ToString();
+    var ratesTerms = heroChest?.Value<IEnumerable<string>>("ratesTerms");
+    var calculatorIntro = heroChest?.Value("calculatorIntro")?.ToString();
+    var calculatorButtonLabel = heroChest?.Value("calculatorButtonLabel")?.ToString();
+
+    var bodyTitle = heroBody?.Value("bodyTitle").ToString();
+    var bodyDescription = heroBody?.Value("bodyDescription").ToString();
+
+    var applyDocs = bodyCards.Select(c => c as Card).ToList();
+
+    var headerImage_large = heroHeader?.Value<IPublishedContent>("image")?.Url;
+    var headerImage_medium = heroHeader?.Value<IPublishedContent>("imageMedium")?.Url;
+    var headerImage_small = heroHeader?.Value<IPublishedContent>("imageSmall")?.Url;
+    
+
+}
+
+<style>
+
+    .control-label {
+        text-align: left !important;
+        width: 100%;
+    }
+
+    #calculator {
+        top: unset;
+        padding-bottom: 0px;
+    }
+
+    #noticeDepositInvestmentAmount {
+        width: 90% !important;
+    }
+
+    #noticeDepositInvestmentThereafter {
+        width: 90% !important;
+    }
+
+    .select {
+        width: 90% !important;
+    }
+
+    .campaign-product-container {
+        top: unset;
+    }
+
+    #noticeDeposit-calculator-container {
+        background-color: #f7f7f7;
+    }
+
+    .card-shadow.rate-card-fixed-deposit-offer {
+        margin: unset;
+        /*text-align: unset;*/
+    }
+
+
+    .btnCalc {
+        padding-top: 25px;
+        padding-bottom: 30px;
+    }
+
+    .card-shadow.rate-card-fixed-deposit-offer .percentage {
+        font-size: 32px;
+    }
+
+    .resultbtn {
+        padding: 16px 16px;
+    }
+
+    .background-interest-selected {
+        background-color: #4c6a8f;
+        color: #fff !important;
+        border-bottom-color: #f8f8f800 !important;
+        border-top-color: #f8f8f800 !important;
+    }
+
+    #noticeResults {
+        margin-top: -355px;
+    }
+
+    .rightboarder {
+        border-right: 1px solid #001f44;
+    }
+
+    @@media (max-width: 1199px) {
+        #noticeResults {
+            margin-top: -360px;
+        }
+    }
+
+    @@media (max-width: 767px) {
+        #noticeResults {
+            margin-top: -330px;
+        }
+    }
+
+    @@media (max-width: 767px) {
+        .btnCalc {
+            text-align: center;
+        }
+    }
+
+    @@media (max-width: 425px) {
+
+        .resultbtn {
+            padding: 16px 14px;
+        }
+    }
+
+    @@media (max-width: 320px) {
+
+        .resultbtn {
+            font-size: 12px;
+        }
+    }
+</style>
+
+
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+<!-- HERO CONTINUED-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+
+<!-- POPULAR RATES-->
+@{
+    var cards = new CustomModels.Benefits
+     {
+        Header = benefitsHeader,
+        Description = benefitsDescription,
+        BenefitCards1 = benefitCards.Select(c => c as NCcard).ToList()
+     };
+    var ratesAndBenefitsModel = new CustomModels.InvestmentRatesAndBenefits
+    {
+        RatesTermsAndConditions = ratesTerms,
+        CalculatorButtonText = calculatorButtonLabel,
+        CalculatorIntroduction = calculatorIntro,
+        Benefits = cards
+    };
+}
+@Html.Partial("_investmentRatesAndBenefitsSection", ratesAndBenefitsModel)
+
+<!-- INVESTMENT CALCULATOR -->
+@Html.Partial("_calculatorStructure", "calculatornotice-form")
+
+<br/>
+
+<!-- HOW TO APPLY-->
+@Html.Partial("_howToApplySection", new CustomModels.HowToApplyDataContainer(bodyTitle, bodyDescription, bodyButton as IEbankItabstractButton, applyDocs))
+
+<!-- CAMPAIGN MORE INFO -->
+@Html.Partial("_heroKneeTabs", heroKnees as ContentModels.HeroKnees)
+
+<!-- TESTIMONIALS -->
+@Html.Partial("_testimonials", testimonialTab as Testimonials)
+
+<!-- CALL BACK FORM -->
+@*@{
+    var _floatingFormViewModel = homePageElements.Children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+
+    @Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)
+
+}*@
+
+@{
+    var _floatingFormViewModel = children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+    @Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)
+}
+
+<!-- POPUP DIALOG -->
+@Html.Partial("_ebankITModal")
+@section scripts 
+{
+
+<script type="text/javascript" src="@Url.Content("~/Scripts/handlebars-v4.0.5.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/jquery.xdomainrequest.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculator.js?ver=2.1")"></script>
+<script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculator1.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculatorHandler.min.js")"></script>
+
+<script type="text/javascript">
+     $(document).ready(function () {
+        var imageBgCss = "url('" + "@headerImage_large" + "')";
+        var imageMdCss = "url('" + "@headerImage_medium" + "')";
+        var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_medium : headerImage_small)" + "')";
+        var CheckScreenSize;
+        (CheckScreenSize = function () {
+            var _width = $(window).outerWidth();
+            var _height = $(window).outerHeight();
+            if (_width <= 511) {
+                $("#heroHeader").css("background-image", imageSmCss);
+            }
+            else {
+                $("#heroHeader").css("background-image", imageBgCss);
+            }
+        })();
+        $(window).resize(CheckScreenSize);
+    });
+        
+  
+    $(function () {
+
+
+        $(".area_buttons_calculate").hide();
+        var hasError = true;
+        var data = {
+            product: 'Notice',
+            rateContainer: '#rates-container',
+            calcFormContainer: '#calculatornotice-form',
+            serviceUrl: '@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.Mobile.URL"]',
+            headers: [
+                    ['ITSAPP-DEVICE', '@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.ITSAPP-DEVICE"]'],
+                    ['ITSAPP-LANG', 'en-GB'],
+                    ['Content-type', 'application/json']
+            ],
+            translations: {
+                interestPayoutExpiry: '@ResourceHelper.GetResource("InterestPayoutOnExpiry")',
+                semiAnnualInterestPayout: '@ResourceHelper.GetResource("SemiAnnualInterestPayout")',
+                annualInterestPayout: '@ResourceHelper.GetResource("AnnualInterestPayout")',
+                minInvestAmount: '@ResourceHelper.GetResource("MinimumInvestmentAmount")',
+                monthlyInterPayout: '@ResourceHelper.GetResource("MonthlyInterestPayout")',
+                terms: '@ResourceHelper.GetResource("Terms")',
+                amount: '@ResourceHelper.GetResource("OnceOffInvestmentAmount")',
+                term: '@ResourceHelper.GetResource("Term")',
+                interestRatePa: '@ResourceHelper.GetResource("InterestRatePerAnnum")',
+                interestEarned: '@ResourceHelper.GetResource("InterestEarned")',
+                totalPayout: '@ResourceHelper.GetResource("TotalPayout")',
+                interestPayoutFrequency: '@ResourceHelper.GetResource("InterestPayoutFrequency")',
+                monthly: '@ResourceHelper.GetResource("MonthlyInvestmentThereafter")',
+                period: '@ResourceHelper.GetResource("Period")',
+                investmentReturns: '@ResourceHelper.GetResource("InvestmentReturns")',
+                AmountMandatory: '@ResourceHelper.GetResource("InvestmentAmountIsMandatory")',
+                after: '@ResourceHelper.GetResource("After")',
+                months: '@ResourceHelper.GetResource("Months")',
+                years: '@ResourceHelper.GetResource("Years")',
+                investmentAmountIsMandatory: '@ResourceHelper.GetResource("InvestmentAmountIsMandatory")',
+                onceOffInvestmentAmountCannotBeLessThan: '@ResourceHelper.GetResource("OnceOffInvestmentAmountCannotBeLessThan")',
+                monthlyInvestmentAmountCannotBeLessThan: '@ResourceHelper.GetResource("MonthlyInvestmentAmountCannotBeLessThan")',
+                periodInvested: '@ResourceHelper.GetResource("PeriodInvested")',
+                investmentReturnsMessage: '@ResourceHelper.GetResource("InvestmentReturnsMessage")',
+                ourOfferAmount: '@ResourceHelper.GetResource("OurOfferAmount")',
+                accept: '@ResourceHelper.GetResource("Accept")',
+                cancel: '@ResourceHelper.GetResource("Cancel")',
+                noticePeriod: '@ResourceHelper.GetResource("NoticePeriod")',
+                noticeDescription: '@ResourceHelper.GetResource("NoticeDescription")',
+                payoutFreqErrorMessage: '@ResourceHelper.GetResource("PayoutFreqErrorMessage")',
+                increaseOnceOff:'@ResourceHelper.GetResource("IncreaseOnceOff")'
+            }
+        };
+
+        $(window).on('CalculatorLoading', function (e) {
+            var _state = e.state;
+            var _target = e.target;
+
+            $(".errorcalculatores").hide();
+
+            if (_target !== 'rates') {
+                if (_state) {
+                    $("#form-preloader").show();
+                   // $("#calculatornotice-form").hide();
+                    $("#calculator-container").hide();
+
+                    ChangePageControls(false);
+                } else {
+                    $("#form-preloader").hide();
+                    if (hasError) {
+                        $(".errorcalculatores").show();
+                       // $("#calculatornotice-form").hide();
+                        $("#calculator-container").hide();
+                    } else {
+                        $(".errorcalculatores").hide();
+                        //$("#calculatornotice-form").show();
+                        $("#calculator-container").show();
+                        var isMobileheaderHide = document.getElementsByClassName('tbl-header-selected');
+                        if (isMobileheaderHide.length > 0) {
+                            $('#calculatornotice-form table thead th.tbl-header-selected').addClass('hidden-xs');
+                            $('#calculatornotice-form table thead th.background-interest-selected').removeClass('hidden-xs');
+                            $('#calculatornotice-form table tbody td.tbl-header-selected').addClass('hidden-xs');
+                            $('#calculatornotice-form table tbody td.background-interest-selected').removeClass('hidden-xs');
+                        }
+                        var isMobilebodyHide = document.getElementsByClassName('value_calculatorformate');
+                        if (isMobilebodyHide.length > 0) {
+                            $('#calculatornotice-form table tbody tr td.value_calculatorformate').addClass('hidden-xs');
+                            $('#calculatornotice-form table tbody tr td.background-interest-selected').removeClass('hidden-xs');
+                        }
+                        $('.money').autoNumeric('init', { aSep: ' ', aDec: '.', aSign: 'R' });
+                    }
+                    ChangePageControls(Calculator.isCalculatorValid('Notice'));
+                }
+            } else {
+                if (_state) {
+                    $("#rates-form-preloader").show();
+                    $('.rate-table').show();
+                } else {
+                    $("#rates-form-preloader").hide();
+                    $('.rate-table').show();
+                }
+            }
+
+        });
+
+        $(window).on('CalculatorValidationHandler', function (e) {
+            var _state = e.state;
+
+            ChangePageControls(_state);
+
+        });
+
+        $(window).on('Error', function (e) {
+
+            var _target = e.target;
+
+            if (_target) {
+                if (_target === 'rates') {
+                    if (!e.errorDescription) {
+                        $(".rate-table").show();
+                        $("#rates-form-preloader").hide();
+
+                        return;
+                    }
+
+                    $(".rate-table").hide();
+                    $("#rates-form-preloader").hide();
+                    $(".errorrates").show();
+                } else {
+                    if (!e.errorDescription) {
+                        hasError = false;
+
+                        $("#form-preloader").hide();
+                       // $("#calculatornotice-form").show();
+                        $("#calculator-container").show();
+                        ChangePageControls(false);
+
+                        $(".errorcalculatores").hide();
+
+                        return;
+                    } else {
+                        hasError = true;
+                        $("#form-preloader").hide();
+                       // $("#calculatornotice-form").hide();
+                        $("#calculator-container").hide();
+                        $(".errorcalculatores").show();
+                        ChangePageControls(false);
+                    }
+                }
+            }
+        });
+
+        function ChangePageControls(enabled) {
+            $(".area_buttons_calculate").hide();
+            if (enabled) {
+                $("#buttonPrint").removeClass("disabledbutton");
+                $(".area_buttons_calculate").show();
+            }
+            else {
+                $("#buttonPrint").addClass("disabledbutton");
+
+            }
+        }
+
+        Calculator.init(data);
+
+        $("#buttonPrint").click(function () {
+            CalculatorHandler.printRatesDoc(data);
+        });
+    });
+
+    $(document).on('click', '#calculateNoticeDeposit', function (event) {
+        $('#noticeResultsMobile').css('height', '280px');
+    });
+</script>
+
+}

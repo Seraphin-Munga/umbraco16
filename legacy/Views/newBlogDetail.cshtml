@@ -1,0 +1,284 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.BlogDetail>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using acf_africanbankv1.Models.Blog;
+@{
+    Layout = "Master.cshtml";
+    //var blogDetailHeader = Model.Content.Children.FirstOrDefault().Children.Where(c => c.DocumentTypeAlias == "heroHeaderBlogDetail").FirstOrDefault();
+    //var blogDetailBody = Model.Content.Children.FirstOrDefault().Children.Where(c => c.DocumentTypeAlias == "heroBodyBlogDetail").FirstOrDefault();
+    //var blogDetailFeet = Model.Content.Children.FirstOrDefault().Children.Where(c => c.DocumentTypeAlias == "heroFeetBlogDetail").FirstOrDefault();
+    //var articles = CurrentPage.Parent.Children;
+    //var blogImage = (IPublishedContent)blogDetailHeader.GetPropertyValue("image");
+    //var blogTitle = blogDetailBody.GetPropertyValue("title");
+    //var blogDate = Convert.ToDateTime(blogDetailBody.GetPropertyValue("blogDate")).ToString("d");
+    //var blogIntroDescription = blogDetailBody.GetPropertyValue("introductionDescription");
+    //var blogBody = blogDetailBody.GetPropertyValue("blogBody");
+    //int contentCount = articles.Count();
+    //string[] _items = new string[contentCount];
+    //int index = 0;
+    bool previousPageIsEllipsis = false;
+
+    var contents = Model.Content.Parent.Children;
+    string sideBannerImg = "";
+    try
+    {
+        sideBannerImg = "/media/52843/side_banner.gif"; //((IPublishedContent)Model.Content.Parent.GetPropertyValue("image")).Url;
+    }
+    catch
+    {
+    }
+    var blogs = new List<BlogItem>();
+    var currentBlog = new BlogItem();
+
+
+    foreach (var item in contents)
+    {
+        if (item.Id == 41927)
+        {
+            break;
+        }
+        var blogHeader = item.Children.FirstOrDefault().Children.Where(c => c is HeroHeaderBlogDetail).FirstOrDefault();
+        var blogBody = item.Children.FirstOrDefault().Children.Where(c => c is HeroBodyBlogDetail).FirstOrDefault();
+        var image = blogHeader.GetPropertyValue("image");
+
+        var blogItem = new BlogItem()
+        {
+            ID = item.Id,
+            ImageUrl = ((IPublishedContent)blogHeader.GetPropertyValue("image")).Url?.ToString() ?? "",
+            Title = (blogBody.GetPropertyValue("title"))?.ToString() ?? "",
+            Description = (blogBody.GetPropertyValue("introductionDescription"))?.ToString() ?? "",
+            PublishDate = Convert.ToDateTime(blogBody.GetPropertyValue("blogDate")),
+            BlogItemUrl = ((IPublishedContent)item).Url,
+            Content = (blogBody.GetPropertyValue("blogBody"))?.ToString() ?? ""
+        };
+
+        if (item.Id == Model.Content.Id)
+        {
+            currentBlog = blogItem;
+        }
+
+        blogs.Add(blogItem);
+    }
+
+    //blogs = blogs.OrderByDescending(b => b.PublishDate).ToList();
+    blogs = blogs.OrderByDescending(b => b.PublishDate).ThenBy(x => x.PublishDate.ToShortDateString() == "01/01/0001").ToList();
+    var indexOfCurrent = blogs.IndexOf(currentBlog);
+    var previousBlogUrl = "";
+    var nextBlogUrl = "";
+    if (indexOfCurrent != 0)
+    {
+        previousBlogUrl = blogs[indexOfCurrent - 1].BlogItemUrl;
+    }
+    if (blogs.IndexOf(currentBlog) != blogs.Count)
+    {
+        nextBlogUrl = blogs[indexOfCurrent + 1].BlogItemUrl;
+    }
+    /*Press Release*/
+    var latestPrs = new List<NcArchieve>();
+
+    var prContent = Model.Content.Parent.Parent.Children(x => x.Name == "Press Releases").FirstOrDefault().Children(x => x.Name == "Hero Body").FirstOrDefault();
+    var tabBody = (TabBody)prContent.Children(x => x is TabBody).FirstOrDefault();
+    var prs = (IEnumerable<IPublishedContent>)tabBody.TabBodyContent.Where(c => c.DocumentTypeAlias == "nCTabGenericContent").FirstOrDefault().GetPropertyValue("sectionContent");
+    var count = 0;
+    for (int x = prs.Count() - 1; x > 0; x--)
+    {
+        var lprs = ((List<IPublishedContent>)(prs.ToList()[x].Properties.ToList()[1].Value));
+        foreach (var p in lprs)
+        {
+            if (count > 3)
+            {
+                break;
+            }
+            var a = (NcArchieve)p;
+            latestPrs.Add(a);
+            count += 1;
+        }
+    }
+
+    /*AB Stories*/
+
+    var abContent = Model.Content.Parent.Parent.Children(x => x.Name == "African Bank Stories").FirstOrDefault()
+        .Children(x => x.Name == "Hero Body").FirstOrDefault()
+        .Children(x => x.Name == "Video").FirstOrDefault()
+        .Children(x => x.Name == "Landing Video").FirstOrDefault()
+        .Children(x => x.Name == "Video items").FirstOrDefault();
+    var videos = (IEnumerable<IPublishedContent>)((TabBody)abContent).TabBodyContent.Where(c => c.DocumentTypeAlias == "nCTabGenericContent").FirstOrDefault().GetPropertyValue("sectionContent");
+
+}
+
+<link href="~/css/Blog.css" rel="stylesheet" />
+<div class="container-fluid">
+    <div class="row">
+        <ol class="breadcrumb">
+            <li><a href="/en/home/blog-landing">Blog</a></li>
+            <li>@currentBlog.Title</li>
+        </ol>
+    </div>
+</div>
+<div class="container">
+
+    <div class="col-sm-12" style="padding:unset;">
+
+        <h1 class="blue-highlight margin-bottom-20 text-left">@currentBlog.Title</h1>
+
+        <div id="divMainBlog" class="col-sm-6 col-xs-12" style="padding-left:unset;">
+
+            <div class="article-card">
+                <div style="display:flex;">
+                    <div id="imgMain" class="image" style="background-image: url('@currentBlog.ImageUrl');">
+                    </div>
+                </div>
+                <div id="divMainReadMore">
+                    <div class="publishDate">
+                        <b class="date-output">Publish Date: @currentBlog.PublishDate.ToShortDateString()</b>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="divNextblogs" class="col-sm-6 xs-remove" style="padding-left:unset;">
+            @foreach (var blog in blogs.Skip(1).Take(3))
+            {
+                <a href="@blog.BlogItemUrl">
+                    <div class="article-card" style="cursor:pointer;">
+                        <div style="display:flex;">
+                            <div class="col-md-4 hidden-md hidden-sm hidden-xs">
+                                <div class="image" style="background-image: url('@blog.ImageUrl')"></div>
+                            </div>
+                            <div class="col-xs-12 col-lg-8">
+                                <div class="image remainingBlogImage hidden-lg " style=" height:220px; position: relative; background-image: url('@blog.ImageUrl')"></div>
+                                <div class="article-content">
+                                    <div class="article-title ">@blog.Title</div>
+                                    <div class="body-content ">
+                                        @blog.Description
+                                    </div>
+                                </div>
+                                <div class="article-content">
+                                    <div class="pull-left hidden-lg"><i>Read more</i></div>
+                                    <div class="pull-right"><i>Publish Date: @blog.PublishDate.ToShortDateString()</i></div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            }
+
+        </div>
+        <div id="divMainDetail" class="col-sm-12 col-xs-12 responsiveMove" style="padding-left:unset; padding-top:30px;">
+            <div class="col-sm-8 col-xs-12" style="padding-left:unset;">
+                @Html.Raw(currentBlog.Content)
+            </div>
+            <div id="divSideContent" class="col-sm-4 xs-remove" style="padding-right:unset;">
+                @*<div id="imgSide" class="image" style="background-image: url('@sideBannerImg'); min-height:850px; background-repeat:no-repeat; background-size:cover; border-radius: 4px;"></div>
+            <IMG SRC='@sideBannerImg' />*@
+            </div>
+            <div class="col-xs-12">
+                @if (!String.IsNullOrEmpty(previousBlogUrl))
+                {
+                    <div class="pull-left">
+                        <a href="@previousBlogUrl" class="btn btn-default"><i class="fa fa-arrow-left"></i> Previous Blog</a>
+                    </div>
+                }
+                @if (!String.IsNullOrEmpty(nextBlogUrl))
+                {
+                    <div class="pull-right">
+                        <a href="@nextBlogUrl" class="btn btn-default">Next Blog <i class="fa fa-arrow-right"></i></a>
+                    </div>
+                }
+            </div>
+            <br />
+        </div>
+
+
+        <div id="divAbStories" class="col-sm-12" style="padding:unset;">
+            <div class="col-sm-12">
+                <h4 class="pageTitle">Latest on African Bank Stories</h4>
+            </div>
+
+            @foreach (var vid in videos.Reverse().Take(2))
+            {
+                var cardIcon = @vid.GetPropertyValue("CardIcon");
+                var imgUrl = ((IPublishedContent)cardIcon).Url;
+
+
+                <div class="col-sm-6">
+
+                    <div class="article-card">
+                        <div style="display:flex;">
+                            <div class="image videoHeight" style="background-image: url('@imgUrl'); position:relative; cursor:pointer;" onclick="this.nextElementSibling.style.display='block'; this.style.display='none'">
+                                <div style="position: absolute; bottom: 35%; left:43%; color:white; opacity: 0.6;" class="article-title">
+                                    <i class="fa fa-play-circle fa-5x" style="text-align:center"></i>
+                                </div>
+                                <div id="descriptionStories" style="" class="body-content">
+                                    @vid.GetPropertyValue("CardDescription")
+                                </div>
+                            </div>
+                            <div style="display:none; width:100%;">
+                                <iframe class="videoHeight" src="@vid.Name?autoplay=1" style="width:100%;"></iframe>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                </div>
+            }
+            <a href="../../african-bank-stories"><h4 class="pageLink" style="float:right;">Watch More</h4></a>
+        </div>
+
+        <div id="divPRs" class="col-sm-12" style="margin-top:30px; padding:unset;">
+            <div class="col-sm-12">
+                <h4 class="pageTitle">Latest Press Releases</h4>
+            </div>
+            <br />
+            @foreach (var pr in latestPrs)
+            {
+
+                <div class="col-sm-6" style="padding-left:unset;">
+
+                    <a href="@pr.File.Url" target="_blank">
+                        <div class="article-card">
+                            <div class="article-content" style="padding-top:20px;">
+                                <div class="col-sm-2 xs-remove">
+                                    <img style="height:50px;" src="/images/pdf.png" alt="Alternate Text">
+                                    @*<i style="font-size:50px; padding-bottom:20px;" class="fa fa-file"></i>*@
+                                </div>
+                                <div class="col-sm-10">
+                                    <div class="article-title">@pr.Title</div>
+                                </div>
+                            </div>
+
+                            @*<div style="position:absolute;bottom:0; left:20%; padding-bottom:10px;">
+                                    <a href="@pr.File.Url" target="_blank">Download</a>
+                                </div>*@
+
+                        </div>
+                    </a>
+                </div>
+            }
+            <a href="../../press-releases"><h4 class="pageLink" style="float:right;">Read More</h4></a>
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+    function imgMainFix() {
+
+        var deviceWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+        if (deviceWidth > 767) {
+            $("#imgMain").css("height", $("#divNextblogs").height() - 53 + "px");
+        }
+    }
+
+    window.onresize = function () {
+        imgMainFix();
+    }
+
+    $(document).ready(function () {
+        $("li.unavailable a").removeAttr("href");
+        imgMainFix();
+    });
+</script>
+

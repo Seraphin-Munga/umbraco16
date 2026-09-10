@@ -1,0 +1,10 @@
+﻿<parameters>
+  <parameter name="IIS Web Application Name"
+  description="Full site path where you want to install your application (for example, Default Web Site/Application)."
+  defaultValue="qa-africanbank-cms.ebankit.local/Common.JS.Library"
+  tags="IisApp">
+    
+    <parameterEntry kind="ProviderPath" scope="iisApp" match="qa-africanbank-cms\.ebankit\.local\\Common.JS.Library" />
+  </parameter>
+ 
+</parameters> 

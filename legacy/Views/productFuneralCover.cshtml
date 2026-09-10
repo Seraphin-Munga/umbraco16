@@ -1,0 +1,924 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageManageYourAccount>
+@using CustomModels = Web.Models;
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers
+
+
+@{
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var children = Model.Children;
+
+
+    // Get specific Children
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    var heroKnees = children?.Where(c => c.ContentType.Alias.ToLower() == "heroknees").FirstOrDefault();
+    var testimonialTab = children?.Where(c => c.ContentType.Alias.ToLower() == "testimonials").FirstOrDefault();
+
+
+    var items = heroKnees.Value("items");
+
+    var keyBenefits = heroBody.Children(x => x.ContentType.Alias.ToLower() == "richtexteditor").FirstOrDefault();
+    var cardImageDescriptions = heroBody.Children(x => x is Card).ToList();
+    var contactUs = heroBody.Children(x => x.ContentType.Alias.ToLower() == "herobodycontactus").FirstOrDefault();
+
+    // Call me back
+    var callMeBack = children?.Where(c => c.ContentType.Alias.ToLower() == "callmeback").FirstOrDefault();
+
+    // Get Specific Grandchildren
+    var bodyCards = heroBody?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+    var bodyButton = heroBody?.Children?
+    .Where(c => c.ContentType.Alias == "ebankITAbstractButton").FirstOrDefault();
+
+    // Get Properties
+    var bodyTitle = heroBody?.Value("bodyTitle").ToString();
+    // var bodyDescription = heroBody?.Value("bodyDescription").ToString();
+    var bodyRedirects = heroKnees?.Value("title").ToString();
+    var applyDocs = bodyCards?.Select(c => c as Card).ToList();
+
+    var benefitsModel = new CustomModels.Benefits
+    {
+        Header = heroChest?.Value("chestTitle").ToString(),
+        Description = heroChest?.Value("chestDescription").ToString(),
+        BenefitCards = heroChest?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card")?.Select(c => c as Card).ToList()
+    };
+
+
+    var headerImage_large = heroHeader?.Value<IPublishedContent>
+        ("image")?.Url;
+    var headerImage_medium = heroHeader?.Value<IPublishedContent>
+        ("imageMedium")?.Url;
+    var headerImage_small = heroHeader?.Value<IPublishedContent>
+        ("imageSmall")?.Url;
+
+}
+
+<style type="text/css">
+    .mega-tabs .nav-tabs>li.active:after {
+        top: unset !important;
+        bottom: -18px;
+    }
+    /* Partial Style Start */
+
+    h2 {
+        text-align: center;
+    }
+
+    .campaign-more-container {
+        margin-top: 80px;
+        padding: 27px;
+    }
+
+    .flex-img {
+        display: table-cell;
+        text-align: center;
+    }
+
+    .eq-height {
+        margin-top: 50px;
+        margin: auto
+    }
+
+    .inner-container {
+        text-align: center;
+    }
+
+   .sign {
+        border-radius: 32px;
+        background: #c4d82e !important;
+        color: #002b60;
+        font-family: 'Arial Narrow Bold', sans-serif;
+        font-weight: 900;
+    }
+
+    .setp-box{
+        width:94px;
+        margin-left: -16px;
+    }
+
+    @*.text-color {
+        color: #002b60 !important;
+        font-weight: bold !important;
+    } *@
+    .h2-color {
+        color: #002b60;
+    }
+    /* Partial Style End */
+    .margin-right-15, .margin-left-15 {
+        margin-right: 15px;
+        margin-left:15px;
+    }
+    
+        #rates-container {
+            margin-top: 50px;
+        }
+
+        .unlisted, .listed {
+            margin: 0;
+            padding: 0;
+        }
+
+        .unlisted {
+            counter-reset: foo;
+            display: table;
+        }
+
+        .listed {
+            list-style: none;
+            counter-increment: foo;
+            display: table-row;
+            width: 100%;
+        }
+
+            .listed::before {
+                content: "";
+                font-family: 'Glyphicons Halflings';
+                font-size: 12px;
+                margin-right: 13px;
+                color: #88bc47;
+                display: table-cell;
+                text-align: right;
+                padding-right: .8em;
+            }
+
+
+        .benefitsHeader {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .hero-static-caption {
+            top: -30px;
+        }
+
+        .keyBenefitsSection {
+            padding-bottom: 4vh;
+        }
+
+        .hidden-sm, .hidden-md {
+            display: none;
+        }
+
+        @@media (max-width: 768px) {
+            @* Why is this rule in place?
+        .hidden-xs {
+            display: initial !important;
+        } *@
+
+            .hand-helds {
+                text-align: center !important;
+            }
+        }
+
+        .campaign-product-container {
+            padding: 50px;
+            background: #f7f7f7;
+            position: relative;
+            top: -30px;
+            margin-top: 50px;
+        }
+
+        .investment-calculator {
+            margin-top: 100px;
+        }
+
+        .mainHeaderText {
+            background: #f7f7f7;
+            position: relative;
+            padding: 20px;
+            bottom: -47px;
+        }
+
+        .long-description {
+            margin-left: 50px;
+            margin-top: 20px;
+        }
+
+        .long-des {
+            margin-bottom: -100px !important;
+        }
+
+        .text-step {
+            @*text-align: center;*@
+            margin-bottom: -20px;
+            position: relative;
+            top: 4px;
+            color: #002b60;
+            font-weight: bold;
+            margin-left: 46px;
+            font-size: 18px;
+        }
+
+
+        @@media (max-width: 640px) {
+            .col-sm-12 {
+                margin: 10px;
+            }
+
+            .investment-calculator {
+                margin-top: 20px;
+            }
+
+            .box-step-text {
+                width: 280px;
+                margin: auto;
+                margin-top: -30px;
+                margin-left: 70px;
+                font-size: 10px;
+            }
+        }
+
+        @@media (min-width: 480px) {
+            .keyBenefitsSection {
+                padding-top: 20px;
+            }
+        }
+
+        @@media (max-width: 767px) {
+            .campaign-product-container.full {
+                margin: 10px -15px;
+            }
+
+            .box-step-text {
+                width: 280px;
+                margin: auto;
+                margin-top: -30px;
+                margin-left: 70px;
+                font-size: 10px;
+            }
+
+            .container-step {
+                height: auto !important;
+            }
+
+            .padding-funeral {
+                padding-left: 48px;
+            }
+
+            .margin-funeral {
+                margin-left: -40px;
+            }
+        }
+
+
+
+        .step {
+            background: #002b60;
+            background-image: linear-gradient(to right, #687b92fc, #002b60);
+            width: 83px;
+            border-top-right-radius: 7px;
+            border-bottom-right-radius: 7px;
+            height: 30px;
+            color: #fff;
+            padding: 4px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+            .step:after {
+                content: "";
+                display: block;
+                position: absolute;
+                top: 0px;
+                left: 98%;
+                border-style: solid;
+                border-color: transparent #002b60;
+                border-width: 16px 0px 14px 32px;
+                width: 0;
+                height: 0px;
+            }
+
+        .container-step {
+            background: #a9a9a9;
+            height: 30px;
+            margin-top: 30px
+        }
+
+        .premiums-member {
+            margin-top: 90px;
+        }
+
+        .member-margin {
+            margin-left: 53px;
+        }
+
+    @@media (min-width: 280px) and (max-width: 350px) {
+        .box-step-text {
+            width: 200px;
+        }
+    }
+</style>
+
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+<!-- HERO CONTINUED-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+
+
+<div class="container">
+
+    @if (benefitsModel.BenefitCards != null && benefitsModel.BenefitCards.Any())
+    {
+        int iterator = 0;
+        <div class="row @(benefitsModel.BenefitCards.Count > 3 ? " card-slider" : "" ) ">
+            @* eq-height *@
+            @{
+                int imgIterator = 0;
+                foreach (Card benefit in benefitsModel.BenefitCards)
+                {
+                    String cardIdTag = " card" + iterator.ToString();
+                    String cardId = benefit.Name.Replace(" ", " ").ToString() + imgIterator.ToString();
+                    <div class="col-md-4 col-sm-4" style="padding-left:unset; padding-right:unset">
+                        <div class="image center-align">
+                            @{
+                                if (benefit.CardIcon != null)
+                                {
+                                    <a href="#@cardId">
+                                        <img class="myWorld-campaign-images" src="@benefit.CardIcon.Url" alt="@benefit.Value("altTag")" />
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a href="#">
+                                        <img class="myWorld-campaign-images" src="@benefit.CardDescription" alt="@benefit.CardTitle" />
+                                    </a>
+                                }
+                            }
+                        </div>
+                    </div>
+                    ++iterator;
+                    ++imgIterator;
+                }
+            }
+        </div>
+    }
+
+    @*<div class="campaign-product-container full">
+
+            //benefitsModel
+            @Html.Partial("_benefitsSection", benefitsModel)
+        </div>*@
+
+    @Html.Raw(heroBody.Value("richTextBox"));
+
+</div>
+@Html.Partial("_keyBenefits", new CustomModels.HowToApplyDataContainer(bodyTitle, bodyRedirects, bodyButton as IEbankItabstractButton, applyDocs))
+
+<!-- PRODUCT INFORMATION-->
+@*<div class="container">
+        <div class="campaign-product-container full">
+            @Html.Partial("_benefitsCard", cardImageDescriptions)
+        </div>
+    </div>*@
+
+
+
+<!-- SUBMIT YOU CLAIM -->
+@* @Html.Partial("_claimForm") *@
+
+<div class="margin-top-20 visible-xs"></div>
+
+@* INVESTMENT CALCULATOR *@
+
+
+<div class="container">
+    @{
+        int count = 1;
+        foreach (var row in items as List<ContentModels.NCcard>)
+        {
+            <div class="row">
+                <div class="container-step margin-bottom-15 margin-right-15 margin-left-15">
+                    <div class="col-sm-1 setp-box">
+                        <div class="step">
+                            <span>@row.Value("nCcardDescription") @count</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-10 box-step-text">
+                        <p class="text-step">@row.Value("NCcardTitle")</p>
+                    </div>
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="long-description">
+                    @Html.Raw(@row.Value("mediumDescription"))
+                </div>
+            </div>
+
+            if (row.ImageListAndDescriptions != null)
+            {
+                <div class="row">
+                    @{
+                        if (row.ImageListAndDescriptions.ToList().Count > 1)
+                        {
+                            foreach (var _item in row.ImageListAndDescriptions.ToList())
+                            {
+                                if (_item.Image != null)
+                                {
+                                    <div class="col-sm-5">
+                                        <div class="row">
+                                            <div class="col-md-6 col-sm-12 hand-helds">
+                                                <img src="@_item.Image.Url" alt="" />
+                                            </div>
+                                            <div class="col-md-6 col-sm-12 hand-helds">
+                                                @Html.Raw(_item.Description)
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            <div class="row">
+                                <div class="col-sm-12 long-des">
+                                    @Html.Raw(@row.Value("nClongDescription"))
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            if (row.ImageListAndDescriptions.Count() == 1)
+                            {
+                                if (row.ImageListAndDescriptions.FirstOrDefault().Image != null)
+                                {
+                                    if (row.ImageListAndDescriptions.FirstOrDefault().Description.ToString() == "")
+                                    {
+                                        @*</div>*@
+                                        <div class="center-align hidden-xs hidden-sm visible-md visible-lg">
+                                            <img src="@row.ImageListAndDescriptions.FirstOrDefault().Image.Url" alt="" style="height: 50.7vh;">
+                                        </div>
+
+                                        <div class="col-xs-12 center-align visible-xs visible-sm hidden-md hidden-lg">
+                                            <img src="@row.NCcardIcon.Url" alt="@row.NCcardIcon.Value("altTag")" /> @* style="height: 70vh;" *@
+                                        </div>
+                                        @*<div class="container">*@
+                                    }
+                                    else
+                                    {
+
+                                        <div class="col-sm-1"></div>
+                                        <div class="col-md-3 col-sm-12 hand-helds">
+                                            <img src="@row.ImageListAndDescriptions.FirstOrDefault().Image.Url" alt="" />
+                                        </div>
+                                        <div class="col-md-8 col-sm-12 hand-helds">
+                                            @Html.Raw(row.NClongDescription)
+                                        </div>
+                                    }
+                                    <div class="row">
+                                        <div class="col-sm-12 member-margin">
+                                            @Html.Raw(row.ImageListAndDescriptions.FirstOrDefault().Description)
+                                        </div>
+                                    </div>
+                                }
+
+                            }
+                        }
+                    }
+                </div>
+            }
+
+            count++;
+        }
+    }
+
+</div>
+
+<div class="mainHeaderText">
+    @Html.Raw(contactUs.Value("mainHeaderText"))
+</div>
+
+
+
+
+@* TODO:// Phase 2
+    <div class="container investment-cal-form">
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="calculator">
+                        <div class="ajax-form-success ajax-alert alert alert-success square errorcalculatores" style="display: none;">@ResourceHelper.GetResource("ErrorCalculatores")</div>
+                        <section id="form-preloader">
+                            <div class="loader" id="form-preloader-loader">
+                                <div class="loader-img"></div>
+                            </div>
+                        </section>
+                        <div id="calculatorfuneral-form"></div>
+                        <div id="calculator-container"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+*@
+
+
+
+
+<div class="margin-top-50 hidden-xs"></div>
+
+<!-- HOW TO APPLY-->
+@* @Html.Partial("_howToApplySection", new CustomModels.HowToApplyDataContainer(bodyTitle, bodyDescription, bodyButton as IEbankItabstractButton, applyDocs)) *@
+
+<!-- CAMPAIGN MORE INFO -->
+@* @Html.Partial("_heroKneeTabs", heroKnees as ContentModels.HeroKnees) *@
+
+<!-- TESTIMONIALS -->
+@* @Html.Partial("_testimonials", testimonialTab as Testimonials) *@
+
+<!-- CALL BACK FORM -->
+@Html.Partial("_callMeBackForm", callMeBack as ContentModels.CallMeBack)
+
+
+
+
+@section scripts{
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/handlebars-v4.0.5.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/jquery.xdomainrequest.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculator.js?ver=1")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculator1.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculatorHandler.min.js")"></script>
+
+    <script type="text/javascript">
+
+                    $(document).ready(function () {
+                        var imageBgCss = "url('" + "@headerImage_large" + "')";
+                        var imageMdCss = "url('" + "@headerImage_medium" + "')";
+                        var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_medium : headerImage_small)" + "')";
+                        var CheckScreenSize;
+                        (CheckScreenSize = function () {
+                            var _width = $(window).outerWidth();
+                            var _height = $(window).outerHeight();
+                            if (_width <= 511) {
+                                $("#heroHeader").css("background-image", imageSmCss);
+                            }
+                            else {
+                                $("#heroHeader").css("background-image", imageBgCss);
+                            }
+                        })();
+                        $(window).resize(CheckScreenSize);
+                    });
+
+                    $(function () {
+                        var data = {
+                            product: 'FUN',
+                            rateContainer: '#rates-container',
+                            calcFormContainer: '#calculatorfuneral-form',
+                            responseCalculatorContainer: '#calculator-container',
+                            serviceUrl: '@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.Mobile.URL"]',
+                            imagesRates: [
+                                'myself_small.png',
+                                'myself_and_spouse_small.png',
+                                'myself_and_children_small.png',
+                                'myself_spouse_children_small.png'
+                            ],
+                            headers: [
+                                ['ITSAPP-DEVICE', '@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.ITSAPP-DEVICE"]'],
+                                ['ITSAPP-DEVICEID', '*'],
+                                ['ITSAPP-LANG', 'en-GB'],
+                                ['Content-type', 'application/json']
+                            ],
+                            translations: {
+                                coverYourself: '@ResourceHelper.GetResource("CoverYourself")',
+                                coverYourselfAndYourSpouse: '@ResourceHelper.GetResource("CoverYourselfAndYourSpouse")',
+                                coverYourselfAndUpTo8Children: '@ResourceHelper.GetResource("CoverYourselfAndUpTo8Children")',
+                                coverYourselfYourSpouseAndUpTo8Children: '@ResourceHelper.GetResource("CoverYourselfYourSpouseAndUpTo8Children")',
+                                additionalMembers: '@ResourceHelper.GetResource("AdditionalMembers")',
+                                additionalFeePerMember: '@ResourceHelper.GetResource("AdditionalFeePerMember")',
+                                youngerThan26: '@ResourceHelper.GetResource("YoungerThan26")',
+                                aged26To64: '@ResourceHelper.GetResource("Aged26To64")',
+                                aged65To75: '@ResourceHelper.GetResource("Aged65To75")',
+                                myself: '@ResourceHelper.GetResource("Myself")',
+                                myselfAndMySpouse: '@ResourceHelper.GetResource("MyselfAndMySpouse")',
+                                myselfAndUpTo8Children: '@ResourceHelper.GetResource("MyselfAndUpTo8Children")',
+                                myselfMySpouseAndUpTo8Children: '@ResourceHelper.GetResource("MyselfMySpouseAndUpTo8Children")',
+                                age: '@ResourceHelper.GetResource("Age")',
+                                coverAmount: '@ResourceHelper.GetResource("CoverAmount")',
+                                additionalMember: '@ResourceHelper.GetResource("AdditionalMember")',
+                                howMuchCoveredMandatory: '@ResourceHelper.GetResource("HowMuchCoveredMandatory")',
+                                addMembersIsMandatory: '@ResourceHelper.GetResource("AddMembersIsMandatory")',
+                                numberAdditionalMembersMandatory: '@ResourceHelper.GetResource("NumberAdditionalMembersMandatory")',
+                                allOptionsMembers: '@ResourceHelper.GetResource("AllOptionsMembers")',
+                                whoDoYouWantToCover: '@ResourceHelper.GetResource("WhoDoYouWantToCover")',
+                                howMuchCoverDoYouNeed: '@ResourceHelper.GetResource("HowMuchCoverDoYouNeed")',
+                                wouldYouLikeToAddAnyAdditionalMembers: '@ResourceHelper.GetResource("WouldYouLikeToAddAnyAdditionalMembers")',
+                                howManyAdditionalMembers: '@ResourceHelper.GetResource("HowManyAdditionalMembers")',
+                                getThisCoverFor: '@ResourceHelper.GetResource("GetThisCoverFor")',
+                                perMonth: '@ResourceHelper.GetResource("PerMonth")',
+                                amountCoverNeed: '@ResourceHelper.GetResource("AmountCoverNeed")',
+                                addAdditionalMember: '@ResourceHelper.GetResource("AddAdditionalMember")',
+                                numberOfAdditionalMembers: '@ResourceHelper.GetResource("NumberOfAdditionalMembers")',
+                                ageOfAdditionalMembers: '@ResourceHelper.GetResource("AgeOfAdditionalMembers")',
+                                selectCoverAmountForAdditionalMembers: '@ResourceHelper.GetResource("SelectCoverAmountForAdditionalMembers")'
+                            }
+                        };
+
+                        $(window).on('CalculatorLoadingEvent', function (e) {
+                            var _state = e.state;
+                            var _target = e.eventName;
+                            if (_target !== 'loadingRatesEvent') {
+                                if (_state) {
+                                    $("#form-preloader").show();
+                                    $(data.calcFormContainer).hide();
+                                    ChangePageControls(false);
+                                } else {
+                                    $("#form-preloader").hide();
+                                    $(data.calcFormContainer).show();
+                                    ChangePageControls(Calculator.isCalculatorValid('FUN'));
+                                }
+                            } else {
+                                if (_state) {
+                                    $("#loader-rates-form-preloader").show();
+                                    $('#calculatorRates').hide();
+                                    ChangePageControls(false);
+                                } else {
+                                    $("#loader-rates-form-preloader").hide();
+                                    $('#calculatorRates').show();
+                                    ChangePageControls(Calculator.isCalculatorValid('FUN'));
+                                }
+                            }
+                        });
+
+                        $(window).on('CalculatorValidationHandler', function (e) {
+                            var _state = e.state;
+                            ChangePageControls(_state);
+                        });
+
+                        $(window).on('Error', function (e) {
+                            $("#rates-form-preloader").hide();
+                            $("#form-preloader").hide();
+                            $(data.calcFormContainer).hide();
+                            $("#calculator-container").hide();
+                            if (!e.errorDescription) {
+                                $("#calculator-container").show();
+                                $(".errorcalculatores").hide();
+                                return;
+                            }
+                            ChangePageControls(false);
+                            $(".errorcalculatores").show();
+                        });
+
+                        function ChangePageControls(enabled) {
+                            if (enabled) {
+                                $("#buttonPrint").removeClass("disabledbutton");
+                                return;
+                            }
+                            $("#buttonPrint").addClass("disabledbutton");
+                        }
+
+                        function PrintElem(elem) {
+                            Popup($(elem)[0].outerHTML);
+                        }
+
+                        function Popup(data) {
+                            //var mywindow = window.open('', 'Calculator Results');
+                            //mywindow.document.write('<html><head><title>Calculator Results</title>');
+                            //mywindow.document.write('<link rel="stylesheet" href="/Content/ebankITMasterCss.min.css?V=1277zadzhbh32" type="text/css"  media="all" />');
+                            //mywindow.document.write('</head><body >');
+                            //mywindow.document.write(data);
+                            //mywindow.document.write('</body><script>window.print();window.close();<\/script></html>');
+
+                            return true;
+                        }
+                        Calculator1.init(data);
+                    });
+    </script>
+    <script type="text/javascript">
+
+                    $(document).ready(function () {
+
+                        $(".cancel-button").click(function () {
+
+                            $("#collapseExample").bootstrapValidator('resetForm', true);
+
+                            $('#collapseExample').collapse('hide');
+
+
+                        });
+
+                        $("#rates-form-preloader").hide();
+
+                        $('#funeral_claim').bootstrapValidator({
+                            message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                            feedbackIcons: {
+
+                            },
+                            onSuccess: function (e) {
+                                e.preventDefault();
+                                SubmitFuneralForm();
+
+                            },
+                            fields: {
+                                'FormFields.Subject': {
+                                    message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                                    validators: {
+                                        notEmpty: {
+                                            message: '@ResourceHelper.GetResource("GenericContactForm_Subject_Required")'
+                                        }
+                                    },
+                                    feedbackIcons: {
+                                        valid: '',
+                                        invalid: '',
+                                        validating: ''
+                                    },
+                                },
+                                'FormFields.Message': {
+                                    message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                                    validators: {
+                                        notEmpty: {
+                                            message: '@ResourceHelper.GetResource("GenericContactForm_Message_Required")'
+                                        }, stringLength: {
+                                            max: 100,
+                                            message: '@ResourceHelper.GetResource("GenericContactForm_Message_LenghtValMessage")'
+                                        }
+                                    },
+                                    feedbackIcons: {
+                                        valid: '',
+                                        invalid: '',
+                                        validating: ''
+                                    },
+                                },
+
+                                'FormFields.FirstName': {
+                                    message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                                    validators: {
+                                        notEmpty: {
+                                            message: '@ResourceHelper.GetResource("GenericContactForm_FirstName_Required")'
+                                        },
+                                        regexp: {
+                                            regexp: /^[a-zA-Z]+$/,
+                                            message: '@ResourceHelper.GetResource("GenericContactForm_FirstName_ValMessage")'
+                                        }, stringLength: {
+                                            max: 20,
+                                            message: '@ResourceHelper.GetResource("GenericContactForm_FirstName_LenghtValMessage")'
+                                        }
+                                    }
+                                },
+                                "FormFields.LastName": {
+                                    message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                                    validators: {
+                                        notEmpty: {
+                                            message: '@ResourceHelper.GetResource("GenericContactForm_LastName_Required")'
+                                        },
+                                        regexp: {
+                                            regexp: /^[a-zA-Z]+$/,
+                                            message: '@ResourceHelper.GetResource("GenericContactForm_LastName_ValMessage")'
+                                        }, stringLength: {
+                                            max: 20,
+                                            message: '@ResourceHelper.GetResource("GenericContactForm_LastName_LenghtValMessage")'
+                                        }
+                                    }
+                                },
+
+                                "FormFields.IdNumber": {
+                                    message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                                    validators: {
+                                        notEmpty: {
+                                            message: '@ResourceHelper.GetResource("GenericContactForm_SAID_Required")'
+                                        },
+                                        regexp: {
+                                            regexp: /^[a-zA-Z0-9]{1,13}$/,
+                                            message: '@ResourceHelper.GetResource("GenericContactForm_SAID_ValMessage")'
+                                        },
+                                        stringLength: {
+                                            max: 13,
+                                            message: '@ResourceHelper.GetResource("GenericContactForm_SAID_LenghtValMessage")'
+                                        }
+                                    }
+                                },
+                                'FormFields.Email': {
+                                    message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                                    validators: {
+                                        notEmpty: {
+                                            message: '@ResourceHelper.GetResource("GenericContactForm_Email_Required")'
+                                        },
+                                        regexp: {
+                                            regexp: /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i,
+                                            message: '@ResourceHelper.GetResource("GenericContactForm_Email_ValMessage")'
+                                        }
+                                    }
+                                },
+                                "FormFields.CellPhone": {
+                                    message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                                    validators: {
+                                        notEmpty: {
+                                            message: '@ResourceHelper.GetResource("GenericContactForm_CellPhone_Required")'
+                                        },
+                                        numeric: {
+                                            message: '@ResourceHelper.GetResource("GenericContactForm_CellPhone_NumericValMessage")'
+                                        },
+                                        stringLength: {
+                                            min: 10,
+                                            max: 10,
+                                            message: '@ResourceHelper.GetResource("GenericContactForm_CellPhone_LenghtValMessage")'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    });
+
+
+                    function SubmitFuneralForm( /*hasSubmit*/) {
+
+
+                        var submitedFormDateTime = new Date().toLocaleString()
+                        $("#loader-rates-form-preloader").show();
+                        $("#log-claim-preloader").show();
+
+
+                        var data = {
+                            FirstName: $('#FirstNameInput').val().trim(),
+                            LastName: $('#LastNameInput').val().trim(),
+                            Subject: 'Log a claim online - Log a Claim',
+                            ProductID: "1",
+                            Email: $('#EmailInput').val().trim(),
+                            CellPhone: $('#CellPhoneInput').val().trim(),
+                            SAID: $('#SAIDInput').val(),
+                            HasSubmit: true,
+                            TimeEnteredOnPage: "@DateTime.Now.ToIsoString()",
+                            SessionId: $('#sessionId').val(),
+                            FreeText: $('#MessageInput').val().trim(),
+                            ProcessID: $('#processID').val(),
+                            ContactType: 'Log a claim Funeral',
+                            ExtendedProperties:
+
+                                [
+                                    {
+                                        "Key": "SubmitedPageDate",
+                                        "Value": submitedFormDateTime
+                                    },
+                                    {
+                                        "Key": "CodeName",
+                                        "Value": navigator.appCodeName
+                                    },
+                                    {
+                                        "Key": "appName",
+                                        "Value": navigator.appName
+                                    },
+                                    {
+                                        "Key": "appVersion",
+                                        "Value": navigator.appVersion
+                                    }
+                                    ,
+                                    {
+                                        "Key": "userAgent",
+                                        "Value": navigator.userAgent
+                                    }
+                                    ,
+                                    {
+                                        "Key": "screenWidth",
+                                        "Value": screenWidth()
+                                    }
+                                    ,
+                                    {
+                                        "Key": "screenHeight",
+                                        "Value": screenHeight()
+                                    },
+                                    {
+                                        "Key": "URL",
+                                        "Value": window.location.href
+                                    }
+                                ]
+
+                        }
+                        requestInProgress = true;
+
+                        AJAX.rootPath = $.rootPath;
+                        AJAX.headers = $.headers;
+
+                        AJAX.request('/public/contacform/submit', {
+                            data: data,
+
+                            success: function (e) {
+                                $("#loader-rates-form-preloader").hide();
+                                $("#log-claim-preloader").hide();
+
+                                if (e.Status == 'Ok') {
+                                    //   console.log("The e -->" + JSON.stringify(e.Status));
+
+                                    $("form#funeral_claim").bootstrapValidator("resetForm");
+                                    $("form#funeral_claim")[0].reset();
+                                    $("#ajax-form-success-log-claim").show();
+                                } else {
+                                    //      console.log("error " + e.Status);
+
+                                    $("#ajax-form-error-log-claim").show();
+
+                                }
+
+                            },
+                            error: function (req, txt, err) {
+                                $("#loader-rates-form-preloader").hide();
+
+                                $("#ajax-form-error-log-claim").show();
+
+                                $("#log-claim-preloader").hide();
+
+                            }
+                        });
+                    }
+    </script>
+}
+

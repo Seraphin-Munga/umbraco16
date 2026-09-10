@@ -1,0 +1,108 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using ContentModels = Umbraco.Web.PublishedModels
+@using Umbraco.Core
+@using System.Web.Optimization
+@{
+    Layout = null;
+    ContentModels.PageHome home = Model.Root() as ContentModels.PageHome;
+    HomePageElements homePageElements = null;
+    if (Model.Children.Where(o => o is HomePageElements).FirstOrDefault() != null)
+    {
+        homePageElements = (HomePageElements)Model.Children.Where(o => o is HomePageElements).FirstOrDefault();
+    }
+    else if (Model.Parent.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault() != null)
+    {
+        homePageElements = (HomePageElements)Model.Parent.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+    }
+    else
+    {
+        homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+    }
+    var disclaimersData = homePageElements.Children.Where(o => o.ContentType.Alias == "ebankITListSectionText").ToList();
+    var disclaimers = disclaimersData.FirstOrDefault().Children;
+    IPublishedContent disclaimerValue = null;
+    foreach (var content in disclaimers)
+    {
+        if (HttpContext.Current.Request.Path.ToString().Contains("/banking"))
+        {
+            if (content.Value("ebankITTitle").ToString().Contains("Banking"))
+            {
+                disclaimerValue = content;
+            }
+        }
+        else
+        {
+            disclaimerValue = content;
+            break;
+        }
+    }
+    var bottomNavigation = (BottomNavigation)homePageElements.Children.Where(c => c is BottomNavigation).FirstOrDefault();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>South African Bank for Consumers - African Bank, We Are You!</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <link href="~/css/bootstrap-4-5-2.min.css" rel="stylesheet">
+    <link href="~/css/font-awesome-4-1-0.min.css" rel="stylesheet">
+    <link href="~/css/font-awesome-4-1-0.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600,700" rel="stylesheet">
+    <link href="~/css/style.css" rel="stylesheet">
+    <link href="~/css/media-query.css" rel="stylesheet">
+    <link href="~/css/aos-2-3-1.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="~/scripts/jquery-3-5-1.min.js"></script>
+    <script src="~/scripts/popper-1-16-0.min.js"></script>
+    <script src="~/scripts/bootstrap-4-5-2.min.js"></script>
+    <script src="~/scripts/aos-2-3-1.js"></script>
+    <script src="~/scripts/search.js"></script>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark custom-nav new-navbar-ab">
+            @Html.Partial("~/Views/Partials/Navigation/Navigation.cshtml")
+        </nav>
+    </header>
+    <!--Optional code starts here -->
+    <main style="width: 100% ;height: 100%">
+        @RenderBody()
+    </main>
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                @Html.Partial("_pageBottomNavigation", bottomNavigation as BottomNavigation)
+            </div>
+            <div class="footer-copyright">
+                <div class="row">
+                    <div class="col-sm-7 col-sm-pull-5">
+                        <img src="~/images/africanbank-logo-white.svg" width="170" alt="African Bank">
+                        <div class="copyright-text">
+                            @Html.Raw(disclaimerValue.Value("ebankITContent"))
+                        </div>
+                    </div>
+                    <div class="col-sm-5 col-sm-push-7">
+                        <img class="pattern hidden-xs" src="~/images/footer-pattern.svg" alt="footer-pattern">
+                        <div class="pull-right">
+                            <a href="#" target="_blank"><i class="footer-social fa" aria-hidden="true"><span style="font-family:Montserrat">B</i></a>
+                            <a href="https://www.facebook.com/africanbank/" target="_blank"><i class="footer-social fa fa-facebook" aria-hidden="true"></i></a>
+                            <a href="https://twitter.com/AfricanBank" target="_blank"><i class="footer-social fa fa-twitter" aria-hidden="true"></i></a>
+                            <a href="https://www.instagram.com/african_bank/" target="_blank"><i class="footer-social fa fa-instagram" aria-hidden="true"></i></a>
+                            <a href="https://za.linkedin.com/company/african-bank" target="_blank"><i class="footer-social fa fa-linkedin" aria-hidden="true"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script type="text/javascript">
+        AOS.init();
+        $('[data-toggle="dropdown"]').each(function () {
+            var $spy = $(this).scrollspy('refresh')
+        })
+    </script>
+</body>
+
+</html>

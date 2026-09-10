@@ -1,0 +1,1279 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage<ContentModels.PageInvestmentCalculator>
+@using AfricanBank.Cms.Portal.Helpers;
+@using ContentModels = Umbraco.Web.PublishedContentModels;
+@{
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var children = Model.Content.Children;
+
+    // Get specific Children
+    var heroHeader = children?.Where(c => c.DocumentTypeAlias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.DocumentTypeAlias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroChest = children?.Where(c => c.DocumentTypeAlias.ToLower() == "herochest").FirstOrDefault();
+    var heroBody = children?.Where(c => c.DocumentTypeAlias.ToLower() == "herobody").FirstOrDefault();
+    var productTabs = heroBody.Children.ToList();
+    var homePageElements = (HomePageElements)Model.Content.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+
+    var heroKnees = children?.Where(c => c.DocumentTypeAlias.ToLower() == "heroknees").FirstOrDefault();
+}
+
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+<!-- HERO CONTINUED-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+
+<!-- CALL BACK FORM -->
+@{
+    var _floatingFormViewModel = children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+    @Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)
+}
+
+<style>
+
+    .control-label {
+        text-align: left !important;
+        width: 100%;
+    }
+
+    img.icon-close {
+        width: 50%;
+    }
+
+    .button.ghostBtn {
+        /*background-color: transparent !important;
+        color: #002b60;*/
+        /*border: 1px solid #002b60;*/
+        border: none;
+        background-color: #88bc47 !important;
+        border-radius: 4px;
+        box-shadow: unset;
+    }
+
+    .button.ghostBtn:hover {
+        background-color: #88bc47 !important;
+    }
+
+    .button.ghostBtn:focus {
+        color: #002b60 !important;
+    }
+
+    .ghostBtn > a {
+        /*background-color: transparent !important;
+        color: #002b60;*/
+        background-color: #88bc47 !important;
+        /*border: 1px solid #002b60;*/
+        border-radius: 4px;
+        box-shadow: unset;
+    }
+
+    .ghostBtn > a:hover {
+        background-color: #88bc47 !important;
+    }
+
+    .ghostBtn > a:focus {
+        color: #002b60 !important;
+        border: rgba(0,0,0,0);
+    }
+
+    .mega-tabs .nav-tabs > li > a {
+        background-color: #f3f3f3;
+    }
+
+    .centerBtn {
+        margin-left: 40%;
+    }
+
+
+    #heroBodyDiv {
+        background: #EFEFEF;
+        padding: 9px;
+    }
+
+    #heroBodyTabGroupDiv {
+        background: #EFEFEF;
+    }
+
+    .tab-content {
+        background-color: white;
+    }
+
+    .mega-tabs
+    {
+        box-shadow:unset;
+    }
+
+    #calIcons {
+        background: #EFEFEF;
+    }
+
+    #btnCalcReturnsNow {
+        text-align: center;
+        padding-top: 50px;
+        padding-bottom: 50px;
+    }
+
+    .tabImg {
+        width: 100%;
+        padding: 5px 20px 20px 20px;
+    }
+
+    li.active > a > div > img.tabImg {
+        padding: 5px 10px 0px 10px;
+    }
+
+    .calcLink {
+        padding-top: 15px !important;
+    }
+
+    .mega-tabs .nav-tabs > li.active > a {
+        color: #88bc47 !important;
+    }
+
+    .mega-tabs .nav-tabs > li.active > a, .mega-tabs .nav-tabs > li.active > a:hover, .mega-tabs .nav-tabs > li.active > a:focus {
+        background: White;
+    }
+
+    #results > .card-shadow.rate-card-fixed-deposit-offer .percentage {
+        font-size: 28px;
+    }
+
+    #results > .card-shadow.rate-card-fixed-deposit-offer {
+        font-size: 18px;
+    }
+
+    #results {
+        height: 230px;
+    }
+
+    .card-shadow.rate-card-fixed-deposit-offer {
+        margin: unset;
+        text-align: unset;
+    }
+
+    .mega-tabs .nav-tabs > li {
+        padding-bottom: 0px;
+        border-right: unset;
+    }
+
+    .card-shadow {
+        box-shadow: unset;
+    }
+
+    #bottomCompareDiv {
+        background: #7f95af;
+        width: 100%;
+        padding-bottom: 25px;
+        margin-top:-55px;
+    }
+
+    #bottomCompareDiv > h3 {
+        text-align: center;
+        color: white;
+    }
+
+    #selectCompare {
+        height:46px;
+    }
+
+    .top-minus-60 {
+        position: unset;
+        /*padding-bottom: 0px;*/
+    }
+
+    #titleSpan {
+        font-size: 14px;
+        font-weight: 900;
+    }
+
+    .resultTitle {
+        font-size: 14px;
+        font-weight: 900;
+    }
+
+    .btnCalc {
+        
+        padding-top: 25px;
+        padding-bottom: 25px;
+    }
+
+        .btnCalc > button {
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+    .resultbtn {
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .centerDiv {
+        text-align: center;
+    }
+
+    .resultbtn {
+        padding: 16px 16px;
+    }
+
+    .card-shadow.rate-card-fixed-deposit-offer .percentage {
+        font-size: 37px;
+    }
+
+    .offer-style {
+        color: #002b60;
+    }
+
+    #compareSelectDiv > select {
+        background-color: transparent;
+        border-color: white;
+        color: white;
+        border-radius: unset;
+    }
+
+    #compareSelectDiv > select > option {
+        color: black;
+    }
+
+    .offer-style{
+        color:white;
+    }
+
+    .background-interest-selected {
+        background-color: #4c6a8f;
+        color: #fff !important;
+        border-bottom-color: #f8f8f800 !important;
+        border-top-color: #f8f8f800 !important;
+    }
+
+    .rightboarder{
+        border-right: 1px solid #001f44;
+    }
+
+    .dropdown-arrow::after {
+        content: "";
+        font-family: FontAwesome;
+        font-size: 22px;
+        top: 9px;
+        color: #bbc0d4;
+        position: absolute;
+        right: 0;
+        z-index: 1;
+        /*text-align: center;*/
+        width: 10%;
+        height: 100%;
+        pointer-events: none;
+        box-sizing: border-box;
+    }
+
+    .select:after {
+        text-align: unset;
+    }
+
+    @@media (max-width: 1200px) and (min-width: 992px) {
+        .btnReCalc {
+            padding: 16px 15px;
+        }
+
+        #results {
+            height: 200px;
+        }
+    }
+
+    @@media(max-width: 991px) and (min-width: 767px) {
+        .mega-tabs .nav-tabs > li {
+            padding: unset;
+        }
+
+        #results > .card-shadow.rate-card-fixed-deposit-offer .percentage {
+            font-size: 20px;
+        }
+
+        #results > .card-shadow.rate-card-fixed-deposit-offer {
+            font-size: 12px;
+
+        }
+
+        .btnReCalc {
+            padding: 16px 8px;
+        }
+
+        #results {
+            height: 180px;
+        }
+    }
+
+    @@media (max-width: 767px) {
+
+        .calcLink {
+            padding-top: 10px !important;
+            padding-bottom: 10px !important;
+        }
+
+        .mega-tabs .nav-tabs > li.active:after{
+            display:none;
+        }
+
+        .rightboarder {
+            border-right: none;
+        }
+
+        #calIcons > li{
+            border: 1px solid;
+        }
+        
+        #compareSelectDiv {
+            padding: 0px 30px 10px 30px;
+        }
+
+        .padBot-90 {
+            padding-bottom: unset;
+        }
+
+        .offer-style {
+            font-size: 21px;
+        }
+
+        .resultbtn {
+            padding: 16px 24px;
+        }
+
+        .percentage {
+            text-align: center;
+        }
+
+        .centerDiv-xs {
+            text-align: center;
+        }
+
+        .btnCalc {
+            margin-left: unset;
+            text-align: center;
+        }
+
+        .mega-tabs .eq-height {
+            display: block;
+        }
+
+        .mega-tabs .nav-tabs > li.loan-summary {
+            padding: unset;
+            width: 100%;
+        }
+
+        #titleSpan {
+            padding: 5px;
+        }
+
+        #results {
+            height: unset;
+        }
+
+        
+    }
+
+    @@media (max-width:445px) {
+        .resultbtn {
+            padding: 16px 15px;
+        }
+    }
+
+    @@media (max-width:410px) {
+        .resultbtn {
+            padding: 16px 6px;
+        }
+    }
+    @@media (max-width:375px) {
+        .resultbtn {
+            padding: 16px 5px;
+            font-size: 15px;
+        }
+    }
+    @@media (max-width:355px) {
+        .resultbtn {
+            padding: 16px 5px;
+            font-size: 14px;
+        }
+    }
+
+    @@media (max-width:320px) {
+        .resultbtn {
+            padding: 16px 5px;
+            font-size: 13px;
+            border: none;
+        }
+    }
+
+</style>
+
+<div id="heroSholderDiv">
+    <div class="container">
+        @Html.Raw(heroShoulder.GetProperty("RichTextEditor").Value)
+        <div class="ghostBtn" id="btnCalcReturnsNow">
+            <a onclick="scrollToCalculator()" class="button primary" id="button">
+                Calculate your returns now!
+            </a>
+        </div>
+    </div>
+</div>
+
+<div id="heroBodyDiv">
+    
+    @Html.Raw(heroBody.GetProperty("RichTextBox").Value)
+
+</div>
+<div id="heroBodyTabGroupDiv">
+    <div class="container">
+        <div class="mega-tabs no-margin">
+            <!-- Nav tabs -->
+            <ul id="calIcons" class="nav nav-tabs eq-height" role="tablist">
+                @{
+
+                    var isFirstRow = true;
+
+                    foreach (var child in productTabs)
+                    {
+                        var header_tabs = child.Children.ToList();
+
+                        foreach (var head_tab in header_tabs)
+                        {
+                            var name = head_tab.Name;
+                            var title = head_tab.GetProperty("ebankITIconTitle").Value;
+                            var url = head_tab.GetPropertyValue<IPublishedContent>("ebankITIcon").Url;
+                            <li role="presentation" class="@(isFirstRow ? "active" : "") loan-summary ">
+                                <a class="calcLink" id="link-@name.Replace(" ","")" href='#@name.Replace(" ","")' aria-controls="home" role="tab" data-toggle="tab"><div id="linkContent-@name.Replace(" ","")"><span id="titleSpan">@title </span><img class="hidden-xs tabImg" src="@url" /></div></a>
+                            </li>
+                            isFirstRow = false;
+                        }
+
+
+                    }
+                }
+            </ul>
+        </div>
+    </div>
+        <div class="tab-content">
+            @{
+                var z = 0;
+                foreach (var child in productTabs)
+                {
+                    var header_tabs = child.Children.ToList();
+                    foreach (var head_tab in header_tabs)
+                    {
+                        var name = head_tab.Name;
+                        var tabname = name.Replace(" ", "");
+                        var content = head_tab.GetProperty("ebankITIconContent").Value;
+                        var start = "";
+                        if (z == 0)
+                        {
+                            z = 1;
+                            start = "active";
+                        };
+                        var partialName = "";
+                        if (tabname == "ProductFixedDeposit")
+                        {
+                            partialName = "_fixedDepositCalculator";
+                        }
+                        if (tabname == "ProductNoticeDeposit")
+                        {
+                            partialName = "_noticeDepositCalculator";
+                        }
+                        if (tabname == "ProductAccessAccumulator")
+                        {
+                            partialName = "_accessAccumulatorCalculator";
+                        }
+                        if (tabname == "ProductTaxFreeInvestment")
+                        {
+                            partialName = "_taxFreeInvestmentCalculator";
+                        }
+
+                        <div role="tabpanel" class="tab-pane @start" id='@tabname'>
+                            <div class="container">
+                                <br />
+                                @Html.Raw(content)
+                                <br />
+                                <div class="centerDiv">
+                                    <a href="https://ib.africanbank.co.za/" class="button primary" id="button">
+                                        Open an account
+                                    </a>
+                                </div>
+                                <br />
+                                <br />
+                            </div>
+                            <div id="calculator-@tabname" class="scrollTo">
+                                @Html.Partial(partialName)
+                            </div>
+                        </div>
+                        
+
+                    }
+                }
+            }
+        </div>
+
+
+        <div id="bottomCompareDiv">
+            <br />
+            <h3>Compare With: </h3>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 col-md-2 col-sm-1 col-xs-0"></div>
+                    <div id="compareSelectDiv" class="col-lg-3 col-md-4 col-sm-5 col-xs-12">
+                        <div class="select area">
+                            <select class="form-control cd-select interest-opt" id="selectCompare">
+                                <option value="FixedDeposit">Fixed Deposit</option>
+                                <option value="NoticeDeposit">Notice Deposit</option>
+                                <option value="AccessAccumulator">Access Accumulator</option>
+                                <option value="TaxFreeInvestment">Tax Free</option>
+                            </select>
+                        </div>
+                    </div>
+                        <div id="compareBtnDiv" class="col-md-6 col-sm-6 col-xs-12">
+                            <div id="btnCompare" class="centerDiv-xs">
+                                <a onclick="switchAndScroll()" class="button primary" id="button">
+                                    Compare
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    @*<div id="btnCompare" class="button primary calculator-button">Compare</div>*@
+                </div>
+
+        </div>
+
+
+
+
+        @*<div class="margin-top-20 visible-xs"></div>*@
+
+    </div>
+
+
+
+
+
+
+@section scripts{
+
+
+
+
+<script type="text/javascript" src="@Url.Content("~/Scripts/handlebars-v4.0.5.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/jquery.xdomainrequest.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculator.js?ver=2")"></script>
+<script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculator1.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculatorHandler.min.js")"></script>
+
+
+<script type="text/javascript">
+    $(function () {
+        //$(".area_buttons_calculate").hide();
+        var hasError = true;
+        var data = {
+            product: 'Fixed',
+            rateContainer: '#rates-container',
+            calcFormContainer: '#calculatorfixed-form',
+            serviceUrl: '@System.Configuration.ConfigurationManager.AppSettings["ebankit.calculators.URL"]',
+            headers: [
+                   ['ITSAPP-DEVICE', '@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.ITSAPP-DEVICE"]'],
+                   ['ITSAPP-LANG', 'en-GB'],
+                   ['Content-type', 'application/json']
+            ],
+            translations: {
+                amount: '@ResourceHelper.GetResource("OnceOffInvestmentAmount")',
+                monthlyInterestRateIncrease: '@ResourceHelper.GetResource("MonthlyInterestRateIncrease")',
+                period: '@ResourceHelper.GetResource("Period")',
+                interestRatePa: '@ResourceHelper.GetResource("InterestRatePerAnnum")',
+                interestEarned: '@ResourceHelper.GetResource("InterestEarned")',
+                totalPayout: '@ResourceHelper.GetResource("TotalPayout")',
+                interestPayoutExpiry: '@ResourceHelper.GetResource("InterestPayoutOnExpiry")',
+                semiAnnualInterestPayout: '@ResourceHelper.GetResource("SemiAnnualInterestPayout")',
+                annualInterestPayout: '@ResourceHelper.GetResource("AnnualInterestPayout")',
+                minInvestAmount: '@ResourceHelper.GetResource("MinimumInvestmentAmount")',
+                monthlyInterPayout: '@ResourceHelper.GetResource("MonthlyInterestPayout")',
+                terms: '@ResourceHelper.GetResource("Terms",1)',
+                term: '@ResourceHelper.GetResource("Term",2)',
+                interestPayoutFrequency: '@ResourceHelper.GetResource("InterestPayoutFrequency")',
+                interestPayoutFreq: '@ResourceHelper.GetResource("InterestPayoutFreq")',
+                AmountMandatory: '@ResourceHelper.GetResource("InvestmentAmountIsMandatory")',
+                investmentReturns: '@ResourceHelper.GetResource("InvestmentReturns")',
+                after: '@ResourceHelper.GetResource("After")',
+                months: '@ResourceHelper.GetResource("Months")',
+                years: '@ResourceHelper.GetResource("Years")',
+                onceOffInvestmentAmountIsMandatory: '@ResourceHelper.GetResource("OnceOffInvestmentAmountIsMandatory")',
+                amountCannotBeLessThan: '@ResourceHelper.GetResource("AmountCannotBeLessThan")',
+                interestPayoutFrequency: '@ResourceHelper.GetResource("InterestPayoutFrequency")',
+                investmentReturnsMessage: '@ResourceHelper.GetResource("InvestmentReturnsMessage")',
+                ourOfferAmount: '@ResourceHelper.GetResource("OurOfferAmount")',
+                accept: '@ResourceHelper.GetResource("Accept")',
+                cancel: '@ResourceHelper.GetResource("Cancel")',
+                increaseCapital: '@ResourceHelper.GetResource("IncreaseCapital")',
+                fixedDescription: '@ResourceHelper.GetResource("FixedDescription")',
+                payoutFreqErrorMessage: '@ResourceHelper.GetResource("PayoutFreqErrorMessage")',
+                monthlyInvestmentThereafter: '@ResourceHelper.GetResource("MonthlyInvestmentThereafter")',
+                increaseOnceOff: '@ResourceHelper.GetResource("IncreaseOnceOff")',
+                changeInterestOption: '@ResourceHelper.GetResource("ChangeInterestOption")'
+            }
+        };
+        $(window).on('CalculatorLoading', function (e) {
+
+            df=e;
+            var _state = e.state;
+            var _target = e.target;
+
+            $(".errorcalculatores").hide();
+
+            if (_target !== 'rates') {
+                if (_state) {
+                    $(".form-preloader").show();
+                    // $("#calculatorfixed-form").hide();
+                    $("#fixedDeposit-calculator-container").hide();
+
+                    ChangePageControls(false);
+                } else {
+                    $(".form-preloader").hide();
+                    if (hasError) {
+                        $(".errorcalculatores").show();
+                        // $("#calculatorfixed-form").hide();
+                        $("#fixedDeposit-calculator-container").hide();
+                    } else {
+                        $(".errorcalculatores").hide();
+                        // $("#calculatorfixed-form").show();
+                        $("#fixedDeposit-calculator-container").show();
+                        $('.money').autoNumeric('init', { aSep: ' ', aDec: '.', aSign: 'R' });
+                    }
+
+                    ChangePageControls(Calculator.isCalculatorValid('Fixed'));
+                }
+            } else {
+                if (_state) {
+                    $("#rates-form-preloader").show();
+                    $('.rate-table').show();
+                } else {
+                    $("#rates-form-preloader").hide();
+                    $('.rate-table').show();
+                }
+            }
+
+        });
+
+        $(window).on('CalculatorValidationHandler', function (e) {
+            var _state = e.state;
+
+            ChangePageControls(_state);
+
+        });
+
+        $(window).on('Error', function (e) {
+
+            var _target = e.target;
+
+            if (_target) {
+                if (_target === 'rates') {
+                    if (!e.errorDescription) {
+                        $(".rate-table").show();
+                        $("#rates-form-preloader").hide();
+
+                        return;
+                    }
+
+                    $(".rate-table").hide();
+                    $("#rates-form-preloader").hide();
+                    $(".errorrates").show();
+                } else {
+
+                    if (!e.errorDescription) {
+                        hasError = false;
+
+                        $(".form-preloader").hide();
+                        // $("#calculatorfixed-form").show();
+                        $("#fixedDeposit-calculator-container").show();
+                        ChangePageControls(false);
+
+                        $(".errorcalculatores").hide();
+
+                        return;
+                    } else {
+
+                        hasError = true;
+                        $(".form-preloader").hide();
+                        // $("#calculatorfixed-form").hide();
+                        $("#fixedDeposit-calculator-container").hide();
+                        $(".errorcalculatores").show();
+                        ChangePageControls(false);
+                    }
+                }
+            }
+        });
+
+        function ChangePageControls(enabled) {
+            $(".area_buttons_calculate").hide();
+            if (enabled) {
+                $("#buttonPrint").removeClass("disabledbutton");
+                $(".area_buttons_calculate").show();
+            }
+            else {
+                $("#buttonPrint").addClass("disabledbutton");
+
+            }
+        }
+
+      //  console.log("pepe " ,JSON.stringify(data,null,2));
+        Calculator.init(data);
+        $("#buttonPrint").click(function () {
+            CalculatorHandler.printRatesDoc(data);
+        });
+
+    });
+</script>
+
+<script type="text/javascript">
+    $(function () {
+
+
+        //$(".area_buttons_calculate").hide();
+        var hasError = true;
+        var data = {
+            product: 'Notice',
+            rateContainer: '#rates-container',
+            calcFormContainer: '#calculatornotice-form',
+            serviceUrl: '@System.Configuration.ConfigurationManager.AppSettings["ebankit.calculators.URL"]',
+            headers: [
+                    ['ITSAPP-DEVICE', '@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.ITSAPP-DEVICE"]'],
+                    ['ITSAPP-LANG', 'en-GB'],
+                    ['Content-type', 'application/json']
+            ],
+            translations: {
+                interestPayoutExpiry: '@ResourceHelper.GetResource("InterestPayoutOnExpiry")',
+                semiAnnualInterestPayout: '@ResourceHelper.GetResource("SemiAnnualInterestPayout")',
+                annualInterestPayout: '@ResourceHelper.GetResource("AnnualInterestPayout")',
+                minInvestAmount: '@ResourceHelper.GetResource("MinimumInvestmentAmount")',
+                monthlyInterPayout: '@ResourceHelper.GetResource("MonthlyInterestPayout")',
+                terms: '@ResourceHelper.GetResource("Terms")',
+                amount: '@ResourceHelper.GetResource("OnceOffInvestmentAmount")',
+                term: '@ResourceHelper.GetResource("Term")',
+                interestRatePa: '@ResourceHelper.GetResource("InterestRatePerAnnum")',
+                interestEarned: '@ResourceHelper.GetResource("InterestEarned")',
+                totalPayout: '@ResourceHelper.GetResource("TotalPayout")',
+                interestPayoutFrequency: '@ResourceHelper.GetResource("InterestPayoutFrequency")',
+                monthly: '@ResourceHelper.GetResource("MonthlyInvestmentThereafter")',
+                period: '@ResourceHelper.GetResource("Period")',
+                investmentReturns: '@ResourceHelper.GetResource("InvestmentReturns")',
+                AmountMandatory: '@ResourceHelper.GetResource("InvestmentAmountIsMandatory")',
+                after: '@ResourceHelper.GetResource("After")',
+                months: '@ResourceHelper.GetResource("Months")',
+                years: '@ResourceHelper.GetResource("Years")',
+                investmentAmountIsMandatory: '@ResourceHelper.GetResource("InvestmentAmountIsMandatory")',
+                onceOffInvestmentAmountCannotBeLessThan: '@ResourceHelper.GetResource("OnceOffInvestmentAmountCannotBeLessThan")',
+                monthlyInvestmentAmountCannotBeLessThan: '@ResourceHelper.GetResource("MonthlyInvestmentAmountCannotBeLessThan")',
+                periodInvested: '@ResourceHelper.GetResource("PeriodInvested")',
+                investmentReturnsMessage: '@ResourceHelper.GetResource("InvestmentReturnsMessage")',
+                ourOfferAmount: '@ResourceHelper.GetResource("OurOfferAmount")',
+                accept: '@ResourceHelper.GetResource("Accept")',
+                cancel: '@ResourceHelper.GetResource("Cancel")',
+                noticePeriod: '@ResourceHelper.GetResource("NoticePeriod")',
+                noticeDescription: '@ResourceHelper.GetResource("NoticeDescription")',
+                payoutFreqErrorMessage: '@ResourceHelper.GetResource("PayoutFreqErrorMessage")',
+                increaseOnceOff:'@ResourceHelper.GetResource("IncreaseOnceOff")'
+            }
+        };
+
+        $(window).on('CalculatorLoading', function (e) {
+            var _state = e.state;
+            var _target = e.target;
+
+            $(".errorcalculatores").hide();
+
+            if (_target !== 'rates') {
+                if (_state) {
+                    $(".form-preloader").show();
+                   // $("#calculatornotice-form").hide();
+                    $("#noticeDeposit-calculator-container").hide();
+
+                    ChangePageControls(false);
+                } else {
+                    $(".form-preloader").hide();
+                    if (hasError) {
+                        $(".errorcalculatores").show();
+                       // $("#calculatornotice-form").hide();
+                        $("#noticeDeposit-calculator-container").hide();
+                    } else {
+                        $(".errorcalculatores").hide();
+                        //$("#calculatornotice-form").show();
+                        $("#noticeDeposit-calculator-container").show();
+                        $('.money').autoNumeric('init', { aSep: ' ', aDec: '.', aSign: 'R' });
+                    }
+                    ChangePageControls(Calculator.isCalculatorValid('Notice'));
+                }
+            } else {
+                if (_state) {
+                    $("#rates-form-preloader").show();
+                    $('.rate-table').show();
+                } else {
+                    $("#rates-form-preloader").hide();
+                    $('.rate-table').show();
+                }
+            }
+
+        });
+
+        $(window).on('CalculatorValidationHandler', function (e) {
+            var _state = e.state;
+
+            ChangePageControls(_state);
+
+        });
+
+        $(window).on('Error', function (e) {
+
+            var _target = e.target;
+
+            if (_target) {
+                if (_target === 'rates') {
+                    if (!e.errorDescription) {
+                        $(".rate-table").show();
+                        $("#rates-form-preloader").hide();
+
+                        return;
+                    }
+
+                    $(".rate-table").hide();
+                    $("#rates-form-preloader").hide();
+                    $(".errorrates").show();
+                } else {
+                    if (!e.errorDescription) {
+                        hasError = false;
+
+                        $(".form-preloader").hide();
+                       // $("#calculatornotice-form").show();
+                        $("#noticeDeposit-calculator-container").show();
+                        ChangePageControls(false);
+
+                        $(".errorcalculatores").hide();
+
+                        return;
+                    } else {
+                        hasError = true;
+                        $(".form-preloader").hide();
+                       // $("#calculatornotice-form").hide();
+                        $("#noticeDeposit-calculator-container").hide();
+                        $(".errorcalculatores").show();
+                        ChangePageControls(false);
+                    }
+                }
+            }
+        });
+
+        function ChangePageControls(enabled) {
+            $(".area_buttons_calculate").hide();
+            if (enabled) {
+                $("#buttonPrint").removeClass("disabledbutton");
+                $(".area_buttons_calculate").show();
+            }
+            else {
+                $("#buttonPrint").addClass("disabledbutton");
+
+            }
+        }
+
+        Calculator.init(data);
+
+        $("#buttonPrint").click(function () {
+            CalculatorHandler.printRatesDoc(data);
+        });
+    });
+</script>
+
+<script type="text/javascript">
+    $(function () {
+        //$(".area_buttons_calculate").hide();
+        var hasError = true;
+        var data = {
+            product: 'Access',
+            rateContainer: '#rates-container',
+            calcFormContainer: '#calculatoracess-form',
+            serviceUrl: '@System.Configuration.ConfigurationManager.AppSettings["ebankit.calculators.URL"]',
+            headers: [
+                   ['ITSAPP-DEVICE', '@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.ITSAPP-DEVICE"]'],
+                   ['ITSAPP-LANG', 'en-GB'],
+                   ['Content-type', 'application/json']
+            ],
+            translations: {
+                amount: '@ResourceHelper.GetResource("OnceOffInvestmentAmount")',
+                monthlyInterestRateIncrease: '@ResourceHelper.GetResource("MonthlyInterestRateIncrease")',
+                period: '@ResourceHelper.GetResource("Period")',
+                interestRatePa: '@ResourceHelper.GetResource("InterestRatePerAnnum")',
+                interestEarned: '@ResourceHelper.GetResource("InterestEarned")',
+                totalPayout: '@ResourceHelper.GetResource("TotalPayout")',
+                terms: '@ResourceHelper.GetResource("Terms")',
+                minInvestAmount: '@ResourceHelper.GetResource("MinimumInvestmentAmount")',
+                monthlyInterPayout: '@ResourceHelper.GetResource("MonthlyInterestPayout")',
+                annualInterestPayout: '@ResourceHelper.GetResource("AnnualInterestPayout")',
+                semiAnnualInterestPayout: '@ResourceHelper.GetResource("SemiAnnualInterestPayout")',
+                interestPayoutExpiry: '@ResourceHelper.GetResource("InterestPayoutOnExpiry")',
+                investmentReturns: '@ResourceHelper.GetResource("InvestmentReturns")',
+                captureAmount: '@ResourceHelper.GetResource("CaptureAmount")',
+                monthlyInvestmentThereafterGreater: '@ResourceHelper.GetResource("MonthlyInvestmentThereafterGreater")',
+                onceOffInvestmentLess: '@ResourceHelper.GetResource("OnceOffInvestmentLess")',
+                rPlaceholder: '@ResourceHelper.GetResource("RPlaceholder")',
+                after: '@ResourceHelper.GetResource("After")',
+                months: '@ResourceHelper.GetResource("Months")',
+                years: '@ResourceHelper.GetResource("Years")',
+                investmentAmountIsMandatory: '@ResourceHelper.GetResource("InvestmentAmountIsMandatory")',
+                amountCannotBeLessThan: '@ResourceHelper.GetResource("AmountCannotBeLessThan")',
+                interestPayoutFrequency: '@ResourceHelper.GetResource("InterestPayoutFrequency")',
+                investmentReturnsMessage: '@ResourceHelper.GetResource("InvestmentReturnsMessage")',
+                ourOfferAmount: '@ResourceHelper.GetResource("OurOfferAmount")',
+                monthlyRateIncrease: '@ResourceHelper.GetResource("MonthlyRateIncrease")',
+                accessDescription: '@ResourceHelper.GetResource("AccessDescription")',
+                payoutFreqErrorMessage: '@ResourceHelper.GetResource("PayoutFreqErrorMessage")',
+                monthlyInvestmentThereafter: '@ResourceHelper.GetResource("MonthlyInvestmentThereafter")'
+            }
+        };
+
+        $(window).on('CalculatorLoading', function (e) {
+            var _state = e.state;
+            var _target = e.target;
+
+            $(".errorcalculatores").hide();
+
+            if (_target !== 'rates') {
+                if (_state) {
+                    $(".form-preloader").show();
+                    //$("#calculatoracess-form").hide();
+                    $("#accessAccumulator-calculator-container").hide();
+                    ChangePageControls(false);
+                } else {
+                    $(".form-preloader").hide();
+                    if (hasError) {
+                        $(".errorcalculatores").show();
+                       // $("#calculatoracess-form").hide();
+                        $("#accessAccumulator-calculator-container").hide();
+                    } else {
+                        $(".errorcalculatores").hide();
+                      //  $("#calculatoracess-form").show();
+                        $("#accessAccumulator-calculator-container").show();
+                        $('.money').autoNumeric('init', { aSep: ' ', aDec: '.', aSign: 'R' });
+                    }
+
+                    ChangePageControls(Calculator.isCalculatorValid('Access'));
+                }
+            } else {
+                if (_state) {
+                    $("#rates-form-preloader").show();
+                    $('.rate-table').show();
+                } else {
+                    $("#rates-form-preloader").hide();
+                    $('.rate-table').show();
+                }
+            }
+
+        });
+
+        $(window).on('CalculatorValidationHandler', function (e) {
+            var _state = e.state;
+
+            ChangePageControls(_state);
+
+        });
+
+        $(window).on('Error', function (e) {
+
+            var _target = e.target;
+
+            if (_target) {
+                if (_target === 'rates') {
+                    if (!e.errorDescription) {
+                        $(".rate-table").show();
+                        $("#rates-form-preloader").hide();
+
+                        return;
+                    }
+
+                    $(".rate-table").hide();
+                    $("#rates-form-preloader").hide();
+                    $(".errorrates").show();
+                } else {
+
+                    if (!e.errorDescription) {
+                        hasError = false;
+
+                        $(".form-preloader").hide();
+                        //$("#calculatoracess-form").show();
+                        $("#accessAccumulator-calculator-container").show();
+                        ChangePageControls(false);
+
+                        $(".errorcalculatores").hide();
+
+                        return;
+                    } else {
+
+                        hasError = true;
+                        $(".form-preloader").hide();
+                       // $("#calculatoracess-form").hide();
+                        $("#accessAccumulator-calculator-container").hide();
+                        $(".errorcalculatores").show();
+                        ChangePageControls(false);
+                    }
+                }
+            }
+        });
+
+        function ChangePageControls(enabled) {
+            $(".area_buttons_calculate").hide();
+            if (enabled) {
+                $("#buttonPrint").removeClass("disabledbutton");
+                $(".area_buttons_calculate").show();
+            }
+            else {
+                $("#buttonPrint").addClass("disabledbutton");
+
+            }
+        }
+        Calculator.init(data);
+
+        $("#buttonPrint").click(function () {
+            CalculatorHandler.printRatesDoc(data);
+        });
+    });
+</script>
+
+<script type="text/javascript">
+    $(function () {
+        //$(".area_buttons_calculate").hide();
+        var hasError = true;
+        var data = {
+            product: 'TxFree',
+            rateContainer: '#rates-container',
+            calcFormContainer: '#calculatortax-form',
+            serviceUrl: '@System.Configuration.ConfigurationManager.AppSettings["ebankit.calculators.URL"]',
+            headers: [
+                   ['ITSAPP-DEVICE', '@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.ITSAPP-DEVICE"]'],
+                   ['ITSAPP-LANG', 'en-GB'],
+                   ['Content-type', 'application/json']
+            ],
+            translations: {
+                amount: '@ResourceHelper.GetResource("OnceOfInvestmentsTaxFree")',
+                monthlyInterestRateIncrease: '@ResourceHelper.GetResource("MonthlyInterestRateIncrease")',
+                period: '@ResourceHelper.GetResource("Period")',
+                interestRatePa: '@ResourceHelper.GetResource("InterestRatePerAnnum")',
+                interestEarned: '@ResourceHelper.GetResource("InterestEarned")',
+                totalPayout: '@ResourceHelper.GetResource("TotalPayout")',
+                terms: '@ResourceHelper.GetResource("Terms")',
+                minInvestAmount: '@ResourceHelper.GetResource("MinimumInvestmentAmount")',
+                monthlyInterPayout: '@ResourceHelper.GetResource("MonthlyInterestPayout")',
+                annualInterestPayout: '@ResourceHelper.GetResource("AnnualInterestPayout")',
+                semiAnnualInterestPayout: '@ResourceHelper.GetResource("SemiAnnualInterestPayout")',
+                interestPayoutExpiry: '@ResourceHelper.GetResource("InterestPayoutOnExpiry")',
+                investmentReturns: '@ResourceHelper.GetResource("InvestmentReturns")',
+                monthlyInvestmentThereafter: '@ResourceHelper.GetResource("MonthlyInvestmentThereafter")',
+                taxSavings: '@ResourceHelper.GetResource("TaxSavings")',
+                captureAmount: '@ResourceHelper.GetResource("CaptureAmount")',
+                monthlyInvestmentThereafterGreater: '@ResourceHelper.GetResource("MonthlyInvestmentThereafterGreater")',
+                totalannualGreater: '@ResourceHelper.GetResource("TotalannualGreater")',
+                onceOffInvestmentLess: '@ResourceHelper.GetResource("OnceOffInvestmentLess")',
+                rPlaceholder: '@ResourceHelper.GetResource("RPlaceholder")',
+                after: '@ResourceHelper.GetResource("After")',
+                months: '@ResourceHelper.GetResource("Months")',
+                years: '@ResourceHelper.GetResource("Years")',
+                maxThirty: '@ResourceHelper.GetResource("MaxThirty")',
+                interestPayoutFrequency: '@ResourceHelper.GetResource("InterestPayoutFrequency")',
+                investmentReturnsMessage: '@ResourceHelper.GetResource("InvestmentReturnsMessage")',
+                ourOfferAmount: '@ResourceHelper.GetResource("OurOfferAmount")',
+                taxDescription: '@ResourceHelper.GetResource("TaxDescription")',
+                payoutFreqErrorMessage: '@ResourceHelper.GetResource("PayoutFreqErrorMessage")'
+            }
+        };
+
+        $(window).on('CalculatorLoading', function (e) {
+            var _state = e.state;
+            var _target = e.target;
+
+            $(".errorcalculatores").hide();
+
+            if (_target !== 'rates') {
+                if (_state) {
+                    $(".form-preloader").show();
+                    //$("#calculatortax-form").hide();
+                    $("#taxFree-calculator-container").hide();
+
+                    ChangePageControls(false);
+                } else {
+                    $(".form-preloader").hide();
+                    if (hasError) {
+                        $(".errorcalculatores").show();
+                      //  $("#calculatortax-form").hide();
+                        $("#taxFree-calculator-container").hide();
+                    } else {
+                        $(".errorcalculatores").hide();
+                        //$("#calculatortax-form").show();
+                        $("#taxFree-calculator-container").show();
+                        $('.money').autoNumeric('init', { aSep: ' ', aDec: '.', aSign: 'R' });
+                    }
+                    ChangePageControls(Calculator.isCalculatorValid('TxFree'));
+                }
+            } else {
+                if (_state) {
+                    $("#rates-form-preloader").show();
+                    $('.rate-table').show();
+                } else {
+                    $("#rates-form-preloader").hide();
+                    $('.rate-table').show();
+                }
+            }
+
+        });
+
+        $(window).on('CalculatorValidationHandler', function (e) {
+            var _state = e.state;
+
+            ChangePageControls(_state);
+
+        });
+
+        $(window).on('Error', function (e) {
+            debugger;
+            var _target = e.target;
+
+            if (_target) {
+                if (_target === 'rates') {
+                    if (!e.errorDescription) {
+                        $(".rate-table").show();
+                        $("#rates-form-preloader").hide();
+
+                        return;
+                    }
+
+                    $(".rate-table").hide();
+                    $("#rates-form-preloader").hide();
+                    $(".errorrates").show();
+                } else {
+
+                    if (!e.errorDescription) {
+                        hasError = false;
+
+                        $(".form-preloader").hide();
+                        //$("#calculatortax-form").show();
+                        $("#taxFree-calculator-container").show();
+                        ChangePageControls(false);
+
+                        $(".errorcalculatores").hide();
+
+                        return;
+                    } else {
+
+                        hasError = true;
+                        $(".form-preloader").hide();
+                        //$("#calculatortax-form").hide();
+                        $("#taxFree-calculator-container").hide();
+                        $(".errorcalculatores").show();
+                        ChangePageControls(false);
+                    }
+                }
+            }
+        });
+
+        function ChangePageControls(enabled) {
+            $(".area_buttons_calculate").hide();
+            if (enabled) {
+                $("#buttonPrint").removeClass("disabledbutton");
+                $(".area_buttons_calculate").show();
+            }
+            else {
+                $("#buttonPrint").addClass("disabledbutton");
+            }
+        }
+
+        Calculator.init(data);
+
+        $("#buttonPrint").click(function () {
+            CalculatorHandler.printRatesDoc(data);
+        });
+
+    });
+</script>
+
+<script type="text/javascript">
+    function scrollToCalculator() {
+        $('html, body').animate({
+            scrollTop: $(".tab-content").closest("div").find(".scrollTo:visible").offset().top - 100
+        }, 1500);
+    }
+
+    function compareFixedDeposit() {
+        var amount = $('#fixedResults').children('.row').children('.col-sm-12').children('.card-shadow').children('.percentage').html();
+        var month = $('#fixedResults').children('.row').children('.col-sm-12').children('.card-shadow').children('.offer-style').html();
+        var content = '<div class="resultTitle">Fixed Deposit</div><div id="results"><div class="card-shadow rate-card-fixed-deposit-offer" style="background:none !important"><div class="percentage">' + amount + '</div><div class="text-uppercase offer-style" style="color:#002b60;">' + month + '<br/><br/><button onclick="scrollToCalculator()" class="button primary ghostBtn btnReCalc hidden-xs">Re-Calculate</button></div></div></div>';
+        $('#linkContent-ProductFixedDeposit').html(content);
+        $('#fixedResultsMobile').css('height', '280px');
+    }
+
+    function compareNoticeDeposit() {
+        var amount = $('#noticeResults').children('.row').children('.col-sm-12').children('.card-shadow').children('.percentage').html();
+        var month = $('#noticeResults').children('.row').children('.col-sm-12').children('.card-shadow').children('.offer-style').html();
+        var content = '<div class="resultTitle">Notice Deposit</div><div id="results"><div class="card-shadow rate-card-fixed-deposit-offer" style="background:none !important"><div class="percentage">' + amount + '</div><div class="text-uppercase offer-style" style="color:#002b60;">' + month + '<br/><br/><button onclick="scrollToCalculator()" class="button primary ghostBtn btnReCalc hidden-xs">Re-Calculate</button></div></div></div>';
+        $('#linkContent-ProductNoticeDeposit').html(content);
+        $('#noticeResultsMobile').css('height', '280px');
+    }
+
+    function compareAccessAccumulator() {
+        var amount = $('#accessResults').children('.row').children('.col-sm-12').children('.card-shadow').children('.percentage').html();
+        var month = $('#accessResults').children('.row').children('.col-sm-12').children('.card-shadow').children('.offer-style').html();
+        var content = '<div class="resultTitle">Access Accumulator</div><div id="results"><div class="card-shadow rate-card-fixed-deposit-offer" style="background:none !important"><div class="percentage">' + amount + '</div><div class="text-uppercase offer-style" style="color:#002b60;">' + month + '<br/><br/><button onclick="scrollToCalculator()" class="button primary ghostBtn btnReCalc hidden-xs">Re-Calculate</button></div></div></div>';
+        $('#linkContent-ProductAccessAccumulator').html(content);
+        $('#accessResultsMobile').css('height', '280px');
+    }
+
+    function compareTaxFree() {
+        var amount = $('#taxResults').children('.row').children('.col-sm-12').children('.card-shadow').children('.percentage').html();
+        var month = $('#taxResults').children('.row').children('.col-sm-12').children('.card-shadow').children('.offer-style').html();
+        var content = '<div class="resultTitle">Tax Free Investment</div><div id="results"><div class="card-shadow rate-card-fixed-deposit-offer" style="background:none !important"><div class="percentage">' + amount + '</div><div class="text-uppercase offer-style" style="color:#002b60;">' + month + '<br/><br/><button onclick="scrollToCalculator()" class="button primary ghostBtn btnReCalc hidden-xs">Re-Calculate</button></div></div></div>';
+        $('#linkContent-ProductTaxFreeInvestment').html(content);
+        $('#taxResultsMobile').css('height', '280px');
+    }
+
+
+    $("body").on('DOMSubtreeModified', "#fixedDeposit-calculator-container", function () {
+        if (!$('#fixedDeposit-calculator-container').is(':empty')) {
+            compareFixedDeposit();
+        }
+    });
+    $("body").on('DOMSubtreeModified', "#noticeDeposit-calculator-container", function () {
+        if (!$('#noticeDeposit-calculator-container').is(':empty')) {
+            compareNoticeDeposit();
+        }
+    });
+    $("body").on('DOMSubtreeModified', "#accessAccumulator-calculator-container", function () {
+        if (!$('#accessAccumulator-calculator-container').is(':empty')) {
+            compareAccessAccumulator();
+        }
+    });
+    $("body").on('DOMSubtreeModified', "#taxFree-calculator-container", function () {
+        if (!$('#taxFree-calculator-container').is(':empty')) {
+            compareTaxFree();
+        }
+    });
+
+</script>
+
+<script type="text/javascript">
+
+    function switchAndScroll() {
+
+        var selected = $('#selectCompare').val();
+        if (selected == 'FixedDeposit') {
+            $('.nav-tabs a[href="#ProductFixedDeposit"]').tab('show');
+        }
+        if (selected == 'NoticeDeposit') {
+            $('.nav-tabs a[href="#ProductNoticeDeposit"]').tab('show');
+        }
+        if (selected == 'AccessAccumulator') {
+            $('.nav-tabs a[href="#ProductAccessAccumulator"]').tab('show');
+        }
+        if (selected == 'TaxFreeInvestment') {
+            $('.nav-tabs a[href="#ProductTaxFreeInvestment"]').tab('show');
+        }
+
+        scrollToCalculator();
+    }
+
+</script>
+
+}

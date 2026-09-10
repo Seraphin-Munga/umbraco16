@@ -1,0 +1,998 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCampaign>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using AcfAfricanbank.Core.Models.Forms;
+@using System.Text.RegularExpressions
+@using CustomModels = Web.Models;
+@{
+    Layout = "Master.cshtml";
+    var domainDirectory = System.Web.HttpContext.Current.Request.Url.AbsoluteUri.Replace(System.Web.HttpContext.Current.Request.Url.AbsolutePath, "");
+    string currentDirectory = domainDirectory;
+    int resultIndex = currentDirectory.IndexOf("?path");
+    if (resultIndex != -1)
+    {
+        currentDirectory = currentDirectory.Substring(0, resultIndex);
+    }
+    var children = Model.Children;
+    var chest = children?.Where(c => c is HeroChest).FirstOrDefault();
+    var heroBody = (HeroBody)children?.Where(c => c is HeroBody).FirstOrDefault();
+    var heroBodyTabGroup = heroBody.Children?.Where(c => c is TabGroup).FirstOrDefault();
+    var selectedItemString = Request["selected"];
+
+    ContentModels.TabHeader videoLanding = null;
+    ContentModels.TabHeader faqs = null;
+
+    heroBodyTabGroup.Children?.Where(c => c is TabHeader).ToList().ForEach(x =>
+    {
+        if (x.Name.ToString() == "FAQ")
+        {
+            faqs = (TabHeader)x;
+        }
+        else
+        {
+            videoLanding = (TabHeader)x;
+        }
+    });
+
+    var videoBody = videoLanding.Children.Where(x => x is TabBody).FirstOrDefault();
+
+    var videoArchive = videoLanding.Children.Where(x => x is TabBody).Skip(1).FirstOrDefault();
+    IEnumerable<NCtabGenericContent> _tabVideoContent = (IEnumerable<NCtabGenericContent>)videoArchive.Value("tabBodyContent");
+    var _videoArchive = (IEnumerable<IPublishedElement>)_tabVideoContent.Where(c => c is NCtabGenericContent).FirstOrDefault().Value("sectionContent");
+    ICollection<NChelpGuide> videos = new List<NChelpGuide>();
+    string[] searchParams = selectedItemString.Split(' ');
+    string[] searchValue = selectedItemString.Split('-');
+
+    ICollection<IPublishedContent> selected_videoArchives = new List<IPublishedContent>();
+
+    foreach (var videoCollection in _videoArchive.Select(x => x.GetProperty("mediaItems")).ToList()) // .Select(cc => cc.Alias == "mediaItems")
+    {
+        foreach (var _videoData in (ICollection<NChelpGuide>)videoCollection.Value("mediaItems"))
+        {
+            if (searchParams.Any(o => _videoData.Value("question").ToString().Contains(o)))
+            {
+                videos.Add(_videoData);
+            }
+        }
+    }
+    var pdfArchive = videoLanding.Children.Where(x => x is TabBody).Skip(2).FirstOrDefault();
+    IEnumerable<NCtabGenericContent> _tabPDFContent = (IEnumerable<NCtabGenericContent>)pdfArchive.Value("tabBodyContent");
+    var _pdfArchive = (IEnumerable<IPublishedElement>)_tabPDFContent.Where(c => c is NCtabGenericContent).FirstOrDefault().Value("sectionContent");
+    ICollection<NChelpGuide> pdfs = new List<NChelpGuide>();
+
+    foreach (var pdfCollection in _pdfArchive.Select(x => x.GetProperty("mediaitems")).ToList()) // .Select(cc => cc.Value)
+    {
+        int counter = 0;
+        foreach (var _pdfData in (ICollection<NChelpGuide>)pdfCollection.Value("mediaItems"))
+        {
+
+            pdfs.Add(_pdfData);
+            @*<script>
+                console.log('@counter');
+            </script>*@
+        counter += 1;
+    }
+}
+
+var tabs = (IEnumerable<IPublishedContent>)heroBody?.Children.Where(c => c is TabBody).ToList();
+
+TabBody tabBodyFAQ = null;
+ImageItem subBodyFAQs = null;
+
+faqs.Children.ToList().ForEach(x =>
+{
+    if (x.Name == "Frequently Asked Questions")
+    {
+        tabBodyFAQ = (TabBody)x;
+    }
+    else if (x.Name == "Sub Header FAQ")
+    {
+        subBodyFAQs = (ImageItem)x;
+    }
+    if (x is TabBody)
+    {
+
+    }
+});
+
+var frequentlyAQ = subBodyFAQs.Children.FirstOrDefault().Value("ebankITImage");
+String faqLongString = subBodyFAQs.Children.FirstOrDefault().Value("ebankITTitle").ToString();
+String faqImagePath = ((ContentModels.Image)frequentlyAQ).UmbracoFile.Src.ToString();
+var faqImageAltTagData = ((ContentModels.Image)frequentlyAQ);
+
+//var sectionContent = (IEnumerable<IPublishedElement>)tabBodyFAQ.TabBodyContent.Where(c => c is NCtabGenericContent).FirstOrDefault().SectionContent;
+
+var sectionContent = ((Umbraco.Web.PublishedModels.HeroBodyFaq)tabBodyFAQ.Children.Where(x => x.Name == "Questions and Answers").FirstOrDefault()).QuestionGroups;
+
+ContentModels.TabBody _availablePlatforms = null;
+ContentModels.TabBody _videoButtonControls = null;
+
+tabs.ToList().ForEach(x =>
+{
+    var partialName = x.GetProperty("PartialViewName");
+
+    if (x.Value("PartialViewName").ToString() == "_platforms")
+    {
+        _availablePlatforms = (TabBody)x;
+    }
+    else if (x.Value("PartialViewName").ToString() == "_buttonControls")
+    {
+        _videoButtonControls = (TabBody)x;
+    }
+});
+
+var availablePlatformItems = (IEnumerable<IPublishedElement>)_availablePlatforms.TabBodyContent.Where(c => c is NCtabGenericContent).FirstOrDefault().Value("sectionContent");
+var videoButtonItems = (IEnumerable<IPublishedElement>)_videoButtonControls.TabBodyContent.Where(c => c is NCtabGenericContent).FirstOrDefault().Value("sectionContent");
+
+string selectedVideo = "";
+string queryStr = null;
+string questionValue = null;
+string[] questionArrayPhrase = null;
+foreach (var video in videos)
+{
+    questionArrayPhrase = video.Value("question").ToString().Split('-');
+    questionValue = questionArrayPhrase[1].ToString().TrimStart(' ');
+    queryStr = searchValue[0].ToString().TrimStart(' ');
+    if (questionValue.Contains(queryStr))
+    {
+        selectedVideo = video.Value("answer").ToString();
+        break;
+    }
+}
+
+// Video Platforms
+var cellphoneIconLinkData = videos.ToList().Where(x => x.Value("answer").ToString().Contains("cellphone")).ToList();
+var cellphoneIconLink = cellphoneIconLinkData.Where(x=> x.Value("question").ToString().ToLower().Contains(selectedItemString.ToLower())).FirstOrDefault();
+
+var onlineIconLinkData = videos.ToList().Where(x => x.Value("answer").ToString().Contains("online")).ToList();
+var onlineIconLink = onlineIconLinkData.Where(x => x.Value("question").ToString().ToLower().Contains(selectedItemString.ToLower())).FirstOrDefault();
+
+var appIconLinkData = videos.ToList().Where(x => x.Value("question").ToString().ToLower().Contains(selectedItemString.ToLower())).ToList();
+var appIconLink = videos.Where(x => x.Value("question").ToString().ToLower().Contains(selectedItemString.ToLower())).ToList()
+    .Where(xx => xx.Value("question").ToString().Split('-')[0].ToString().ToLower().Trim() == "app").FirstOrDefault();
+
+string _appIconLink = "";
+// IPublishedContent appIconLink = null;
+string trimmedfoundLinkValue = null;
+string[] foundLinkValue = null;
+string _answerString = null;
+queryStr = null;
+foreach (var video in videos)
+{
+    queryStr = searchValue[0].ToString().TrimStart(' ').ToLower();
+    foundLinkValue = video.Value("question").ToString().Split('-');
+    var answer = video.Value("question").ToString();
+    _answerString = video.Value("answer").ToString();
+    trimmedfoundLinkValue = foundLinkValue[0].ToString().TrimStart(' ').ToLower();
+
+    if ((foundLinkValue[0].ToString().Trim() == "Cellphone") && (trimmedfoundLinkValue == queryStr))
+    {
+        cellphoneIconLink = video;
+    }
+    if ((foundLinkValue[0].ToString().Trim() == "Online") && (trimmedfoundLinkValue.Contains(queryStr)))
+    {
+        onlineIconLink = video;
+    }
+    if ((foundLinkValue[0].ToString().Trim() == "App") && (trimmedfoundLinkValue.Contains(queryStr)))
+    {
+        // appIconLink = (IPublishedContent) video.Value("answer");
+        selectedVideo = video.Value("answer").ToString();
+    }
+}
+
+string selectedPDF = "";
+questionArrayPhrase = null;
+questionValue = null;
+foreach (var pdf in pdfs)
+{
+    questionArrayPhrase = pdf.Value("question").ToString().Split('-');
+    questionValue = questionArrayPhrase[1].ToString().TrimStart(' ').ToLower();
+    queryStr = searchValue[0].ToString().TrimStart(' ').ToLower();
+    if (questionValue.Contains(queryStr))
+    {
+        selectedPDF = pdf.Value("answer").ToString();
+        break;
+    }
+}
+
+
+// for the selected PDF platform
+string selectedPlatformAppPDFValue = null;
+string selectedPlatformCellPDFValue = null;
+string selectedPlatformOnlinePDFValue = null;
+
+foreach (var pdf in pdfs)
+{
+
+    questionArrayPhrase = pdf.Value("question").ToString().Split('-');
+    string platformPDF = questionArrayPhrase[0].ToString().Trim();
+    questionValue = questionArrayPhrase[1].ToString().TrimStart(' ').ToLower();
+    queryStr = searchValue[0].ToString().TrimStart(' ').ToLower();
+
+    if ((platformPDF == "App") && (questionValue.Contains(queryStr))) {
+        selectedPlatformAppPDFValue = pdf.Value("answer").ToString();
+    }
+    else if ((platformPDF == "Online") && (questionValue.Contains(queryStr))) {
+        selectedPlatformOnlinePDFValue = pdf.Value("answer").ToString();
+    }
+    else if ((platformPDF == "Cellphone") && (questionValue.Contains(queryStr))) {
+        selectedPlatformCellPDFValue = pdf.Value("answer").ToString();;
+    }
+}
+
+var sourcePath = Request["path"];
+String viewMoreHowTos = "View Related Videos";
+
+
+}
+
+<style>
+     
+     #umbracoPreviewBadge {
+        display: none;
+    }
+    
+    .back-button {
+        font-weight:900;
+    }
+    .web-app-text-display {
+        margin-right: 7%;
+    }
+    .cell-display {
+        text-align: left;
+        font-size: 12px;
+        font-weight:900;
+    }
+    .platform-icon0 {
+        border-radius: 100%;
+        transition: 0.5s;
+        background: #002b60;
+        cursor:pointer;
+        margin-bottom: 10px;
+    }
+    
+    .platform-icon1 {
+        border-radius: 100%;
+        transition: 0.5s;
+        background: #002b60;
+        cursor: pointer;
+        margin-bottom: 10px;
+    }
+   
+
+    .platform-icon2 {
+        border-radius: 100%;
+        transition: 0.5s;
+        background: #002b60;
+        cursor: pointer;
+        margin-bottom: 10px;
+    }
+    .top-3-faqs {
+        font-size: 6vh;
+        font-weight: 600;
+        color: #88bc47;
+    }
+    .top-3-faqs-description {
+        font-size: x-large;
+        color: #002b60;
+    }
+    .faq-image-item {
+        height: 60px;
+    }
+
+    .platform-icon-display {
+        display: unset;
+    }
+
+    .sublink-collapsables {
+        color: #88bc47;
+        font-size: x-large;
+        font-weight: 700;
+        display: flex;
+        cursor: pointer;
+    }
+
+    .faq-link-pointer {
+        font-weight: 700;
+        color: white;
+        font-size: large;
+        display: flex;
+        cursor: pointer;
+    }
+
+    .sublink-pointer-flexer {
+        cursor: pointer;
+        display: flex;
+    }
+
+    /*#region video control - web view */
+
+    .videoPlatformPlayer {
+        height: 450px;
+        max-width: 800px;
+    }
+    .hover-related-video {
+        cursor: pointer;
+        margin: 10px;
+    }
+    /*endregion*/
+    /*#region search textbox + button */
+    .search {
+        width: 100%;
+        position: relative;
+        display: flex;
+    }
+    .searchTerm {
+        width: 100%;
+        border: 2px solid #88bc47;
+        border-right: none;
+        padding: 5px;
+        height: 40px;
+        border-radius: 21px 0 0 21px;
+        outline: none;
+        color: #ffffff;
+        background: black;
+    }
+    .searchTerm:focus {
+        color: #00B4CC;
+    }
+    .searchButton {
+        width: 40px;
+        height: 40px;
+        border: 1px solid #98d150;
+        background: #98d150;
+        text-align: center;
+        color: #fff;
+        border-radius: 0 21px 21px 0;
+        cursor: pointer;
+        font-size: 20px;
+    }
+
+    /*#endregion*/
+
+    /*#region dropdown list toggle */
+    
+    .triangle-nav.collapsed:before {
+        content: '▶';
+        display: block;
+        width: 15px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        transition: all linear 0.25s;
+    }
+
+    .triangle-nav:before {
+        content: '▼';
+        display: block;
+        width: 15px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        transition: all linear 0.25s;
+    }
+    /*#endregion*/
+
+    /*#region page campaign settings*/
+    .css-color-change {
+        color: #002b60;
+    }
+
+    .css-background-change {
+        background: #88bc47;
+    }
+
+    .video-item-img {
+        height: 193px;
+    }
+
+    .video-container {
+        width: 1140px;
+        margin-top: 0px;
+    }
+
+    #video-header {
+        height: 60vh;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    .video-item-description {
+        font-size: 14px;
+        height: 75px;
+        overflow-y: auto;
+    }
+
+    .video-item {
+        background: #f6f6f6;
+        box-shadow: 0px 1px 20px rgba(0,0,0,0.125);
+        margin-bottom: 25px;
+        height: 110px;
+        margin-top: 0px;
+    }
+
+    .video-body {
+        font-size: 16px;
+        margin-bottom: 30px;
+    }
+
+    .video-title {
+        font-weight: 900;
+        font-size: 40px;
+    }
+
+    .video-citation-box {
+        transition: 0.3s;
+        cursor: pointer;
+        position: absolute;
+        bottom: 15px;
+        margin: auto;
+        padding: 0px 25px;
+    }
+
+    /*Font Styling*/
+
+    .landing-video-title {
+        transition: 0.3s;
+        font-size: 42px;
+        font-weight: 800;
+        background: rgba(0,0,0,0.3);
+        padding: 0px 10px;
+        width: fit-content;
+        max-width: 800px;
+    }
+
+    .landing-video-description {
+        margin: 10px 0px;
+        max-width: 800px;
+    }
+
+
+        .landing-video-description > p {
+            font-size: 16px;
+            background: #002b60;
+            padding: 10px;
+            width: fit-content;
+        }
+
+    .main-click {
+        cursor: pointer;
+        transition: 0.3s;
+        border-radius: 100%;
+        padding: 2px;
+        text-align: center;
+        width: 55px;
+        height: 55px;
+        font-size: 50px !important;
+    }
+
+    .video-item-title {
+        font-size: 18px;
+        position: unset;
+    }
+
+    .main-click:hover {
+        transition: 0.3s;
+        box-shadow: 0px 1px 25px rgba(0,0,0,0.425);
+        margin-top: -2px;
+    }
+
+    .video-citation-box:hover .landing-video-title {
+        background: #88bc47;
+        transition: 0.3s;
+        box-shadow: 0px 1px 25px rgba(0,0,0,0.4);
+        margin-top: -2px;
+        margin-left: 5px;
+    }
+
+    #video-body > .row {
+        margin-bottom: 45px;
+    }
+
+    .video_list_item {
+        transition: 0.3s;
+        box-shadow: 0px 1px 20px rgba(0,0,0,0.125);
+        cursor: pointer;
+        height: 130px;
+    }
+
+        .video_list_item:hover {
+            transition: 0.3s;
+            box-shadow: 0px 1px 25px rgba(0,0,0,0.425);
+            margin-left: -2px;
+        }
+
+            .video_list_item:hover .main-click {
+                transition: 0.3s;
+                opacity: 1;
+            }
+
+    .sharethis-inline-share-buttons {
+        /* bottom: 0; */
+        margin-top: 28px;
+        right: 15px;
+        z-index: 10 !important;
+        margin-right: 9px;
+    }
+    .related-video-header-desc {
+        text-align: left;
+        padding: 13px 0px 0px 27px;
+        font-size: large;
+    }
+
+    #st-1 {
+        font-family: "Helvetica Neue", Verdana, Helvetica, Arial, sans-serif;
+        direction: ltr;
+        display: block;
+        opacity: 1;
+        z-index: 94034;
+    }
+
+    /*#endregion*/
+
+    /*#region media queries */
+        @@media (max-width: 360px) {
+        .web-app-text-display {
+            margin-right: 31%;
+        }
+    }
+    @@media (max-width: 480px) {
+        .web-app-text-display {
+            margin-right: 24%;
+        }
+        .top-3-faqs {
+            font-size: 5vh;
+            font-weight: 600;
+            color: #88bc47;
+            display: flex;
+        }
+        .top-3-faqs-description {
+            font-size: small;
+            color: #002b60;
+            display: flex;
+            line-height: 1.9;
+        }
+        .faq-image-item {
+            height: 50px;
+            margin-left: 3%;
+            margin-right: 3%;
+        }
+        .platform-icon-display {
+            display: flex;
+        }
+        #video-header {
+            margin-top: unset;
+        }
+
+        .video-container {
+            width: unset;
+        }
+
+        .video-title {
+            font-size: 34px;
+        }
+
+        .video-item {
+            box-shadow: none;
+            margin-bottom: 10px;
+        }
+
+        .video-item-title {
+            bottom: unset;
+        }
+
+        .sharethis-inline-share-buttons {
+            right: unset;
+        }
+
+        .video-item-img {
+            height: 100%;
+        }
+
+        .main-video-thumbnail {
+            border: none;
+        }
+
+        .videoPlatformPlayer {
+            height: 260px;
+            max-width: 800px;
+        }
+        .sub-video-thumnail {
+            background-size: cover;
+            width: 30%;
+            float: left;
+            height: 120px;
+        }
+
+        .sub-video-text {
+            width: 70%;
+            display: inline-block;
+            height: 120px;
+            margin-bottom: 10px;
+        }
+
+        .sub-videos-row {
+            margin-bottom: 0px;
+        }
+
+        .video-item-description {
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .episode-click {
+            margin: 40px auto;
+        }
+
+        .video-citation-box {
+            position: absolute;
+            bottom: 0;
+            margin: auto;
+            padding: 20px;
+            left: 0;
+        }
+
+        .video-header-thumb {
+            margin-top: 0px;
+            margin-left: -15px;
+            width: 110%;
+        }
+
+        .landing-video-title {
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 30px;
+            padding: 10px;
+        }
+
+        .sub-videos {
+        }
+
+        .sub-video-container {
+            box-shadow: 0px 1px 20px rgba(0,0,0,0)
+        }
+
+        .landing-video-description {
+            width: 90%;
+        }
+    }
+
+    @@media (min-width: 480px )and (max-width: 768px) {
+        .web-app-text-display {
+            margin-right: 11%;
+        }
+        
+        #video-header {
+            margin-top: unset;
+        }
+
+        .video-item {
+            box-shadow: none;
+        }
+
+        .landing-video-title {
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+        .video-citation-box {
+            position: absolute;
+            bottom: 0;
+            margin: auto;
+            padding: 20px;
+            left: 0;
+        }
+
+        .sub-video-text {
+            background: #f6f6f6;
+            height: 220px;
+            padding-top: 10px;
+        }
+    }
+
+    @@media (min-width: 769px )and (max-width: 1024px) {
+
+        .web-app-text-display {
+            margin-right: 8%;
+        }
+        #video-header {
+            margin-top: unset;
+        }
+
+        .video-item-description {
+            height: unset;
+        }
+
+        #video-body > .row {
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        .video-item {
+            box-shadow: none;
+        }
+
+        .landing-video-title {
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+        .video-container {
+            width: unset;
+        }
+
+        .video-citation-box {
+            position: absolute;
+            bottom: 0;
+            margin: auto;
+            padding: 20px;
+            left: 0;
+        }
+
+        .sub-video-text {
+            background: #f6f6f6;
+            height: 200px;
+            padding-top: 10px;
+        }
+    }
+
+    /*#endregion */
+
+</style>
+
+<div class="container">
+
+    <!-- HERO BANNER -->
+    <div class="row">
+        <div class="" style="width:100%">
+            <div style="margin:10px">
+                <div style="padding:5px" class="searchItemList">
+                    <form style="margin-top: 30px">
+                        <a class="back-button" href="" onclick="history.back()"><< Go back</a>
+                    </form>
+                    <div class="item-content">
+                        <div class="card">
+                            <div class="card-header" role="tab" id="tabHeading0">
+                                <h5>
+                                    <span class="triangle-nav sublink-collapsables title text-uppercase" data-toggle="collapse"
+                                          href="#heading0" aria-expanded="true" aria-controls="collapseThree">
+                                        &nbsp;&nbsp;@selectedItemString
+                                    </span>
+                                </h5>
+                            </div>
+                            <hr />
+                           <div id="heading0" class="collapse in" role="tabpanel" aria-labelledby="tabHeading0" data-parent="#accordion">
+                                <div class="container margin-left-50 faq content card-body">
+                                    <div class="platform-icon-display row text-center margin-top-30 margin-bottom-30">
+                                         @{
+                                             int platformIterator = 0;
+                                             bool isCellPhonePlatform = false;
+                                             bool isAppPlatform = false;
+                                             bool isOnlinePlatform = false;
+                                             foreach (var platform in availablePlatformItems)
+                                             {
+                                                 if (platformIterator == 0) { isAppPlatform = true; }
+                                                 if (platformIterator == 1) { isOnlinePlatform = true; }
+                                                 if (platformIterator == 2) { isCellPhonePlatform = true; }
+                                                 var imageValue = (IPublishedContent)platform.Value("nCebankITDocument"); //  (IPublishedContent)platform.Value("nCebankITDocument");
+                                                 string iconClassName = "platform-icon" + platformIterator.ToString();
+                                                 var stringPath = imageValue.Url;
+                                                 //   var stringPath = ((Umbraco.Web.Models.ImageCropDataSet)imageValue.Value("umbracoFile")).Src.ToString();
+                                                <div class="col-xs-4" style="text-align: @(isAppPlatform ? "right" : ""); text-align: @(isCellPhonePlatform ? "left" : "")">
+                                                    @if (isCellPhonePlatform && cellphoneIconLink != null)
+                                                    {
+                                                        <img src="@stringPath" width="70" class="@iconClassName"
+                                                             onclick='playVideoPlatform("@cellphoneIconLink.Value("answer").ToString()", "@iconClassName", "@selectedPlatformCellPDFValue")' 
+                                                             alt="@imageValue.Value("altTag")" />
+                                                             <br>
+                                                             <span class="cell-display">CELLPHONE</span>
+                                                    }
+                                                    else if (isAppPlatform && appIconLink != null)
+                                                    {
+                                                        <img src="@stringPath" width="70" class="@iconClassName"
+                                                             onclick='playVideoPlatform("@appIconLink.Value("answer").ToString()", "@iconClassName", "@selectedPlatformAppPDFValue")' 
+                                                             alt="@imageValue.Value("altTag")" />
+                                                             <br>
+                                                             <span class="cell-display web-app-text-display">APP</span>
+                                                    }
+                                                    else if (isOnlinePlatform && onlineIconLink != null)
+                                                    {
+                                                        <img src="@stringPath" width="70" class="@iconClassName"
+                                                             onclick='playVideoPlatform("@onlineIconLink.Value("answer").ToString()", "@iconClassName", "@selectedPlatformOnlinePDFValue")' 
+                                                             alt="@imageValue.Value("altTag")" />
+                                                             <br>
+                                                             <span class="cell-display">ONLINE</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <img src="@stringPath" width="70" class="@iconClassName" alt="@imageValue.Value("altTag")" />
+                                                            <p>
+                                                                <i class="glyphicon glyphicon-remove" 
+                                                                style="content: &quot;\e013&quot;;
+                                                                     font-family: 'Glyphicons Halflings';
+                                                                     font-size: 12px;
+                                                                     color: #ef0843;
+                                                                     @(isAppPlatform ? "margin-right:28px": "");
+                                                                     @(isCellPhonePlatform ? "margin-left:30px" : "")"></i>
+                                                            </p>
+                                                    }
+                                                </div>
+                                                platformIterator += 1;
+                                                isCellPhonePlatform = false;
+                                                isAppPlatform = false;
+                                                isOnlinePlatform = false;
+                                            }
+                                        }
+                                    </div> 
+                                    
+                                    <div class="text-center">
+                                        <video autoplay class="videoPlatformPlayer" width="100%" controls="controls">
+                                            <source src='@selectedVideo' />
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    </div>
+                                    <div class="row text-center margin-top-40 ">
+                                        <div class="col-md-2"></div>
+                                        @{
+                                            foreach (var buttons in videoButtonItems)
+                                            {
+                                                var imageValue = (IPublishedContent)buttons.Value("nCebankITDocument");
+                                                // var stringPath = ((Umbraco.Web.Models.ImageCropDataSet)imageValue.Value("umbracoFile")).Src.ToString();
+                                                var stringPath = imageValue.Url;
+                                                <div class="col-md-12">
+                                                    <a class="video_list_item" href="@selectedPDF" target="_blank" style="margin-right: 2%;">
+                                                        <img src="@stringPath" width="200" alt="@imageValue.Value("altTag")" />
+                                                    </a>
+                                                </div>
+                                            }
+                                        }
+                                        <div class="col-md-2"></div>
+                                    </div>
+
+                                    <h1 class="video-title css-color-change">
+                                        @heroBody.Value("bodyTitle")
+                                    </h1>
+                                    <div class="video-body">
+                                        <p>@heroBody.Value("bodyDescription")</p>
+                                        <p> @Html.Raw(heroBody.RichTextBox)</p>
+                                    </div>
+                                </div>
+                            </div> 
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div style="padding:5px" class="searchItemList">
+                    <div class="item-content">
+                        <div class="card">
+                            <div class="card-header" role="tab" id="tabHeading1">
+                                <h5>
+                                    <span class="triangle-nav collapsed sublink-pointer-flexer title text-uppercase" data-toggle="collapse" href="#heading1" aria-expanded="false" aria-controls="collapseThree">
+                                        &nbsp;&nbsp;@viewMoreHowTos
+                                    </span>
+                                </h5>
+                            </div>
+                            <div id="heading1" class="collapse" role="tabpanel" aria-labelledby="tabHeading1" data-parent="#accordion">
+                                <div style="margin-left: 5%" class="margin-left-50 faq content card-body">
+                                    <div class="col-md-12 video-content">
+                                        <div class="container">
+                                            @Html.Partial("_pageRelatedVideos", videos as ICollection<NChelpGuide>)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                </div>
+                <br>
+                <!--FAQ-->
+                <div style="font-size: 5vh;font-weight: 600;color: #88bc47;">
+                    @faqs.EbankIticonTitle
+                    <img class="faq-image-item" src="@faqImagePath" alt="@faqImageAltTagData.Value("altTag")" />
+                    <span class="top-3-faqs-description">@faqLongString</span>
+                </div>
+                <br />
+                <div class="container">
+                    <div class="faq-section full" ng-controller="ReportsAndArchievesController">
+    <div class="margin-top-20 visible-xs"></div>
+    @{
+        var groups = (IEnumerable<IPublishedElement>)sectionContent;
+        var sections = groups.Select(x => x.Value("groupName")).ToList();
+
+        foreach (var group in groups)
+        {
+            var questions = (IEnumerable<QuestionItem>) group.Value("questionsAndAnswers");
+            int headingId = 0;
+            <div class="row sectionHeading">
+                <div style="background-color:#335580;padding: 10px; margin-bottom:5px;margin-top:5px;" id="accordion" role="tablist">
+                    <div style="margin:10px">
+                        @foreach (var question in questions)
+                        {
+                            var Q = question.Value("question");
+                            var A = question.Value("answer");
+                            var headingSting = "_heading" + headingId.ToString();
+                            var tabStringHeader = "_tabHeading" + headingId.ToString();
+                            <div style="border: solid #7e7e7e;border-width: 1px 1px;padding:5px" class="searchItemList" ng-show="stringContains('@Q', searchTerm)">
+                                <div class="item-content">
+                                    <div class="card">
+                                        <div class="card-header" role="tab" id="@tabStringHeader">
+                                            <h5>
+                                                <span class="triangle-nav collapsed faq-link-pointer title text-white" data-toggle="collapse" href="#@headingSting" aria-expanded="false" aria-controls="collapseThree">
+                                                    &nbsp;&nbsp;@Q
+                                                </span>
+                                            </h5>
+                                        </div>
+                                        <div id="@headingSting" class="collapse" role="tabpanel" aria-labelledby="@tabStringHeader" data-parent="#accordion">
+                                            <div style="margin-left: 5%" class="margin-left-50 text-white faq content card-body">
+                                                @A
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            headingId += 1;
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- HERO BODY-->
+</div>
+<script>
+    $(document).ready(function () {
+        MediaHashVideo();
+    });
+    function playVideoPlatform(videoPath, classIconName, pdfPath) {
+        if (videoPath !== null) {
+            for (var i = 0; i <= 2; i++) {
+                $(".platform-icon" + i).css("background", "#002b60");
+                $(".platform-icon" + i).css("transition", "0.5s");
+            }
+            
+            // update the PDF button link
+            $('.video_list_item').attr('href', '@currentDirectory' + pdfPath);
+            // end PDF button link
+            
+            $('.' + classIconName).css("background", "#001f44");
+            $('.videoPlatformPlayer').attr('src', '@currentDirectory' + videoPath);
+            $(".videoPlatformPlayer").each(function () {
+                $(this).get(0).play();
+                $("html, body").animate({ scrollTop: 0 }, 2000);
+            });
+        }
+    }
+    function onPage(name) {
+        var path = window.location.pathname;
+        return name == path.substring(path.lastIndexOf('/') + 1);
+    }
+    if (onPage('video-hub')) {
+        $('.css-background-change').css('background', '#2E0554');
+        $('.css-color-change').css('color', '#2E0554');
+    };
+    $(".main-click").click(function () {
+        $(".video-citation-box").hide();
+        $("#video-header").css({ 'height': '75vh' });
+    });
+
+    function MediaHashVideo() {
+        var selected_video = window.location.hash.replace('#', '');
+        if (selected_video !== null && selected_video !== undefined && selected_video != "") {
+            //-->show video loader
+            $("#video-loader").show();
+            $(".video-citation-box").hide();
+            //}
+            $("#video-ytd")[0].src = selected_video;
+            setTimeout(function () {
+                $('#video-ytd')[0].src += "?autoplay=1";
+                $("#video-ytd").addClass("video-ytd-show");
+                $("#video-loader").hide();
+            }, 5000);
+        }
+    }
+</script>
+<script type="text/javascript" src="~/scripts/search.js"></script>

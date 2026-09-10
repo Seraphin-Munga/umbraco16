@@ -1,0 +1,645 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+
+@{
+    Layout = "Master.cshtml";
+    @*var testimoniesPropertyName = "campaignTestimonials";
+        var testimonies = Model.Content.GetPropertyValue<IEnumerable<IPublishedContent>>(testimoniesPropertyName);
+        var featuredProductPropertyName = "featuredProducts";
+        var featuredProducts = Model.Content.GetPropertyValue<IEnumerable<IPublishedContent>>(featuredProductPropertyName);
+        var downloadPropertyName = "downloadFiles";
+        var downloadFilename = "file name";
+        var downloadLink = "file link";
+        var creditInsuredRelatedLinkPropertyName = "creditInsuredOptions";
+        var campaignPropertyName = "campaignProductInfo";
+        var campaignHeroImage = Model.Content.GetPropertyValue<IPublishedContent>("campaignHeroImage");
+        var campaignHeroDescription = Model.Content.GetPropertyValue<IPublishedContent>("campaignHeroDescription");
+        var campaignHeroButtonLabel = Model.Content.GetPropertyValue<IPublishedContent>("campaignHeroButtonLabel");
+        var campaignHeroButtonRedirectLink = Umbraco.Field("campaignHeroButtonRedirectLink");
+        var campaignHeroHeadline = Model.Content.GetPropertyValue<IPublishedContent>("campaignHeroHeadline");
+
+        if (@Model.Content.HasProperty(campaignPropertyName) && !string.IsNullOrEmpty(@Model.Content.GetProperty(campaignPropertyName).Value.ToString()))
+        {
+            var campaignProductInfo = Model.Content.GetPropertyValue<IEnumerable<IPublishedContent>>("campaignProductInfo");
+            foreach (var campaign in campaignProductInfo)
+            {
+                var campaignProductImage = campaign.GetPropertyValue<IPublishedContent>("campaignProductImage");
+                var campaignProductTitle = campaign.GetPropertyValue("campaignProductTitle").ToString();
+                var campaignProductDescription = campaign.GetPropertyValue("campaignProductDescription").ToString();
+                var campaignProductHighlight = campaign.GetPropertyValue("campaignProductHighlight").ToString();
+                var campaignProductLearnMoreButtonLabel = campaign.GetPropertyValue("campaignProductLearnMoreButtonLabel").ToString();
+                var campaignProductLearnMoreButtonRedirectLink = campaign.GetPropertyValue("campaignProductLearnMoreButtonRedirectLink").ToString();
+                var campaignProductApplyNowButtonLabel = campaign.GetPropertyValue("campaignProductApplyNowButtonLabel").ToString();
+                var campaignProductApplyNowButtonRedirectLink = campaign.GetPropertyValue("campaignProductApplyNowButtonRedirectLink").ToString();
+                var campaignProductBenefits = campaign.GetPropertyValue<IEnumerable<IPublishedContent>>("structureProductBenefit");
+            }
+        }*@
+}
+
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script src="/Scripts/GoogleCharts/highcharts.js"></script>
+<script src="/Scripts/GoogleCharts/exporting.js"></script>
+<script src="/Scripts/GoogleCharts/customEvents.js"></script>
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;400;500;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.12.1/polyfill.min.js"></script>
+
+<script>
+    var data = {
+        serviceUrl: '@System.Configuration.ConfigurationManager.AppSettings["ebankit.calculators.URL"]',
+        headers: [
+               ['ITSAPP-DEVICE', '@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.ITSAPP-DEVICE"]'],
+               ['ITSAPP-LANG', 'en-GB'],
+               ['Content-type', 'application/json']
+        ],
+    };
+    var getFetchAttr = function getFetchAttr() {
+      return data;
+    };
+</script>
+
+
+<div class="hheader" id="hheader">
+</div>
+<section class="inv-section">
+    <div class="page-title i-container">
+        <h1>Calculate your investment returns on <span>SA's best rate!</span></h1>
+        <h3>Choose your investment type and make a <span>calculated move!</span></h3>
+    </div>
+    <div class="calculator-wrap">
+        <div class="calculator-section container">
+            <div class="row investment-calculator " style="margin-top: 20px;">
+                <div class="calculator-form col-md-5">
+                    <label class="TxFree-norm-class1">How much do you want to invest?</label><label class="TxFree-error-class1" style="display: none;color:tomato;font-weight: bolder;font-size: 12px;"></label>
+                    <input type="text" placeholder="eg. R500" class="investment_amount_input" maxlength="13" oninput="validate_decimal(this);" onkeypress="return isNumber(event)" onkeyup="newInvestmentAmountEntered()" onblur="formatThisVal()" />
+                    <label>Which Investment type do you want?</label>
+                    <select class="investmentType">
+                        <option value="Fixed Deposit">Fixed Deposit</option>
+                        <option value="Notice Deposit">Notice Deposit</option>
+                        <option value="Access Acumulator">Access Acumulator</option>
+                        <option value="TxFree Free">Tax Free</option>
+                    </select>
+                    <div class="Fixed-inputs-holder investmentType-holder">
+                        <label>For how long do you want to invest?</label>
+                        <select class="Fixed-select-input dynamic-input"></select>
+                        <label>Which payout frequency do you want?</label>
+                        <select class="Fixed-payFeq-input dynamic-inputs"></select>
+                    </div>
+                    <div class="Notice-inputs-holder investmentType-holder" style="display: none;">
+                        <label>Monthly Investment Thereafter</label>
+                        <input type="text" placeholder="R 0.00" maxlength="13" oninput="validate_decimal(this);" onkeypress="return isNumber(event)" class="thereafter_amount_input" onblur="TAX_FREE_VALIDATION(this)" />
+                        <label>Notice Period *</label>
+                        <select class="Notice-select-input dynamic-input"></select>
+                        <label>Interest Payout Frequency *</label>
+                        <select class="Notice-payFeq-input dynamic-inputs"></select>
+                    </div>
+                    <div class="Access-inputs-holder investmentType-holder" style="display: none;">
+                        <label>For how long do you want to invest?</label>
+                        <select class="Access-select-input dynamic-input"></select>
+                        <label>Interest Payout Frequency *</label>
+                        <select class="Access-payFeq-input dynamic-inputs"></select>
+                    </div>
+                    <div class="TxFree-inputs-holder investmentType-holder" style="display: none;">
+
+                        <label class="TxFree-norm-class">Monthly Investment Amount</label><label class="TxFree-error-class" style="display: none;color:tomato;font-weight: bolder;font-size: 12px;"></label>
+                        <input type="text" placeholder="Max is R3 000.00" oninput="validate_decimal(this);" onkeypress="return isNumber(event)" maxlength="13" onblur="TAX_FREE_VALIDATION(this)" class="thereafter_amount_input tax_thereafter_amount_input" />
+                        <select class="TxFree-select-input dynamic-input" style="display: none;"></select>
+                        <label>Interest Payout Frequency *</label>
+                        <select class="TxFree-payFeq-input dynamic-inputs"></select>
+                    </div>
+
+                    <div class="cta-button">
+                        <button class="primary-ghost-btn">Calculate</button>
+                    </div>
+                    <div class="re-cta-button" style="display: none;">
+                        <button class="primary-ghost-btn">Re-calculate</button>
+                    </div>
+                    <div class="rec-calc-div-gif" style="display: none;">
+                        <img src="/media/be3hjfv1/loaderico.svg" />
+                    </div>
+                </div>
+                <div class="calculator-results col-md-7">
+                    <div class="artwork"><img src="/media/umahndqa/inv-cal.png" style="width:100%;" alt="Investment Vehicle" /></div>
+                    <div class="i-loader">
+                        <img src="/media/be3hjfv1/loaderico.svg" />
+                        <h3>Calculating, Please wait..!</h3>
+                    </div>
+                    <div class="investment-results">
+                        <div id="chart-container" style="height: 230px;width:100%;"></div>
+                        <div class="row more-results">
+                            <div class="col-sm-5 flexbox" style="align-items:center;align-content:center;">
+                                <div class="your-return-chosen">
+                                    <div class="wrap">
+                                        <h2>Your payout on <span class="selected-header-inv-type">Fixed Deposit</span> will be:</h2>
+                                        <p class="big-return"></p>
+                                        <p class="return-inv-term" style="color: #23273C;"></p>
+                                        <div class="primary-btn" onclick="investBtnClicked()"><a href="#">Invest now</a></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-7 flexbox">
+                                <div class="other-returns ">
+                                    <h3 style="font-size: 16px;font-weight: 700;color: #000E16;margin: 15px auto 20px;">Checkout other investment options!</h3>
+                                    <div class="otherInvestmentTypes"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <p class="dislcaimer-inv">*Our calculators are only a guide. Actual payout could differ due to the number of days in a month and interest rates at the start date of the investment.</p>
+        </div>
+    </div>
+</section>
+
+
+<Style>
+
+    .hheader {
+        background: #EFEFEF url("/media/n1ti0kc4/investment-banner.svg");
+        background-repeat: no-repeat;
+        background-size: contain;
+        height: 240px;
+        background-attachment: fixed;
+    }
+
+    .inv-section {
+        margin-top: -250px
+    }
+
+    .calculator-wrap {
+        background: #EFEFEF;
+    }
+
+    .i-container {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .page-title {
+        text-align: center;
+        background: linear-gradient(#fff,#EFEFEF);
+        padding: 10px;
+        width: 90%;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        box-shadow: 0px -16px 14px #0000000d;
+        z-index: 1;
+    }
+
+
+        .page-title h1 {
+            font-size: 21px;
+            font-weight: 900;
+            line-height: 30px;
+            color: #002B60;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+
+            .page-title h1 > span {
+                color: #1E9FF2;
+            }
+
+        .page-title h3 {
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 16px;
+            color: #011420;
+            padding: 0px 20px;
+        }
+
+            .page-title h3 > span {
+                border-bottom: solid 3px #1E9FF2;
+            }
+
+    .calculator-form > label, .calculator-form > div > label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #011420;
+        margin-bottom: 0px;
+        width: 300px;
+        text-align: left;
+    }
+
+    .calculator-form > input, .calculator-form > select, .calculator-form > div > select {
+        padding: 0px 20px;
+        border-radius: 25px;
+        border: none;
+        outline: none;
+        -webkit-outline: none;
+        width: 300px;
+        height: 50px;
+        margin-top: 10px;
+        margin-bottom: 30px;
+    }
+
+    .calculator-form input, .calculator-form div input {
+        font-size: 24px;
+        font-weight: 300;
+        color: #000000;
+    }
+
+    .calculator-form select, .calculator-form div select {
+        transition: 0.35s;
+        background: #fff url("https://www.africanbank.co.za/media/1pzbuq4v/dropdown-select.svg") center;
+        background-position-x: center;
+        background-position-y: center;
+        background-repeat: repeat;
+        background-position: 93% 50%;
+        background-repeat: no-repeat;
+        -webkit-appearance: none;
+        color: #000000;
+    }
+
+    .investment-calculator {
+        background: #EFEFEF;
+        margin-top: 100px;
+        padding: 15px;
+        -webkit-display: flex;
+        -moz-display: flex;
+        -o-display: flex;
+        -webkit-flex-direction: column-reverse;
+        -moz-flex-direction: column-reverse;
+        -o-flex-direction: column-reverse;
+    }
+
+    .artwork {
+        text-align: center;
+        vertical-align: middle;
+        left: 0;
+        margin-top: -15px;
+    }
+
+    .i-loader {
+        width: 100%;
+        text-align: center;
+        padding: 50px;
+        display: none;
+        margin: 15% auto;
+    }
+
+    .artwork img {
+        width: 260px
+    }
+
+    .calculator-form {
+        text-align: center;
+    }
+
+        .calculator-form > label, .calculator-form > div > label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: #011420;
+            margin-bottom: 0px;
+            width: 300px;
+            text-align: left;
+        }
+
+        .calculator-form input, .calculator-form div input {
+            font-size: 24px;
+            font-weight: 900;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .calculator-form > input::placeholder, .calculator-form > div > input::placeholder {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .calculator-form > input, .calculator-form > select, .calculator-form > div > input, .calculator-form > div > select {
+            font-family: 'Montserrat', sans-serif;
+            padding: 0px 20px;
+            border-radius: 25px;
+            border: none;
+            outline: none;
+            -webkit-outline: none;
+            width: 300px;
+            height: 50px;
+            margin-top: 10px;
+            margin-bottom: 30px;
+        }
+
+            .calculator-form > input:focus, .calculator-form > div > input:focus {
+                transition: 0.5s;
+                border: 2px solid #259CD8;
+            }
+
+    button {
+        cursor: pointer;
+    }
+
+    .primary-btn {
+        width: 100%;
+        transition: 0.5s;
+        background: #88BC47;
+        padding: 15px 25px;
+        height: 50px;
+        border-radius: 25px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer
+    }
+
+        .primary-btn a {
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .primary-btn:hover {
+            transition: 0.5s;
+            background: #65922B;
+        }
+
+    .primary-ghost-btn {
+        transition: 0.5s;
+        border: solid 2px #00285B;
+        padding: 9px 14px;
+        width: 220px;
+        height: 50px;
+        border-radius: 25px;
+        margin: 10px auto;
+        font-size: 14px;
+        font-weight: 600;
+        outline: none;
+        -webkit-outline: none;
+        background: none;
+        color: #00285B;
+        cursor: pointer;
+    }
+
+        .primary-ghost-btn:hover {
+            transition: 0.5s;
+            background: #00285B;
+            color: #fff;
+            box-shadow: 0px 10px 20px #0000045;
+        }
+
+    .investment-results {
+        margin-bottom: 35px;
+        box-shadow: 0px 10px 14px #00000045;
+        border-radius: 10px;
+        overflow: hidden;
+        position: absolute;
+        left: -5000px;
+    }
+
+    .your-return-chosen {
+        text-align: center;
+        background: #ebebeb;
+        padding: 20px;
+        margin: 20% auto;
+        border-bottom-right-radius: 5px;
+        border-top-right-radius: 5px;
+        align-self: center;
+        justify-self: center;
+    }
+
+        .your-return-chosen > .wrap > h2 {
+            font-size: 18px;
+            font-weight: 900;
+            color: #23273C;
+            margin-top: 20px;
+        }
+
+    .big-return {
+        font-size: 24px;
+        font-weight: 900;
+        color: #C4D82E;
+        margin: 0px;
+        padding: 0;
+        line-height: 1;
+    }
+
+    .return-inv-term {
+        font-size: 16px;
+        font-weight: 500;
+        color: #23273C;
+    }
+
+    .other-inv-title {
+        font-size: 14px;
+        font-weight: bold;
+        margin: 0px;
+        color: #000000 !important;
+    }
+
+    .big-return-other {
+        color: #C4D82E !important;
+        font-size: 20px;
+        font-weight: bold;
+        margin: 0px;
+    }
+
+    .other-inv-term {
+        font-size: 12px;
+        font-weight: normal;
+        margin: 0px;
+        color: #011420 !important;
+    }
+
+    .inv-other-ico {
+        float: left;
+        width: 62px;
+        margin-right: 10px;
+    }
+
+    .other-inv {
+        transition: 0.5s;
+        margin-bottom: 20px;
+        cursor: pointer;
+    }
+
+        .other-inv:hover {
+            background: #00000009;
+            box-shadow: 0px 5px 10px #00000009;
+            padding: 2px;
+            transition: 0.5s;
+        }
+
+    .investment-calculator h3 {
+        color: #000000;
+    }
+
+    .big-return {
+        color: #C4D82E !important;
+    }
+
+    .centeredCategory {
+        line-height: 35px;
+        text-align: center;
+        cursor: pointer;
+    }
+
+    .highcharts-background {
+        width: 100%;
+    }
+    /****Media Query For Loans****/
+    @@media (min-width: 320px) and (max-width: 640px) {
+        .hheader {
+            background-size: 100% 30%;
+        }
+
+        .inv-section {
+            margin-top: 0px
+        }
+
+        .i-container {
+            height: 120px;
+            margin-top: -160px;
+        }
+
+        .calculator-wrap {
+            margin-top: 0px;
+        }
+
+        .investment-calculator {
+            margin-top: 30px !important;
+        }
+
+        .your-return-chosen {
+            margin: 0px;
+            margin-left: 0px;
+            border-radius: 0px;
+        }
+    }
+
+    @@media (min-width: 768px) and (max-width: 900px) {
+        .inv-section {
+            margin-top: 0px
+        }
+    }
+
+    @@media (min-width: 768px) {
+        .big-return {
+            font-size: 24px;
+        }
+
+        .hheader {
+        }
+
+        .i-container {
+            margin-top: -130px;
+        }
+
+        .artwork img {
+            margin-top: -50px;
+        }
+
+        .cta-button, .re-cta-button {
+            text-align: center;
+            padding-right: 0px;
+        }
+
+        .inv-other-ico {
+            width: 45px;
+        }
+    }
+
+    @@media (min-width: 992px) {
+        .hheader {
+        }
+
+        .i-container {
+            margin-top: -125px;
+        }
+
+        .investment-calculator {
+            flex-direction: unset;
+            padding-top: 20px;
+        }
+
+        .cta-button, .re-cta-button {
+            text-align: center;
+            padding-right: 0px;
+        }
+
+        .calculator-results {
+            padding: 10px;
+        }
+
+        .inv-other-ico {
+            width: 64px;
+        }
+    }
+
+    .more-results {
+        Background: #f8f8f8;
+    }
+
+    .other-returns {
+        padding: 20px;
+        background: #F8F8F8;
+    }
+
+        .other-returns > h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #000E16;
+            margin: 15px auto 20px;
+        }
+
+    @@media (min-width: 1200px) {
+        .i-container {
+            margin-bottom: -30px;
+        }
+
+        .investment-calculator {
+            flex-direction: unset;
+            padding-top: 20px;
+        }
+
+        .artwork img {
+            margin-top: 0px;
+        }
+
+        .cta-button, .re-cta-button {
+            text-align: center;
+            padding-right: 15px;
+        }
+
+        .hheader {
+            height: 640px;
+            padding-top: 470px;
+        }
+
+        .page-title h1 {
+            font-size: 52px;
+            line-height: 5rem;
+        }
+
+        .page-title h3 {
+            font-size: 24px;
+        }
+    }
+
+    @@media (min-width: 1400px) {
+        .i-container {
+            margin-bottom: -30px;
+            margin-top: -200px;
+            height: 200px;
+        }
+
+        .hheader {
+            height: 640px;
+            padding-top: 470px;
+        }
+    }
+</Style>
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript" src="/Scripts/GoogleCharts/api.js"></script>
+<script type="text/javascript" src="/Scripts/GoogleCharts/index.js"></script>
+
+
+

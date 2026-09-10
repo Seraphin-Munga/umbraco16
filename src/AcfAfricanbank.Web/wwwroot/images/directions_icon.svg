@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="46px" height="45px" viewBox="0 0 46 45" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.1 (51147) - http://www.bohemiancoding.com/sketch -->
+    <title>Slice 1</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+        <g id="Group" transform="translate(1.000000, 1.000000)" stroke="#89BC47" stroke-width="2">
+            <path d="M34.2558136,12.2558136 C34.2558136,21.6279068 22,34 22,34 C22,34 9.7441864,21.672966 9.7441864,12.2558136 C9.7441864,5.4871149 15.2313004,0 22,0 C28.7686996,0 34.2558136,5.4871149 34.2558136,12.2558136 Z" id="Shape"></path>
+            <circle id="Oval" cx="22" cy="12.2558289" r="5.0465117"></circle>
+            <polyline id="Shape" points="31 29 37 29 44 43 0 43 7 29 13.0000067 29"></polyline>
+            <path d="M12,29 C12,29 8.1333332,35.3333321 17,36 C25.8666668,36.6666679 34.2666664,36 34,42" id="Shape"></path>
+        </g>
+    </g>
+</svg>

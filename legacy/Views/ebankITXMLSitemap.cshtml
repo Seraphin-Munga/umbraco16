@@ -1,0 +1,54 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using Umbraco.Web.Composing
+@using System.Linq;
+@{
+    Layout = null;
+    Response.Write("<?xml version='1.0' encoding='UTF-8' ?>");
+    Response.ContentType = "text/xml";
+}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+    @ListChildNodes(Umbraco.Content(Current.UmbracoHelper.AssignedContentItem.Id).AncestorOrSelf(1))
+</urlset>
+@helper ListChildNodes(IPublishedContent startNode)
+{
+    string[] stringArray = { "hero-body", "video-hub" };
+    foreach (var node in startNode.Children/*.Where("hideInXmlSitemap == false")*/)
+    {
+
+        if ((node is HeroBodyFaq) == false)
+        {
+
+            string hasAnyName = Array.Find(stringArray, x => node.Url.Contains(x.ToString()));
+            if (string.IsNullOrEmpty(hasAnyName))
+            {
+                if (node.TemplateId > 0)
+                {
+                    <url>
+                        <loc>@GetUrlWithDomainPrefix(node.Url)</loc>
+                        <lastmod>@(string.Format("{0:s}+00:00", node.UpdateDate))</lastmod>
+                    </url>
+                }
+                if (node.Level <= 100 && node.Children.Count() > 0)
+                {
+                    @ListChildNodes(node)
+                }
+            }
+        }
+    }
+}
+@functions {
+    private static string GetUrlWithDomainPrefix(string url)
+    {
+        if (url.StartsWith("/"))
+            url = url.Substring(1);
+
+        var domainPrefix = string.Format("https://{0}/", HttpContext.Current.Request.ServerVariables["HTTP_HOST"]);
+
+        if (url.StartsWith(domainPrefix))
+            return url;
+        else
+            return domainPrefix + url;
+    }
+}

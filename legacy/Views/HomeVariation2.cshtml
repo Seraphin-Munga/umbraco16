@@ -1,0 +1,324 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using AcfAfricanbank.Core.Models.Forms
+@using Umbraco.Web.Models
+@{
+    Layout = "Master.cshtml";
+
+    var testimoniesPropertyName = "campaignTestimonials";
+    var testimonies = Model.Value<IEnumerable<IPublishedElement>>(testimoniesPropertyName);
+    var featuredProductPropertyName = "featuredProducts";
+    var featuredProducts = Model.Value<IEnumerable<IPublishedElement>>(featuredProductPropertyName);
+    var downloadPropertyName = "downloadFiles";
+    var downloadFilename = "file name";
+    var downloadLink = "file link";
+    var creditInsuredRelatedLinkPropertyName = "creditInsuredOptions";
+    var campaignPropertyName = "campaignProductInfo";
+    var campaignHeroImage = Model.Value<IPublishedContent>("campaignHeroImage");
+    var campaignHeroDescription = Model.Value<IPublishedContent>("campaignHeroDescription");
+    var campaignHeroButtonLabel = Model.Value<IPublishedContent>("campaignHeroButtonLabel");
+    var campaignHeroButtonRedirectLink = Model.Value("campaignHeroButtonRedirectLink");
+    var campaignHeroHeadline = Model.Value<IPublishedContent>("campaignHeroHeadline");
+
+    if (@Model.HasProperty(campaignPropertyName) && !string.IsNullOrEmpty(@Model.GetProperty(campaignPropertyName).ToString()))
+    {
+        var campaignProductInfo = Model.Value<IEnumerable<IPublishedElement>>("campaignProductInfo");
+
+        foreach (var campaign in campaignProductInfo)
+        {
+            var campaignProductImage = campaign.Value<IPublishedContent>("campaignProductImage");
+
+            var campaignProductTitle = campaign.Value("campaignProductTitle").ToString();
+            var campaignProductDescription = campaign.Value("campaignProductDescription").ToString();
+            var campaignProductHighlight = campaign.Value("campaignProductHighlight").ToString();
+            var campaignProductLearnMoreButtonLabel = campaign.Value("campaignProductLearnMoreButtonLabel").ToString();
+            var campaignProductLearnMoreButtonRedirectLink = campaign.Value("campaignProductLearnMoreButtonRedirectLink").ToString();
+            var campaignProductApplyNowButtonLabel = campaign.Value("campaignProductApplyNowButtonLabel").ToString();
+            var campaignProductApplyNowButtonRedirectLink = campaign.Value("campaignProductApplyNowButtonRedirectLink").ToString();
+            var campaignProductBenefits = campaign.Value<IEnumerable<IPublishedContent>>("structureProductBenefit");
+        }
+    }
+}
+
+<!-- HERO BANNER -->
+<div class="hero-static-container">
+    <div class="container-fluid">
+        <div class="row no-gutter">
+            <div class="col-sm-offset-2 col-sm-10">
+                @if (@Model.HasProperty("campaignProductInfo") && !string.IsNullOrEmpty(@Model.GetProperty("campaignProductInfo").ToString()))
+                {
+                    <div class="hero-static-banner" style="background-image: url('@campaignHeroImage.Url');">
+                        <ol class="breadcrumb">
+                            <li>Products</li>
+                            <li class="active">Campaign</li>
+                        </ol>
+                        <img class="pattern" src="/images/footer-pattern.svg">
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- HERO CONTINUED-->
+<div class="container">
+    <div class="hero-static-caption">
+        <h1 class="hero-static-title">@Model.Value("campaignHeroHeadline")</h1>
+        <div class="row">
+            <div class="col-sm-12 col-md-9">
+                <div class="hero-static-description">@Model.Value("campaignHeroDescription")</div>
+            </div>
+            <div class="col-sm-12 col-md-3"><a href="@campaignHeroButtonRedirectLink" class="button primary">@Model.Value("campaignHeroButtonLabel")</a></div>
+        </div>
+    </div>
+</div>
+
+<!-- PRODUCT INFORMATION-->
+<div class="container">
+    <div class="campaign-product-container">
+        <div id="dece-offer">
+            <div class="row">
+                <div class="col-md-4"><img class="dece-img" src="~/media/w44do1ab/hero-campaign-block1-b2l.jpg"><a href="~/en/home/product-value-added-deals/" class="button primary campaign-more">View more</a></div>
+                <div class="col-md-4"><img class="dece-img" src="~/media/jm1h1zq3/hero-campaign-block2-b2l.jpg"></div>
+                <div class="col-md-4"><img class="dece-img" src="~/media/00sfm51l/hero-campaign-block3-b2l.jpg"><a href="#" id="deal_pop_up" class="button primary campaign-more">View more</a></div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <h4 class="campaing-header">LIFESTYLE DEAL</h4>
+                    <p style=" padding:0% 5%; 0% %5">
+                        We've got all those 2019 stationery and clothing needs sorted! Get EXTRA DISCOUNTS** t
+                        at our lifestyle partners when you add a portion of your Loan to an Extra Value Card.
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <h4 class="campaing-header">DIGITAL DEAL</h4>
+                    <p style=" padding: 0% 5%; 0% %5">
+                        Whether for school, work or varsity, we’ve got you covered with our Back-to-Life laptop bundle.
+                        Add the Mecer Xpression notebook bundle onto your Loan for only R3 999.
+                        This bundle Includes: Laptop, bag, printer, ink voucher, Vast 10GB Wifi & free delivery to your door!
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h6 style="font-weight: bold; text-align:center">Disclaimers</h6>
+                    <p style="font-size:13px; line-height:23px; padding: 0% 5%; 0% %5;">
+                        *Terms, conditions and affordability rules apply. Service, initiation and insurance fees apply. Tech
+                        Deal delivery fees included. No device insurance included. Insurance underwritten by Guardrisk
+                        Life Limited Reg No.1999/013922/06. African Bank is an authorised financial services and registered
+                        credit provider. NCR Reg No: NCRCP7638. Reg No: 2014/176899/06. Offer valid from 29 January
+                        2019 to 31 March 2019. **Discount voucher redemption rules apply.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        @if (@Model.HasProperty(campaignPropertyName) && !string.IsNullOrEmpty(@Model.GetProperty(campaignPropertyName).ToString()))
+        {
+            var campaignProductInfo = Model.Value<IEnumerable<IPublishedElement>>("campaignProductInfo");
+
+            foreach (var campaign in campaignProductInfo)
+            {
+                var campaignProductImage = campaign.Value<IPublishedContent>("campaignProductImage");
+
+                <div class="product-info">
+                    <div class="row eq-height">
+                        <div class="col-sm-12 col-md-4 col-md-push-8">
+                            <div class="image" style="background-image: url(@campaignProductImage.Url)">
+                                <img src="@campaignProductImage.Url" class="hidden-lg hidden-md" />
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4 col-md-pull-4">
+                            <div class="intro">
+                                <div class="title">@campaign.Value("campaignProductTitle").ToString()</div>
+                                <p class="body-content">@campaign.Value("campaignProductDescription").ToString()</p>
+                                <div class="floating-highlight">
+                                    <div class="icon">
+                                        <span class="icon-repayment"></span>
+                                    </div>
+                                    <div>
+                                        <p class="bold">@campaign.Value("campaignProductHighlight").ToString()</p>
+                                        <p>@campaign.Value("campaignHighlightDescription").ToString()</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4 col-md-pull-4">
+                            <div class="benefits">
+                                <p class="bold">BENEFITS</p>
+                                <ul>
+                                    @if (campaign.HasProperty("campaignProductBenefit") && !string.IsNullOrEmpty(campaign.GetProperty("campaignProductBenefit").ToString()))
+                                    {
+                                        var productBenefits = campaign.Value<IEnumerable<IPublishedElement>>("campaignProductBenefit");
+
+                                        foreach (var benefit in productBenefits.Where(i => i != null))
+                                        {
+                                            <li>@benefit.Value("loanBenefitDescription").ToString()</li>
+                                        }
+                                    }
+                                </ul>
+                                <div class="floating-buttons">
+                                    @{
+                                        var learnMore = campaign.Value<IEnumerable<Umbraco.Web.Models.Link>>("learnMoreButtonLink");
+                                        foreach (var links in learnMore)
+                                        {
+
+                                            <a href="@links.Url" class="button primary small">@campaign.Value("campaignProductLearnMoreButtonLabel").ToString()</a>
+                                        }
+                                    }
+                                    <a href="@campaignHeroButtonRedirectLink" class="button secondary small">@campaign.Value("campaignProductApplyNowButtonLabel").ToString()</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<!-- HOW TO APPLY-->
+<div class="container no-padding">
+    <div class="campaign-apply">
+        <h2>@Model.Value("howToApplyTitle")</h2>
+        <div class="row margin-top-20">
+
+            <div class="col-sm-6">
+                <div class="body-content">@Model.Value("applicationDescription") </div>
+                <div class="margin-top-40">
+                    <a href="@campaignHeroButtonRedirectLink" class="button primary hidden-xs" trigger-contact-form>@Model.Value("applyNowButtonLabel")</a>
+                </div>
+            </div>
+
+            <div class="col-sm-6 text-center">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <img src="~/images/apply-payslip.svg" height="80" />
+                        <p class="body-content margin-top-20">Latest original pay slip</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <img src="~/images/apply-residence.svg" height="80" />
+                        <p class="body-content margin-top-20">Proof of residence</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <img src="~/images/apply-id.svg" height="80" />
+                        <p class="body-content margin-top-20">Identity document</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <img src="~/images/apply-statement.svg" height="80" />
+                        <p class="body-content margin-top-20">Latest bank statement reflecting 3 salary deposits</p>
+                    </div>
+                </div>
+                <div>
+                    <a href="" class="button primary visible-xs">@Model.Value("applyNowButtonLabel")</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="margin-top-40 visible-xs"></div>
+
+<!-- CAMPAIGN MORE INFO -->
+<div class="campaign-more-container">
+    <div class="hover-block"></div>
+    <div class="container">
+
+        <div class="margin-top-80 hidden-xs"></div>
+        <div class="row eq-height">
+            <div class="col-sm-4">
+                <div class="campaign-more-highlights">
+                    Payment options range from 9-72 months.
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="campaign-more-highlights">
+                    Interest rate (APR)  from 15% to 27.75%
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="campaign-more-highlights">
+                    Insurance rate from 5.04% to 5.4%
+                </div>
+            </div>
+        </div>
+
+        <div class="margin-top-30 campaign-terms">
+            @Model.Value("creditInsuredLegalStatement")
+        </div>
+    </div>
+
+</div>
+
+    </div>
+</div>
+
+<!-- TESTIMONIALS -->
+<div class="testimonials-container white-bg">
+    <div class="container">
+        <h3 class="text-center margin-top-60">What our customers are saying</h3>
+        <div class="testimonials-carousel">
+            <div id="testimonials" class="carousel slide" data-ride="carousel" data-interval="false">
+                <!-- Indicators -->
+                @if (@Model.HasProperty(testimoniesPropertyName) && !string.IsNullOrEmpty(@Model.GetProperty(testimoniesPropertyName).ToString()))
+                {
+                    <ol class="carousel-indicators">
+                        @{
+                            int counter = 0;
+
+                            foreach (var testimonyItem in testimonies)
+                            {
+                                <li data-target="#hero-banner" data-slide-to="@counter" class="@((counter == 0) ? "active" : "")"></li>
+
+                                counter++;
+                            }
+                        }
+                    </ol>
+
+                    <!-- Wrapper for slides -->
+                    <div class="carousel-inner">
+                        @{
+                            int newCounter = 0;
+
+                            foreach (var testimonyItem in testimonies)
+                            {
+                                var Avatar = testimonyItem.Value<IPublishedContent>("testimonialAvatar");
+
+                                <div class="item @((newCounter == 0) ? "active" : "")">
+                                    <div class="testimonial">
+                                        <div class="avatar">
+                                            <img src="@Avatar.Url" alt="">
+                                        </div>
+                                        <div class="descr">
+                                            @testimonyItem.Value("testimonialStory")
+                                        </div>
+                                        <div class="name">@testimonyItem.Value("testimonialName")</div>
+                                    </div>
+                                </div>
+
+                                newCounter++;
+                            }
+                        }
+                    </div>
+                }
+                <!-- Controls -->
+                <a class="left carousel-control" href="#testimonials" role="button" data-slide="prev">
+                    <span class="icon-arrow-left"></span>
+                </a>
+                <a class="right carousel-control" href="#testimonials" role="button" data-slide="next">
+                    <span class="icon-arrow-right"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- CALL BACK FORM -->
+@Html.Partial("_FloatingForm", new FloatingFormViewModel())
+
+
+<!-- BACK TO LIFE -->
+@Html.Partial("Back to life popup")

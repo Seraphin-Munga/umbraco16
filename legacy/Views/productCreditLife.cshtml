@@ -1,0 +1,382 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageManageYourAccount>
+    @using CustomModels = Web.Models;
+    @using ContentModels = Umbraco.Web.PublishedModels;
+
+    @using Web.Helpers;
+
+    @{
+    /**/
+
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var children = Model.Children;
+
+    // Get specific Children
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    var heroKnees = children?.Where(c => c.ContentType.Alias.ToLower() == "heroknees").FirstOrDefault();
+
+    var testimonialTab = children?.Where(c => c.ContentType.Alias.ToLower() == "testimonials").FirstOrDefault();
+    var contentLists = children?.Where(c => c.ContentType.Alias == "featuresAndFreeServices").ToList();
+    var homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+    var uncoveredItemList = contentLists?.Where(c =>
+    {
+    var val = c.Value("contentListType")?.ToString() ?? string.Empty;
+    var type = (!string.IsNullOrEmpty(val)) ? val : string.Empty;
+
+    return type.ToLower() == "credit life uncovered items";
+    }).FirstOrDefault();
+
+    // Get Specic properties
+
+
+    var benefitsModel = new CustomModels.Benefits
+    {
+    Header = heroChest?.Value("chestTitle").ToString(),
+    Description = heroChest?.Value("chestDescription").ToString(),
+    BenefitCards = heroChest?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card")?.Select(c => c as Card).ToList()
+    };
+
+    var headerImage_large = heroHeader?.Value<IPublishedContent>
+        ("image")?.Url;
+        var headerImage_medium = heroHeader?.Value<IPublishedContent>
+            ("imageMedium")?.Url;
+            var headerImage_small = heroHeader?.Value<IPublishedContent>
+                ("imageSmall")?.Url;
+
+                }
+
+                <!-- HERO BANNER -->
+                @Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+                <!-- HERO CONTINUED-->
+                @Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+
+                <!-- PRODUCT INFORMATION-->
+                <div class="container">
+                    <div class="campaign-product-container full">
+                        @Html.Partial("_benefitsSection", benefitsModel)
+                    </div>
+                </div>
+
+                <!-- SUBMIT YOU CLAIM -->
+                @Html.Partial("_claimForm")
+
+                <!-- NOT COVERED -->
+                @if (uncoveredItemList != null)
+                {
+                var title = uncoveredItemList.Value("listAreaHeader");
+                var desc = uncoveredItemList.Value("listAreaDescription");
+                var ContentLists = uncoveredItemList.Value<IEnumerable<IPublishedElement>>("contentLists") ?? new List<IPublishedContent>();
+
+    <div class="container">
+        <div class="padded-white">
+            <div class="row">
+
+                <div class="col-sm-6">
+                    <h2>@title</h2>
+                    <p class="body-content margin-top-20">
+                        @desc
+                    </p>
+                </div>
+                <div class="col-sm-6">
+                    @foreach (var listHolder in ContentLists)
+                    {
+                        var header = listHolder.Value("listHeader");
+                        var items = listHolder.Value<IEnumerable<IPublishedElement>>("listItems") ?? new List<IPublishedContent>();
+
+                        <h4>@header</h4>
+                        <ul class="checklist margin-top-20">
+                            @foreach (var item in items)
+                            {
+                                var val = item.Value("nCvalue");
+                                <li>
+                                    @val
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- CAMPAIGN MORE INFO -->
+@Html.Partial("_heroKneeTabs", heroKnees as ContentModels.HeroKnees)
+
+<!-- TESTIMONIALS -->
+@Html.Partial("_testimonials", testimonialTab as Testimonials)
+
+@section scripts
+{
+
+    <script defer id="customcare-webchat" src="https://africanbank-webchat.gotbot.co.za/js/customcare-webchat.js"></script
+    <script type="text/javascript" src="@Url.Content("~/Scripts/handlebars-v4.0.5.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/jquery.xdomainrequest.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculator.js?ver=1")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculator1.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculatorHandler.min.js")"></script>
+
+    <script type="text/javascript">
+
+    $(document).ready(function () {
+
+
+        var imageBgCss = "url('" + "@headerImage_large" + "')";
+        var imageMdCss = "url('" + "@headerImage_medium" + "')";
+        var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_large : headerImage_small)" + "')";
+        var CheckScreenSize;
+        (CheckScreenSize = function () {
+            var _width = $(window).outerWidth();
+            var _height = $(window).outerHeight();
+            if (_width <= 511) {
+                $("#heroHeader").css("background-image", imageSmCss);
+            }
+            else {
+                $("#heroHeader").css("background-image", imageBgCss);
+            }
+        })();
+        $(window).resize(CheckScreenSize);
+
+
+
+        $("#loader-rates-form-preloader").hide();
+
+        $(".cancel-button").click(function () {
+
+            $("#collapseExample").bootstrapValidator('resetForm', true);
+
+            $('#collapseExample').collapse('hide');
+
+
+        });
+
+
+        $("#rates-form-preloader").hide();
+
+
+        $('#funeral_claim').bootstrapValidator({
+            message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+            feedbackIcons: {
+
+            },
+            onSuccess: function (e) {
+                e.preventDefault();
+                SubmitFuneralForm();
+
+            },
+            fields: {
+                'FormFields.Subject': {
+                        message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                        validators: {
+                            notEmpty: {
+                                message: '@ResourceHelper.GetResource("GenericContactForm_Subject_Required")'
+                            }
+                        },
+                        feedbackIcons: {
+                            valid: '',
+                            invalid: '',
+                            validating: ''
+                        },
+                    },
+                'FormFields.Message': {
+                    message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                    validators: {
+                        notEmpty: {
+                            message: '@ResourceHelper.GetResource("GenericContactForm_Message_Required")'
+                        }, stringLength: {
+                            max: 100,
+                            message: '@ResourceHelper.GetResource("GenericContactForm_Message_LenghtValMessage")'
+                        }
+                    },
+                    feedbackIcons: {
+                        valid: '',
+                        invalid: '',
+                        validating: ''
+                    },
+                },
+
+                'FormFields.FirstName': {
+                    message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                    validators: {
+                        notEmpty: {
+                            message: '@ResourceHelper.GetResource("GenericContactForm_FirstName_Required")'
+                        },
+                        regexp: {
+                            regexp: /^[a-zA-Z]+$/,
+                            message: '@ResourceHelper.GetResource("GenericContactForm_FirstName_error")'
+                        }, stringLength: {
+                            max: 20,
+                            message: '@ResourceHelper.GetResource("GenericContactForm_FirstName_LenghtValMessage")'
+                        }
+                    }
+                },
+                "FormFields.LastName": {
+                    message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                    validators: {
+                        notEmpty: {
+                            message: '@ResourceHelper.GetResource("GenericContactForm_LastName_Required")'
+                        },
+                        regexp: {
+                            regexp: /^[a-zA-Z]+$/,
+                            message: '@ResourceHelper.GetResource("GenericContactForm_LastName_error")'
+                        }, stringLength: {
+                            max: 20,
+                            message: '@ResourceHelper.GetResource("GenericContactForm_LastName_LenghtValMessage")'
+                        }
+                    }
+                },
+
+                "FormFields.IdNumber": {
+                    message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                    validators: {
+                        notEmpty: {
+                            message: '@ResourceHelper.GetResource("GenericContactForm_SAID_Required")'
+                        },
+                        regexp: {
+                            regexp: /^[a-zA-Z0-9]{1,13}$/,
+                            message: '@ResourceHelper.GetResource("GenericContactForm_SAID_ValMessage")'
+                        },
+                        stringLength: {
+                            max: 13,
+                            message: '@ResourceHelper.GetResource("GenericContactForm_SAID_LenghtValMessage")'
+                        }
+                    }
+                },
+                'FormFields.Email': {
+                    message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                    validators: {
+                        notEmpty: {
+                            message: '@ResourceHelper.GetResource("GenericContactForm_Email_Required")'
+                        },
+                        regexp: {
+                            regexp: /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i,
+                            message: '@ResourceHelper.GetResource("GenericContactForm_Email_ValMessage")'
+                        }
+                    }
+                },
+                "FormFields.CellPhone": {
+                    message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                    validators: {
+                        notEmpty: {
+                            message: '@ResourceHelper.GetResource("GenericContactForm_CellPhone_Required")'
+                        },
+                        numeric: {
+                            message: '@ResourceHelper.GetResource("GenericContactForm_CellPhone_NumericValMessage")'
+                        },
+                        stringLength: {
+                            min: 10,
+                            max: 10,
+                            message: '@ResourceHelper.GetResource("GenericContactForm_CellPhone_LenghtValMessage")'
+                        }
+                    }
+                }
+            }
+        });
+    });
+
+
+function SubmitFuneralForm( /*hasSubmit*/) {
+
+    $("#loader-rates-form-preloader").show();
+    $("#log-claim-preloader").show();
+
+                var submitedFormDateTime = new Date().toLocaleString()
+
+                var data = {
+                    FirstName: $('#FirstNameInput').val().trim(),
+                    LastName: $('#LastNameInput').val().trim(),
+                    Subject: 'Log a claim online - Log a Claim',
+                    ProductID: "1",
+                    Email: $('#EmailInput').val().trim(),
+                    CellPhone: $('#CellPhoneInput').val().trim(),
+                    SAID: $('#SAIDInput').val(),
+                    HasSubmit: true,
+                    TimeEnteredOnPage: "@DateTime.Now.ToIsoString()",
+                    SessionId: $('#sessionId').val(),
+                    FreeText: $('#MessageInput').val().trim(),
+                    ProcessID: $('#processID').val(),
+                    ContactType:'Log a claim Funeral',
+                    ExtendedProperties:
+
+                    [
+                    {
+                    "Key": "SubmitedPageDate",
+                    "Value": submitedFormDateTime
+                    },
+                    {
+                    "Key": "CodeName",
+                    "Value": navigator.appCodeName
+                    },
+                    {
+                    "Key": "appName",
+                    "Value": navigator.appName
+                    },
+                    {
+                    "Key": "appVersion",
+                    "Value": navigator.appVersion
+                    }
+                    ,
+                    {
+                    "Key": "userAgent",
+                    "Value": navigator.userAgent
+                    }
+                    ,
+                    {
+                    "Key": "screenWidth",
+                    "Value": screenWidth()
+                    }
+                    ,
+                    {
+                    "Key": "screenHeight",
+                    "Value": screenHeight()
+                    },
+                    {
+                    "Key": "URL",
+                    "Value": window.location.href
+                    }
+                    ]
+
+                    }
+                    requestInProgress = true;
+                    AJAX.rootPath = $.rootPath;
+                    AJAX.headers = $.headers;
+                    AJAX.request('/public/contacform/submit', {
+                    data: data,
+
+                    success: function (e) {
+                        $("#log-claim-preloader").hide();
+
+                        if (e.Status == 'Ok') {
+                     //   console.log("The e -->" + JSON.stringify(e.Status));
+
+                        $("form#funeral_claim").bootstrapValidator("resetForm");
+                        $("form#funeral_claim")[0].reset();
+                            $("#ajax-form-success-log-claim").show();
+                            $("#loader-rates-form-preloader").hide();
+
+                    } else {
+                      //      console.log("error " + e.Status);
+
+                            $("#ajax-form-error-log-claim").show();
+                    }
+
+                    },
+                    error: function (req, txt, err) {
+
+                        $("#ajax-form-error-log-claim").show();
+                        $("#log-claim-preloader").hide();
+
+
+                    }
+                    });
+    }
+
+</script>
+
+}
+

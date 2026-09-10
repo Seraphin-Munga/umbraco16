@@ -1,0 +1,75 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCampaign>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models;
+@using Web.Helpers
+@using Umbraco.Web.Models
+@using System.Text.RegularExpressions
+
+@{
+                /**/
+
+                Layout = "Master.cshtml";
+
+                // All Current Page Children
+                var children = Model.Children;
+
+                // Get specific Children
+                var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+                var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+
+                var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
+
+                var chestTitle = heroChest?.Value("chestTitle").ToString();
+                var chestDescription = heroChest?.Value("chestDescription").ToString();
+                var chestCards = heroChest?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+
+                var campaignBankingItemsModel = new CustomModels.Benefits
+                {
+                    Header = chestTitle,
+                    Description = chestDescription,
+                    BenefitCards = chestCards.Select(c => c as Card).ToList(),
+
+                };
+
+                var heroBody = (HeroBody)children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+                var heroBodyTabGroup = heroBody.Children?.Where(c => c.ContentType.Alias.ToLower() == "tabgroup").FirstOrDefault();
+                var videoLanding = heroBodyTabGroup.Children?.Where(c => c.ContentType.Alias.ToLower() == "tabheader").FirstOrDefault();
+                var videoItem = videoLanding.Children.Where(c => c.ContentType.Alias.ToLower() == "tabbody").FirstOrDefault();
+}
+
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+<br />
+<div class="container">
+    <div class="internet-banking-container full image-full">
+
+        @if (campaignBankingItemsModel.BenefitCards != null && campaignBankingItemsModel.BenefitCards.Any())
+        {
+            int iterator = 0;
+
+            <div class="row eq-height @(campaignBankingItemsModel.BenefitCards.Count > 3 ? " card-slider" : "" ) ">
+                @foreach (Card benefit in campaignBankingItemsModel.BenefitCards)
+                {
+                    String cardIdTag = " card" + iterator.ToString();
+                    <div class="col-sm-8">
+                        <div class="image">
+                            @if (benefit.CardIcon != null)
+                            {
+                                <img class="myWorld-campaign-images chest-images" src="@benefit.CardIcon.Url" alt="@benefit.Value("altTag")" />
+                            }
+                        </div>
+                        <div class="title text-uppercase">@benefit.CardTitle</div>
+                        <p class="descr">@benefit.CardDescription</p>
+                    </div>
+                    ++iterator;
+                }
+            </div>
+        }
+    </div>
+    <div class="row">
+        @Html.Partial("_pageHeaderVideo", videoLanding as TabHeader)
+    </div>
+</div>
+

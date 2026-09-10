@@ -1,0 +1,437 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCorporateInformation>
+@using acf_africanbankv1.Utilities
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers
+
+@{
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var Children = Model.Children;
+
+    // Get specific Children
+    var heroHeader = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var herochest = (HeroChestInvestors)Children?.Where(c => c.ContentType.Alias.ToLower() == "herochestinvestors").FirstOrDefault();
+
+    var heroBody = (HeroBody)Children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    var tabBody = (TabBody)heroBody.Children(x => x.ContentType.Alias.ToLower() == "tabbody").FirstOrDefault();
+
+    var _heroBodyInvestor = (HeroBodyInvestor)heroBody.Children?.Where(c => c.ContentType.Alias.ToLower() == "herobodyinvestor").FirstOrDefault();
+
+    var heroKnees = (HeroKnees)Children?.Where(c => c.ContentType.Alias.ToLower() == "heroknees").FirstOrDefault();
+    var tabKnees = (TabBody)heroKnees.Children(x => x.ContentType.Alias.ToLower() == "tabbody").FirstOrDefault();
+
+    var signupErrorMessage = _heroBodyInvestor.SignupErrorMessage;
+    var signupSuccessMessage = _heroBodyInvestor.SignupSuccessMessage;
+    var roles = _heroBodyInvestor.OptionRoles;
+    var interestes = _heroBodyInvestor.OptionInterests;
+
+
+    string[] roles_options = new string[] { };
+    try
+    {
+        roles_options = roles.ToString().Split(';');
+    }
+    catch { }
+
+
+    string[] interestes_options = new string[] { };
+    try
+    {
+        interestes_options = interestes.ToString().Split(';');
+    }
+    catch { }g
+
+}
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+<!-- HERO SHOULDER-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+
+<!-- HERO CHEST -->
+<div class="container">
+    <div class="campaign-product-container">
+        <div class="margin-top-20 visible-xs"></div>
+        <div class="row text-container reporting">
+            <div class="row inline-checklist">
+                @foreach (var _item in herochest.Checklist)
+                {
+                    var item = (NCchecklist)_item;
+                    <div class="col-sm-6 col-md-6 col-lg-6">
+                        <h3>@item.Title</h3>
+                        @Html.Raw(item.Items)
+                    </div>
+                }
+            </div>
+
+            <div class="row report-files">
+                @foreach (var _download in _heroBodyInvestor.Cards)
+                {
+                    var download = (NCdownload)_download;
+                    <div class="report-item col-md-4">
+                        <div class="report-content">
+                            @if (download.Thumbnail != null)
+                            {
+                                <img src="@download.Thumbnail.Url" alt="@download.Thumbnail.Value("altTag")" />
+                            }
+                            <h4>@download.Title</h4>
+                            <p>@download.SubTitle</p>
+                        </div>
+                        
+                        @if (download.File != null)
+                        {
+                            <a class="download-btn" target="_blank" href="@download.File.Url">
+                                <div>Download</div>
+                            </a>
+                        }
+                    </div>
+                }
+            </div> 
+        </div>
+    </div>
+</div>
+<!-- SIGN UP-->
+@if (_heroBodyInvestor.ShowSignUpForm)
+{
+    <div id="call-to-action-investment" class="content-block call-to-action bg-ab-blue investment-calculator top-minus-60">
+        <div class="container">
+
+            <div class="container">
+
+                <div class="row">
+                    <div class="col-sm-9">
+                        @Html.Raw(_heroBodyInvestor.SignupFormTitle)
+                    </div>
+                    <div class="col-sm-3 text-center">
+                        <a class="button secondary margin-top-10" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                            @ResourceHelper.GetResource(_heroBodyInvestor.Value("OpenButtonCaption").ToString())
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-8 col-sm-offset-2">
+                        <div class="collapse margin-top-50" id="collapseExample">
+
+                            <div id="formMessageContainer" style="display: none;">
+                                <div id="formMessage" class="content-block message message-danger margin-top-20"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-10 col-sm-offset-1 alert-danger-email padding-top-20" style="display: none;">
+                                    <div class="alert alert-danger square">@ResourceHelper.GetResource("GenericContactFormEmailErrorMessage")</div>
+                                </div>
+                            </div>
+
+                            <!-- TODO: Please do not change the field names' property  -->
+                            <div id="userDetailsForm" class="row financial-reporting bv-form" novalidate="novalidate">
+                                <form id="userSignUpForm" class="signupForm bv-form" action="/savings/newsletter/signup" data-method="ajax" method="post" novalidate="novalidate">
+                                    <div class="col-xs-12 col-sm-10 col-sm-offset-1 padding-top-20">
+                                        <div class="ajax-form-success ajax-alert alert alert-success square" style="display: none">@ResourceHelper.GetResource("NewletterForm_Success")</div>
+                                        <div class="ajax-form-error ajax-alert alert alert-danger square" style="display: none">@ResourceHelper.GetResource("NewletterForm_Error")</div>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-10 ">
+                                        <div class="user-details-form">
+                                            <input type="hidden" id="serverUrl" value="@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.Mobile.URL"]" />
+                                            <input type="hidden" id="header_service" value="@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.ITSAPP-DEVICE"]" />
+
+                                            <div class="row">
+                                                <div class="col-md-4 control-label">
+                                                    <div class="form-group">
+                                                        <label for="firstName" class="label_form">@ResourceHelper.GetResource("NewsletterForm_FirstName_Label") *</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <div class="form-group">
+                                                        <input type="text" maxlength="30" class="form-control input_form" id="firstName" name="firstName" placeholder="@ResourceHelper.GetResource("NewsletterForm_FirstName_Placeholder")">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4 control-label">
+                                                    <div class="form-group">
+                                                        <label for="surname" class="label_form">@ResourceHelper.GetResource("NewsletterForm_LastName_Label") *</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <div class="form-group">
+
+                                                        <input type="text" maxlength="30" class="form-control input_form" id="surname" name="lastName" placeholder="@ResourceHelper.GetResource("NewletterForm_LastName_Placeholder")">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4 control-label">
+                                                    <div class="form-group">
+                                                        <label for="organization" class="label_form">@ResourceHelper.GetResource("NewsletterForm_Organisation_Label") *</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <div class="form-group">
+
+                                                        <input type="text" maxlength="50" class="form-control input_form" id="organization" name="organization" placeholder="@ResourceHelper.GetResource("NewsletterForm_Organisation_Placeholder")">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4 control-label">
+                                                    <div class="form-group">
+                                                        <label for="role" class="label_form">@ResourceHelper.GetResource("NewsletterForm_RoleOrganisation_Label") *</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <div class="form-group">
+                                                        <div class="select-wrapper">
+                                                            <select class="form-control select_input_form" id="role" name="roleInOrganization">
+                                                                @{
+                                                                    <option value="">@ResourceHelper.GetResource("NewsletterForm_RoleOrganisation_Placeholder")</option>
+                                                                    for (int i = 0; i < roles_options.Length; i++)
+                                                                    {
+                                                                        <option value="@roles_options[i]">@roles_options[i]</option>
+
+                                                                    }
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4 control-label">
+                                                    <div class="form-group">
+                                                        <label for="formEmail" class="label_form">@ResourceHelper.GetResource("NewsletterForm_Email_Label")</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <div class="form-group">
+                                                        <input type="email" class="form-control input_form" id="formEmail" name="email" placeholder="@ResourceHelper.GetResource("NewsletterForm_Email_Placeholder")">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4 control-label">
+                                                    <div class="form-group ">
+                                                        <label for="cellNumber" class="label_form">@ResourceHelper.GetResource("NewsletterForm_CellPhoneNumber_Label") *</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <div class="form-group">
+                                                        <input type="text" maxlength="10" class="form-control input_form" id="cellNumber" name="cellNumber" placeholder="@ResourceHelper.GetResource("NewsletterForm_CellPhoneNumber_Placeholder")">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4 control-label">
+                                                    <div class="form-group">
+                                                        <label for="interest" class="label_form">@ResourceHelper.GetResource("NewsletterForm_Interest_Label") *</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <div class="form-group">
+                                                        <div class="select-wrapper">
+                                                            <select class="form-control select_input_form" id="interest" name="interest">
+                                                                @{
+                                                                    <option value="">@ResourceHelper.GetResource("NewsletterForm_Interest_Placeholder")</option>
+                                                                    for (int i = 0; i < interestes_options.Length; i++)
+                                                                    {
+                                                                        <option value="@interestes_options[i]">@interestes_options[i]</option>
+
+                                                                    }
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row margin-bottom-20 margin-top-20">
+                                                <div class="col-md-8 col-lg-offset-4">
+                                                    <div class="row">
+                                                        <div class="col-md-6 margin-bottom-20">
+
+                                                            <button class="btn cancel-button button default btn-full-width" type="button">
+                                                                @ResourceHelper.GetResource(_heroBodyInvestor.Value("CancelButtonCaption").ToString())
+                                                            </button>
+                                                        </div>
+                                                        <div class="col-md-6 margin-bottom-20">
+
+                                                            <button id="applyButton" class="btn button secondary btn-full-width" type="submit">
+                                                                @ResourceHelper.GetResource(_heroBodyInvestor.Value("SubmitButtonCaption").ToString())
+                                                            </button>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="row margin-bottom-20">
+                                                        <section id="rates-form-preloader">
+                                                            <div class="loader" id="preloader">
+                                                                <div class="loader-img"></div>
+                                                            </div>
+                                                        </section>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+}
+<!-- HERO KNEES -->
+<div class="container">
+    <div class="press-release-section reports investor full">
+        <div class="report-section-heading">
+            @Html.Raw(heroKnees.Heading)
+        </div>
+    </div>
+</div>
+@Html.Partial("_pageDocumentView", tabKnees as ContentModels.TabBody)
+@section scripts{
+<script type="text/javascript">
+        NewsLetter = {
+
+        init: function () {
+            $('#userSignUpForm').bootstrapValidator({
+          /*  trigger: 'blur', */
+            message: '@ResourceHelper.GetResource("NewsletterForm_InvalidValue")',
+            feedbackIcons: {
+
+            },
+            fields: {
+                firstName: {
+                    message: '@ResourceHelper.GetResource("NewsletterForm_InvalidValue")',
+                    validators: {
+                        notEmpty: {
+                            message: '@ResourceHelper.GetResource("NewsletterForm_FirstName_Required")'
+                        },
+                        regexp: {
+                            regexp: /^[a-zA-Z0-9_ -]{1,30}$/,
+                            message: '@ResourceHelper.GetResource("NewsletterForm_FirstName_ValMessage")'
+                        }
+                    }
+                },
+                lastName: {
+                    message: '@ResourceHelper.GetResource("NewsletterForm_InvalidValue")',
+                    validators: {
+                        notEmpty: {
+                            message: '@ResourceHelper.GetResource("NewsletterForm_LastName_Required")'
+                        },
+                        regexp: {
+                            regexp: /^[a-zA-Z0-9_ -]{1,50}$/,
+                            message: '@ResourceHelper.GetResource("NewsletterForm_LastName_ValMessage")'
+                        }
+                    }
+                },
+
+                organization: {
+                    message: '@ResourceHelper.GetResource("NewsletterForm_InvalidValue")',
+                    validators: {
+                        notEmpty: {
+                            message: '@ResourceHelper.GetResource("NewsletterForm_Organisation_Required")'
+                        },
+                        regexp: {
+                            regexp: /^[a-zA-Z0-9_ -]{1,30}$/,
+                            message: '@ResourceHelper.GetResource("NewsletterForm_Organisation_ValMessage")'
+                        }
+                    }
+                },
+                roleInOrganization: {
+                    message: '@ResourceHelper.GetResource("NewsletterForm_InvalidValue")',
+                    validators: {
+                        notEmpty: {
+                            message: '@ResourceHelper.GetResource("NewsletterForm_RoleOrganisation_Required")'
+                        }
+
+                    },
+                    feedbackIcons: {
+                        valid: '',
+                        invalid: '',
+                        validating: ''
+                    },
+                },
+                email: {
+                    message: '@ResourceHelper.GetResource("NewsletterForm_InvalidValue")',
+                    validators: {
+                        notEmpty: {
+                            message: '@ResourceHelper.GetResource("NewsletterForm_Email_Required")'
+                        },
+                        regexp: {
+                            regexp: /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i,
+                            message: '@ResourceHelper.GetResource("NewsletterForm_Email_ValMessage")'
+                        }
+                    }
+                },
+                cellNumber: {
+                    message: '@ResourceHelper.GetResource("NewsletterForm_InvalidValue")',
+                    validators: {
+                        notEmpty: {
+                            message: '@ResourceHelper.GetResource("NewsletterForm_CellPhone_Required")'
+                        },
+                        numeric: {
+                            message: '@ResourceHelper.GetResource("NewsletterForm_CellPhone_NumericValMessage")'
+                        },
+                        stringLength: {
+                            min: 10,
+                            max: 10,
+                            message: '@ResourceHelper.GetResource("NewsletterForm_CellPhone_NumberValMessageLength")'
+                        }
+                    }
+                },
+                interest: {
+                    message: '@ResourceHelper.GetResource("NewsletterForm_InvalidValue")',
+                    validators: {
+                        notEmpty: {
+                            message: '@ResourceHelper.GetResource("NewsletterForm_Interest_Required")'
+                        }
+
+                    },
+                    feedbackIcons: {
+                        valid: '',
+                        invalid: '',
+                        validating: ''
+                    },
+                }
+
+            }
+        });
+        }
+    };
+
+    $(document).ready(function () {
+
+        NewsLetter.init();
+
+
+        //Stupid workaround to get state of form...
+        $('#applyButton').on('click', function (e) {
+
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            $('.signupForm').bootstrapValidator('validate');
+            if ($('.signupForm').data('bootstrapValidator').isValid() === false) {
+
+                console.log("Failed Submitting newletter");
+
+                return this;
+            }
+            else {
+
+              //  console.log("Submitting newletter");
+                $("#preloader").show();
+                $('.signupForm').submit();
+            }
+
+        });
+    });
+</script>
+}

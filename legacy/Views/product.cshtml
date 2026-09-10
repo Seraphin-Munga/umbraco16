@@ -1,0 +1,140 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageLoans>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models;
+
+@{
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var children = Model.Children;
+
+    // Get specific Children
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    var heroKnees = children?.Where(c => c.ContentType.Alias.ToLower() == "heroknees").FirstOrDefault();
+    var testimonialTab = children?.Where(c => c.ContentType.Alias.ToLower() == "testimonials").FirstOrDefault();
+    var homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+
+    // Get Specific grand children
+    var chestCards = heroChest?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+    var bodyCards = heroBody?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+    var bodyButton = heroBody?.Children?
+         .Where(c => c.ContentType.Alias == "ebankITAbstractButton").FirstOrDefault();
+
+    // Get Properties from children
+    var chestTitle = heroChest?.Value("chestTitle").ToString();
+    var chestDescription = heroChest?.Value("chestDescription").ToString();
+
+    var bodyTitle = heroBody?.Value("bodyTitle").ToString();
+    var bodyDescription = heroBody?.Value("bodyDescription").ToString();
+    var applyDocs = bodyCards.Select(c => c as Card).ToList();
+
+    var benefitsModel = new CustomModels.Benefits
+    {
+        Header = chestTitle,
+        Description = chestDescription,
+        BenefitCards = chestCards.Select(c => c as Card).ToList()
+    };
+
+    var headerImage_large = heroHeader?.Value<IPublishedContent>("image")?.Url;
+    var headerImage_medium = heroHeader?.Value<IPublishedContent>("imageMedium")?.Url;
+    var headerImage_small = heroHeader?.Value<IPublishedContent>("imageSmall")?.Url;
+
+    var isAmp = Request.QueryString["amp"] != null;
+
+
+    if (!isAmp)
+    {
+
+    }
+    else
+    {
+
+    }
+
+
+
+            }
+
+
+
+            <!-- HERO BANNER -->
+            @Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+            <!-- HERO CONTINUED-->
+            @Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+
+            <!-- PRODUCT INFORMATION-->
+<div class="container">
+    <div class="campaign-product-container full">
+        @Html.Partial("_benefitsSection", benefitsModel)
+    </div>
+
+    <amp-img alt="Misty road"
+             fallback
+             width="550"
+             height="368"
+             src="https://apod.nasa.gov/apod/image/2202/AuroraPillars_Correia_960.jpg">
+    </amp-img>
+
+</div>
+
+            <!-- HOW TO APPLY-->
+            @Html.Partial("_howToApplySection", new CustomModels.HowToApplyDataContainer(bodyTitle, bodyDescription, bodyButton as IEbankItabstractButton, applyDocs))
+
+            <!-- CAMPAIGN MORE INFO -->
+            @Html.Partial("_heroKneeTabs", heroKnees as ContentModels.HeroKnees)
+
+            <!-- TESTIMONIALS -->
+            @Html.Partial("_testimonials", testimonialTab as Testimonials)
+
+            <!-- CALL BACK FORM -->
+            @{
+                var _floatingFormViewModel = children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+
+                @Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)
+            }
+            @section scripts
+{
+                <script>
+    $(document).ready(function () {
+        var imageBgCss = "url('" + "@headerImage_large" + "')";
+        var imageMdCss = "url('" + "@headerImage_medium" + "')";
+        var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_medium : headerImage_small)" + "')";
+        var CheckScreenSize;
+        (CheckScreenSize = function () {
+            var _width = $(window).outerWidth();
+            var _height = $(window).outerHeight();
+            if (_width < 511) {
+                $("#heroHeader").css("background-image", imageSmCss);
+            }
+            else {
+                $("#heroHeader").css("background-image", imageBgCss);
+            }
+        })();
+        $(window).resize(CheckScreenSize);
+    });
+
+                </script>
+                <style>
+                    @@media (min-width: 376px) and (max-width: 414px) {
+                        .mega-tabs .nav-tabs > li.active:after {
+                            top: auto;
+                        }
+                    }
+
+                    @@media only screen and (max-width: 414px) {
+                        .mega-tabs .nav-tabs > li.active:after {
+                            bottom: -18px;
+                        }
+                    }
+
+                    @@media (max-width: 360px) {
+                        .mega-tabs .nav-tabs > li.active:after {
+                            top: auto;
+                        }
+                    }
+                </style>
+            }

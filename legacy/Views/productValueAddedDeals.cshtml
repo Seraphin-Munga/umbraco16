@@ -1,0 +1,425 @@
+﻿@using AcfAfricanbank.Core.Models.Forms
+@using Umbraco.Web.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using System.Configuration;
+@using ContentModels = Umbraco.Web.PublishedModels;
+@*@using ContentModels = Umbraco.Web.PublishedContentModels;*@
+@using CustomModels = Web.Models;
+
+@{
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var children = Model.Children;
+
+    // Get specific Children
+    var heroHeader = children.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+
+    var heroPoll = children.Where(c => c.ContentType.Alias.ToLower() == "radiobuttonitem").FirstOrDefault();
+
+    var heroChest = children.Where(c => c.ContentType.Alias.ToLower() == "herochestvad").FirstOrDefault();
+
+    var testimonialTab = children.Where(c => c.ContentType.Alias.ToLower() == "testimonials").FirstOrDefault();
+    var mobileDevicePoppup = children.Where(c => c.ContentType.Alias.ToLower() == "pagepopup").FirstOrDefault();
+
+    var heroBody = children.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    var applicationRequirements = heroBody.Children(x => x.ContentType.Alias.ToLower() == "herobodycontactus").FirstOrDefault();
+
+    var oneNumberControl = heroBody.Children.Where(c => c is RichTextEditor).FirstOrDefault();
+    var bodyTitle = heroBody.Value("bodyTitle").ToString();
+    var bodyDescription = heroBody.Value("bodyDescription").ToString();
+
+    var footerDescription = heroBody.Value("richTextBox").ToString();
+
+    var homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+    var chestCards = heroChest.Children.Where(c => c.ContentType.Alias.ToLower() == "card");
+
+    var benefitsModel = new CustomModels.Benefits
+    {
+        Header = bodyTitle,
+        Description = bodyDescription,
+        BenefitCards = chestCards.Select(c => c as Card).ToList()
+    };
+
+    // Get Specific grand children
+    var mainTabs = heroChest.Children.Where(c => c.ContentType.Alias.ToLower() == "valueaddeddeal");
+
+    var techDealsTab = mainTabs; //.Where(c => @Umbraco.GetPreValueAsString(int.Parse(c.Value("tabType").ToString())).ToLower() == "mobile devices").FirstOrDefault();
+
+    //var edconTab = mainTabs.Where(c => umbraco.library.GetPreValueAsString(int.Parse(c.Value("tabType").ToString())).ToLower() == "edcon extra value card").FirstOrDefault();
+
+    //var hifiCorpTab = mainTabs.Where(c => umbraco.library.GetPreValueAsString(int.Parse(c.Value("tabType").ToString())).ToLower() == "hifi corp extra value card").FirstOrDefault();
+    //ContainerViewModel containerViewModel = new ContainerViewModel();
+
+    var headerImage_large = heroHeader.Value<IPublishedContent>("image").Url;
+    // var headerImage_medium = heroHeader.GetPropertyValue<IPublishedContent>("imageMedium").Url;
+    var headerImage_small = heroHeader.Value<IPublishedContent>("imageSmall").Url;
+
+            }
+<style>
+    .loan-product-container {
+        top: 0px !important;
+    }
+
+    .hero-static-caption, .hero-static-description {
+        top: 0px !important;
+    }
+
+    .loan-summary-container {
+    top: 63px;
+    }
+
+    .padding-50 {
+    padding: 57px 57px 19px 57px;
+    }
+
+    .card-slide {
+    width: 100% !important;
+    display: inline-block !important;
+    }
+
+    .slick-slide {
+    width: 100% !important;
+    display: inline-block !important;
+    }
+
+
+
+    @@media(max-width: 768px) {
+        .loan-product-container {
+        top: -24px;
+        }
+
+        .number-to-call {
+            margin-top: 70px;
+        }
+
+        .loan-product-container {
+            padding-bottom: 14px;
+        }
+    }
+
+    @@media only screen and (max-width: 414px) {
+        .mega-tabs .nav-tabs > li.active:after {
+        bottom: -18px;
+        top: unset;
+        }
+
+        .number-to-call {
+            margin-top: 70px;
+        }
+    }
+
+    @@media(max-width: 1024px) and (min-width: 768px) {
+        .loan-product-container {
+        top: -52px;
+        }
+
+        .loan-product-container {
+            padding-bottom: 14px;
+        }
+    }
+
+    @@media(max-width: 1280px) and (min-width: 1024px) {
+        .loan-product-container {
+        top: -60px;
+        }
+    }
+
+    @@media(max-width: 3840px) and (min-width: 2560px) {
+        .loan-product-container {
+        top: -105px;
+        }
+    }
+
+    @@media(max-width: 1896px) and (min-width: 1564px) {
+        .loan-product-container {
+        top: -82px;
+        }
+    }
+</style>
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+<!-- HERO CONTINUED-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+
+@*@Html.Partial("_pagePoll", heroPoll as ContentModels.RadioButtonItem) *@
+
+
+
+<!-- LOAN SUMMARY -->
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding-50">
+            @Html.Raw(heroShoulder.Value("richTextEditor"))
+        </div>
+    </div>
+
+
+
+    <div class="campaign-apply">
+        @Html.Raw(applicationRequirements.Value("mainHeaderText"))
+    </div>
+    <div class="campaign-product-container full">
+        <div class="text-center spacer">
+            <h4 style="font-size: 28px;">@Html.Raw(benefitsModel.Header)</h4>
+        </div>
+        @if (benefitsModel.BenefitCards != null && benefitsModel.BenefitCards.Any())
+        {
+            int iterator = 0;
+
+            <div class="row eq-height @(benefitsModel.BenefitCards.Count > 3 ? "card-slider" : "") margin-top-50">
+                @foreach (Card benefit in benefitsModel.BenefitCards)
+                {
+                    String cardIdTag = "card" + iterator.ToString();
+                    <div class="col-sm-4 card-slide">
+                        <div class="card-plain">
+                            <div class="center-icon-text">
+                                <div class="image">
+                                    @if (benefit.CardIcon != null)
+                                    {
+                                        <img src="@benefit.CardIcon.Url" alt="@benefit.CardIcon.Value("altTag")" />
+                                    }
+                                </div>
+                                <div class="title text-uppercase">@benefit.Name</div>
+                                <p class="descr">@benefit.CardDescription</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    ++iterator;
+                }
+            </div>
+        }
+    </div>
+
+    <div class="loan-product-container margin-top-10">
+        @* <div class="loan-product-container">*@
+        <div class="loan-summary-container">
+            <div class="container-vad">
+                <div class="mega-tabs">
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs eq-height small-text" role="tablist">
+                        @{
+                            int looper = 0;
+                            foreach (var tab in mainTabs)
+                            {
+                                var cssClass = tab.Equals(mainTabs.First()) ? "active campaign-more" : "campaign-more";
+                                var title = tab.Value("title").ToString();
+                                var tabId = title.Replace(" ", string.Empty);
+                                var icon = tab.Value<IPublishedContent>("tabIcon");
+
+                                <li role="presentation" class="@cssClass">
+                                    <a href="#@tabId" aria-controls="home" role="tab" data-toggle="tab">
+                                        @if (looper > 0)
+                                        {
+                                            <img src="@icon.Url" alt="@icon.Value("altTag")?.ToString()" width="80" /> <span class="hidden-xs">@title</span>
+                                        }
+                                        else
+                                        {
+                                            <img src="@icon.Url" alt="@icon.Value("altTag")?.ToString()" width="36" /> <span class="hidden-xs">@title</span>
+                                        }
+
+                                    </a>
+                                </li>
+                                ++looper;
+                            }
+                        }
+
+                    </ul>
+                </div>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+
+                    @if (techDealsTab != null)
+                    {
+
+                        List<StructureVadtechDeals> mobileDevices = new List<StructureVadtechDeals>();
+                        List<StructureVadtechDeals> tabletDevices = new List<StructureVadtechDeals>();
+
+                        var tablets = heroBody.Children.Where(c => c.ContentType.Alias.ToLower() == "valueaddeddeal").FirstOrDefault();
+                        ((Umbraco.Web.PublishedModels.ValueAddedDeal)tablets).CatalogCards.ToList().ForEach(yy =>
+                        {
+                            tabletDevices.Add(yy);
+                        });
+                        heroChest.Children.Where(c => c.ContentType.Alias.ToLower() == "valueaddeddeal").ToList().ForEach(x =>
+                        {   
+                            if (x.Name == "Mobile Devices")
+                            {
+                                ((Umbraco.Web.PublishedModels.ValueAddedDeal)x).CatalogCards.ToList().ForEach(xx =>
+                                {
+                                    mobileDevices.Add(xx);
+                                });
+                            }
+                        });
+
+                        var deviceNumber = 1;
+                        foreach (var techDeal in heroChest.Children.Where(c => c.ContentType.Alias.ToLower() == "valueaddeddeal"))
+                        {
+                            var title = techDeal.Value("title").ToString();
+                            var tabId = title.Replace(" ", string.Empty);
+                            var cssClass = techDeal.Equals(mainTabs.First()) ? "tab-pane active" : "tab-pane";
+                            var description = techDeal.Value("description").ToString();
+                            var catalogItems = ((Umbraco.Web.PublishedModels.ValueAddedDeal)techDeal).CatalogCards; // techDeal.Value<IEnumerable<IPublishedContent>>("catalogCards");
+
+                            // var applyButton = techDeal.Value<IEnumerable<IPublishedContent>>("tabButtons").FirstOrDefault();
+                            // var applyButtonText = applyButton.Value("ebankITButtonText");
+                            // var selectedTabButtonVal = umbraco.library.GetPreValueAsString(int.Parse(applyButton.GetPropertyValue("externalLinkType").ToString()));
+                            // var applyButtonLink = "https://ib.africanbank.net/"; // ConfigurationManager.AppSettings[selectedTabButtonVal];
+
+                            <div role="tabpanel" class="@cssClass" id="@tabId">
+                                <div class="tab-category" style="display:none;">
+                                    @title
+                                </div>
+
+                                <p class="text-center">
+                                    @description
+                                </p>
+                                <div class="row margin-top-30">
+                                    @{
+                                        //if (techDeal.Name == "Mobile Devices")
+                                        //{
+                                        //    catalogItems = mobileDevices;
+                                        //}
+                                        //else
+                                        //{
+                                        //    catalogItems = tabletDevices;
+                                        //}
+                                        foreach (var highlight in catalogItems)
+                                        {
+                                            if (techDeal.Name == "Mobile Devices")
+                                            {
+                                                var img = highlight.Value<IPublishedContent>("vADTechDealImage");
+                                                var buttonRedirectLink = highlight.Value<IPublishedContent>("vADTechDealButtonRedirectLink2");
+                                                var buttonLabel = highlight.Value("vADTechDealButtonLabel").ToString();
+                                                var deviceSearch = "Mobile device " + deviceNumber.ToString();
+                                                var popupInfo = mobileDevicePoppup.Children.Where(c => c.Name == deviceSearch).FirstOrDefault();
+                                                var popupTitle = popupInfo.Value("cardTitle");
+                                                var popupDescription = popupInfo.Value("cardDescription").ToString();
+                                                var popupimage = popupInfo.Value<IPublishedContent>("cardIcon").Url;
+                                                deviceNumber++;
+                                                <div class="col-sm-4 margin-top-30">
+                                                    <div class="card-plain">
+                                                        <img class="width-100" src="@img.Url" alt="@img.Value("altTag")" />
+                                                        <span class="button primary view_deal" data-item="@popupTitle*@popupDescription*@popupimage" target="_blank">@buttonLabel</span>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                        foreach (var highlight in tabletDevices)
+                                        {
+                                            if (techDeal.Name != "Mobile Devices")
+                                            {
+                                                var img = highlight.Value<IPublishedContent>("vADTechDealImage");
+                                                var buttonRedirectLink = highlight.Value<IPublishedContent>("vADTechDealButtonRedirectLink2");
+                                                var buttonLabel = highlight.Value("vADTechDealButtonLabel").ToString();
+                                                var deviceSearch = "Mobile device " + deviceNumber.ToString();
+                                                var popupInfo = mobileDevicePoppup.Children.Where(c => c.Name == deviceSearch).FirstOrDefault();
+                                                var popupTitle = popupInfo.Value("cardTitle");
+                                                var popupDescription = popupInfo.Value("cardDescription").ToString();
+                                                var popupimage = popupInfo.Value<IPublishedContent>("cardIcon").Url;
+                                                deviceNumber++;
+                                                <div class="col-sm-4 margin-top-30">
+                                                    <div class="card-plain">
+                                                        <img class="width-100" src="@img.Url" alt="@img.Value("altTag")" />
+                                                        <span class="button primary view_deal" data-item="@popupTitle*@popupDescription*@popupimage" target="_blank">@buttonLabel</span>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                    }
+                                </div>
+                                <div class="row margin-top-30">
+                                    @Html.Raw(footerDescription)
+                                </div>
+                                <div class="row tech-deals__buttons margin-top-30">
+                                    @{
+                                        foreach (var link in ((Umbraco.Web.PublishedModels.ValueAddedDeal)techDeal).RelatedLinks)
+                                        {// @(link.Target ? "_blank" : "")
+                                            <a href="@link.Url" target="" class="btn-rounded-green">
+                                                <div class="caption-text">@link.Name</div>
+                                            </a>
+                                        }
+                                    }
+                                    @*THIS Triggers a Call Me Back Popup - >> trigger-contact-form << *@
+                                    @*<a href="@applyButtonLink" class="btn-rounded-green">
+            <div>@applyButtonText</div>
+        </a>*@
+                                </div>
+                                <div class="margin-top-80 hidden-xs"></div>
+                            </div>
+                        }
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="number-to-call">@Html.Raw(@oneNumberControl.Value("textEditor"))</div>
+
+
+@*
+    <!-- TESTIMONIALS -->
+    Html.Partial("_testimonials", testimonialTab as Testimonials)
+
+    <!-- CALL BACK FORM -->
+*@
+@{
+    var _floatingFormViewModel = children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+
+    @Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)
+
+}
+@*https://africanbank.co.za/media/51824/deal.png
+    @Html.Partial("_renderPopUpContent", new ContainerViewModel()
+            {
+                HTMLContent = @<text>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="deal">
+                        <div id="image">
+                            <img id="deal_img" src="" alt="african-bank-deal">
+                        </div>
+                        <div id="deal-content">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+                </text>
+    })*@
+
+@section scripts
+{
+
+    <script type="text/javascript">
+
+
+         $(document).ready(function () {
+                var imageBgCss = "url('" + "@headerImage_large" + "')";
+                @* var imageMdCss = "url('" + "@headerImage_medium" + "')"; *@
+                var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_large : headerImage_small)" + "')";
+                var CheckScreenSize;
+                (CheckScreenSize = function () {
+                    var _width = $(window).outerWidth();
+                    var _height = $(window).outerHeight();
+                    if (_width <= 511) {
+                        $("#heroHeader").css("background-image", imageSmCss);
+                    }
+                    else {
+                        $("#heroHeader").css("background-image", imageBgCss);
+                    }
+                })();
+                $(window).resize(CheckScreenSize);
+            });
+
+        $(".btn_ok_modal").click(function () {
+            $('#generic').modal('hide');
+        });
+    </script>
+}

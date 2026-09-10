@@ -1,0 +1,2481 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.QuickLoans>
+@using Web.Utilities
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers
+@*@inherits Umbraco.Web.Mvc.UmbracoTemplatePage*@
+
+
+<link href="~/css/quick_loans.css" rel="stylesheet" />
+<style type="text/css">
+    /*
+    .ia-close {
+        display: none;
+        float: right;
+        margin-right: 12px;
+        margin-top: -15px;
+        float: right;
+        color: #ffffff;
+        text-shadow: 0 1px 0 #fff;
+        opacity: 1;
+        padding: 20px;
+        font-weight: 100;
+        position: absolute;
+        right: 0px;
+    }
+
+    #ds-terminate-IA #terminate-IA {
+        margin-top: 90px;
+    }
+    */
+    .text-to-speech-icon-container .margin-tb-5 {
+        margin-top: 18px !important;
+    }
+
+    .white-color-link {
+        cursor: pointer;
+        color: white;
+        font-size: 11px;
+        text-decoration: underline;
+    }
+
+    .for-ia {
+        padding: 11px 35px;
+    }
+
+    .survey-ds-text2 p {
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .icon-space {
+        text-align: center;
+        padding: 8px;
+    }
+
+    /*
+    .IA-begin-ds {
+        background: #6E9739 0% 0% no-repeat padding-box;
+        box-shadow: 0px 3px 20px #0000001A;
+        border: 1px solid #FFFFFF;
+        border-radius: 3px;
+        opacity: 1;
+    } */
+
+    .rejection-ds-message {
+        font-size: 16px;
+        font-weight: bold;
+        opacity: 1;
+    }
+
+    #survey-tab-ds #survey-tab {
+        padding-top: 8%;
+    }
+
+    .survey-ds-title {
+        text-align: center;
+    }
+
+    .index_ImproveOffers:after {
+        font-family: Font-awesome;
+        url('/media/53353/improve-ico.svg');
+        float: right;
+    }
+
+    .padder {
+        padding: 0 0 25px 0;
+    }
+
+    .ui-helper-hidden-accessible {
+        display: none;
+    }
+
+    .has-success .form-control-feedback {
+        color: #3c763d;
+    }
+
+    .ui-widget-content {
+        border: 1px solid #dddddd !important;
+        color: #333333 !important;
+    }
+
+    .ui-menu {
+        list-style: none !important;
+        padding: 0 !important;
+        margin: 0;
+        display: block;
+        outline: none;
+    }
+
+        .ui-menu .ui-menu-item {
+            position: relative;
+            margin: 0;
+            padding: 3px 1em 3px .4em;
+            cursor: pointer;
+            min-height: 0;
+            list-style-image: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7);
+        }
+
+    .ui-autocomplete {
+        width: 250px !important;
+        background: #fafafa;
+        z-index: 500;
+        height: 150px;
+        overflow-y: auto;
+    }
+
+        .ui-autocomplete li {
+            display: block;
+            color: #808b97;
+            width: 100%;
+            padding: 10px 0;
+            cursor: pointer;
+            border-bottom: 1px solid #adb1b6;
+        }
+
+    ul, ol {
+        line-height: 1.4;
+    }
+
+    .ui-autocomplete li:hover {
+        background: #e4e6e3;
+        color: white;
+    }
+
+    .ui-autocomplete li a {
+        text-decoration: none;
+    }
+
+    .ui-helper-hidden-accessible {
+        display: none;
+    }
+
+    .btn:focus {
+        outline: none !important;
+    }
+
+    .sw-btn-next, .sw-btn-prev {
+        background-color: #4C6A8F !important;
+        color: #FFFFFF;
+    }
+
+    #GetYourOffer tbody td {
+        text-align: left;
+        font-size: 16px;
+        color: #002b60;
+    }
+
+    #GetYourOffer .thead-dark {
+        background-color: #002b60;
+    }
+
+        #GetYourOffer .thead-dark th {
+            color: #fff;
+        }
+
+    #GetYourOffer tbody .amount {
+        color: #002b60;
+        font-size: 16px;
+    }
+
+    .side-info-txt {
+        font-size: 11px;
+        padding-top: 24px;
+    }
+
+    #form-loader {
+        position: unset;
+        margin-top: 0%;
+        width: unset;
+        z-index: 50;
+        display: none;
+        left: 0%;
+    }
+
+    .bank-not-found {
+        display: none;
+        color: red;
+    }
+
+    .employer-not-found {
+        display: none;
+        font-size: 11px;
+        color: black !important;
+        padding: 0px 7px 15px 9px !important;
+    }
+
+    .employerCheck {
+        display: none;
+        font-size: 11px;
+        color: #a94442 !important;
+        padding: 0px 7px 15px 9px !important;
+    }
+
+    #button1, #button2 {
+        display: none;
+    }
+
+    h3 {
+        font-size: 27px;
+    }
+
+    #index_offer, #credit_card_offer, #overdraft_offer {
+        display: none;
+        margin-left: 10%;
+        margin-right: 10%;
+        border-radius: 5px;
+    }
+
+    .terminate-reason {
+        padding-left: 15%;
+        padding-right: 15%;
+        text-align: center;
+    }
+
+    #reasonDesc {
+        color: white;
+    }
+
+    .offId, .uniId {
+        display: none;
+    }
+
+    .invalid-gross-feedback {
+        font-size: 10px;
+        color: red;
+        display: none;
+    }
+
+    .invalid-employer-feedback {
+        font-size: 10px;
+        color: red;
+        display: none;
+    }
+
+    .close {
+        float: right;
+        color: #ffffff;
+        text-shadow: 0 1px 0 #fff;
+        opacity: 1;
+        padding: 20px;
+        font-weight: 100;
+        margin-top: -25px;
+        position: absolute;
+        right: 0px;
+    }
+
+    .center-icon-text .image img {
+        width: 16%;
+    }
+
+    .card-plain {
+        height: 88%;
+        max-width: 258px;
+    }
+
+    .loan-offer, .card-offer, .overdraft-offer {
+        background: lightgray;
+        box-shadow: 0px 0px 10px -3px #000000;
+    }
+
+    .quick-error-message {
+        display: none;
+    }
+
+    .bankNotOnList {
+        display: none;
+    }
+
+    .navPadding {
+        padding-top: 0px !important;
+    }
+
+    .employer-selector, .bank-selector {
+        font-weight: 600;
+    }
+
+    .modal-content {
+        position: relative;
+        background-color: #fff;
+        border: 1px solid #999;
+        border: 1px solid rgba(0,0,0,0.2);
+        border-radius: 0;
+        -webkit-box-shadow: 0 3px 9px rgba(0,0,0,0.5);
+        box-shadow: 0 3px 9px rgba(0,0,0,0.5);
+        background-clip: padding-box;
+        outline: 0;
+    }
+
+    .modal-header {
+        padding: 15px;
+        border-bottom: 1px solid #e5e5e5;
+    }
+
+        .modal-header .close {
+            margin-top: -2px;
+        }
+
+    bootstrap.min.css?bn=v1.8.4:5
+    button.close {
+        padding: 0;
+        cursor: pointer;
+        background: transparent;
+        border: 0;
+        -webkit-appearance: none;
+    }
+
+    .ab-form h1 {
+        color: #001d37;
+        font-size: 2rem;
+        margin-bottom: 0;
+        margin-top: 0;
+        text-align: left;
+    }
+
+    .modal-header {
+        padding: 15px;
+        border-bottom: 1px solid #e5e5e5;
+    }
+
+    .modal-footer {
+        padding: 15px;
+        text-align: right;
+        border-top: 1px solid #e5e5e5;
+    }
+
+    .search-controls {
+        display: flex;
+    }
+
+    #glyphicon-for-search {
+        top: 0px !important;
+    }
+
+    #empSectorId {
+        right: 17px !important;
+    }
+
+    #quickLoanEmployerSearch, #bankSearchString {
+        width: 68%;
+        border: 1px solid #e4e6e3;
+        border-right: none;
+        padding: 8px;
+        height: 40px;
+        border-radius: 2px 0 0 2px;
+        outline: none;
+        padding-left: 20px;
+    }
+
+    #quick-loan-employer-search-button, #quick-loan-bank-search-button {
+        width: 60px;
+        height: 40px;
+        border: 1px solid #e4e6e3;
+        background: #fff;
+        text-align: center;
+        color: #fff !important;
+        border-radius: 0 2px 2px 0;
+        cursor: pointer;
+        font-size: 18px;
+        outline: none;
+        border-left: none;
+    }
+
+    .quick-loan {
+        background: #002b60;
+        margin-bottom: 12px;
+    }
+
+    .sw-toolbar-bottom {
+        width: auto;
+        position: absolute;
+        bottom: -27%;
+        text-align: center;
+        z-index: 1;
+        left: 0;
+        right: 0px;
+    }
+
+    #quick-background {
+        background-repeat: no-repeat;
+        position: absolute;
+        width: 100%;
+        height: 80%;
+        z-index: -1;
+    }
+
+    .wizad-container {
+        height: 670px;
+        position: relative;
+        margin-top: 0px;
+    }
+
+        .wizad-container i.form-control-feedback {
+            right: -30px !important;
+        }
+
+    .sw-container.tab-content {
+        height: 57vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        min-height: unset !important;
+        padding-top: 22px;
+    }
+
+    .form-field.row {
+        margin: 0px;
+    }
+
+    #ui-datepicker-div {
+        background: grey !important;
+    }
+
+    .form-field-hide {
+        display: none;
+    }
+
+    .form-field {
+        width: 100%;
+    }
+
+    .otp-btn {
+        background: none;
+        border-radius: 2px;
+        border-color: #7289A6;
+        font-size: 14px;
+        margin-top: 7%;
+    }
+
+    .form-field label {
+        color: black;
+        font-weight: 300;
+        margin: 8px 0px 3px 0px;
+        display: inline-block;
+    }
+
+    .form-field .col-md-3 {
+        margin-right: 5%;
+    }
+
+    #smartwizard .nav-tabs > li > a,
+    #smartwizard .nav-tabs > li.active > a,
+    #smartwizard .nav-tabs > li.active > a:hover,
+    #smartwizard .nav-tabs > li.active > a:focus,
+    #smartwizard .nav-tabs > li > a:hover {
+        background: none;
+        border: none;
+        padding-top: 0px;
+        padding-bottom: 0px;
+        text-align: left;
+        float: left;
+    }
+
+    #step-1, #step-2, #step-3 {
+        padding: 0px 26px 0px 26px;
+    }
+
+    .sw-theme-arrows > ul.step-anchor > li {
+        width: 20%;
+        padding: 5px;
+        border-bottom: 1px solid #ddd;
+        margin-right: 0%;
+        text-align: center;
+    }
+
+    .btn-toolbar.mr-2 {
+        position: relative;
+        width: 100% !important;
+        display: inline-block;
+        float: right;
+    }
+
+    .nav-item.done {
+        border-bottom: solid 5px #88bc47 !important;
+    }
+
+    .step-anchor {
+        border: none;
+    }
+
+        .step-anchor .active p {
+            color: #88bc47;
+            font-weight: 600;
+        }
+
+        .step-anchor .active {
+            border-bottom: solid 5px #88bc47 !important;
+            padding: 5px !important;
+        }
+
+    #bank-search, #employer-search {
+        background: white;
+        position: absolute;
+        width: 100%;
+        z-index: 3;
+        height: 150px;
+        overflow: auto;
+        padding-top: 5px;
+        border: solid 1px gainsboro;
+        margin-top: 2px;
+        box-shadow: 0px 0px 11px -4px #000000;
+        /*display: none;*/
+    }
+
+        #bank-search ul, #employer-search ul {
+            list-style: none;
+            margin: 0px;
+            padding: 0px;
+        }
+
+            #bank-search ul li, #employer-search ul li {
+                border-bottom: solid 1px gainsboro;
+                padding-left: 10px;
+                cursor: pointer;
+            }
+
+    #call_me_back {
+        border-radius: 3px;
+        float: left;
+        display: inline-block;
+        width: 90%;
+    }
+
+    .sw-btn-next, .sw-btn-prev {
+        border-radius: 3px;
+        background-color: #002b60;
+        padding: 15px;
+        color: white;
+        display: inline-block;
+        float: right !important;
+        border-radius: 0px;
+        font-size: 16px;
+        text-align: center;
+        font-weight: normal;
+        box-shadow: 0 20px 40px 0 rgba(0, 0, 0, .2);
+        -webkit-font-smoothing: antialiased;
+        transition: all 1s ease;
+        display: inline-block;
+        cursor: pointer;
+        width: 165px;
+    }
+
+    .sw-btn-next {
+        border-radius: 3px;
+        text-align: left;
+        padding-left: 15px;
+        padding-right: 5px;
+    }
+
+    .sw-btn-prev {
+        border-radius: 3px;
+        padding-left: 5px;
+        padding-right: 15px;
+    }
+
+    .sw-btn-next:after {
+        font-family: FontAwesome;
+        content: "\f054";
+        float: right;
+    }
+
+    .sw-btn-next:focus {
+        color: #ffffff;
+    }
+
+    #terminate-quick-loan span {
+        width: 3px;
+        height: 47px;
+        margin-left: 5px;
+        display: inline-block;
+        background: grey;
+    }
+
+    #terminate-quick-loan {
+        width: 220px;
+        display: inline-block;
+        float: right;
+    }
+
+    .quick-parallelogram {
+        height: 111px;
+        transform: skew(20deg);
+        left: -98px;
+        border-top: solid 10px #88bc47;
+        background-color: #002b60;
+    }
+
+    #quick-flat-bottom {
+        position: fixed;
+        left: -50px;
+        width: 100%;
+        bottom: 0px;
+    }
+
+    .quick-content .badge {
+        padding: 8px;
+        border-radius: 50%;
+        width: 35px;
+        background-color: #88bc47;
+        font-size: 16px;
+        margin: 0px 9px;
+    }
+
+    .quick-content h1 {
+        font-size: 25px;
+    }
+
+    .quick-content {
+        top: 0px;
+        text-align: center;
+        margin-left: -18PX;
+        color: white;
+        transform: skew(-20deg);
+        padding-left: -15%;
+    }
+
+    .wizard {
+        width: 100%;
+        box-shadow: 0 2px 6px 0 rgba(69,73,91,.08);
+        margin-top: 10px;
+        height: inherit;
+        position: relative;
+    }
+
+    #quick-drop-off {
+        position: absolute;
+        z-index: 10;
+        background-color: #002B60; /* background-color: rgb(0, 43, 96, 0.85); */
+        width: 97.7%;
+        height: auto;
+        padding-top: 2%;
+        padding-bottom: 2%;
+        margin-top: 1%;
+        display: none;
+        left: 1%;
+        box-shadow: 0px 3px 6px #00000029;
+    }
+
+        #quick-drop-off, #quick-drop-off h4,
+        #quick-drop-off, #quick-drop-off label {
+            color: white;
+        }
+
+    #terminate-process {
+        text-align: center;
+    }
+
+    #terminate-process,
+    #terminate-to-call-me {
+        width: 70%;
+        margin: auto;
+        display: none;
+    }
+
+    .step-anchor {
+        height: auto;
+        width: 100%;
+        position: relative;
+        display: block;
+    }
+
+        .step-anchor .badge {
+            padding: 7px;
+            height: 40px;
+            border-radius: 50%;
+            width: 40px;
+            font-size: 20px;
+        }
+
+        .step-anchor .nav-item span.badge-done {
+            background: #88bc47;
+            color: white;
+        }
+
+        .step-anchor .nav-item a, .step-anchor .nav-item p {
+            display: inline-block;
+        }
+
+        .step-anchor .nav-item span {
+            background: white;
+            color: #88bc47;
+            border: solid;
+            margin-right: 5px;
+        }
+
+        .step-anchor .nav-item p {
+            margin-top: 15px;
+            font-size: 14px;
+            width: 140px;
+        }
+
+    .badge-done {
+        background-color: #88bc47;
+    }
+
+    .quick-offer {
+        text-align: center;
+        height: 135px;
+        border-radius: 8px;
+        margin: auto;
+        margin-top: 5%;
+        margin-bottom: 5%;
+    }
+
+    .quick-offer-content .form-group {
+        margin-bottom: 5%;
+    }
+
+    .quick-offer-option span {
+        background: white;
+        color: black;
+        display: block;
+        margin-top: 69px;
+        text-align: center;
+        position: absolute;
+        left: -25px;
+        padding: 5px;
+        font-size: 25px;
+    }
+
+    .quick-offer-option {
+        display: inline-block;
+        background: #E6E6E6;
+        height: 200px;
+        width: 1%;
+        float: left;
+        position: relative;
+    }
+
+    .quick-offer-smile {
+        margin-bottom: 5%;
+        margin-left: 5%;
+    }
+
+    .option-register {
+        margin-left: 40px;
+    }
+
+    .option-signin {
+        margin-right: 6px;
+    }
+
+        .option-register a, .option-signin a {
+            width: 145px;
+        }
+
+        .option-signin p, .option-register p {
+            line-height: 1.9;
+        }
+
+    .quick-offer-content {
+        width: 100%;
+        margin: auto;
+        text-align: center;
+        padding-top: 1%;
+    }
+
+    .quick-offer p, .quick-offer h5 {
+        line-height: 1.5;
+    }
+
+    .quick-offer h3 {
+        padding-top: 10px;
+        color: #88bc47;
+        font-weight: bold;
+    }
+
+    .expense-modal .modal-content {
+        border-radius: 0px !important;
+    }
+
+    .expense-modal .modal-header {
+        background: none !important;
+    }
+
+        .expense-modal .modal-header h4 {
+            font-size: 30px !important;
+            text-align: left !important;
+            color: #BCBCBC !important;
+            font-weight: 900 !important;
+        }
+
+    .expense-modal .help-block {
+        text-align: left !important;
+    }
+
+    .expense-modal label {
+        color: #858585;
+        display: block !important;
+        text-align: left;
+        font-weight: 400;
+    }
+
+    .expense-modal .modal-footer {
+        background: #002B60 !important;
+        color: white !important;
+    }
+
+        .expense-modal .modal-footer button {
+            background: #003B84 !important;
+        }
+
+    #quick-total-block {
+        font-size: 25px;
+    }
+
+    .expense-modal {
+        margin-top: 5%;
+    }
+
+    #quick-total {
+        font-size: 34px;
+        font-weight: 900;
+        margin-left: 5%;
+    }
+
+    .form-field.row {
+        margin: 0px;
+    }
+
+    .form-field-hide {
+        display: none;
+    }
+
+    .form-field {
+        width: 100%;
+    }
+
+    .pause-form .loader {
+        margin-top: 10%;
+    }
+
+    .form-preloader-title {
+        color: white;
+    }
+
+    .pause-form {
+        top: 0px;
+        left: 3%;
+        padding-top: 10%;
+        margin-top: 3%;
+        background: #002b60;
+        opacity: 0.8;
+        width: 90%;
+        height: 83%;
+        position: absolute;
+        z-index: 10;
+        display: none;
+    }
+
+    .form-group {
+        margin-bottom: 20px !important;
+    }
+
+    #frmStep2_2 .form-control {
+        width: 85%;
+    }
+
+    #frmStep2_2 .form-group i {
+        right: 10px !important;
+    }
+
+    .sw-btn-next:hover, .sw-btn-prev:hover, #call_me_back:hover {
+        background: #858585;
+        color: white;
+    }
+
+    .sw-btn-prev {
+        display: none;
+    }
+
+    input:focus {
+        border-color: #88bc47 !important;
+        box-shadow: inset 0 0px 0px #88bc47, 0 0 0px #88bc47 !important
+    }
+
+    .wizad-container i.form-control-feedback.glyphicon-remove {
+        color: #a94442 !important;
+    }
+
+    .wizad-container i.form-control-feedback.glyphicon-ok {
+        color: #88bc47 !important;
+    }
+
+    .form-field input::placeholder {
+        color: #C1C1C2 !important;
+    }
+
+    .form-field .glyphicon {
+        top: 34px !important;
+        color: #C1C1C1;
+    }
+
+    .help-block {
+        margin-top: 1px !important;
+        background: none !important;
+        color: #a94442 !important;
+        padding: 0px 7px 15px 9px !important;
+    }
+
+    #para {
+        background: none !important;
+        color: #a94442 !important;
+        ] display: none;
+        margin-top: 125px;
+        width: 400px;
+        margin-left: -200px;
+    }
+
+    .custom-top {
+        top: -15px;
+    }
+
+    @@media(max-width: 576px) {
+
+        .custom-top {
+            top: -30px;
+        }
+
+        .sw-theme-arrows > ul.step-anchor > li.active p {
+            font-size: 11px !important;
+            padding-left: 0px;
+        }
+
+        .step-anchor {
+            position: static !important;
+            background: white;
+            z-index: 1;
+        }
+
+        .sw-container.tab-content {
+            padding-top: 5% !important;
+            padding-bottom: 5% !important;
+        }
+    }
+
+    @@media only screen and (max-width: 1366px),screen and (max-height: 736px) {
+        .quick-content h1 {
+            font-size: 22px;
+            margin-top: 10px;
+        }
+
+        .sw-container.tab-content {
+            height: 54vh;
+        }
+
+        .btn-toolbar.mr-2 {
+            width: 45%;
+        }
+    }
+    /*#region Extra large devices (large desktops, 1200px and up)*/
+    @@media (min-width: 1200px) {
+    }
+    /*#endregion*/
+
+    /*#region Large devices (desktops, 992px and up)*/
+    @@media (min-width: 992px) and (max-width: 1199.98px) {
+        /*#region --quick loans page*/
+        .nav-tabs > li > a {
+            text-align: center;
+        }
+
+        .step-anchor .nav-item p {
+            margin-top: 5px;
+            padding-left: 0px;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .step-anchor .nav-item span {
+            display: inline-block;
+            float: none;
+        }
+
+        .quick-content {
+            margin-left: 7%;
+        }
+
+        #quick-background {
+            background: none !important;
+        }
+
+        .sw-container.tab-content {
+            height: 46vh;
+        }
+
+        .quick-offer-content {
+            width: 66%;
+        }
+        /*#endregion*/
+    }
+    /*#endregion*/
+
+    /*#region Medium devices (tablets, 768px and up)*/
+    @@media (max-width: 768px) {
+        /*#region --quick loans page*/
+
+        #para {
+            margin-top: 0px !important;
+            width: 100% !important;
+            margin-left: 0px !important;
+        }
+
+        .quick-offer-content .button {
+            box-shadow: 0 3px 10px 0 rgba(0,0,0,.2);
+        }
+
+        .quick-offer-smile {
+            margin-left: 0px;
+        }
+
+        .quick-offer-option {
+            display: inline-block;
+            width: 100%;
+            height: 1px;
+            margin-top: 35px;
+            margin-bottom: 30px;
+        }
+
+            .quick-offer-option span {
+                display: inline-block;
+                margin-top: -20px;
+                text-align: center;
+                position: relative;
+                left: unset;
+                padding: 5px;
+                font-size: 25px;
+            }
+
+        .btn-toolbar.mr-2 {
+            width: 50%;
+        }
+
+        .sw-container.tab-content {
+            height: 75vh;
+        }
+
+        .sw-toolbar-bottom {
+            margin-left: 0%;
+            bottom: -18%;
+        }
+
+        .quick-content h1 {
+            font-size: 20px;
+        }
+
+        .quick-content {
+            margin-left: 9%;
+        }
+
+        .step-anchor .nav-item p {
+            display: none;
+        }
+
+        .sw-theme-arrows > ul.step-anchor > li {
+            width: 17%;
+        }
+
+            .sw-theme-arrows > ul.step-anchor > li.active a {
+                text-align: left;
+            }
+
+            .sw-theme-arrows > ul.step-anchor > li.active p {
+                width: auto;
+                display: initial;
+            }
+
+            .sw-theme-arrows > ul.step-anchor > li.active {
+                width: 30%;
+            }
+
+        .sw-btn-next, .sw-btn-prev {
+            width: 115px;
+        }
+
+        .quick-parallelogram {
+            width: 320px;
+        }
+
+        #terminate-quick-loan {
+            width: 150px;
+            position: absolute;
+            left: 10px;
+        }
+
+        #call_me_back {
+            width: 90%;
+            padding-left: 0px;
+            padding-right: 0px;
+        }
+        /*#endregion*/
+    }
+    /*#endregion*/
+
+    /*#regionSmall devices (landscape phones, 576px and up)*/
+    @@media(max-width: 576px) {
+        .radio-wrap .checkmark:after {
+            transition: 0.35s;
+            top: 4px;
+            left: 4px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #259CD8;
+            box-shadow: 0px 2px 4px #00000010;
+        }
+
+        .checkmark.radio {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+        }
+        /*#region --quick loans page*/
+        .wizad-container {
+            padding: 0px;
+        }
+
+        .step-anchor {
+            position: fixed;
+            background: white;
+            z-index: 1;
+        }
+
+        .quick-offer {
+            width: 270px;
+        }
+
+        #quick-drop-off {
+            padding-top: 2%;
+            padding-bottom: 2%;
+            margin-top: 20px;
+        }
+
+        .wizard {
+            margin-top: 0px;
+            box-shadow: none;
+            width: 96%;
+        }
+
+        .quick-offer-item .item {
+            padding-left: 20px;
+        }
+
+        .quick-offer-item li {
+            width: 210px;
+        }
+
+        #quick-flat-bottom {
+            left: 0px;
+            width: 100%;
+            background: #002b60;
+            border-top: none;
+            background-color: #002b60;
+            height: 75px;
+        }
+
+        .sw-container.tab-content {
+            padding-top: 20%
+        }
+
+        .quick-parallelogram {
+            display: none;
+        }
+
+        .quick-content h1 {
+            font-size: 17px;
+        }
+
+        .quick-content {
+            margin-left: 1%;
+            width: 200px;
+        }
+
+        .sw-toolbar-bottom {
+            width: 100%;
+            bottom: 10px;
+            text-align: center;
+            margin-left: 0px;
+            position: fixed;
+        }
+
+        .sw-btn-next, .sw-btn-prev {
+            width: 125px;
+        }
+
+        .sw-theme-arrows > ul.step-anchor > li {
+            width: 12%;
+        }
+
+            .sw-theme-arrows > ul.step-anchor > li.active a {
+                padding-bottom: 2px;
+            }
+
+            .sw-theme-arrows > ul.step-anchor > li a {
+                padding-right: 0px;
+                padding-bottom: 7px;
+            }
+
+            .sw-theme-arrows > ul.step-anchor > li.active p {
+                font-size: 14px;
+                padding-left: 0px;
+            }
+
+        .step-anchor .nav-item span {
+            margin-right: 0px;
+        }
+
+        .btn-toolbar.mr-2 {
+            margin-right: 2%;
+        }
+
+        .sw-theme-arrows > ul.step-anchor > li.active {
+            width: 50%;
+        }
+
+        #terminate-quick-loan {
+            width: 138px;
+        }
+
+            #terminate-quick-loan span {
+                display: none;
+            }
+
+        #call_me_back {
+            width: 84%;
+        }
+
+        .option-register {
+            margin-left: 0px;
+        }
+
+        .step-anchor .badge {
+            padding: 10px;
+            border-radius: 50%;
+            width: 40px;
+            font-size: 14px;
+        }
+        /*#endregion*/
+    }
+    /*#endregion*/
+
+    /*#region portrait Extra small devices (portrait phones, less than 576px)*/
+    @@media (max-width: 575.98px) {
+        .radio-wrap .checkmark:after {
+            transition: 0.35s;
+            top: 4px;
+            left: 4px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #259CD8;
+            box-shadow: 0px 2px 4px #00000010;
+        }
+
+        .checkmark.radio {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+        }
+        /*#region --quick loans page*/
+        .wizad-container {
+            height: 580px;
+        }
+
+        .sw-btn-next, .sw-btn-prev {
+            width: 30% !important;
+        }
+
+        #terminate-quick-loan {
+            width: 130px;
+        }
+        /*#endregion*/
+        .quick-offer-content {
+            width: 82%;
+        }
+
+        .chest-images {
+            width: 100%;
+        }
+        /*#endregion*/
+    }
+    /*#endregion*/
+
+    /*radio button*/
+    @@media (min-width: 1025px) and (max-width: 1441px) {
+        .radio-wrap {
+            display: flex;
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 22px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+    }
+
+    @@media (min-width: 820px) and (max-width: 1368px) {
+        .survey-qsn {
+            height: 540px;
+        }
+    }
+
+    @@media (min-width: 1200px) {
+
+        .radio-wrap {
+            display: flex;
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 22px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+    }
+
+    .form-horizontal .radio, .form-horizontal .checkbox {
+        min-height: 0px;
+    }
+
+    .checkmark.radio {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 25px;
+        width: 25px;
+        border-radius: 50%;
+    }
+
+    .radio-wrap input:checked ~ .checkmark:after {
+        display: block;
+    }
+
+    .radio-wrap .checkmark:after {
+        transition: 0.35s;
+        top: 4px;
+        left: 4px;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        background: #259CD8;
+        box-shadow: 0px 2px 4px #00000010;
+    }
+
+    .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+
+    @@media (min-width: 1025px) and (max-width: 1441px) {
+        .radio-text {
+            font-size: 16px;
+        }
+    }
+
+    @@media (min-width: 1200px) {
+        .radio-text {
+            font-size: 16px;
+        }
+    }
+
+    .radio-text {
+        font-size: 12px;
+    }
+
+    .radio-wrap {
+        display: flex;
+        position: relative;
+        padding-left: 30px;
+        margin-bottom: 12px;
+        cursor: pointer;
+        font-size: 22px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    label {
+        text-transform: none;
+    }
+
+    .radio-wrap input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+        .radio-wrap input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+    .radio-wrap .checkmark:after {
+        transition: 0.35s;
+        top: 4px;
+        left: 4px;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        background: #259CD8;
+        box-shadow: 0px 2px 4px #00000010;
+    }
+
+    .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+
+    .radio-wrap input:checked ~ .checkmark {
+    }
+
+    .checkmark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 25px;
+        width: 25px;
+        border: solid 1px #003B61;
+        border-radius: 7px;
+        transition: 0.35s;
+    }
+
+    @@media (min-width: 1025px) and (max-width: 1441px) {
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 25px;
+            width: 25px;
+            border: solid 1px #003B61;
+            border-radius: 7px;
+            transition: 0.35s;
+        }
+    }
+
+    @@media (min-width: 1200px) {
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 25px;
+            width: 25px;
+            border: solid 1px #003B61;
+            border-radius: 7px;
+            transition: 0.35s;
+        }
+    }
+</style>
+@{
+    Layout = "MasterHeaderOnly.cshtml";
+
+    var Children = Model.Children;
+
+    // Get specific Children
+    var HeroHeader = Children?.Where(c => c is HeroHeader).FirstOrDefault();
+    var dropOff = Children?.Where(c => c is PagePopup).FirstOrDefault();
+    var heroBody = Children?.Where(c => c is HeroBody).FirstOrDefault();
+    var login = heroBody.Children.Where(c => c.Name == "Login").FirstOrDefault() as Link;
+    var register = heroBody.Children.Where(c => c.Name == "Register").FirstOrDefault() as Link;
+
+    var consolidationLoan = heroBody.Children.Where(c => c.Name == "Consolidation Loan").FirstOrDefault() as Link;
+    var fifteenPercentLoan = heroBody.Children.Where(c => c.Name == "15% Loan").FirstOrDefault() as Link;
+
+
+    var quickTitle = heroBody.Value("bodyTitle");
+    var quickBody = heroBody.Value("richTextBox");
+
+    var salaryFrequencyDropdownId = 5389;
+    var bankDropdownId = 5390;
+    var bankStatementsDropdownId = 5391;
+    var employmentSectorDropdownId = 5382;
+    var childMaintenanceDropdownId = 5395;
+
+    var terminateProcess = dropOff.Children.Where(c => c.Name == "Terminate process").FirstOrDefault() as DocumentTypeTitleAndDescription;
+
+    var heroHeaderImage = HeroHeader?.Value<IPublishedContent>("image")?.Url;
+
+    var campaignCode = Request.Params["campaignCode"];
+
+    var utm_source = Request.Params["utm_source"];
+    var utm_medium = Request.Params["utm_medium"];
+    var utm_campaign = Request.Params["utm_campaign"];
+
+    // Get the utm tagging
+    string strPageUrl = Request.RawUrl;
+    var shoulderButtonLink = "";
+    if (strPageUrl.Contains("?"))
+    {
+        var strendUrl = strPageUrl.Split('?').Last();
+        shoulderButtonLink = String.Format("{1}{2}", shoulderButtonLink, "?", strendUrl);
+    }
+}
+<!-- BODY -->
+
+<style type="text/css">
+
+    .index_accept {
+        border-radius: 3px;
+    }
+
+    #st-panel-submit1 {
+        width: 100%;
+        color: #fff;
+        font-size: 16px;
+        text-transform: uppercase;
+        border: none;
+        padding: 13px;
+        height: 53px;
+        border-radius: 4px;
+    }
+
+    #quick-drop-off {
+        height: 80%;
+    }
+
+    .survey-text1 .survey-ds-title {
+        text-align: center;
+        font-weight: 700;
+        margin-top: 84px;
+    }
+
+    .survey-text2 {
+        text-align: center;
+        font-weight: 600;
+    }
+
+    /*.IA-begin {
+         Commenting these out so we can center align
+        margin-left: 460px;
+        margin-top: 45px;
+        
+        background: #6E9739 0% 0% no-repeat padding-box;
+        box-shadow: 0px 3px 20px #0000001a;
+        border: 1px solid #FFFFFF;
+        border-radius: 3px;
+        opacity: 1;
+    }*/
+</style>
+
+<div class="wizad-container container">
+    <!--Start-------------drop off popup------------------->
+    <div id="quick-drop-off">
+        <a class="close" href="">X</a>
+        @*<a class="ia-close" href="">X</a>*@
+        <div id="terminate-process">
+            <h4>@terminateProcess.BodyTitle</h4>
+            <p>@terminateProcess.BodyDescription</p>
+            <a class="button secondary" href="../home/branch-locator">Find Branch</a>
+        </div>
+
+        <div id="terminate-to-call-me">
+            <p></p>
+            <section id="form-loader">
+                <div class="loader" id="loader-rates-form-preloader">
+                    <div class="loader-img"></div>
+                </div>
+            </section>
+            <div id="call_me_form">
+                <form id="frmCallMeBack">
+                    @Html.AntiForgeryToken()
+                    <input id="sessionId" type="hidden" value="@(Guid.NewGuid().ToString())" />
+                    <input id="processID" type="hidden" value="" />
+                    <div id="form_fields">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>* @ResourceHelper.GetResource("Identity Number") </label>
+                                    <input hidden id="utmSource" value="@utm_source" />
+                                    <input hidden id="utmCampaign" value="@utm_campaign" />
+                                    <input hidden id="utmMedium" value="@utm_medium" />
+
+                                    <input type="text" id="SAIDInput" name="FormFields.identityNumber" class="form-control" placeholder="@ResourceHelper.GetResource("Identity Number")" required
+                                           minlength="13" maxlength="13">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>* @ResourceHelper.GetResource("Cell Phone Number")</label>
+                                    <input type="text" id="CellPhoneInput" name="FormFields.mobileNumber" class="form-control" placeholder="@ResourceHelper.GetResource("Cell Phone Number")"
+                                           required maxlength="12">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>* @ResourceHelper.GetResource("Name")</label>
+                                    <input type="text" id="FirstNameInput" name="FormFields.firstName" class="form-control" placeholder="@ResourceHelper.GetResource("Name")" maxlength="30">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>* @ResourceHelper.GetResource("Surname")</label>
+                                    <input type="text" id="LastNameInput" name="FormFields.lastName" class="form-control" placeholder="@ResourceHelper.GetResource("Surname")" required maxlength="30">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>* @ResourceHelper.GetResource("Email")</label>
+                                    <input type="email" id="EmailInput" name="FormFields.email" class="form-control" placeholder="@ResourceHelper.GetResource("Email")" required maxlength="50">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="hidden" id="MessageInput" name="FormFields.message" placeholder="Message*" value="Pepe"
+                                           required minlength="90">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                @*<button type="button" id="st-panel-submit" onclick="open_call_me()" class="call-me btn-hover-blue">Call Me</button>*@
+                                <button type="button" id="st-panel-submit1" onclick="open_call_me()" class="call-me btn-hover-blue">Call Me</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div id="call_me_success">
+                <div class="call_me_success_header">
+                    <span class="fa fa-check call_me_success_header_icon"></span><span class="call_me_success_header_title">Request for call back received</span>
+                </div>
+                <p id="call_me_success_body">
+                    Thank you for using our call me back<br>
+                    option. We will be in touch soon<br><br>
+                    From the bank where Everybody is Somebody.
+
+                </p>
+                <div id="call_me_success_fotter">
+                    <img src="/images/icon-creditlife-easyapp.png" class="icon-open" alt="Consultant">
+                </div>
+            </div>
+        </div>
+
+        <div id="terminate-offline">
+            <h4>@terminateProcess.BodyTitle</h4>
+            <p>@terminateProcess.BodyDescription</p>
+            <a class="button secondary" href="../home/quick-loans">Try again</a>
+        </div>
+
+        <div class="terminate-reason" style="display:none"></div>
+
+        @*
+        <div id="terminate-IA" style="margin-top: 90px;">
+            <div id="survey-tab">
+                <div class="icon-space"><img src="/media/fzbhsseo/being-reviewed-icon.svg" /></div>
+                <p class="survey-text2" style="font-size: 18px;text-align: center;font-weight: 800;">(<span style="color: red">IA</span>) Survey</p>
+                <p class="survey-text2">Please give us more information, so we can <br>improve our qualifying offers<br> today! </p>
+                <div class="center-align margin-top-40">
+                    <a class="button for-ia secondary IA-begin" href="#">
+                        Begin
+                        <embed style="vertical-align: middle;margin-left:15px" src="/media/50hngh2h/improve-ico.svg">
+                    </a>
+                </div>
+            </div>
+            <div id="iframeHolder"><iframe class="survey-questionnaire survey-qsn" id="iframe" src="https://i-a.co/q/afrbnkc/xxx" width="100%" height="500" frameBorder="0" style="margin-top: -20px;"></iframe></div>
+        </div>
+
+        <div id="ds-terminate-IA" style="margin-top: 90px;display:none">
+            <div id="survey-tab-ds">
+                <div class="icon-space"><img src="/media/fzbhsseo/being-reviewed-icon.svg" /></div>
+                <div class="survey-ds-title"></div>
+                <div class="survey-ds-text2"></div>
+                <div class="center-align margin-top-40">
+                    <a class="button for-ia secondary IA-begin-ds" href="#">
+                        Take our survey
+                        <embed style="vertical-align: middle;margin-left:15px" src="/media/50hngh2h/improve-ico.svg">
+                    </a>
+                </div>
+                <div class="center-align" style="margin-top: 10px;">
+                    <a class="white-color-link ok-with-decline">No, thank you</a>
+                </div>
+            </div>
+            <div id="iframeHolder-ds"><iframe class="survey-questionnaire-ds ia-frame-trigg" id="iframe" src="" width="100%" height="500" frameBorder="0" style="margin-top: -20px;"></iframe></div>
+        </div>
+        *@
+    </div>
+    <!--END-------------drop off popup------------------->
+
+    @{
+        // var quickLoanForm = Model.Content;
+    }
+    <div ng-cosdsdntroller="Expense">
+        <!--START-----------Submition pause---------------->
+        <section id="form-preloader" class="pause-form">
+            <div class="loader" id="form-preloader-loader">
+                <div class="loader-img"></div>
+            </div>
+            <div class="loading-message text-white align-center"></div>
+            <h4 class="form-preloader-title align-center">Please wait...</h4>
+        </section>
+        <!--END-------------Submittion pause--------------->
+        <!-- SmartWizard html -->
+        <div id="smartwizard" style="display:none;" class="wizard">
+            <ul>
+                <li>
+                    <a href="#step-1">
+                        <span class="badge">@Model.Value("step1Name")</span>
+                        <p>@Model.Value("step1ShortDescription")</p>
+                    </a>
+                </li>
+                <li><a href="#step-3"><span class="badge">@Model.Value("step2Name")</span><p>@Model.Value("step3ShortDescription")</p></a></li>
+                <li><a href="#step-2"><span class="badge">@Model.Value("step3Name")</span><p>@Model.Value("step2ShortDescription")</p></a></li>
+                <li><a href="#step-4"><span class="badge">@Model.Value("step4Name")</span><p>@Model.Value("step4ShortDescription")</p></a></li>
+                <li><a href="#step-5"><span class="badge">@Model.Value("step5Name")</span><p>@Model.Value("step5ShortDescription")</p></a></li>
+            </ul>
+
+            <div>
+
+
+                <div id="step-1">
+                    @*<small class="border-bottom border-gray pb-2">@Model.Value("step1Heading")</small>*@
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-field row">
+                                <form id="frmStep1">
+                                    @Html.AntiForgeryToken()
+                                    <div class="form-field row">
+                                        <div class="col-md-5">
+                                            <div class="form-group">
+                                                <label class="label">@ResourceHelper.GetResource(Model.Value("quickLoansIDNumber").@ToString())</label>
+                                                <input type="text" maxlength="13" class="form-control" id="idNumber" name="idNumber" required placeholder="@ResourceHelper.GetResource(Model.Value("quickLoansIDNumber").ToString())">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="form-group">
+                                                <label class="label">Title</label>
+                                                <select id="title" name="title" class="form-control">
+                                                    <option selected value="">Select title</option>
+                                                    <option value="MR">Mr</option>
+                                                    <option value="MRS">Mrs</option>
+                                                    <option value="MS">Ms</option>
+                                                </select>
+                                                <span class="glyphicon glyphicon-menu-down form-control-feedback" style="padding-right: 25px;"></span>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+
+                                </form>
+                                <form id="frmStep_1_1" class="myform">
+                                    @Html.AntiForgeryToken()
+                                    <div class="form-field row ">
+                                        @*form-field-hide*@
+                                        <div class="col-md-5">
+                                            <div class="form-group">
+                                                <label class="label">@ResourceHelper.GetResource(Model.Value("quickLoansName").ToString())</label>
+                                                <input type="text" id="firstName" name="firstName" class="form-control" placeholder="@ResourceHelper.GetResource(Model.Value("quickLoansName").ToString())">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="form-group">
+                                                <label class="label">@ResourceHelper.GetResource(Model.Value("quickLoansSurname").ToString())</label>
+                                                <input type="text" id="surname" name="surname" class="form-control" placeholder="@ResourceHelper.GetResource(Model.Value("quickLoansSurname").ToString())">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-field row ">
+                                        @*form-field-hide*@
+
+                                        <div class="col-md-5">
+                                            <div class="form-group">
+                                                <label class="label">@ResourceHelper.GetResource(Model.Value("quickLoansCellphoneNo").ToString())</label>
+                                                <input type="text" id="telephoneNumber" name="telephoneNumber" class="form-control" placeholder="@ResourceHelper.GetResource(Model.Value("quickLoansCellphoneNo").ToString())"
+                                                       required maxlength="10">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="form-group">
+                                                <label class="label">@ResourceHelper.GetResource(Model.Value("quickLoansEmail").ToString())</label>
+                                                <input type="email" id="email" name="email" class="form-control" placeholder="@ResourceHelper.GetResource(Model.Value("quickLoansEmail").ToString())">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-field row">
+                                        <div class="col-md-5">
+                                            <div class="form-group">
+                                                <p class="" style="font-size:11px;color:black;margin: 8px 8px 3px 8px;">Can we inform you of African Bank specials and offers?</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 custom-margin custom-top">
+                                            @*<div class="col-md-2 col-xs-3">*@
+                                            <div class="form-group">
+                                                <label class="radio-wrap">
+                                                    <span class="radio-text">Yes</span>
+                                                    <input type="radio" id="rdbYes" name="option" value="1" class="myRadio" checked="checked">
+                                                    <span class="checkmark radio"></span>
+                                                </label>
+                                                @*</div>
+                                                    <div class="col-md-2 col-xs-3">*@
+                                                <label class="radio-wrap">
+                                                    <span class="radio-text">No</span>
+                                                    <input type="radio" id="rdbNo" name="option" value="0" class="myRadio">
+                                                    <span class="checkmark radio"></span>
+                                                </label>
+                                                @*</div>*@
+                                                @*<div class="col-md-8">
+                                                    </div>*@
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="col-md-4 side-info-txt">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <ul class="checklist">
+                                        <li>Payment options range from 7-72 months</li>
+                                        <li>Interest rate (APR) from 15% to 24.50%</li>
+                                        <li>Insurance rate from 5.04% to 5.4%</li>
+
+                                    </ul>
+                                    <p>
+                                        <small>
+                                            Representative example: All prices include VAT, R20 000 borrowed for 12 months. Once
+                                            off initiation fee (capitalized) R 1197, Monthly admin fee R69.00 post 1% VAT increase.
+                                            Representative APR 15% ,Representative insurance rate 5.4%. Monthly installment
+                                            amount payable R 2036
+                                        </small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="step-2">
+                    @*<small class="border-bottom border-gray pb-2">@Model.Value("step3Heading")</small>*@
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p id="otp-sucess"><span id="quick-otp"></span></p>
+                            <p class="otpMessage">@ResourceHelper.GetResource(Model.Value("quickLoansOneTimePinMessage").ToString())</p>
+                        </div>
+                        <form id="frmStep2" class="myform">
+                            @Html.AntiForgeryToken()
+                            <div class="form-field row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource(Model.Value("quickLoansOneTimePIN").ToString())</label>
+                                        <input type="number" id="oneTimePIN" name="oneTimePIN" class="form-control" placeholder="@ResourceHelper.GetResource(Model.Value("quickLoansOneTimePIN").ToString())">
+                                    </div>
+                                    <small class="wrong-otp-error-message incorrect-otp" style="display:none;color:red">Please enter the correct OTP!</small>
+                                </div>
+                            </div>
+                            <div class="form-field row ">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <button id="resend-otp" class="btn btn-lg otp-btn">Resend OTP</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div id="step-3" ng-cosdsdntroller="Expense">
+                    @*<small class="border-bottom border-gray pb-2">@Model.Value("step2Heading")</small>*@
+                    <div class="row">
+                        <form id="frmStep3">
+                            @Html.AntiForgeryToken()
+                            <div class="form-field row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource(Model.Value("quickLoansEmploymentSector").ToString())</label>
+
+                                        <select id="employeeType" name="employeeType" placeholder="Select employment sector" class="form-control">
+                                            <option disabled selected hidden>Select employment sector</option>
+                                        </select>
+                                        <span id="empSectorId" class="glyphicon glyphicon-menu-down form-control-feedback"></span>
+
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="employer-group form-group">
+                                        <label class="label">@ResourceHelper.GetResource(Model.Value("quickLoansEmployer").ToString())</label>
+
+                                        <div class="search-controls">
+                                            <input type="text" id="tbEmployer" name="tbEmployer" placeholder="Search Employer" class="form-control" />
+                                            <span class="glyphicon glyphicon-search form-control-feedback" style="margin-right: 13px;"></span>
+                                            <div class="invalid-employer-feedback">
+                                                Please select Employer
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <input type="checkbox" id="chkUnknownEmployer" style="display:none;width:10px;margin-top:1px" class="col-md-2" />
+                                            <div class="employer-not-found col-md-10"></div>
+                                            <div class="employerCheck" style="display:none"></div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="form-field row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        @*@ResourceHelper.GetResource("quickLoanEmploymentStatus")*@
+                                        <label class="label">Employment Status</label>
+                                        <select id="occupationStatus" name="occupationStatus" class="form-control">
+                                            @*<option value="">Select employment status </option>
+                                                <option value="Ful">Full time</option>
+                                                 <option value="PT">Part time</option>*@
+                                        </select>
+                                        <span class="glyphicon glyphicon-menu-down form-control-feedback"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="startdate-group form-group">
+                                        <label class="label">@ResourceHelper.GetResource(Model.Value("quickLoansEmploymentStartDate").ToString())</label>
+                                        <input type="text" id="start-date" name="employmentStartDate" class="form-control" placeholder="@ResourceHelper.GetResource(Model.Value("quickLoansEmploymentStartDate").ToString())">
+                                        <span class="glyphicon glyphicon-calendar form-control-feedback"></span>
+                                    </div>
+                                </div>
+                                <div id="emp-end-date" class="col-md-3 form-field-hide">
+                                    <div class="enddate-group form-group">
+                                        <label class="label">Employment End Date</label>
+                                        <input type="text" id="end-date" name="employmentEndDate" class="form-control" placeholder="Employment End Date">
+                                        <span class="glyphicon glyphicon-calendar form-control-feedback"></span>
+
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource(Model.Value("quickLoansSalaryFrequencyLabel").ToString())</label>
+                                        <select id="wageType" name="wageType" class="form-control">
+                                            <option value="">Select wage type</option>
+                                            <option value="M">Monthly</option>
+                                            <option value="F">Fortnightly</option>
+                                            <option value="W">Weekly</option>
+                                        </select>
+                                        <span class="glyphicon glyphicon-menu-down form-control-feedback"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-field row">
+                                <div class="col-md-3">
+                                    <div class="bank-group form-group">
+                                        <label class="label">@ResourceHelper.GetResource(Model.Value("quickLoansBankLabel").ToString())</label>
+                                        <div class="search-controls">
+                                            <input type="text" id="tbBanks" name="tbBanks" placeholder="Search Bank" class="form-control" />
+                                            <span class="glyphicon glyphicon-search form-control-feedback" style="margin-right: 13px;"></span>
+
+                                            @*<input readonly type="text" class="searchBank form-control" placeholder="Search Bank" id="bankSearchString" name="bankSearchString">
+                                                <input type="hidden" id="bankReference" />
+                                                <input type="hidden" id="bankBranch" />
+                                                <button class="btn btn-info btn-lg" type="button" id="quick-loan-bank-search-button"
+                                                        data-toggle="modal" data-target="#bankSearchModal" data-target-field="#bankName" data-html-display-field="#bankNameDisplay"
+                                                        data-x20-ref-field="#bankReference" data-requires-employment-type="true" data-employment-type="">
+                                                    <span id="glyphicon-for-search" class="glyphicon glyphicon-search"></span>
+                                                </button> *@
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-field row">
+                                <div id="get-statement" class="col-md-3 form-field-hide">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource(Model.Value("quickLoansBankStatementLabel").ToString())</label>
+                                        <select id="bankStatement" name="bankStatement" class="form-control">
+                                            <option value="">Bank statement</option>
+                                            <option value="Yes">Yes</option>
+                                            <option value="No">No</option>
+                                        </select>
+                                        <span class="glyphicon glyphicon-menu-down form-control-feedback"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource(Model.Value("quickLoansGrossSalaryBeforeTax").ToString())</label>
+                                        <input type="text" id="GrossSalaryBeforeTaxInput" name="grossSalaryBeforeTax" class="form-control" placeholder="@ResourceHelper.GetResource(Model.Value("quickLoansGrossSalaryBeforeTax").ToString())"
+                                               required maxlength="20">
+                                        <div class="invalid-gross-feedback">
+                                            Your Gross cannot be smaller than your Net Income
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="label">@ResourceHelper.GetResource(Model.Value("quickLoansNetIncome").ToString())</label>
+                                        <input type="text" id="NetIncomeInput" name="netIncome" class="form-control" placeholder="@ResourceHelper.GetResource(Model.Value("quickLoansNetIncome").ToString())"
+                                               required maxlength="20">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="livingexpense-group form-group">
+                                        <label class="label">@ResourceHelper.GetResource(Model.Value("quickLoansLivingExpense").ToString())</label>
+                                        <input readonly type="text" id="livingExpense" name="livingExpense" class="form-control" placeholder="@ResourceHelper.GetResource(Model.Value("quickLoansLivingExpense").ToString())">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-field row">
+                                <div class="col-md-12">
+                                    @Model.Value("quickLoansReferenceCheckWarning")
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div id="step-4">
+                    <div class="row">
+                        <form id="frmStep4" class="myform">
+                            @Html.AntiForgeryToken()
+                            <div class="quick-offer-content">
+                                <div class="quick-success">
+                                    <p id="congratulationMessage">
+                                        Your estimated credit offer is shown below.<br /> The final offer
+                                        might change depending on a full credit evaluation process.
+                                    </p>
+                                    <!--Start-->
+                                    <div class="container" style="width:90%">
+
+                                        <div id="offer-div" class="row eq-height margin-top-10"></div>
+                                        <div id="GetYourOffer">
+                                            <div class="body_qq"></div>
+                                            @*
+                                            <div class="container ia-controls" style="margin-top: -21px;">
+                                                <div class="row" style="display: none;">
+                                                    <div class="col-sm-12" style="background: #002B60 0% 0% no-repeat padding-box;opacity: 1;width: 55%;">You have been provided with the above offers. Take our survey to see if these offers can be improved.</div>
+                                                </div>
+                                                <div class="row" style="display: block;">
+                                                    <div class="col-sm-1" style="background: #002b60;color: white;vertical-align: middle;padding:5.5px">
+                                                        <embed src="/media/u0ajlnwd/improve-smybol.svg" />
+                                                    </div>
+                                                    <div class="col-sm-8" style="background: #002b60;color: white;vertical-align: middle;font-size: 16px;font-weight: 500;text-align: left;padding: 14px;">
+                                                        You have been provided with the above offers. Take our survey to see if these offers can be improved.
+                                                    </div>
+                                                    <div class="arrow-right" style="width: 0px;height: 0px;border-top: 36px solid transparent;border-bottom: 37px solid transparent;border-left: 33px solid #002b60;position: relative;top: 42%;float: left;"></div>
+                                                    <div class="col-sm-2" style="padding: 10px;color: white;margin-left: -20px;">
+                                                        <button class="index_ImproveOffers" type="button" style="background: #4C6A8F 0% 0% no-repeat padding-box;box-shadow: 0px 3px 20px #00000052;
+                                                                                                border: 1px solid #FFFFFF;
+                                                                                                border-radius: 3px;
+                                                                                                opacity: 0.87;
+                                                                                                width: 144px;
+                                                                                                height: 50px;">
+                                                            <embed style="vertical-align: middle;margin-left: 4px;" src="/media/50hngh2h/improve-ico.svg" />
+                                                            Improve offers
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            *@
+                                        </div>
+
+                                        <div class="row margin-top-10 button-footer">
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <!--<a id="index_offer" class="button primary">Accept offer</a>-->
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <a id="credit_card_offer" class="button primary">Accept offer</a>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <a id="button1" class="">Accept offer</a>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <a id="button2" class="">Accept offer</a>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <!--End-->
+                                </div>
+                                <!--<div class="acceptTandC">
+                                    <div class="form-group">
+                                        <input id="terms" class="cbx" type="checkbox">
+                                        <label class="lbl" for="terms">Accept terms and conditions </label>
+                                    </div>
+
+                                </div>-->
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div id="step-5">
+                    <div class="quick-offer-content">
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="option-signin">
+                                    <p>
+                                        @login.PageSection
+                                    </p>
+                                    <a class="button secondary" href="@login.UrlLink.FirstOrDefault().Url">@login.Text</a>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="quick-offer-option">
+                                    <span>OR</span>
+                                </div>
+                                <div class="option-register">
+                                    <p>
+                                        @register.PageSection
+                                    </p>
+                                    <a class="button primary" href="@register.UrlLink.FirstOrDefault().Url">@register.Text</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row" style="padding-left: 24px; padding-right: 24px;">
+        <div class="col-md-5">
+
+        </div>
+        <div class="col-md-7 side-info-txt">
+            <p>
+                © Copyright 2021 African Bank. An authorized financial services and credit provider  Reg No. 2014/176899/06 (NCRCP7638)
+            </p>
+        </div>
+    </div>
+    <div id="quick-flat-bottom">
+        <div class="row">
+            <div class="col-md-5">
+                <div class="quick-parallelogram">
+                    <div class="quick-content">
+                        <h1>@quickTitle</h1>
+                        @quickBody
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    @Html.Partial("_renderPopUpContent", new ContainerViewModel()
+    {
+        HTMLContent = @<text>
+            <div class="modal-body">
+                <form id="frmStep2_2">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @*@ResourceHelper.GetResource("RentAccommodation")*@
+                                <label class="label">Accomodation</label>
+                                <input type="text" id="rentAccomodation" name="rentAccomodation" class="form-control expense-add " placeholder="0.00" required>
+                            </div>
+                            <div class="form-group">
+                                @*@ResourceHelper.GetResource("Education")*@
+                                <label class="label">Education</label>
+                                <input type="text" id="education" name="education" class="form-control expense-add" placeholder="0.00" required>
+                            </div>
+                            <div class="form-group">
+                                @*@ResourceHelper.GetResource("FoodGroceries")*@
+                                <label class="label">Groceries</label>
+                                <input type="text" id="foodGroceries" name="foodGroceries" class="form-control expense-add" placeholder="0.00" required>
+                            </div>
+                            <div class="form-group">
+                                @*@ResourceHelper.GetResource("Transportation")*@
+                                <label class="label">Transportation</label>
+                                <input type="text" id="transporation" name="transporation" class="form-control expense-add" placeholder="0.00" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @*@ResourceHelper.GetResource("MedicalExpenses")*@
+                                <label class="label">Medical Expenses</label>
+                                <input type="text" id="medicalExpense" name="medicalExpense" class="form-control expense-add" placeholder="0.00" required>
+                            </div>
+                            <div class="form-group">
+                                @*@ResourceHelper.GetResource("Other")*@
+                                <label class="label">Other</label>
+                                <input type="text" id="other" name="other" class="form-control expense-add" placeholder="0.00" required>
+                            </div>
+                            <div class="form-group">
+                                @*@ResourceHelper.GetResource(Model.Value("quickLoansChildMaintenanceLabel").ToString())*@
+                                <label class="label">Maintenance</label>
+                                <select id="ChildMaintenanceInput" name="childMaintenance" class="form-control">
+                                    <option selected value="no">No</option>
+                                    <option value="yes">Yes</option>
+                                </select>
+                                @*<span class="glyphicon glyphicon-menu-down form-control-feedback"></span>*@
+                            </div>
+                            <div class="form-group" id="childMaintenanceAmountDiv">
+                                @*@ResourceHelper.GetResource(Model.Value("quickLoansChildMaintenanceExpenses").ToString())*@
+                                <label class="label">Child Maintenance</label>
+                                <input type="text" id="ChildMaintenanceExpensesInput" name="childMaintenanceExpenses" class="form-control expense-add" placeholder="0.00" value="0" required>
+                            </div>
+
+                            <div class="form-group">
+                                <p id="para" style="display:none;">Your total value cannot be zero. Please ensure that at least 1 expense is captured.</p>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p id="quick-total-block">Total<span id="quick-total"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <a id="quick-save" class="button primary">Save</a>
+                    </div>
+                </div>
+            </div>
+        </text>
+})
+
+
+</div>
+
+<div id="handle_messages" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content" style="height: 250px;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">×</button>
+                <h4 class="modal-title"><span id="eventTitle"></span></h4>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="messaging"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="messaging"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@* Employer Search *@
+<div class="modal fade" id="employerSearchModal" tabindex="-1" role="dialog" aria-labelledby="employerSearchLabel" aria-hidden="true">
+    <div class="modal-dialog square">
+        <div class="modal-content square">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h1 class="modal-title text-ab-blue" id="employerSearchLabel">Search for employer name</h1>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger" id="searchErrorMsg" style="display:none"></div>
+                <div class="form-group">
+                    <div class="input-container">
+                        @*<i class="glyphicon glyphicon-remove clear-input-btn"></i>*@
+                        <label id="residentialSearchHeaderLabel" class="form-label">Employer name *</label>&nbsp;&nbsp;
+                        <input type="text" id="employerSearchName" class="form-control"
+                               data-label="Employer name *"
+                               placeholder="Employer name *" />&nbsp;&nbsp;
+
+                        <div class="row">
+                            <div class="col-xs-6 text-center">
+                                <button id="employerSearchCancel" type="button" class="btn btn-ab-blank" data-dismiss="modal" style="min-width: 11rem;">Cancel</button>
+                            </div>
+                            <div class="col-xs-6 text-center">
+                                <button type="submit" id="employerSearchButton" class="btn btn-ab-blank" style="min-width: 11rem;">Search</button>
+                            </div>
+                        </div>
+                        <input type="hidden" id="hidReferenceX20" value="" />
+                        <input type="hidden" id="hidEmploymentType" value="" />
+                        <input type="hidden" id="targetFieldSelector" value="" />
+                        <input type="hidden" id="employerRefSelector" value="" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div id="employerSearchError" class="alert alert-danger" style="display:none;">An unexpected error has occurred. Please try again. Kindly contact support if the problem persists.</div>
+                            <table class="table table-striped" id="employerSearchResults" style="font-size:1.2rem;">
+                            </table>
+                            <div class="row">
+                                <div class="employer-not-found col-xs-12 text-center"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12 text-center">
+                                    <a id="employerNotFound" class="cursor-link text-ab-blue" style="cursor: pointer;">I can't find my employer</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@* Bank Search *@
+<div class="modal fade" id="bankSearchModal" tabindex="-1" role="dialog" aria-labelledby="bankSearchLabel" aria-hidden="true">
+    <div class="modal-dialog square">
+        <div class="modal-content square">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h1 class="modal-title text-ab-blue" id="bankSearchLabel">Search for Bank</h1>
+            </div>
+
+            <div class="modal-footer">
+                <div class="">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div id="bankSearchError" class="alert alert-danger" style="display:none;">An unexpected error has occurred. Please try again. Kindly contact support if the problem persists.</div>
+                            <table class="table table-striped" id="bankSearchResults" style="font-size:1.2rem;"></table>
+                            <div class="row">
+                                <div class="col-xs-12 text-center">
+                                    <a id="bankNotFound" class="cursor-link text-ab-blue" style="cursor: pointer;">I can't find my Bank</a>
+                                </div>
+                                <div class="bank-not-found col-xs-12 text-center"></div>
+                                <div class="bankNotOnList">
+
+                                    <div class="col-xs-12 text-center">
+                                        <span style="color: red;font-weight:600;font-size: 9px;">Please note you will be redirected to the Call Me Back process to continue your Quick             Loan application</span>
+                                    </div>
+
+                                    <div class="col-xs-12 text-center">
+                                        <button id="bankNotOnListCallMeBackRather" type="button" class="btn btn-ab-blank btn-primary" data-dismiss="modal" style="min-width: 11rem;">Ok, I understand.            </button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script src="~/javascripts/datetime/moment-with-locales.js"></script>
+<script src="~/javascripts/datetime/bootstrap-datetimepicker.js"></script>
+
+<script src="~/scripts/smartWizard/jquery.smartWizard.js"></script>
+
+<script src="~/scripts/jquery-ui.js"></script>
+<script src="~/javascripts/form_validation.js"></script>
+
+<script src="~/javascripts/reuse/data_mangement.js"></script>
+<script src="~/javascripts/reuse/date_picker.js"></script>
+@* <script src="~/javascripts/quick_loan.js"></script> *@
+<script src="~/scripts/quick_loan.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.5/validator.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/md5.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+
+
+<script>
+
+    $(document).ready(function () {
+        addFormValidation();
+
+        $(".expense-add").keyup(function () {
+            var sum = 0;
+            $('.expense-add').each(function () {
+                sum += Number($(this).val());
+            });
+            $('#quick-total').html("R " + sum.toString());
+
+        });
+
+        function addFormValidation() {
+            $('.form-horizontal').bootstrapValidator({
+                feedbackIcons: {
+                    valid: 'glyphicon glyphicon-ok-sign',
+                    invalid: 'glyphicon glyphicon-remove-sign',
+                    validating: 'glyphicon glyphicon-refresh'
+                },
+                fields: {
+                    'idNumber': {
+                        validators: {
+                            notEmpty: {
+                                message: 'The ID / Passport Number is required and cannot be empty'
+                            },
+                            regexp: {
+                                regexp: /^[0-9]{1,13}$/,
+                                message: 'The ID / PASSPORT NUMBER can only consist of alphanumeric characters'
+                            },
+                            stringLength: {
+                                max: 13,
+                                message: 'The ID / Passport Number can only be a 13 or less digit sequence'
+                            },
+                            callback: {
+                                callback: function (value, validator, $field) {
+                                    var idNumber = value;
+
+                                    if (null === idNumber || 0 === idNumber.length) return !1;
+                                    var correct = !0;
+                                    if (13 !== idNumber.length || isNaN(parseFloat(idNumber)) && isFinite(idNumber)) return !1;
+                                    var yob = parseInt(idNumber.substring(0, 2));
+                                    var d = new Date();
+                                    var currentYear = d.getFullYear();
+                                    if (yob + 2000 < currentYear) {
+                                        yob = 2000 + yob
+                                    } else { yob = yob + 1900; }
+
+                                    var tempDate = new Date(idNumber.substring(0, 2), idNumber.substring(2, 4) - 1, idNumber.substring(4, 6)),
+                                        id_date = tempDate.getDate(),
+                                        id_month = tempDate.getMonth();
+                                    if (currentYear - yob >= 70 || currentYear - yob < 18) {
+                                        return {
+                                            valid: false,
+                                            message: 'Your age should be between 18 and 69'
+                                        }
+                                    } // make sure the applicant is not over 70 years of age or younger than 18
+                                    (tempDate.getYear() != idNumber.substring(0, 2) || id_month != idNumber.substring(2, 4) - 1 || id_date != idNumber.substring(4, 6)) && (correct = !1);
+                                    for (var tempTotal = 0, checkSum = 0, multiplier = 1, i = 0; 13 > i; ++i) tempTotal = parseInt(idNumber.charAt(i)) * multiplier, tempTotal > 9 && (tempTotal = parseInt(tempTotal.toString().charAt(0)) + parseInt(tempTotal.toString().charAt(1))), checkSum += tempTotal, multiplier = multiplier % 2 === 0 ? 1 : 2;
+                                    return checkSum % 10 !== 0 && (correct = !1), correct
+
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        $(".wizard").show();
+    });
+
+    $(function () {
+        $("#iframeHolder").hide();
+        $("#iframeHolder-ds").hide();
+        /*
+        $('.IA-begin').click(function () {
+            $("#survey-tab").hide();
+            $(".btn-toolbar").hide();
+            $("#iframeHolder").show();
+            $("#quick-drop-off").css("background-color", "rgb(0, 43, 96)");
+            $(".frontpage").css("background-color", "rgb(152 147 147)");
+        });
+        $('.IA-begin-ds').click(function () {
+            $("#survey-tab-ds").hide();
+            $(".btn-toolbar").hide();
+            $("#iframeHolder-ds").show();
+            $("#quick-drop-off").css("background-color", "rgb(0, 43, 96)");
+            $(".frontpage").css("background-color", "rgb(152 147 147)");
+        });
+        */
+    });
+</script>

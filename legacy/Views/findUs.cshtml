@@ -1,0 +1,253 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageTalkAndFindUs>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers;
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+
+@{
+    Layout = "~/Views/Master.cshtml";
+
+    // All Current Page Children
+    var Children = Model.Children.ToList();
+
+    // Get specific Children
+
+
+    var heroHeader = Children?.Where(c => c is HeroHeader).FirstOrDefault();
+    var heroShoulder = Children?.Where(c => c is HeroShoulder).FirstOrDefault();
+    var heroChest = Children?.Where(c => c is HeroChest).FirstOrDefault();
+    var heroBody = Children?.Where(c => c is HeroBody).FirstOrDefault();
+
+    //var heroHeader = Children?.Where(c => c.DocumentTypeAlias.ToLower() == "heroheader").FirstOrDefault() ?? new HeroHeader();
+    //var heroShoulder = Children?.Where(c => c.DocumentTypeAlias.ToLower() == "heroshoulder").FirstOrDefault() ?? new HeroShoulder(Model.Content);
+    //var heroBody = Children?.Where(c => c.DocumentTypeAlias.ToLower() == "herobody").FirstOrDefault();
+
+    var contact_details = heroBody.Children;
+}
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+<!-- HERO CONTINUED-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+
+<!-- PRODUCT INFORMATION-->
+<div class="container margin-bottom-minus-50">
+    <div class="campaign-product-container full">
+        <div class="mega-tabs top-minus-90 no-margin">
+
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active branch-tab" style="width:100%">
+                    <a href="#headoffice" aria-controls="home" role="tab" data-toggle="tab"><img src="~/images/icon-find.svg" alt="icon-find" width="30" />Branch Locator</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="margin-top-20 visible-xs"></div>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="headoffice">
+                <div class="branch-locator-container">
+                    <div class="branch-locator-input">
+
+                        <div class="branch-locator-input-title">@heroBody.Value("bodyTitle").ToString()</div>
+                        <div class="branch-locator-input-decsr">
+                            @heroBody.Value("bodyDescription").ToString()
+                        </div>
+                        <div class="branch-locator-input-search">
+                            <div class="form-group">
+                                <i class="fa fa-search branch-search-icon"></i>
+                                <form id="branchForm" class="registerForm">
+
+                                    <input type="text" class="form-control" id="townName" placeholder="Type the town name">
+                                </form>
+                                <div class="alert alert-success hidden" id="feedbackMsg" role="alert">
+                                    @ResourceHelper.GetResource("ebankITBranchLocatorTownLabel")
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row margin-top-20">
+                            @{
+                                foreach (var item in contact_details)
+                                {
+
+                                    var nestedContent = item.Value<IEnumerable<IPublishedElement>>("SectionItem");
+
+                                   
+                                    foreach (var data in nestedContent)
+                                    {
+                                        <div class="col-sm-6">
+                                            <h5 class="title">@data.Value("title")</h5>
+                                            <p class="body-content white" id="search_address">
+                                                @data.Value("description")
+                                            </p>
+                                        </div>
+                                    }
+                            }
+                            }
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-9 col-sm-offset-3">
+                            <div class="branch-locator-map">
+                                <!--START- Ebankit-change -->
+
+                                <div id="load_map">
+                                    <div id="map_display">
+                                    </div>
+                                    <div id="map_ditails">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h4>Details</h4>
+                                                <div id="details-data">
+                                                    <div class="row">
+                                                        <div class="col-xs-5">
+                                                            Address
+                                                        </div>
+                                                        <div class="col-xs-7">
+                                                            <span id="address"></span>
+                                                            <br />
+                                                            <span id="town"></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-xs-5">
+                                                            Branch code
+                                                        </div>
+                                                        <div class="col-xs-7">
+                                                            <span id="branch_code"></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-xs-5">
+                                                            Tel
+                                                        </div>
+                                                        <div class="col-xs-7">
+                                                            <span id="tel_no"></span>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h4>Hours</h4>
+                                                <div id="hour-data">
+                                                    <div class="row">
+                                                        <div class="col-xs-6">
+                                                            @ResourceHelper.GetResource("ebankITBranchLocatorMonFriLabel"):
+                                                        </div>
+                                                        <div class="col-xs-6"><span id="mon-fri"></span></div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-xs-6">
+                                                            @ResourceHelper.GetResource("ebankITBranchLocatorSaturdayLabel"):
+                                                        </div>
+                                                        <div class="col-xs-6"><span id="satur"></span></div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-xs-6">
+                                                            @ResourceHelper.GetResource("ebankITBranchLocatorSundayLabel"):
+                                                        </div>
+                                                        <div class="col-xs-6"><span id="sun"></span></div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-xs-6">
+                                                            @ResourceHelper.GetResource("ebankITBranchLocatorHolidaysLabel"):
+                                                        </div>
+                                                        <div class="col-xs-6"><span id="holi"></span></div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12 ">
+                                                <div id="close_map">
+                                                    <button class="btn btn-default btn-lg" onclick="close_map();">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div id="branch-locator-items" class="content-block call-to-action branch-locator ">
+
+                                    <div class="table-responsive hidden">
+                                        <table class="table table-responsive" id="map-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>@ResourceHelper.GetResource("ebankITBranchLocatorNameLabel")</th>
+                                                    <th class="text-center hidden-xs">@ResourceHelper.GetResource("ebankITBranchLocatorPhoneLabel")</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="branch-list">
+                                                <!-- branches listed here... -->
+                                            </tbody>
+                                        </table>
+
+
+                                        <script id="address-template" type="text/x-handlebars-template">
+
+
+                                            <tr id="branch_{{tempID}}" class="hover-branch" onclick="load_map('{{tempID}}','{{PhysicalAddress1}}','{{PhysicalAddress2}}','{{PhysicalAddress3}}','{{Town}}','{{Province}}','{{BusinessTelephoneNumber}}','{{BusinessHoursMonToFri}}','{{BusinessHoursSat}}','{{BusinessHoursSun}}','{{BusinessHoursPublicHolidays}}','{{BranchCode}}','{{Longitude}}','{{Latitude}}');">
+                                                <td>
+                                                    {{ PhysicalAddress1 }}
+                                                    <br>
+                                                    {{ PhysicalAddress2 }}
+                                                    <br>
+                                                    {{ PhysicalAddress3 }}
+                                                    <br>
+                                                    {{ Town }}
+
+                                                </td>
+                                                <td class="text-center hidden-xs">
+                                                    <a href="tel:{{ BusinessTelephoneNumber }}">{{ BusinessTelephoneNumber }}</a>
+                                                </td>
+                                                <td>
+                                                    {{#if MMI}}<center>
+                                                        <img src="/Images/directions_icon.svg" alt="@ResourceHelper.GetResource("ebankITBranchLocatorMMI")" style="width:40px;height:40px" title="@ResourceHelper.GetResource("ebankITBranchLocatorMMI")" />
+                                                        <br />
+                                                        @ResourceHelper.GetResource("ebankITBranchLocatorMMI")
+                                                    </center>
+                                                    {{else}}
+
+                                                    <div class="more-info">
+                                                        <span class="ab-glyphs ab-glyphs-car text-ab-green glyphs-car">
+                                                            <img src="/Images/directions_icon.svg" alt="directions" />
+                                                        </span>
+                                                        <span class="glyphicon glyphicon-chevron-right text-ab-green glyph-arrow"></span>
+                                                        <h5 class="text-ab-green text-center">@ResourceHelper.GetResource("ebankITBranchLocatorMapAndDirectionsLabel")</h5>
+                                                    </div>
+
+                                                    {{/if}}
+                                                </td>
+
+                                            </tr>
+                                        </script>
+                                        <!--END- Ebankit-change -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/Scripts/handlebars-v4.0.5.min.js")"></script>
+    <script type="text/javascript" src="~/scripts/ab-branch-locator.js"></script>
+    <script type="text/javascript" src="https://maps.google.com/maps/api/js?key=AIzaSyACY1CTwQQrIAWJUgLMscxZioI-_6tDluE"></script>
+}
+
+
+

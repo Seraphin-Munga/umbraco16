@@ -1,0 +1,1106 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageInvestments>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models
+@using Web.Helpers;
+@using System.Collections.Generic;
+@{
+
+    /**/
+
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var children = Model.Children;
+
+    // Get specific Children
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+
+    var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
+    var chestTitle = heroChest?.Value("chestTitle").ToString();
+    var chestDescription = heroChest?.Value("chestDescription").ToString();
+    var chestCards = heroChest?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+
+    var bankingItemsModel = new CustomModels.Benefits
+    {
+        BenefitCards = chestCards.Select(c => c as Card).ToList()
+    };
+
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+
+    IEnumerable<IPublishedContent> bodyButtons = (IEnumerable<IPublishedContent>)heroBody.Children.Where(c => c is ContentModels.EbankItabstractButton);
+    ContentModels.EbankItabstractButton openNowButton = null;
+    ContentModels.EbankItabstractButton learnMoreButton = null;
+    ContentModels.EbankItabstractButton androidDownloadNow = null;
+    ContentModels.EbankItabstractButton iosDownloadNow = null;
+    ContentModels.EbankItabstractButton huaweiDownloadNow = null;
+
+    foreach (var button in bodyButtons)
+    {
+        if (button.Value("EbankItbuttonText").ToString().Contains("Open Now"))
+        {
+            openNowButton = (ContentModels.EbankItabstractButton)button;
+        }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("Android"))
+        {
+            androidDownloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("iOS"))
+        {
+            iosDownloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("Huawei"))
+        {
+            huaweiDownloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+        else // there is only 2 buttons in there - else an (else if condition will be applied)
+        {
+            learnMoreButton = (ContentModels.EbankItabstractButton)button;
+        }
+    }
+
+    var openNowButtonLink = "#";
+    openNowButtonLink = string.IsNullOrEmpty(openNowButton?.EbankItbuttonInternalLink?.Url) ?
+    openNowButton?.EbankItbuttonExternalLink :
+    openNowButton.EbankItbuttonInternalLink?.Url;
+    openNowButtonLink = (string.IsNullOrEmpty(openNowButtonLink)) ? "#" : openNowButtonLink;
+    var buttonText = openNowButton.EbankItbuttonText;
+
+    var learnMoreButtonLink = "#";
+    learnMoreButtonLink = string.IsNullOrEmpty(learnMoreButton?.EbankItbuttonInternalLink?.Url) ?
+    learnMoreButton?.EbankItbuttonExternalLink :
+    learnMoreButton.EbankItbuttonInternalLink?.Url;
+    learnMoreButtonLink = (string.IsNullOrEmpty(learnMoreButtonLink)) ? "#" : learnMoreButtonLink;
+
+    var androidButtonLink = "#";
+    androidButtonLink = string.IsNullOrEmpty(androidDownloadNow?.EbankItbuttonInternalLink?.Url) ?
+    androidDownloadNow?.EbankItbuttonExternalLink :
+    androidDownloadNow.EbankItbuttonInternalLink?.Url;
+    androidButtonLink = (string.IsNullOrEmpty(androidButtonLink)) ? "#" : androidButtonLink;
+
+    var iosButtonLink = "#";
+    iosButtonLink = string.IsNullOrEmpty(iosDownloadNow?.EbankItbuttonInternalLink?.Url) ?
+    iosDownloadNow?.EbankItbuttonExternalLink :
+    iosDownloadNow.EbankItbuttonInternalLink?.Url;
+    iosButtonLink = (string.IsNullOrEmpty(iosButtonLink)) ? "#" : iosButtonLink;
+
+    var huaweiButtonLink = "#";
+    huaweiButtonLink = string.IsNullOrEmpty(huaweiDownloadNow?.EbankItbuttonInternalLink?.Url) ?
+    huaweiDownloadNow?.EbankItbuttonExternalLink :
+    huaweiDownloadNow.EbankItbuttonInternalLink?.Url;
+    huaweiButtonLink = (string.IsNullOrEmpty(huaweiButtonLink)) ? "#" : huaweiButtonLink;
+
+    var moreAboutMyWorldRichTxt = heroBody.Children(x => x.ContentType.Alias.ToLower() == "richtexteditor").FirstOrDefault();
+    var disclaimer = heroBody.Children(x => x.Name == "Disclaimer").FirstOrDefault();
+    var MyWorldRichTxt = heroBody.Children(x => x is RichTextEditor).LastOrDefault();
+    var viewName = Path.GetFileNameWithoutExtension(Server.MapPath(VirtualPath));
+
+    var tabGroup = heroBody.Children(x => x.ContentType.Alias.ToLower() == "tabgroup").FirstOrDefault();
+    var ratesDescription = heroBody.Children(x => x.ContentType.Alias.ToLower() == "tabgroup").Last();
+    var infoGraphic = heroBody.Children.First().Children.FirstOrDefault();
+    TabBody tabInfoGraphicData = (TabBody)heroBody.Children.First();
+
+    // get linkdata for Meta and Instagram
+    var fBookData = tabInfoGraphicData.Children(x => x is Card).First();
+    var fBookIconUrl = ((ContentModels.Image)((IPublishedContent)fBookData.Value("cardIcon"))).Url;
+    var fBookPagerLink = (IEnumerable<Umbraco.Web.Models.Link>)fBookData.Value("buttonLink");
+    String fBookUrl = "";
+    foreach (var link in fBookPageLink)
+    {
+        fBookUrl = link.Url;
+    }
+
+    var instaData = tabInfoGraphicData.Children(x => x is Card).Last();
+    var instaUrl = ((ContentModels.Image)((IPublishedContent)instaData.Value("cardIcon"))).Url;
+    // var instaPagerUrl = (IEnumerable<Umbraco.Web.Models.Link>)instaData.Value("buttonLink");
+
+    var buttonLinkData = tabInfoGraphicData.Children.Where(x => x.ContentType.Alias.ToString().ToLower() == "ebankititem2").FirstOrDefault();
+    var imageUrlString = ((ContentModels.Image)((IPublishedContent)infoGraphic.Value("ebankITImage"))).Url;
+    var altTagImageUrl = ((ContentModels.Image)((IPublishedContent)infoGraphic.Value("ebankITImage"))).AltTag;
+
+    var features = heroBody.Children(x => x is Card).FirstOrDefault();
+    // var myworld = heroBody.Children(x => x is Card).Skip(1).First();
+    //  var powerpocket = heroBody.Children(x => x is Card).SkipLast().Last();
+    //  var savingpocket = heroBody.Children(x => x is Card).LastOrDefault();
+
+    //  var myworldimg = myworld.Value<IPublishedContent>("cardIcon");
+    //  var powerpocketimg = powerpocket.Value<IPublishedContent>("cardIcon");
+    //  var savingpocketimg = savingpocket.Value<IPublishedContent>("cardIcon");
+
+    var powerTabs = tabGroup.Children(xx => xx.ContentType.Alias.ToLower() == "tabheader").Take(2).ToList();
+    var powerDescription = ratesDescription.Children(xx => xx.ContentType.Alias.ToLower() == "tabheader").ToList();
+
+    var tabGroupLast = heroBody.Children(x => x is TabGroup).Last();
+    var _buttons = tabGroupLast.Children.Where(c => c is TabHeader).FirstOrDefault();
+    var buttonPDFs = _buttons.Children.Where(c => c is EbankItabstractButton).ToList();
+
+    var lowerBankingTab = tabGroup.Children(x => x.ContentType.Alias.ToLower() == "tabheader").Except(powerTabs).ToList();
+
+    TabBody tabData = null;
+    TabBody tabWaysToBank = null;
+    TabBody myWorldPDFData = null;
+
+    foreach (var tab in heroBody.Children)
+    {
+        if (tab.ContentType.Alias.ToLower() == "tabbody")
+        {
+            if (tab.Value("partialViewName").ToString() == "partialHeroChest")
+            {
+                tabWaysToBank = (TabBody)tab;
+            }
+            else if (tab.Value("partialViewName").ToString() == "_renderPDFData")
+            {
+                myWorldPDFData = (TabBody)tab;
+            }
+            else
+            {
+                tabData = (TabBody)tab;
+            }
+        }
+    }
+
+    var sectionCardsContent = (ICollection<IPublishedElement>)tabWaysToBank.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+
+    var myWorldPDFs = (ICollection<IPublishedElement>)myWorldPDFData.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+
+    var _bankingItemsModel = new CustomModels.Benefits
+    {
+        Header = chestTitle,
+        Description = chestDescription,
+        BenefitCards = sectionCardsContent.Select(c => c as Card).ToList(),
+        BenefitCards1 = sectionCardsContent.Select(c => c as NCcard).ToList()
+    };
+
+    var tableItems = heroBody.Children(x => x is TableChecklist).FirstOrDefault();
+
+    var domainUrl = Request.Url.Host.ToLower();
+
+    var heroKnees = children?.Where(c => c.ContentType.Alias.ToLower() == "heroknees").FirstOrDefault();
+    var bankingCards = "/media/jzylorhd/african-bank-banking-myworld-account-card-power-pocket-family-shared400x350.png";
+
+    string urlProtocol = HttpContext.Current.Request.Url.Scheme.ToLower();
+    urlProtocol = urlProtocol + "://" + domainUrl + bankingCards;
+    var popupAppTitle = "Download the App using one of the following";
+    var popQRCode = "/media/ylalxyxb/image001.png";
+    var popAndroidApp = "/media/mtjfxi5f/googleplaystoredownloadimagelink.png";
+    var popIOsApp = "/media/5pdkgij3/appstoredownloadimagelink.png";
+    var popHuaweiApp = "/media/di0py4qr/appgallery-logo-2.png";
+
+    var headerImage_large = heroHeader?.Value<IPublishedContent>("image")?.Url;
+    var headerImage_medium = heroHeader?.Value<IPublishedContent>("imageMedium")?.Url;
+    var headerImage_small = heroHeader?.Value<IPublishedContent>("imageSmall")?.Url;
+
+    // Schema data
+    var description = heroShoulder.Value("shouderDescription");
+    var title = heroShoulder.Value("shoulderTitle");
+}
+<style>
+    .modal .modal-dialog .modal-content .modal-header {
+        background-color: transparent;
+        border-bottom: 1px solid #eee;
+    }
+    /*AR CARDS STYLING*/
+
+    .card-block {
+        position: relative;
+        margin: 0;
+        padding: 1em;
+    }
+
+    .card {
+        overflow: hidden;
+        padding: 5;
+        border: none;
+        border-radius: 20px;
+        box-shadow: rgba(0, 0, 0, 0.15) 0px 15px 25px, rgba(0, 0, 0, 0.05) 0px 5px 10px;
+        margin: 20px auto;
+        width: 80%;
+    }
+
+    .card-title h3 {
+        font-weight: 900;
+        line-height: 1.2;
+        color: #002B60;
+    }
+
+    .card-description {
+        font-size: 21px;
+        margin-bottom: 20px;
+    }
+
+    .description-span {
+        color: #6B6F81;
+        font-weight: bold;
+    }
+
+    .footer-content {
+        color: #6B6F81;
+        font-weight: bold;
+    }
+
+    img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+    }
+
+
+    /*updated*/
+
+    .space-header {
+        margin-top: 3vh;
+    }
+
+    @@media (min-width: 280px) and (max-width: 540px) {
+        .info-button {
+            text-align: center;
+        }
+        <!-- updated-- >
+        .card-image {
+            border-radius: 21px !important;
+        }
+    }
+
+    .campaign-myworld-container {
+        background-image: url("/media/ptkpputz/african-banking-1935x255.png");
+        background-size: 1772px;
+        position: relative;
+        background-color: #002b60;
+        padding: 83px 0 80px 0;
+    }
+
+    .disclaimer-text {
+        margin-top: 15px;
+        font-size: 14px !important;
+    }
+
+    .black-card-shared-card {
+        width: 80%;
+    }
+
+    @@media only screen and (max-width: 768px) {
+
+        .black-card-shared-card {
+            width: 80%;
+        }
+
+        .card {
+            overflow: hidden;
+            padding: 5;
+            border: none;
+            border-radius: 20px;
+            box-shadow: rgba(0, 0, 0, 0.15) 0px 15px 25px, rgba(0, 0, 0, 0.05) 0px 5px 10px;
+            margin: 20px auto;
+            width: 100%;
+        }
+
+        .card-footer {
+            display: none;
+        }
+    }
+
+    .onenumbercall {
+        text-align: center;
+        margin-top: 0;
+        margin-bottom: 10px;
+        line-height: 1.1;
+        display: block;
+    }
+
+    @@media (min-width: 1000px) and (max-width: 10000px) {
+
+        .left-col {
+            border-right: none !important;
+            margin-left: 210px;
+        }
+        <!-- updated styling-- >
+        .card-image {
+            border-radius: 58px !important;
+        }
+
+        #popUpHuawei {
+            margin-right: -45rem;
+            margin-top: -82px;
+        }
+
+        @@supports (-moz-appearance:none) {
+
+            #popUpHuawei {
+                margin-right: 0px;
+                margin-left: 329px;
+            }
+        }
+
+        .modal-dialog {
+            width: 900px !important;
+        }
+
+        .content {
+            padding-left: 20px;
+        }
+    }
+
+    @@media (min-width: 768px) and (max-width: 1024px) {
+        #popUpHuawei {
+            margin-right: -35rem;
+            margin-top: -68px;
+        }
+        <!-- updated-- >
+        .card-image {
+            border-radius: 41px !important;
+        }
+
+        .col-sm-6 img {
+            width: 160px;
+        }
+
+        .modal-dialog {
+            width: 790px !important;
+            padding-left: 30px;
+            padding-right: 50px;
+        }
+
+        @@supports (-moz-appearance:none) {
+            #popUpHuawei {
+                margin-left: 9rem;
+                margin-top: -68px;
+            }
+        }
+    }
+</style>
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+<!-- HERO CONTINUED-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+
+<!-- INFOGRAPHIC SECTION/AR CARD-->
+<div class="container">
+    <div class="card">
+        <div class="row d-flex justify-content-center">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-5">
+                        <img class="img-fluid" src="@imageUrlString" alt="@altTagImageUrl">
+                    </div>
+                    <div class="col-md-7">
+                        <div class="card-block">
+                            @infoGraphic.Value("ebankItContent")
+
+                            @{
+                                if (buttonLinkData != null)
+                                {
+                                    Umbraco.Web.Models.Link buttonDocumentLink = null;
+                                    if (buttonLinkData.Value("sectionLink") != null)
+                                    {
+                                        foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)buttonLinkData.Value("sectionLink"))
+                                        {
+                                            buttonDocumentLink = link;
+                                            break;
+                                        }
+                                        if (buttonDocumentLink != null)
+                                        {
+                                            var _buttonText = buttonDocumentLink.Name;
+                                            var btnId = viewName + "_" + _buttonText.ToString().Replace(" ", "") + "_" + "AR_VR";
+                                            @*<!--link to button-->
+                                                <a class="col-xs-12 col-sm-12 hidden-md hidden-lg span-buttons button primary clearfix text-center" href="@buttonDocumentLink.Url" target="_blank" id="@btnId">
+                                                    @_buttonText
+                                                </a>
+                                            *@
+
+                                            @* bootstrap button modal *@
+                                            <button type="button" class="btn hidden-md hidden-lg span-buttons button primary clearfix text-center" data-toggle="modal" data-target="#exampleModalCenter" id="@btnId">
+                                                @_buttonText
+                                            </button>
+
+                                            @*<!-- Modal -->*@
+                                            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLongTitle">Choose your social connect</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            @*social Media icons to be added with links *@
+                                                            <div class="container">
+                                                                <div class="row">
+                                                                    <div class="col-md-6">
+                                                                        <img src="@fBookIconUrl" alt="View AR on meta" />
+
+                                                                        <a class="col-xs-12 col-sm-12 hidden-md hidden-lg span-buttons button primary clearfix text-center" href="@fBookIconUrl" target="_blank" id="@btnId">
+                                                                            @_buttonText
+                                                                        </a>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <img src="@instaUrl" alt="View AR on meta" />
+                                                                        <a class="col-xs-12 col-sm-12 hidden-md hidden-lg span-buttons button primary clearfix text-center" href="" target="_blank" id="@btnId">
+                                                                            @_buttonText
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- END INFOGRAPHIC SECTION-->
+<div class="container margin-bottom-minus-60">
+    <div class="campaign-banking-container full">
+
+        <div class="row text-container">
+            @Html.Raw(heroBody.Value("richTextBox"))
+        </div>
+    </div>
+</div>
+
+<!-- HERO CHEST -->
+<!-- Start: Hero Chest (looks a little different to the one all other pages are using - hence no partial view set for it) -->
+<div class="text-center spacer">
+    <h3>@bankingItemsModel.Header</h3>
+    <p>@bankingItemsModel.Description</p>
+</div>
+@if (bankingItemsModel.BenefitCards != null && bankingItemsModel.BenefitCards.Any())
+{
+    int cardIChestterator = 0;
+
+    <div class="container eq-height @(bankingItemsModel.BenefitCards.Count > 3 ? "card-slider" : "") margin-top-40">
+        @foreach (Card benefit in bankingItemsModel.BenefitCards)
+        {
+            String cardIdTag = "card" + cardIChestterator.ToString();
+            <div class="col-sm-4">
+                <a href="#@cardIdTag">
+                    <div class="card-plain">
+                        <div class="center-icon-text">
+                            <div class="image">
+                                @if (benefit.CardIcon != null)
+                                {
+                                    <img class="own-world-of-banking-icons" src="@benefit.CardIcon.Url" alt="@benefit.CardIcon.Value("altTag")" />
+                                }
+                            </div>
+                            <div class="title text-uppercase">@benefit.CardTitle</div>
+                            <p class="descr">@benefit.CardDescription</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            ++cardIChestterator;
+        }
+    </div>
+}
+<!-- End: Hero Chest (looks a little different to the one all other pages are using - hence no partial view set for it) -->
+<div class="campaign-myworld-container">
+    <div class="container myworld-container">
+
+        <div class="row">
+            <div class="col-md-4">
+                <img loading="lazy" class="black-card-shared-card" src="@bankingCards" alt="african-bank-banking-myworld-account-card-power-pocket-family-shared">
+            </div>
+
+            <div class="col-md-8 more-about-myworld margin-top-60">
+                <h3 class="text-white">@Html.Raw(MyWorldRichTxt.Value("textEditor"))</b></h3>
+            </div>
+        </div>
+        @Html.Raw(moreAboutMyWorldRichTxt.Value("textEditor"))
+        <hr class="hr-banking">
+        <div class="sa-lowest-banking-fees">
+            <div class="row">
+                @{
+                    int pocketIterator = 0;
+                    bool isSavingsPocket = false;
+                }
+                @foreach (var pocketItem in powerTabs)
+                {
+                    if (pocketIterator == 1)
+                    {
+                        isSavingsPocket = true;
+                    }
+                    var imageUrl = ((ContentModels.Image)((IPublishedContent)pocketItem.Value("ebankITIcon"))).Url;
+                    var imageAlt = ((ContentModels.Image)((IPublishedContent)pocketItem.Value("ebankITIcon")));
+                    var imageTag = imageAlt.Value("altTag");
+                    var cardParentItem = pocketItem.Children.Where(c => c.ContentType.Alias.ToLower() == "imageitem").FirstOrDefault();
+                    var cardChildItem = cardParentItem.Children.Where(c => c.ContentType.Alias.ToLower() == "ebankititem").FirstOrDefault();
+
+                    var cardUrl = ((ContentModels.Image)((IPublishedContent)cardChildItem.Value("ebankITImage"))).Url;
+
+                    <div class="col-sm-6 @(isSavingsPocket ? "savings-pocket-top-header" : "") ">
+                        <img src="@imageUrl" alt="@imageTag" width="35" style="float:left; margin-right: 10px" />
+                        <h4 id="@pocketItem.Value("ebankITIconTitle").ToString().Replace(" ", string.Empty)" class="color-power margin-bottom-20">@pocketItem.Value("ebankITIconTitle")</h4>
+                        <p class="margin-bottom-80">
+                            @Html.Raw(pocketItem.Value("ebankITIconContent"))
+                        </p>
+                        <a class="button span-buttons green-button @(isSavingsPocket ? "button-balance-margin" : "margin-top-20")" href="@openNowButtonLink" target="_blank" style="color: white; text-align:center">@buttonText</a>
+                    </div>
+                    pocketIterator += 1;
+                    isSavingsPocket = false;
+                }
+            </div>
+            <hr class="hr-banking">
+            <div class="row">
+                <div class="container row">
+                    <div class="center-align">
+                        @{int pocketItemCount = 0;}
+                        @*  <h4 class="text-white  margin-bottom-5" style="text-align: center;font-weight: bold;margin-bottom: 30px;">SA's best rate* on any positive balance</h4>*@
+
+                        @foreach (var pocketItemDescription in powerDescription)
+                        {
+                            <h4 id="@pocketItemDescription.Value("ebankITIconTitle").ToString().Replace(" ", string.Empty)" class="color-power margin-bottom-20">@pocketItemDescription.Value("ebankITIconTitle")</h4>
+                            <p class="margin-bottom-80">
+                                @Html.Raw(pocketItemDescription.Value("ebankITIconContent"))
+                            </p>
+
+                            if (pocketItemCount == 0)
+                            {
+                                <div class="row center-align">
+                                    <a class="button span-buttons green-button margin-top-20" href="@openNowButtonLink" target="_blank" style="color: white; text-align:center">@buttonText</a>
+                                </div>
+                            }
+                            pocketItemCount++;
+                            @*  <div class="row center-align margin-top-30">All interest rates quoted are nominal annual compounded monthly (NACM) rates.</div>*@
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="linen"></div>
+            @{
+                int intQandA = 0;
+            }
+            @foreach (var lowerFeesItem in lowerBankingTab)
+            {
+                if (lowerFeesItem.Children.Where(c => c.ContentType.Alias.ToLower() == "imageitem").FirstOrDefault() == null)
+                {
+                    var pocketQA = "qAndA" + intQandA.ToString();
+
+                    <div class="center-align">
+                        <h4 id="@pocketQA" class="margin-bottom-80 margin-top-20"></h4>
+                        <p class="margin-bottom-20 margin-top-20">@Html.Raw(lowerFeesItem.Value("ebankITIconContent"))</p>
+                    </div>
+                    intQandA += 1;
+                    if (intQandA == 1)
+                    {
+                        <div class="linen"></div>
+                    }
+                }
+            }
+        </div>
+        <hr class="hr-banking">
+        <div id="accordion">
+            <h4 class="btnFeaturesTable text-white center-align " data-toggle="collapse" href="#colTable" aria-controls="colTable" aria-expanded="true" style="cursor:pointer">
+                <strong> @features.Value("cardTitle")@*MyWORLD Banking Features*@</strong>
+                <i id="table-toggle" style="margin-top:1%;" class="accordion-toggle fa fa-chevron-down">
+                </i>
+            </h4>
+            <div class="collapse" id="colTable">
+                <div class="row desk-table">
+                    <div class="col-md-12">
+                        <div class="margin-top-10">
+                            <table class="table" style="background-color: white;margin: auto; width:80%">
+                                <thead>
+                                    <tr style="background: #002b60;">
+                                        <th></th>
+                                        <th class="green-with-bold-text-centered 0" id="0">
+                                            <img loading="lazy" src=@*"@myworldimg.Url"*@"~/media/sqfisuaz/my-world.png" width="40" /><br>
+                                            @*   @myworld.Value("cardTitle")*@ MyWORLD
+                                        </th>
+                                        <th class="green-with-bold-text-centered 1" id="1">
+                                            <img loading="lazy" src=@*"@powerpocketimg.Url"*@ "/media/irunewqr/powerpocke-white.png" width="40" /><br>
+                                            @*  @powerpocket.Value("cardTitle")*@ Power Pocket
+                                        </th>
+                                        <th class="green-with-bold-text-centered 2" id="2">
+                                            <img loading="lazy" src=@*"@savingpocketimg.Url"*@ "/media/gxslvqmr/savepocket-white.png" alt="best savings account in south africa" width="40" /><br>
+                                            @*   @savingpocket.Value("cardTitle") *@ Savings Pocket
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                                @{
+                                    int iterator = 1;
+                                    string accordionName = null;
+
+                                    foreach (var item in (IEnumerable<NCtabularInfo>)tableItems.Value("Data"))
+                                    {
+                                        accordionName = "accordion" + iterator.ToString();
+
+                                        if (item.Value("tabularData") != null)
+                                        {
+                                            foreach (var data in (IEnumerable<NCtabularData>)item.Value("tabularData"))
+                                            {
+                                                <tr class="@accordionName" style="color:#002b60;">
+                                                    <td>
+                                                        @data.Value("action")
+                                                    </td>
+                                                    @if (data.Value("action").ToString().Contains("Minimum account balance"))
+                                                    {
+                                                        <td style="text-align:center">R0.00</td>
+                                                        <td style="text-align:center">R0.00</td>
+                                                        <td style="text-align:center">R0.00</td>
+                                                    }
+
+                                                    @if (data.Value("action").ToString().Contains("Add a pocket user to bank"))
+                                                    {
+                                                        <td></td>
+                                                        <td style="text-align:center">1 User</td>
+                                                        <td style="text-align:center">1 User</td>
+                                                    }
+                                                    else if (data.Value("action").ToString().Contains("Add pocket members to view"))
+                                                    {
+                                                        <td></td>
+                                                        <td style="text-align:center">Up to 10 Members</td>
+                                                        <td style="text-align:center">Up to 10 Members</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        if (data.Value("bankingOptions") != null)
+                                                        {
+                                                            foreach (var options in (IEnumerable<BankingOptions>)data.Value("bankingOptions"))
+                                                            {
+                                                                bool isSelected = (bool)@options.Value("isSelected");
+                                                                <td style="text-align:center">
+                                                                    @if (isSelected)
+                                                                    {
+                                                                        <img loading="lazy" src="~/media/0pgijfa5/tickbubble.png" alt="tickbubble" width="30" />
+                                                                    }
+                                                                </td>
+                                                            }
+                                                        }
+
+                                                    }
+                                                </tr>
+                                            }
+                                            ++iterator;
+                                        }
+                                    }
+                                }
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @* @{
+                int mobiIterator = 1;
+                string mobiAccordionName = null;
+                foreach (var mobiItem in (IEnumerable<NCtabularInfo>)tableItems.Value("Data"))
+                {
+                    mobiAccordionName = "accordion" + mobiIterator.ToString();
+
+                    <div class="mobi-table" style="width:  100%;padding: 0px;left:  0;">
+                        <div data-toggle="collapse" data-target=".@mobiAccordionName" class="clickable tr-category">
+                            <div class="arrow-container">
+                                @{ var mobiIconName = "mobiIcon" + mobiIterator.ToString(); }
+                                <i id="@mobiIconName" style="float: right;"><span class="fa fa-arrow-down"></span></i>
+                            </div>
+                            <b>@mobiItem.Value("category")</b>
+                        </div>
+                        @{
+                            if (mobiItem.Value("tabularData") != null)
+                            {
+                                foreach (var mobiData in (IEnumerable<NCtabularData>)mobiItem.Value("tabularData"))
+                                {
+                                    <div class="row @mobiAccordionName collapse" aria-expanded="false" style="text-align: left; width: 100%; margin-top: 0px; padding: 25px; height: 50px;">
+                                        @{
+                                            if (mobiData.Value("action").ToString().Contains("Minimum account balance"))
+                                            {
+                                                <div class="col-xs-4">R0.00</div>
+                                                <div class="col-xs-4">R0.00</div>
+                                                <div class="col-xs-4">R0.00</div>
+                                            }
+                                            if (mobiData.Value("action").ToString().Contains("Add a pocket user to bank"))
+                                            {
+                                                <div class="col-xs-4">
+                                                    <img loading="lazy" src="/media/52123/my-world.png" alt="MyWorld bank account" width="80%">
+                                                    <i class="glyphicon glyphicon-remove" style="
+                                                                    content: &quot;\e013&quot;;
+                                                                    font-family: 'Glyphicons Halflings';
+                                                                    font-size: 12px;
+                                                                    margin-right: 232px;
+                                                                    color: #ef0843;
+                                                                    position: absolute;
+                                                                "></i>
+                                                </div>
+                                                <div class="col-xs-4">1 User</div>
+                                                <div class="col-xs-4">1 User</div>
+                                            }
+                                            else if (mobiData.Value("action").ToString().Contains("Add pocket members to view"))
+                                            {
+                                                <div class="col-xs-4">
+                                                    <img src="/media/52123/my-world.png" alt="MyWorld bank account" width="80%">
+                                                    <i class="glyphicon glyphicon-remove" style="
+                                                                    content: &quot;\e013&quot;;
+                                                                    font-family: 'Glyphicons Halflings';
+                                                                    font-size: 12px;
+                                                                    margin-right: 232px;
+                                                                    color: #ef0843;
+                                                                    position: absolute;
+                                                                "></i>
+                                                </div>
+                                                <div class="col-xs-4">Up to 10 Members</div>
+                                                <div class="col-xs-4">Up to 10 Members</div>
+                                            }
+
+                                            if (mobiItem.Value("category").ToString() == "All")
+                                            {
+                                                <div class="col-xs-4"><img src="/media/51865/yes-internet-banking-icon.svg" alt="yes-internet-banking-icon" width="80%"></div>
+                                                <div class="col-xs-4"><img src="/media/51863/yes-app-icon.svg" alt="yes-app-icon" width="80%"></div>
+                                                <div class="col-xs-4"><img src="/media/51864/yes-cell-icon.svg" alt="yes-cell-icon" width="80%"></div>
+                                            }
+                                            else
+                                            {
+                                                var mobiOption = (IEnumerable<BankingOptions>)mobiData.Value("bankingOptions");
+
+                                                BankingOptions internetBanking, africanBankApp, cellPhoneBanking = null;
+
+                                                if (mobiOption != null)
+                                                {
+                                                    internetBanking = (BankingOptions)mobiOption.ToList()[0];
+                                                    africanBankApp = (BankingOptions)mobiOption.ToList()[1];
+                                                    cellPhoneBanking = (BankingOptions)mobiOption.ToList()[2];
+
+                                                    if (internetBanking.Value("optionForFeatues").ToString() == "MyWORLD" && (bool)internetBanking.Value("isSelected"))
+                                                    {
+                                                        <div class="col-xs-4">
+                                                            <img loading="lazy" src="/Media/52123/my-world.png" alt="MyWorld bank account" width="80%">
+                                                            <i class="glyphicon glyphicon-ok" style="
+                                                                    content: &quot;\e013&quot;;
+                                                                    font-family: 'Glyphicons Halflings';
+                                                                    font-size: 12px;
+                                                                    margin-right: 232px;
+                                                                    color: #88bc47;
+                                                                    position: absolute;
+                                                                "></i>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="col-xs-4">
+                                                            <img loading="lazy" src="/Media/52123/my-world.png" alt="MyWorld bank account" width="80%">
+                                                            <i class="glyphicon glyphicon-remove" style="
+                                                                    content: &quot;\e013&quot;;
+                                                                    font-family: 'Glyphicons Halflings';
+                                                                    font-size: 12px;
+                                                                    margin-right: 232px;
+                                                                    color: #ef0843;
+                                                                    position: absolute;
+                                                                "></i>
+
+                                                        </div>
+                                                    }
+
+                                                    if (africanBankApp.Value("optionForFeatues").ToString() == "Power Pocket" && (bool)africanBankApp.Value("isSelected"))
+                                                    {
+                                                        <div class="col-xs-4">
+                                                            <img loading="lazy" src="/Media/52013/powerpocke-white.png" alt="Shared Account with Power Pocket" width="80%">
+                                                            <i class="glyphicon glyphicon-ok" style="
+                                                                    content: &quot;\e013&quot;;
+                                                                    font-family: 'Glyphicons Halflings';
+                                                                    font-size: 12px;
+                                                                    margin-right: 232px;
+                                                                    color: #88bc47;
+                                                                    position: absolute;
+                                                                "></i>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="col-xs-4">
+                                                            <img loading="lazy" src="/Media/52013/powerpocke-white.png" alt="Shared Account with Power Pocket" width="80%">
+                                                            <i class="glyphicon glyphicon-remove" style="
+                                                                    content: &quot;\e013&quot;;
+                                                                    font-family: 'Glyphicons Halflings';
+                                                                    font-size: 12px;
+                                                                    margin-right: 232px;
+                                                                    color: #ef0843;
+                                                                    position: absolute;
+                                                                "></i>
+                                                        </div>
+                                                    }
+
+                                                    if (cellPhoneBanking.Value("optionForFeatues").ToString() == "Savings Pocket" && (bool)cellPhoneBanking.Value("isSelected"))
+                                                    {
+                                                        <div class="col-xs-4">
+                                                            <img loading="lazy" src="/Media/52015/savepocket-white.png" alt="best savings account in south africa" width="80%">
+                                                            <i class="glyphicon glyphicon-ok" style="
+                                                                    content: &quot;\e013&quot;;
+                                                                    font-family: 'Glyphicons Halflings';
+                                                                    font-size: 12px;
+                                                                    margin-right: 232px;
+                                                                    color: #88bc47;
+                                                                    position: absolute;
+                                                                "></i>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="col-xs-4">
+                                                            <img loading="lazy" src="/Media/52015/savepocket-white.png" alt="best savings account in south africa" width="80%">
+                                                            <i class="glyphicon glyphicon-remove" style="
+                                                                    content: &quot;\e013&quot;;
+                                                                    font-family: 'Glyphicons Halflings';
+                                                                    font-size: 12px;
+                                                                    margin-right: 232px;
+                                                                    color: #ef0843;
+                                                                    position: absolute;
+                                                                "></i>
+                                                        </div>
+                                                    } /**/
+                                                }
+                                            }
+                                        }
+                                    </div>
+                                }
+                            }
+                        }
+
+                    </div>
+                    ++mobiIterator;
+                }
+            }*@
+        <!-- End Desktop Features Table View -->
+        <hr class="hr-banking" />
+        <div class="internet-banking-row eq-height">
+            <div class="article-content">
+                @foreach (var lowerFeesItem in lowerBankingTab)
+                {
+                    if (lowerFeesItem.Children.Where(c => c.ContentType.Alias.ToLower() == "imageitem").FirstOrDefault() != null)
+                    {
+
+                        var cardChildItems = lowerFeesItem.Children.Where(c => c.ContentType.Alias.ToLower() == "imageitem").FirstOrDefault().Children;
+
+                        <div class="row">
+                            <h4 class="text-white center-align"><b>MyWORLD Banking fees</b></h4>
+                            <div class="col-md-12 margin-top-10">
+                                <div class="row">
+                                    @{
+                                        foreach (var cardChildItem in cardChildItems)
+                                        {
+                                            var cardUrl = ((ContentModels.Image)((IPublishedContent)cardChildItem.Value("ebankITImage"))).Url;
+                                            var imageAlt = ((ContentModels.Image)((IPublishedContent)cardChildItem.Value("ebankITImage")));
+                                            var imageTag = imageAlt.Value("altTag");
+
+                                            <div class="col-sm-2">
+                                                <img src="@cardUrl" alt="@imageTag" width="100%" />
+                                            </div>
+                                            <div class="col-sm-4 margin-top-20">
+                                                @Html.Raw(cardChildItem.Value("ebankITContent"))
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-md-12 center-align" style="padding-top: 20px">
+                                <div class="row">
+                                    @{
+                                        foreach (var item in myWorldPDFs)
+                                        {
+                                            if (item.Value("nCcategoryName").ToString().Contains("Pricing Guide"))
+                                            {
+                                                var viewBankingFeesBtn = buttonPDFs.FirstOrDefault();
+                                                var viewBankingFeesFromBtn = buttonPDFs.LastOrDefault();
+                                                var linkString = ((EbankItabstractButton)viewBankingFeesBtn).EbankItbuttonExternalLink; //((ContentModels.File)item.Value("nCebankITDocument")).Url;
+                                                var linkStringFeeFrom = ((EbankItabstractButton)viewBankingFeesFromBtn).EbankItbuttonExternalLink;
+                                                <div class="col-md-6">
+                                                    <a class="button view-banking-fees" href="@linkString" target="_blank" style="margin-right: 2%;">
+                                                        @(((EbankItabstractButton)viewBankingFeesBtn).EbankItbuttonText) @*  View Banking Fees*@
+                                                    </a>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <a class="button view-banking-fees" href="~/media/gdrao3sm/tb2109_001_pricing-update_branch_web.pdf" target="_blank" style="margin-right: 2%;">
+                                                        @(((EbankItabstractButton)viewBankingFeesFromBtn).EbankItbuttonText)
+                                                        @* Fees from 01 October 2021*@
+                                                    </a>
+                                                </div>
+
+                                            }
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<!-- HERO BODY-->
+@Html.Partial("_bankingBodyContent", tabData as ContentModels.TabBody)
+
+<div class="container payments-section full">
+    <div class="margin-top-20 visible-xs"></div>
+    <div class="container row">
+        <h4 class="container margin-bottom-20 align-center">Ways to Bank</h4>
+        <p class="align-center">@tabWaysToBank.Value("partialViewClassName")</p>
+        @{
+            int cardIterator = 0;
+            bool increaseCardHeight = false;
+            foreach (var item in sectionCardsContent)
+            {
+                if (cardIterator == (int)sectionCardsContent.Count() - 1)
+                {
+                    increaseCardHeight = true;
+                }
+                var cardTitle = item.Value<string>("nCcardTitle");
+                var cardDesc = item.Value<string>("nCcardDescription");
+                var icon = item.Value<IPublishedContent>("nCcardIcon");
+                <div class="col-sm-4 margin-bottom-20">
+                    <div class="@(increaseCardHeight ? "cellphone-button-banking-campaign" : "")">
+                        <div class="text-left center-align white-link-color richtextbox-blue-bg">
+                            <img loading="lazy" src="@icon.Url" alt="@icon.Value("altTag")" class="image-center-resizer" />
+                            <p class="title blue-color font-size-20">@cardTitle</p>
+                            <p>@cardDesc</p>
+                        </div>
+                    </div>
+                    @{
+                        if (!cardTitle.Contains("App"))
+                        {
+                            <div class="col-md-4 center-align margin-bottom-20 margin-right-50 banking-options-buttons">
+                                <a class="button span-buttons green-button learn-more-banking " href="~/en/home/online-banking/" target="_blank">Learn More</a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-md-4 center-align margin-bottom-20 margin-left-50 banking-options-buttons">
+                                <span class="button span-buttons green-button view_OnlineApps downloadNow" data-item="@popupAppTitle*@popQRCode*@popAndroidApp*@popIOsApp" target="_blank">Download Now</span>
+                            </div>
+                        }
+                    }
+                </div>
+                cardIterator += 1;
+            }
+        }
+    </div>
+</div>
+<!-- NUMBER TO CALL -->
+<div class="number-to-call">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                @Html.Raw(disclaimer.Value("textEditor"))
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade in" id="generic2" role="dialog" style="padding-right: 17px;">
+    <div class="modal-dialog">
+        <div class="modal-content sizer">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><b>×</b></button>
+                <h4 class="modal-title" id="modal-title"></h4>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-15">
+                        <br /><br />
+                    </div>
+                    <div class="col-xs-12 col-sm-4">
+                        <a href="@androidButtonLink" target="_blank">
+                            <img width="200" id="popUpAndroid" alt="google-play-store-african-bank-android-app" src="/media/mtjfxi5f/googleplaystoredownloadimagelink.png">
+                        </a>
+                    </div>
+                    <div class="col-xs-12 hidden-sm hidden-md hidden-lg"><br></div>
+                    <div class="col-xs-12 col-sm-4">
+                        <a href="@iosButtonLink" target="_blank">
+                            <img width="200" id="popUpIOS" alt="ios-african-bank-app" src="/media/5pdkgij3/appstoredownloadimagelink.png">
+                        </a>
+                    </div>
+                    <div class="col-xs-12 hidden-sm hidden-md hidden-lg"><br></div>
+                    <div class="col-xs-12 col-sm-4">
+                        <a href="@huaweiButtonLink">
+                            <img width="200" id="popUpIOS" src="/media/di0py4qr/appgallery-logo-2.png" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+<!-- HERO BODY CONTINUED-->
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            var imageBgCss = "url('" + "@headerImage_large" + "')";
+            var imageMdCss = "url('" + "@headerImage_medium" + "')";
+            var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_medium : headerImage_small)" + "')";
+            var CheckScreenSize;
+            (CheckScreenSize = function () {
+                var _width = $(window).outerWidth();
+                var _height = $(window).outerHeight();
+                if (_width <= 511) {
+                    $("#heroHeader").css("background-image", imageSmCss);
+                }
+                else {
+                    $("#heroHeader").css("background-image", imageBgCss);
+                }
+            })();
+            $(window).resize(CheckScreenSize);
+        });
+
+            $(".btnFeaturesTable").click(function () {
+            $("#table-toggle").toggleClass('fa-chevron-up fa-chevron-down');
+            $(".accordion-content ").fadeToggle();
+        });
+    </script>
+    <script type="application/ld+json">
+        {
+        "@@context": "http://schema.org",
+        "@@type": "WebPage",
+        "author": {
+        "@@id": "African Bank"
+        },
+        "copyrightHolder": {
+        "@@id": "African Bank"
+        },
+        "copyrightYear": "2020-09-03T11:03:00-07:00",
+        "creator": {
+        "@@id": "African Bank"
+        },
+        "dateModified": "2019-09-02T10:19:08-07:00",
+        "datePublished":"2020-09-02T11:03:00-07:00",
+        "description": "@description",
+        "headline": "@title",
+        "image": {
+        "@@type": "ImageObject",
+        "url": "@urlProtocol"
+        },
+        "inLanguage": "en-za",
+        "mainEntityOfPage": "https://africanbank.co.za/en/home/",
+        "name": "Banking MyWORLD",
+        "publisher": {
+        "@@id": "African Bank"
+        },
+        "url": "https://africanbank.co.za/en/home/"
+        }
+    </script>
+    <script type="application/ld+json">
+        {
+        "@@context": "https://schema.org",
+        "@@type": "Table",
+        "about": "list of MyWORLD Banking Features"
+        }
+    </script>
+}
+

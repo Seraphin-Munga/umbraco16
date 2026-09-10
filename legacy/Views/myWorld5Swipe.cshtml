@@ -1,0 +1,794 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCampaign>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models;
+@using Web.Helpers
+@using Umbraco.Web.Models
+@using System.Text.RegularExpressions
+
+@{
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var children = Model.Children;
+
+    // Get specific Children
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+
+    var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
+
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    var bodyBlurpDescription = heroBody.Value("richTextBox");
+
+    // Get the (generic Open Now that will be used throughout the page) button from the Hero Shoulder
+    IEnumerable<IPublishedElement> bodyButtons = (IEnumerable<IPublishedElement>)heroBody.Children.Where(c => c is ContentModels.EbankItabstractButton);
+    ContentModels.EbankItabstractButton openNowButton = null;
+    ContentModels.EbankItabstractButton learnMoreButton = null;
+    ContentModels.EbankItabstractButton androidDownloadNow = null;
+    ContentModels.EbankItabstractButton iosDownloadNow = null;
+    ContentModels.EbankItabstractButton downloadNow = null;
+
+
+    foreach (var button in bodyButtons)
+    {
+        if (button.Value("EbankItbuttonText").ToString().Contains("Register / Login"))
+        {
+            openNowButton = (ContentModels.EbankItabstractButton)button;
+        }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("Learn More"))
+        {
+            learnMoreButton = (ContentModels.EbankItabstractButton)button;
+
+        }
+
+        else if (button.Value("EbankItbuttonText").ToString().Contains("Android"))
+        {
+            androidDownloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("iOS"))
+        {
+            iosDownloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+        else
+        {
+            downloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+    }
+
+    var openNowButtonLink = "#";
+    openNowButtonLink = string.IsNullOrEmpty(openNowButton?.EbankItbuttonInternalLink?.Url) ?
+    openNowButton?.EbankItbuttonExternalLink :
+    openNowButton.EbankItbuttonInternalLink?.Url;
+    openNowButtonLink = (string.IsNullOrEmpty(openNowButtonLink)) ? "#" : openNowButtonLink;
+
+    var learnMoreButtonLink = "#";
+    learnMoreButtonLink = string.IsNullOrEmpty(learnMoreButton?.EbankItbuttonInternalLink?.Url) ?
+    learnMoreButton?.EbankItbuttonExternalLink :
+    learnMoreButton.EbankItbuttonInternalLink?.Url;
+    learnMoreButtonLink = (string.IsNullOrEmpty(learnMoreButtonLink)) ? "#" : learnMoreButtonLink;
+
+    // End get generic shoulder button
+
+    var chestTitle = heroChest?.Value("chestTitle").ToString();
+    var chestDescription = heroChest?.Value("chestDescription").ToString();
+    var chestCards = heroChest?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+
+    var campaignBankingItemsModel = new CustomModels.Benefits
+    {
+        Header = chestTitle,
+        Description = chestDescription,
+        BenefitCards = chestCards.Select(c => c as Card).ToList(),
+
+    };
+
+    //Create your won world of banking
+
+    var tabs = (IEnumerable<IPublishedElement>)heroBody?.Children.Where(c => c.ContentType.Alias.ToLower() == "tabbody").ToList();
+
+    ContentModels.TabBody newWaysOfBanking = null;
+    ContentModels.TabBody createOwnWorldOfBanking = null;
+    ContentModels.TabBody myWorldTermsAndConditions = null;
+
+    tabs.ToList().ForEach(x =>
+    {
+        var partialName = x.Value("PartialViewName");
+
+        if (partialName.ToString() == "_cardRenderDescribedCards")
+        {
+            newWaysOfBanking = (TabBody)x;
+        }
+        else if (partialName.ToString() == "_renderPDFData")
+        {
+            myWorldTermsAndConditions = (TabBody)x;
+        }
+        else
+        {
+            createOwnWorldOfBanking = (TabBody)x;
+        }
+    });
+
+    var campaignMessagingData = newWaysOfBanking.Children.Where(x => x.ContentType.Alias == "ebankITItem2").FirstOrDefault();
+    var extraCampaignMessaging = campaignMessagingData.Value("ebankITContent");
+
+    var ownWorldItems = (IEnumerable<IPublishedElement>)createOwnWorldOfBanking.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+
+    var newWaysItems = (IEnumerable<IPublishedElement>)newWaysOfBanking.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+    var myWorldTAndCs = (IEnumerable<IPublishedElement>)myWorldTermsAndConditions.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+
+    var viewName = Path.GetFileNameWithoutExtension(Server.MapPath(VirtualPath)); //used mainly to identify the page
+    var buttonText = openNowButton.EbankItbuttonText;
+    var onlineButtonText = learnMoreButton.EbankItbuttonText;
+    var btnId = viewName + "_" + buttonText.ToString().Replace(" ", "") + "_" + "banking-campaign";
+
+    var btnLearnMoreId = viewName + "_" + onlineButtonText.ToString().Replace(" ", "") + "_" + "MyWorld5Swipe-Campaign";
+
+    // Mobile App Modal Data
+    var popupAppTitle = "Download African App using one of the following";
+    var popQRCode = "/media/51852/image001.png";
+    var popAndroidApp = "/media/51814/GooglePlayStoreDownloadImageLink.png";
+    var popIOsApp = "/media/51813/appstoredownloadimagelink.png";
+    // End Mobile App
+
+    // Create Modal campaign
+    var popupTitle = "Your reward has been successfully allocated to you ";
+    var popupDescription = "You will receive your reward <a>redemption sms</a> within 24-48 hrs of activating your MyWorld bank account";
+    var popupButton = "Click here to activate your account now!";
+
+    var popupImage2 = "/media/51854/icon-gmail.png";
+    var popupDescription2 = "Create your Google Account.";
+    var popupButton2 = "Create Account";
+    // End Modal campaign
+
+    var headerImage_large = heroHeader?.Value<IPublishedContent>("image")?.Url;
+    var headerImage_medium = heroHeader?.Value<IPublishedContent>("imageMedium")?.Url;
+    var headerImage_small = heroHeader?.Value<IPublishedContent>("imageSmall")?.Url;
+
+}
+
+<style>
+    hr {
+        border-top: 3px solid #c5d82e;
+    }
+    .hero-static-banner {
+        margin-top: 0px;
+    }
+    .registerLogin {
+        width: unset;
+        text-align: right;
+    }
+    .myWorld-campaign-images {
+        cursor:pointer;
+    }
+
+    a {
+      color: #002b60;
+    }
+
+    #popUpButton {
+        width:250px;
+        margin-top: -160px;
+        border-radius: 15px;
+    }
+    .modal-dialog {
+        top: 30%;
+    }
+    .modal .modal-dialog .modal-content .modal-header h4 {
+        font-size: 16px;
+    }
+    a:link{
+      text-decoration: none;
+    }
+    .hero-static-caption {
+        background: #88bc47;
+    }
+
+    .button-styler {
+        background-color: #88bc47 !important;
+    }
+
+    .hero-static-title {
+        color: #fff;
+    }
+
+    .number-to-call {
+       font-size: 11px;
+       font-weight: normal;
+    }
+
+    .foot-para {
+        font-size: 12px;
+        margin-top: 8px;
+    }
+
+    .onenumbercall {
+        text-align: center;
+        font-weight: 900;
+        font-size: 24px;
+        color: #002b60;
+        margin-top: 0;
+        margin-bottom: 10px;
+        line-height: 1.1;
+        display: block;
+    }
+
+    .modal .modal-dialog .modal-content .modal-header {
+        @*border: 0;*@
+         background-color: #c5d82f;
+        border-radius: 26px;
+    }
+
+    .modal .modal-dialog .modal-content .modal-header h4 {
+        color: #002b60;
+    }
+
+    h4 {
+        font-weight: 600;
+    }
+
+
+    .modal-content {
+        background-color: #c5d82f;
+        border-radius: 26px;
+    }
+
+    .modal-title {
+        margin-top: 14px;
+    }
+
+    .modal .modal-dialog .modal-content .modal-header .close {
+        color: #ffffff;
+    }
+
+    .close {
+        text-shadow: 0 0px 0 #fff;
+    }
+
+    .new-para {
+        padding-left: 350px;
+        padding-right: 350px;
+        text-align: center;
+        color: #002b60;
+        font-size: 17px;
+    }
+
+    .reward-para {
+        margin-top: 20px;
+        padding-left: 14%;
+        padding-right: 14%;
+        text-align: center;
+        color: #002b60;
+        font-size: 32px;
+    }
+
+   @*    .img-Header  {
+       display: block;
+       margin-left: auto;
+       margin-right: auto;
+       width: 100%;
+    }*@
+
+    .campaign-myworld-container {
+        color: #fff !important;
+    }
+
+    .bank-para {
+        text-align: center;
+        color: #000000;
+        font-size: 23px;
+        margin-top:20px;
+    }
+
+    .bank-message {
+        text-align: center;
+        color: #464855;
+        font-size: 15px;
+        margin-top:20px;
+    }
+
+    .blue-block {
+        text-align: center;
+        font-size: 15px;
+        border-style:solid;
+        color: #fff;
+        background-color:#002b60;
+
+    }
+
+    .blue-messageOne {
+        font-size: 22px;
+    }
+
+    .blue-messageSec {
+        font-size: 21px;
+        padding-left: 120px;
+        padding-right: 120px;
+    }
+
+    .blue-header {
+        color: #fff;
+        margin-top:0px;
+        font-size: 26px;
+    }
+
+    @@media (min-width: 360px) and (max-width: 640px) {
+
+        .blue-messageOne {
+            font-size: 18px;
+        }
+
+        .blue-messageSec {
+            font-size: 19px;
+            padding-left: 60px;
+            padding-right: 60px;
+        }
+
+        .blue-header {
+            font-size: 30px;
+        }
+
+        .blue-block {
+           /* height: 720px; */
+           margin: 0px -3px 0px -3px;
+           padding-left: 0px;
+           padding-right: 0px;
+        }
+
+        .new-para {
+            margin-top: 40px;
+            padding-left: 15px;
+            padding-right: 15px;
+            font-size: 16px;
+        }
+
+        .reward-para {
+            margin-top: 20px;
+            padding-left: 15px;
+            padding-right: 15px;
+            font-size: 31px;
+        }
+    }
+
+    @@media (min-width: 411px) and (max-width: 731px) {
+
+         .blue-block {
+           /* height: 620px; */
+           margin: 0px -3px 0px -3px;
+           padding-left: 0px;
+           padding-right: 0px;
+        }
+
+        .new-para {
+            margin-top: 40px;
+            padding-left: 15px;
+            padding-right: 15px;
+            font-size: 16px;
+        }
+
+        .reward-para {
+            margin-top: 20px;
+            padding-left: 15px;
+            padding-right: 15px;
+            font-size: 31px;
+        }
+    }
+
+     @@media (min-width: 320px) and (max-width: 568px) {
+
+        .blue-messageOne {
+            font-size: 18px;
+        }
+
+        .blue-messageSec {
+            font-size: 19px;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        .blue-header {
+            font-size: 30px;
+        }
+
+        .blue-block {
+           /* height: 740px; */
+           margin: 0px -3px 0px -3px;
+           padding-left: 0px;
+           padding-right: 0px;
+        }
+
+        .new-para {
+            margin-top: 40px;
+            padding-left: 15px;
+            padding-right: 15px;
+            font-size: 14px;
+        }
+
+        .reward-para {
+            margin-top: 20px;
+            padding-left: 15px;
+            padding-right: 15px;
+            font-size: 31px;
+        }
+    }
+
+    @@media (min-width: 411px) and (max-width: 823px) {
+
+        .blue-block {
+           /* height: 720px; */
+           margin: 0px -3px 0px -3px;
+           padding-left: 0px;
+           padding-right: 0px;
+        }
+
+        .new-para {
+            margin-top: 40px;
+            padding-left: 15px;
+            padding-right: 15px;
+            font-size: 16px;
+        }
+
+        .reward-para {
+            margin-top: 20px;
+            padding-left: 15px;
+            padding-right: 15px;
+            font-size: 31px;
+        }
+    }
+
+
+    @@media (min-width: 375px) and (max-width: 667px) {
+
+        .blue-block {
+           /* height: 720px; */
+           margin: 0px -3px 0px -3px;
+           padding-left: 0px;
+           padding-right: 0px;
+        }
+
+        .new-para {
+            margin-top: 40px;
+            padding-left: 15px;
+            padding-right: 15px;
+            font-size: 16px;
+        }
+    }
+
+    @@media (min-width: 414px) and (max-width: 736px) {
+
+        .blue-block {
+           /* height: 650px; */
+           margin: 0px -3px 0px -3px;
+           padding-left: 0px;
+           padding-right: 0px;
+        }
+
+
+        .new-para {
+            margin-top: 40px;
+            padding-left: 15px;
+            padding-right: 15px;
+            font-size: 16px;
+        }
+    }
+
+    @@media (min-width: 375px) and (max-width: 812px) {
+        .new-para {
+            margin-top: 40px;
+            padding-left: 15px;
+            padding-right: 15px;
+            font-size: 16px;
+        }
+    }
+
+    @@media (min-width: 768px) and (max-width: 1024px) {
+
+            .blue-messageOne {
+            font-size: 18px;
+        }
+
+        .blue-messageSec {
+            font-size: 19px;
+            padding-left: 60px;
+            padding-right: 60px;
+        }
+
+        .blue-header {
+            font-size: 30px;
+        }
+
+        .blue-block {
+           /* height: 460px; */
+           margin: 0px -3px 0px -3px;
+           padding-left: 0px;
+           padding-right: 0px;
+        }
+
+        .new-para {
+            margin-top: -10px;
+        }
+    }
+
+</style>
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+
+<div class="new-para">
+    <p>@Html.Raw(bodyBlurpDescription)</p>
+</div>
+
+<div class="reward-para">
+    <div class="img-header">
+        <div class="row">
+            <div class="col-md-5 col-sm-5">
+                <hr>
+            </div>
+            <div class="col-md-2 col-sm-2">
+                <img class="image-holder" src="https://www.africanbank.co.za/media/53723/abw2009_004_mw_5bonus_swipe_gift_icon_110x50-1.png" />
+            </div>
+            <div class="col-md-5 col-sm-5">
+                <hr>
+            </div>
+        </div>
+
+    </div>
+</div>
+<br />
+<br />
+<div class="container">
+    <div class="internet-banking-container full image-full">
+        @if (campaignBankingItemsModel.BenefitCards != null && campaignBankingItemsModel.BenefitCards.Any())
+        {
+            int iterator = 0;
+
+            <div class="row eq-height @(campaignBankingItemsModel.BenefitCards.Count > 3 ? "card-slider" : "") ">
+                @{
+                    int imgIterator = 0;
+                    foreach (Card benefit in campaignBankingItemsModel.BenefitCards)
+                    {
+                        String cardIdTag = "card" + iterator.ToString();
+                        String cardId = benefit.Name.Replace(" ", "").ToString() + imgIterator.ToString();
+                        <div class="col-sm-12">
+                            <div class="image center-align">
+                                @if (benefit.CardIcon != null)
+                                {
+                                    <img class="myWorld-campaign-images primary view_OnlineModal"
+                                         data-item="@popupTitle*@popupDescription"
+                                         target="_blank" style="width:72%;" src="@benefit.CardIcon.Url"
+                                         alt="@benefit.Value("altTag")" />
+                                }
+                            </div>
+                            <div class="title text-uppercase">@benefit.CardTitle</div>
+                            <p class="descr">@Html.Raw(benefit.Value("nCmainDescription"))</p>
+                        </div>
+                        ++iterator;
+                        ++imgIterator;
+                    }
+                }
+            </div>
+        }
+
+    </div>
+</div>
+
+<div class="reward-para">
+    <div class="img-header">
+        <div class="row">
+            <div class="col-md-5 col-sm-5">
+                <hr>
+            </div>
+            <div class="col-md-2 col-sm-2">
+                <img class="image-holder" src="https://www.africanbank.co.za/media/53724/abw2009_004_mw_5bonus_swipe_gift_icon_110x50-2.jpg" />
+            </div>
+            <div class="col-md-5 col-sm-5">
+                <hr>
+            </div>
+        </div>
+
+    </div>
+</div>
+<br />
+<div class="container blue-block">
+    <div class="blue-header">
+        <p>@Html.Raw(extraCampaignMessaging)</p>
+    </div>
+    <br />
+    <div class="center-align">
+        <a href="@learnMoreButtonLink" class="button green-button" id="@btnLearnMoreId">@onlineButtonText</a>
+    </div>
+    <br />
+</div>
+<br>
+<br>
+
+<div class="campaign-myworld-container">
+    <div class="container payments-section full green-button">
+
+        <div class="row myworld-campaign-section-container green-color">
+            @{
+                int idIterator = 0;
+                foreach (var item in newWaysItems)
+                {
+                    var cardTitle = item.Value<string>("nCcardTitle");
+                    var cardTitleId = cardTitle.Trim().ToString().Replace(" ", "").ToString() + idIterator.ToString();
+                    var cardDesc = item.Value<string>("nCcardDescription");
+                    var icon = item.Value<IPublishedElement>("nCcardIcon");
+                    //var mainDescription = item.Value("nCmainDescription");
+                    var mainDescription = item.Value<string>("mainDescription");
+                    <div class="col-sm-12 margin-bottom-20 hero-title blue-color" style="font-size:20px">
+                        <div class="text-left blue-color">
+                            <p id="@cardTitleId" class="title blue-color font-size-30" style="font-weight:700">@cardTitle</p>
+                            <p>@Html.Raw(mainDescription)</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-3 col-md-offset-9 registerLogin margin-bottom-20">
+                            @*<a href="@openNowButtonLink" class="button blue-button" id="">
+                                    @buttonText
+                                </a>*@
+                            <a href="@learnMoreButtonLink" class="button span-buttons blue-button" id="">
+                                @onlineButtonText
+                            </a>
+                        </div>
+                    </div>
+                    idIterator += 1;
+                }
+            }
+        </div>
+    </div>
+
+</div>
+@*Blue Background End*@
+<div class="hover-block"></div>
+
+<div class="bank-para">
+    <p> Ways to Bank </p>
+    <div class="bank-message">
+        <p> Seamless, simplified in a few easy steps. Anywhere, anytime 24/7 via Internet Banking, Our App and Cellphone Banking</p>
+    </div>
+    @*<div class="mega-tabs" style="margin-top:-42px">
+            <!-- Nav tabs -->
+
+            <ul class="nav nav-tabs eq-height" role="tablist">
+                <li role="presentation" class="online-banking-li">
+                    Ways to bank
+                </li>
+            </ul>
+        </div>*@
+</div>
+
+<div class="container payments-section full margin-bottom-30">
+    @*<div class="margin-top-20 visible-xs"></div>*@
+    <div class="row">
+        <h4 class="container margin-bottom-20 align-center">@createOwnWorldOfBanking.Value("partialViewClassName")</h4>
+        @{
+            int cardIterator = 0;
+            bool increaseCardHeight = false;
+
+            foreach (var item in ownWorldItems)
+            {
+
+                if (cardIterator == (int)ownWorldItems.Count() - 1)
+                {
+                    increaseCardHeight = true;
+                }
+                var cardTitle = item.Value<string>("nCcardTitle");
+                var cardDesc = item.Value<string>("nCcardDescription");
+                var icon = item.Value<IPublishedContent>("nCcardIcon");
+                <div class="col-sm-4 margin-bottom-20">
+                    <div class="@(increaseCardHeight ? "cellphone-button-banking-campaign" : "")">
+                        <div class="text-left center-align white-link-color richtextbox-blue-bg">
+                            <img src="@icon.Url" alt="@icon.Value("altTag")" class="image-center-resizer" />
+                            <p class="title blue-color font-size-20">@cardTitle</p>
+                            <p>@cardDesc</p>
+                        </div>
+                    </div>
+                    @{
+                        if (!cardTitle.Contains("App"))
+                        {
+                            <div class="col-md-4 center-align margin-bottom-20 margin-right-50 banking-options-buttons">
+                                <a href="@learnMoreButtonLink" class="button span-buttons green-button" id="">
+                                    @onlineButtonText
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-md-4 center-align margin-bottom-20 margin-left-50 banking-options-buttons">
+                                <span class="button span-buttons green-button view_OnlineApps downloadNow" data-item="@popupAppTitle*@popQRCode*@popAndroidApp*@popIOsApp" target="_blank">@downloadNow.EbankItbuttonText</span>
+                            </div>
+                        }
+                    }
+                </div>
+                cardIterator += 1;
+            }
+        }
+    </div>
+</div>
+
+
+<!-- NUMBER TO CALL -->
+<div class="number-to-call">
+    <p style="text-align: center;">1 <span>Number to call</span></p>
+    <a class="onenumbercall" style="text-align: center;" href="tel:0861123456">0861 123 456</a>
+    @{
+        int pipeIterator = 0;
+        foreach (var item in myWorldTAndCs)
+        {
+            var linkString = ((ContentModels.File)item.Value("nCebankITDocument")).Url;
+            <a rel="noopener noreferrer" href="@linkString" target="_blank" class="tAndC">
+                @item.Value("nCebankITTitle").ToString()
+            </a>
+        }
+    }
+
+    <br />
+
+    <div class="footer-header">
+        <p class="foot-para">
+            Banking fees are based on Soldiarity's methodology of comparing defined baskets of transactions (12,17,25 and 30 transactions)
+            across 7 entry level bank accounts. In this way, an average industry price was obtained. African Bank's fees are at
+            least 30% cheaper across each basket of transactions when compared to this industry average, as at 6 April 2019.
+        </p>
+    </div>
+</div>
+
+@Html.Partial("_renderPopUpContent3", new ContainerViewModel()
+{
+    HTMLContent = @<text>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-12 col-md-12">
+                    <p id="popUpTitle">Make sure you swipe 5 times this month to claim your reward.</p>
+                </div>
+            </div>
+        </div>
+    </text>
+})
+
+@Html.Partial("_renderPopUpContent2", new ContainerViewModel()
+{
+    HTMLContent2 = @<text>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-15">
+                    <a href="@androidDownloadNow.Value("ebankITButtonExternalLink")" target="_blank">
+                        <img width="200" id="popUpAndroid" alt="google-play-store-african-bank-android-app" />
+                    </a>
+                    <br /><br />
+                    <a href="@iosDownloadNow.Value("ebankITButtonExternalLink")" target="_blank">
+                        <img width="200" id="popUpIOS" alt="ios-african-bank-app" />
+                    </a>
+                </div>
+            </div>
+        </div>
+    </text>
+})
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.modal-dialog').removeClass('modal-lg').addClass('modal-md');
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            var imageBgCss = "url('" + "@headerImage_large" + "')";
+            var imageMdCss = "url('" + "@headerImage_medium" + "')";
+            var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_medium : headerImage_small)" + "')";
+            var CheckScreenSize;
+            (CheckScreenSize = function () {
+                var _width = $(window).outerWidth();
+                var _height = $(window).outerHeight();
+                if (_width <= 511) {
+                    $("#heroHeader").css("background-image", imageSmCss);
+                }
+                else {
+                    $("#heroHeader").css("background-image", imageBgCss);
+                }
+            })();
+            $(window).resize(CheckScreenSize);
+        });
+
+    </script>
+}

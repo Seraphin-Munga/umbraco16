@@ -1,0 +1,159 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageAboutUs>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@{
+    Layout = "Master.cshtml";
+
+    var children = Model.Children;
+
+    // Get specific Children
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroBody = children?.Where(c => c.ContentType.Alias == "documentTypeTitleAndDescription");
+
+    IEnumerable<IPublishedContent> bodyContent = null;
+    IEnumerable<IPublishedContent> feetContent = null;
+
+    foreach (var part in heroBody)
+    {
+        if (part.Children.Where(c => c.ContentType.Alias == "heroBodyContactUs").FirstOrDefault() != null)
+        {
+            bodyContent = part.Children;
+        }
+        else if (part.Children.Where(x => x.ContentType.Alias == "heroFeetContactUs").FirstOrDefault() != null)
+        {
+            feetContent = part.Children;
+        }
+    }
+
+    var heroFeet = feetContent?.Where(c => c.ContentType.Alias.ToLower() == "herofeetcontactus").FirstOrDefault();
+    var heroFeetMainItem = heroFeet.Value("footItems");
+}
+
+@functions
+{
+    //manipulate the text based on the textbox type from the cms
+    //I used a case statement jusnt incase we start formating other types
+    private string FormatContatDetail(string text, string type)
+    {
+
+        switch (type.ToLower())
+        {
+            case "mailto:":
+                return "<a href='mailto:" + text.Split(':')[1].Trim() + "' target='_top'>" + text + "</a>";
+            case "tel:":
+                return "<a href='tel:" + text.Split(':')[1].Trim() + "' target='_top'>" + text + "</a>";
+            default:
+                return text;
+        }
+    }
+}
+
+<style ty[e="text/css">
+    .border-grid-col>.col-sm-3 {
+        width: 100%;
+    }
+    @@media (min-width: 768px) {
+        .border-grid-col>.col-sm-3 {
+            width: 100%;
+        }
+    }
+</style>
+
+<!-- HERO BANNER -->
+<!-- HERO HEADER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+<!-- HERO SHOULDER-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+
+
+
+<!-- PRODUCT INFORMATION-->
+<div class="container">
+    <div class="campaign-product-container full">
+        <div class="margin-top-20 visible-xs"></div>
+        @{
+            var mainHeader = bodyContent.FirstOrDefault().Value("mainHeaderText");
+            var headerAndDetailItems = (IEnumerable<HeaderAndDetailItem>)bodyContent.FirstOrDefault().Value("contactUsContent");
+
+            <p class="body-text text-center">
+                @mainHeader
+            </p>
+            <div class="row margin-top-50">
+                <div role="tabpanel" class="tab-pane" id="numbers">
+                    <div class="row eq-height text-center">
+                        @{
+                            int index = 0;
+                            foreach (var item in headerAndDetailItems)
+                            {
+                                string headerTitle = item.Value("headerTitle").ToString();
+                                <div class="col-sm-12">
+                                    <div class="text-18">@headerTitle</div>
+                                    <p>
+                                        @foreach (var detail in (IEnumerable<SimpleTextBox>)item.Value("detailListItems"))
+                                        {
+                                            @Html.Raw(FormatContatDetail(detail.Value("textBoxItem").ToString(), (detail.Value("textBoxType") != null ) ? detail.Value("textBoxType").ToString(): string.Empty))
+                                            <br />
+                                        }
+                                    </p>
+                                </div>
+                                if (++index == 4)
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    </div>
+                    <div class="row eq-height border-grid-col">
+                        @{
+                            foreach (var item in headerAndDetailItems.Skip(4))
+                            {
+                                <div class="col-sm-3">
+                                    <div class="text-18">@item.Value("headerTitle")</div>
+                                    <p>
+                                        @foreach (var detail in (IEnumerable<IPublishedContent>)item.Value("detailListItems"))
+                                        {
+                                            @Html.Raw(FormatContatDetail(detail.Value("textBoxItem").ToString(), (detail.Value("textBoxType") != null) ? detail.Value("textBoxType").ToString() : string.Empty))
+                                            <br />
+                                        }
+                                    </p>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+        
+        <div class="row margin-top-50">
+            @{
+                index = 0;
+                var feetDetails = (IEnumerable<NCrichTextboxItem>)heroFeetMainItem;
+                foreach (var item in feetDetails.Take(2))
+                {
+                    <div class="col-sm-6">
+                        @{
+                            if ((bool)item.Value("ncVisible"))
+                            {
+                                @Html.Raw(item.Value("ncTextBox").ToString());
+                            }
+                        }
+                    </div>
+                }
+
+                foreach (var item in feetDetails.Skip(2))
+                {
+                    <div class="col-sm-6">
+                        @{
+                            if ((bool)item.Value("ncVisible"))
+                            {
+                                @Html.Raw(item.Value("ncTextBox").ToString());
+                            }
+                        }
+                    </div>
+                }
+            }
+
+        </div>
+    </div>
+</div>

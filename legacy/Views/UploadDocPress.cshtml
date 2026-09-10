@@ -1,0 +1,20 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageMediaCenter>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Utilities
+@{
+    Layout = "Master.cshtml";
+    // All Current Page Children
+    var Children = Model.Children;
+    // Get specific Children
+    var heroHeader = Children?.Where(c => c is HeroHeader).FirstOrDefault();
+    var heroShoulder = Children?.Where(c => c is HeroShoulder).FirstOrDefault();
+    var heroBody = Children?.Where(c => c is HeroBody).FirstOrDefault();
+    var tabBody = (TabBody)heroBody.Children(x => x is TabBody).FirstOrDefault();
+}
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+<!-- HERO SHOULDER -->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+<!-- HERO BODY -->
+@Html.Partial("_pageDocumentView", tabBody as ContentModels.TabBody)
+

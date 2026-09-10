@@ -1,0 +1,475 @@
+.payments-section{
+  .icon{
+    width:42px;
+    height:42px;
+    margin-bottom:16px;
+
+    .icon-repayment{
+      font-size:42px;
+      color:#88bc47;
+    }
+  }
+
+  .title{
+    font-size: 16px;
+    font-weight: 400;
+    margin-bottom:5px;
+  }
+
+  p{
+    margin-bottom:11px;
+  }
+
+  .download-icon{
+    background-color: #88bc47;
+    border-radius:100%;
+    text-align:center;
+    vertical-align:middle;
+    width:24px;
+    height:24px;
+    display:table-cell;
+
+    i{
+      color:#FFFFFF;
+    }
+  }
+
+  .card-plain{
+    min-height:250px;
+  }
+}
+
+.payments-description-section{
+
+  .row{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    padding:65px;
+    border-bottom:solid 1px #f7f7f7;
+
+    &:last-child{
+      border-bottom:none;
+      margin-bottom:80px;
+    }
+
+    .icon{
+      font-size:71px;
+      color:#88bc47;
+      padding-right:60px;
+    }
+
+    .title{
+      font-size: 60px;
+      font-weight: 200;
+      line-height: 1.05;
+      max-width:373px;
+    }
+
+    .description{
+      max-width:520px;
+      padding-left:30px;
+    }
+
+  }
+
+}
+
+.press-release-dropdown{
+  background-repeat:no-repeat;
+  background-position:center left 14px;
+  max-width:370px;
+  padding:0px 20px 0px 44px;
+  background-color:#FFFFFF;
+
+
+  select{
+    color:#FFFFFF;
+    font-size: 12px;
+    line-height: 2;
+    text-align: left;
+    color: #a7abbe;
+    border:none;
+    width:100%;
+    height:44px;
+    -webkit-appearance: menulist;
+    -moz-appearance: menulist;
+    appearance: menulist;
+
+    &:focus{
+      outline:none;
+    }
+  }
+}
+
+.press-release-section{
+
+  .report-section-heading{
+    margin-bottom:80px;
+
+    h2{
+      font-size: 38px;
+      font-weight: 200;
+      line-height: 1.42;
+      text-align:center;
+      margin-bottom:0px;
+    }
+
+    p{
+      font-weight: 300;
+      line-height: 1.71;
+      text-align:center;
+    }
+  }
+
+  ul{
+    li{
+      &:first-child{
+        .download-item{
+            border-top: 1px solid #e4e5ec;
+        }
+      }
+    }
+  }
+
+  .download-item {
+
+    font-weight: 400;
+    padding: 5px 10px;
+    border-bottom: 1px solid #e4e5ec;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+}
+
+  .download-btn {
+    padding: 9px 30px;
+    border-radius: 100px;
+    background-color: #88bc47;
+    color: #ffffff;
+    font-weight: 400;
+    font-size: 12px;
+    display: inline-block;
+    float: right;
+  }
+
+  ul{
+    list-style: none;
+    padding: 0 15px;
+    max-width:870px;
+    margin:0 auto;
+    margin-top: 30px;
+  }
+
+  &__download-date {
+    color: #88bc47;
+    font-size: 1.2rem;
+    text-align: left;
+    text-transform: uppercase;
+  }
+  @media (max-width: 850px)
+  {
+      &__download-date { 
+          text-align:center;
+          margin-bottom:4px;
+      }
+  }
+}
+
+.faq-section{
+
+  .main-title{
+    font-size: 54px;
+    font-weight: 200;
+    line-height: 1.33;
+  }
+
+  .faq-item{
+    display:flex;
+    justify-content:space-between;
+    margin:30px 0px;
+    background-color:#FFFFFF;
+    padding:20px;
+    border-radius:4px;
+    border-left:15px solid #d8d8d8;
+    position:relative;
+
+    &.active{
+      border-left:15px solid #88bc47;
+
+      .download-icon{
+        transform:rotate(180deg);
+      }
+    }
+
+    .download-icon{
+      background-color: #88bc47;
+      border-radius:100%;
+      text-align:center;
+      vertical-align:middle;
+      width:24px;
+      height:24px;
+      position:absolute;
+      top:10px;
+      right:10px;
+      cursor:pointer;
+
+      i{
+        color:#FFFFFF;
+        margin-top:6px;
+      }
+    }
+
+    .item-content{
+
+      .title{
+        font-size: 18px;
+        color:#464855;
+        font-weight:400;
+        margin-bottom:17px;
+      }
+
+      .content{
+        font-size: 14px;
+        font-weight: 300;
+        line-height: 1.71;
+        text-align: left;
+        color: #6b6f82;
+        padding:0px 5px;
+        display:none;
+      }
+    }
+
+  }
+
+}
+
+.connect-online-section{
+  h3{
+    font-size: 54px;
+    font-weight: 200;
+    line-height: 1.33;
+    text-align: left;
+    color: #464855;
+    margin-bottom:30px;
+  }
+
+  .icon{
+    width:42px;
+    height:42px;
+    margin-bottom:16px;
+
+    .icon-repayment{
+      font-size:42px;
+      color:#88bc47;
+    }
+  }
+
+  .title{
+    font-size: 16px;
+    font-weight: 400;
+    margin-bottom:23px;
+  }
+
+  p{
+    margin-bottom:11px;
+  }
+
+  .download-icon{
+    background-color: #88bc47;
+    border-radius:100%;
+    text-align:center;
+    vertical-align:middle;
+    width:24px;
+    height:24px;
+    display:table-cell;
+
+    i{
+      color:#FFFFFF;
+    }
+  }
+
+  .card-plain{
+    min-height:300px;
+    padding:20px 30px;
+  }
+}
+
+.cost-container{
+  background-color:#002b60;
+  color:#FFFFFF;
+  text-align:center;
+
+  .campaign-apply{
+    padding-bottom:0px;
+  }
+
+  h2{
+    color:#FFFFFF;
+    margin-top:40px;
+  }
+
+  .cost-header{
+    .row{
+      display:flex;
+      justify-content:center;
+
+      .col-sm-6{
+        max-width:270px;
+
+        .body-content{
+          color:#FFFFFF;
+        }
+      }
+    }
+
+    .icon{
+      .icon-repayment{
+        font-size: 53px;
+        color: #88bc47;
+      }
+    }
+  }
+}
+
+.campaign-more-container{
+  &.features-container{
+    background-color:#FFFFFF;
+
+    .hover-block{
+      background-color:#002b60;
+    }
+
+    .mega-tabs .nav-tabs > li.campaign-more{
+      width:100%;
+
+      a{
+        color:#002b60;
+      }
+    }
+
+    .container{
+      background-color:#f7f7f7;
+
+      .tab-content{
+        .row{
+          display:flex;
+          flex-wrap:wrap;
+          padding:0px 15px;
+
+          .col-sm-4{
+            padding-bottom:30px;
+
+            .title{
+              min-height:70px;
+            }
+
+            p{
+              margin-top:10px;
+            }
+          }
+        }
+      }
+    }
+
+  }
+}
+
+@media screen and (max-width: 850px){
+
+  .faq-section .main-title{
+    font-size:47px;
+    margin-left:15px;
+  }
+
+  .signup-container .signup-inside{
+    flex-wrap:wrap;
+  }
+
+  .signup-container .signup-inside .signup-form, .signup-container .signup-inside .signup-heading, .signup-container .signup-inside h2{
+    width:100% !important;
+  }
+
+  .text-container{
+    padding:10px;
+  }
+
+  .press-release-section.investor .investor-dropdown .dropdown-label, .press-release-section.investor .investor-dropdown .dropdown-label{
+    text-align:left !important;
+  }
+
+  .press-release-section.investor .investor-dropdown .dropdown-label, .press-release-section.investor .investor-dropdown .dropdown-label .dmtn-year{
+    text-align:center !important;
+  }
+
+  .campaign-more-container.features-container .container .tab-content .row .col-sm-4{
+    width:100%;
+  }
+
+  .press-release-dropdown{
+    max-width:100%;
+  }
+
+  .press-release-section .download-item{
+    flex-wrap:wrap;
+    display:block;
+    padding:20px;
+    text-align:center;
+
+    .col-sm-9{
+        width:100%;
+    }
+
+    .col-sm-3{
+        width:100%;
+    }
+    .col-sm-7 {
+        width:100%;
+    }
+    .col-sm-2 {
+        width:100%;
+    }
+  }
+
+  .press-release-section .download-btn{
+    float:none;
+    margin-top:20px;
+  }
+
+  .card-plain{
+    max-width:100% !important;
+  }
+
+  .payments-description-section .row{
+    flex-wrap:wrap;
+    padding-left:20px;
+    padding-right:20px;
+    text-align:center;
+
+    div{
+      width:100%;
+    }
+
+    .description{
+      padding:0px;
+    }
+
+    .title{
+      padding:0px;
+      max-width:100%;
+      font-size:50px;
+      margin-bottom:20px;
+    }
+
+    .icon{
+      padding-right:0px;
+    }
+  }
+}
+
+
