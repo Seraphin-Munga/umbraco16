@@ -101,8 +101,13 @@ The old `Web/` code lives in `legacy/` so the port happens in this repo. It is *
 the solution and does not build** (`System.Web` / .NET Framework). See `legacy/README.md`
 for the folder→port-target map. Static front-end assets (css/js/fonts/images,
 `Common.JS.Library`) were copied into `src/AcfAfricanbank.Web/wwwroot/` and are served
-as-is. ~149 views and ~431 `.cs` files are staged for porting once ModelsBuilder can
+as-is. ~431 `.cs` files are staged in `legacy/` for porting once ModelsBuilder can
 regenerate against the migrated doc types (Steps 5–6).
+
+The **~150 views** were copied straight into `src/AcfAfricanbank.Web/Views/` (not
+`legacy/`) — still v8 syntax, don't render yet, but Razor isn't build-compiled so the
+solution stays green. Scaffolded Umbraco partials (`_ViewImports`, `Partials/blockgrid`,
+`Partials/blocklist`) were preserved.
 
 ### Remaining steps — Option A (DB upgrade chain)
 

@@ -10,8 +10,14 @@ Framework / `System.Web` code that cannot compile against .NET 9 / Umbraco 16.
 | `Helpers/` | 8 helpers (Search, ViewModel, UmbracoSections, Cache, Resource, Config…) | `src/…/Services` or `src/AcfAfricanbank.Core` — most depend on ModelsBuilder output |
 | `Models/` | 22 hand models + subfolders + **366 generated** ModelsBuilder files | hand models → port; generated → **regenerate** from the migrated doc types |
 | `Entities/`, `Extensions/`, `Handlers/`, `CustomValidators/`, `App_Start/` | misc support | port case-by-case |
-| `Views/` | ~149 `.cshtml` | `src/AcfAfricanbank.Web/Views/` — `@inherits` + namespace changes, Grid → Block Grid |
 | `App_Plugins/CustomUmbracoDashboard/` | AngularJS backoffice dashboard | **full rewrite** as a v16 Web-Components package |
+
+Views are **not** here — the ~150 `.cshtml` were copied straight into
+`src/AcfAfricanbank.Web/Views/` (their real location). They still carry v8 syntax
+(`@inherits Umbraco.Web.Mvc.UmbracoViewPage<...>`, `Umbraco.Web.PublishedModels`,
+`@Html.GetGridHtml`, macro partials) and will not render until ported: `@inherits` +
+namespace changes per file, Grid → Block Grid, macros removed. Razor isn't compiled on
+build, so they don't break `dotnet build`.
 | `Global.asax.cs` | app startup / events | `IComposer` + `INotificationHandler<T>` |
 | `web.config`, `packages.config` | old config / package list | `appsettings.json` + `<PackageReference>` (see MIGRATION.md package map) |
 
