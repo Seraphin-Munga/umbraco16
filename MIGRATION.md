@@ -8,32 +8,43 @@
 | Runtime | .NET Framework 4.7.2 | .NET 9 |
 | Project style | packages.config, non-SDK csproj | SDK-style, `<PackageReference>` |
 | Backoffice | AngularJS | Lit / TypeScript Web Components |
-| Database | `MDWSQL2016\SQL01` / `Umbraco8_AB_CMS_13Nov` (leave untouched) | `MTWSQL2019\SQL01` / `DTData` (empty / brand new) |
-| DB migration strategy | — | **Fresh rebuild + content sync — content move is the LAST step** |
+| Database | `MDWSQL2016\SQL01` / `Umbraco8_AB_CMS_13Nov` (leave untouched) | `MTWSQL2019\SQL01` / `DTData` = **a restored copy of the v8 DB** |
+| DB migration strategy | — | **Option A — run Umbraco's DB upgrade chain on a copy (8.18 → 10 → 16)** |
 
-`DTData` is a new empty database — Umbraco 16 does a first-time install and builds the v16
-schema itself. The v8 database is never connected to by the new app. SQL login auth
-(username + password); credentials live in **user-secrets**, not in any committed file.
+`DTData` must be **seeded with a restore of `Umbraco8_AB_CMS_13Nov`** (DBA action). The
+Umbraco 16 app then runs migrations that transform that data to the v16 schema — all
+content, doc types, data types, media references, members, dictionary, languages,
+redirects carry over. The live v8 DB is never touched. Auth: Windows Integrated (no SQL
+login); connection string in user-secrets.
 
 Old solution stays in place at `../Platform` for reference throughout.
 
-## Strategy decision
+## Strategy decision — Option A (chosen 2026-09-10)
 
-We are **not** running the Umbraco 8→10 database upgrade chain. Instead:
+**In-place upgrade of the v8 project is impossible** (different runtime, different web
+framework, CMS was rewritten at v9). So: migrate the **database** up the version chain,
+and port the **code** into the new v16 project on top of the migrated schema.
 
-1. Build a clean Umbraco 16 solution.
-2. Recreate document types / data types / templates by hand (or via uSync).
-3. Port all server code and views.
-4. Rewrite the two backoffice customizations.
-5. **Only at the end:** migrate real content + media from the v8 SQL Server DB
-   (test run first, then a final sync at go-live).
+1. Upgrade a **restored copy** of the v8 DB to the latest Umbraco 8 (**8.18.x**) — required
+   baseline for the v10 migration.
+2. Migrate that DB to **Umbraco 10** using HQ's "Migrate from Umbraco 8" guide.
+3. Point the **Umbraco 16** project at the v10 DB; let it run all 10→16 migrations on boot.
+4. Copy the `media` folder across; rebuild Examine indexes.
+5. Port code (controllers, views, ModelsBuilder models, backoffice) against the now-migrated
+   content. No doc types recreated by hand — they come across in the DB.
+
+### Environment required for the DB steps
+- A **Windows machine on the corp network** (Integrated Auth to `MTWSQL2019\SQL01`; also
+  needed to run the .NET Framework v8.18 app for step 1).
+- `DTData` (or another DB) **restored from the v8 backup** — DBA action.
+- The v8 `media` folder from the live server.
 
 ## Status
 
 ### Done — Step 1: solution scaffold
 - [x] `AcfAfricanbank.sln` created
-- [x] `src/AcfAfricanbank.Web` — `dotnet new umbraco` (Umbraco.Cms 16.5.1, net9.0, SQLite for local dev)
-- [x] `src/AcfAfricanbank.Core` — net9.0 class library, references `Umbraco.Cms.Web.Common` 16.5.1
+- [x] `src/AcfAfricanbank.Web` — `dotnet new umbraco` (Umbraco.Cms 16.5.1, net9.0)
+- [x] `src/AcfAfricanbank.Core` — net9.0 class library, references `Umbraco.Cms.Web.Website` 16.5.1
 - [x] Web project references Core
 - [x] `dotnet build` succeeds (1 warning: NU1902 moderate advisory on Umbraco.Cms 16.5.1 — latest 16.x patch, no action available)
 - [x] App boots on .NET 9 and serves the installer (`GET /` and `GET /umbraco` → 200)
@@ -54,23 +65,17 @@ provider = Microsoft.Data.SqlClient
 ### BLOCKER — cannot connect from the current dev machine
 This Mac is **not domain-joined, has no Kerberos config, and cannot even resolve
 `MTWSQL2019`** (not on the corp network / no VPN). Integrated Security from .NET on
-macOS needs all of:
-1. Network route to the server (corp LAN or VPN) + DNS resolution
-2. `/etc/krb5.conf` with the AD realm
-3. A ticket: `kinit you@AD.REALM` (verify with `klist`)
-4. For the named instance `\SQL01`: SQL Browser (UDP 1434) reachable, or a fixed port +
-   a registered SPN (`MSSQLSvc/mtwsql2019.<domain>:SQL01`)
+macOS needs a network route to the server, `/etc/krb5.conf` with the AD realm, a ticket
+(`kinit you@AD.REALM`), and — for the named instance `\SQL01` — SQL Browser (UDP 1434)
+reachable or a fixed port + SPN.
 
-**Recommended:** run every DB-connected step (installer, the migration chain, content
-import) from a **Windows machine on the corp network**, where the domain account "just
-works" — which is exactly what the DBA described. Use the Mac for code only.
-Alternatives: configure Kerberos on the Mac (fiddly with named instances), or go back to
-the DBA for a contained SQL login.
+**All DB steps run on a Windows box on the corp network.** The Mac is code-only.
 
-Nothing here blocks continued code porting (Steps 4–6, 10).
-
-On first boot against an empty `DTData`: complete the installer at `/umbraco`, or add an
-`Umbraco:CMS:Unattended:InstallUnattended` block (git-ignored dev file only).
+### Outstanding requests to the DBA / infra
+- [ ] Restore `Umbraco8_AB_CMS_13Nov` as **`DTData`** on `MTWSQL2019\SQL01` (or give a
+  name to use), granting the dev account `db_owner` on it.
+- [ ] Provide a copy of the live `~/media` folder from the v8 web server.
+- [ ] Confirm the AD realm / domain for Kerberos, if any Mac-side connection is wanted later.
 
 ### Done — Step 2: ported `AcfAfricanbank.Core`
 `Umbraco.Cms.Web.Website` 16.5.1 package ref added. Solution builds clean (0 warnings in Core).
@@ -91,27 +96,52 @@ Follow-ups for the Web port:
 - callers of `MobileDetection.IsMobileDevice()` must now resolve it from DI (inject into
   controller / `@inject` in views) instead of calling it statically.
 
-- [ ] **Step 3 — Recreate doc types / data types / templates** in v16 (native tabs replace `Our.Umbraco.DocTypeFieldsets`)
-- [ ] **Step 4 — Port controllers** (`../Platform/Web/Controllers/`, ~15):
+### Remaining steps — Option A (DB upgrade chain)
+
+The two tracks run in parallel once the DBA has restored `DTData`; the code track lands
+on top of the migrated schema.
+
+#### Database track (Windows + corp network)
+- [ ] **Step 3 — v8 copy → Umbraco 8.18** (on `DTData` copy)
+  - Take the old `../Platform` solution, update `UmbracoCms` 8.2.1 → 8.18.x, point it at
+    the `DTData` copy, run once so it migrates the DB to the 8.18 schema. Back up after.
+  - Pre-clean datatypes that use editors with no v10 handler (`RDA.ImagePicker`,
+    DocTypeFieldsets, EzSearch): either install a v10-compatible build or switch those
+    datatypes to a built-in editor **before** the v10 step.
+- [ ] **Step 4 — DB migration to Umbraco 10** (HQ "Migrate from Umbraco 8" guide)
+  - New throwaway Umbraco 10 project → point at the 8.18 `DTData` → `Umbraco:CMS:Unattended:UpgradeUnattended=true` → boot → migrations transform schema+data to v10.
+  - Resolve migration errors (unknown property editors, packages). Verify content tree,
+    media, members in the v10 backoffice.
+- [ ] **Step 5 — DB migration 10 → 16**
+  - Point `src/AcfAfricanbank.Web` (this repo) at the v10 `DTData`, `UpgradeUnattended=true`,
+    boot → runs all 10→16 migrations in one pass. Verify backoffice loads.
+  - Copy the v8 `media` folder into `src/AcfAfricanbank.Web/wwwroot/media`.
+  - Rebuild Examine indexes.
+
+#### Code track (Mac, on top of the migrated DB)
+- [ ] **Step 6 — Regenerate ModelsBuilder models** from the migrated doc types (set mode to
+  SourceCode; models replace the v8 `Web/Models/*.generated.cs`). Reattach custom partials.
+- [ ] **Step 7 — Port controllers** (`../Platform/Web/Controllers/`, ~15):
   QuickLoans, Error, NewsletterFormSurface, CustomUmbracoDashboard, InvestmentCalculator,
   GenericFormSurface, Custom, Home, DocumentUpload, JSONWriter, Enterprise,
   UnsubscribeNewsletterFormSurface, SearchSurface
   - `SurfaceController` / `RenderMvcController` → `RenderController`, new DI ctors
   - `UmbracoApiController` → removed in v14+; use plain ASP.NET Core `[ApiController]`
   - `Global.asax.cs` + `Helpers/ApplicationStartup.cs` → `IComposer` + `INotificationHandler<T>`
-- [ ] **Step 5 — Port views** (~150 `.cshtml`; no `.master`/`.ascx` in v16)
-  - `@inherits` base class + namespace changes in every file
-  - `_ViewImports.cshtml` for global usings
-  - legacy Grid (`@Html.GetGridHtml`) → Block Grid if used
-- [ ] **Step 6 — Regenerate ModelsBuilder models** (delete v8 `Web/Models/*.generated.cs`, set mode, regenerate, reattach custom partials)
-- [ ] **Step 7 — Backoffice rewrites** (AngularJS → Web Components):
+- [ ] **Step 8 — Port views** (~150 `.cshtml`; no `.master`/`.ascx` in v16)
+  - `@inherits` base class + namespace changes in every file; `_ViewImports.cshtml` usings
+  - legacy Grid (`@Html.GetGridHtml`) → still renders in v13 but **removed in v14+**; the
+    10→16 migration will surface this. Convert Grid content to Block Grid.
+- [ ] **Step 9 — Backoffice rewrites** (AngularJS → Web Components):
   - `App_Plugins/CustomUmbracoDashboard`
-  - `RdaImagePicker` property editor
-- [ ] **Step 8 — Package replacements** (see table below)
-- [ ] **Step 9 — Config**: `web.config` + `connectionStrings.config` → `appsettings.json` (`Umbraco:CMS:*`); keep minimal `web.config` for IIS/ANCM
-- [ ] **Step 10 — Test projects** (4 in old solution) → port to `Umbraco.Cms.Tests.*` base classes
-- [ ] **Step 11 — Content + media migration** (last): v8 SQL Server → v16, test run then go-live sync
+  - `RdaImagePicker` property editor (or remap its datatype to Media Picker 3 in Step 3)
+- [ ] **Step 10 — Package replacements** (see table below) + config: `web.config` /
+  `connectionStrings.config` → `appsettings.json` (`Umbraco:CMS:*`); keep minimal
+  `web.config` for IIS/ANCM
+- [ ] **Step 11 — Test projects** (4 in old solution) → port to `Umbraco.Cms.Tests.*` base classes
 - [ ] **Step 12 — Build/deploy**: `dotnet publish` + ASP.NET Core Hosting Bundle on IIS; update CI
+- [ ] **Step 13 — Go-live**: re-run Steps 3–5 on a **fresh** restore of the (by-then-current)
+  v8 production DB so no editor changes are lost, then cut over.
 
 ## Package replacement map
 
@@ -133,8 +163,14 @@ Follow-ups for the Web port:
 
 ## Known blockers / decisions still open
 
-- Confirm whether the v8 site uses the legacy **Grid** editor (drives Step 5 scope).
-- Inventory third-party Umbraco packages beyond DocTypeFieldsets / EzSearch (check `Web/App_Plugins` and `Web/bin` on the live box).
-- Decide uSync vs. manual for doc-type recreation (Step 3) and content move (Step 11).
-- `RdaImagePicker` — decide whether to rebuild as a custom editor or replace with the
-  native Media Picker 3 + adjust converters/templates.
+- **DBA:** restore `Umbraco8_AB_CMS_13Nov` → `DTData` + `db_owner` for the dev; hand over
+  the v8 `media` folder. (Nothing on the DB track can start until this exists.)
+- **Windows box on the corp network** for Steps 3–5 (runs the v8.18 app + Integrated Auth).
+- Confirm whether the v8 site uses the legacy **Grid** editor — it blocks the 10→16 step
+  (Grid removed in v14) and drives Step 8 scope.
+- Inventory third-party Umbraco packages / property editors on the live box
+  (`Web/App_Plugins`, `Web/bin`) so datatypes referencing dead editors are cleaned in Step 3.
+- `RDA.ImagePicker` — decide before Step 3: install a v10-compatible build, or remap that
+  datatype to Media Picker 3 (simpler, then Step 9 just drops the custom editor).
+- Umbraco version to migrate *through*: 8.18 → 10 is mandated; 10 → 16 in one boot is the
+  plan — fall back to 10 → 13 (LTS) → 16 if the single jump throws.
