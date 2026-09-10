@@ -8,14 +8,19 @@
 | Runtime | .NET Framework 4.7.2 | .NET 9 |
 | Project style | packages.config, non-SDK csproj | SDK-style, `<PackageReference>` |
 | Backoffice | AngularJS | Lit / TypeScript Web Components |
-| Database | `MDWSQL2016\SQL01` / `Umbraco8_AB_CMS_13Nov` (leave untouched) | `MTWSQL2019\SQL01` / `DTData` = **a restored copy of the v8 DB** |
+| Database | `MDWSQL2016\SQL01` / `Umbraco8_AB_CMS_13Nov` (leave untouched) | `MTWSQL2019\SQL01` / `Umbraco16_AB_CMS_10Sept` |
+| DB auth | SQL login `UmbracoDev` | SQL login `UmbracoDev` (same) — provider `Microsoft.Data.SqlClient` |
 | DB migration strategy | — | **Option A — run Umbraco's DB upgrade chain on a copy (8.18 → 10 → 16)** |
 
-`DTData` must be **seeded with a restore of `Umbraco8_AB_CMS_13Nov`** (DBA action). The
-Umbraco 16 app then runs migrations that transform that data to the v16 schema — all
-content, doc types, data types, media references, members, dictionary, languages,
-redirects carry over. The live v8 DB is never touched. Auth: Windows Integrated (no SQL
-login); connection string in user-secrets.
+For Option A, `Umbraco16_AB_CMS_10Sept` must be **seeded with a restore of
+`Umbraco8_AB_CMS_13Nov`** before the v16 app runs against it. The Umbraco 16 app then runs
+migrations that transform that data to the v16 schema — all content, doc types, data
+types, media references, members, dictionary, languages, redirects carry over. The live v8
+DB is never touched.
+
+Connection string is in **user-secrets** on each dev machine (not committed):
+`Server=MTWSQL2019\SQL01;Database=Umbraco16_AB_CMS_10Sept;User Id=UmbracoDev;Password=…;TrustServerCertificate=True;Encrypt=True`
+plus `umbracoDbDSN_ProviderName = Microsoft.Data.SqlClient`.
 
 Old solution stays in place at `../Platform` for reference throughout.
 
@@ -36,7 +41,7 @@ and port the **code** into the new v16 project on top of the migrated schema.
 ### Environment required for the DB steps
 - A **Windows machine on the corp network** (Integrated Auth to `MTWSQL2019\SQL01`; also
   needed to run the .NET Framework v8.18 app for step 1).
-- `DTData` (or another DB) **restored from the v8 backup** — DBA action.
+- `Umbraco16_AB_CMS_10Sept` **restored from the v8 backup** — DBA action (if not already).
 - The v8 `media` folder from the live server.
 
 ## Status
@@ -49,33 +54,26 @@ and port the **code** into the new v16 project on top of the migrated schema.
 - [x] `dotnet build` succeeds (1 warning: NU1902 moderate advisory on Umbraco.Cms 16.5.1 — latest 16.x patch, no action available)
 - [x] App boots on .NET 9 and serves the installer (`GET /` and `GET /umbraco` → 200)
 
-### Done — Database target wired (auth: Windows Integrated)
-DBA rule: **no SQL login is issued** — connect with your own Windows domain account
-(Integrated Security). Connection string is set in user-secrets:
-
-```
-Server=MTWSQL2019\SQL01;Database=DTData;Integrated Security=true;TrustServerCertificate=True;Encrypt=True
-provider = Microsoft.Data.SqlClient
-```
+### Done — Database target wired (SQL login)
+Target DB: `MTWSQL2019\SQL01` / **`Umbraco16_AB_CMS_10Sept`**, SQL login `UmbracoDev`.
+Stored in user-secrets on the dev machine (not committed); provider updated from the v8
+config's `System.Data.SqlClient` → **`Microsoft.Data.SqlClient`** (required for v16).
 
 - [x] SQLite dev DB removed
-- [x] `dotnet user-secrets init` + connection string stored (no credentials in it)
+- [x] `dotnet user-secrets set` — connection string + provider name
 - [x] `appsettings.Development.json` carries no connection string
 
-### BLOCKER — cannot connect from the current dev machine
-This Mac is **not domain-joined, has no Kerberos config, and cannot even resolve
-`MTWSQL2019`** (not on the corp network / no VPN). Integrated Security from .NET on
-macOS needs a network route to the server, `/etc/krb5.conf` with the AD realm, a ticket
-(`kinit you@AD.REALM`), and — for the named instance `\SQL01` — SQL Browser (UDP 1434)
-reachable or a fixed port + SPN.
+Note: the DB password was shared in plain text; consider rotating it after the migration.
 
-**All DB steps run on a Windows box on the corp network.** The Mac is code-only.
+### BLOCKER — cannot connect from the current dev machine
+This Mac cannot resolve `MTWSQL2019` (home network, no VPN / corp LAN). Auth is now a SQL
+login so no Kerberos is needed — any machine **with a network route to the server** can
+connect. Until this Mac is on the corp network/VPN, DB steps run on a machine that is.
 
 ### Outstanding requests to the DBA / infra
-- [ ] Restore `Umbraco8_AB_CMS_13Nov` as **`DTData`** on `MTWSQL2019\SQL01` (or give a
-  name to use), granting the dev account `db_owner` on it.
+- [ ] Restore `Umbraco8_AB_CMS_13Nov` → **`Umbraco16_AB_CMS_10Sept`** on `MTWSQL2019\SQL01`
+  (unless it is already seeded), with `UmbracoDev` granted `db_owner`.
 - [ ] Provide a copy of the live `~/media` folder from the v8 web server.
-- [ ] Confirm the AD realm / domain for Kerberos, if any Mac-side connection is wanted later.
 
 ### Done — Step 2: ported `AcfAfricanbank.Core`
 `Umbraco.Cms.Web.Website` 16.5.1 package ref added. Solution builds clean (0 warnings in Core).
