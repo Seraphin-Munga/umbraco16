@@ -109,22 +109,22 @@ solution stays green. Scaffolded Umbraco partials (`_ViewImports`, `Partials/blo
 
 ### Remaining steps — Option A (DB upgrade chain)
 
-The two tracks run in parallel once the DBA has restored `DTData`; the code track lands
+The two tracks run in parallel once the DBA has restored `Umbraco16_AB_CMS_10Sept`; the code track lands
 on top of the migrated schema.
 
 #### Database track (Windows + corp network)
-- [ ] **Step 3 — v8 copy → Umbraco 8.18** (on `DTData` copy)
+- [ ] **Step 3 — v8 copy → Umbraco 8.18** (on `Umbraco16_AB_CMS_10Sept` copy)
   - Take the old `../Platform` solution, update `UmbracoCms` 8.2.1 → 8.18.x, point it at
-    the `DTData` copy, run once so it migrates the DB to the 8.18 schema. Back up after.
+    the `Umbraco16_AB_CMS_10Sept` copy, run once so it migrates the DB to the 8.18 schema. Back up after.
   - Pre-clean datatypes that use editors with no v10 handler (`RDA.ImagePicker`,
     DocTypeFieldsets, EzSearch): either install a v10-compatible build or switch those
     datatypes to a built-in editor **before** the v10 step.
 - [ ] **Step 4 — DB migration to Umbraco 10** (HQ "Migrate from Umbraco 8" guide)
-  - New throwaway Umbraco 10 project → point at the 8.18 `DTData` → `Umbraco:CMS:Unattended:UpgradeUnattended=true` → boot → migrations transform schema+data to v10.
+  - New throwaway Umbraco 10 project → point at the 8.18 `Umbraco16_AB_CMS_10Sept` → `Umbraco:CMS:Unattended:UpgradeUnattended=true` → boot → migrations transform schema+data to v10.
   - Resolve migration errors (unknown property editors, packages). Verify content tree,
     media, members in the v10 backoffice.
 - [ ] **Step 5 — DB migration 10 → 16**
-  - Point `src/AcfAfricanbank.Web` (this repo) at the v10 `DTData`, `UpgradeUnattended=true`,
+  - Point `src/AcfAfricanbank.Web` (this repo) at the v10 `Umbraco16_AB_CMS_10Sept`, `UpgradeUnattended=true`,
     boot → runs all 10→16 migrations in one pass. Verify backoffice loads.
   - Copy the v8 `media` folder into `src/AcfAfricanbank.Web/wwwroot/media`.
   - Rebuild Examine indexes.
@@ -174,7 +174,7 @@ on top of the migrated schema.
 
 ## Known blockers / decisions still open
 
-- **DBA:** restore `Umbraco8_AB_CMS_13Nov` → `DTData` + `db_owner` for the dev; hand over
+- **DBA:** restore `Umbraco8_AB_CMS_13Nov` → `Umbraco16_AB_CMS_10Sept` + `db_owner` for the dev; hand over
   the v8 `media` folder. (Nothing on the DB track can start until this exists.)
 - **Windows box on the corp network** for Steps 3–5 (runs the v8.18 app + Integrated Auth).
 - Confirm whether the v8 site uses the legacy **Grid** editor — it blocks the 10→16 step
