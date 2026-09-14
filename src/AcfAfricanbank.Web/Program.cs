@@ -780,6 +780,62 @@ if (args.Length > 0 &&
     }
 
     // ========================================================
+    // STEP 5B
+    // PUBLISH CONTENT
+    // ========================================================
+    //
+    // contentService.Save() above only ever writes a draft. Umbraco does
+    // not serve draft content on the live site, so without this step
+    // every migrated page 404s despite existing in the content tree.
+    // contentMap was populated in parent-before-child order (STEP 4), and
+    // Dictionary preserves insertion order in practice, so iterating it
+    // publishes parents before their children.
+
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine("STEP 5B - PUBLISH CONTENT");
+    Console.WriteLine("=================================================");
+
+    var publishedCount = 0;
+
+    foreach (var targetKey in contentMap.Values)
+    {
+        try
+        {
+            var content =
+                contentService.GetById(targetKey);
+
+            if (content == null || content.Published)
+            {
+                continue;
+            }
+
+            var publishResult =
+                contentService.Publish(content, new[] { "*" });
+
+            if (publishResult.Success)
+            {
+                publishedCount++;
+            }
+            else
+            {
+                Console.WriteLine(
+                    $"FAILED PUBLISH: {targetKey} - " +
+                    $"{publishResult.Result}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(
+                $"ERROR PUBLISH {targetKey}: " +
+                ex.Message);
+        }
+    }
+
+    Console.WriteLine(
+        $"Published {publishedCount} of {contentMap.Count} content items.");
+
+    // ========================================================
     // STEP 6
     // DICTIONARY
     // ========================================================
