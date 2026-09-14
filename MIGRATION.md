@@ -65,6 +65,18 @@ config's `System.Data.SqlClient` → **`Microsoft.Data.SqlClient`** (required fo
 
 Note: the DB password was shared in plain text; consider rotating it after the migration.
 
+### Local Windows dev DB (separate from the migration target)
+A teammate is developing on a **Windows machine**, using **LocalDB** as a personal
+sandbox — committed directly in `appsettings.json`:
+```
+Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco16_AB_CMS_10Sept.mdf;Integrated Security=True
+```
+LocalDB is Windows-only (won't run on the Mac). This is a **fresh, empty** LocalDB file —
+running the project against it does a normal first-time v16 install, not a migration.
+It's unrelated to the real `MTWSQL2019\Umbraco16_AB_CMS_10Sept` target used for the actual
+8→10→16 database migration (Steps 3–5), which still needs to happen on a machine that can
+reach that server.
+
 ### BLOCKER — cannot connect from the current dev machine
 This Mac cannot resolve `MTWSQL2019` (home network, no VPN / corp LAN). Auth is now a SQL
 login so no Kerberos is needed — any machine **with a network route to the server** can
