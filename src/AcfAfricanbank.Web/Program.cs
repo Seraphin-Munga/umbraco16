@@ -871,33 +871,117 @@ static async Task<List<SourceDataType>> GetDataTypesAsync(
 {
     var result = new List<SourceDataType>();
 
-    const string sql = """
-        SELECT
-            dt.nodeId,
-            ISNULL(dt.propertyEditorAlias, ''),
-            ISNULL(n.text, '')
-        FROM cmsDataType dt
-        INNER JOIN umbracoNode n
-            ON n.id = dt.nodeId
-        ORDER BY dt.nodeId
+    // Table/column naming for this drifted a version or two ago (this DB
+    // has no cmsDataType, unlike the otherwise-matching cmsContentType /
+    // cmsPropertyType / cmsPropertyTypeGroup). Discover the real names via
+    // INFORMATION_SCHEMA instead of hardcoding another guess, and never
+    // let a schema surprise here take down the rest of the migration.
+    try
+    {
+        var tableName =
+            await ResolveSchemaNameAsync(
+                connection,
+                view: "TABLES",
+                nameColumn: "TABLE_NAME",
+                tableFilter: null,
+                candidates: ["cmsDataType", "umbracoDataType"]);
+
+        if (tableName == null)
+        {
+            Console.WriteLine(
+                "WARNING: no data type table found " +
+                "(tried cmsDataType, umbracoDataType) - " +
+                "properties will be created without a matched editor.");
+
+            return result;
+        }
+
+        var editorAliasColumn =
+            await ResolveSchemaNameAsync(
+                connection,
+                view: "COLUMNS",
+                nameColumn: "COLUMN_NAME",
+                tableFilter: tableName,
+                candidates: ["propertyEditorAlias", "editorAlias"])
+            ?? "propertyEditorAlias";
+
+        var sql =
+            $"""
+            SELECT
+                dt.nodeId,
+                ISNULL(dt.{editorAliasColumn}, ''),
+                ISNULL(n.text, '')
+            FROM {tableName} dt
+            INNER JOIN umbracoNode n
+                ON n.id = dt.nodeId
+            ORDER BY dt.nodeId
+            """;
+
+        await using var command =
+            new SqlCommand(sql, connection);
+
+        await using var reader =
+            await command.ExecuteReaderAsync();
+
+        while (await reader.ReadAsync())
+        {
+            result.Add(
+                new SourceDataType(
+                    reader.GetInt32(0),
+                    reader.GetString(1),
+                    reader.GetString(2)));
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(
+            $"WARNING: could not read data types ({ex.Message}) - " +
+            "properties will be created without a matched editor.");
+    }
+
+    return result;
+}
+
+
+static async Task<string?> ResolveSchemaNameAsync(
+    SqlConnection connection,
+    string view,
+    string nameColumn,
+    string? tableFilter,
+    string[] candidates)
+{
+    var paramNames =
+        candidates
+            .Select((_, i) => $"@p{i}")
+            .ToArray();
+
+    var whereTable =
+        tableFilter != null
+            ? "TABLE_NAME = @table AND "
+            : string.Empty;
+
+    var sql =
+        $"""
+        SELECT TOP 1 {nameColumn}
+        FROM INFORMATION_SCHEMA.{view}
+        WHERE {whereTable}{nameColumn} IN ({string.Join(",", paramNames)})
+        ORDER BY {nameColumn}
         """;
 
     await using var command =
         new SqlCommand(sql, connection);
 
-    await using var reader =
-        await command.ExecuteReaderAsync();
-
-    while (await reader.ReadAsync())
+    if (tableFilter != null)
     {
-        result.Add(
-            new SourceDataType(
-                reader.GetInt32(0),
-                reader.GetString(1),
-                reader.GetString(2)));
+        command.Parameters.AddWithValue("@table", tableFilter);
     }
 
-    return result;
+    for (var i = 0; i < candidates.Length; i++)
+    {
+        command.Parameters.AddWithValue(paramNames[i], candidates[i]);
+    }
+
+    return (await command.ExecuteScalarAsync()) as string;
 }
 
 
