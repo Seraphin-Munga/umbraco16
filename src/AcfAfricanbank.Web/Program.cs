@@ -240,13 +240,35 @@ if (args.Length > 0 &&
                             ? fileService.GetTemplate(masterAlias)
                             : null;
 
+                    // v8 templates are files on disk, not a DB column - the
+                    // matching .cshtml was already copied into this
+                    // project's own Views/ folder.
+                    var viewPath =
+                        Path.Combine(
+                            app.Environment.ContentRootPath,
+                            "Views",
+                            $"{sourceTemplate.Alias}.cshtml");
+
+                    var design =
+                        System.IO.File.Exists(viewPath)
+                            ? await System.IO.File.ReadAllTextAsync(viewPath)
+                            : string.Empty;
+
+                    if (!System.IO.File.Exists(viewPath))
+                    {
+                        Console.WriteLine(
+                            $"NOTE    : {sourceTemplate.Alias} " +
+                            $"- no matching Views/{sourceTemplate.Alias}.cshtml, " +
+                            "created empty.");
+                    }
+
                     var newTemplate =
                         fileService.CreateTemplateWithIdentity(
                             string.IsNullOrWhiteSpace(sourceTemplate.Name)
                                 ? sourceTemplate.Alias
                                 : sourceTemplate.Name,
                             sourceTemplate.Alias,
-                            sourceTemplate.Design,
+                            design,
                             masterTemplate);
 
                     templateMap[sourceTemplate.NodeId] =
@@ -884,18 +906,21 @@ static async Task<List<SourceTemplate>> GetTemplatesAsync(
 {
     var result = new List<SourceTemplate>();
 
+    // This Umbraco 8 instance stores templates as files on disk
+    // (~/Views/{alias}.cshtml) - cmsTemplate only has nodeId/alias, no
+    // master/design columns. The master/child relationship lives in the
+    // ordinary umbracoNode parent-child tree instead.
     const string sql = """
         SELECT
             t.nodeId,
             ISNULL(t.alias, ''),
             ISNULL(n.text, ''),
-            t.master,
-            ISNULL(t.design, '')
+            n.parentId
         FROM cmsTemplate t
         INNER JOIN umbracoNode n
             ON n.id = t.nodeId
         ORDER BY
-            CASE WHEN t.master IS NULL THEN 0 ELSE 1 END,
+            n.level,
             t.nodeId
         """;
 
@@ -907,18 +932,35 @@ static async Task<List<SourceTemplate>> GetTemplatesAsync(
 
     while (await reader.ReadAsync())
     {
+        var parentId =
+            reader.IsDBNull(3)
+                ? (int?)null
+                : reader.GetInt32(3);
+
         result.Add(
             new SourceTemplate(
                 reader.GetInt32(0),
                 reader.GetString(1),
                 reader.GetString(2),
-                reader.IsDBNull(3)
-                    ? null
-                    : reader.GetInt32(3),
-                reader.GetString(4)));
+                parentId is > 0
+                    ? parentId
+                    : null));
     }
 
-    return result;
+    // A template's parent node is only a "master" if that parent is
+    // itself a template - it may just be the generic templates root.
+    var templateNodeIds =
+        result
+            .Select(x => x.NodeId)
+            .ToHashSet();
+
+    return result
+        .Select(x =>
+            x.MasterId.HasValue &&
+            templateNodeIds.Contains(x.MasterId.Value)
+                ? x
+                : x with { MasterId = null })
+        .ToList();
 }
 
 
@@ -1258,8 +1300,7 @@ record SourceTemplate(
     int NodeId,
     string Alias,
     string Name,
-    int? MasterId,
-    string Design);
+    int? MasterId);
 
 record SourceDocumentTypeTemplate(
     int ContentTypeNodeId,
