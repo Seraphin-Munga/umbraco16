@@ -242,12 +242,21 @@ if (args.Length > 0 &&
 
             var typeParentId = -1;
 
-            if (sourceType.ParentId > 0 &&
-                containerMap.TryGetValue(
-                    sourceType.ParentId,
-                    out var typeParentContainer))
+            if (sourceType.ParentId > 0)
             {
-                typeParentId = typeParentContainer.Id;
+                if (containerMap.TryGetValue(
+                        sourceType.ParentId,
+                        out var typeParentContainer))
+                {
+                    typeParentId = typeParentContainer.Id;
+                }
+                else
+                {
+                    Console.WriteLine(
+                        $"NOTE    : {sourceType.Alias} - source folder " +
+                        $"{sourceType.ParentId} wasn't migrated, " +
+                        "creating at root instead.");
+                }
             }
 
             var contentType =
@@ -282,6 +291,97 @@ if (args.Length > 0 &&
         {
             Console.WriteLine(
                 $"ERROR CONTENT TYPE {sourceType.NodeId}: " +
+                ex.Message);
+        }
+    }
+
+    // ========================================================
+    // STEP 1B2
+    // CONTENT TYPE COMPOSITIONS
+    // ========================================================
+    //
+    // A content type can pull in shared property sets from separate
+    // "composition" content types (cmsContentType2ContentType: each row's
+    // childContentTypeId composes in parentContentTypeId's properties).
+    // Composition content types already get created above like any other
+    // content type, along with their own direct properties in STEP 3 - but
+    // without this link, composing types never show those properties, since
+    // Umbraco has no other way to know PageHome (say) also uses them.
+
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine("STEP 1B2 - CONTENT TYPE COMPOSITIONS");
+    Console.WriteLine("=================================================");
+
+    var sourceCompositions =
+        await GetContentTypeCompositionsAsync(source);
+
+    Console.WriteLine(
+        $"Found {sourceCompositions.Count} composition links.");
+
+    foreach (var composition in sourceCompositions)
+    {
+        try
+        {
+            if (!contentTypeMap.TryGetValue(
+                    composition.ChildNodeId,
+                    out var childAlias))
+            {
+                Console.WriteLine(
+                    $"SKIP COMPOSITION {composition.ChildNodeId}: " +
+                    "composing content type not migrated.");
+
+                continue;
+            }
+
+            if (!contentTypeMap.TryGetValue(
+                    composition.ParentNodeId,
+                    out var compositionAlias))
+            {
+                Console.WriteLine(
+                    $"SKIP COMPOSITION {childAlias}: " +
+                    $"composition {composition.ParentNodeId} not migrated.");
+
+                continue;
+            }
+
+            var childType =
+                contentTypeService.Get(childAlias);
+
+            var compositionType =
+                contentTypeService.Get(compositionAlias);
+
+            if (childType == null || compositionType == null)
+            {
+                continue;
+            }
+
+            if (childType.ContentTypeCompositionExists(compositionAlias))
+            {
+                Console.WriteLine(
+                    $"EXISTS COMPOSITION: {childAlias} -> {compositionAlias}");
+
+                continue;
+            }
+
+            if (!childType.AddContentType(compositionType))
+            {
+                Console.WriteLine(
+                    $"FAILED COMPOSITION: {childAlias} -> {compositionAlias} " +
+                    "(rejected - would create a cycle or alias clash).");
+
+                continue;
+            }
+
+            contentTypeService.Save(childType);
+
+            Console.WriteLine(
+                $"CREATED COMPOSITION: {childAlias} -> {compositionAlias}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(
+                $"ERROR COMPOSITION {composition.ChildNodeId}: " +
                 ex.Message);
         }
     }
@@ -1480,6 +1580,40 @@ static async Task<List<SourceContentTypeContainer>>
 }
 
 
+static async Task<List<SourceContentTypeComposition>>
+    GetContentTypeCompositionsAsync(
+        SqlConnection connection)
+{
+    var result = new List<SourceContentTypeComposition>();
+
+    // childContentTypeId is the composing type (e.g. PageHome);
+    // parentContentTypeId is the shared/composition type whose properties
+    // it pulls in (e.g. a "Composition Section" type).
+    const string sql = """
+        SELECT
+            childContentTypeId,
+            parentContentTypeId
+        FROM cmsContentType2ContentType
+        """;
+
+    await using var command =
+        new SqlCommand(sql, connection);
+
+    await using var reader =
+        await command.ExecuteReaderAsync();
+
+    while (await reader.ReadAsync())
+    {
+        result.Add(
+            new SourceContentTypeComposition(
+                reader.GetInt32(0),
+                reader.GetInt32(1)));
+    }
+
+    return result;
+}
+
+
 static async Task<List<SourceMedia>> GetMediaAsync(
     SqlConnection connection)
 {
@@ -1888,6 +2022,10 @@ record SourceContentTypeContainer(
     string Name,
     int Level,
     int SortOrder);
+
+record SourceContentTypeComposition(
+    int ChildNodeId,
+    int ParentNodeId);
 
 record SourceMedia(
     int NodeId,
