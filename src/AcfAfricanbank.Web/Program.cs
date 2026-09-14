@@ -797,9 +797,12 @@ if (args.Length > 0 &&
     Console.WriteLine("=================================================");
 
     var publishedCount = 0;
+    var processedCount = 0;
 
     foreach (var targetKey in contentMap.Values)
     {
+        processedCount++;
+
         try
         {
             var content =
@@ -829,6 +832,17 @@ if (args.Length > 0 &&
             Console.WriteLine(
                 $"ERROR PUBLISH {targetKey}: " +
                 ex.Message);
+        }
+
+        // Publishing does real per-item work (cache/index updates), so it's
+        // much slower than the earlier bulk-save steps - print progress
+        // regularly instead of going silent for a long, unpredictable time.
+        if (processedCount % 25 == 0 ||
+            processedCount == contentMap.Count)
+        {
+            Console.WriteLine(
+                $"... {processedCount}/{contentMap.Count} processed, " +
+                $"{publishedCount} published so far");
         }
     }
 
