@@ -1,6 +1,9 @@
+using System.Text.Json;
 using Microsoft.Data.SqlClient;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 
@@ -487,6 +490,182 @@ if (args.Length > 0 &&
         Console.WriteLine(
             $"ERROR LINKING TEMPLATES: {ex.Message}");
     }
+
+    // ========================================================
+    // STEP 1D
+    // MEDIA
+    // ========================================================
+    //
+    // Media (images/files/folders) lives in its own tree, unrelated to
+    // document types, so it's migrated independently. cmsContentType also
+    // stores the built-in media type definitions (Image, File, Folder, ...)
+    // - those already exist out of the box in Umbraco 16, so mediaTypeAlias
+    // is only used to find/create the matching type by alias, same as
+    // GetTemplatesAsync does for templates.
+    //
+    // The physical files live on disk under the v8 site's ~/media folder
+    // (sourceMediaRootPath below) - adjust that path if this doesn't run on
+    // the same machine/checkout as that folder.
+
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine("STEP 1D - MEDIA");
+    Console.WriteLine("=================================================");
+
+    var mediaService =
+        app.Services.GetRequiredService<IMediaService>();
+
+    var mediaFileManager =
+        app.Services.GetRequiredService<MediaFileManager>();
+
+    var mediaUrlGenerators =
+        app.Services.GetRequiredService<MediaUrlGeneratorCollection>();
+
+    var contentTypeBaseServiceProvider =
+        app.Services.GetRequiredService<IContentTypeBaseServiceProvider>();
+
+    var sourceMediaRootPath =
+        Path.Combine(
+            app.Environment.ContentRootPath,
+            "..", "..", "..",
+            "Platform", "Web", "Media");
+
+    var sourceMediaItems =
+        await GetMediaAsync(source);
+
+    Console.WriteLine(
+        $"Found {sourceMediaItems.Count} media items.");
+
+    var sourceMediaFileValues =
+        await GetMediaFileValuesAsync(source);
+
+    // Source Umbraco 8 media node ID -> target media item's int Id.
+    var mediaMap =
+        new Dictionary<int, int>();
+
+    var mediaCreatedCount = 0;
+    var mediaFileCopiedCount = 0;
+
+    foreach (var mediaItem in sourceMediaItems)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(mediaItem.MediaTypeAlias))
+            {
+                Console.WriteLine(
+                    $"SKIP MEDIA {mediaItem.NodeId}: " +
+                    "no media type alias.");
+
+                continue;
+            }
+
+            var mediaParentId = -1;
+
+            if (mediaItem.ParentId > 0)
+            {
+                if (!mediaMap.TryGetValue(
+                        mediaItem.ParentId,
+                        out var mappedParentId))
+                {
+                    Console.WriteLine(
+                        $"SKIP MEDIA {mediaItem.NodeId}: " +
+                        "parent not migrated.");
+
+                    continue;
+                }
+
+                mediaParentId = mappedParentId;
+            }
+
+            var media =
+                mediaService.CreateMedia(
+                    mediaItem.Name,
+                    mediaParentId,
+                    mediaItem.MediaTypeAlias);
+
+            if (sourceMediaFileValues.TryGetValue(
+                    mediaItem.NodeId,
+                    out var rawFileValue))
+            {
+                var relativePath =
+                    ExtractMediaSrc(rawFileValue);
+
+                if (!string.IsNullOrWhiteSpace(relativePath))
+                {
+                    var trimmedPath =
+                        relativePath.TrimStart('~').TrimStart('/');
+
+                    if (trimmedPath.StartsWith(
+                            "media/",
+                            StringComparison.OrdinalIgnoreCase))
+                    {
+                        trimmedPath =
+                            trimmedPath["media/".Length..];
+                    }
+
+                    var physicalPath =
+                        Path.Combine(
+                            sourceMediaRootPath,
+                            trimmedPath.Replace(
+                                '/',
+                                Path.DirectorySeparatorChar));
+
+                    if (System.IO.File.Exists(physicalPath))
+                    {
+                        await using var fileStream =
+                            System.IO.File.OpenRead(physicalPath);
+
+                        media.SetValue(
+                            mediaFileManager,
+                            mediaUrlGenerators,
+                            shortStringHelper,
+                            contentTypeBaseServiceProvider,
+                            "umbracoFile",
+                            Path.GetFileName(physicalPath),
+                            fileStream);
+
+                        mediaFileCopiedCount++;
+                    }
+                    else
+                    {
+                        Console.WriteLine(
+                            $"NOTE MEDIA {mediaItem.NodeId}: " +
+                            $"file not found at {physicalPath}");
+                    }
+                }
+            }
+
+            var mediaSaveResult =
+                mediaService.Save(media);
+
+            if (!mediaSaveResult.Success)
+            {
+                Console.WriteLine(
+                    $"FAILED MEDIA: {mediaItem.NodeId}");
+
+                continue;
+            }
+
+            mediaMap[mediaItem.NodeId] =
+                media.Id;
+
+            mediaCreatedCount++;
+
+            Console.WriteLine(
+                $"CREATED MEDIA: " +
+                $"{mediaItem.NodeId} -> {mediaItem.Name}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(
+                $"ERROR MEDIA {mediaItem.NodeId}: " +
+                ex.Message);
+        }
+    }
+
+    Console.WriteLine(
+        $"Created {mediaCreatedCount} of {sourceMediaItems.Count} " +
+        $"media items ({mediaFileCopiedCount} files copied).");
 
     // ========================================================
     // STEP 2
@@ -1205,6 +1384,13 @@ static async Task<List<SourceContentType>> GetContentTypesAsync(
 {
     var result = new List<SourceContentType>();
 
+    // cmsContentType holds document types, media types AND member types in
+    // the same table, distinguished only by the underlying node's object
+    // type - filter to "a2cb7800-f571-4787-9638-bc48539a0efb" (Umbraco's
+    // well-known Document Type GUID) so media types like the built-in
+    // "Image" (umbracoFile/umbracoWidth/...) don't get migrated here as if
+    // they were document types; they belong to IMediaTypeService instead.
+    //
     // Name comes from umbracoNode.text (the real display name shown in the
     // backoffice tree) rather than cmsContentType.description, which is a
     // separate, usually-empty free-text field. n.parentId identifies which
@@ -1220,6 +1406,7 @@ static async Task<List<SourceContentType>> GetContentTypesAsync(
         FROM cmsContentType ct
         INNER JOIN umbracoNode n
             ON n.id = ct.nodeId
+        WHERE n.nodeObjectType = 'a2cb7800-f571-4787-9638-bc48539a0efb'
         ORDER BY
             n.level,
             ct.nodeId
@@ -1290,6 +1477,127 @@ static async Task<List<SourceContentTypeContainer>>
     }
 
     return result;
+}
+
+
+static async Task<List<SourceMedia>> GetMediaAsync(
+    SqlConnection connection)
+{
+    var result = new List<SourceMedia>();
+
+    // "b796f64c-1f99-4ffb-b886-4bf4bc011a9c" is Umbraco's well-known Media
+    // object type GUID (as opposed to Document or Media Type). The media
+    // type alias (Image, File, Folder, or a custom one) comes from the same
+    // cmsContentType table content types use.
+    const string sql = """
+        SELECT
+            n.id,
+            ISNULL(n.parentId, -1),
+            ISNULL(ct.alias, ''),
+            ISNULL(n.text, ''),
+            n.level,
+            n.sortOrder
+        FROM umbracoNode n
+        INNER JOIN umbracoContent c
+            ON c.nodeId = n.id
+        INNER JOIN cmsContentType ct
+            ON ct.nodeId = c.contentTypeId
+        WHERE n.nodeObjectType = 'b796f64c-1f99-4ffb-b886-4bf4bc011a9c'
+        ORDER BY
+            n.level,
+            n.sortOrder,
+            n.id
+        """;
+
+    await using var command =
+        new SqlCommand(sql, connection);
+
+    await using var reader =
+        await command.ExecuteReaderAsync();
+
+    while (await reader.ReadAsync())
+    {
+        result.Add(
+            new SourceMedia(
+                reader.GetInt32(0),
+                reader.GetInt32(1),
+                reader.GetString(2),
+                reader.GetString(3),
+                reader.GetInt32(4),
+                reader.GetInt32(5)));
+    }
+
+    return result;
+}
+
+
+static async Task<Dictionary<int, string>> GetMediaFileValuesAsync(
+    SqlConnection connection)
+{
+    var result = new Dictionary<int, string>();
+
+    // The umbracoFile property holds either a plain relative path
+    // ("/media/1234/photo.jpg") or, when the Image Cropper editor is used,
+    // a JSON blob with a "src" field - ExtractMediaSrc handles both.
+    const string sql = """
+        SELECT
+            cv.nodeId,
+            pd.varcharValue,
+            pd.textValue
+        FROM umbracoPropertyData pd
+        INNER JOIN cmsPropertyType pt
+            ON pt.id = pd.propertytypeid
+        INNER JOIN umbracoContentVersion cv
+            ON cv.id = pd.versionId
+        WHERE pt.Alias = 'umbracoFile'
+        """;
+
+    await using var command =
+        new SqlCommand(sql, connection);
+
+    await using var reader =
+        await command.ExecuteReaderAsync();
+
+    while (await reader.ReadAsync())
+    {
+        var nodeId = reader.GetInt32(0);
+
+        var value =
+            reader.IsDBNull(1)
+                ? (reader.IsDBNull(2) ? null : reader.GetString(2))
+                : reader.GetString(1);
+
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            result[nodeId] = value;
+        }
+    }
+
+    return result;
+}
+
+
+static string? ExtractMediaSrc(string raw)
+{
+    var trimmed = raw.TrimStart();
+
+    if (trimmed.StartsWith('{'))
+    {
+        try
+        {
+            using var document = JsonDocument.Parse(raw);
+
+            return document.RootElement.TryGetProperty("src", out var srcProperty)
+                ? srcProperty.GetString()
+                : null;
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+    }
+
+    return raw;
 }
 
 
@@ -1577,6 +1885,14 @@ record SourceContentType(
 record SourceContentTypeContainer(
     int NodeId,
     int ParentId,
+    string Name,
+    int Level,
+    int SortOrder);
+
+record SourceMedia(
+    int NodeId,
+    int ParentId,
+    string MediaTypeAlias,
     string Name,
     int Level,
     int SortOrder);

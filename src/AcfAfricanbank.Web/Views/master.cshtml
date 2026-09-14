@@ -2,7 +2,7 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @using ContentModels = Umbraco.Cms.Web.Common.PublishedModels
 @inject AcfAfricanbank.Core.Utilities.ResourceHelper ResourceHelper
-@inject Umbraco.Cms.Core.PropertyEditors.IVariationContextAccessor VariationContextAccessor
+@inject Umbraco.Cms.Core.Models.PublishedContent.IVariationContextAccessor VariationContextAccessor
 @inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 
 @{
@@ -141,7 +141,7 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
     // Classic HttpCookie multi-value ("Value=x&Other=y") had no direct
     // equivalent in ASP.NET Core's flat string cookies - parse it manually.
     var userSettings = "";
-    var africanBankCookie = Request.Cookies["AfricanBank"];
+    var africanBankCookie = Context.Request.Cookies["AfricanBank"];
     if (!string.IsNullOrEmpty(africanBankCookie))
     {
         var valuePair = africanBankCookie
@@ -155,9 +155,15 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
         }
     }
 
-    var utm_source = Request.Query["utm_source"].ToString();
-    var utm_medium = Request.Query["utm_medium"].ToString();
-    var utm_campaign = Request.Query["utm_campaign"].ToString();
+    var utm_source = Context.Request.Query["utm_source"].ToString();
+    var utm_medium = Context.Request.Query["utm_medium"].ToString();
+    var utm_campaign = Context.Request.Query["utm_campaign"].ToString();
+
+    // Any querystring (tracking params, etc.) marks the page noindex below
+    // so tracked-link variants of a URL don't get indexed as duplicates.
+    var query = Context.Request.QueryString.Value ?? string.Empty;
+
+    var url = Model.Url(mode: UrlMode.Absolute);
 }
 
 
@@ -708,7 +714,6 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
     </noscript>
     <script async src="https://cdn.ampproject.org/v0.js"></script>
 
-    @Styles.Render("~/bundles/styles")
     <script>
         // This code is only used to remember theme selection between page loads
         //const themeSwitch = document.querySelector('.theme-switch');
