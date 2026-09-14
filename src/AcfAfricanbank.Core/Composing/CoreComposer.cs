@@ -13,5 +13,7 @@ public class CoreComposer : IComposer
     public void Compose(IUmbracoBuilder builder)
     {
         builder.Services.AddScoped<MobileDetection>();
+        builder.Services.AddMemoryCache();
+        builder.Services.AddScoped<ResourceHelper>();
     }
 }

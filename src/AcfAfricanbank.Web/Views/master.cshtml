@@ -1,9 +1,9 @@
 ﻿<!DOCTYPE html>
-@inherits Umbraco.Web.Mvc.UmbracoViewPage
-@using ContentModels = Umbraco.Web.PublishedModels
-@using Umbraco.Core
-@using Web.Helpers;
-@using System.Web.Optimization
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels
+@inject AcfAfricanbank.Core.Utilities.ResourceHelper ResourceHelper
+@inject Umbraco.Cms.Core.PropertyEditors.IVariationContextAccessor VariationContextAccessor
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 
 @{
 
@@ -13,7 +13,7 @@
     ContentModels.PageHome home = Model.Root() as ContentModels.PageHome;
     var colorTheme = "#002b60";
     var font = "arial";
-    var allKids = Model.Children.ToList();
+    var allKids = Model.Children(VariationContextAccessor).ToList();
     ContentModels.CallMeBack floatingForm = null;
     var currentPage = Umbraco.AssignedContentItem;
 
@@ -35,9 +35,9 @@
         foreach (var t in allKids)
         {
 
-            if (t.Children.Where(c => c is ContentModels.CallMeBack).Any())
+            if (t.Children(VariationContextAccessor).Where(c => c is ContentModels.CallMeBack).Any())
             {
-                floatingForm = (ContentModels.CallMeBack)t.Children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+                floatingForm = (ContentModels.CallMeBack)t.Children(VariationContextAccessor).Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
                 break;
             }
         }
@@ -67,17 +67,17 @@ var prodID = floatingForm?.Value("productID") ?? "";
 var check_open = floatingForm?.Value<bool>("callMeBackDifferentLocation");
 
 HomePageElements homePageElements = null;
-if (Model.Children.Where(o => o is HomePageElements).FirstOrDefault() != null)
+if (Model.Children(VariationContextAccessor).Where(o => o is HomePageElements).FirstOrDefault() != null)
 {
-    homePageElements = (HomePageElements)Model.Children.Where(o => o is HomePageElements).FirstOrDefault();
+    homePageElements = (HomePageElements)Model.Children(VariationContextAccessor).Where(o => o is HomePageElements).FirstOrDefault();
 }
-else if (Model.Parent.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault() != null)
+else if (Model.Parent.Parent.Children(VariationContextAccessor).Where(o => o is HomePageElements).FirstOrDefault() != null)
 {
-    homePageElements = (HomePageElements)Model.Parent.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+    homePageElements = (HomePageElements)Model.Parent.Parent.Children(VariationContextAccessor).Where(o => o is HomePageElements).FirstOrDefault();
 }
 else
 {
-    homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+    homePageElements = (HomePageElements)Model.Parent.Children(VariationContextAccessor).Where(o => o is HomePageElements).FirstOrDefault();
 }
 
 // var disclaimersData = homePageElements.Children.Where(o => o.ContentType.Alias == "ebankITListSectionText").ToList();
@@ -100,17 +100,17 @@ else
 //}
 
 
-var heroBodyBlog = (HeroBody)homePageElements.Children.Where(x => x is HeroBody).FirstOrDefault();
-var heroBodyBlogLink = heroBodyBlog.Children.Where(x => x.ContentType.Alias.ToLower() == "link").FirstOrDefault();
+var heroBodyBlog = (HeroBody)homePageElements.Children(VariationContextAccessor).Where(x => x is HeroBody).FirstOrDefault();
+var heroBodyBlogLink = heroBodyBlog.Children(VariationContextAccessor).Where(x => x.ContentType.Alias.ToLower() == "link").FirstOrDefault();
 
-Umbraco.Web.Models.Link itemLink = null;
-foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)((Link)heroBodyBlogLink).UrlLink)
+Umbraco.Cms.Core.Models.Link itemLink = null;
+foreach (var link in (IEnumerable<Umbraco.Cms.Core.Models.Link>)((Link)heroBodyBlogLink).UrlLink)
 {
     itemLink = link;
     break;
 }
 
-var bottomNavigation = (BottomNavigation)homePageElements.Children.Where(c => c is BottomNavigation).FirstOrDefault();
+var bottomNavigation = (BottomNavigation)homePageElements.Children(VariationContextAccessor).Where(c => c is BottomNavigation).FirstOrDefault();
 //var CacheVersion = "ver=" + AfricanBank.Cms.Portal.Helpers.CacheFactory.CacheVersion();
 var seo_title = Model.Value("title_tag"); //Umbraco.Field("title_tag");
 var seo_description = Model.Value("descrition_tag");
@@ -127,9 +127,9 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
         twitter_default_image = Model.Value("image").ToString();
     }
     //check if blog image exist
-    if (Model.Children.Where(c => c is BlogDetailsElements).FirstOrDefault() != null)
+    if (Model.Children(VariationContextAccessor).Where(c => c is BlogDetailsElements).FirstOrDefault() != null)
     {
-        var headerItem = Model.Children.Where(c => c is BlogDetailsElements).FirstOrDefault().Children.Where(x => x is HeroHeaderBlogDetail).FirstOrDefault();
+        var headerItem = Model.Children(VariationContextAccessor).Where(c => c is BlogDetailsElements).FirstOrDefault().Children(VariationContextAccessor).Where(x => x is HeroHeaderBlogDetail).FirstOrDefault();
 
         ContentModels.Image imageData = (ContentModels.Image)headerItem.Value("Image");
         if (imageData != null)
@@ -138,20 +138,26 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
         }
     }
 
-    var url = Request.Url.OriginalString.Trim();
-    var uri = new Uri(url);
-
-    var query = HttpUtility.ParseQueryString(uri.Query);
-
+    // Classic HttpCookie multi-value ("Value=x&Other=y") had no direct
+    // equivalent in ASP.NET Core's flat string cookies - parse it manually.
     var userSettings = "";
-    if (Request.Cookies["AfricanBank"] != null)
+    var africanBankCookie = Request.Cookies["AfricanBank"];
+    if (!string.IsNullOrEmpty(africanBankCookie))
     {
-        userSettings = Request.Cookies["AfricanBank"]["Value"];
+        var valuePair = africanBankCookie
+            .Split('&', StringSplitOptions.RemoveEmptyEntries)
+            .Select(p => p.Split('=', 2))
+            .FirstOrDefault(p => p.Length == 2 && p[0] == "Value");
+
+        if (valuePair != null)
+        {
+            userSettings = valuePair[1];
+        }
     }
 
-    var utm_source = Request.Params["utm_source"];
-    var utm_medium = Request.Params["utm_medium"];
-    var utm_campaign = Request.Params["utm_campaign"];
+    var utm_source = Request.Query["utm_source"].ToString();
+    var utm_medium = Request.Query["utm_medium"].ToString();
+    var utm_campaign = Request.Query["utm_campaign"].ToString();
 }
 
 
@@ -181,7 +187,7 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
     <meta name="twitter:creator" content="@Html.Raw("@")AfricanBank" />
     <meta name="twitter:title" content="African Bank | @seo_title.ToString()" />
     <meta name="twitter:description" content="@seo_description" />
-    <meta name="twitter:image" content="@System.Configuration.ConfigurationManager.AppSettings["site_domain"]@twitter_default_image" />
+    <meta name="twitter:image" content="@Configuration["site_domain"]@twitter_default_image" />
 
     <meta property="og:title" content="African Bank | @seo_title.ToString()" />
     <meta property="og:type" content="article" />
@@ -189,7 +195,7 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
 
     <meta property="og:url" content="@Model.Url(mode: UrlMode.Absolute)" />
     <meta property="og:description" content="@seo_description" />
-    <meta property="og:image" content="@System.Configuration.ConfigurationManager.AppSettings["site_domain"]@twitter_default_image" />
+    <meta property="og:image" content="@Configuration["site_domain"]@twitter_default_image" />
 
 
     <!-- Google Tag Manager -->
@@ -896,8 +902,8 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
 
     <script defer type="text/javascript" src="~/scripts/mobile.min.js?ver=@CacheVersion"></script>
     <script defer type="text/javascript">
-        $.rootPath = '@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.Mobile.URL"]';
-        $.headers = { "ITSAPP-DEVICE": "@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.ITSAPP-DEVICE"]", "ITSAPP-LANG": '', "ITSAPP-DEVICEID": '*' };
+        $.rootPath = '@Configuration["ebankit.Portal.Services.Mobile.URL"]';
+        $.headers = { "ITSAPP-DEVICE": "@Configuration["ebankit.Portal.Services.ITSAPP-DEVICE"]", "ITSAPP-LANG": '', "ITSAPP-DEVICEID": '*' };
     </script>
     <script type="text/javascript" src="/scripts/web3.js"></script>
 
