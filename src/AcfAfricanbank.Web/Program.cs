@@ -610,9 +610,13 @@ if (args.Length > 0 &&
     // is only used to find/create the matching type by alias, same as
     // GetTemplatesAsync does for templates.
     //
-    // The physical files live on disk under the v8 site's ~/media folder
-    // (sourceMediaRootPath below) - adjust that path if this doesn't run on
-    // the same machine/checkout as that folder.
+    // The physical files live on disk under the v8 site's ~/media folder.
+    // Set "Migration:SourceMediaRootPath" in appsettings/user-secrets to an
+    // absolute path on whichever machine runs `migrate` - there's no way to
+    // guess this reliably across machines. Falls back to assuming this repo
+    // checkout sits next to a sibling `Platform` checkout of the old v8
+    // solution (i.e. "../../../Platform/Web/Media" from this project), which
+    // only holds on some dev setups.
 
     Console.WriteLine();
     Console.WriteLine("=================================================");
@@ -632,10 +636,26 @@ if (args.Length > 0 &&
         app.Services.GetRequiredService<IContentTypeBaseServiceProvider>();
 
     var sourceMediaRootPath =
+        builder.Configuration["Migration:SourceMediaRootPath"] ??
         Path.Combine(
             app.Environment.ContentRootPath,
             "..", "..", "..",
             "Platform", "Web", "Media");
+
+    if (!Directory.Exists(sourceMediaRootPath))
+    {
+        Console.WriteLine();
+        Console.WriteLine("*************************************************");
+        Console.WriteLine("WARNING: source media folder not found at:");
+        Console.WriteLine($"  {Path.GetFullPath(sourceMediaRootPath)}");
+        Console.WriteLine(
+            "No media files will be copied - items will be created " +
+            "with no umbracoFile value. Set \"Migration:SourceMediaRootPath\" " +
+            "in appsettings.json or user-secrets to the correct absolute " +
+            "path on this machine and re-run migrate.");
+        Console.WriteLine("*************************************************");
+        Console.WriteLine();
+    }
 
     var sourceMediaItems =
         await GetMediaAsync(source);
