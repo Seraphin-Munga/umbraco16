@@ -1,5 +1,2482 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageHome>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Umbraco.Web.Models
 @{
+    var homePage = Umbraco.Content("18275");
 	Layout = "Master.cshtml";
+	
 }
+
+@* the fun starts here *@
+<link rel="stylesheet" href="/css/projectmagic.css" /> 
+<link href="~/css/loan-calculator.css" rel="stylesheet" />
+
+
+<style>
+
+/*new css*/
+
+.p-0 {
+    padding: 0px !important;
+}
+
+.testimonial-section {
+      padding: 60px 15px;
+      background: linear-gradient(152deg, rgba(0,43,96,1) 33%, rgba(4,24,49,1) 51%);
+      text-align: center;
+    }
+
+    .testimonial {
+      background: #fff;
+      padding: 30px 20px;
+      margin-bottom: 30px;
+      border-radius: 30px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      height: 100%;
+    }
+
+    .testimonial img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin-bottom: 15px;
+    }
+
+    .testimonial h4 {
+      margin: 10px 0 5px;
+      font-weight: bold;
+      color: #112768 !important;
+    }
+
+    .testimonial p.title {
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+
+    .testimonial p.quote {
+      font-style: italic;
+    }
+    
+   .section-container {
+      display: flex;
+      padding: 50px 15px;
+    }
+
+    .text-slider-carousel {
+      width: 100%;
+      margin: 0px;
+      position: relative;
+    }
+
+    .text-slider-carousel .item {
+      padding: 30px 0px;
+    }
+
+    .carousel-indicators {
+      bottom: -40px;
+    }
+
+    .carousel-indicators li {
+      background-color: #ccc;
+      border: none;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .carousel-indicators .active {
+      background-color: #112768;
+    }
+
+    .slide-number {
+      position: absolute;
+      bottom: -25px;
+      left: 20px;
+      font-size: 1rem;
+      color: #666;
+    }
+    
+    .slide-number .current-slide {
+  font-size: 1.5rem; /* Bigger number */
+  color: #666;
+}
+
+.slide-number .divider,
+.slide-number .total-slides {
+  font-size: 1rem;
+}
+
+    .video-section {
+    display: flex;
+    align-items: center;
+    }
+
+    .video-placeholder {
+      position: relative;
+        cursor: pointer;
+      width: 100%;
+      border-radius: 29px;
+      background-color: #112768;
+    }
+    
+    .modal {
+    display: none;
+    overflow: hidden;
+    position: fixed;
+    top: 30% !important;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1050;
+    -webkit-overflow-scrolling: touch;
+    outline: 0;
+}
+
+    .video-placeholder img {
+      width: 100%;
+      height: auto;
+      display: block;
+      background-size: cover; /* Or: contain, 100% 100% */
+      background-position: center;
+      border-radius: 29px;
+    }
+
+    .video-placeholder .play-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 60px;
+      height: 60px;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .video-placeholder .play-btn:after {
+      content: '';
+      display: block;
+      width: 0;
+      height: 0;
+      border-left: 20px solid white;
+      border-top: 10px solid transparent;
+      border-bottom: 10px solid transparent;
+    }
+
+    .card-stack {
+      display:flex;
+      padding: 20px;
+      color: #fff;
+      font-size: 30px;
+      font-weight: 600;
+      border-radius: 29px;
+      margin-bottom: 15px;
+      height: 200px;
+      width: 100%;
+    }
+
+    .card-stack-bg-1{
+      background: #002B60;
+      
+    }
+    
+    .span-green {
+        color: #5dc300 !important;
+    }
+    
+    .image-skew {
+    display: flex;
+    align-items: center;
+    height: 395px;
+    width: 600px;
+    rotate: -11deg;
+    }
+
+    .centered-text {
+      display: flex;
+      align-items: center;
+    }
+
+    .card-stack-bg-2 {
+      background: #5DC300;
+    }    
+.mtb-60 {
+    margin: 60px 0;
+}
+
+.section-rounded-edge {
+    display: flex;
+    align-items: center;
+    padding-bottom: 40px;
+    width: 100%;
+    min-height: 800px;
+}
+
+.section-rounded-edge-3 {
+    display: flex;
+    align-items: center;
+    padding-bottom: 10px;
+    width: 100%;
+    min-height: 700px;
+}
+
+.tap-2-glass-image-holder {
+  max-height: 350px;
+  border-radius: 29px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.tap-2-glass-image-holder img {
+  width: 100%;
+  height: auto; /* preserve aspect ratio */
+  object-fit: cover;
+  border-radius: 29px;
+  display: block;
+}
+
+.section-rounded-edge-2 {
+    display: flex;
+    align-items: center;
+    padding-bottom: 40px;
+    width: 100%;
+    min-height: 350px;
+}
+
+.section-800 {
+    display: flex;
+    align-items: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    width: 100%;
+    min-height: 800px;
+}
+
+.bg-white {
+    background-color: #fff;
+}
+
+.row-eq-height {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.box {
+    display:flex;
+    flex-direction: column;
+    justify-content: space-between;
+  padding: 15px;
+  height: 100%;
+}
+
+.major-title {
+    font-weight: 200 !important;
+    font-size: 72px !important;
+}
+
+.span-major-title {
+    font-weight: 700 !important;
+    font-size: 72px !important;
+    font-style: italic !important;
+}
+    
+.align-items-end {
+    align-items: end;
+}
+
+
+.align-items-start {
+    align-items: flex-start;
+}
+
+.nav-modal-container .active {
+     text-decoration: none; 
+    color: #5dc300 0% 0%; !important;
+    text-wrap: nowrap;
+}
+.swiper {
+      width: 100%;
+      height: 100%;
+    }
+    .home-loan-calculator{
+    background-color: #8095AF;
+    margin: 15px;
+    border-radius: 29px;
+    width: 100%;
+       
+    } 
+.btn-brand-link{
+    font-weight: 600;
+    color: #5DC300;
+}
+
+
+    select {
+        text-align-last: center;
+        padding-right: 30px;
+    }
+    
+    select > option {
+        background: #fff !important;
+    }
+    
+    .calculator-wrap {
+        background: #fff;
+
+    }
+
+    .page-title {
+        text-align: left;
+        @*padding: 10px;
+        width: 90%;*@
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        z-index: 1;
+    }
+    
+    .i-container {
+       margin-left: auto;
+       margin-right: auto;
+       margin-top: 0px;
+       height: 150px;
+ 
+    }
+
+    .page-title h1 {
+      font-weight: 800;
+      color: #002B60;
+      margin-top: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .page-title h1 > span {
+        color: #1E9FF2;
+    }
+    
+    .page-title h3 {
+        font-size: 14px;
+        font-weight: bold;
+        line-height: 16px;
+        color: #011420;
+        padding: 0px 20px;
+    }
+    
+    .page-title h3 > span {
+        border-bottom: solid 3px #1E9FF2;
+    }
+    
+    .calculator-form > label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #011420;
+        margin-bottom: 0px;
+        width: 300px;
+        text-align: left;
+    }
+    
+    .calculator-form > input, .calculator-form > select {
+        padding: 0px 20px;
+        border-radius: 25px;
+        border: none;
+        outline: none;
+        -webkit-outline: none;
+        width: 100%;
+        height: 50px;
+        margin-top: 10px;
+        margin-bottom: 30px;
+        font-size: 24px;
+        
+    }
+    
+    .calculator-form input {
+        font-size: 24px;
+        font-weight: 300;
+        color: #000000;
+    }
+    
+    @*.calculator-form select {
+        font-size: 24px;
+        font-weight: 600;
+        color: #000000;
+        background: #fff;
+    }*@
+    
+.calculator-form > select {	
+	transition:0.35s;
+	background: #fff url("/media/1pzbuq4v/dropdown-select.svg") center;
+	background-position:93% 50%;
+	background-repeat: no-repeat;
+	-webkit-appearance: none;
+	color: #000000;
+	}
+
+.calculator-form > select.active{
+	transition:0.35s;
+	background: #fff url("/media/kw5nb3e2/dropdown-select-up.svg") center;
+	background-position:93% 50%;
+	background-repeat: no-repeat;
+	-webkit-appearance: none;
+}
+
+.calculator-form > select:hover {
+	cursor:pointer;
+	box-shadow: 0px 5px 5px #0000000a;
+}
+  
+
+.artwork {
+	text-align: center;
+	vertical-align: middle;
+	left:0;
+}
+
+.i-loader {
+	width: 100%;
+	text-align: center;
+	padding: 50px;
+	display: none;
+}
+
+.artwork  img{
+	width:260px
+}
+
+.calculator-form {
+	text-align:center;
+}
+
+.calculator-form > label {
+	font-family: 'Montserrat', sans-serif;
+	font-size: 14px;
+    font-weight: 900;
+    color: #002B60; 
+    margin-bottom: 0px;
+    width: 300px;
+    text-align: left;
+
+}
+.calculator-form input {
+	font-size:24px;
+	font-weight:900;
+	font-family: 'Montserrat', sans-serif;
+}
+
+.calculator-form > input::placeholder {
+	font-size:14px;
+	font-weight:500;
+}
+
+.calculator-form > input:focus {
+	transition:0.5s;
+	border: 2px solid #259CD8;
+	background: #fff;
+}
+
+
+button { cursor: pointer; text-transform:uppercase; }
+
+.primary-btn {
+
+	width: 220px;
+	transition: 0.5s;
+	background: #C4D82E;
+	padding: 15px 25px;
+	height: 50px;
+	border-radius: 25px;
+	text-align: center;
+	font-size: 14px;
+	font-weight: 500;
+cursor:pointer}
+
+.primary-btn a {
+		text-decoration: none;
+	color:#fff;
+}
+.primary-btn:hover{
+	transition: 0.5s;
+	background: #C4D82E;
+}
+
+.primary-ghost-btn {
+transition: 0.5s;
+    padding: 9px 14px;
+    width: 220px;
+    height: 50px;
+    border-radius: 25px;
+    margin: 10px auto;
+    font-size: 14px;
+    font-weight: 600;
+    outline: none;
+    -webkit-outline: none;
+    background: #C4D82E;
+    color: #fff;
+    text-transform: uppercase;
+	cursor: pointer;
+	
+}
+
+.primary-ghost-btn:hover {
+	transition: 0.5s;
+	background: #00285B;
+	color: #fff;
+	box-shadow: 0px 10px 20px #0000045;
+}
+
+.investment-results {margin-bottom: 35px;box-shadow: 0px 10px 14px #00000045; border-radius:10px; overflow: hidden; 
+position: absolute; left:-5000px}
+
+.your-return-chosen {
+	background: #fff;
+	padding:20px;
+	padding-bottom: 45px;
+}
+
+.your-return-chosen > h2 {
+	font-size: 18px;
+	font-weight: 900;
+	color: #23273C; 
+	margin-top: 20px;
+}
+
+.big-return {
+	font-size: 42px;
+	font-weight: 900;
+	color: #C4D82E;
+	    margin: 0px;
+    padding: 0;
+    line-height: 1;
+}
+
+.return-inv-term {
+	font-size: 16px;
+	font-weight: 500;
+	color: #23273C !important;
+}
+
+.other-returns {
+	padding:20px;
+	background: #F8F8F8;
+}
+
+.other-returns > h3 {
+	font-size: 16px;
+	font-weight: 700;
+	color: #000E16;
+	margin: 15px auto 20px;
+}
+.other-inv-title {
+	font-size: 14px;
+	font-weight: bold;
+	margin: 0px;
+	color: #000000 !important;
+}
+
+.big-return-other {
+	color: #C4D82E !important;
+	font-size:20px;
+	font-weight: bold;
+	margin: 0px;
+}
+.other-inv-term {
+	font-size: 12px;
+	font-weight: normal;
+	margin: 0px;
+	color: #011420 !important;
+	
+}
+
+.inv-other-ico {
+    float: left;
+    width: 62px;
+    margin-right: 10px;
+}
+
+.other-inv {
+	transition: 0.5s;
+	margin-bottom: 20px;cursor: pointer;
+}
+
+.other-inv:hover {
+	background: #00000009;
+	box-shadow: 0px 5px 10px #00000009;
+	padding: 2px;
+	transition: 0.5s;
+}
+
+.investment-calculator h3 {
+    color: #000000;
+}
+
+.big-return {
+    color: #C4D82E !important;
+ 
+}
+
+.loan-disclaimer {
+    text-align: left;
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+.terms-con > a {
+    float: left;
+    color: #000000;
+    font-size: 14px;
+}
+
+.col-xs-1 {
+    width: 10%;
+    margin-left: 15px;
+}
+
+.col-1 {
+    margin-top: -15px;
+    margin-bottom: 15px;
+    color: #000000;
+}
+
+.col-2 {
+    margin-top: -34px;
+    margin-bottom: 15px;
+    color: #000000;
+}
+
+.loan-range {
+    background: #002B60;
+}
+
+.loan-range:hover {
+    background-color: #002B60;
+}
+
+#input-Amount1 {
+    color: #0D1622;
+}
+
+#installment_calc1 {
+     color: #002B60;
+}
+
+@*//*@
+
+.investment-calculator p {
+    color: #212529 !important; 
+    font-size: 2.1rem;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+.hheader{
+	background: #EFEFEF url("investment -banner.svg");
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-attachment: fixed;
+	    height: 240px;
+    padding-top: 120px;
+}
+
+.loan-calc-wrap {	
+	text-align: center;
+	background: #FAFAFA;
+	padding: 15px;
+	border-radius: 10px;
+	box-shadow: 0px 10px 14px #0000000;
+}
+
+.flex-center-all{
+	display:flex;
+	align-items: center;
+}
+
+.page-title{
+	@*padding:25px;*@
+}
+
+.page-title h1 > span {
+	color:#1E9FF2;
+}
+
+.page-title h3 {
+	font-size: 14px;
+	font-weight: bold;
+	line-height: 16px;
+	color:#011420;
+	padding: 0px 20px;
+}
+
+.page-title h3 > span {
+	border-bottom: solid 3px #1E9FF2;
+	
+}
+
+.arrow-right {
+    color: #5dc300 !important;
+}
+
+.card-offer {
+    background-color: #fff;
+}
+
+.calculator-wrap {
+	background: #EFEFEF url("/media/txqc2lob/money-icons-desktop-bg.svg");
+	background-size: contain;
+	background-attachment: scroll;
+	background-repeat: no-repeat;
+	background-position: 20% 50%;
+	z-index: -1;
+    @*position: absolute;*@
+    width: 100%;
+    margin-top: -500px;
+    padding-top: 360px;
+}
+
+.investment-calculator{
+	margin:100px auto;
+	background: none;
+	padding-left: 0px;
+    padding-right: 0px;
+}
+
+.artwork {
+	text-align: center;
+	vertical-align: middle;
+	left:0;
+}
+
+.loader {
+	width: 100%;
+	text-align: center;
+	padding: 50px;
+	display: none;
+}
+
+.artwork  img{
+	width:260px
+}
+
+
+.calculator-form > label {
+	
+	font-size: 18px;
+    font-weight: bold;
+    color: #002b60;
+    margin-bottom: 0px;
+    width: 100%;
+    text-align: left;
+
+}
+.calculator-form input {
+	font-size:21px;
+	font-weight:bold;
+}
+
+.calculator-form > input::placeholder {
+	font-size:14px;
+	font-weight:600;
+	color: #696969;
+}
+
+
+.calculator-form > input:focus {
+	transition:0.5s;
+	border: 2px solid #259CD8;
+}
+
+
+button { cursor: pointer;}
+
+.primary-btn {
+
+	width: 220px;
+	transition: 0.5s;
+	background: #88BC47;
+	padding: 15px 25px;
+	height: 50px;
+	border-radius: 25px;
+	text-align: center;
+	font-size: 14px;
+	font-weight: 500;
+    cursor:pointer
+}
+
+.primary-btn a {
+		text-decoration: none;
+	color:#fff;
+}
+.primary-btn:hover{
+	transition: 0.5s;
+	background: #65922B;
+}
+
+.primary-ghost-btn {
+transition: 0.5s;
+    border: solid 2px #88bc47;
+    padding: 9px 14px;
+    width: 220px;
+    height: 50px;
+    border-radius: 25px;
+    margin: 10px auto;
+    font-size: 14px;
+    font-weight: 600;
+    outline: none;
+    -webkit-outline: none;
+    background: #88bc47;
+    color: #fff;
+	cursor: pointer;
+}
+
+.primary-ghost-btn:hover {
+	transition: 0.5s;
+	background: #88bc47;
+	color: #fff;
+	box-shadow: 0px 10px 20px #0000045;
+}
+
+.investment-results {margin-bottom: 35px;box-shadow: 0px 10px 14px #00000045; border-radius:10px; overflow: hidden; 
+position: absolute; left:-5000px}
+
+.your-return-chosen {
+	background: #fff;
+	padding:20px;
+	padding-bottom: 45px;
+}
+
+.your-return-chosen > h2 {
+	font-size: 18px;
+	font-weight: 900;
+	color: #23273C; 
+	margin-top: 20px;
+}
+
+.big-return {
+	font-size: 42px;
+	font-weight: 900;
+	color: #C4D82E;
+	    margin: 0px;
+    padding: 0;
+    line-height: 1;
+}
+
+.return-inv-term {
+	font-size: 16px;
+	font-weight: 500;
+	color: #23273C;
+}
+
+.other-returns {
+	padding:20px;
+	background: #F8F8F8;
+}
+
+.other-returns > h3 {
+	font-size: 16px;
+	font-weight: 700;
+	color: #000E16;
+	margin: 15px auto 20px;
+}
+.other-inv-title {
+	font-size: 14px;
+	font-weight: bold;
+	margin: 0px;	
+}
+
+.big-return-other {
+	color: #C4D82E;
+	font-size:20px;
+	font-weight: bolder;
+	margin: 0px;
+}
+.other-inv-term {
+	font-size: 12px;
+	font-weight: normal;
+	margin: 0px;
+	
+}
+
+.inv-other-ico {
+    float: left;
+    width: 62px;
+    margin-right: 10px;
+}
+
+.other-inv {
+	transition: 0.5s;
+	margin-bottom: 20px;cursor: pointer;
+}
+
+.other-inv:hover {
+	background: #00000009;
+	box-shadow: 0px 5px 10px #00000009;
+	padding: 2px;
+	transition: 0.5s;
+}
+
+.your-return-chosen {
+	background: #fff;
+	padding:20px;
+	padding-bottom: 45px;
+}
+
+.your-return-chosen > h2 {
+	font-size: 18px;
+	font-weight: 900;
+	color: #23273C; 
+	margin-top: 20px;
+}
+
+.big-return {
+	font-size: 42px;
+	font-weight: 900;
+	color: #C4D82E;
+	margin: 0px;
+    padding: 0;
+    line-height: 1;
+}
+
+.return-inv-term {
+	font-size: 16px;
+	font-weight: 500;
+	color: #23273C !important;
+}
+
+.other-returns {
+	padding:20px;
+	background: #F8F8F8;
+}
+
+.other-returns > h3 {
+	font-size: 16px;
+	font-weight: 700;
+	color: #000E16;
+	margin: 15px auto 20px;
+}
+.other-inv-title {
+	font-size: 14px;
+	font-weight: bold;
+	margin: 0px;
+	color: #000000 !important;
+}
+
+.big-return-other {
+	color: #C4D82E !important;
+	font-size:20px;
+	font-weight: bold;
+	margin: 0px;
+}
+.other-inv-term {
+	font-size: 12px;
+	font-weight: normal;
+	margin: 0px;
+	color: #011420 !important;
+	
+}
+
+    .cta-button {
+        text-align: center;
+    }
+    
+
+.inv-other-ico {
+    float: left;
+    width: 62px;
+    margin-right: 10px;
+}
+
+.other-inv {
+	transition: 0.5s;
+	margin-bottom: 20px;cursor: pointer;
+}
+
+.other-inv:hover {
+	background: #00000009;
+	box-shadow: 0px 5px 10px #00000009;
+	padding: 2px;
+	transition: 0.5s;
+}
+
+.investment-calculator h3 {
+    color: #000000;
+}
+
+.big-return {
+    color: #C4D82E !important;
+ 
+}
+
+.loan-disclaimer {
+    text-align: left;
+    font-size: 14px !important;
+    color: 	#808080 !important;
+    margin-top: 15px;
+}
+
+.terms-con > a {
+    float: left;
+    color: #000000;
+    font-size: 14px;
+    margin-top: -10px;
+}
+
+
+#input-Amount1 {
+    text-align: center;
+    color: #000000;
+    background: #fff;
+}
+
+#installment_calc1 {
+     color: #002B60;
+     background: #fff;
+     text-align: center;
+}
+
+
+
+.line-sep {
+    border: 1px solid #808080;
+    opacity: 1;
+    margin-top: 0px;
+
+}
+
+.loan-range {
+    background: #002B60;
+}
+
+.loan-range:hover {
+    background-color: #002B60;
+}
+
+.bank-title {
+     font-size: 44px;
+    letter-spacing: 0px;
+    font-weight: 400;
+    color: #112768;
+    }
+
+    .bant-subtitle {
+      font: italic normal 600 46px / 57px Montserrat;
+      letter-spacing: 0px;
+      color: #5dc300 !important;
+    }
+
+    .swiper-pagination-bullet {
+      width: 8px !important;
+      height: 24px !important;
+      background: #666666 0% 0% no-repeat padding-box !important;
+      border-radius: 20px !important;
+      opacity: 0.3;
+    }
+
+    .swiper-pagination-bullet-active {
+      width: 8px !important;
+      height: 48px !important;
+      background: #5dc300 0% 0% no-repeat padding-box !important;
+      border-radius: 20px !important;
+      opacity: 1;
+    }
+
+    .swiper-pagination-horizontal {
+    height: 100px !important;
+    margin-top: -51px !important;
+    }
+
+    .bank-menu {
+  
+         height: 142px;
+    background: #002a60 0% 0% no-repeat padding-box;
+    border-radius: 0px 100px 100px 0px;
+    position: relative;
+    z-index: 10;
+      bottom: 12em;
+
+    }
+    .bank-menu::before {
+    content: "";
+    position: absolute;
+    width: 100%; /* Adjust width as needed */
+    height: 100%; /* Adjust height as needed */
+    background-color: #002a60; /* Change color as needed */
+  
+       left: -1169px !important;
+    top: 0;
+    z-index: -1;
+}
+
+
+.bg-gradient-container {
+    display: flex;
+    justify-content: center;
+    background: linear-gradient(152deg, rgba(0,43,96,1) 22%, rgba(4,24,49,1) 50%);
+    margin: 15px;
+    border-radius: 30px;
+    width: 100%;
+    height: 370px;
+}
+    
+    .bank-sub-menu {
+      width: 550px;
+      height: inherit; /* Inherit the height from bank-menu */
+    }
+    .bank-menu-icons {
+      padding: 21px;
+    }
+    
+    .bank-menu-icons a {
+      text-decoration: none!important;  
+    }
+    
+    /*zoom in animation*/
+    .zoom-in {
+  opacity: 0;
+  transform: scale(0.85);
+  transition: transform 1.2s ease, opacity 1.2s ease;
+  will-change: transform, opacity;
+}
+
+.zoom-in.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+    
+    
+    /*end of animation*/
+
+
+
+    .slider-image {
+  
+      transform: translate(-50%, -50%);
+      z-index: 10;
+   
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+          margin-top: 46em;
+    margin-left: 41em;
+    }
+    
+    .card-upsale{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 260px;
+    border: 1px solid #f2f2f2;
+    padding: 20px 14px;
+    margin: 15px;
+    border-radius: 10px;
+    height: 170px;
+    box-shadow:rgba(50, 50, 105, 0.10) 0px 2px 15px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
+    }
+    
+
+
+             /*modal css start here*/
+     
+.lineUp {
+  animation: 1s anim-lineUp ease-in ;
+}
+@@keyframes anim-lineUp {
+  0% {
+    opacity: 0;
+    transform: translateY(80%);
+  }
+  20% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(0%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0%);
+  }
+}
+
+
+     .nav-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 20;
+    }
+
+
+    .nav-modal {
+      display: none;
+      flex-direction: column;
+      width: 500px;
+      height:220px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+      z-index: 3;
+      border-radius: 30px 30px 30px 30px;
+      position: relative;
+    }
+    
+    .nav-modal-container {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav-modal-header {
+      display: flex;
+      background-color: white;
+      color: #128C7E;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      border-radius: 25px;
+    }
+
+    .nav-modal-tab {
+      flex: 1;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      font-weight: normal;
+      font-size: 14px;
+      color: grey;
+      background: white;
+      padding: 10px;
+    }
+
+    .nav-modal-tab.active {
+      background-color: #fff;
+      color: #0D0D0D;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .nav-modal-tab.active::after {
+      content: '';
+      display: block;
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 50%;
+      height: 2px;
+      background-color: #88BC47;
+      transform: translateX(-50%);
+    }
+
+    .nav-modal-tab-content {
+      display: none;
+      padding: 67px;
+      border-radius: 0 0 30px 30px;
+    }
+    
+     .nav-modal-tab-content1 {
+      padding: 67px;
+    }
+
+
+    .nav-modal-tab-content.active {
+      display: block;
+    }
+   
+    .text-with-icon {
+      display: flex;
+      align-items: center;
+    }
+
+  
+    .redirect-Text  {
+        transition: transform .2s; 
+        font-weight:bold;
+        color:#021A44;
+      
+    }
+    
+    .redirect-Text:hover { 
+  -ms-transform: scale(1.2); /* Adjust the scale value as needed */
+  -webkit-transform: scale(1.2); /* Adjust the scale value as needed */
+  transform: scale(1.2); /* Adjust the scale value as needed */
+		} 
+    
+    .long-Text{
+        margin-bottom: 16px;
+         font-size: 13px;
+         color:#010101;
+         margin-top: -16%;
+    }
+        .long-Text2{
+        margin-bottom: 16px;
+        font-size: 20px !important;
+        color: #112768 !important ;
+        margin-top: -16%;
+        font-weight: 700;
+        font-size: 29px;
+        line-height: 1.2;
+
+    }
+    
+    .grid-container-element { 
+        padding-top:2%;
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    width: 100%; 
+    } 
+    .grid-child-element {
+        margin-top: -9px;
+    }
+
+
+.modal-Icon{
+    padding-left: 35px;
+    padding-top:3.5%;
+}
+
+    .close-button 
+    {
+    -top: -22px;
+    right: -21px;
+
+  
+        
+    }
+
+
+.close-btn-bg-dot {
+  height: 25px;
+  width: 25px;
+  background-color: #fff;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+
+.nav-modal-close-btn{
+  height: 0px;
+  line-height: 0px;  
+  width: 0px;  
+  font-size: 2em;
+  font-weight: bold;
+  color:white;
+  border-radius: 50%;
+  background-color: white;
+  text-align: center;
+  cursor: pointer;
+}
+
+.nav-modal-flex-container {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.circle-background {
+   top: -18px;
+    cursor: pointer;
+    position: absolute;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 32px;
+    font-size: 40px;
+   }
+
+
+@@media only screen and (max-width: 530px) {
+    
+    .nav-modal-tab.active::after {
+      content: '';
+      display: block;
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 85%;
+      height: 2px;
+      background-color: #88BC47;
+      transform: translateX(-50%);
+    }
+    
+    .nav-modal {
+      width: 90%;
+      max-width: 400px; /* You can adjust this value as needed for the modal width */
+      height: auto;
+      padding: 20px;
+    }
+
+    .nav-modal-header {
+      padding: 10px;
+    }
+
+    .nav-modal-tab {
+      padding: 8px;
+      font-size: 14px;
+    }
+
+    .nav-modal-tab-content {
+      padding: 20px;
+    }
+
+    .grid-container-element {
+      grid-template-columns: 1fr 1fr;
+       cursor: pointer;
+    }
+
+    .modal-Icon {
+      padding-top: 5%;
+      padding-left: 100%;
+    }
+
+    .close-button 
+    {
+    
+    right: -17px;
+    top: -12px;
+    }
+
+    .nav-modal-close-btn{
+      color:black;
+      cursor: pointer;
+    }
+.circle-background {
+top: -26px;
+    cursor: pointer;
+    position: absolute;
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    background-color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    font-size: 33px;
+     
+    }
+    .redirect-Text {
+        font-size: 15px;
+    }
+    .long-Text{
+         
+         font-size: 13px;
+         color:#010101;
+         margin-top: -8%;
+    }
+  }
+
+
+@@media (min-width: 768px) and (max-width: 1199px){
+.dropdown-container.navbar-default .navbar-nav>li:first-child>a {
+    padding-left: 30px !important;
+}
+   } 
+    /*modal css end here*/
+  
+    
+    @@media (min-width: 768px) and (max-width: 1024px) {
+    .slider-image {
+  
+        position: absolute;
+        top: 73%;
+        
+              margin-top: 0 !important;
+    margin-left: 0 !important;
+    }
+    
+ 
+}
+
+@@media (max-width: 768px) {
+
+    .video-section {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    }
+    
+   .slider-image {
+  
+        position: absolute;
+        top: 80%;
+        
+              margin-top: 0 !important;
+    margin-left: 0 !important;
+    }
+    
+  
+
+}
+
+
+.bank-menu-icons {
+    padding: 16px !important;
+}
+
+
+    
+ @@keyframes slideLeft {
+      0% {
+        transform: translateX(-90%);
+      }
+    }
+
+
+/****Media Query For Loans****/
+
+@@media (max-width: 768px){
+
+
+      
+        .banner-box-one {
+        left: 24%;
+        top: 26%;
+        display: flex !important;
+    }
+    
+    .swiper-wrapper {
+    height: 95vh !important;
+
+     }
+     
+        .swiper-pagination, .my-pagination {
+
+    top: 50% !important;
+
+    
+    justify-content: end;
+}
+
+      
+      .bank-menu {
+        height: 91px !important;
+        bottom: 96px !important;
+        width: 90%;
+            margin-left: 0px;
+      }
+      
+      .bank-sub-menu {
+        display: none !important;
+      }
+
+        .btn-app img {
+        width: 26px !important;
+        height: 26px !important;
+    }
+      
+      .swiper-pagination {
+        position: absolute !important;
+      
+        transform: translateY(-50%) !important;
+        z-index: 10 !important;
+        display: inline-grid;
+        left: 3% !important;
+    }
+        
+      .slider-image {
+        left: 55% !important;
+        width: 100% !important;
+      }
+      
+      .bank-title {
+        font: normal normal normal 36px / 57px Montserrat !important;
+        width: 324px;
+      }
+
+   .page-title {
+     margin-top: -85px;
+   }
+   
+    .loan-select-term {
+        text-align: center;
+    }
+    
+
+    #input-Amount1 {
+        width: 100%;
+    }
+    
+    #installment_calc1 {
+         width: 100%;
+    }
+
+    .calculator-form > label {
+        text-align: center;
+        margin-top: 15px;
+    }
+    
+    .calculator-form > select {
+        text-align: center;
+        width: 100%;
+    }
+    
+    .calculator-wrap {
+      margin-top: 0px;
+      padding-top: 40px;
+      
+   }
+   
+   .page-title h1 {
+      text-align: center;
+    }
+   
+   .investment-calculator p {
+      text-align: center;
+   }
+   
+   .loan-disclaimer {
+     padding-left: 40px;
+     padding-right: 30px;
+   }
+}
+
+
+@@media (min-width: 320px) and (max-width: 640px) {
+    
+    .page-title h1 {
+      text-align: center;
+    }
+    
+    .calculator-form > label {
+        margin-top: 15px;
+    }
+    
+   .hheader{
+     background-size: 100% 30%;
+   }
+   
+    .i-container {
+      height: 120px;
+      margin-top: 0px;
+   }
+   
+   .calculator-wrap {
+      margin-top: 0px;
+      padding-top: 40px;
+   }
+   
+   .investment-calculator {
+     margin-top: 30px !important;
+   }
+   
+   .other-inv-term {
+     padding: 20px;
+   }
+   
+    .investment-calculator p {
+      text-align: center;
+   }
+   
+   .loan-disclaimer {
+     padding-left: 40px;
+     padding-right: 30px;
+   }
+
+}
+
+@@media (min-width: 768px) {
+
+    .calculator-form > label {
+        margin-top: 15px;
+    }
+    
+   .big-return {
+        font-size: 30px;
+    }
+    
+    
+
+   
+   .i-container {
+     margin-top: 0px;
+   }
+   
+   
+.investment-calculator{
+	flex-direction: unset;
+	padding-top: 20px;
+}
+
+	.artwork img {
+		margin-top: 100px;
+	}
+
+	.calculator-results {
+		padding:0;
+	}
+	.inv-other-ico {
+		width:45px;
+	}
+	
+
+}
+
+@@media (min-width: 992px) { 
+ 
+    .calculator-form > label {
+        margin-top: 15px;
+    }
+    
+ .hheader{
+    
+   }
+   
+.i-container {
+        margin-top: 0px;
+        height: 150px;
+   }
+   
+.investment-calculator{
+	flex-direction: unset;
+	padding-top: 20px;
+    	display: flex;
+}
+
+
+
+	.calculator-results {
+		padding:10px;
+	}
+	.inv-other-ico {
+		width:64px;
+	}
+}
+
+
+@@media (min-width: 1200px) { 
+
+    .calculator-form > label {
+        margin-top: 15px;
+    }
+    
+ .hheader{
+    
+   }
+   
+    .i-container {
+    margin-bottom: 0px;
+    height: 150px;
+   }
+   
+.investment-calculator{
+	flex-direction: unset;
+	padding-top: 20px;
+}
+	.artwork img {
+		margin-top: 0px;
+	}
+
+	
+	.hheader{
+	height: 640px;
+    padding-top: 470px;
+	}
+	
+.page-title h1{
+	font-size: 40px;
+	line-height: 4rem;}
+	.page-title h3 {
+		font-size:24px;}
+}
+
+
+@@media (min-width: 1400px) { 
+
+   
+    .i-container {
+       margin-bottom: -30px;
+       margin-top: 0px;
+       height: 150px;
+   }
+
+  .hheader{
+	
+	}
+} 
+
+@@media (max-width: 540px) { 
+
+     .banner-box-one {
+        left: 26% !important;
+        top: 26%;
+        display: flex !important;
+    }
+    
+    .slider-image {
+     
+        margin-top: -20px !important;
+
+    }
+} 
+
+
+
+ /* tablet */
+ 
+ 
+
+
+@@media only screen and (min-width: 768px) and (max-width: 1024px) {
+      .banner-box-one {
+        left: 42%;
+        display: block !important;
+        width: 57% !important;
+      }
+      .bank-menu {
+        width: 60% !important;
+        height: 110px !important;
+            margin-left: 0px;
+        margin-top: -40px;
+      }
+      .bank-sub-menu {
+        display: none !important;
+      }
+      
+      
+.swiper-pagination, .my-pagination{
+    top:100% !important;
+}
+
+      .bank-menu-icons img {
+        margin-right: 7px !important;
+      }
+
+         .bank-menu-icons {
+        padding: 20px !important;
+    }
+
+      .slider-image {
+        left: 55% !important;
+        width: 60% !important;
+      }
+      .bank-title {
+        font: normal normal normal 36px / 57px Montserrat !important;
+            width: auto !important;
+      }
+    }
+    
+@@media (max-width: 890px) and (min-width: 320px){
+  .bank-menu-icons {
+        padding: 8px !important;
+        
+        margin-left: -50px !important;
+    }
+    .home-loan-calculator {
+    margin-top: -90px !important;
+}
+
+    .bank-menu {
+        height: 77px !important;
+     margin-left: 0px;
+    }
+}
+
+   @@media (max-width: 767px) {
+      .modal-video iframe {
+        height: 250px;
+      }
+    }   
+
+</style>
+
+<!--slider section-->
+<section class="section-rounded-edge-3">
+  @Html.Partial("_main-slider")  
+</section>
+
+<!--product cards-->
+<section class="mtb-30">
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12 mb-30">
+        <h1 class="color-brand-1 major-title mb-20">
+          <span>BANK with</span><br />
+          <span class="span-major-title span-green">AUDACITY</span>
+        </h1>
+      </div>
+    </div>
+
+    <div class="row zoom-in">
+      <div class="col-xs-12 col-sm-6 col-md-4 mb-30">
+        <div class="card-upsale">
+          <div class="title">
+            <h4 class="color-brand-1">BORROW</h4>
+          </div>
+          <div class="description">
+            <p class="font-sm-2 color-brand-1">Lorem ipsum dolor sit amet consectetur.</p>
+          </div>
+          <div>
+            <p class="primary">
+              <a href="https://www.africanbank.co.za/en/home/banking/#MyWorld" class="btn-brand-link hover-up">Apply Now</a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xs-12 col-sm-6 col-md-4 mb-30">
+        <div class="card-upsale">
+          <div class="title">
+            <h4 class="color-brand-1">SAVE AND INVEST</h4>
+          </div>
+          <div class="description">
+            <p class="font-sm-2 color-brand-1">Lorem ipsum dolor sit amet consectetur.</p>
+          </div>
+          <div>
+            <p class="primary">
+              <a href="https://www.africanbank.co.za/en/home/banking/#MyWorld" class="btn-brand-link hover-up">Apply Now</a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xs-12 col-sm-6 col-md-4 mb-30">
+        <div class="card-upsale">
+          <div class="title">
+            <h4 class="color-brand-1">BANK</h4>
+          </div>
+          <div class="description">
+            <p class="font-sm-2 color-brand-1">Lorem ipsum dolor sit amet consectetur.</p>
+          </div>
+          <div>
+            <p class="primary">
+              <a href="https://www.africanbank.co.za/en/home/banking/#MyWorld" class="btn-brand-link hover-up">Apply Now</a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xs-12 col-sm-6 col-md-4 mb-30">
+        <div class="card-upsale">
+          <div class="title">
+            <h4 class="color-brand-1">INSURE</h4>
+          </div>
+          <div class="description">
+            <p class="font-sm-2 color-brand-1">Lorem ipsum dolor sit amet consectetur.</p>
+          </div>
+          <div>
+            <p class="primary">
+              <a href="https://www.africanbank.co.za/en/home/banking/#MyWorld" class="btn-brand-link hover-up">Apply Now</a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xs-12 col-sm-6 col-md-4 mb-30">
+        <div class="card-upsale">
+          <div class="title">
+            <h4 class="color-brand-1">REWARDS</h4>
+          </div>
+          <div class="description">
+            <p class="font-sm-2 color-brand-1">Lorem ipsum dolor sit amet consectetur.</p>
+          </div>
+          <div>
+            <p class="primary">
+              <a href="https://www.africanbank.co.za/en/home/banking/#MyWorld" class="btn-brand-link hover-up">Join us</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!--end of product cards-->
+
+<!--calculator section-->
+        <!-- loan calculator -->
+        <section class="section-rounded-edge">
+        <div class="home-loan-calculator">
+                     <div class="container">
+            <div class="row d-flex align-items-center row-change md-text-center pt-50 pb-40">
+              <div class="col-md-6">
+                  <h1 class="calculator-brand-1 mt-15 mb-20">Loan Calculator</h1>
+                <!--Calculator -->
+                 <div class="calculator-form ">
+						<p class="cal-loan-disclaimer" id="" style="padding:5px 0px" >Please enter Loan amount between R2 000 to R250 000</p>
+						<label>Amount</label>
+						@*<span id="error-loanamount1" style="color:red; position:absolute; font-size: 15px"></span>*@
+						<input id="input-Amount1" class="loan-inpt" type="text" value="2000" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57">
+                             
+						@*<input id="input-Amount1" type="text" value="2000" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 5" >*@
+						
+						<div class="range-wrap">
+                            <div class="range-value" id="rangeV1"></div>
+                            <input id="slide-range1" type="range" class="loan-range" min="2000" max="250000" step="500" value="2000">
+                        </div>
+                    
+                        
+                        <div class="loans" style="margin-bottom: -7px">
+                            <div class="col-1" style="text-align: left; font-size:14px">R2 000</div>
+                            <div></div>
+                            <div class="col-2" style="text-align: right; font-size:14px">R250 000</div>
+                        </div>
+						
+						<label>Repayment Term</label>
+                        <select class="loan-select-term" id="term1">
+                            <option value="7">7 Months</option>
+                            <option value="9">9 Months</option>
+                            <option value="12">12 Months</option>
+                            <option value="18">18 Months</option>
+                            <option value="24">24 Months</option>
+                            <option value="30">30 Months</option>
+                            <option value="36">36 Months</option>
+                            <option value="42">42 Months</option>
+                            <option value="48">48 Months</option>
+                            <option value="60">60 Months</option>
+                            <option value="72">72 Months</option>
+                        </select>
+                 
+                        
+						
+						<div class="range-wrap">
+                            <div class="range-value" id="rangeV2"></div>
+                            <input id="input-month1" type="range" class="loan-range" min="7" max="72" value="7">
+                        </div>
+                    
+                        
+                        <div class="Months" style="margin-bottom: -7px">
+                            <div class="col-1" style="text-align: left; font-size:14px">7 Months</div>
+                            <div></div>
+                            <div class="col-2" style="text-align: right; font-size:14px">72 Months</div>
+                        </div>
+                    
+					    <label>Monthly Repayment will be</label>
+    		        
+    		              <input id="installment_calc1"  class="loan-inpt-return" type="text" value="879.53" readonly>
+    		        
+						<div class="combo-btn">
+<div class="mt-50 text-start column1">
+<p class="combo-btn-text primary"><a href="https://www.africanbank.co.za/en/home/get-a-quote?utm_source=Website&amp;utm_medium=Productpage&amp;utm_campaign=WebLead" class="btn  btn-brand-1 hover-up">APPLY NOW</a></p>
+</div>
+</div>
+        
+            
+              </div>
+              
+            </div>
+            <div class="col-md-6">
+                <img
+                  class="d-block"
+                  src="/media/zcdl2xa3/loan-calc.png"
+                  alt=""
+                />
+              </div>
+          </div> 
+        </div>
+        </section>
+<!--end of calc section-->
+
+
+<!--goal section-->
+<section class="section-title mtb-120">
+          <div class="container">
+          
+            <div class="row d-flex align-items-end row-change md-text-center">
+             <div class="col-md-7">
+               <h1 class="color-brand-1 major-title">
+                  Reach <span class="span-major-title">Your</span> <br />Goals
+                </h1>
+                <div class="mt-50 text-start">
+                  <div class="combo-btn">
+<div class="mt-50 text-start column1">
+<p class="combo-btn-text primary"><a href="https://www.africanbank.co.za/en/home/banking/#MyWorld" class="btn  btn-brand-1 hover-up">Apply Now</a></p>
+</div>
+</div>
+                </div>
+      
+              </div>
+            <div class="col-md-5">
+                <h4 class="color-brand-1 mb-20">
+                  Get a Personal Loan
+                </h4>
+                <p class="font-md color-brand-1">When you apply for an online Personal Loan with African Bank, you access a world of potential with just a few clicks. Start your application journey by finding out how much you can possibly qualify for.</p>
+
+              </div>
+            </div>
+          </div>
+        </section>
+<!--end of goal section-->
+
+<!--image banner section-->
+<section class="section-rounded-edge-2">
+    <div class="bg-gradient-container">
+        <div class="image-skew zoom-in">
+                  <img
+                  class="d-block"
+                  src="/media/wpbbmjuw/ab-card-front-1.png"
+                  alt=""
+                />
+    </div>  
+        </div>
+</section>
+<!--end of image banner section-->
+
+<!--borrow card section-->
+<section class="mtb-60">
+    <section class="section-title">
+          <div class="container">
+          <div class="row d-flex align-items-start row-change md-text-center">
+             <div class="col-md-6">
+               <span class="color-brand-1 span-major-title">Borrow</span>
+              </div>
+            <div class="col-md-6">
+                <h4 class="color-brand-1 mb-20">
+                  Personal and Business
+                </h4>
+                <p class="font-md color-brand-1">
+                    African Bank business and commercial banking offers products and services designed to assist you in building value, managing business growth, and maximising your company’s potential.
+                </p>
+
+              </div>
+            </div>
+<div class="row row-eq-height mtb-40">
+<div class="col-md-4">
+<div class="card-offer box">
+    <div>icon section</div>
+<div class="card-info">
+<h4 class="color-brand-2 mb-20">Contactless Payments</h4>
+<p class="font-md color-brand-1 mb-15">Our Corporate Finance and M&A team is the sub-Saharan African member firm of Oaklins, the leading global mid-market M&A advisor.</p>
+<p class="font-md color-brand-1 mb-20">We combine firm roots in the local market and collaboration on a global scale with a passion for excellence.</p>
+
+</div>
+<div class="button-section">
+<p class="combo-btn-text primary"><a href="https://www.africanbank.co.za/en/home/banking/#MyWorld" class="btn  btn-brand-1 hover-up">Learn More</a></p>
+</div>
+</div>
+</div>
+<div class="col-md-4">
+<div class="card-offer box">
+<div>icon section</div>
+<div class="card-info">
+<h4 class="color-brand-2 mb-20">Specialised property finance</h4>
+<p class="font-md color-brand-1 mb-15">Our specialised property finance division focuses on tailored financial solutions for both development and investment opportunities.</p>
+<p class="font-md color-brand-1 mb-20">We focus on traditional commercial and industrial property funding.</p>
+</div>
+<div class="button-section">
+<p class="combo-btn-text primary"><a href="https://www.africanbank.co.za/en/home/banking/#MyWorld" class="btn  btn-brand-1 hover-up">Learn More</a></p>
+</div>
+</div>
+</div>
+<div class="col-md-4">
+<div class="card-offer box">
+<div>icon section</div>
+<div class="card-info">
+<h4 class="color-brand-2 mb-20">Coverage, Corporate & investment banking</h4>
+<p class="font-md color-brand-1 mb-20">African Bank Business Banking offers products and services designed to assist you in building value, managing business growth, and maximising your company’s potential. We consider tailor-making a solution.</p>
+</div>
+<div class="button-section">
+<p class="combo-btn-text primary"><a href="https://www.africanbank.co.za/en/home/banking/#MyWorld" class="btn  btn-brand-1 hover-up">Learn More</a></p>
+</div>
+</div>
+</div>
+            </div>
+          </div>
+        </section>
+</section>
+
+<!--end of borrow card section-->
+
+<!--tap2glass section-->
+<section class="section-800 bg-white">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+               <h1 class="color-brand-1 major-title">
+                  Get The <br/>
+                <span class="span-major-title">Tap2Glass</span> App
+                </h1>
+                <div class="mt-50 text-start">
+                  <div class="combo-btn">
+<div class="mt-50 text-start column1">
+<p class="combo-btn-text primary"><a href="https://www.africanbank.co.za/en/home/banking/#MyWorld" class="btn  btn-brand-1 hover-up">Apply Now</a></p>
+</div>
+</div>
+                </div>
+      
+              </div>
+        </div>
+        <div class="row mtb-40">
+            <div class="col-md-8">
+  <div class="tap-2-glass-image-holder">
+    <img
+      class="img-responsive"
+      src="/media/yxxluexb/image-6.png"
+      alt="Teenage girl"
+    />
+  </div>
+</div>
+            <div class="col-md-4">
+               <p class="font-md color-brand-1 mb-15">
+                   Designed to revolutionalise the way you manage your business and get paid. Tap2Glass allows you to get paid wherever you are, simply load Tap2Glass to your phone.
+               </p> 
+               <p class="font-md color-brand-1 mb-15">
+                   Tap2Glass turns your NFC enabled Android device (phone or tablet) into a card machine for easy customer payments.
+               </p>
+               <p class="font-md color-brand-1 mb-15">
+                It’s a quick, cost-effective, convenient, and more importantly, a secure way to transact.
+               </p>
+            </div>
+        </div>
+        
+    </div>
+    
+</section>
+
+<!--end of tap-2-glass-->
+<!--invest section-->
+<section class="section-800 bg-grey-60 section-container">
+  <div class="container">
+    <div class="row">
+      <!-- Left Column: Text -->
+      <div class="col-md-5">
+        <h1 class="color-brand-1 major-title mb-20">
+          <span class="span-major-title">Invest and <span class="span-green">Insure</span></span>
+          </h1>
+          <h4 class="color-brand-1 mb-20">
+            Call Deposits  |  Prime-Time Notice Deposits Flexi Notice Deposits  |  Fixed deposits
+        </h4>
+        <!-- slider section -->
+        <div class="container text-slider-carousel">
+          <!-- Slide number -->
+          <div class="slide-number" id="slideNumber">
+               <span class="current-slide">1</span><span class="divider"> / </span><span class="total-slides">3</span>
+          </div>
+        
+          <div id="testimonialCarousel" class="carousel slide" data-ride="carousel" data-interval="4000">
+            <!-- Indicators -->
+            <ol class="carousel-indicators">
+              <li data-target="#testimonialCarousel" data-slide-to="0" class="active"></li>
+              <li data-target="#testimonialCarousel" data-slide-to="1"></li>
+              <li data-target="#testimonialCarousel" data-slide-to="2"></li>
+            </ol>
+        
+            <!-- Slides -->
+            <div class="carousel-inner" role="listbox">
+              <div class="item active">
+                <p class="font-md color-brand-1">We have a series of targeted investment products for our depositor client base including attorneys, assets managers and trustees.</p>
+              </div>
+        
+              <div class="item">
+                <p class="font-md color-brand-1">We have a series of targeted investment products for our depositor client base including attorneys, assets managers and trustees.</p>
+              </div>
+        
+              <div class="item">
+                <p class="font-md color-brand-1">We have a series of targeted investment products for our depositor client base including attorneys, assets managers and trustees.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Right Column: Video + Cards -->
+      <div class="col-md-7">
+        <div class="row video-section">
+          <!-- Video Column -->
+          <div class="col-md-6 col-sm-12 col-xs-12">
+            <div class="video-placeholder" data-toggle="modal" data-target="#videoModal" data-video-id="3DSeauqrIpI">
+            <img src="/media/0hvg2xa3/image-10.png" alt="Video Preview" />
+            <div class="play-btn"></div>
+            </div>
+          </div>
+  
+          <!-- Stacked Cards Column -->
+          <div class="col-sm-6">
+              <div class="row">
+            <div class="col-md-6 card-stack card-stack-bg-1">
+              <div class="centered-text">
+                <h4 class="text-white">
+                  Where Trust Meets Innovation
+              </h4>
+              </div>
+            </div>
+            <div class="col-md-6 card-stack card-stack-bg-2">
+              <div class="centered-text">
+                <h4 class="text-white">
+                  Where Trust Meets Innovation
+              </h4>
+              </div>
+            </div>
+            
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!--end of invest section-->
+
+<!--download app section-->
+<section class="section-800 bg-grey-60">
+                <div class="container">
+                  <div class="row d-flex align-items-center row-change md-text-center">
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                      <h1 class="color-brand-1 major-title mb-20">
+                        <span class="span-major-title">Download</span> <br/>
+                         Mobile App
+                        </h1>
+                        
+                        <h4 class="color-brand-1 mb-20">
+                            The Advantages Of Using Online Banking
+                        </h4>
+                       <p class="font-md color-brand-1">When you apply for an online Personal Loan with African Bank, you access a world of potential with just a few clicks. Start your application journey by finding out how much you can possibly qualify for.</p>
+<div class="combo-btn">
+<div class="mt-50 text-start column1">
+<p class="combo-btn-text primary"><a href="https://www.africanbank.co.za/en/home/get-a-quote?utm_source=Website&amp;utm_medium=Productpage&amp;utm_campaign=WebLead" class="btn  btn-brand-1 hover-up">DOWNLOAD NOW</a></p>
+</div>
+</div>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                      <img class="d-block" src="/media/l2jj3olr/image-7.png" alt="iori"> 
+                       
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+<!--end of download app section-->
+
+<!--testimonials-->
+<section class="testimonial-section ">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 mb-50">
+               <h1 class="text-white span-major-title">
+                  Testimonials
+                </h1>
+              </div>
+        </div>
+          <div class="row">
+    <div class="col-sm-4">
+      <div class="video-placeholder" data-toggle="modal" data-target="#videoModal" data-video-id="2DyV7I5Q4b4">
+              <img src="/media/0hvg2xa3/image-10.png" alt="Video Preview">
+              <div class="play-btn"></div>
+            </div>
+    </div>
+    <div class="col-sm-4">
+     <div class="video-placeholder" data-toggle="modal" data-target="#videoModal">
+              <img src="/media/0hvg2xa3/image-10.png" alt="Video Preview">
+              <div class="play-btn"></div>
+            </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="video-placeholder" data-toggle="modal" data-target="#videoModal">
+              <img src="/media/0hvg2xa3/image-10.png" alt="Video Preview">
+              <div class="play-btn"></div>
+            </div>
+    </div>
+  </div>
+    </div>
+</section>
+
+<!--end of testimonials-->
+
+
+<!-- Modal -->
+<div id="videoModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="videoModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content modal-video" style="background: transparent; border: none;">
+      <div class="modal-body" style="padding: 0; position: relative; display: flex; justify-content: center; align-items: center;">
+        <!-- Green Close Button -->
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+          style="position: absolute; top: -20px; right: -20px; z-index: 10; background: #28a745; color: white; border-radius: 50%; padding: 6px 12px; font-size: 24px;">
+          <span>&times;</span>
+        </button>
+        <!-- Responsive Video Wrapper -->
+        <div class="embed-responsive embed-responsive-16by9" style="width: 100%;">
+          <div id="videoPlayer" class="embed-responsive-item"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+$(document).on('click', '.video-placeholder', function () {
+  const videoId = $(this).data('video-id');
+  const iframe = `
+    <iframe  id="modalIframe" width="100%" height="400"
+      src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1"
+      frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
+    </iframe>`;
+  $('#videoPlayer').html(iframe);
+});
+
+$('#videoModal').on('hidden.bs.modal', function () {
+// debugger;
+const $iframe = $('#modalIframe');
+  // Step 1: Remove the iframe
+  if ($iframe.length) {
+      // Reset src and remove to ensure video is stopped
+      $iframe.attr('src', '');
+      $iframe.remove();
+    }
+
+    // Recreate empty container to allow reinjection next time
+    $('#videoPlayer').remove();
+ 
+
+  // Step 2: Wait a moment and re-add the container to avoid ghost playback
+  setTimeout(function () {
+    $('.embed-responsive').append('<div id="videoPlayer" class="embed-responsive-item"></div>');
+  }, 100); // Delay ensures iframe removal registers
+});
+
+
+
+
+// Handle slide count
+$(document).ready(function () {
+  function updateSlideNumber() {
+    var index = $('#testimonialCarousel .carousel-inner .item.active').index() + 1;
+    var total = $('#testimonialCarousel .carousel-inner .item').length;
+    $('#slideNumber .current-slide').text(index);
+    $('#slideNumber .total-slides').text(total);
+  }
+
+  $('#testimonialCarousel').on('slid.bs.carousel', updateSlideNumber);
+
+  // Initial setup
+  updateSlideNumber();
+});
+
+//handling the number slide
+$(document).ready(function () {
+  function updateSlideNumber() {
+    var index = $('#testimonialCarousel .carousel-inner .item.active').index() + 1;
+    var total = $('#testimonialCarousel .carousel-inner .item').length;
+    $('#slideNumber .current-slide').text(index);
+    $('#slideNumber .total-slides').text(total);
+  }
+
+  $('#testimonialCarousel').on('slid.bs.carousel', updateSlideNumber);
+
+  // Initial setup
+  updateSlideNumber();
+});
+  
+//   handling zoom animation scroll trigger
+document.addEventListener("DOMContentLoaded", () => {
+    const elements = document.querySelectorAll('.zoom-in');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target); // animate only once
+        }
+      });
+    }, {
+      threshold: 0.1
+    });
+
+    elements.forEach(el => observer.observe(el));
+  });
+</script>
