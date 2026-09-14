@@ -1,6 +1,5 @@
 ﻿<!DOCTYPE html>
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
-@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels
 @inject AcfAfricanbank.Core.Utilities.ResourceHelper ResourceHelper
 @inject Umbraco.Cms.Core.Models.PublishedContent.IVariationContextAccessor VariationContextAccessor
 @inject Microsoft.Extensions.Configuration.IConfiguration Configuration
@@ -9,52 +8,61 @@
 
     string CacheVersion = "V1.1";
     Layout = null;
-    // Get basic design settings from the homepage
-    ContentModels.PageHome home = Model.Root() as ContentModels.PageHome;
+    // Get basic design settings from the homepage.
+    //
+    // This view deliberately uses the untyped IPublishedContent API
+    // (IsDocumentType("alias"), Value<T>("alias")) instead of ModelsBuilder's
+    // generated content model classes (PageHome, CallMeBack, ...). Those
+    // classes only exist once the matching document types are migrated and
+    // Umbraco has regenerated them, which made this view uncompilable at
+    // various points during the migration. IsDocumentType/Value<T> work
+    // directly off the alias strings already in the migrated database, so
+    // this view compiles and runs regardless of ModelsBuilder state.
+    var home = Model.Root();
     var colorTheme = "#002b60";
     var font = "arial";
     var allKids = Model.Children(VariationContextAccessor).ToList();
-    ContentModels.CallMeBack floatingForm = null;
+    IPublishedContent floatingForm = null;
     var currentPage = Umbraco.AssignedContentItem;
 
-    if (allKids.Where(c => c is ContentModels.CallMeBack).Any())
+    if (allKids.Where(c => c.IsDocumentType("callMeBack")).Any())
     {
         @*All pages except home*@
-        floatingForm = (ContentModels.CallMeBack)allKids.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+        floatingForm = allKids.Where(c => c.IsDocumentType("callMeBack")).FirstOrDefault();
     }
     else
     {
         @*
             var _home = Model.Parent;
-            var homePageElementItems = _home.Children.Where(c => c is ContentModels.HomePageElements).FirstOrDefault();
+            var homePageElementItems = _home.Children.Where(c => c.IsDocumentType("homePageElements")).FirstOrDefault();
             if (homePageElementItems != null)
             {
-                floatingForm = (ContentModels.CallMeBack)homePageElementItems.Children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+                floatingForm = homePageElementItems.Children.Where(c => c.IsDocumentType("callMeBack")).FirstOrDefault();
             }
         *@
         foreach (var t in allKids)
         {
 
-            if (t.Children(VariationContextAccessor).Where(c => c is ContentModels.CallMeBack).Any())
+            if (t.Children(VariationContextAccessor).Where(c => c.IsDocumentType("callMeBack")).Any())
             {
-                floatingForm = (ContentModels.CallMeBack)t.Children(VariationContextAccessor).Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+                floatingForm = t.Children(VariationContextAccessor).Where(c => c.IsDocumentType("callMeBack")).FirstOrDefault();
                 break;
             }
         }
     }
 
-    @*<!--if (allKids.Where(c => c is ContentModels.CallMeBack).Any())
+    @*<!--if (allKids.Where(c => c.IsDocumentType("callMeBack")).Any())
         {-->
         All pages except home
-            <!--floatingForm = (ContentModels.CallMeBack)allKids.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+            <!--floatingForm = allKids.Where(c => c.IsDocumentType("callMeBack")).FirstOrDefault();
             }
             else
             {
                 foreach (var t in allKids)
                 {
-                    if (t.Children.Where(c => c is ContentModels.CallMeBack).Any() && currentPage.Id == 2808)
+                    if (t.Children.Where(c => c.IsDocumentType("callMeBack")).Any() && currentPage.Id == 2808)
                     {
-                        floatingForm = (ContentModels.CallMeBack)t.Children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+                        floatingForm = t.Children.Where(c => c.IsDocumentType("callMeBack")).FirstOrDefault();
                         break;
                     }
 
@@ -66,18 +74,18 @@ var call_me_contact_type = floatingForm?.Value("contactType") ?? "";
 var prodID = floatingForm?.Value("productID") ?? "";
 var check_open = floatingForm?.Value<bool>("callMeBackDifferentLocation");
 
-HomePageElements homePageElements = null;
-if (Model.Children(VariationContextAccessor).Where(o => o is HomePageElements).FirstOrDefault() != null)
+IPublishedContent homePageElements = null;
+if (Model.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault() != null)
 {
-    homePageElements = (HomePageElements)Model.Children(VariationContextAccessor).Where(o => o is HomePageElements).FirstOrDefault();
+    homePageElements = Model.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault();
 }
-else if (Model.Parent.Parent.Children(VariationContextAccessor).Where(o => o is HomePageElements).FirstOrDefault() != null)
+else if (Model.Parent.Parent.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault() != null)
 {
-    homePageElements = (HomePageElements)Model.Parent.Parent.Children(VariationContextAccessor).Where(o => o is HomePageElements).FirstOrDefault();
+    homePageElements = Model.Parent.Parent.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault();
 }
 else
 {
-    homePageElements = (HomePageElements)Model.Parent.Children(VariationContextAccessor).Where(o => o is HomePageElements).FirstOrDefault();
+    homePageElements = Model.Parent.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault();
 }
 
 // var disclaimersData = homePageElements.Children.Where(o => o.ContentType.Alias == "ebankITListSectionText").ToList();
@@ -100,17 +108,17 @@ else
 //}
 
 
-var heroBodyBlog = (HeroBody)homePageElements.Children(VariationContextAccessor).Where(x => x is HeroBody).FirstOrDefault();
+var heroBodyBlog = homePageElements.Children(VariationContextAccessor).Where(x => x.IsDocumentType("heroBody")).FirstOrDefault();
 var heroBodyBlogLink = heroBodyBlog.Children(VariationContextAccessor).Where(x => x.ContentType.Alias.ToLower() == "link").FirstOrDefault();
 
 Umbraco.Cms.Core.Models.Link itemLink = null;
-foreach (var link in (IEnumerable<Umbraco.Cms.Core.Models.Link>)((Link)heroBodyBlogLink).UrlLink)
+foreach (var link in heroBodyBlogLink.Value<IEnumerable<Umbraco.Cms.Core.Models.Link>>("urlLink"))
 {
     itemLink = link;
     break;
 }
 
-var bottomNavigation = (BottomNavigation)homePageElements.Children(VariationContextAccessor).Where(c => c is BottomNavigation).FirstOrDefault();
+var bottomNavigation = homePageElements.Children(VariationContextAccessor).Where(c => c.IsDocumentType("bottomNavigation")).FirstOrDefault();
 //var CacheVersion = "ver=" + AfricanBank.Cms.Portal.Helpers.CacheFactory.CacheVersion();
 var seo_title = Model.Value("title_tag"); //Umbraco.Field("title_tag");
 var seo_description = Model.Value("descrition_tag");
@@ -127,14 +135,14 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
         twitter_default_image = Model.Value("image").ToString();
     }
     //check if blog image exist
-    if (Model.Children(VariationContextAccessor).Where(c => c is BlogDetailsElements).FirstOrDefault() != null)
+    if (Model.Children(VariationContextAccessor).Where(c => c.IsDocumentType("blogDetailsElements")).FirstOrDefault() != null)
     {
-        var headerItem = Model.Children(VariationContextAccessor).Where(c => c is BlogDetailsElements).FirstOrDefault().Children(VariationContextAccessor).Where(x => x is HeroHeaderBlogDetail).FirstOrDefault();
+        var headerItem = Model.Children(VariationContextAccessor).Where(c => c.IsDocumentType("blogDetailsElements")).FirstOrDefault().Children(VariationContextAccessor).Where(x => x.IsDocumentType("heroHeaderBlogDetail")).FirstOrDefault();
 
-        ContentModels.Image imageData = (ContentModels.Image)headerItem.Value("Image");
+        var imageData = headerItem.Value<IPublishedContent>("Image");
         if (imageData != null)
         {
-            twitter_default_image = ((ContentModels.Image)headerItem.Value("Image")).Url;
+            twitter_default_image = imageData.Url();
         }
     }
 

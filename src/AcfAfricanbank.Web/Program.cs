@@ -893,21 +893,16 @@ if (args.Length > 0 &&
             }
 
             // ------------------------------------------------
-            // System datatypes have negative IDs in Umbraco 8.
-            // ------------------------------------------------
-
-            if (property.DataTypeId <= 0)
-            {
-                Console.WriteLine(
-                    $"SKIP PROPERTY: {property.Alias} " +
-                    $"(system datatype {property.DataTypeId})");
-
-                continue;
-            }
-
-            // ------------------------------------------------
             // Resolve the source datatype's editor alias, then find a
             // target datatype using the same (or remapped) editor alias.
+            //
+            // Negative IDs are NOT necessarily "system-only" - Umbraco
+            // seeds its default data types (Richtext editor, Textstring,
+            // Date, ...) with fixed negative IDs too, and those are normal,
+            // editable properties. They still resolve fine via
+            // sourceDataTypes below since GetDataTypesAsync doesn't filter
+            // by sign; only a genuinely-missing lookup falls through to the
+            // "not found" skip beneath this.
             // ------------------------------------------------
 
             if (!sourceDataTypes.TryGetValue(
