@@ -1,4 +1,5 @@
 using Microsoft.Data.SqlClient;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -91,11 +92,119 @@ if (args.Length > 0 &&
 
     // ========================================================
     // STEP 1
+    // DOCUMENT TYPE FOLDERS
+    // ========================================================
+    //
+    // Umbraco 8 organizes document types into folders (e.g. Settings >
+    // Document Types > Base, Compositions, Pages, ...). Those folders are
+    // plain umbracoNode rows with nodeObjectType = the well-known "Document
+    // Type Container" GUID, not part of cmsContentType. Migrate them first
+    // so STEP 1B can place each content type under the right folder.
+
+    Console.WriteLine("=================================================");
+    Console.WriteLine("STEP 1 - DOCUMENT TYPE FOLDERS");
+    Console.WriteLine("=================================================");
+
+    var contentTypeContainerService =
+        app.Services.GetRequiredService<IContentTypeContainerService>();
+
+    var sourceContainers =
+        await GetContentTypeContainersAsync(source);
+
+    Console.WriteLine(
+        $"Found {sourceContainers.Count} document type folders.");
+
+    var existingContainers =
+        (await contentTypeContainerService.GetAllAsync()).ToList();
+
+    // Source Umbraco 8 folder node ID -> already-created target folder.
+    var containerMap =
+        new Dictionary<int, EntityContainer>();
+
+    foreach (var sourceContainer in sourceContainers)
+    {
+        try
+        {
+            Guid? parentKey = null;
+            int? parentId = null;
+
+            if (sourceContainer.ParentId > 0)
+            {
+                if (!containerMap.TryGetValue(
+                        sourceContainer.ParentId,
+                        out var parentContainer))
+                {
+                    Console.WriteLine(
+                        $"SKIP FOLDER {sourceContainer.Name}: " +
+                        "parent folder not migrated.");
+
+                    continue;
+                }
+
+                parentKey = parentContainer.Key;
+                parentId = parentContainer.Id;
+            }
+
+            var existingContainer =
+                existingContainers.FirstOrDefault(x =>
+                    x.Name != null &&
+                    x.Name.Equals(
+                        sourceContainer.Name,
+                        StringComparison.OrdinalIgnoreCase) &&
+                    x.ParentId == (parentId ?? -1));
+
+            if (existingContainer != null)
+            {
+                containerMap[sourceContainer.NodeId] =
+                    existingContainer;
+
+                Console.WriteLine(
+                    $"EXISTS FOLDER  : {sourceContainer.Name}");
+
+                continue;
+            }
+
+            var createResult =
+                await contentTypeContainerService.CreateAsync(
+                    null,
+                    sourceContainer.Name,
+                    parentKey,
+                    Constants.Security.SuperUserKey);
+
+            if (!createResult.Success ||
+                createResult.Result == null)
+            {
+                Console.WriteLine(
+                    $"FAILED FOLDER  : {sourceContainer.Name} " +
+                    $"- {createResult.Status}");
+
+                continue;
+            }
+
+            containerMap[sourceContainer.NodeId] =
+                createResult.Result;
+
+            existingContainers.Add(createResult.Result);
+
+            Console.WriteLine(
+                $"CREATED FOLDER : {sourceContainer.Name}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(
+                $"ERROR FOLDER {sourceContainer.Name}: " +
+                ex.Message);
+        }
+    }
+
+    // ========================================================
+    // STEP 1B
     // CONTENT TYPES
     // ========================================================
 
+    Console.WriteLine();
     Console.WriteLine("=================================================");
-    Console.WriteLine("STEP 1 - CONTENT TYPES");
+    Console.WriteLine("STEP 1B - CONTENT TYPES");
     Console.WriteLine("=================================================");
 
     var sourceContentTypes =
@@ -128,8 +237,18 @@ if (args.Length > 0 &&
                 continue;
             }
 
+            var typeParentId = -1;
+
+            if (sourceType.ParentId > 0 &&
+                containerMap.TryGetValue(
+                    sourceType.ParentId,
+                    out var typeParentContainer))
+            {
+                typeParentId = typeParentContainer.Id;
+            }
+
             var contentType =
-                new ContentType(shortStringHelper, -1)
+                new ContentType(shortStringHelper, typeParentId)
                 {
                     Alias =
                         sourceType.Alias,
@@ -165,13 +284,13 @@ if (args.Length > 0 &&
     }
 
     // ========================================================
-    // STEP 1B
+    // STEP 1C
     // TEMPLATES
     // ========================================================
 
     Console.WriteLine();
     Console.WriteLine("=================================================");
-    Console.WriteLine("STEP 1B - TEMPLATES");
+    Console.WriteLine("STEP 1C - TEMPLATES");
     Console.WriteLine("=================================================");
 
     var fileService =
@@ -780,76 +899,6 @@ if (args.Length > 0 &&
     }
 
     // ========================================================
-    // STEP 5B
-    // PUBLISH CONTENT
-    // ========================================================
-    //
-    // contentService.Save() above only ever writes a draft. Umbraco does
-    // not serve draft content on the live site, so without this step
-    // every migrated page 404s despite existing in the content tree.
-    // contentMap was populated in parent-before-child order (STEP 4), and
-    // Dictionary preserves insertion order in practice, so iterating it
-    // publishes parents before their children.
-
-    Console.WriteLine();
-    Console.WriteLine("=================================================");
-    Console.WriteLine("STEP 5B - PUBLISH CONTENT");
-    Console.WriteLine("=================================================");
-
-    var publishedCount = 0;
-    var processedCount = 0;
-
-    foreach (var targetKey in contentMap.Values)
-    {
-        processedCount++;
-
-        try
-        {
-            var content =
-                contentService.GetById(targetKey);
-
-            if (content == null || content.Published)
-            {
-                continue;
-            }
-
-            var publishResult =
-                contentService.Publish(content, new[] { "*" });
-
-            if (publishResult.Success)
-            {
-                publishedCount++;
-            }
-            else
-            {
-                Console.WriteLine(
-                    $"FAILED PUBLISH: {targetKey} - " +
-                    $"{publishResult.Result}");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(
-                $"ERROR PUBLISH {targetKey}: " +
-                ex.Message);
-        }
-
-        // Publishing does real per-item work (cache/index updates), so it's
-        // much slower than the earlier bulk-save steps - print progress
-        // regularly instead of going silent for a long, unpredictable time.
-        if (processedCount % 25 == 0 ||
-            processedCount == contentMap.Count)
-        {
-            Console.WriteLine(
-                $"... {processedCount}/{contentMap.Count} processed, " +
-                $"{publishedCount} published so far");
-        }
-    }
-
-    Console.WriteLine(
-        $"Published {publishedCount} of {contentMap.Count} content items.");
-
-    // ========================================================
     // STEP 6
     // DICTIONARY
     // ========================================================
@@ -1156,15 +1205,24 @@ static async Task<List<SourceContentType>> GetContentTypesAsync(
 {
     var result = new List<SourceContentType>();
 
+    // Name comes from umbracoNode.text (the real display name shown in the
+    // backoffice tree) rather than cmsContentType.description, which is a
+    // separate, usually-empty free-text field. n.parentId identifies which
+    // document type folder (if any) the content type lives in.
     const string sql = """
         SELECT
-            nodeId,
-            ISNULL(alias, ''),
-            ISNULL(description, ''),
-            ISNULL(icon, ''),
-            allowAtRoot
-        FROM cmsContentType
-        ORDER BY nodeId
+            ct.nodeId,
+            ISNULL(ct.alias, ''),
+            ISNULL(n.text, ''),
+            ISNULL(ct.icon, ''),
+            ct.allowAtRoot,
+            ISNULL(n.parentId, -1)
+        FROM cmsContentType ct
+        INNER JOIN umbracoNode n
+            ON n.id = ct.nodeId
+        ORDER BY
+            n.level,
+            ct.nodeId
         """;
 
     await using var command =
@@ -1181,7 +1239,54 @@ static async Task<List<SourceContentType>> GetContentTypesAsync(
                 reader.GetString(1),
                 reader.GetString(2),
                 reader.GetString(3),
-                reader.GetBoolean(4)));
+                reader.GetBoolean(4),
+                reader.GetInt32(5)));
+    }
+
+    return result;
+}
+
+
+static async Task<List<SourceContentTypeContainer>>
+    GetContentTypeContainersAsync(
+        SqlConnection connection)
+{
+    var result = new List<SourceContentTypeContainer>();
+
+    // "2f7a2769-6b0b-4468-90dd-af42d64f7f16" is Umbraco's well-known
+    // Document Type Container object type GUID - stable across versions,
+    // so it identifies document type folders the same way in a v8 source
+    // database as it does in modern Umbraco.
+    const string sql = """
+        SELECT
+            n.id,
+            ISNULL(n.parentId, -1),
+            ISNULL(n.text, ''),
+            n.level,
+            n.sortOrder
+        FROM umbracoNode n
+        WHERE n.nodeObjectType = '2f7a2769-6b0b-4468-90dd-af42d64f7f16'
+        ORDER BY
+            n.level,
+            n.sortOrder,
+            n.id
+        """;
+
+    await using var command =
+        new SqlCommand(sql, connection);
+
+    await using var reader =
+        await command.ExecuteReaderAsync();
+
+    while (await reader.ReadAsync())
+    {
+        result.Add(
+            new SourceContentTypeContainer(
+                reader.GetInt32(0),
+                reader.GetInt32(1),
+                reader.GetString(2),
+                reader.GetInt32(3),
+                reader.GetInt32(4)));
     }
 
     return result;
@@ -1466,7 +1571,15 @@ record SourceContentType(
     string Alias,
     string Name,
     string Icon,
-    bool AllowAtRoot);
+    bool AllowAtRoot,
+    int ParentId);
+
+record SourceContentTypeContainer(
+    int NodeId,
+    int ParentId,
+    string Name,
+    int Level,
+    int SortOrder);
 
 record SourcePropertyGroup(
     int Id,
