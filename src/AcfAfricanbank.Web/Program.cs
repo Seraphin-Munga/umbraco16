@@ -165,6 +165,189 @@ if (args.Length > 0 &&
     }
 
     // ========================================================
+    // STEP 1B
+    // TEMPLATES
+    // ========================================================
+
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine("STEP 1B - TEMPLATES");
+    Console.WriteLine("=================================================");
+
+    var fileService =
+        app.Services.GetRequiredService<IFileService>();
+
+    var sourceTemplates =
+        await GetTemplatesAsync(source);
+
+    Console.WriteLine(
+        $"Found {sourceTemplates.Count} templates.");
+
+    var templateMap =
+        new Dictionary<int, string>();
+
+    var remainingTemplates =
+        new List<SourceTemplate>(sourceTemplates);
+
+    // Create templates in dependency order: a template can only be created
+    // once its master template (if any) already exists. Loop until nothing
+    // changes so any inheritance depth is handled.
+    var madeProgress = true;
+
+    while (remainingTemplates.Count > 0 && madeProgress)
+    {
+        madeProgress = false;
+
+        foreach (var sourceTemplate in remainingTemplates.ToList())
+        {
+            string? masterAlias = null;
+
+            if (sourceTemplate.MasterId.HasValue)
+            {
+                if (!templateMap.TryGetValue(
+                        sourceTemplate.MasterId.Value,
+                        out masterAlias))
+                {
+                    // Master not created yet - try again next pass.
+                    continue;
+                }
+            }
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(sourceTemplate.Alias))
+                {
+                    remainingTemplates.Remove(sourceTemplate);
+                    madeProgress = true;
+                    continue;
+                }
+
+                var existingTemplate =
+                    fileService.GetTemplate(sourceTemplate.Alias);
+
+                if (existingTemplate != null)
+                {
+                    templateMap[sourceTemplate.NodeId] =
+                        existingTemplate.Alias;
+
+                    Console.WriteLine(
+                        $"EXISTS  : {sourceTemplate.Alias}");
+                }
+                else
+                {
+                    var masterTemplate =
+                        masterAlias != null
+                            ? fileService.GetTemplate(masterAlias)
+                            : null;
+
+                    var newTemplate =
+                        fileService.CreateTemplateWithIdentity(
+                            string.IsNullOrWhiteSpace(sourceTemplate.Name)
+                                ? sourceTemplate.Alias
+                                : sourceTemplate.Name,
+                            sourceTemplate.Alias,
+                            sourceTemplate.Design,
+                            masterTemplate);
+
+                    templateMap[sourceTemplate.NodeId] =
+                        newTemplate.Alias;
+
+                    Console.WriteLine(
+                        $"CREATED : {sourceTemplate.Alias}");
+                }
+
+                remainingTemplates.Remove(sourceTemplate);
+                madeProgress = true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    $"ERROR TEMPLATE {sourceTemplate.NodeId}: " +
+                    ex.Message);
+
+                remainingTemplates.Remove(sourceTemplate);
+                madeProgress = true;
+            }
+        }
+    }
+
+    foreach (var leftoverTemplate in remainingTemplates)
+    {
+        Console.WriteLine(
+            $"SKIP TEMPLATE {leftoverTemplate.NodeId}: " +
+            "master template could not be resolved.");
+    }
+
+    // --------------------------------------------------------
+    // Wire up allowed + default templates on content types.
+    // --------------------------------------------------------
+
+    try
+    {
+        var docTypeTemplates =
+            await GetDocumentTypeTemplatesAsync(source);
+
+        foreach (var group in docTypeTemplates.GroupBy(x => x.ContentTypeNodeId))
+        {
+            if (!contentTypeMap.TryGetValue(
+                    group.Key,
+                    out var contentTypeAliasForTemplates))
+            {
+                continue;
+            }
+
+            var contentTypeForTemplates =
+                contentTypeService.Get(contentTypeAliasForTemplates);
+
+            if (contentTypeForTemplates == null)
+            {
+                continue;
+            }
+
+            var allowedTemplates =
+                group
+                    .Select(x =>
+                        templateMap.TryGetValue(x.TemplateNodeId, out var alias)
+                            ? fileService.GetTemplate(alias)
+                            : null)
+                    .Where(t => t != null)
+                    .Select(t => t!)
+                    .ToArray();
+
+            if (allowedTemplates.Length == 0)
+            {
+                continue;
+            }
+
+            contentTypeForTemplates.AllowedTemplates =
+                allowedTemplates;
+
+            var defaultEntry =
+                group.FirstOrDefault(x => x.IsDefault);
+
+            if (defaultEntry != null &&
+                templateMap.TryGetValue(
+                    defaultEntry.TemplateNodeId,
+                    out var defaultAlias))
+            {
+                contentTypeForTemplates.SetDefaultTemplate(
+                    fileService.GetTemplate(defaultAlias));
+            }
+
+            contentTypeService.Save(contentTypeForTemplates);
+
+            Console.WriteLine(
+                $"LINKED TEMPLATES: {contentTypeAliasForTemplates} " +
+                $"({allowedTemplates.Length})");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(
+            $"ERROR LINKING TEMPLATES: {ex.Message}");
+    }
+
+    // ========================================================
     // STEP 2
     // PROPERTY GROUPS
     // ========================================================
@@ -696,6 +879,82 @@ static async Task<List<SourceDataType>> GetDataTypesAsync(
 }
 
 
+static async Task<List<SourceTemplate>> GetTemplatesAsync(
+    SqlConnection connection)
+{
+    var result = new List<SourceTemplate>();
+
+    const string sql = """
+        SELECT
+            t.nodeId,
+            ISNULL(t.alias, ''),
+            ISNULL(n.text, ''),
+            t.master,
+            ISNULL(t.design, '')
+        FROM cmsTemplate t
+        INNER JOIN umbracoNode n
+            ON n.id = t.nodeId
+        ORDER BY
+            CASE WHEN t.master IS NULL THEN 0 ELSE 1 END,
+            t.nodeId
+        """;
+
+    await using var command =
+        new SqlCommand(sql, connection);
+
+    await using var reader =
+        await command.ExecuteReaderAsync();
+
+    while (await reader.ReadAsync())
+    {
+        result.Add(
+            new SourceTemplate(
+                reader.GetInt32(0),
+                reader.GetString(1),
+                reader.GetString(2),
+                reader.IsDBNull(3)
+                    ? null
+                    : reader.GetInt32(3),
+                reader.GetString(4)));
+    }
+
+    return result;
+}
+
+
+static async Task<List<SourceDocumentTypeTemplate>>
+    GetDocumentTypeTemplatesAsync(
+        SqlConnection connection)
+{
+    var result = new List<SourceDocumentTypeTemplate>();
+
+    const string sql = """
+        SELECT
+            contentTypeNodeId,
+            templateNodeId,
+            IsDefault
+        FROM cmsDocumentType
+        """;
+
+    await using var command =
+        new SqlCommand(sql, connection);
+
+    await using var reader =
+        await command.ExecuteReaderAsync();
+
+    while (await reader.ReadAsync())
+    {
+        result.Add(
+            new SourceDocumentTypeTemplate(
+                reader.GetInt32(0),
+                reader.GetInt32(1),
+                reader.GetBoolean(2)));
+    }
+
+    return result;
+}
+
+
 static async Task<List<SourceContentType>> GetContentTypesAsync(
     SqlConnection connection)
 {
@@ -994,6 +1253,18 @@ record SourceDataType(
     int NodeId,
     string EditorAlias,
     string Name);
+
+record SourceTemplate(
+    int NodeId,
+    string Alias,
+    string Name,
+    int? MasterId,
+    string Design);
+
+record SourceDocumentTypeTemplate(
+    int ContentTypeNodeId,
+    int TemplateNodeId,
+    bool IsDefault);
 
 record SourceContentType(
     int NodeId,
