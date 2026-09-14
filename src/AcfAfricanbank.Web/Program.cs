@@ -1,6 +1,7 @@
 using Microsoft.Data.SqlClient;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -85,6 +86,9 @@ if (args.Length > 0 &&
     var dataTypeService =
         app.Services.GetRequiredService<IDataTypeService>();
 
+    var shortStringHelper =
+        app.Services.GetRequiredService<IShortStringHelper>();
+
     // ========================================================
     // STEP 1
     // CONTENT TYPES
@@ -125,8 +129,11 @@ if (args.Length > 0 &&
             }
 
             var contentType =
-                new ContentType(sourceType.Alias)
+                new ContentType(shortStringHelper, -1)
                 {
+                    Alias =
+                        sourceType.Alias,
+
                     Name =
                         string.IsNullOrWhiteSpace(sourceType.Name)
                             ? sourceType.Alias
@@ -189,6 +196,13 @@ if (args.Length > 0 &&
     Console.WriteLine(
         $"Found {properties.Count} properties.");
 
+    // Legacy int data type IDs only exist in the v8 source database, so the
+    // target-side data types are looked up by their legacy int Id property
+    // (kept on IDataType for back-compat) rather than by GetAsync(Guid/string).
+    var dataTypesById =
+        (await dataTypeService.GetAllAsync())
+            .ToDictionary(x => x.Id);
+
     foreach (var property in properties)
     {
         try
@@ -245,10 +259,9 @@ if (args.Length > 0 &&
             // Try to find datatype by database node ID.
             // ------------------------------------------------
 
-            var dataType =
-                dataTypeService.Get(property.DataTypeId);
-
-            if (dataType == null)
+            if (!dataTypesById.TryGetValue(
+                    property.DataTypeId,
+                    out var dataType))
             {
                 Console.WriteLine(
                     $"SKIP PROPERTY: {property.Alias} " +
@@ -271,7 +284,8 @@ if (args.Length > 0 &&
 
             var propertyType =
                 new PropertyType(
-                    dataType.Key,
+                    shortStringHelper,
+                    dataType,
                     property.Alias);
 
             propertyType.Name =
@@ -290,7 +304,7 @@ if (args.Length > 0 &&
 
             contentType.AddPropertyType(
                 propertyType,
-                groupName);
+                groupName ?? "content");
 
             contentTypeService.Save(contentType);
 
