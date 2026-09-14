@@ -4,6 +4,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 
@@ -89,6 +90,12 @@ if (args.Length > 0 &&
 
     var dataTypeService =
         app.Services.GetRequiredService<IDataTypeService>();
+
+    var propertyEditors =
+        app.Services.GetRequiredService<PropertyEditorCollection>();
+
+    var configurationEditorJsonSerializer =
+        app.Services.GetRequiredService<IConfigurationEditorJsonSerializer>();
 
     var shortStringHelper =
         app.Services.GetRequiredService<IShortStringHelper>();
@@ -817,12 +824,30 @@ if (args.Length > 0 &&
                 StringComparer.OrdinalIgnoreCase);
 
     // A handful of editor aliases were renamed between v8 and modern Umbraco.
+    // Umbraco.TinyMCE -> Umbraco.RichText is the big one: the Rich Text
+    // Editor is used on almost every content type, so without this remap
+    // nearly every RTE property across the whole site gets silently
+    // skipped.
     var editorAliasRemap =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             ["Umbraco.TextboxMultiple"] = "Umbraco.TextArea",
             ["Umbraco.MediaPicker"] = "Umbraco.MediaPicker3",
             ["Umbraco.MultipleMediaPicker"] = "Umbraco.MediaPicker3",
+            ["Umbraco.TinyMCE"] = "Umbraco.RichText",
+        };
+
+    // These editors still exist in Umbraco 16, but a fresh install doesn't
+    // seed a default Data Type for them (unlike Textstring/RichText/Date/
+    // etc.) - create one on demand instead of skipping every property that
+    // uses them. Editors that are genuinely gone in v16 (Umbraco.Grid,
+    // Umbraco.NestedContent - see MIGRATION.md) are deliberately not here;
+    // those need real data conversion, not just a new Data Type.
+    var autoCreatableEditorAliases =
+        new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Umbraco.Decimal",
+            "Umbraco.MultipleTextstring",
         };
 
     var unresolvedEditorAliases =
@@ -899,16 +924,38 @@ if (args.Length > 0 &&
             var editorAlias =
                 sourceDataType.EditorAlias;
 
+            var resolvedEditorAlias =
+                editorAliasRemap.TryGetValue(editorAlias, out var remappedAlias)
+                    ? remappedAlias
+                    : editorAlias;
+
             if (!targetDataTypesByEditorAlias.TryGetValue(
-                    editorAlias,
+                    resolvedEditorAlias,
                     out var dataType) &&
-                editorAliasRemap.TryGetValue(
-                    editorAlias,
-                    out var remappedAlias))
+                autoCreatableEditorAliases.Contains(resolvedEditorAlias) &&
+                propertyEditors.TryGet(resolvedEditorAlias, out var editor))
             {
-                targetDataTypesByEditorAlias.TryGetValue(
-                    remappedAlias,
-                    out dataType);
+                var newDataType =
+                    new DataType(editor, configurationEditorJsonSerializer)
+                    {
+                        Name = $"{resolvedEditorAlias} (migrated)"
+                    };
+
+                var createResult =
+                    await dataTypeService.CreateAsync(
+                        newDataType,
+                        Constants.Security.SuperUserKey);
+
+                if (createResult.Success)
+                {
+                    dataType = createResult.Result;
+
+                    targetDataTypesByEditorAlias[resolvedEditorAlias] =
+                        dataType;
+
+                    Console.WriteLine(
+                        $"CREATED DATATYPE: {resolvedEditorAlias}");
+                }
             }
 
             if (dataType == null)
