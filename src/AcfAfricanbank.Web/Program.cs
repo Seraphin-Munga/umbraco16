@@ -196,12 +196,34 @@ if (args.Length > 0 &&
     Console.WriteLine(
         $"Found {properties.Count} properties.");
 
-    // Legacy int data type IDs only exist in the v8 source database, so the
-    // target-side data types are looked up by their legacy int Id property
-    // (kept on IDataType for back-compat) rather than by GetAsync(Guid/string).
-    var dataTypesById =
+    // Legacy int data type IDs are only meaningful within the v8 source
+    // database - the target database's system data types get their own,
+    // unrelated auto-incremented IDs on install, so an ID-to-ID match finds
+    // almost nothing. Match by property EDITOR ALIAS instead (e.g.
+    // "Umbraco.TextBox"), which is stable across versions for most editors.
+    var sourceDataTypes =
+        (await GetDataTypesAsync(source))
+            .ToDictionary(x => x.NodeId);
+
+    var targetDataTypesByEditorAlias =
         (await dataTypeService.GetAllAsync())
-            .ToDictionary(x => x.Id);
+            .GroupBy(x => x.EditorAlias, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(
+                g => g.Key,
+                g => g.First(),
+                StringComparer.OrdinalIgnoreCase);
+
+    // A handful of editor aliases were renamed between v8 and modern Umbraco.
+    var editorAliasRemap =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Umbraco.TextboxMultiple"] = "Umbraco.TextArea",
+            ["Umbraco.MediaPicker"] = "Umbraco.MediaPicker3",
+            ["Umbraco.MultipleMediaPicker"] = "Umbraco.MediaPicker3",
+        };
+
+    var unresolvedEditorAliases =
+        new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
 
     foreach (var property in properties)
     {
@@ -256,16 +278,43 @@ if (args.Length > 0 &&
             }
 
             // ------------------------------------------------
-            // Try to find datatype by database node ID.
+            // Resolve the source datatype's editor alias, then find a
+            // target datatype using the same (or remapped) editor alias.
             // ------------------------------------------------
 
-            if (!dataTypesById.TryGetValue(
+            if (!sourceDataTypes.TryGetValue(
                     property.DataTypeId,
-                    out var dataType))
+                    out var sourceDataType))
             {
                 Console.WriteLine(
                     $"SKIP PROPERTY: {property.Alias} " +
-                    $"(datatype {property.DataTypeId} not found)");
+                    $"(source datatype {property.DataTypeId} not found)");
+
+                continue;
+            }
+
+            var editorAlias =
+                sourceDataType.EditorAlias;
+
+            if (!targetDataTypesByEditorAlias.TryGetValue(
+                    editorAlias,
+                    out var dataType) &&
+                editorAliasRemap.TryGetValue(
+                    editorAlias,
+                    out var remappedAlias))
+            {
+                targetDataTypesByEditorAlias.TryGetValue(
+                    remappedAlias,
+                    out dataType);
+            }
+
+            if (dataType == null)
+            {
+                unresolvedEditorAliases.Add(editorAlias);
+
+                Console.WriteLine(
+                    $"SKIP PROPERTY: {property.Alias} " +
+                    $"(no target datatype for editor '{editorAlias}')");
 
                 continue;
             }
@@ -568,6 +617,20 @@ if (args.Length > 0 &&
     Console.WriteLine(
         $"Dictionary items read       : {dictionaries.Count}");
 
+    if (unresolvedEditorAliases.Count > 0)
+    {
+        Console.WriteLine();
+        Console.WriteLine(
+            "Editor aliases with no matching target datatype " +
+            "(create one in the backoffice with this editor, then " +
+            "re-run migrate to fill in those properties):");
+
+        foreach (var alias in unresolvedEditorAliases)
+        {
+            Console.WriteLine($"  - {alias}");
+        }
+    }
+
     Console.WriteLine();
     Console.WriteLine(
         "Migration command completed.");
@@ -597,6 +660,41 @@ await app.RunAsync();
 // ============================================================
 // FUNCTIONS
 // ============================================================
+
+static async Task<List<SourceDataType>> GetDataTypesAsync(
+    SqlConnection connection)
+{
+    var result = new List<SourceDataType>();
+
+    const string sql = """
+        SELECT
+            dt.nodeId,
+            ISNULL(dt.propertyEditorAlias, ''),
+            ISNULL(n.text, '')
+        FROM cmsDataType dt
+        INNER JOIN umbracoNode n
+            ON n.id = dt.nodeId
+        ORDER BY dt.nodeId
+        """;
+
+    await using var command =
+        new SqlCommand(sql, connection);
+
+    await using var reader =
+        await command.ExecuteReaderAsync();
+
+    while (await reader.ReadAsync())
+    {
+        result.Add(
+            new SourceDataType(
+                reader.GetInt32(0),
+                reader.GetString(1),
+                reader.GetString(2)));
+    }
+
+    return result;
+}
+
 
 static async Task<List<SourceContentType>> GetContentTypesAsync(
     SqlConnection connection)
@@ -891,6 +989,11 @@ static async Task<List<SourceDictionary>>
 // ============================================================
 // RECORDS
 // ============================================================
+
+record SourceDataType(
+    int NodeId,
+    string EditorAlias,
+    string Name);
 
 record SourceContentType(
     int NodeId,
