@@ -28,6 +28,16 @@
     menu = homePageElements?.Children(VariationContextAccessor).Where(o => o.IsDocumentType("topNavigation")).FirstOrDefault();
 }
 
+<!-- TEMP DEBUG - remove once the richTextboxItem IsElement issue is resolved -->
+<script>
+    $(function () {
+        $.getJSON('/diagnostics/richtextboxitem', function (data) {
+            console.log('richTextboxItem diagnostic:', data);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            console.log('richTextboxItem diagnostic failed:', textStatus, errorThrown);
+        });
+    });
+</script>
 
 <style>
 .active {
