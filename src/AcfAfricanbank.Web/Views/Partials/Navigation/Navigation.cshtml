@@ -31,11 +31,18 @@
 <!-- TEMP DEBUG - remove once the richTextboxItem/homePageElements issues are resolved -->
 <script>
     $(function () {
-        ['richTextboxItem', 'homePageElements'].forEach(function (alias) {
-            $.getJSON('/diagnostics/contenttype/' + alias, function (data) {
-                console.log(alias + ' diagnostic:', data);
+        [
+            { alias: 'richTextboxItem', childAlias: null },
+            { alias: 'homePageElements', childAlias: 'topNavigation' }
+        ].forEach(function (check) {
+            var url = '/diagnostics/contenttype/' + check.alias;
+            if (check.childAlias) {
+                url += '?childAlias=' + check.childAlias;
+            }
+            $.getJSON(url, function (data) {
+                console.log(check.alias + ' diagnostic:', data);
             }).fail(function (jqXHR, textStatus, errorThrown) {
-                console.log(alias + ' diagnostic failed:', textStatus, errorThrown);
+                console.log(check.alias + ' diagnostic failed:', textStatus, errorThrown);
             });
         });
     });
