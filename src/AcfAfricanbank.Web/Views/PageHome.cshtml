@@ -34,11 +34,14 @@
         <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
             <ol class="carousel-indicators">
                 @{
-                    int counter = 0;
-                    foreach (var items in heroHeader.Items)
+                    if (heroHeader != null)
                     {
-                        <li data-target="#carouselExampleIndicators" data-slide-to="@counter" class="@((counter == 0) ? "active" : "")"></li>
-                        counter++;
+                        int counter = 0;
+                        foreach (var items in heroHeader.Items)
+                        {
+                            <li data-target="#carouselExampleIndicators" data-slide-to="@counter" class="@((counter == 0) ? "active" : "")"></li>
+                            counter++;
+                        }
                     }
                 }
             </ol>
