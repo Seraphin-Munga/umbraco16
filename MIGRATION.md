@@ -197,3 +197,5 @@ on top of the migrated schema.
   datatype to Media Picker 3 (simpler, then Step 9 just drops the custom editor).
 - Umbraco version to migrate *through*: 8.18 → 10 is mandated; 10 → 16 in one boot is the
   plan — fall back to 10 → 13 (LTS) → 16 if the single jump throws.
+
+<!-- push connectivity check: 2026-09-15T15:00:37Z -->
