@@ -5,22 +5,21 @@
 @using Umbraco.Cms.Web.Common.Mvc;
 @inject Umbraco.Cms.Core.Models.PublishedContent.IPublishedValueFallback PublishedValueFallback
 @inject Umbraco.Cms.Core.Routing.IPublishedUrlProvider PublishedUrlProvider
-@inject Umbraco.Cms.Core.Services.Navigation.INavigationQueryService NavigationQueryService
-@inject Umbraco.Cms.Core.Services.Navigation.IPublishedStatusFilteringService PublishedStatusFilteringService
+@inject Umbraco.Cms.Core.Models.PublishedContent.IVariationContextAccessor VariationContextAccessor
 @{
     Layout = "~/Views/MasterNew.cshtml";
     ContentModels.PageHome home = Model as ContentModels.PageHome;
-    var homePageElements = (HomePageElements)home.Children(NavigationQueryService, PublishedStatusFilteringService).Where(o => o is HomePageElements).FirstOrDefault();
-    var heroHeader = (HeroHeaderHome)homePageElements.Children(NavigationQueryService, PublishedStatusFilteringService).Where(o => o is HeroHeaderHome).FirstOrDefault();
-    var heroShoulder = (HeroShoulderHome)homePageElements.Children(NavigationQueryService, PublishedStatusFilteringService).Where(o => o is HeroShoulderHome).FirstOrDefault();
-    var heroBody = (HeroBody)homePageElements.Children(NavigationQueryService, PublishedStatusFilteringService).Where(x => x is HeroBody).FirstOrDefault();
+    var homePageElements = (HomePageElements)home.Children(VariationContextAccessor).Where(o => o is HomePageElements).FirstOrDefault();
+    var heroHeader = (HeroHeaderHome)homePageElements.Children(VariationContextAccessor).Where(o => o is HeroHeaderHome).FirstOrDefault();
+    var heroShoulder = (HeroShoulderHome)homePageElements.Children(VariationContextAccessor).Where(o => o is HeroShoulderHome).FirstOrDefault();
+    var heroBody = (HeroBody)homePageElements.Children(VariationContextAccessor).Where(x => x is HeroBody).FirstOrDefault();
     //var heroBodyGetLoans = (StructureBodyTextWithImageAndLink)heroBody.Children.Where(y => y is StructureBodyTextWithImageAndLink).FirstOrDefault();
-    var heroBodySections = heroBody?.Children(NavigationQueryService, PublishedStatusFilteringService)?.Where(y => y is StructureBodyTextWithImageAndLink).ToList();
-    var heroFeetNew = homePageElements?.Children(NavigationQueryService, PublishedStatusFilteringService).Where(c => c is HeroFeet).FirstOrDefault();
-    var testimonialsNew = (Testimonials)heroFeetNew?.Children(NavigationQueryService, PublishedStatusFilteringService).Where(c => c is Testimonials).FirstOrDefault();
-    var heroBodyBlog = (HeroBody)homePageElements.Children(NavigationQueryService, PublishedStatusFilteringService).Where(x => x is HeroBody).FirstOrDefault();
-    var heroBodyBlogLink = heroBodyBlog.Children(NavigationQueryService, PublishedStatusFilteringService).Where(x => x.ContentType.Alias.ToLower() == "link").FirstOrDefault();
-    var bottomNavigation = (BottomNavigation)homePageElements.Children(NavigationQueryService, PublishedStatusFilteringService).Where(c => c is BottomNavigation).FirstOrDefault();
+    var heroBodySections = heroBody?.Children(VariationContextAccessor)?.Where(y => y is StructureBodyTextWithImageAndLink).ToList();
+    var heroFeetNew = homePageElements?.Children(VariationContextAccessor).Where(c => c is HeroFeet).FirstOrDefault();
+    var testimonialsNew = (Testimonials)heroFeetNew?.Children(VariationContextAccessor).Where(c => c is Testimonials).FirstOrDefault();
+    var heroBodyBlog = (HeroBody)homePageElements.Children(VariationContextAccessor).Where(x => x is HeroBody).FirstOrDefault();
+    var heroBodyBlogLink = heroBodyBlog.Children(VariationContextAccessor).Where(x => x.ContentType.Alias.ToLower() == "link").FirstOrDefault();
+    var bottomNavigation = (BottomNavigation)homePageElements.Children(VariationContextAccessor).Where(c => c is BottomNavigation).FirstOrDefault();
     var htmlStringUtilities = new HtmlStringUtilities();
 }
 
@@ -322,12 +321,12 @@
                 {
                     int myCounter = 0;
                     int blogcount = 0;
-                    foreach (var blog in blogParent.Children(NavigationQueryService, PublishedStatusFilteringService).Take(3))
+                    foreach (var blog in blogParent.Children(VariationContextAccessor).Take(3))
                     {
-                        if (blog.Children(NavigationQueryService, PublishedStatusFilteringService).Any())
+                        if (blog.Children(VariationContextAccessor).Any())
                         {
 
-                            foreach (var blogElement in blog.Children(NavigationQueryService, PublishedStatusFilteringService).LastOrDefault().Children(NavigationQueryService, PublishedStatusFilteringService))
+                            foreach (var blogElement in blog.Children(VariationContextAccessor).LastOrDefault().Children(VariationContextAccessor))
                             {
                                 if (blogElement.Value(PublishedValueFallback, "title") != null)
                                 {
@@ -347,7 +346,7 @@
                                         blogBoxClass = "blog-third-box";
                                     }
 
-                                    var blogHeader = blog.Children(NavigationQueryService, PublishedStatusFilteringService).FirstOrDefault().Children(NavigationQueryService, PublishedStatusFilteringService).Where(c => c is HeroHeaderBlogDetail).FirstOrDefault();
+                                    var blogHeader = blog.Children(VariationContextAccessor).FirstOrDefault().Children(VariationContextAccessor).Where(c => c is HeroHeaderBlogDetail).FirstOrDefault();
                                     var ImageUrl = ((IPublishedContent)blogHeader.Value(PublishedValueFallback, "image")).Url(PublishedUrlProvider)?.ToString() ?? "";
                                     <div class="col-md-4 col-12">
                                         <div class="container @blogBoxClass.ToString()"
