@@ -2516,6 +2516,7 @@ if (args.Length > 0 &&
 app.MapGet("/diagnostics/contenttype/{alias}", (
     string alias,
     string? childAlias,
+    bool withChildren,
     IContentTypeService contentTypeService,
     IContentService contentService) =>
 {
@@ -2544,10 +2545,6 @@ app.MapGet("/diagnostics/contenttype/{alias}", (
         contentTypeId = contentType.Id,
         isElement = contentType.IsElement,
         totalRecords,
-        // ?childAlias=X: for each item, also report whether it has a live
-        // child of that document type (e.g. does *this* homePageElements
-        // node actually have a topNavigation child, not just whether one
-        // exists somewhere in the site).
         items = items.Select(c => new
         {
             id = c.Id,
@@ -2557,6 +2554,24 @@ app.MapGet("/diagnostics/contenttype/{alias}", (
             path = c.Path,
             trashed = c.Trashed,
             published = c.Published,
+            // ?withChildren=true: every child of this item, unfiltered.
+            children = !withChildren
+                ? null
+                : contentService
+                    .GetPagedChildren(c.Id, 0, 1000, out _, null!)
+                    .Select(child => new
+                    {
+                        id = child.Id,
+                        name = child.Name,
+                        docType = child.ContentType.Alias,
+                        trashed = child.Trashed,
+                        published = child.Published
+                    })
+                    .ToList(),
+            // ?childAlias=X: does this item have a live child of that
+            // specific document type (e.g. does *this* homePageElements
+            // node actually have a topNavigation child, not just whether
+            // one exists somewhere in the site).
             matchingChild = string.IsNullOrEmpty(childAlias)
                 ? null
                 : contentService
