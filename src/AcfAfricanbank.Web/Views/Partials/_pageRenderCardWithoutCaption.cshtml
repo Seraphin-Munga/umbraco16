@@ -1,0 +1,27 @@
+﻿@model Umbraco.Web.PublishedModels.TabBody
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using System.Configuration;
+@using Web.Helpers;
+
+@{
+    var tbody = Model.GetProperty("tabBodyContent");
+    var cardData = Model.TabBodyContent.ToList();
+}
+<div class="col-sm-12 text-center cost-header">
+    <div class="row margin-top-40">
+        @foreach (var item in cardData)
+        {
+            var data = item.Value<IEnumerable<IPublishedElement>>("sectionContent");
+            foreach (var info in data)
+            {
+                <div class="col-sm-6">
+                    <div class="icon">
+                        <span class=@info.Value("nCiconClass")></span>
+                    </div>
+                    <p class="body-content margin-top-20">@info.Value("nCebankITIconContent")</p>
+                </div>
+            }
+        }
+    </div>
+</div>
+

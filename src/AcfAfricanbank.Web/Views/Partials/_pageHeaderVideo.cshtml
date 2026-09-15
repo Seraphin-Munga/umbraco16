@@ -1,0 +1,32 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@{
+    var title = Model.Value("ebankITIconTitle");
+    var thumb_img = Model.Value<IPublishedContent>("ebankITIcon").Url;
+    var description = Model.Value("ebankITIconContent");
+    var initial_video = Model.Value("iconClass");
+
+}
+<style type="text/css">
+    .spacer {
+        padding-top: 14px;
+    }
+</style>
+<div id="video-header" class="video_list_item" data-video="@initial_video">
+    <div id="video-header-thumb" style="background-image:url('@thumb_img'); background-position: right;">
+        <iframe width="100%" height="100%" id="video-ytd" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        <section id="video-loader">
+            <div class="loader" id="form-preloader-loader">
+                <div class="loader-img"></div>
+            </div>
+        </section>
+        <div class="video-citation-box">
+            <div class="video-citation">
+                <div class="landing-video-title video_list_item" data-video="@initial_video">@title</div>
+            </div>
+            <div class="video-play-button spacer">
+                @*<span class="fa fa-play-circle video_list_item" data-video="@initial_video"></span>*@
+                <span class="video_list_item" data-video="@initial_video"><i class="fa fa-play-circle fa-3x main-click play-icon css-background-change"></i></span>
+            </div>
+        </div>
+    </div>
+</div>

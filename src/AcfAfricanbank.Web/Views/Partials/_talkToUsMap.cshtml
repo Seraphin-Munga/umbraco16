@@ -1,0 +1,30 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@model Umbraco.Web.PublishedModels.TabBody
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using System.Configuration;
+@{
+    var tbody = Model.GetProperty("tabBodyContent");
+    var numbers = Model.TabBodyContent.ToList();
+}
+<div class="branch-locator-container">
+    @{
+        foreach (var row in numbers)
+        {
+            var data = row.GetPropertyValue<IEnumerable<IPublishedContent>>("sectionContent");
+            foreach (var info in data)
+            {
+                <div class="branch-locator-input" id="branch-change-top">
+                    @Html.Raw(@info.GetPropertyValue("bodyDescription"))
+                </div>
+                <div class="row">
+                    <div class="col-sm-9 col-sm-offset-3">
+                        <div class="branch-locator-map" id="talk-to-us-map">
+                            <span></span>
+                            <iframe src="@System.Configuration.ConfigurationManager.AppSettings[@info.GetPropertyValue("bodyTitle").ToString()]" width="100%" height="100%" frameborder="0" style="border:0" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    }
+</div>

@@ -1,0 +1,846 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+
+<style>
+    .cookie-notice {
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        box-shadow: 0px 10px 20px 0px rgba(0, 0, 0, 0.30);
+        padding: 40px;
+        width: 100%;
+        z-index: 1000;
+    }
+    
+    td{
+        text-align: left;
+    }
+    
+     p{
+         font-family: "Montserrat", sans-serif !important;
+     }
+     
+     .text-title{
+          font-size: 14px !important;
+     }
+    
+    .cookie-notice .btn-green {
+        background-color: #7CB342;
+        color: white;
+        border: none;
+    }
+    .cookie-notice .btn-green:hover {
+        background-color: #689F38;
+    }
+    .cookie-notice .btn-outline {
+        border: 1.2px solid #4C6A8F;
+        color: #4C6A8F;
+    }
+    .close-btn {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        font-size: 40px;
+        position: fixed;
+        right: 12px;
+        top: 10px;
+    }
+    .btn-one {
+        padding: 8px 24px !important;
+        width: 281px !important;
+        border-radius: 60px !important;
+        margin-bottom: 12px;
+        text-transform: capitalize;
+        font-family: Montserrat;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: normal;
+    }
+    .btn-cookies {
+            background: #89bc47 0% 0%;
+        color: #FFF;
+    }
+    
+ 
+    
+    .text-align-end {
+        text-align: end;
+    }
+    
+
+    a{
+       text-decoration: none !important;
+    }
+    
+    .paragraph-cookie{
+        color: #4A4A4A;
+        font-family: Montserrat;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 20px; /* 142.857% */
+    }
+    
+    .modal-title{
+            font-weight: 600 !important;
+            color: #002B60 !important;
+        
+    }
+    
+    .modal-footer .btn+.btn {
+    font-weight: 600 !important;
+    
+}
+
+    .modal-footer  {
+      padding: 11px !important;
+    
+}
+    
+    
+       /* Cookie Settings Modal */
+        #cookieSettingsModal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+         
+     
+            padding: 20px;
+       
+            display: none;
+            z-index: 1100;
+        }
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            z-index: 1000;
+        }
+        
+        
+         .switch {
+        position: relative;
+        display: inline-block;
+        width: 40px;
+        height: 20px;
+        float: right;
+    }
+    
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: -5px;
+        bottom: 0;
+        background-color: #ccc;
+        border-radius: 20px;
+        transition: 0.4s;
+    }
+    
+    
+    
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 14px;
+        width: 14px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        border-radius: 50%;
+        transition: 0.4s;
+    }
+    
+    input:checked + .slider {
+        background-color: #4CAF50;
+    }
+    
+    input:checked + .slider:before {
+        transform: translateX(20px);
+    }
+    
+       input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Styling the 'tick' inside */
+        input:checked + .slider .tick {
+            display: block;
+        }
+
+        .tick {
+            display: none;
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: white;
+        }
+        
+            input:not(:checked) + .slider .cross {
+            display: block;
+        }
+
+        .tick, .cross {
+            display: none;
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: white;
+        }
+
+        .cross {
+            left: 21px;
+    font-size: 12px;
+        }
+    
+    
+    .analytics-cookies{
+    border-radius: 8px;
+    background: #F0F4F7;
+    padding: 18px;
+       margin-top: 20px;
+    margin-bottom: 22px;
+        height: 64px;
+    }
+    
+    .icon-img{
+        
+         float: left;
+    }
+    
+    
+      .icon-img label{
+            position: absolute;
+    margin-top: 5px;
+        text-transform: capitalize;
+        font-family: "Montserrat", sans-serif !important;
+            font-weight: 600;
+    }
+    
+    .alert-light{
+        border-radius: 8px;
+border: 0.5px solid #C6C6C6;
+background: #FFF;
+    }
+    
+     
+    .alert-light p{
+    color: #2D4156;
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    text-align: left;
+    }
+    
+    .modal-description{
+            font-weight: 400;
+    }
+    
+    .modal-header .close {
+    margin-top: -32px !important;
+        background: #EAEFF2 !important;
+    padding: 10px;
+    font-size: 40px;
+    color: #757373;
+    position: absolute;
+  right: 8px;
+    top: 29px;
+}
+}
+
+.modal-header {
+    border-bottom: none !important;
+}
+   
+   
+   .modal-subtitle{
+       font-size: 14px;
+    font-weight: 500;
+    color: #002B60 !important;
+    margin-bottom: 11px;
+   } 
+   
+   
+   .btn-cookie{
+       
+           background: #4C6A8F;
+    text-transform: capitalize;
+    width: 200px;
+    padding: 0 !important;
+    height: 34px;
+    color: #fff !important;
+   }
+   
+
+   
+   .modal-footer, .modal-body {
+    text-align: right !important;
+}
+
+.btn-cancel{
+        float: left;
+    width: 150px;
+        padding: 0 !important;
+    height: 34px;
+  text-transform: capitalize;
+      color: #002b60;
+    font-weight: 600 !important;
+}
+
+.panel-heading{
+        text-align: justify;
+        background: #f0f4f7 !important;
+        margin-top: 10px;
+         padding: 20px;
+}
+
+.panel-title{
+        color: #2d4156 !important;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.show {
+ display: unset !important; 
+}
+
+.panel-default{
+    border: unset !important;
+}
+
+.panel-body {
+         background: #f0f4f7;
+}
+
+.th-color{
+        font-size: 12px !important;
+    color: #071920 !important;
+    font-weight: 600 !important;
+}
+
+    .btn-cancel-des{
+          display: block;
+        }
+        
+          .btn-cancel-mob{
+          display: none;
+        }
+
+
+input[type="checkbox"]:disabled + .slider {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important; 
+    background: rgba(118, 118, 118, 0.3) !important;
+}
+
+.link-underline{
+    
+        text-decoration: underline !important;
+    font-weight: 600;
+}
+
+
+
+
+.btn-cookies:hover {
+    color: #fff  !important;
+    background: #6C9F2C !important ;
+}
+  
+  
+  .btn-outline:hover {
+    background: #4c6a8f  !important;
+      color: #fff !important;
+}
+
+ .btn-outline{
+        background: #fff;
+ }
+ 
+   .btn-one {
+         font-weight: 600 !important;
+       }
+       
+       
+       .grid-buttons{
+           display: grid;
+           justify-content: end;
+            margin-left: -90px;
+       }
+       
+       
+       .paddingLeftBlock{
+            padding-left: 70px;
+       }
+
+        
+    @@media(max-width: 768px){
+    
+      .btn-one {
+         width: 100% !important;
+         margin-top:20px;
+         margin-bottom: -4px;
+       }
+       
+         .paddingLeftBlock{
+            padding-left: 0 !important;
+       }
+       
+       .modal-content {
+         padding: 11px !important;
+        }
+        
+               .grid-buttons{
+           display: unset !important;
+    
+       }
+       
+       .modal-body{
+           overflow: auto;
+             height: 510px;
+        }
+       
+       .btn-cancel-des{
+          display: none !important;
+        }
+        
+          .btn-cancel-mob{
+          display: block !important;
+              margin-top: 10px;
+        }
+       
+       
+       .switch{
+             margin-left: 12px;
+        }
+       
+       #cookieSettingsModal{
+        width: 115% !important;
+            top: 57% !important;
+       }
+       
+        .btn-cookie{
+   
+     width: 100% !important;
+         margin-top: 10px;
+
+   }
+   
+   .btn-cancel{
+  width: 100% !important
+}
+
+
+      .icon-img label{
+      width: 226px;
+    text-align: left;
+    }
+    
+    
+       .cookie-notice {
+      border-radius: 24px 24px 0px 0px;
+    }
+    
+    
+    .panel-heading {
+    padding: 6px !important;
+    height: 60px !important;
+    padding-top: 21px !important;
+    }
+
+
+.modal-body {
+  
+    padding: 6px !important;
+}
+    
+    
+    
+    }
+    
+</style>
+
+
+
+<style>
+    
+     .app-banner {
+     padding: 12px;
+   
+      display: flex;
+      display: none;
+      align-items: center;
+      background-color: #b2bfcf;
+      border-radius: 6px;
+      max-width: 480px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    .close-download {
+    
+    position: relative;
+    left: -8px;
+    width: 29px;
+
+    }
+    
+    .app-title{
+            color: #002b60;;
+    font-size: 13px;
+    }
+    
+
+    .app-icon {
+      width: 40px;
+      height: 40px;
+      margin-right: 0.75rem;
+    }
+
+    .app-info {
+      flex-grow: 1;
+    }
+
+    .app-info b {
+      display: block;
+      color: #003366;
+    }
+
+    .btn-continue {
+        width: 120px;
+  height: 36px;
+  flex-grow: 0;
+  text-transform: capitalize !important;
+  margin: 2px 0 2px 12px;
+  border-radius: 2px;
+  border: solid 1px #4c6a8f;
+  background-color: #fff;
+    }
+
+    .btn-continue:hover {
+      background-color: #003366;
+      color: white;
+    }
+    
+    .link-color{
+          color: #4c6a8f !important;
+    }
+    
+    
+    @@media (max-width: 768px){
+    
+       .app-banner{
+       
+          display: flex ;
+       }
+    }
+    
+</style>
+
+
+  <div class="app-banner">
+      <img id="close-download"  class="close-download" src="http://cmsdev.africanbank.net/media/wdihdj23/cancel.svg"/>
+   
+    <img src="http://cmsdev.africanbank.net/media/zynfjuur/app-logo-png.png" class="app-icon" alt="African Bank Logo">
+    <div class="app-info">
+      <b>African Bank App</b>
+      <small class="app-title">FREE on the App Store</small>
+    </div>
+    <button class=" btn-continue">
+         
+         <a  class="link-color" href="https://play.google.com/store/apps/details?id=za.co.android.africanbank">Continue</a>
+        
+    </button>
+  </div>
+
+
+
+<div id="cookieNotice" class="cookie-notice">
+    <div class="container-cookie">
+        <div class="row">
+            <div class="col-md-6 paddingLeftBlock">
+                <h6 class="color-brand-1 mb-20"><strong>Cookies on African Bank</strong></h6>
+                <p class="mb-1 paragraph-cookie">This site uses certain cookies to function correctly. <strong>Accepting all cookies</strong> allows us to personalize your experience and understand how our site is used.</p>
+               
+               
+               <p class="mb-1 mt-20 paragraph-cookie"> View <strong> Cookie settings</strong> for our Cookie Policy or for more cookie options.</p>
+               
+              
+            </div>
+            <div class="col-md-6 text-align-end">
+                <button class="close-btn" onclick="closeNotice()">&times;</button>
+            </div>
+            <div class="col-md-6 text-center d-grid grid-buttons">
+                <div>
+                    <button  class="btn btn-one btn-cookies  acceptAll">Accept all cookies</button>
+                </div>
+                <div>
+                    <button id="acceptNecessary" class="btn btn-one btn-cookies">Accept only necessary cookies</button>
+                </div>
+                <div>
+            
+            <button class="btn btn-one btn-outline px-3" id="openSettings">Cookie Settings</button>
+                 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+    <!-- Modal Background Overlay -->
+    <div id="overlay"></div>
+
+
+<div id="cookieSettingsModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header modal-header-cookies mt-1">
+                <h5 class="modal-title " id="cookieModalLabel">Cookie Settings</h5>
+                <button type="button" class="close cancelSettings" data-dismiss="modal" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h4 class=" text-left modal-subtitle">Cookie usage</h4>
+                <p class="modal-description paragraph-cookie text-left">We use necessary cookies to enable the website to work. Other cookies enable additional features that change your experience on the site. You can change these settings whenever you want.</p>
+
+                <!-- Accordion for Cookie Categories -->
+                <div class="panel-group" id="cookieAccordion">
+                    
+                    <!-- Strictly Necessary Cookies (Disabled) -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                              <label class="switch">
+                                    <input type="checkbox" id="strictlyNecessary" checked disabled>
+                                        <span class="slider">
+                                  <span class="tick">&#10003;</span> <!-- Checkmark -->
+                                    <span class="cross">&#10005;</span> <!-- Cross mark -->
+                                  </span>
+                                </label>
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#cookieAccordion" href="#collapseOne">
+                                    <span class="glyphicon glyphicon-chevron-down"></span> 
+                                </a>
+                                <span>Strictly Necessary Cookies</span>
+                            </h4>
+                        </div>
+                        <div id="collapseOne" class="panel-collapse collapse">
+                            <div class="panel-body">
+                              
+                                <p class="color-brand-1 text-left">These cookies are essential for the proper functioning of my website. Without these cookies, the website would not work properly</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Performance and Analytics Cookies -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                                  <label class="switch">
+                                    <input type="checkbox" id="performanceCookies">
+                                           
+                                <span class="slider">
+                                  <span class="tick">&#10003;</span> <!-- Checkmark -->
+                                    <span class="cross">&#10005;</span> <!-- Cross mark -->
+                                  </span>
+                                </label>
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#cookieAccordion" href="#collapseTwo">
+                                    <span class="glyphicon glyphicon-chevron-down"></span>
+                                </a>
+                               <span class="cookes-label"> Performance and Analytics Cookies</span>
+                            </h4>
+                             
+                        </div>
+                        <div id="collapseTwo" class="panel-collapse collapse">
+                            <div class="panel-body">
+                          <div class="color-brand-1" >
+   <p>    These cookies allow the website to remember the choices you have made in the
+    past</p>
+    
+    <div class="table-responsive">
+          <table class="table">
+    <thead>
+      <tr>
+        <th class="th-color" scope="col">Name</th>
+        <th class="th-color" scope="col">Domain</th>
+        <th class="th-color" scope="col">Expiration</th>
+        <th class="th-color" scope="col">Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td data-column="Name">^_ga</td>
+        <td data-column="Domain">google.com</td>
+        <td data-column="Expiration">2 years</td>
+        <td data-column="Description">description ...</td>
+      </tr>
+      <tr>
+        <td data-column="Name">_gid</td>
+        <td data-column="Domain">google.com</td>
+        <td data-column="Expiration">1 day</td>
+        <td data-column="Description">description ...</td>
+      </tr>
+    </tbody>
+  </table>
+    </div>
+
+</div>
+
+                                 
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Advertisement and Targeting Cookies -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                               <label class="switch">
+                                    <input type="checkbox" id="advertisementCookies">
+                                      <span class="slider">
+                                  <span class="tick">&#10003;</span> <!-- Checkmark -->
+                                    <span class="cross">&#10005;</span> <!-- Cross mark -->
+                                  </span>
+                                </label>
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#cookieAccordion" href="#collapseThree">
+                                    <span class="glyphicon glyphicon-chevron-down"></span> 
+                                </a>
+                                
+                                 <span class="cookes-label"> Advertisement and Targeting Cookies </span>
+                            </h4>
+                        </div>
+                        <div id="collapseThree" class="panel-collapse collapse">
+                            <div class="panel-body">
+                             
+                                <p class="color-brand-1 text-left">These cookies collect information about how you use the website, which pages you visited and which links you clicked on. All of the data is anonymized and cannot be used to identify you</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- More Information -->
+                <div class="alert alert-light" role="alert">
+                    <h4 class="color-brand-1 text-title text-left">More information</h4>
+                    <p>For more information on cookies and how we manage your data, please read our <a class="link-underline" href="../../en/home/cookie-policy/">Cookie Policy</a>.</p>
+                      <br/>
+                    <p>You can <a class="link-underline" href="../../en/home/about-us-contact-us/">contact us</a> if you have any questions about the policy or your choices.</p>
+                </div>
+            </div>
+            <div class="modal-footer text-end">
+                <button type="button" class="btn btn-secondary cancelSettings btn-cancel-des btn-cancel" data-dismiss="modal">Cancel</button>
+                   <button type="button" class="btn btn-cookie acceptAll">Accept all cookies</button>
+                <button type="button" class="btn btn-cookie" id="acceptSelected">Accept selected cookies</button>
+             
+                  <button type="button" class="btn btn-secondary cancelSettings btn-cancel-mob btn-cancel" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+     function setCookie(name, value, days) {
+        let expires = "";
+        if (days) {
+            let date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + value + "; path=/" + expires;
+    }
+
+    function getCookie(name) {
+        let nameEQ = name + "=";
+        let cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            let c = cookies[i].trim();
+            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length);
+        }
+        return null;
+    }
+
+    function closeNotice() {
+        $("#cookieNotice").fadeOut();
+    }
+
+    $(document).ready(function () {
+        if (getCookie("cookieConsent")) {
+            $("#cookieNotice").hide();
+        }
+        
+        
+        $("#close-download").click(function (){
+     
+               $(".app-banner").hide();
+        })
+        
+
+        $(".acceptAll").click(function () {
+         
+            setCookie("cookieConsent", "all", 30);
+            closeNotice();
+             $("#cookieSettingsModal, #overlay").fadeOut();
+        });
+
+        $("#acceptNecessary").click(function () {
+            setCookie("cookieConsent", "necessary", 30);
+            closeNotice();
+             $("#cookieSettingsModal, #overlay").fadeOut();
+        });
+
+        $("#openSettings").click(function () {
+            $("#cookieSettingsModal, #overlay").fadeIn();
+        });
+
+        $(".cancelSettings").click(function () {
+            $("#cookieSettingsModal, #overlay").fadeOut();
+        });
+        
+        
+        $('#cookieAccordion .panel-collapse').on('show.bs.collapse', function () {
+    $(this).parent().find(".glyphicon").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-up");
+});
+
+$('#cookieAccordion .panel-collapse').on('hide.bs.collapse', function () {
+    $(this).parent().find(".glyphicon").removeClass("glyphicon-chevron-up").addClass("glyphicon-chevron-down");
+});
+
+
+        $("#acceptSelected").click(function () {
+            let performance = $("#performanceCookies").prop("checked") ? "true" : "false";
+            let advertisement = $("#advertisementCookies").prop("checked") ? "true" : "false";
+
+            setCookie("performanceCookies", performance, 30);
+            setCookie("advertisementCookies", advertisement, 30);
+            setCookie("cookieConsent", "custom", 30);
+
+            $("#cookieSettingsModal, #overlay").fadeOut();
+            closeNotice();
+        });
+    });
+
+</script>

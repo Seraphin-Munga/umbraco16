@@ -1,0 +1,12 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+<div class="modal fade" id="generic" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><b>&times;</b></button>
+                <h4 class="modal-title" id="modal-title"></h4>
+            </div>
+            @Model.HTMLContent(null)
+        </div>
+    </div>
+</div>

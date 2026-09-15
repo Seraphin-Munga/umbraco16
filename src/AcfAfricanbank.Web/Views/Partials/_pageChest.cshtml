@@ -1,0 +1,9 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@model Umbraco.Web.PublishedContentModels.HeroChest
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using System.Configuration;
+
+@{
+    var Children = Model.Children;
+    var chestItem = Children?.Where(c => c.DocumentTypeAlias == "HeroChestElementItem").FirstOrDefault();
+}

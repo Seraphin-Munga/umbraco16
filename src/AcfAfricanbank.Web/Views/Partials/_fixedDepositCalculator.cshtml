@@ -1,0 +1,35 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using System.Collections.Generic;
+@using AfricanBank.Cms.Portal.Helpers;
+
+<style>
+
+    #calculator{
+        top:unset;
+    }
+
+    #fixedDepositInvestmentAmount {
+        width: 90% !important;
+    }
+    .select.area{
+        width:90%!important;
+    }
+    .campaign-product-container{
+        top:unset;
+    }
+    /*#fixedDeposit-calculator-container > .container {
+        margin: unset;
+        padding: unset;
+        width: inherit;
+    }*/
+    #fixedDeposit-calculator-container {
+        background-color: #f7f7f7
+    }
+    #fixedResults{
+        margin-top: -320px;
+    }
+
+
+</style>
+
+@Html.Partial("_calculatorStructurev2", "calculatorfixed-form")

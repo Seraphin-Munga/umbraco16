@@ -1,0 +1,61 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@model Umbraco.Web.PublishedModels.HeroChest
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using System.Configuration;
+
+@{
+    var Children = Model.Children;
+    var chestItem = Children?.Where(c => c.DocumentTypeAlias == "HeroChestElementItem").FirstOrDefault();
+}
+<div class="container">
+    <div class="campaign-product-container connect-online-section full">
+        <div class="margin-top-20 visible-xs"></div>
+        <h3 class="text-center">What are the benefits?</h3>
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="card-plain">
+                    <div class="text-left">
+                        <div class="icon">
+                            <span class="icon-repayment"></span>
+                        </div>
+                        <div class="title text-uppercase">Convenience</div>
+                        <p class="">Connect online whenever and wherever. Self-service functionality, available 24/7 - we can help you online even when our doors are closed.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="card-plain">
+                    <div class="text-left">
+                        <div class="icon">
+                            <span class="icon-repayment"></span>
+                        </div>
+                        <div class="title text-uppercase">Control</div>
+                        <p class="">You decide when and how you would like to interact with African Bank.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="card-plain">
+                    <div class="text-left">
+                        <div class="icon">
+                            <span class="icon-repayment"></span>
+                        </div>
+                        <div class="title text-uppercase">Security</div>
+                        <p class="">The service allows you to interact freely whilst protecting your confidential information.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="card-plain">
+                    <div class="text-left">
+                        <div class="icon">
+                            <span class="icon-repayment"></span>
+                        </div>
+                        <div class="title text-uppercase">It's Free</div>
+                        <p class="">There is no monthly subscription or transaction fee for using the service.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

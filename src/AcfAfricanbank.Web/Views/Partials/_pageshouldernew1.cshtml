@@ -1,0 +1,54 @@
+﻿@model Umbraco.Web.PublishedModels.HeroShoulder
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using System.Configuration;
+@using Umbraco.Core.Models;
+@using Umbraco.Core.PropertyEditors;
+@using Umbraco.Web.Composing;
+
+
+  <style>
+    .hero-static-caption .hero-static-description, .hero-static-caption p {
+        @* margin-top: 0;
+        margin-bottom: 20px;
+        font-weight: bold;
+        font-size: 62px;*@
+        line-height: 1.03;
+    }
+    .hero-static-caption .hero-static-title, .hero-static-caption h1 {
+        margin-bottom: 0px;
+    }
+    .hero-static-caption p {
+        width: 100%;
+    }
+    .hero-static-caption {
+        background:transparent linear-gradient(180deg, #02397D 0%, #002B60 100%) 0% 0% no-repeat padding-box; 
+        top:-140px;
+    }
+</style>
+<div class="container">
+    <div class="hero-static-caption">
+        <div class="text_header">
+            <h1 class="hero-static-title">
+                
+                @Model.RichTextEditor
+            </h1>
+        </div>
+      @*  <div class="row">
+            <div class="col-sm-12 col-md-9">
+                <div class="hero-static-description">
+                    <p style="width:100%">
+                        @Model.ShouderDescription
+                    </p>
+                </div>
+            </div>
+            @if (shoulderButton != null)
+            {
+            <div class="col-sm-12 col-md-3">
+                <a href="@shoulderButtonLink" class="button primary button-styler">
+                    @shoulderButton.EbankItbuttonText
+                </a>
+            </div>
+            }
+        </div>*@
+    </div>
+</div>

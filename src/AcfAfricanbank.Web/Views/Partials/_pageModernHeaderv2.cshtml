@@ -1,0 +1,797 @@
+﻿@model Umbraco.Web.PublishedModels.HeroHeader
+
+@using Io = System.IO
+
+@using System.Drawing
+
+@using ImageProcessor
+
+ 
+
+@{
+
+ 
+
+    var headerImage_large = Model?.Value<IPublishedContent>("image")?.Url;
+
+    var headerImage_medium = Model?.Value<IPublishedContent>("imageMedium")?.Url;
+
+    var headerImage_small = Model?.Value<IPublishedContent>("imageSmall")?.Url;
+
+    var breadcrumbItems = Model?.Value("breadcrumb")?.ToString()?.Split(',')?.ToList();
+
+ 
+ EbankItsectionsMenu titles = null;
+   
+
+    if (Model.Children.Count() > 0)
+
+    {
+
+        titles = (EbankItsectionsMenu)Model.Children.ToList().Where(c => c is EbankItsectionsMenu).FirstOrDefault();
+
+        //  cards = (TabBody)Model.Children.ToList().Where(cc => cc is TabBody).FirstOrDefault();
+
+ 
+
+        string largeImageFullPath = Server.MapPath(headerImage_large);
+
+        try
+
+        {
+
+            if (Io.File.Exists(largeImageFullPath) && string.IsNullOrEmpty(headerImage_medium))
+
+            {
+
+                var idx = headerImage_large.IndexOf('.', (headerImage_large.Length - 5));
+
+                var fileName = headerImage_large.Substring(0, idx);
+
+                var fileExt = headerImage_large.Substring(idx);
+
+                var generatedMedFile = $"{fileName}_med.gen{fileExt}";
+
+                if (!Io.File.Exists(Server.MapPath(generatedMedFile)))
+
+                {
+
+                    byte[] photoBytes = Io.File.ReadAllBytes(largeImageFullPath);
+
+                    int quality = 100;
+
+                    var size = new Size(900, 380);
+
+                    using (var inStream = new MemoryStream(photoBytes))
+
+                    {
+
+                        using (var outStream = new MemoryStream())
+
+                        {
+
+                            using (var imageFactory = new ImageFactory(preserveExifData: true))
+
+                            {
+
+                                var res = imageFactory.Load(inStream)
+
+                                     .Resize(size)
+
+                                     .Quality(quality)
+
+                                     .Save(generatedMedFile);
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+                headerImage_medium = generatedMedFile;
+
+            }
+
+        }
+
+        catch (Exception ex)
+
+        {
+
+        }
+
+        var altTextImage = Model.Parent.Value("alternateImageText");
+
+    }
+
+ 
+
+}
+
+ 
+
+<style type="text/css">
+#chatIconImg{
+    display:none;
+}
+#iframe-karaboChat-speechBubble{
+    display:none;
+}
+:root {
+    --color-dark: #000000;
+    --color-primary: #5DC300;
+    --font-color: #DDDDDD;
+    --font-light: #EEEEEE;
+    --font-paragraph-dark:#707070;
+    --card-bg: #222222;
+}
+.breadcrumb1 li {
+    color: #fff !important;
+}
+.breadcrumb1 li a{
+    color: #fff !important;
+}
+breadcrumb1 li::after {
+    color: #fff !important;
+}
+nav{
+    background:#000;
+}
+
+a:hover, a:focus {
+
+    color: #DDDDDD;
+    text-decoration: unset;
+
+}
+
+.breadcrumb{
+    background:#000;
+     margin-bottom: 0px  !important;
+}
+
+    .search {
+
+        width: 100%;
+        position: relative;
+        display: flex;
+    }
+
+ 
+
+    .searchTerm {
+
+        width: 100%;
+
+        border: 2px solid #88bc47;
+
+        border-right: none;
+
+        padding: 5px;
+
+        height: 40px;
+
+        border-radius: 21px 0 0 21px;
+
+        outline: none;
+
+        /*background: #555650;*/
+
+        padding-left: 12px;
+
+    }
+
+    @@keyframes scrollToLeft {
+  0% {
+    transform: translateX(100%); 
+  }
+  100% {
+    transform: translateX(-100%); 
+  }
+}
+
+        .searchTerm:focus {
+
+            /*color: white;*/
+
+        }
+
+ 
+
+    .searchButton:focus {
+
+        border-color: yellow;
+    }
+
+ 
+
+    .searchButton {
+
+        width: 40px;
+
+        height: 40px;
+
+        border: 1px solid #98d150;
+
+        background: #98d150;
+
+        text-align: center;
+
+        color: #fff;
+
+        border-radius: 0 21px 21px 0;
+
+        cursor: pointer;
+
+        font-size: 20px;
+
+        outline: none;
+
+        border-radius: none;
+
+    }
+    
+/*==================
+HEADER SECTION 
+==================== */
+.hero-static-banner {
+    background-color: #000;
+    background-position: left center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 100%;
+    height: 100%;
+}
+
+.header-title {
+    color:var(--font-light);
+    margin-bottom: 2.5rem;
+}
+
+.header-title h1 {
+    font-size: 65px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    font-weight: bold;
+}
+
+.header-title p {
+    font-weight: bold;
+    font-size: 25px;
+}
+
+.classic-light {
+    font-weight: normal;
+}
+
+
+ /*==================
+CARD SECTION 
+==================== */
+
+<!--.deck {-->
+<!--    color: var(--font-color);-->
+<!--    display: flex;-->
+<!--    flex-wrap: wrap;-->
+<!--    justify-content: center;-->
+<!--    align-items: center;-->
+<!--    align-content: center;-->
+<!--    padding-bottom: 20px;-->
+<!--}-->
+
+<!--.card-deck:nth-child(odd) {-->
+<!--  cursor: not-allowed; /* Disable cursor events */-->
+<!--    display: flex;-->
+<!--    flex-direction: column;-->
+<!--    justify-content: space-evenly;-->
+<!--    align-items: center;-->
+<!--    height: 280px;-->
+<!--    width: 280px;-->
+<!--    background-color: var(--card-bg);-->
+<!--    border-radius: 21px;-->
+<!--    margin: 1.5%;-->
+<!--}-->
+
+<!--.card-deck:nth-child(even) {-->
+<!--  cursor: pointer; /* Enable cursor events */-->
+<!--    display: flex;-->
+<!--    flex-direction: column;-->
+<!--    justify-content: space-evenly;-->
+<!--    align-items: center;-->
+<!--    height: 280px;-->
+<!--    width: 280px;-->
+<!--    background-color: var(--card-bg);-->
+<!--    border-radius: 21px;-->
+<!--    margin: 1.5%-->
+<!--}-->
+
+<!--.card-title{-->
+<!--    display: flex;-->
+<!--    flex-direction: column;-->
+<!--    align-items: center;-->
+<!--    justify-content: center;-->
+<!--}-->
+
+<!--.card-title h1 {-->
+<!--    font-weight: bold;-->
+<!--    font-size: 21px;-->
+<!--}-->
+
+<!--.card-info {-->
+<!--    font-size: 14px;-->
+<!--    text-align: center;-->
+<!--    width: 90%;-->
+<!--}-->
+
+
+<!--.card-deck:nth-child(even) .card-link {-->
+<!--    cursor: pointer;-->
+<!--    display: flex;-->
+<!--    align-items: center;-->
+<!--    justify-content: center;-->
+<!--}-->
+
+<!--.card-deck:nth-child(odd) .icon {-->
+<!--  display: inline-block; /* Show the coming soon icon */-->
+<!--  cursor: not-allowed; /* Disable cursor events */-->
+<!--}-->
+
+<!--.card-deck:nth-child(even) .icon {-->
+<!--  display: inline-block; /* Show the right arrow icon */-->
+<!--  padding: 5px;-->
+<!--    border: 3px solid #4B9B59;-->
+<!--    border-radius: 50%;-->
+<!--    height: 50px;-->
+<!--    width: 50px;-->
+<!--    display: flex;-->
+<!--    align-items: center;-->
+<!--    margin: 0;-->
+<!--    justify-content: center;-->
+<!--}-->
+
+
+.header-btn {
+    margin-top: 35px;
+}
+
+.header-button{
+    background-color: #3BBCE2;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    width: 150px;
+    color:#DDDDDD;
+    padding:15px 25px;
+}
+
+.card-deck:nth-child(even):hover{
+transform: translateY(-10px);
+}
+
+.header-title{
+    padding-top: 5%;
+}
+
+.card-deck:nth-child(even) .card-link:hover .icon{
+    border:none;
+    background-color:#4B9B59;
+}
+
+.scroll-container {
+
+  width: 100%;
+
+  height: 100%;
+
+  overflow: hidden;
+
+  white-space: nowrap; /* Ensure content stays in a single line */
+
+  float: right;
+
+  padding-top:15px;
+
+}
+
+ 
+
+.content {
+   border-bottom: none;
+  display: inline-block; /* Content will be displayed in a single line */
+
+  animation: scrollToLeft 20s linear infinite; /* Scroll animation */
+
+}
+
+/*==================
+MEDIA QUERIES  
+==================== */
+@*
+@@media (min-width: 1440px){
+
+.hero-static-container {
+    width: 100%;
+    background-color: #000;
+    }
+    
+.header-title p {
+    width: 650px;
+    }
+
+}
+
+@@media(min-width: 1024px){
+
+.hero-static-container {
+    width: 100%;
+    }
+    
+.hero-static-banner {
+    background-color: #000;
+    background-position: left center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 100%;
+    height: 70%;
+    }
+
+    /* header title */
+
+.header-title {
+    padding-bottom: 50px;
+    }
+
+.header-title h1 {
+    font-size: 55px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    }
+
+.header-title p {
+    font-weight: bold;
+    font-size: 22px;
+    width: 650px;
+    }
+
+<!--.card-deck {-->
+<!--    display: flex;-->
+<!--    flex-direction: column;-->
+<!--    justify-content: space-evenly;-->
+<!--    align-items: center;-->
+<!--    height: 250px;-->
+<!--    width: 260px;-->
+<!--    background-color: var(--card-bg);-->
+<!--    border-radius: 21px;-->
+<!--    margin: 1.5%;-->
+<!--    }-->
+
+
+}*@
+@*
+@@media(max-width: 884px) and (min-width: 601px)  {
+    .blank-col {
+        display: none;
+    }
+    .header-title {
+        text-align: center;
+        padding-top: 5%;
+        margin-bottom: 3%;
+    }
+    .header-title h1 {
+        font-size: 40px;
+    }
+    
+    .header-title p {
+        font-size:25px;
+        width: 75%;
+        margin: 0px auto;
+    }
+    .deck {
+        display: flex;
+        flex-wrap: no-wrap;
+    }
+    
+    .card-deck:nth-child(odd) {
+        cursor: not-allowed; /* Disable cursor events */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+        height: 220px;
+        width: 220px;
+        background-color: var(--card-bg);
+        border-radius: 21px;
+        margin: 1%;
+    }
+    
+    .card-deck:nth-child(even) {
+        cursor: pointer; /* Enable cursor events */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+        height: 220px;
+        width: 220px;
+        background-color: var(--card-bg);
+        border-radius: 21px;
+        margin: 1%;
+    }
+    .card-title {
+        display: flex;
+        margin-top: 1%;
+        flex-direction: column;
+        align-content: center;
+    }
+    .card-title h1{
+        
+        font-weight: bold;
+        font-size: 17px;
+    }
+    
+    .card-info {
+        font-size: 14px;
+        text-align: center;
+        font-weight: 100;
+        width: 90%;
+    }
+}*@
+
+@*@@media(max-width: 640px) and (min-width: 350px){
+
+    .hero-static-container {
+    background: #000;
+    height: 85vh;
+    }
+
+    .hero-static-banner {
+    background-color: #000;
+    background-position: inherit;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 100%;
+    height: 500px;
+    }
+    
+    .blank-col {
+        display: none;
+    }
+    
+    
+    
+    .header-title {
+    padding-top: 5%;
+    text-align: center;
+    }
+    
+    .header-title h1 {
+    font-size: 30px;
+    }
+    
+    .header-title p {
+    font-weight: bold;
+    font-size: 17px;
+    }
+    
+    .deck{
+        margin-top: 30%;
+    }
+    
+    .card-deck:nth-child(odd) {
+    cursor: not-allowed; /* Disable cursor events */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 15px;
+    align-items: center;
+    height: 100px;
+    width: 90%;
+    background-color: var(--card-bg);
+    border-radius: 21px;
+    margin: 1.5%;
+    cursor: pointer;
+    }
+    
+   .card-deck:nth-child(even) {
+    cursor: pointer; /* Enable cursor events */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 15px;
+    align-items: center;
+    height: 100px;
+    width: 90%;
+    background-color: var(--card-bg);
+    border-radius: 21px;
+    margin: 1.5%;
+    cursor: pointer;
+    }
+    .card-title {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: center;
+    }
+    
+    .card-title h1 {
+    font-size: 15px;
+    }
+    
+    .card-info {
+    margin-top: -16px;
+    font-size: 12px;
+    text-align: left;
+    width: 90%;
+    }
+}
+*@
+</style>
+
+ 
+
+ 
+
+<!-- BREADCRUMB BANNER SECTION -->
+<nav>
+    <div class="container">
+        <div class="row scroll-backgrnd">
+
+    <div class="col-md-5 col-xs-6">
+          <!--BreadCrumb start here -->
+<div class="container">
+     @Html.Partial("_breadcrumb") 
+</div>
+<!--BreadCrum end-->
+      @*  <ol class="breadcrumb">
+
+            @if (breadcrumbItems != null)
+
+            {
+
+                foreach (string breadcrumItem in breadcrumbItems)
+
+                {
+
+                    var cssClass = breadcrumItem == breadcrumbItems.Last() ? "active" : string.Empty;
+
+                    <li class="@cssClass">@breadcrumItem</li>
+
+                }
+
+            }
+        </ol>*@
+        
+    </div>
+
+    <div class="col-md-7 col-xs-6">
+
+        <div class="scroll-container">
+
+            <div class="header content">@Html.Raw(titles.Value("headerTitle"))</div>
+
+        </div>
+
+    </div>
+</div>
+</div>
+</nav>
+
+
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+ 
+
+<script>
+
+      $(document).ready(function () {
+
+ 
+
+        var imageBgCss = "url('" + "@headerImage_large" + "')";
+
+        var imageMdCss = "url('" + "@headerImage_medium" + "')";
+
+        var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_large : headerImage_small)" + "')";
+
+        var CheckScreenSize;
+
+        (CheckScreenSize = function () {
+
+ 
+
+            var _width = $(window).outerWidth();
+
+            var _height = $(window).outerHeight();
+
+            if (_width <= 428) {
+
+                $("#heroHeader").css("background-image", imageSmCss);
+
+            }
+
+            else {
+
+                $("#heroHeader").css("background-image", imageBgCss);
+
+            }
+
+        })();
+
+        $(window).resize(CheckScreenSize);
+
+    });
+
+</script>
+
+ 
+
+
+
+@*
+
+     @section scripts  {
+
+        <script>
+
+        $(document).ready(function () {
+
+ 
+
+            var imageBgCss = "url('" + "@headerImage_large" + "')";
+
+            var imageMdCss = "url('" + "@headerImage_medium" + "')";
+
+            var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_large : headerImage_small)" + "')";
+
+            var CheckScreenSize;
+
+            (CheckScreenSize = function () {
+
+ 
+
+                var _width = $(window).outerWidth();
+
+                var _height = $(window).outerHeight();
+
+                if (_width < 414) {
+
+                    $("#heroHeader").css("background-image", imageSmCss);
+
+                }
+
+                else {
+
+                    $("#heroHeader").css("background-image", imageBgCss);
+
+                }
+
+            })();
+
+            $(window).resize(CheckScreenSize);
+
+        });
+
+ 
+
+        </script>
+
+ 
+
+    }
+
+ 
+
+*@
+
+ 
+ 

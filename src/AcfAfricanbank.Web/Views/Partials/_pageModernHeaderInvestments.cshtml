@@ -1,0 +1,506 @@
+﻿@model Umbraco.Web.PublishedModels.HeroHeader
+@using Io = System.IO
+@using System.Drawing
+@using ImageProcessor
+
+@{
+
+    var headerImage_large = Model?.Value<IPublishedContent>("image")?.Url;
+    var headerImage_medium = Model?.Value<IPublishedContent>("imageMedium")?.Url;
+    var headerImage_small = Model?.Value<IPublishedContent>("imageSmall")?.Url;
+    var breadcrumbItems = Model?.Value("breadcrumb")?.ToString()?.Split(',')?.ToList();
+
+    TabBody cards = null;
+    ModernHeader titles = null;
+    TabBody tabData = null;
+     TabBody tabWaysToBank = null;
+     foreach (var tab in Model.Children)
+    {
+        if (tab.ContentType.Alias.ToLower() == "tabbody")
+        {
+        if (tab.Value("partialViewName").ToString() == "partialHeader")
+            {
+                tabWaysToBank = (TabBody)tab;
+            }
+           
+            else
+            {
+                tabData = (TabBody)tab;
+            }
+        }
+    }
+     var sectionCardsContent = (ICollection<IPublishedElement>)tabWaysToBank.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+    if (Model.Children.Count() > 0)
+    {
+        titles = (ModernHeader) Model.Children.ToList().Where(c => c is ModernHeader).FirstOrDefault();
+      //  cards = (TabBody)Model.Children.ToList().Where(cc => cc is TabBody).FirstOrDefault();
+       
+        string largeImageFullPath = Server.MapPath(headerImage_large);
+        try
+        {
+            if (Io.File.Exists(largeImageFullPath) && string.IsNullOrEmpty(headerImage_medium))
+            {
+                var idx = headerImage_large.IndexOf('.', (headerImage_large.Length - 5));
+                var fileName = headerImage_large.Substring(0, idx);
+                var fileExt = headerImage_large.Substring(idx);
+                var generatedMedFile = $"{fileName}_med.gen{fileExt}";
+                if (!Io.File.Exists(Server.MapPath(generatedMedFile)))
+                {
+                    byte[] photoBytes = Io.File.ReadAllBytes(largeImageFullPath);
+                    int quality = 100;
+                    var size = new Size(900, 380);
+                    using (var inStream = new MemoryStream(photoBytes))
+                    {
+                        using (var outStream = new MemoryStream())
+                        {
+                            using (var imageFactory = new ImageFactory(preserveExifData: true))
+                            {
+                                var res = imageFactory.Load(inStream)
+                                     .Resize(size)
+                                     .Quality(quality)
+                                     .Save(generatedMedFile);
+                            }
+                        }
+                    }
+                }
+                headerImage_medium = generatedMedFile;
+            }
+        }
+        catch (Exception ex)
+        {
+        }
+        var altTextImage = Model.Parent.Value("alternateImageText");
+    }
+
+}
+
+<style type="text/css">
+
+nav{
+    background:#000;
+}
+.kh-search-engine{
+  margin-top:60px;
+  }
+.black-section {
+    background-color: #000;
+    width: 100%;
+}
+.hero-static-container {
+    background:#000;
+   @* margin-top:-1%;*@
+    
+}
+.hero-static-banner {
+    height: 600px;
+    background-size: contain;
+    background-position: inherit;
+}
+.breadcrumb{
+padding-left: 1px;
+    
+    }
+    .search {
+        width: 100%;
+        position: relative;
+        display: flex;
+    }
+
+    .searchTerm {
+        width: 100%;
+        border: 2px solid #88bc47;
+        border-right: none;
+        padding: 5px;
+        height: 40px;
+        border-radius: 21px 0 0 21px;
+        outline: none;
+        /*background: #555650;*/
+        padding-left: 12px;
+    }
+
+        .searchTerm:focus {
+            /*color: white;*/
+        }
+
+    .searchButton:focus {
+        border-color: yellow;
+    }
+
+    .searchButton {
+        width: 40px;
+        height: 40px;
+        border: 1px solid #98d150;
+        background: #98d150;
+        text-align: center;
+        color: #fff;
+        border-radius: 0 21px 21px 0;
+        cursor: pointer;
+        font-size: 20px;
+        outline: none;
+        border-radius: none;
+    }
+    .text-header{
+        margin-top:100px;
+    }
+      
+      .header-button{
+            background: border-box;
+            font-size: 24px;
+            margin-left: 46%;
+            border-style: groove;
+            border-right: 50%;
+            width: 150px; 
+            color:#DDDDDD;
+      }
+  .header-descr{
+    @* padding-top:50px;*@
+    @* margin-top:55px;*@
+   }
+     
+  @* .scroll-backgrnd{
+     background-color: #000;
+    color: #fff; 
+  }*@
+    .scroll-container {
+  width: 130%;
+  height: 100%;
+  overflow: hidden;
+  white-space: nowrap; /* Ensure content stays in a single line */
+  float: right;
+  padding-top:15px;
+  margin-right:-30%;
+}
+
+.content {
+  display: inline-block; /* Content will be displayed in a single line */
+  animation: scrollToLeft 20s linear infinite; /* Scroll animation */
+}
+
+@@keyframes scrollToLeft {
+  0% {
+    transform: translateX(100%); 
+  }
+  100% {
+    transform: translateX(-100%); 
+  }
+}
+.header-title{
+   @* margin-left: 13%;*@
+    margin-top: 5%;
+    }
+ .ab-business {
+   
+  @* margin-left: 16%;*@
+ 
+    width: 100%;
+    margin-left: 15%;
+}
+
+.span-buttons{
+    margin-left:0%;
+}
+ @@media (min-width: 256px) and (max-width: 767px){
+ .hero-static-banner-mbl{
+   background-size: cover;
+   height: 300px;
+    background-position: initial;
+   
+ }
+ .kh-search-engine {
+    margin-top: 10px;
+}
+ .title-text{
+   font-size: 25px !important;
+ }
+ .business-text{
+    font-size: 14px !important;
+    width: 70% !important;
+ }
+ .header-title {
+   @* margin-left: 4%;*@
+  }
+ @* .header-descr {
+    margin-top: 30px;
+}*@
+  .ab-business {
+   margin-left: 10%;
+   @* text-align: start;
+    width: auto;
+   @* margin-top: -15%;*@
+  }
+  .title-mbl{
+  margin-bottom:30px;
+  }
+ }
+ @@media (max-width: 767px)
+ {
+    .breadcrumb {
+        display: block;
+        padding-left: 10px;
+        padding-right: 0px;
+    }
+ }
+ @@media (min-width: 768px) and (max-width: 991px){
+ .ab-business {
+   margin-left: 8% !important;
+    }
+ }
+  @@media (min-width: 768px) and (max-width: 1024px){
+  
+  .kh-search-engine {
+    margin-top: -200px;
+}
+    
+    .business-text{
+    width:70% !important;
+    }
+    .header-title {
+   @* margin-left: 7%;*@
+    }
+   @* .ab-business {
+   margin-left: 8% !important;
+    }*@
+    .hero-static-banner-mbl {
+   
+    background-position: inherit
+    }
+     .title-mbl{
+  margin-bottom:30px;
+     @* padding-left:0;*@
+  }
+  }
+ @*  @@media (min-width: 768px) and (max-width: 991px){
+       .title-mbl{
+  
+      margin-left: -55px;
+  }
+    }*@
+  
+  @@media (min-width: 992px) and (max-width: 1199px)
+    {
+    .ab-business {
+   margin-left: 8%;
+    }
+    }
+    
+     @@media (min-width: 1114px) and (max-width: 1270px){
+  
+  .ab-business {
+    margin-top: 5%;
+  
+  margin-left: 15%;
+    }
+  .hero-static-banner-mbl {
+   
+    background-position: inherit;
+    }
+       .title-mbl{
+  margin-bottom:30px;
+  }
+  .header-title {
+  @*  margin-left: -25px;*@
+    }
+    
+  }
+</style>
+
+<!-- HERO BANNER -->
+
+
+<nav>
+    <div class="container">
+        <div class="row scroll-backgrnd">
+            <div class="col-md-5 col-xs-6">
+                <ol class="breadcrumb">
+                    @if (breadcrumbItems != null)
+                    {
+                        foreach (string breadcrumItem in breadcrumbItems)
+                        {
+                            var cssClass = breadcrumItem == breadcrumbItems.Last() ? "active" : string.Empty;
+                            <li class="@cssClass">@breadcrumItem</li>
+                        }
+                    }
+                  
+               </ol>
+            
+              
+            </div>
+            <div class="col-md-7 col-xs-6">
+                <div  class="scroll-container">
+                    <div class="header content">@Html.Raw(titles.Value("subHeaderTitle"))</div> 
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</nav>
+
+
+<div class="hero-static-container">
+    <div class="hero-static-banner destktop-banner hidden-md hidden-xs hidden-sm visible-lg" id="heroHeader" style="background-image: url('@headerImage_large');">
+        <div class="container @*container-fluid*@ ">
+            <div class="row @*no-gutter*@ ">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 blank-col"></div>
+                <div class="title col-lg-8 col-md-8 col-sm-8 col-xs-12" @* class="col-sm-12"*@>
+                    <div class="@*center-align*@ kh-search-engine">
+
+                        @if (titles != null)
+                        {
+                            
+                            <div class="row header-descr">
+
+                                @{
+                                    int cardIterator = 0;
+                                    bool increaseCardHeight = false;
+                                    foreach (var item in sectionCardsContent)
+                                    {
+                                        if (cardIterator == (int)sectionCardsContent.Count() - 1)
+                                        {
+                                            increaseCardHeight = true;
+                                        }
+                                        Umbraco.Web.Models.Link itemLink = null;
+                                        foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)item.Value("tabSubItemLinks"))
+                                        {
+                                            itemLink = link;
+                                            break;
+                                        }
+                                        <div class="row">
+                                            <div class="ab-business text-header">
+                                            <div class="header-title">@Html.Raw(titles.Value("headerTitle"))</div>
+                                                @Html.Raw(item.Value("tabSubItemTextContent"))
+                                                @if (itemLink != null)
+                                                {
+                                                    <a class="button primary span-buttons" href="@itemLink.Url" target="_blank">@itemLink.Name</a>
+                                                }
+
+                                            </div>
+                                        </div>
+                                    }
+                                }
+
+                            </div>
+
+
+
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    @*mobile*@
+    
+    <div class="hero-static-banner hero-static-banner-mbl destktop-banner visible-md visible-xs visible-sm hidden-lg" id="heroHeader" style="background-image: url('@headerImage_large');">
+
+    </div>
+    <div class="container visible-md visible-xs visible-sm hidden-lg black-section @*container-fluid*@ ">
+        <div class="row @*no-gutter*@ ">
+            @*<div class="col-md-4 col-sm-4 blank-col"></div>*@
+            <div class="title title-mbl col-lg-8 col-md-8 col-sm-8 col-xs-12" @* class="col-sm-12"*@>
+                <div class="@*center-align*@ kh-search-engine">
+
+                    @if (titles != null)
+                    {
+                        
+                        <div class="row header-descr">
+
+                            @{
+                                int cardIterator = 0;
+                                bool increaseCardHeight = false;
+                                foreach (var item in sectionCardsContent)
+                                {
+                                    if (cardIterator == (int)sectionCardsContent.Count() - 1)
+                                    {
+                                        increaseCardHeight = true;
+                                    }
+                                    Umbraco.Web.Models.Link itemLink = null;
+                                    foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)item.Value("tabSubItemLinks"))
+                                    {
+                                        itemLink = link;
+                                        break;
+                                    }
+                                    <div class="row">
+                                        <div class="ab-business">
+                                            <div class="header-title">@Html.Raw(titles.Value("headerTitle"))</div>
+                                            @Html.Raw(item.Value("tabSubItemTextContent"))
+                                            @if (itemLink != null)
+                                            {
+                                                <a class="button primary span-buttons" href="@itemLink.Url" target="_blank">@itemLink.Name</a>
+                                            }
+
+                                        </div>
+                                    </div>
+                                }
+                            }
+
+                        </div>
+
+
+
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+    
+    
+    
+   
+
+
+
+<script>
+      $(document).ready(function () {
+       
+        var imageBgCss = "url('" + "@headerImage_large" + "')";
+        var imageMdCss = "url('" + "@headerImage_medium" + "')";
+        var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_large : headerImage_small)" + "')";
+        var CheckScreenSize;
+        (CheckScreenSize = function () {
+            
+            var _width = $(window).outerWidth();
+            var _height = $(window).outerHeight();
+            if (_width <= 414) {
+                $("#heroHeader").css("background-image", imageSmCss);
+            }
+            else {
+                $("#heroHeader").css("background-image", imageBgCss);
+            }
+        })();
+        $(window).resize(CheckScreenSize);
+    });
+</script>
+
+
+ @* 
+ @section scripts  {
+    <script>
+    $(document).ready(function () {
+       
+        var imageBgCss = "url('" + "@headerImage_large" + "')";
+        var imageMdCss = "url('" + "@headerImage_medium" + "')";
+        var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_large : headerImage_small)" + "')";
+        var CheckScreenSize;
+        (CheckScreenSize = function () {
+            
+            var _width = $(window).outerWidth();
+            var _height = $(window).outerHeight();
+            if (_width < 414) {
+                $("#heroHeader").css("background-image", imageSmCss);
+            }
+            else {
+                $("#heroHeader").css("background-image", imageBgCss);
+            }
+        })();
+        $(window).resize(CheckScreenSize);
+    });
+
+    </script>
+
+}
+ 
+ *@
+

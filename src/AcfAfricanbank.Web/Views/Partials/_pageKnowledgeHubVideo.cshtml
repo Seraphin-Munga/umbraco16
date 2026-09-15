@@ -1,0 +1,28 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@model Dictionary<string, List<string>>
+
+@{
+    foreach (var videoData in Model)
+    {
+        var stringHeader = videoData.Value.ToList()[0].ToString().Split(';')[0];
+        var stringValue = videoData.Value.ToList()[1].ToString();
+        <div data-video="@stringHeader" class="video_list_item">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="video-item-content">
+                        <p style="font-size: 14px" class="css-color-change">
+                            @stringHeader
+                        </p>
+                        <a class="margin-left-20" href="@stringValue" target="_blank"><b>Watch</b></a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12" style="padding:10px 25px 0px 38px;">
+                    <div class="sharethis-inline-share-buttons" data-url="@stringValue"></div>
+                </div>
+            </div>     
+            <hr />
+        </div>
+    }
+}

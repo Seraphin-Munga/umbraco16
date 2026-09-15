@@ -1,0 +1,63 @@
+﻿@model Umbraco.Web.PublishedModels.TabBody
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using System.Configuration;
+
+@{
+    var tbody = Model.GetProperty("tabBodyContent");
+    var cardData = Model.TabBodyContent.ToList();
+}
+<div class="campaign-more-container features-container">
+    <div class="hover-block"></div>
+    <div class="container">
+        @foreach (var item in cardData)
+        {
+            var sectionContent = (IEnumerable<IPublishedElement>)item.Value("sectionContent");
+            var chestItems = sectionContent.Where(c => c.ContentType.Alias == "nCHeroChestElementItem").FirstOrDefault();
+            var _chestItem = chestItems.Value<IEnumerable<IPublishedElement>>("nCheroChestItem").Where(c => c.ContentType.Alias == "heroChestTitle").FirstOrDefault();
+            var lowerChestCards = _chestItem.Value("listOfChestCards");
+
+
+            <div class="mega-tabs">
+                <ul class="nav nav-tabs eq-height" role="tablist">
+                    @{
+                        var isFirstRow = true;
+                        int j = 0;
+                        var inforId = "#info" + j.ToString();
+                        <li role="presentation" class="@(isFirstRow ? "active" : "") campaign-more">
+                            <a href=@inforId aria-controls="home" role="tab" data-toggle="tab">
+                                @_chestItem.Value("cardMainTitle")
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="tab-content">
+                @{
+                    bool isFirstTab = true;
+                    int i = 0;
+                    var tabId = "info" + i.ToString();
+                    <div role="tabpanel" class="tab-pane @(isFirstTab ? "active" : "")" id=@tabId>
+                        <div class="row">
+                            @foreach (var card in (IEnumerable<NCheroChest>)lowerChestCards)
+                            {
+                                <div class="col-sm-4">
+                                    <div class="card-plain">
+                                        <div class="center-icon-text">
+                                            <div class="icon">
+                                                <span class=@card.Value("nCchestIconClass")></span>
+                                            </div>
+                                            <div class="title text-uppercase">@card.Value("nCchestTitle")</div>
+                                            <p class="descr">@card.Value("nCchestDescription")</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    isFirstTab = false;
+                    ++i;
+            }
+            </div>
+        }
+    </div>
+</div>

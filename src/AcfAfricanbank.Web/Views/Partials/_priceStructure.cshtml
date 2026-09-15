@@ -1,0 +1,138 @@
+﻿@model Umbraco.Web.PublishedModels.PriceStructure
+@using System.Text.RegularExpressions
+
+@{ 
+    var structureHeader = string.IsNullOrEmpty(Model.StructureHeading) ? "Pricing Structure" : Model.StructureHeading;
+    var priceGroups = Model.PriceGroups.Select(g => g as PriceGroup) ?? new List<PriceGroup>();
+    var footerText = Model.StructureFooterText ?? string.Empty;
+    var counter = 0;
+}
+<style>
+ @@media (min-width: 280px) and (max-width: 767px){
+    .pricing-table__footer{
+            margin: auto;
+    }
+    
+    .pricing-table__body{
+     margin: auto;
+    }
+    }
+    
+.online-banking-container {
+    height: 30px !important;
+    padding: 30px !important;
+}
+    
+</style>
+@if (Model != null)
+{
+    <div class="pricing-table desk-table">
+    <div class="container">
+        <div>
+            <div class="text-center">
+                <h3>@structureHeader</h3>
+            </div>
+            <div class="pricing-table__body">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <ul class="nav nav-tabs">
+                            @foreach (var group in priceGroups)
+                            {
+                                var name = group.GroupName;
+                                var id = Regex.Replace(name, @"[^0-9a-zA-Z]+", "");
+                                var cssClass = group.Equals(priceGroups.First()) ? "active" : string.Empty;
+                                <li class="@cssClass"><a data-toggle="tab" href="#@id">@name</a></li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="col-sm-9">
+                        <div class="tab-content">
+                            @foreach (var group in priceGroups)
+                            {
+                                var name = group.GroupName;
+                                var id = Regex.Replace(name, @"[^0-9a-zA-Z]+", ""); //name.Replace(" ", string.Empty);
+                                var cssClass = group.Equals(priceGroups.First()) ?
+                                                "tab-pane fade in active tab-content__item" :
+                                               "tab-pane fade tab-content__item";
+                                var priceItems = group.PriceItems.Select(i => i as PricedItem) ?? new List<PricedItem>();
+                                <div id="@id" class="@cssClass">
+                                    <h3 class="text-uppercase">@name</h3>
+                                    @foreach (var item in priceItems)
+                                    {
+                                        <ul>
+                                            <li>
+                                                <div class="row">
+                                                    <div class="col-sm-6">
+                                                        @item.ItemName
+                                                    </div>
+                                                    <div class="col-sm-6 text-right">
+                                                        @item.ItemPrice
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pricing-table__footer text-center">
+                <p>@footerText</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+}
+
+
+
+   @foreach (var group in priceGroups)
+                {
+               
+                    var name = group.GroupName;
+                   var id = Regex.Replace(name, @"[^0-9a-zA-Z]+", ""); //name.Replace(" ", string.Empty);
+                                var cssClass = group.Equals(priceGroups.First()) ?
+                 "tab-pane fade in active tab-content__item" :
+                  "tab-pane fade tab-content__item";
+                 var priceItems = group.PriceItems.Select(i => i as PricedItem) ?? new List<PricedItem>();
+                
+              <div class="mobi-table" style="width:  100%;padding: 0px;left:  0;">
+                <div data-toggle="collapse" data-target=".accordion@((counter))" class="clickable tr-category online-banking-container">
+                    <div class="arrow-container">
+            
+                        <i id="mobiIcon4" style="float: right;"><span class="fa fa-arrow-down"></span></i>
+                    </div>
+                    <b>@name</b>
+                </div>
+                    <div class="row accordion@((counter)) collapse" aria-expanded="false" style="text-align: left; width: 100%; margin-top: 0px; padding: 25px; height: 50px;">
+                            <h3 class="text-uppercase">@name</h3>
+                           @foreach (var item in priceItems)
+                                    {
+                              
+                                <hr/>
+                                        <ul style=" list-style: none;">
+                                            <li>
+                                                <div class="row">
+                                                    <div class="col-sm-6">
+                                                        @item.ItemName
+                                                    </div>
+                                                    <div class="col-sm-6 text-right">
+                                                        @item.ItemPrice
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    }
+            
+                    </div>
+              </div>
+                   
+                    
+                    
+                counter++;
+                }
+
+

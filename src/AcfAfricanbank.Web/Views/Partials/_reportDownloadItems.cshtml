@@ -1,0 +1,24 @@
+﻿@model  IEnumerable<ContentModels.NcArchieve>
+@using ContentModels = Umbraco.Web.PublishedModels;
+
+<ul ng-controller="ReportsAndArchievesController">
+    @foreach (var report in Model)
+    {
+        <li ng-show='stringContains("@report.Title", searchTerm) && categoryMatch("@report.ArchiveCategory", category)' class="searchItemList">
+            <div class="row no-gutter download-item">
+                <div class="col-sm-2">
+                    <div class="download-date">@report.Date.ToString("dd MMM yyyy")</div>
+                </div>
+                <div class="col-sm-7">
+                    <div class="download-descr">@report.Title</div>
+                </div>
+                <div class="col-sm-3">
+                    @if (report.File != null)
+                    {
+                        <a href="@report.File.Url" target="_blank" class="download-btn">Download</a>
+                    }
+                </div>
+            </div>
+        </li>
+    }
+</ul>

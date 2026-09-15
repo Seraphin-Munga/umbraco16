@@ -1,0 +1,90 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@model Umbraco.Web.PublishedModels.HeroHeader
+@using Io = System.IO
+@using System.Drawing
+@using ImageProcessor
+
+@{
+    var searchtxtResults = Model.Children.FirstOrDefault();
+
+}
+
+@*<div class="container">
+    <div class="row eq-height">
+        <div class="col-sm-3">
+            <div class="mega-menu-product" style="">
+                <div class="product-category">VIDEOS</div>
+
+                <div class="product">
+                    <a class="title" href="/en/home/product-personal-loan/">Personal Loan</a>
+                    <p class="descr">Get fixed repayments on flexible terms</p>
+                </div>
+                <div class="product">
+                    <a class="title" href="/en/home/product-consolidation-loan/">Consolidation Loan</a>
+                    <p class="descr">Consolidate your debt with lower repayments</p>
+                </div>
+                <div class="product">
+                    <a class="title" href="/en/home/product-15-loan/">The 15% Loan</a>
+                    <p class="descr">From R5 000 to R50 000, over 6 to 18 months</p>
+                </div>
+                <div class="product">
+                    <a class="title" href="/en/home/product-value-added-deals/">Value Added Deals</a>
+                    <p class="descr">Add a mobile device or value card to your loan</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="mega-menu-product" style="">
+                <div class="product-category">INTERACTIVE</div>
+
+                <div class="product">
+                    <a class="title" href="/en/home/product-fixed-deposit-investment/">Fixed deposits</a>
+                    <p class="descr">Make a single deposit for 3 to 60 months</p>
+                </div>
+                <div class="product">
+                    <a class="title" href="/en/home/product-notice-deposit/">Notice deposit</a>
+                    <p class="descr">Access your money with 7, 32 or 90 days’ notice</p>
+                </div>
+                <div class="product">
+                    <a class="title" href="/en/home/product-access-accumulator/">Access accumulator</a>
+                    <p class="descr">Earn increasing interest with anytime access</p>
+                </div>
+                <div class="product">
+                    <a class="title" href="/en/home/product-tax-free/">Tax free investment</a>
+                    <p class="descr">Invest for 12 months or more, without paying tax</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="mega-menu-product" style="">
+                <div class="product-category">PDF</div>
+
+                <div class="product">
+                    <a class="title" href="/en/home/product-silver-credit-card/">Silver credit card</a>
+                    <p class="descr">Support your changing lifestyle</p>
+                </div>
+                <div class="product">
+                    <a class="title" href="/en/home/product-gold-credit-card/">Gold credit card</a>
+                    <p class="descr">Make an instant impression</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="mega-menu-product" style="border-right: 0px !important; ">
+                <div class="product-category">FAQ's</div>
+
+                <div class="product">
+                    <a class="title" href="/en/home/product-credit-life/">Credit life</a>
+                    <p class="descr">Cover your loan or credit card debt</p>
+                </div>
+                <div class="product">
+                    <a class="title" href="/en/home/product-funeral-cover/">Funeral insurance</a>
+                    <p class="descr">Cover yourself and your loved ones</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>*@
+
+

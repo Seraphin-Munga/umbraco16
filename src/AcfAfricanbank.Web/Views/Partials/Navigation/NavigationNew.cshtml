@@ -1,0 +1,165 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using Umbraco.Web
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using System.Linq;
+@{
+    TopNavigation menu = null;
+
+    HomePageElements homePageElements = null;
+
+    if (Model.Children.Where(o => o is HomePageElements).FirstOrDefault() != null)
+    {
+        homePageElements = (HomePageElements)Model.Children.Where(o => o is HomePageElements).FirstOrDefault();
+    }
+    else if (Model.Parent.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault() != null)
+    {
+        homePageElements = (HomePageElements)Model.Parent.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+    }
+    else
+    {
+        homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+    }
+    menu = (TopNavigation)homePageElements.Children.Where(c => c.ContentType.Alias == "topNavigation").FirstOrDefault();
+
+}
+
+<div class="container">
+    <a class="navbar-brand" href="#">
+        <img src="~/images/africanbank-logo-white.svg" alt="African Bank" width="210" height="100%">
+    </a>
+    <button class="navbar-toggler navbar-toggler-right collapsed" type="button" data-toggle="collapse" data-target="#collapsibleNavbar" aria-expanded="false">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="navbar-collapse collapse" id="collapsibleNavbar">
+        <ul class="navbar-nav mr-auto">
+            <!-- Dropdown -->
+            <li>
+                <a href="~/en/home/" class="no-left-padding">
+                    <span class="icon-home nav-home-icon d-none d-sm-block"><i class="fa fa-home" aria-hidden="true"></i></span>
+                    <span class="home-text d-block d-sm-none">Home</span>
+                </a>
+            </li>
+            <!-- Loop starts here -->
+            @{
+                if (menu != null)
+                {
+                    foreach (var menuData in (IEnumerable<NCmenuCategory>)menu.Value("MenuInfo"))
+                    {
+                        foreach (var relatedLink in (IEnumerable<Umbraco.Web.Models.Link>)menuData.Value("menuName"))
+                        {
+
+                            if (relatedLink.Url != "#")
+                            {
+                                <li class="nav-item"><a class="nav-link" href="@relatedLink.Url">@relatedLink.Name</a></li>
+                            }
+                            else if (relatedLink.Target != "")
+                            {
+                                <li class="nav-item dropdown megamenu">
+                                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true">
+                                        @relatedLink.Name
+                                        @if (menuData.Value("menus") != null)
+                                        {
+                                            <i class="fa fa-caret-down"></i>
+                                        }
+                                    </a>
+                                    @if (menuData.Value("menus") != null)
+                                    {
+                                        <div class="dropdown-menu">
+                                            <div class="container">
+                                                <div class="d-lg-flex flex-lg-row">
+                                                    @{
+                                                        List<NCmenuContent> categoryItems = (List<NCmenuContent>)menuData.Value("menus");
+                                                        string cssStyleLastCat = null;
+                                                        var lastItem = categoryItems.Last();
+                                                        foreach (var categoryItem in categoryItems)
+                                                        {
+                                                            if (categoryItem != lastItem)
+                                                            {
+                                                                cssStyleLastCat = "";
+                                                            }
+                                                            else
+                                                            {
+                                                                cssStyleLastCat = "border-right: 0px !important; ";
+                                                            }
+                                                            var categoryName = categoryItem.Value("categoryName");
+                                                            var linkData = categoryItem.Value("link");
+                                                            <div class="col-sm-3 custom-flex">
+                                                                <div class="mega-menu-product" style="@cssStyleLastCat">
+                                                                    <div class="product-category">@categoryItem.Value("categoryName")</div>
+                                                                    @foreach (var linkValue in (IEnumerable<NCmenuList>)linkData)
+                                                                    {
+                                                                        string pageSection = "";
+                                                                        if (linkValue.Value("pageSection") != null)
+                                                                        {
+                                                                            pageSection = linkValue.Value("pageSection").ToString();
+                                                                        }
+                                                                        string _linkString = null;
+                                                                        if (linkValue.Value("menuList") != null)
+                                                                        {
+                                                                            foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)linkValue.Value<IEnumerable<Umbraco.Web.Models.Link>>("menuList"))
+                                                                            {
+                                                                                if (pageSection != "")
+                                                                                {
+                                                                                    _linkString = link.Url + pageSection;
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    _linkString = link.Url;
+                                                                                }
+                                                                                <div class="product">
+                                                                                    <a class="title" href=@_linkString>@link.Name</a>
+                                                                                    <p class="descr">@linkValue.Value("menuDescription")</p>
+                                                                                </div>
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </li>
+                            }
+                        }
+                    }
+                }
+            }
+            <!-- Loop ends here -->
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li class="nav-item button-padding"><a href="https://ib.africanbank.co.za/modules/Registration/Public/Register.aspx" target="_blank" class="nav-link round-button">Register</a></li>
+            <li class="nav-item button-padding"><a href="https://ib.africanbank.co.za/" target="_blank" class="nav-link login-button"><span>Login</span></a></li>
+            <li>
+                <a href="#" class="search-icon globalSearch" data-toggle="tooltip" data-placement="bottom" data-original-title="" title="">
+                    <span class="search-text d-md-none d-lg-none d-sm-none">Search</span>
+                    <span class="search-text-icon fa fa-search fa-2x"></span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+<!--START Ebankit change -->
+<div class="global-search-bar row">
+    <div class="area_search">
+        <div class="global-search-new-close-btn"></div>
+        <form id="site_search" class="search-placeholder-text site_search" method="get">
+            <input type="text" autocomplete="off" class="form-control global-search-text" id="search_box">
+        </form>
+        <div class="global-search-results">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <h5> Top Results <br /> <p>Display Search reults here....</p> </h5>
+                    </div>
+                    <div class="col-12">
+                        <ul id="search_results"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--END Ebankit change -->

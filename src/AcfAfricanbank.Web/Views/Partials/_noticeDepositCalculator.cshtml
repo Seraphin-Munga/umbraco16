@@ -1,0 +1,54 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using AfricanBank.Cms.Portal.Helpers;
+
+<style>
+
+    #calculator {
+        top: unset;
+    }
+
+    #noticeDepositInvestmentAmount {
+        width: 90% !important;
+    }
+
+    #noticeDepositInvestmentThereafter {
+        width: 90% !important;
+    }
+
+    .select {
+        width: 90% !important;
+    }
+
+    .campaign-product-container {
+        top: unset;
+    }
+
+    /*#noticeDeposit-calculator-container > .container {
+        margin: unset;
+        padding: unset;
+        width: inherit;
+    }*/
+    #noticeDeposit-calculator-container {
+        background-color: #f7f7f7
+    }
+
+    #noticeResults {
+        margin-top:-355px;
+    }
+
+    @@media (max-width:1199px) {
+        #noticeResults {
+            margin-top: -358px;
+        }
+    }
+
+    @@media (max-width: 767px) {
+        #noticeResults {
+            margin-top: -320px;
+        }
+    }
+
+</style>
+
+@Html.Partial("_calculatorStructure", "calculatornotice-form")
+

@@ -1,0 +1,54 @@
+﻿@model Umbraco.Web.PublishedModels.HeroShoulder
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using System.Configuration;
+@using Umbraco.Core.Models;
+@using Umbraco.Core.PropertyEditors;
+@using Umbraco.Web.Composing;
+
+<style>
+    @*.hero-static-description {
+        position: relative !important;
+        top: -60px;
+        padding-bottom: 20px;
+    }
+    @@media(max-width: 767px) {
+        .hero-static-description {
+           margin-top:12px;
+        }
+        
+        .bg-color-desc {
+            background: #f7f7f7;
+        }
+         .hero-static-description-0 {
+           padding-bottom:40px !important;
+        }
+    }*@
+</style>
+
+<div class="container" style="padding-bottom:7%;">
+    <div class="hero-static-caption">
+        <h1 class="hero-static-title">@Model.ShoulderTitle</h1>
+        
+        @if (Model.ShouderDescription != null)
+    {
+        <div class="row bg-color-desc" >
+            <div class="col-sm-12 col-md-12" >
+                <div class="hero-static-description" >
+                    <p class="hero-static-description-0" style=" width: 100%; font-size: 14px; font-weight: bold;padding:10px; padding-top:24px;padding-bottom:24px;">
+                         @Model.ShouderDescription
+                    </p>
+                    @*<a href="~/media/fgnhtlel/r3999-va-deal_a5-flyer_digital.pdf" class="btn-rounded-green" style="padding: 9px 30px;border-radius: 100px;
+                                        background-color: #88bc47;
+                                        color: #fff;
+                                        font-weight: 400;
+                                        font-size: 12px;display:block; margin:auto;width:183px;
+                                        margin-bottom:10px;">Download Brochure</a>*@
+                </div>
+            </div>
+        </div>
+    }
+
+    </div>
+
+    
+</div>

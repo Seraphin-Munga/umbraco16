@@ -1,0 +1,15 @@
+﻿@model Umbraco.Web.PublishedModels.HeroHeader
+@using ContentModels = Umbraco.Web.PublishedModels;
+@{
+    var videoHeader = Model; // "../.." + 
+    string videoUrl = ((ContentModels.File)videoHeader.Value("video")).UmbracoFile;
+}
+
+
+<span class="s-class"></span>
+<div class="video-header video-header">
+    <video autoplay loop muted style="width: 100%">
+        <source src="@videoUrl" type="video/mp4" />
+        Your browser does not support video, please download the video.
+    </video>
+</div>

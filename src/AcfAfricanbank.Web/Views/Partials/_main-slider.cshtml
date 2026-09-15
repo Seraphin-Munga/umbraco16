@@ -1,0 +1,419 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+
+<link rel="stylesheet" href="/css/projectmagic.css" /> 
+  <style>
+.btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 10px;
+      font-family: "Montserrat", sans-serif;
+      font-weight: 500;
+      text-align: center;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: #B6D133 0% 0%;
+      color: #fff;
+      border-radius: 50px;
+      box-shadow: 2px 5px 10px rgba(0, 0, 0, 0.15);
+      padding: 12px 25px;
+      min-width: 161px; /*width: 180px;*/
+      max-height: 43px;
+      margin-top: 14px;
+      position: relative;
+      overflow: hidden;
+      border: none;
+  }
+
+  .btn-primary:hover {
+      background-color: #52AD00;
+      transform: translateY(-2px);
+      box-shadow: 4px 7px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-primary::after {
+      content: '\276F';
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      transition: transform 0.3s ease;
+  }
+
+  .btn-primary:hover::after {
+      transform: translateY(-50%) translateX(5px);
+  }
+
+    .card-wrapper {
+      width: 98%; /* Adjust as needed for horizontal spacing */
+      margin: 15px auto; /* Center the card horizontally and add top/bottom margin */
+      height: 67vh;
+      border-radius: 20px;
+      background-color: #000;
+      box-sizing: border-box;
+    }
+
+    .major-title {
+      font-weight: 600 !important;
+      font-size: 37px !important;
+      color: #fff;
+  }
+ 
+  .span-major-title {
+      font-weight: 600 !important;
+      font-size: 60px !important;
+      font-style: italic !important;
+  }
+    .carousel {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    .jumbotron-slide {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 1.2s ease-in-out;
+      background-size: cover;
+      background-position: center;
+      border-top-left-radius: 20px;
+      border-bottom-left-radius: 20px;
+    }
+    
+    .jumbotron-slide.active {
+      opacity: 1;
+    }
+    .carousel-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-top-left-radius: 20px;
+      border-bottom-left-radius: 20px;
+      height: 100%;
+      width: 100%;
+      background: transparent linear-gradient(270deg, #002A602E 0%, #002A6085 38%, #002A60BA 100%) 0% 0% no-repeat padding-box;
+      z-index: 2;
+    }
+    .carousel-caption-left {
+      position: absolute;
+      bottom: 80px;
+      left: 30px;
+      z-index: 3;
+      color: #fff;
+      text-align: left;
+      max-width: 90%;
+    }
+
+    .card-content {
+      display: flex;
+      height: 100%;
+      width: 100%;
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #heroSlider {
+      flex: 1;
+      position: relative;
+    }
+
+    .static-grid {
+      width: 300px; /* 2 columns * 125px */
+      display: grid;
+      grid-template-columns: repeat(2, 150px);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 0;
+      box-sizing: border-box;
+      background-color: #1a1a1a; /* Optional contrasting bg */
+      height: 100%;
+    }
+
+    .grid-card {
+      background-color: #003B85;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      position: relative;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* shadow for depth */
+      border: 1px solid rgba(255, 255, 255, 0.05); /* subtle edge separation */
+      transition: transform 0.2s ease;
+      font-size: 12px;
+      flex-direction: column;
+      cursor: pointer;
+    }
+
+    .grid-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(0,0,0,0.05));
+      pointer-events: none;
+      border-radius: inherit;
+    }
+
+    
+    .grid-card:hover {
+      background-color: #002d66; /* slightly darker shade on hover */
+    }
+
+    .grid-card .prod-title {
+      margin-top: 12px;
+    }
+
+
+    .grid-card .icon-style{
+      color: white;
+      opacity: 0.5;
+    }
+
+    /* Carousel tracker styles */
+    .carousel-tracker {
+      display: flex;
+      justify-content: flex-start;
+      position: absolute;
+      bottom: 15px; /* Adjust vertical position from the bottom */
+      left: 15px; /* Adjust horizontal position from the left */
+      z-index: 3; /* Make sure it's above the image */
+    }
+
+    .tracker-button {
+      width: 8px;
+      height: 8px;
+      margin-right: 6px;
+      border-radius: 50%;
+      background-color: #fff;
+      opacity: 0.6;
+      transition: transform 0.2s ease, opacity 0.3s ease;
+      cursor: pointer;
+    }
+
+    .tracker-button.active {
+      transform: scale(1.5);
+      border: 2px #B6D133 solid;
+      opacity: 1;
+    }
+
+    
+    @@media (max-width: 768px) {
+      .card-content {
+        flex-direction: column;
+      }
+
+      .carousel-tracker {
+        display: none;
+      }
+
+      .card-wrapper {
+        height: 67vh;
+      }
+
+      #heroSlider {
+        height: 15vh;
+        order: -1; /* Display above grid on mobile */
+      }
+
+      .static-grid {
+        display: flex;
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        height: 10vh;
+        box-sizing: border-box;
+        order: 1;
+      }
+
+      /* Hide the scrollbar */
+      .static-grid::-webkit-scrollbar {
+        display: none; /* Hide scrollbar for webkit browsers */
+      }
+
+      .grid-card {
+        flex: 0 0 auto;
+        width: 30vw;
+        height: 10vh; 
+        scroll-snap-align: start;
+      }
+
+      .jumbotron-slide,
+      .carousel-overlay {
+        border-radius: 0 !important;
+      }
+
+      .carousel-caption-left {
+        bottom: 10px;
+        left: 20px;
+        right: 20px;
+        max-width: 90%;
+      }
+
+      .carousel-caption-left h1 {
+        font-size: 20px !important;
+      }
+
+      .major-title,
+      .span-major-title {
+        font-size: 22px !important;
+      }
+
+      .grid-card .prod-title {
+        font-size: 8px;
+      }
+
+      .grid-card .icon-style {
+        font-size: 14px;
+      }
+
+      .btn-brand-app {
+        width: 25%;
+        height: 20px;
+        font-size: 10px;
+      }
+    }
+
+  </style>
+
+ <div class="card-wrapper">
+    <div class="card-content">
+      <div id="heroSlider" class="carousel jumbotron-slider carousel-fade slide" data-ride="carousel">
+        <!-- !-- Carousel tracker -->
+        <div class="carousel-tracker" id="carouselTracker"></div>
+      </div>
+    
+      <div id="productGrid" class="static-grid"></div>
+    </div>
+    
+  </div>
+
+  <!-- Preload images (for smooth first load) -->
+  <div style="display: none;">
+    <img src="/media/vzujjdpw/woman-sitting-with-notebook-laptop.jpg" alt="">
+    <img src="/media/rp4jz4eb/black-business-director-resting-her-high-end-ceo-chair-after-project.jpg" alt="">
+    <img src="/media/rf4keoe4/african-business-male-people-shaking-hands.jpg" alt="">
+  </div>
+  
+  
+  <script>
+    const images = [
+    { 
+        src: "/media/vzujjdpw/woman-sitting-with-notebook-laptop.jpg", 
+        title: 'Reach <span class="span-major-title">Your</span> <br />Goals', 
+        redirect: "https://www.africanbank.co.za/en/home/banking/#MyWorld" 
+    },
+    { 
+        src: "/media/vzujjdpw/woman-sitting-with-notebook-laptop.jpg", 
+        title: 'Reach <span class="span-major-title">Your</span> <br />Goals', 
+        redirect: "https://www.africanbank.co.za/en/home/banking/#MyWorld" 
+    },
+    { 
+        src: "/media/vzujjdpw/woman-sitting-with-notebook-laptop.jpg", 
+        title: 'Reach <span class="span-major-title">Your</span> <br />Goals', 
+        redirect: "https://www.africanbank.co.za/en/home/banking/#MyWorld" 
+    },{ 
+        src: "/media/vzujjdpw/woman-sitting-with-notebook-laptop.jpg", 
+        title: 'Reach <span class="span-major-title">Your</span> <br />Goals', 
+        redirect: "https://www.africanbank.co.za/en/home/banking/#MyWorld" 
+    },
+    { 
+        src: "/media/vzujjdpw/woman-sitting-with-notebook-laptop.jpg", 
+        title: 'Reach <span class="span-major-title">Your</span> <br />Goals', 
+        redirect: "https://www.africanbank.co.za/en/home/banking/#MyWorld" 
+    },
+    { 
+        src: "/media/vzujjdpw/woman-sitting-with-notebook-laptop.jpg", 
+        title: 'Reach <span class="span-major-title">Your</span> <br />Goals', 
+        redirect: "https://www.africanbank.co.za/en/home/banking/#MyWorld" 
+    },
+    { 
+        src: "/media/vzujjdpw/woman-sitting-with-notebook-laptop.jpg", 
+        title: 'Reach <span class="span-major-title">Your</span> <br />Goals', 
+        redirect: "https://www.africanbank.co.za/en/home/banking/#MyWorld" 
+    },
+    { 
+        src: "/media/vzujjdpw/woman-sitting-with-notebook-laptop.jpg", 
+        title: 'Reach <span class="span-major-title">Your</span> <br />Goals', 
+        redirect: "https://www.africanbank.co.za/en/home/banking/#MyWorld" 
+    }
+    ];
+
+    const products = [
+      { icon: 'account_balance', title: 'Bank', redirect: '' },
+      { icon: 'attach_money', title: 'Borrow', redirect: '' },
+      { icon: 'savings', title: 'Save & Invest', redirect: '' },
+      { icon: 'health_and_safety', title: 'Insure', redirect: '' },
+      { icon: 'card_giftcard', title: 'Rewards', redirect: '' },
+      { icon: 'shopping_cart', title: 'Marketplace', redirect: '' }
+    ];
+    
+    const carousel = document.getElementById('heroSlider');
+    const grid = document.getElementById('productGrid');
+    const tracker = document.getElementById('carouselTracker');
+    let currentIndex = 0;
+    let interval;
+    
+    images.forEach((img, index) => {
+      let slide = document.createElement('div');
+      slide.className = 'jumbotron-slide';
+      if (index === 0) slide.classList.add('active');
+      slide.style.backgroundImage = `url(${img.src})`;
+      slide.innerHTML = `<div class="carousel-overlay"></div>
+        <div class="carousel-caption-left">
+          <h1 class="text-white major-title">${img.title}</h1>
+          <div class="mt-50 text-start column1">
+            <p class="btn btn-primary"><a href="${img.redirect}" class="btn btn-brand-1 hover-up">Apply Now</a></p>
+          </div>
+        </div>`;
+      carousel.appendChild(slide);
+
+      // Create a tracker button for each slide
+      let button = document.createElement('div');
+      button.classList.add('tracker-button');
+      if (index === 0) button.classList.add('active');
+      tracker.appendChild(button);
+    });
+ 
+    products.forEach((prod, index) => {
+      let card = document.createElement('div');
+      card.className = 'grid-card';
+      card.innerHTML = `
+        <span class="material-icons-outlined icon-style">${prod.icon}</span>
+        <div class="prod-title">${prod.title.toUpperCase()}</div>
+      `;
+      grid.appendChild(card);
+    });
+
+    function showNextSlide() {
+      const slides = document.querySelectorAll('.jumbotron-slide');
+      const buttons = document.querySelectorAll('.tracker-button');
+      slides[currentIndex].classList.remove('active');
+      buttons[currentIndex].classList.remove('active');
+      currentIndex = (currentIndex + 1) % images.length;
+      slides[currentIndex].classList.add('active');
+      buttons[currentIndex].classList.add('active');
+    }
+    
+    function startCarousel() {
+      interval = setInterval(showNextSlide, 3500);
+    }
+    
+    function stopCarousel() {
+      clearInterval(interval);
+    }
+    
+    carousel.addEventListener('mouseenter', stopCarousel);
+    carousel.addEventListener('mouseleave', startCarousel);
+    
+    startCarousel();
+  </script>

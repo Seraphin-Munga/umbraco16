@@ -1,0 +1,52 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@model  IEnumerable<ContentModels.NcArchieve>
+@using ContentModels = Umbraco.Web.PublishedModels;
+
+<ul ng-controller="ReportsAndArchievesController">
+    @foreach (var report in Model)
+    {
+
+        string fileExtension = report.File.GetPropertyValue("UmbracoExtension").ToString();
+        string iconPath = null;
+
+        if (fileExtension == "pdf")
+        {
+            iconPath = "../../../images/pdf.png";
+        }
+        else
+        {
+            iconPath = "../../../images/mp42-ico.png"; 
+        }
+
+        <li ng-show='stringContains("@report.Title", searchTerm) && categoryMatch("@report.ArchiveCategory", category)' class="searchItemList">
+            <div class="row no-gutter download-item">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top:10px">
+
+                    <a href="@report.File.Url" target="_blank">
+                        <div class="pr-card video_list_item">
+                            <div class="row" style="padding:10px">
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                    <div class="row">
+                                        <div class="col-xs-2 col-sm-1 col-md-1 col-lg-1">
+                                            <img style="height: 60px;vertical-align:center;" src="@iconPath" alt="@report.Title" />
+                                        </div>
+                                        <div class="col-xs-10 col-sm-11 col-md-11 col-lg-11">
+                                            <span style="font-size: 15px">@report.Title</span>
+                                            <div style="font-size: 12px;">
+                                                <span>Date: @report.Date.ToShortDateString()</span>
+                                            </div>
+                                            <div style="font-size: 11px;font-style: italic;">
+                                                Download
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+        </li>
+    }
+</ul>

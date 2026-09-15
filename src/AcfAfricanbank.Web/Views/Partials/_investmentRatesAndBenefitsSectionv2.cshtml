@@ -1,0 +1,101 @@
+﻿@model Web.Models.InvestmentRatesAndBenefits
+@using Web.Helpers;
+
+<section class="section-800 pt-50 pb-40 home-loan-calculator bg-grey-60">
+          <div class="container">
+            <div class="row d-flex align-items-center">
+                    <div class="campaign-product-container">
+                            <!--START Ebankit-change rates-->
+                            <script type="text/javascript">
+                               
+                            </script>
+                            <div class="ajax-form-success ajax-alert alert alert-success square errorrates" style="display: none;">@ResourceHelper.GetResource("ErrorRates")</div>
+                            <section id="rates-form-preloader" style="display: none;">
+                                <div class="loader" id="loader-rates-form-preloader">
+                                    <div class="loader-img"></div>
+                                </div>
+                            </section>
+                            <div id="rates-container">
+                    
+                                <div id="rates-container">
+                                       @if (Model != null)
+        {
+            <ul class="table-terms">
+                @if (Model.RatesTermsAndConditions != null)
+                {
+                    foreach (var term in Model.RatesTermsAndConditions)
+                    {
+                        <li>
+                            @term
+                        </li>
+                    }
+                }
+            </ul>
+               <div class="text-center margin-top-40 info-grpahic">
+                <p class="body-content">@Model.CalculatorIntroduction</p>
+                <a href="#calculator" class="button primary">@Model.CalculatorButtonText</a>
+                <a href="~/media/2x3bzlvo/lr_in1811_003_fixed-deposit_infographic.pdf" target="_blank" class="button primary" style="display:none;">View Infographic</a>
+                </div>
+
+        }
+                                </div>
+                    
+                            </div>
+                                <ul class="table-terms">
+                                            <li>
+                                                Interest rates are quoted on a per annum basis and are valid for today only as they may change over time.
+                                            </li>
+                                            <li>
+                                                Terms and conditions apply. We cannot advise you on the tax implications of investing. It is recommended that you contact your financial adviser or tax consultant.
+                                            </li>
+                                </ul>
+                                   <div class="text-center margin-top-40 info-grpahic">
+                                    <p class="body-content">Calculate the returns on your
+                     investment at market leading rates.</p>
+                                    <a href="#calculator" class="button primary">Use Calculator</a>
+                                    <a href="/media/2x3bzlvo/lr_in1811_003_fixed-deposit_infographic.pdf" target="_blank" class="button primary" style="display:none;">View Infographic</a>
+                                    </div>
+                        </div>
+                     </div>
+         
+</div>
+</section>  
+
+@*
+<div class="container">
+    <div class="campaign-product-container full">
+        <!--START Ebankit-change rates-->
+        <script type="text/javascript">
+           
+        </script>
+        <div class="ajax-form-success ajax-alert alert alert-success square errorrates" style="display: none;">@ResourceHelper.GetResource("ErrorRates")</div>
+        <section id="rates-form-preloader">
+            <div class="loader" id="loader-rates-form-preloader">
+                <div class="loader-img"></div>
+            </div>
+        </section>
+        <div id="rates-container"></div>
+        @if (Model != null)
+        {
+            <ul class="table-terms">
+                @if (Model.RatesTermsAndConditions != null)
+                {
+                    foreach (var term in Model.RatesTermsAndConditions)
+                    {
+                        <li>
+                            @term
+                        </li>
+                    }
+                }
+            </ul>
+               <div class="text-center margin-top-40 info-grpahic">
+                <p class="body-content">@Model.CalculatorIntroduction</p>
+                <a href="#calculator" class="button primary">@Model.CalculatorButtonText</a>
+                <a href="~/media/2x3bzlvo/lr_in1811_003_fixed-deposit_infographic.pdf" target="_blank" class="button primary" style="display:none;">View Infographic</a>
+                </div>
+
+        }
+    </div>
+</div>
+
+*@

@@ -1,0 +1,83 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.CardItem>
+@using AcfAfricanbank.Core.Models.Forms;
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = acf_africanbankv1.Models;
+@{
+    var styleAtt = "";
+
+    styleAtt = Model.Content.Children?.Where(c => c.Name == "Style").FirstOrDefault().GetPropertyValue("text").ToString();
+    var videoCardData = Model.Content.GetPropertyValue<IEnumerable<IPublishedContent>>("cardItemDetail");
+}
+<style>
+
+.grow-for-it .sharethis-inline-share-buttons{
+    position:relative;
+}
+@@media only screen and (max-width: 1366px) ,screen and (max-height: 736px) {
+
+    .grow-for-it .video-card-copy {
+        margin: 2% 0 5%;
+    }
+}
+/*#region Extra large devices (large desktops, 1200px and up)*/
+@@media (min-width: 1200px) {
+
+
+}
+/*#endregion*/
+
+/*#region Large devices (desktops, 992px and up)*/
+@@media (min-width: 992px) and (max-width: 1199.98px) {
+
+.grow-for-it{padding: 5%;}
+
+}
+/*#endregion*/
+
+/*#region Medium devices (tablets, 768px and up)*/
+@@media (max-width: 768px) {
+    .grow-for-it {
+        padding: 5%;
+    }
+
+}
+/*#endregion*/
+
+/*#regionSmall devices (landscape phones, 576px and up)*/
+@@media(max-width: 576px) {
+
+}
+/*#endregion*/
+
+/*#region portrait Extra small devices (portrait phones, less than 576px)*/
+@@media (max-width: 575.98px) {
+
+/*#endregion*/
+
+}
+</style>
+<div class="@styleAtt">
+    <h3>Other stories</h3>
+    @if (videoCardData != null)
+    {
+        foreach (var video_detail in videoCardData)
+        {
+            var image = video_detail.GetPropertyValue<IPublishedContent>("cardIcon").Url;
+            <div class="row">
+                <div class="col-md-12 col-lg-4">
+                    <div class="">
+                        <div class="video-card-image" style="background-image:url(@image);">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 col-lg-8">
+                    <div class="video-card-copy">
+                        <h4 class="video-card-title">@video_detail.GetPropertyValue("cardTitle")</h4>
+                        <p class="video-card-description">@video_detail.GetPropertyValue("cardDescription")</p>
+                        <div class="sharethis-inline-share-buttons" data-url="@Request.Url.AbsoluteUri"></div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

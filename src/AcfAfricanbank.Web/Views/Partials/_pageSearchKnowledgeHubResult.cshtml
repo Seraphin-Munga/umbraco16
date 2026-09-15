@@ -1,0 +1,138 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using Examine
+
+@*@using Examine.SearchCriteria
+@using UmbracoExamine*@
+@using System.Text.RegularExpressions
+@using ContentModels = Umbraco.Web.PublishedModels
+@*@using Examine.LuceneEngine.SearchCriteria;*@
+@{
+    //List<Umbraco.Web.PublishedContentModels.File> pdfFiles = new List<ContentModels.File>();
+    Dictionary<string, List<string>> _pdfFields = new Dictionary<string, List<string>>();
+    Dictionary<string, List<string>> _videoFields = new Dictionary<string, List<string>>();
+    Dictionary<string, List<string>> _pagesFields = new Dictionary<string, List<string>>();
+
+    IExamineManager examineManager = ExamineManager.Instance;
+
+    var searchString = Request["searchstring"];
+
+    if (!String.IsNullOrEmpty(searchString))
+    {
+        var searcher = examineManager.TryGetIndex("ExternalSearcher", out var externalIndex) ? externalIndex.GetSearcher() : null;
+
+        // var searchCriteria = searcher.CreateSearchCriteria(Examine.SearchCriteria.BooleanOperation.Or);
+        var searchCriteria = searcher.CreateQuery(null, Examine.Search.BooleanOperation.Or); // make it "nodes" and check what comes back
+
+        var searchQuery = searchCriteria.Field("nodeName", searchString.Boost(8)).Or().Field("nodeName", searchString.Fuzzy()).Execute();
+        // searchQuery = searchQuery.OrderBy(x => x.Values).ToList();
+        // .And().Field("nodeType", "39746")
+        var searchResults = searchQuery; //  searcher.Search(searchQuery.Compile());
+
+        if (searchResults.Any())
+        {
+            _pdfFields = new Dictionary<string, List<string>>();
+            _videoFields = new Dictionary<string, List<string>>();
+            _videoFields = new Dictionary<string, List<string>>();
+            <div style="border: 1px solid #88bc47;" class="container">
+                @{
+                    foreach (var searchResult in searchResults)
+                    {
+                        if (searchResult.Values.Where(x => x.Key == "umbracoExtension").FirstOrDefault().Key == "umbracoExtension" && (searchResult.Values.Where(x => x.Key == "nodeName").FirstOrDefault().Value.Contains("pdf")))
+                        {
+                            List<string> fileValues = new List<string>()
+                            {
+                                searchResult.Values.Where(x => x.Key == "nodeName").FirstOrDefault().Value + "; " + searchResult.Values.Where(x => x.Key == "nodeType").FirstOrDefault().Value,
+                                searchResult.Values.Where(x => x.Key == "umbracoFile").FirstOrDefault().Value
+                            };
+
+                            bool itemExists = _pdfFields.Any(x => x.Key.ToString() == searchResult.Values.Where(c => c.Key == "nodeName").FirstOrDefault().Value.ToString());
+
+                            if (itemExists == false)
+                            {
+                                _pdfFields.Add(searchResult.Values.Where(c => c.Key == "id").FirstOrDefault().Value, fileValues);
+                            }
+                        }
+                        else if (searchResult.Values.Where(x => x.Key == "umbracoExtension").FirstOrDefault().Key == "umbracoExtension" && (searchResult.Values.Where(x => x.Key == "nodeName").FirstOrDefault().Value.Contains("mp4")))
+                        {
+                            List<string> fileValues = new List<string>()
+                            {
+                                // ((Examine.LuceneEngine.SearchResults)searchResults).Docs.Where(x => x.Value.Id == 1391)
+                                searchResult.Values.Where(x => x.Key == "nodeName").FirstOrDefault().Value + "; " + searchResult.Values.Where(x => x.Key == "nodeType").FirstOrDefault().Value,
+                                searchResult.Values.Where(x => x.Key == "umbracoFile").FirstOrDefault().Value
+                            };
+                           
+                           bool itemExists = _videoFields.Any(x => x.Key.ToString() == searchResult.Values.Where(c => c.Key == "umbracoBytes").FirstOrDefault().Value.ToString());
+
+                            if (itemExists == false)
+                            {
+                                _videoFields.Add(searchResult.Values.Where(c => c.Key == "umbracoBytes").FirstOrDefault().Value, fileValues);
+                            }
+                        }
+                        else if (!searchResult.Values.Where(x => x.Key == "nodeName").FirstOrDefault().Value.Contains("jpg") && !searchResult.Values.Where(x => x.Key == "nodeName").FirstOrDefault().Value.Contains("png"))
+                        {
+                            if (searchResult.Values.Where(x => x.Key == "nodeType").FirstOrDefault().Value == "39599")
+                            {
+                                List<string> fileValues = new List<string>()
+                                {
+                                    searchResult.Values.Where(x => x.Key == "nodeType").FirstOrDefault().Value,
+                                    searchResult.Values.Where(x => x.Key == "urlName").FirstOrDefault().Value
+                                };
+    
+                                bool itemExists = _pagesFields.Any(x => x.Key.ToString() == searchResult.Values.Where(c => c.Key == "nodeName").FirstOrDefault().Value.ToString());
+    
+                                if (itemExists == false)
+                                {
+                                    _pagesFields.Add(searchResult.Values.Where(c => c.Key == "nodeName").FirstOrDefault().Value, fileValues);
+                                }
+                            }
+                        }
+                    }
+                }
+                @{
+                    if (_videoFields.Count() == 0 && _pdfFields.Count() == 0 && _pagesFields.Count() == 0)
+                    {
+                        <div id="notFoundDiv" style="color: red; font-weight: bold; display:block;">No Records Found</div>
+                    }
+                    else
+                    {
+                        <div id="accordion">
+                            <div style="margin-top:-3%">
+                                <button type="button" class="open-table accordion-toggle" id="btnFeaturesTable" style="outline:none">
+                                    Close
+                                </button>
+                            </div>
+                            <div class="accordion-content">
+                                <div class="row margin-top-20">
+                                    @{
+                                        <div class="col-md-4">
+                                            <h4 style="background: #88bc47;color:white; font-weight:500;padding: 10px;">Video</h4>
+                                            <hr />
+                                            @Html.Partial("_pageKnowledgeHubVideo", _videoFields)
+                                        </div>
+                                        <div class="col-md-4 col-sm-6">
+                                            <h4 style="background: #88bc47;color:white; font-weight:500;padding: 10px;">PDF</h4>
+                                            <hr />
+                                            @Html.Partial("_pageKnowledgeHubResultPDF", _pdfFields)
+                                        </div>
+                                        <div class="col-md-4 col-sm-6">
+                                            <h4 style="background: #88bc47;color:white; font-weight:500;padding: 10px;">Guides</h4>
+                                            <hr />
+                                            @Html.Partial("_pageKnowledgeHubResultPages", _pagesFields)
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                
+            </div>
+        }
+        else
+        {
+            <div style="border: 1px solid #88bc47;" class="container">
+                <div id="notFoundDiv" style="color: red; font-weight: bold; display:block;">No Records Found</div>
+            </div>
+        }
+    }
+}

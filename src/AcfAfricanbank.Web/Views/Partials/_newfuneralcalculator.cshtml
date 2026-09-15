@@ -1,0 +1,572 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+ <style>
+      
+
+        :root {
+            --bg-color: #e9e9e9;
+            --btnPrimary-color: #5dc300;
+            --light-color: #fff;
+            --bgGray: #495057;
+            --step-color: #00285a;
+            --bgColor-2: #5c5290;
+        }
+
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            background: var(--bg-color);
+        }
+        
+        #funeral-calculator {
+            overflow: hidden !important; 
+        }
+
+        h1 {
+            font-weight: 700;
+            font-size: 32px;
+            line-height: 1.2;
+        }
+
+        .calculator-section,
+        .image-section {
+            border: none !important;
+        }
+
+        .image-section img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        #extendedFamilyContainer{
+            margin-bottom: 10px;
+        }
+
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+
+        select,
+        input[type="number"] {
+            width: 100%;
+            padding: 17px !important;
+            font-size: 16px !important;
+            font-weight: 500;
+            border-radius: 70px !important;
+            border: 1px solid var(--btnPrimary-color);
+        }
+
+        #funeral-calculator button {
+            padding: 17px 20px;
+            background-color: var(--btnPrimary-color) !important;
+            color: var(--light-color) !important;
+            border: none !important;
+            cursor: pointer;
+            border-radius: 70px !important;
+            font-size: 16px !important;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        #funeral-calculator button:hover {
+            background-color: #52AD00 !important;
+        }
+
+        #addExtendedButton {
+            margin-bottom: 20px;
+        }
+        
+        #addChildButton {
+            margin-top: 17px;
+        }
+
+        #premium-result {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .extended-family-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .extended-family-row select {
+            flex: 1 1 90%;
+        }
+
+        .extended-family-row button {
+            flex: 0 0 10%;
+        }
+
+        .extended-family-row.extended-cover-error {
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .extended-family-row select {
+            flex: 1;
+            margin-right: 5px;
+        }
+
+        .extended-family-row button {
+            flex-shrink: 0;
+        }
+
+        .disabled-button {
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        .child-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .child-row input {
+            flex: 1;
+            margin-right: 5px;
+        }
+
+        .child-row button {
+            flex-shrink: 0;
+        }
+
+        .image-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            min-height: 500px;
+
+        }
+        
+        .form-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+            display: block;
+            background-repeat: no-repeat;
+            background-position: right .75rem center;
+            background-size: 16px 12px;
+        }
+
+        .premium-container {
+            background: #fff;
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.15);
+            margin-top: 20px;
+        }
+
+        #premium-display h3 {
+            margin-bottom: 10px;
+        }
+
+        .image-section {
+            position: relative;
+        }
+
+        #premium-display {
+            position: relative;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .premium-amount {
+            font-size: 40px;
+            font-weight: 700;
+            color: var(--step-color);
+            margin-bottom: 10px;
+            transition: all 0.5s ease-in-out;
+        }
+
+        .premium-details {
+            font-size: 18px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .premium-details h4 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .premium-details ul {
+            padding-left: 0;
+            list-style-type: none;
+        }
+
+        .premium-details li {
+            font-size: 16px;
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .premium-details li::before {
+            content: '\2713';
+            color: var(--btnPrimary-color);
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .extended-family-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            gap: 10px;
+        }
+
+        .extended-family-row select,
+        .extended-family-row.extended-cover-error {
+            flex: 1;
+        }
+
+        .apply-btn {
+            margin-top: 20px;
+            width: 100%;
+            font-size: 18px !important;
+            padding: 20px !important;
+        }
+        
+        @@media (max-width: 926px) {
+
+            .calculator-section,
+            .image-section {
+                flex: 1 1 100%;
+            }
+            
+            select, input[type="number"] {
+            padding: 10px !important;
+            font-size: 13px !important;
+        }
+        
+        .extended-family-row select {
+            text-align: center !important;
+        }
+        
+        #funeral-calculator button {
+            padding: 12px 19px;
+            border-radius: 70px !important;
+            font-size: 13px !important;
+        }
+
+        .extended-family-row button[onclick="removeExtendedFamilyRow(this)"] {
+            padding: 5px 10px; 
+            font-size: 14px;
+        }
+
+        .extended-family-row button[onclick="removeExtendedFamilyRow(this)"]::before {
+            content: '-';
+            display: inline-block;
+            margin-right: 0; 
+        }
+
+        .extended-family-row button[onclick="removeExtendedFamilyRow(this)"] span {
+            display: none;
+        }
+
+        #addExtendedButton {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 15px; /* Adjust padding */
+            font-size: 14px; /* Adjust font size */
+        }
+
+        #addExtendedButton::before {
+            content: '+';
+            display: inline-block;
+            margin-right: 5px; 
+        }
+        
+        }
+
+    </style>
+    
+<section class="container mb-40 mt-40" id="funeral-calculator">
+    <div class="row d-md-flex justify-content-center align-items-center">
+        <div class="col-md-6">
+            <div class="calculator-section">
+                <h1 class="mb-3">Funeral Calculator</h1>
+                <div class="mb-3">
+                    <label for="coverType" class="form-label">Cover Type:</label>
+                    <select id="coverType" class="form-select" onchange="updateExtendedFamilyOptions()">
+                        <option value="main">Main Member</option>
+                        <option value="spouse">Main Member & Spouse</option>
+                        <option value="children">Main Member & Children</option>
+                        <option value="family">Family</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="coverAmount" class="form-label">Cover Amount:</label>
+                    <select id="coverAmount" class="form-select">
+                        <option value="5000">R5,000</option>
+                        <option value="10000">R10,000</option>
+                        <option value="15000">R15,000</option>
+                        <option value="20000">R20,000</option>
+                        <option value="25000">R25,000</option>
+                        <option value="30000">R30,000</option>
+                        <option value="50000">R50,000</option>
+                        <option value="100000">R100,000</option>
+                    </select>
+                </div>
+                <div id="extendedFamilyOptions" class="mb-3" style="display: none;">
+                    <label class="form-label">Extended Family Members:</label>
+                    <div id="extendedFamilyContainer"></div>
+                    <button type="button" id="addExtendedButton" onclick="addExtendedFamilyRow()">Add Extended Family Member</button>
+                </div>
+                <div id="childrenOptions" class="mb-3" style="display: none;">
+                    <label for="numChildren" class="form-label">Number of Children (Under 21):</label>
+                    <input type="number" id="numChildren" class="form-control" value="0" min="0" max="8">
+                    <div id="childrenError" class="text-danger"></div>
+                    <span class="text-muted text-bold">*Maximum cover for children under 21 is R20,000</span>
+                </div>
+                <button onclick="calculatePremium()" class="mt-20 cal-btn">Calculate</button>
+                <div class="mt-15">
+                    <span>*Cover for Spouse/ Partner or Children cannot be more than the main member</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="image-section">
+                <img id="defaultImage" src="https://africanbank.co.za/media/gxxokcop/loan-calc.png" alt="Funeral Image" loading="lazy">
+                <div id="premium-display" class="premium-container" style="display: none;">
+                    <h3 class="text-center">Estimated Total Premium</h3>
+                    <p class="premium-amount mt-10 text-center">R<span id="premium-value">0.00</span></p>
+                    <div class="mt-30 mb-30 inline-checklist">
+                        <h4 class="text-center">Benefits:</h4>
+                        <ul class="list-ticks list-ticks-2 mt-30">
+                            <li>Get cover up to R100 000 each for the main and spouse.</li>
+                            <li>Cover up to R20 000, each, for up to 8 children under the age of 21 years.</li>
+                            <li>Cover up to R50 000, each, for up to 8 extended family.</li>
+                        </ul>
+                    </div>
+                    <button id="apply-now" href="https://ib.africanbank.co.za/SignIn.aspx" class="apply-btn">Apply Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+const premiums = {
+  main: { 5000: 22, 10000: 43, 15000: 65, 20000: 86, 25000: 108, 30000: 129, 50000: 215, 100000: 430 },
+  spouse: { 5000: 33, 10000: 65, 15000: 98, 20000: 130, 25000: 163, 30000: 195, 50000: 325, 100000: 650 },
+  children: { 5000: 25, 10000: 50, 15000: 75, 20000: 100, 25000: 125, 30000: 150, 50000: 250, 100000: 500 },
+  family: { 5000: 36, 10000: 72, 15000: 108, 20000: 144, 25000: 180, 30000: 216, 50000: 360, 100000: 720 },
+  extendedUnder25: { 5000: 15, 10000: 29, 15000: 44, 20000: 58, 25000: 73, 30000: 87, 50000: 145 },
+  extended26to64: { 5000: 30, 10000: 59, 15000: 89, 20000: 118, 25000: 148, 30000: 177, 50000: 295 },
+  extendedOver65: { 5000: 52, 10000: 103, 15000: 155, 20000: 206, 25000: 258, 30000: 309, 50000: 515 }
+};
+
+let numExtended = 0; // Start with 0 extended family rows
+
+function calculatePremium() {
+  const coverType = document.getElementById("coverType").value;
+  const coverAmount = parseInt(document.getElementById("coverAmount").value);
+  let premium = 0;
+
+  if (coverType === "family") {
+    let isValid = true;
+    premium = premiums.family[coverAmount];
+    let extendedPremium = 0;
+    const extendedRows = document.querySelectorAll(".extended-family-row");
+    extendedRows.forEach(row => {
+      const extendedAge = row.querySelector(".extendedAge").value;
+      const extendedCover = parseInt(row.querySelector(".extendedCover").value);
+
+      if (extendedCover > coverAmount) {
+        const errorDiv = row.querySelector(".extended-cover-error");
+        errorDiv.textContent = "Cover cannot exceed main member's cover.";
+        document.querySelector("button[onclick='calculatePremium()']").disabled = true;
+        isValid = false;
+        return;
+      }
+
+      const extendedKey = `extended${extendedAge === "under25"? "Under25": (extendedAge === "26to64"? "26to64": "Over65")}`;
+      extendedPremium += premiums[extendedKey][extendedCover];
+    });
+
+    if (isValid) {
+      document.querySelector("button[onclick='calculatePremium()']").disabled = false;
+      premium += extendedPremium;
+
+      document.getElementById("premium-value").textContent = premium.toFixed(2);
+      document.getElementById("premium-display").style.display = "flex";
+      document.getElementById("defaultImage").style.display = "none";
+    }
+  } else if (coverType === "children" || coverType === "spouse" || coverType === "main") {
+    premium = premiums[coverType === "children"? "children": coverType === "spouse"? "spouse": "main"][coverAmount];
+
+    document.getElementById("premium-value").textContent = premium.toFixed(2);
+    document.getElementById("premium-display").style.display = "flex";
+    document.getElementById("defaultImage").style.display = "none";
+  } else {
+    premium = premiums[coverType][coverAmount];
+
+    document.getElementById("premium-value").textContent = premium.toFixed(2);
+    document.getElementById("premium-display").style.display = "flex";
+    document.getElementById("defaultImage").style.display = "none";
+  }
+}
+
+function updateExtendedCoverOptions(row) {
+  const coverAmount = parseInt(document.getElementById("coverAmount").value);
+  const extendedCoverSelect = row.querySelector(".extendedCover");
+  const extendedAge = row.querySelector(".extendedAge").value;
+  const extendedPremiums = premiums[`extended${extendedAge === "under25"? "Under25": extendedAge === "26to64"? "26to64": "Over65"}`];
+
+  extendedCoverSelect.innerHTML = "";
+
+  const maxExtendedCover = Math.min(coverAmount, 50000);
+
+  for (let i = 5000; i <= maxExtendedCover; i += 5000) {
+    if (extendedPremiums.hasOwnProperty(i)) {
+      const option = document.createElement("option");
+      option.value = i;
+      option.text = `R${i}`;
+      extendedCoverSelect.add(option);
+    }
+  }
+
+  const errorDiv = row.querySelector(".extended-cover-error");
+  errorDiv.textContent = "";
+}
+
+function addExtendedFamilyRow() {
+        if (numExtended < 8) {
+            const container = document.getElementById("extendedFamilyContainer");
+            const newRow = document.createElement("div");
+            newRow.classList.add("extended-family-row");
+
+            newRow.innerHTML = `
+                <select class="extendedAge">
+                    <option value="under25">Under 25</option>
+                    <option value="26to64">26 - 64</option>
+                    <option value="over65">Over 65</option>
+                </select>
+                <select class="extendedCover"></select>
+                <button type="button" onclick="removeExtendedFamilyRow(this)"><span>Remove</span></button>
+                <div class="extended-cover-error" style="color: red;font-size: 16px;"></div>
+            `;
+            container.appendChild(newRow);
+            numExtended++;
+
+            if (numExtended >= 8) {
+                document.getElementById("addExtendedButton").classList.add("disabled-button");
+                document.getElementById("addExtendedButton").disabled = true;
+            }
+
+            updateExtendedCoverOptions(newRow);
+
+            newRow.querySelector(".extendedCover").addEventListener("change", checkExtendedCovers);
+        }
+    }
+
+
+function checkExtendedCovers() {
+  const coverAmount = parseInt(document.getElementById("coverAmount").value);
+  const extendedRows = document.querySelectorAll(".extended-family-row");
+  let isValid = true;
+
+  extendedRows.forEach(row => {
+    const extendedCover = parseInt(row.querySelector(".extendedCover").value);
+    const errorDiv = row.querySelector(".extended-cover-error");
+
+    if (extendedCover > coverAmount) {
+      isValid = false;
+      errorDiv.textContent = "Cover cannot exceed main member's cover.";
+    } else {
+      errorDiv.textContent = "";
+    }
+  });
+
+  document.querySelector("button[onclick='calculatePremium()']").disabled =!isValid;
+}
+
+function removeExtendedFamilyRow(button) {
+  const row = button.parentNode;
+  row.parentNode.removeChild(row);
+  numExtended--;
+  if (numExtended < 8) {
+    document.getElementById("addExtendedButton").classList.remove("disabled-button");
+    document.getElementById("addExtendedButton").disabled = false;
+  }
+}
+
+function updateExtendedFamilyOptions() {
+  const coverType = document.getElementById("coverType").value;
+  const extendedOptions = document.getElementById("extendedFamilyOptions");
+  const childrenOptions = document.getElementById("childrenOptions");
+
+  extendedOptions.style.display = coverType === "family"? "block": "none";
+  childrenOptions.style.display = coverType === "children"? "block": "none";
+
+  if (coverType!== "family") {
+    numExtended = 0;
+    extendedOptions.innerHTML = `<label>Extended Family Members:</label><div id="extendedFamilyContainer"></div><button type="button" id="addExtendedButton" onclick="addExtendedFamilyRow()">Add Extended Family Member</button>`;
+    document.getElementById("addExtendedButton").classList.remove("disabled-button");
+    document.getElementById("addExtendedButton").disabled = false;
+  } else {
+    const extendedRows = document.querySelectorAll(".extended-family-row");
+    extendedRows.forEach(row => {
+      updateExtendedCoverOptions(row);
+    });
+  }
+}
+
+// Event listener for numChildren input
+document.getElementById("numChildren").addEventListener("change", () => {
+  const numChildren = parseInt(document.getElementById("numChildren").value);
+  const errorDiv = document.getElementById("childrenError");
+  const calculateBtn = document.querySelector("button[onclick='calculatePremium()']");
+
+  if (numChildren >= 0 && numChildren <= 8) {
+    errorDiv.textContent = "";
+    calculateBtn.disabled = false;
+
+    const coverType = document.getElementById("coverType").value;
+    const coverAmount = parseInt(document.getElementById("coverAmount").value);
+    let premium = premiums[coverType][coverAmount];
+
+    // Example logic (adjust as needed):
+    if (coverType === "children") {
+      // Apply discount or additional charges based on numChildren
+      //...
+    }
+
+    document.getElementById("premium-value").textContent = premium.toFixed(2);
+
+  } else {
+    errorDiv.textContent = "Please enter a valid number of children (0-8)";
+    calculateBtn.disabled = true;
+  }
+});
+
+// Add event listener to coverAmount select
+document.getElementById("coverAmount").addEventListener("change", () => {
+  const coverType = document.getElementById("coverType").value;
+
+  if (coverType === "family") {
+    const extendedRows = document.querySelectorAll(".extended-family-row");
+    extendedRows.forEach(row => {
+      updateExtendedCoverOptions(row);
+    });
+  }
+});
+    </script>

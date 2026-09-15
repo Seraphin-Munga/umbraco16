@@ -1,0 +1,60 @@
+﻿@model Web.Models.HowToApplyDataContainer
+@using System.Configuration;
+
+
+@{
+    var button = Model.ApplyButton;
+    var cards = Model.DocumentsCards ?? new List<Card>();
+    var cardRows = new List<List<Card>>();
+    var currentCardRow = new List<Card>();
+    
+
+    foreach (var c in cards)
+    {
+        currentCardRow.Add(c);
+        if (currentCardRow.Count() == 2 || c.Equals(cards.Last()))
+        {
+            cardRows.Add(currentCardRow);
+            currentCardRow = new List<Card>();
+        }
+    }
+
+}
+<div class="campaign-more-container">
+    <div class="container">
+        <h2 class="h2-color">@Model.Header</h2>
+        <div class="row">
+            @if (Model.DocumentsCards != null)
+            {
+                <div class="row "> @* eq-height *@
+                    @foreach (var row in Model.DocumentsCards) //   cardRows)
+                    {
+                        <div class="col-md-3 col-sm-12 circle">
+                            <div class="center-align">
+                                @{
+                                    if (row.CardIcon != null)
+                                    {
+                                        <img class="myWorld-campaign-images" src="@row.CardIcon.Url" alt="@row.CardIcon.Value("altTag")" />
+                                    }
+                                    else
+                                    {
+                                        <img class="myWorld-campaign-images" src="@row.CardDescription" alt="@row.CardTitle" /> @* ... a work around - umbraco icon null failover *@
+                                    }
+                                }
+                                <p class="body-content margin-top-20 text-color">
+                                    @Html.Raw(row.CardDescriptionLongText)
+                                    @*@(rowCard.CardDescription ?? rowCard.CardTitle) *@
+                                </p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+        <div class="row">
+            @Html.Raw(Model.Description)
+        </div>
+    </div>
+</div>
+
+

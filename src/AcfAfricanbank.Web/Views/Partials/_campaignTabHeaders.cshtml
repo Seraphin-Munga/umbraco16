@@ -1,0 +1,19 @@
+﻿@model List<string>
+@using System.Text.RegularExpressions
+
+<ul class="nav nav-tabs eq-height" role="tablist">
+    @if (Model != null)
+    {
+        foreach (string tabHeader in Model)
+        {
+            var cssClassBuilder = Model.Count() > 1 ? "campaign-more" : "width-100";
+            var cssClass = tabHeader == Model.First() ? $"{cssClassBuilder} active" : cssClassBuilder;
+            var tabId = Regex.Replace(tabHeader, @"[^0-9a-zA-Z]+", "");
+            <li role="presentation" class="@cssClass">
+                <a href="#@tabId" role="tab" data-toggle="tab">
+                    @tabHeader
+                </a>
+            </li>
+        }
+    }
+</ul>

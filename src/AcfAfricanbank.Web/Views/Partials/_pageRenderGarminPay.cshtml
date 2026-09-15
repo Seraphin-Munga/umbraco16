@@ -1,0 +1,669 @@
+﻿
+@model Umbraco.Web.PublishedModels.TabBody
+@using Web.Helpers
+
+@{
+    var tbody = Model.GetProperty("tabBodyContent");
+    var cardData = Model.TabBodyContent.ToList();
+
+    ContainerViewModel containerViewModel = new ContainerViewModel();
+    
+  @* String androidLnk = "/media/mtjfxi5f/googleplaystoredownloadimagelink.png";
+    String huawaeiLnk = "/media/20220624/Appstoredownloadimagelink.png";
+    String iOSLnk = "/media/20220624/Googleplaystoredownloadimagelink.png";
+ var popHuaweiApp = "/media/l2dls1tu/huaweiappgallery.png";*@
+   
+  
+}
+
+<style>
+    .blog-container {
+        background: #fff
+    }
+    
+    .button.primary {
+    border-radius: 25px;
+    top: 2172px;
+    left: 499px;
+    width: 230px;
+    height: 50px;
+    background: #8CBE4D 0% 0% no-repeat padding-box;
+    box-shadow: none;
+    opacity: 1;
+}
+    .grey-background-0{
+       background: #F6F6F6 !important;
+    }
+    .grey-background-2{
+      background: #F6F6F6 !important;
+    }
+    /*.grey-background-0{
+      background: #FFFFFF !important;
+      border: 2px solid #F6F6F6;
+    }
+    .grey-background-1{
+      background: #F6F6F6 !important;
+    }
+    .grey-background-2{
+      background: #FFFFFF !important;
+    }*/
+    .desktop-blog {
+        display: block !important;
+    }
+    
+    .desktop-video{
+       display: block !important; 
+    }
+
+     .mobile-video {
+        display: none;
+    }
+
+
+    .mobile-blog {
+        display: none;
+    }
+    
+     .tablet-blog {
+         display: none;
+        }
+
+    .move-content-left {
+        margin-top: -150px;
+        margin-left: 200px;
+    }
+
+    .while-background {
+        background: #fff;
+    }
+
+    .test-class {
+        text-align: left;
+        font: normal normal bold 20px Montserrat;
+        letter-spacing: 0px;
+        color: #002B60;
+        font-size: 30px !important;
+        opacity: 1;
+    }
+
+    @@media(min-width: 767px) and (max-width: 991px) {
+     .banner-image {
+        width: 100%;
+    }
+       .container-blog {
+            bottom: 0 !important;
+            left: 0 !important;
+            top: 20px;
+            padding: 32px;
+            margin-left: 0px;
+        }
+        
+     .text-tab{
+         text-align: center !important;
+     }
+        
+ 
+    
+    .mega-tabs .nav-tabs > li.active:after {
+       bottom: -18px !important;
+    }
+    
+    .campaign-list {
+     margin-bottom: -60px !important;
+     }
+    
+    .while-background{
+        margin-bottom: -60px;
+    }
+
+        .container-blog {
+            margin-bottom: 40px;
+                padding: 32px;
+                margin-left: 0px;
+        }
+
+            .move-content-left {
+                margin-top: 0 !important;
+                margin-left: 0 !important;
+            }
+
+        .test-class {
+            text-align: center !important;
+        }
+
+        .desktop-blog {
+            display: none !important;
+        }
+
+        .mobile-blog {
+            display: none !important;
+        }
+        
+        .tablet-blog {
+         display: block !important;
+        }
+        
+    }
+
+    @@media only screen and (max-width: 767px) {
+        .container-blog {
+            bottom: 0 !important;
+            top: 20px;
+                padding: 32px;
+                margin-left: 0px;
+            left: 0 !important;
+        }
+        
+        .fqs-img{
+          width:100%;
+        }
+        
+        .text-tab{
+         text-align: center !important;
+     }
+        
+        .mega-tabs .nav-tabs > li.active:after {
+           bottom: -18px !important;
+        }
+        
+    .banner-image {
+        width: 100%;
+    }
+    
+    .campaign-list {
+    margin-bottom: -60px !important;
+    }
+    
+      .while-background{
+        margin-bottom: -60px;
+    }
+
+        .test-class {
+            text-align: center !important;
+        }
+
+        .container-blog {
+            margin-bottom: 40px;
+                padding: 32px;
+                margin-left: 0px;
+        }
+
+        .desktop-blog {
+            display: none !important;
+        }
+
+        .mobile-blog {
+            display: block !important;
+        }
+        
+         .tablet-blog {
+         display: none !important;
+        }
+
+   
+
+        .move-content-left {
+            margin-top: 0 !important;
+            margin-left: 0 !important;
+        }
+    }
+
+    @@media(max-width:767px) {
+        .container-blog {
+            bottom: 0 !important;
+            top: 20px;
+                padding: 32px;
+            left: 0 !important;
+        }
+        
+    .mega-tabs .nav-tabs > li.active:after {
+       bottom: -18px !important;
+    }
+    
+
+    
+     .desktop-video{
+       display: none !important; 
+    }
+
+     .mobile-video {
+        display: block  !important;
+    }
+    
+    .text-tab{
+         text-align: center !important;
+     }
+        
+  .while-background{
+        margin-bottom: -60px;
+    }
+    
+    .campaign-list {
+       margin-bottom: -60px !important;
+     }
+
+        .container-blog {
+            margin-bottom: 55px;
+                padding: 48px;
+                margin-left: 0px;
+        }
+
+        .desktop-blog {
+            display: none !important;
+        }
+        
+         .banner-image {
+        width: 100%;
+       }
+
+        .mobile-blog {
+            display: block !important;
+        }
+         .tablet-blog {
+         display: none !important;
+        }
+
+        .test-class {
+            text-align: center !important;
+        }
+
+    
+
+        .move-content-left {
+            margin-top: 0 !important;
+            margin-left: 0 !important;
+        }
+    }
+    @@media (max-width: 1030px) and (min-width: 1020px){
+    .container-blog-mobile{
+      
+    margin-left: 6rem !important;
+       }
+       }
+    
+@@media (max-width: 1024px) and (min-width: 921px){
+    .container-blog-mobile{
+      
+    margin-left: 16rem;
+       }
+       
+       .container-blog{
+         bottom: -24px !important;
+        padding: 32px;
+       }
+    
+    .inner-check{
+         top: -20px !important
+    }
+    
+    .body-content {
+    margin-top: 0px !important;
+    width: 410px !important;
+  }
+  
+  .container-blog-mobile-two{
+      left: -50px !important;
+  }
+  
+  .download-button{
+      margin-top: -4rem !important;
+          margin-right: 4rem;
+  }
+    
+  }
+  
+
+@@media (max-width: 767px){
+   .test-class {
+    text-align: center !important;
+    font-size: 22px !important;
+    }
+}
+ @@media only screen and (min-width: 800px){
+    .container-blog-mobile-two-text{
+    left:2%;
+   
+    }
+    
+
+  
+}
+@@media  (min-width: 1114px) and (max-width: 1140px){
+ .container-blog-mobile-two-text{
+    left:7%;
+    }
+}
+
+  @* @@media (min-width: 768px) and (max-width: 1024px) {
+        #popUpHuawei {
+            margin-right: -35rem;
+            margin-top: -68px;
+        }
+          .modal-dialog {
+            width: 790px !important;
+            padding-left: 30px;
+            padding-right: 50px;
+        }
+        }
+        @@media (min-width: 1000px) and (max-width: 10000px) {
+
+        .left-col {
+            border-right: none !important;
+            margin-left: 210px;
+        }
+
+        #popUpHuawei {
+            margin-right: -45rem;
+            margin-top: -82px;
+        }
+         @@supports (-moz-appearance:none) {
+
+            #popUpHuawei {
+                margin-right: 0px;
+                margin-left: 329px;
+            }
+        }
+
+        .modal-dialog {
+            width: 900px !important;
+        }
+    }*@
+</style>
+
+<div class=" audiaus-reward">
+
+    @foreach (var item in cardData)
+    {
+        var data = item.Value<IEnumerable<IPublishedElement>>("sectionContent");
+        int iterator = 0;
+
+        bool isSwappedClass = false;
+        bool isContentMoveClass = false;
+
+        foreach (var info in data)
+        {
+
+            var image = info.Value("tabSubItemImage");
+            String url = ((IPublishedContent)image).Url.ToString();
+            String altTag = ((IPublishedContent)image).Value("altTag").ToString();
+            String cardId = "card" + iterator.ToString();
+            var count = (iterator % 2) == 1;
+
+            <div class="blog-container desktop-blog">
+                <div class="row  grey-background-@iterator ">
+
+                    @if ((iterator % 2) == 1)
+                    {
+
+                        <div class="col-sm-5 ">
+                            <img class="banner-image" src="@url" alt="@altTag" />
+                        </div>
+
+                        <div class="col-sm-5  container-blog container-blog-mobile container-blog-mobile-two-text" style="position: relative;bottom: -120px;">
+                            <div class="body-content ul-bullets">
+                                <div class="article-title online-banking test-class">@info.Value("tabSubItemTitle")</div>
+                                @info.Value("tabSubItemTextContent")
+                            </div>
+                            <div class="row   ">
+
+                                @foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)info.Value("tabSubItemLinks"))
+                                {
+
+                                    if (link.Name.Contains("Chat") || link.Name.Contains("Join African Bank"))
+                                    {
+                                        <div class="col-sm-4">
+                                            <a class="button primary span-buttons" href="@link.Url" target="_blank" style="color: white;">@link.Name</a>
+                                        </div>
+
+                                    }
+                                    else if (link.Name.Contains("Terms & Conditions"))
+                                    {
+
+                                        <div class="col-sm-4">
+                                            <a class=" download-guide button primary span-buttons " href="@link.Url" target="_blank" style="color: white;">@link.Name</a>
+                                        </div>
+                                    }
+
+
+                                }
+
+
+                            </div>
+
+                        </div>
+
+                    }
+                    else
+                    {
+
+                        <div class="col-sm-6 col-md-offset-1 container-blog container-blog-mobile-two container-blog-mobile-two-text " style="position: relative;@*bottom: -80px;*@ margin-bottom: 30px;margin-top: 0px;">
+                            <div class="body-content ul-bullets" style="margin-top:80px;">
+                                <div class="article-title online-banking test-class">@info.Value("tabSubItemTitle")</div>
+                                @info.Value("tabSubItemTextContent")
+                            </div>
+                            <div class="row ">
+
+                                @foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)info.Value("tabSubItemLinks"))
+                                {
+
+                                    if (link.Name.Contains("Chat") || link.Name.Contains("Join African Bank"))
+                                    {
+                                        <div class="col-sm-4">
+                                            <a class="button primary span-buttons" href="@link.Url" target="_blank" style="color: white;">@link.Name</a>
+                                        </div>
+
+                                    }
+                                    else if (link.Name.Contains("Terms & Conditions"))
+                                    {
+
+                                        <div class="col-sm-4">
+                                            <a class=" download-guide button primary span-buttons " href="@link.Url" target="_blank" style="color: white;">@link.Name</a>
+                                        </div>
+                                    }
+
+
+                                }
+
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-sm-1 col-md-offset-4">
+                            <img style="float:right" class="banner-image" src="@url" alt="@altTag" />
+                        </div>
+
+                    }
+
+
+
+
+
+                </div>
+
+            </div>
+            
+            @*tablet*@
+            <div class="blog-container tablet-blog">
+                <div class="row  grey-background-@iterator">
+
+                    @if ((iterator % 2) == 1)
+                    {
+
+                        <div class="col-sm-6 ">
+                            <img class="banner-image" src="@url" alt="@altTag" />
+                        </div>
+
+                        <div class="col-sm-5  container-blog container-blog-mobile container-blog-mobile-two-text" style="position: relative;bottom: -120px;">
+                            <div class="body-content ul-bullets">
+                                <div class="article-title online-banking test-class">@info.Value("tabSubItemTitle")</div>
+                                @info.Value("tabSubItemTextContent")
+                            </div>
+                            <div class="row   ">
+
+                                @foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)info.Value("tabSubItemLinks"))
+                                {
+
+                                    if (link.Name.Contains("Chat") || link.Name.Contains("Join African Bank"))
+                                    {
+                                        <div class="col-sm-4">
+                                            <a class="button primary span-buttons" href="@link.Url" target="_blank" style="color: white;">@link.Name</a>
+                                        </div>
+
+                                    }
+                                    else if (link.Name.Contains("Terms & Conditions"))
+                                    {
+
+                                        <div class="col-sm-4">
+                                            <a class=" download-guide button primary span-buttons " href="@link.Url" target="_blank" style="color: white;">@link.Name</a>
+                                        </div>
+                                    }
+
+
+                                }
+
+
+                            </div>
+
+                        </div>
+
+                    }
+                    else
+                    {
+
+                        <div class="col-sm-6 col-md-offset-1 container-blog container-blog-mobile-two container-blog-mobile-two-text " style="position: relative;bottom: -80px;">
+                            <div class="body-content ul-bullets">
+                                <div class="article-title online-banking test-class">@info.Value("tabSubItemTitle")</div>
+                                @info.Value("tabSubItemTextContent")
+                            </div>
+                            <div class="row ">
+
+                                @foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)info.Value("tabSubItemLinks"))
+                                {
+
+                                    if (link.Name.Contains("Chat") || link.Name.Contains("Join African Bank"))
+                                    {
+                                        <div class="col-sm-4">
+                                            <a class="button primary span-buttons" href="@link.Url" target="_blank" style="color: white;">@link.Name</a>
+                                        </div>
+
+                                    }
+                                    else if (link.Name.Contains("Terms & Conditions"))
+                                    {
+
+                                        <div class="col-sm-4">
+                                            <a class=" download-guide button primary span-buttons " href="@link.Url" target="_blank" style="color: white;">@link.Name</a>
+                                        </div>
+                                    }
+
+
+                                }
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-sm-6 col-md-offset-4">
+                            <img  class="banner-image" src="@url" alt="@altTag" />
+                        </div>
+
+                    }
+
+                </div>
+
+            </div>
+
+
+            <div class="blog-container mobile-blog">
+                <div class="row grey-background-@iterator">
+               
+
+                        <div class="col-sm-6">
+                            <img class="banner-image" src="@url" alt="@altTag" />
+                        </div>
+
+                        <div class="col-sm-6  container-blog" style="position: relative;bottom: -170px;left: -40x;left: 23px;">
+                            <div class="body-content ul-bullets">
+                                <div class="article-title online-banking test-class">@info.Value("tabSubItemTitle")</div>
+                                @info.Value("tabSubItemTextContent")
+                                 
+                            </div>
+                            <div class="row ">
+
+                                @foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)info.Value("tabSubItemLinks"))
+                                {
+
+                                    if (link.Name.Contains("Chat") || link.Name.Contains("Join African Bank"))
+                                    {
+                                        <div class="col-sm-4">
+                                            <a class="button primary span-buttons" href="@link.Url" target="_blank" style="color: white;">@link.Name</a>
+                                        </div>
+
+                                    }
+                                    else if (link.Name.Contains("Terms & Conditions"))
+                                    {
+
+                                        <div class="col-sm-4">
+                                            <a class=" download-guide button primary span-buttons " href="@link.Url" target="_blank" style="color: white;">@link.Name</a>
+                                        </div>
+                                    }
+                                    
+
+
+                                }
+
+
+                            </div>
+
+                        </div>
+                </div>
+
+            </div>
+
+            iterator++;
+            
+
+        }
+    }
+
+</div>
+@*@Html.Partial("_renderPopUpContent2", new ContainerViewModel()
+{
+    HTMLContent2 = @<text>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-15">
+
+                    <br /><br />
+
+                </div>
+                <div class="col-xs-12 col-sm-4">
+                    <a id="AndroidUrl" href="@androidLnk" target="_blank">
+                        <img width="200" id="popUpAndroid" />
+                    </a>
+                </div>
+
+                <div class="col-xs-12 hidden-sm hidden-md hidden-lg"><br></div>
+
+                <div class="col-xs-12 col-sm-4">
+                    <a id="iOSUrl" href="@iOSLnk">
+                        <img width="200" id="popUpIOS" />
+                    </a>
+                </div>
+                <div class="col-xs-12 hidden-sm hidden-md hidden-lg"><br></div>
+
+                <div class="col-xs-12 col-sm-6">
+                    <a href="@huawaeiLnk">
+                        <img loading="lazy" width="200" id="popUpHuawei" src="@popHuaweiApp" />
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </text>
+})*@
+
+
+
+
+

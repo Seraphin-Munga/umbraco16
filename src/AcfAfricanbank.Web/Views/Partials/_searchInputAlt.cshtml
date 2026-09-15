@@ -1,0 +1,40 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@{
+    string query = null;
+    if (Model.GetType() == typeof(String))
+    {
+        query = Model;
+    }
+    else
+    {
+        query = null;
+    }
+}
+
+@*<form id="lg-md-show-search" class="navbar-form  content-padding-10" style="display: flex;">
+    <input type="text" class="searchTerm" placeholder="Search for blog..." id="searchstring" name="searchstring">
+    <button type="submit" id="btnSubmit" class="searchButton">
+        <i class="fa fa-search"></i>
+    </button>
+</form>*@
+
+<div class="input-group addon  content-padding-10" style="display: flex;">
+    @if (query != null)
+    {
+    <input class="form-control searchaltstyle" type="text" ng-model="searchTerm" ng-init="searchTerm = '@query.ToString()'" placeholder="Search for blog..." onkeyup="ValidateSearch();" />
+    }
+    else
+    {
+    <input id="SearchKeyUp" class="form-control searchaltstyle" type="text" ng-model="searchTerm" ng-init="searchTerm = ''" placeholder="Search for blog..." onkeyup="ValidateSearch();" />
+    }
+    <button class="searchButton">
+        <i class="fa fa-search"></i>
+    </button>
+    @*
+    <span class="input-group-addon" style="background-color:white; border:none"><i class="fa fa-search" style="color:#88bc47"></i></span>*@
+</div>
+<br />
+<div id="notFoundDiv" style="color: red; font-weight: bold; display:none;">No Records Found</div>
+
+<script src="~/scripts/searchInput.min.js"></script>
+

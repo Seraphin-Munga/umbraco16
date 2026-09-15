@@ -1,0 +1,120 @@
+﻿
+@model Umbraco.Web.PublishedModels.HeroHeader
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers;
+@using Umbraco.Web.Models
+@using CustomModels = Web.Models;
+
+
+@{ 
+
+    var headerImage_large = Model?.Value<IPublishedContent>("image")?.Url;
+    var headerImage_medium = Model?.Value<IPublishedContent>("imageMedium")?.Url;
+    var headerImage_small = Model?.Value<IPublishedContent>("imageSmall")?.Url;
+    var headerPartial = Model.Children.Where(c => c is TabGroup).FirstOrDefault();
+    var tabHeader = headerPartial.Children.Where(cc => cc is TabHeader).FirstOrDefault();
+}
+
+
+
+<style>
+
+    #festive-img {
+        background: url("@headerImage_large");
+        background-repeat: no-repeat;
+        background-size: cover;
+        padding-bottom: 40px;
+    }
+
+    .small-description {
+           text-align: -webkit-right;
+    }
+
+    .text-description {
+          top: 237px;
+    width: 365px;
+    height: 144px;
+    text-align: left;
+    font: italic normal bold 59px/72px Montserrat;
+    letter-spacing: 0px;
+    color: #002B60;
+    opacity: 1;
+    position: relative;
+    right: 100px;
+    }
+
+    hr.horizontal {
+        border-top: 1px solid #002b60;
+        margin-top: 51px;
+    }
+
+    .text-follow-social {
+       font-weight: 500;
+    color: #F8FBFD;
+    font-size: 23px;
+    position: relative;
+    left: 90%;
+    top: 1px;
+    }
+
+    .festive-social {
+  width: 29px;
+    height: 34px;
+    border-radius: 4px;
+    border: solid 1px #fff;
+    box-shadow: 0 2px 1px 0 rgba(0, 0, 0, 0.03);
+    color: #fff;
+    padding: 7px;
+    margin-left: 3px;
+    text-align: center;
+    font-size: 17px;
+}
+    }
+
+    .float-left-icons {
+        float: right;
+    }
+
+    .margin-right-festive {
+        margin-right: 120px;
+    }
+
+    .margin-top-fest {
+        margin-top: -40px;
+    }
+</style>
+
+
+<div id="festive-img">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <img id="img-growit" src="@headerImage_small" />
+            </div>
+            <div class="col-md-6 small-description">
+                <p class="text-description">
+                    @tabHeader.Value("ebankITIconTitle")
+                </p>
+            </div>
+
+        </div>
+        <hr class="horizontal">
+        <div class="row float-left-icons">
+            <div class="col-md-8 margin-right-festive">
+                       @Html.Raw(tabHeader.Value("ebankITIconContent"))
+            </div>
+            <div class="col-md-12 margin-top-fest">
+                <div class="pull-right">
+
+                    <a href="https://www.facebook.com/africanbank/" target="_blank"><i class="festive-social fab fa-facebook-f" aria-hidden="true"></i></a>
+                    <a href="https://twitter.com/AfricanBank" target="_blank"><i class="festive-social fab fa-twitter" aria-hidden="true"></i></a>
+                    <a href="https://www.instagram.com/african_bank/" target="_blank"><i class="festive-social fab fa-instagram" aria-hidden="true"></i></a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+

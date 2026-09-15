@@ -1,0 +1,32 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@{
+    var content = Model.Content.GetPropertyValue<IEnumerable<IPublishedContent>>("tabBodyContent");
+    var videos = content.Where(c => c.DocumentTypeAlias == "nCTabGenericContent").FirstOrDefault().GetPropertyValue<IEnumerable<IPublishedContent>>("sectionContent");
+    var x = 1;
+}
+<div id="video-body">
+    <div class="row">
+        @foreach (var videoData in videos)
+        {
+
+            var title = "Episode " + x;
+            var description = videoData.GetPropertyValue("cardDescription");
+            var img = videoData.GetPropertyValue<IPublishedContent>("cardIcon").Url;
+            var videoUrl = videoData.GetPropertyValue("cardTitle");
+            <div id="item-@x" class="col-md-4 col-sm-6 vid-list">
+                <div data-video="@videoUrl*@title*@description" class="video-item video_list_item">
+                    <div class="vid-list-play-botton"><i class="fa fa-play-circle fa-5x"></i></div>
+                    <div class="video-item-img" style="background-image:url(@img)"></div>
+                    <div class="video-item-content">
+                        <div class="video-description-box">
+                            <p class="video-item-description">@description</p>
+                        </div>
+                            <span class="video-item-title css-color-change">@title</span>
+                            <div class="sharethis-inline-share-buttons" data-url="@Request.Url.AbsoluteUri#@videoUrl"></div>
+                        </div>
+                    </div>
+            </div>
+            x++;
+        }
+    </div>
+</div>

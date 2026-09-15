@@ -1,0 +1,510 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+
+<style>
+/* styles.css */
+
+.control-label{
+    text-transform: capitalize !important;
+}
+.has-success .form-control {
+    border-color: #C4D82E;
+}
+
+.alert {
+@*font-size: xx-small !important;*@
+    padding: 5px !important;
+    margin-bottom: 0px !important;
+}
+.form-control:focus {
+    border-color: #00285A !important;
+}
+
+.col-md-12 {
+    padding-left: 0px; 
+    padding-right: 0px;
+}
+
+.textarea_input {
+    margin-bottom: 25px;
+    max-height: 70px !important;
+    min-height: 70px !important;
+}
+
+.form-control {
+    height: 45px;
+}
+
+.claim-container {
+    min-height: 350px;
+    margin-top: 42px;
+    margin-right: 63px;
+    margin-left: 15%;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-top: 0px !important;
+}
+
+.input_form {
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    border: 1px solid #DBDBDB;
+    border-radius: 30px;
+    opacity: 1;
+    width: 100%;
+}
+
+.claim-prev-button {
+    display: flex;
+    align-items: center;
+    border: none;
+    padding: 10px;
+    color: white;
+    cursor: pointer;
+}
+
+.claim-prev-button svg {
+    transition: all 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.claim-prev-button p {
+    margin: 0;
+    font-size: 16px; /* Adjust font size as needed */
+}
+
+.claim-prev-button:hover svg {
+    width: 25px; /* New width on hover */
+    height: 25px; /* New height on hover */
+}
+
+.text-centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    text-align: center;
+    color: white;  /* Assuming text color should contrast with the background */
+}
+
+.text-centered p {
+    margin: 0;
+    color: white;
+    text-align: center;
+}
+
+.centered-text {
+    color: white;
+    text-align: center;
+    padding: 10px; /* Optional: Add some padding around the text */
+}
+
+.main-stepper-container {
+    margin-top:120px;
+    background-color: transparent;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.stepper-container {
+    display: none !important;
+    width: 60%;  /* Adjust width if necessary */
+    padding: 0;  /* Remove any padding */
+    background: transparent;
+}
+
+.stepper-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    background-color: transparent;  /* Remove background */
+    border: none;  /* Remove border */
+    margin-bottom: 20px;  /* Add margin to separate from the form content */
+}
+
+.step {
+    flex: 1;
+    text-align: center;
+    padding: 10px 0;
+    cursor: pointer;
+    position: relative;
+    font-size: 1rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.step.active {
+    font-size: 20px !important;
+    text-decoration: underline !important;
+    font-weight: bold !important;
+    color: #00285a !important;
+}
+
+.claim-step-content {
+    display: none;
+}
+
+.claim-step-content.active {
+    display: block;
+}
+
+h2 {
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+p {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #000000;
+}
+
+input {
+    width: 50%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.next-button:hover {
+    opacity: 0.9;
+}
+
+.next-button {
+    width: 100%;
+    background: #003477 0% 0% no-repeat padding-box;
+    box-shadow: 2px 5px 
+    10px #00000029;
+    border-radius: 50px;
+    opacity: 1;
+    height: 45px;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+    /* float: right; */
+}
+
+.claim-prev-button {
+    background: transparent;
+    border: none;
+    float: left;
+    gap: 5px;  /* Space between the icon and text */
+    color: #ffffff;
+}
+
+.form-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #001b47;
+    color: white;
+    padding: 20px;
+    font-size: 1.5rem;
+    border-radius: 10px 10px 0 0;
+}
+
+.form-title strong {
+    color: #ffd700;
+}
+
+.form-content {
+    height: 100%;  @*450px*@
+    width: 450px;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.claim-flex-container {
+    display: flex;
+    width: 100%;
+}
+
+.claim-flex-item-content {
+    display: flex;
+    flex-direction: column;
+    /* align-items: start; */
+    /* justify-content: center; */
+    /* width: 100%; */
+    /* height: 100%; */
+}
+
+.claim-flex-item2 {
+    border-radius: 15px 0px 0px 15px;
+    height: 470px;
+    max-height: 470px;
+    flex: 1;
+    position: relative;
+}
+
+.claim-flex-item1 {
+    background: transparent;
+    border-radius: 15px 0px 0px 15px;
+    height: 470px;
+    max-height: 470px;
+    flex: 1;
+    position: relative;
+}
+
+.border-radius img {
+    max-width: 100%;
+}
+
+/* Responsive styles */
+@@media (max-width: 992px) {
+.main-stepper-container {
+    margin-top:0px;
+    }
+    .claim-container {
+        margin-left: 5%;
+        margin-right: 5%;
+    }
+
+    .form-content {
+        width: 85%;
+    }
+
+    .stepper-container {
+        width: 80%;
+    }
+
+    .input {
+        width: 70%;
+    }
+
+    .claim-flex-container {
+        flex-direction: column;
+    }
+}
+
+@@media (max-width: 768px) {
+    .claim-container {
+        margin-left: 2%;
+        margin-right: 2%;
+    }
+
+    .form-content {
+        width: 100%;
+        height: auto;
+    }
+
+    .stepper-container {
+        width: 90%;
+    }
+
+    .input {
+        width: 100%;
+    }
+
+    .claim-flex-container {
+        flex-direction: column;
+    }
+}
+
+@@media (max-width: 576px) {
+    .claim-container {
+        margin-left: 1%;
+        margin-right: 1%;
+    }
+
+    .form-content {
+        width: 100%;
+        height: auto;
+    }
+
+    .stepper-container {
+        width: 100%;
+    }
+
+    .step {
+        font-size: 0.875rem;
+    }
+
+    .next-button {
+        font-size: 0.875rem;
+    }
+
+    .claim-flex-container {
+        flex-direction: column;
+    }
+}
+
+</style>
+
+
+<div class="main-stepper-container">
+  <div class="stepper-container">
+    <div class="stepper-header">
+        <div class="step active" data-step="1">Personal Details</div>
+        <div class="step" data-step="2">Contact Details</div>
+        <!--<div class="step" data-step="3">Your Offer</div>-->
+    </div>
+  </div>
+    <form id="funeral_claim" novalidate>
+        <div class="form-content">
+            <div class="col-md-12">
+                <div id="ajax-form-success-log-claim" class="ajax-form-success ajax-alert alert alert-success square" style="display: none">
+                    Thank you for logging a claim. We will attend to this shortly. For any queries, please contact our call centre on 0861888786.
+                </div>
+                <div id="ajax-form-error-log-claim" class="ajax-form-error ajax-alert alert alert-danger square" style="display: none">
+                    An error occurred while trying to submit the information. For any queries, please contact our call centre on 0861888786.
+                </div>
+            </div>
+            <input id="sessionId" type="hidden" value="@(Guid.NewGuid().ToString())" />
+            <input id="processID" type="hidden" value="" />
+            
+            <div class="form-group" style="display:none">
+                <label for="invest-amount" class="col-md-4 control-label">Subject *</label>
+                <div class="col-md-8">
+                    <select class="form-control select_input_form" id="SubjectInput" name="FormFields.Subject">
+                        <option value="Log a Claim" selected="selected">Log a Claim</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="claim-step-content active" data-step="1">
+                <div class="claim-flex-container">
+                    <div class="claim-flex-item2 claim-flex-item-content">
+            
+                        <div class="claim-container">
+                            <p style="color:#000000;">Please fill in your details to get started with your application.</p>
+                            
+                            <div class="form-group">
+                                <label for="FirstNameInput" class="col-md-12 control-label">First Name </label>
+                                <div class="col-md-12">
+                                    <input class="form-control input_form" id="FirstNameInput" name="FormFields.FirstName" placeholder="First Name" type="text" value="" required />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="LastNameInput" class="col-md-12 control-label">Surname </label>
+                                <div class="col-md-12">
+                                    <input class="form-control input_form" id="LastNameInput" name="FormFields.LastName" placeholder="Surname" type="text" value="" required />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="SAIDInput" class="col-md-12 control-label">ID/Passport Number </label>
+                                <div class="col-md-12">
+                                    <input class="form-control input_form" id="SAIDInput" maxlength="13" name="FormFields.IdNumber" placeholder="ID / Passport Number" type="text" value="" required />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-12">
+                                    <p class="combo-btn-text primary">
+                                        <a id="applyButton" type="submit" class="btn next-button button  hover-up">Next</a>
+                                    </p>
+                                
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="claim-step-content" data-step="2">
+                <div class="claim-flex-container">
+                    <div class="claim-flex-item claim-flex-item-content">
+                                                 <button type="button" class="claim-prev-button" style="color: black;">
+                <svg class="claim-pre-chevron" width="20px" height="20px"  viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <rect width="24" height="24" fill="white"></rect> <path d="M14.5 17L9.5 12L14.5 7" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                Back
+            </button>
+                        <div class="claim-container">
+                            <p style="color:#000000;">Please fill in your details to get started with your application.</p>
+                            
+                            <div class="form-group">
+                                <label for="CellPhoneInput" class="col-md-12 control-label">Cellphone Number </label>
+                                <div class="col-md-12">
+                                    <input class="form-control input_form" id="CellPhoneInput" maxlength="10" name="FormFields.CellPhone" placeholder="Mobile Number" type="text" value="" required />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="EmailInput" class="col-md-12 control-label">Email </label>
+                                <div class="col-md-12">
+                                    <input class="form-control input_form" id="EmailInput" name="FormFields.Email" placeholder="Email" type="email" value="" required />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="MessageInput" class="col-md-12 control-label">Message </label>
+                                <div class="col-md-12">
+                                    <textarea class="form-control textarea_input" cols="20" id="MessageInput" name="FormFields.Message" placeholder="Message" rows="6" required></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                
+                                
+                                
+                                
+                                <div class="col-md-12">
+                                    <button id="applyButton" class="next-button btn button" type="submit" >Submit Claim</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+<script>
+
+$(document).ready(function() {
+    $('.next-button').click(function() {
+        var currentStep = $(this).closest('.claim-step-content');
+        var nextStep = currentStep.next('.claim-step-content');
+        
+        if (validateStep(currentStep)) {
+            if (nextStep.length) {
+                currentStep.removeClass('active');
+                nextStep.addClass('active');
+                updateStepper(nextStep.data('step'));
+            }
+        } else {
+          return  validateStep(currentStep)
+        }
+    });
+
+    $('.claim-prev-button').click(function() {
+        var currentStep = $(this).closest('.claim-step-content');
+        var prevStep = currentStep.prev('.claim-step-content');
+
+        if (prevStep.length) {
+            currentStep.removeClass('active');
+            prevStep.addClass('active');
+            updateStepper(prevStep.data('step'));
+        }
+    });
+
+    function updateStepper(step) {
+        $('.step').removeClass('active');
+        $('.step[data-step="' + step + '"]').addClass('active');
+    }
+
+    function validateStep(step) {
+        var isValid = true;
+        step.find('input, textarea').each(function() {
+            if (!this.checkValidity()) {
+                isValid = false;
+                $(this).addClass('is-invalid');
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        });
+        return isValid;
+    }
+})
+</script>
+                        

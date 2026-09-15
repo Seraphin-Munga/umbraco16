@@ -1,0 +1,76 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+
+<style>
+        .breadcrumb1 {
+            position: absolute;
+            border: none;
+            list-style: none;
+            display: flex;
+            background: transparent;
+        }
+        .breadcrumb1 li {
+            
+            margin: 0 5px;
+            font: normal normal 600 15px/37px Montserrat;
+            letter-spacing: 0px;
+            color: #112768;
+            opacity: 1;
+        }
+        
+        
+        .breadcrumb1 li a {
+           text-decoration: none;
+            font: normal normal normal 15px/37px Montserrat;
+            letter-spacing: 0px;
+            color: #112768;
+            opacity: 1;
+        }
+        .breadcrumb1 li::after {
+            top: 4px;
+            position: relative;
+            height: 15px;
+            font: normal normal 600 33px / 0px Montserrat;
+            letter-spacing: 0px;
+            color: #112768;
+            opacity: 1;
+            content: "\203A";
+            margin-left: 9px;
+        }
+        .breadcrumb1 li:last-child::after {
+            content: "";
+        }
+    </style>
+<nav aria-label="breadcrumb1">
+        <ul class="breadcrumb1" id="breadcrumb1"></ul>
+    </nav>
+<script>
+ document.addEventListener("DOMContentLoaded", function() {
+            var currentURL = window.location.pathname;
+            var breadcrumb1Container = document.getElementById("breadcrumb1");
+
+            var pathSegments = currentURL.split('/').filter(function(segment) {
+                return segment.length > 0;
+            });
+
+            var fullPath = '';
+
+            // Show breadcrumbs only if not on the home page
+            if (pathSegments.length > 2) {
+                var breadcrumb1HTML = '<li><a href="/en/home">Home</a></li>';
+                pathSegments.forEach(function(segment, index) {
+                    if (index > 1) { // Skip the first segment (/en) and start from the second
+                        fullPath += '/' + segment;
+                        if (index === pathSegments.length - 1) {
+                            breadcrumb1HTML += '<li>' + segment.replace(/-/g, ' ') + '</li>';
+                        } else {
+                            breadcrumb1HTML += '<li><a href="' + fullPath + '">' + segment.replace(/-/g, ' ') + '</a></li>';
+                        }
+                    }
+                });
+                breadcrumb1Container.innerHTML = breadcrumb1HTML;
+            } else {
+                breadcrumb1Container.style.display = 'none'; // Hide breadcrumbs
+            }
+        });
+
+</script>    

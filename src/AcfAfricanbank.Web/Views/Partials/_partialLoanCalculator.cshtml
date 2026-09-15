@@ -1,0 +1,492 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@model Umbraco.Core.Models.IPublishedContent
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using System.Configuration;
+@{
+    var children = Model;
+
+    // Get calculator Children
+    var calculatorBody = children; // ?.Where(c => c.DocumentTypeAlias.ToLower() == "loancalculatortype").FirstOrDefault();
+    var calculatorData = calculatorBody.GetPropertyValue<IEnumerable<IPublishedContent>>("CalculatorView");
+    var panelItem = calculatorBody.Children.Where(x => x.DocumentTypeAlias.ToString().ToLower() == "panel").FirstOrDefault();
+    var panelData = panelItem.GetPropertyValue<IEnumerable<IPublishedContent>>("PanelListitems");
+
+    var applyNowButton = panelItem.Children.Where(c => c.DocumentTypeAlias.ToLower() == "ebankitabstractbutton").FirstOrDefault();
+    var buttonLink = "#";
+    var buttonLinkVal = applyNowButton?.GetPropertyValue("ebankITButtonExternalLink")?.ToString();
+    var buttonText = applyNowButton?.GetPropertyValue("ebankITButtonText")?.ToString();
+    buttonLink = (string.IsNullOrEmpty(buttonLinkVal)) ? buttonLink : buttonLinkVal;
+
+    var termConditionLink = panelItem.Children.Where(c => c.DocumentTypeAlias.ToLower() == "elementsindocumentcategory").FirstOrDefault();
+    var finalLynk = "#";
+    var linkValue = termConditionLink.GetPropertyValue<IEnumerable<IPublishedContent>>("documents");
+    foreach (var tcItem in linkValue)
+    {
+        var tcButton = tcItem.GetPropertyValue<IPublishedContent>("file").Url;
+        finalLynk = (string.IsNullOrEmpty(tcButton)) ? finalLynk : tcButton;
+    }
+    var linkText = termConditionLink?.GetPropertyValue("category")?.ToString();
+}
+
+<link href="~/css/loan_calculator.css" rel="stylesheet" />
+
+<style>
+    .instant-application {
+        padding-bottom: 1px;
+        max-width: 920px;
+        min-height: 400px;
+        margin: auto;
+        box-shadow: 0px 10px 20px rgba(0,0,0,0.22);
+    }
+
+    .right-form {
+        background: #011F44;
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+        color: #fff;
+        height: 456px;
+        padding: 25px;
+        text-align: center;
+        /* padding-bottom: 10px; */
+    }
+
+    .button.primary:hover {
+        background-color: #fff;
+        color: #002b60;
+    }
+
+    .disabled {
+        pointer-events: none;
+    }
+
+    @@media (min-width: 768px) and (max-width: 1024px) {
+        .right-form {
+            background: #011F44;
+            border-top-right-radius: 0px;
+            border-bottom-right-radius: 0px;
+            color: #fff;
+            height: 456px;
+            padding: 70px;
+            text-align: center;
+            top: 50px;
+            /* padding-bottom: 10px; */
+        }
+
+        .left-form {
+            background: #002B60;
+            border-top-left-radius: 0px;
+            border-bottom-left-radius: 0px;
+            color: #fff;
+            padding: 0px;
+        }
+
+        .loan-form {
+            padding: 17px;
+            text-align: center;
+        }
+
+        .changer {
+            border-top: solid 1px #011F44;
+            background: #002B60;
+            height: 50px;
+            width: 100%;
+            border-bottom-left-radius: 0px;
+        }
+    }
+
+    @@media (min-width: 320px) and (max-width: 425px) {
+        .right-form {
+            background: #011F44;
+            border-top-right-radius: 0px;
+            border-bottom-right-radius: 0px;
+            color: #fff;
+            height: 456px;
+            padding: 25px;
+            text-align: center;
+            /* padding-bottom: 10px; */
+        }
+    }
+    /*For value bubble*/
+    .range-wrap {
+        /*width: 500px;*/
+        position: relative;
+        top: 10px;
+    }
+
+    .range-value {
+        position: absolute;
+        top: -50%;
+    }
+
+        .range-value span {
+            width: 50px;
+            top: -40px;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+            background: #03a9f4;
+            color: #fff;
+            font-size: 12px;
+            display: block;
+            position: absolute;
+            left: 55%;
+            transform: translate(-50%, 0);
+            border-radius: 2px;
+        }
+
+            .range-value span:before {
+                content: "";
+                position: absolute;
+                width: 0;
+                height: 0;
+                border-top: 10px solid #03a9f4;
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                top: 100%;
+                left: 50%;
+                margin-left: -5px;
+                margin-top: -1px;
+            }
+
+    input:focus, select:focus {
+        outline: none;
+    }
+</style>
+
+<div class="container">
+    <h1 style="text-align: center">Instant Loan Application</h1>
+    <div class="instant-application">
+        <div class="row the-form">
+            @* <div class="col-md-12 left-form">*@
+            <div class="col-md-12">
+                @{
+                    if (calculatorData != null)
+                    {
+                        int idCounter = 1;
+                        foreach (var calItem in calculatorData)
+                        {
+                            <form class="loan-form form@(idCounter)">
+                                <h1 style="text-align: center">@calItem.GetPropertyValue("headingDescription")</h1>
+                                <label id="error-loanamount@(idCounter)" style="color:red"></label>
+                                <input id="input-Amount@(idCounter)" class="loan-inpt" type="text" value="5000" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57">
+                                <div class="row" style="margin-bottom: -7px">
+                                    <div class="col-xs-4" style="text-align: left; font-size:10px;top:15px">R@(calItem.GetPropertyValue("startamount"))</div>
+                                    <div class="col-xs-4"></div>
+                                    <div class="col-xs-4" style="text-align: right; font-size:10px;top:15px">R@(calItem.GetPropertyValue("endamount"))</div>
+                                </div>
+                                <div class="range-wrap">
+                                    <div class="range-value" id="rangeV@(idCounter)"></div>
+                                    <input id="slide-range@(idCounter)" type="range" class="loan-range" min="@calItem.GetPropertyValue("startamount")" max="@calItem.GetPropertyValue("endamount")" step="500" value="5000">
+                                </div>
+                                <select class="loan-select-term" id="term@(idCounter)">
+                                    <option value="3">3 Months</option>
+                                    <option value="6">6 Months</option>
+                                    <option value="12" selected>12 Months</option>
+                                    <option value="48">48 Months</option>
+                                    <option value="60">60 Months</option>
+                                    <option value="72">72 Months</option>
+                                </select>
+                                <div class="row" style="margin-bottom: -7px">
+                                    <div class="col-xs-4" style="text-align: left; font-size:10px; top:5px">@calItem.GetPropertyValue("startTerm")</div>
+                                    <div class="col-xs-4"></div>
+                                    <div class="col-xs-4" style="text-align: right; font-size:10px; top:5px ">@calItem.GetPropertyValue("endTerm")</div>
+                                </div>
+                                <input id="input-month@(idCounter)" type="range" class="loan-range" min="3" max="72" value="12">
+                                <div class="repayment">
+                                    <div class="col-md-6">@calItem.GetPropertyValue("outputDescription")</div>
+                                    <div class="col-md-6 repayment-amount"><input id="installment_calc@(idCounter)" style="color:#89BC47;" class="loan-inpt-return" type="text" value="" readonly>	</div>
+                                </div>
+                            </form>
+                            idCounter++;
+                        }
+                    }
+                }
+
+                <div class="changer">
+                    <div class="col-xs-10 switch-text"><p>Calculate based on your monthly repayment budget </p></div>
+                    <div class="col-xs-1 switch-loan"><img src="~/media/53020/baseline_compare_arrows_white_48dp.png" width="30" alt="" /></div>
+                </div>
+            </div>
+            
+            @*
+            <div class="col-md-4 right-form">
+                <h4 style="color:#ffffff">@panelItem.GetPropertyValue("headingDescription")</h4>
+                <div class="required-documents">
+                    @{
+                        if (panelData != null)
+                        {
+                            foreach (var item in panelData)
+                            {
+                                if ((bool)item.GetPropertyValue("isControlVisible") == true)
+                                {
+                                    var imgsrc = item.GetPropertyValue<IPublishedContent>("ebankITImage").Url;
+                                    <div style="float:left; margin-right: 15px"><img src="@imgsrc" width="27" alt="" /></div><p> @item.GetPropertyValue("ebankITContent")</p>
+                                    <br>
+                                }
+                            }
+                        }
+                    }
+
+                </div>
+                <p class="loan-disclaimer">* Please note that the amounts calculated  are indicative.</p>
+                @if (applyNowButton != null)
+                {
+                    <a id="btnApply" href="@buttonLink" class="button primary clearfix" style="background-color: #88bc47 !important;">
+                        @buttonText
+                    </a>
+                }
+                <div class="terms-con"><a href="@finalLynk" style="color:white">@linkText</a></div>
+            </div>
+            
+             *@
+        </div>
+    </div>
+</div>
+@*
+
+Note: section script will only work if it's called from the parent (Personal Loan) - if you call it from here; it will not work 
+
+@section scripts {
+    <script>
+        jQuery(document).ready(function () {
+            jQuery(".changer").click(function () {
+                jQuery(".form1").slideToggle('swing');
+                jQuery(".form2").slideToggle('swing');
+            });
+            var loan = $("#input-Amount1").val();
+            /******set color for range slider********************/
+            var valPercent = (loan - parseInt($('#slide-range1').attr('min'))) /
+                (parseInt($('#slide-range1').attr('max')) - parseInt($('#slide-range1').attr('min')));
+            $('#slide-range1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #05f1f5), color-stop(' + valPercent + ', #074FA8))');
+
+            var loanterm = $('#term1').val();
+            var valPercent = (loanterm - parseInt($('#input-month1').attr('min'))) /
+                (parseInt($('#input-month1').attr('max')) - parseInt($('#input-month1').attr('min')));
+            $('#input-month1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #05f1f5), color-stop(' + valPercent + ', #074FA8))');
+            /***************** End of set color**********************/
+            $('#error-loanamount1').css('display', 'none');
+            installmentEstimator(loan, loanterm);
+            var afordibility = $("#input-Amount2").val();
+            /******set color for range slider********************/
+            var valPercent2 = (afordibility - parseInt($('#slide-range2').attr('min'))) /
+                (parseInt($('#slide-range2').attr('max')) - parseInt($('#slide-range2').attr('min')));
+            $('#slide-range2').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent2 + ', #05f1f5), color-stop(' + valPercent2 + ', #074FA8))');
+
+            var newloanterm = $('#term2').val();
+            var valPercent = (loanterm - parseInt($('#input-month2').attr('min'))) /
+                (parseInt($('#input-month2').attr('max')) - parseInt($('#input-month2').attr('min')));
+            $('#input-month2').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #05f1f5), color-stop(' + valPercent + ', #074FA8))');
+            /***************** End of set color**********************/
+            $('#error-loanamount2').css('display', 'none');
+            loanSizeCalculator(afordibility, newloanterm);
+            /**************** value bubble show hide on mouse hover*************************/
+            $("#slide-range1").on("mouseup", function () {
+                $("#rangeV1").css("display", "none");
+            });
+            $("#slide-range1").on("mousedown", function () {
+                $("#rangeV1").css("display", "block");
+            });
+            $("#slide-range2").on("mouseup", function () {
+                $("#rangeV2").css("display", "none");
+            });
+            $("#slide-range2").on("mousedown", function () {
+                $("#rangeV2").css("display", "block");
+            });
+            /**************** end of bubble show hide on mouse hover*************************/
+        });
+
+        $('#slide-range1').on('input', function () {
+            var newVal = $(this).val();
+            $("#input-Amount1").val(newVal);
+            /**************display value bubble*********************/
+            var newValue = Number((newVal - $('#slide-range1').attr('min')) * 100 / ($('#slide-range1').attr('max') - $('#slide-range1').attr('min')));
+            var newPosition = 10 - (newValue * 0.2);
+            $('#rangeV1').append('<span>' + newVal + '</span>');
+            $('#rangeV1').css('left', 'calc(' + newValue + '% + (' + newPosition + 'px))');
+            /******************End of dispaly value bubble********************/
+            /********************Set color for range slider**********************/
+            var valPercent = (newVal - parseInt($('#slide-range1').attr('min'))) /
+                (parseInt($('#slide-range1').attr('max')) - parseInt($('#slide-range1').attr('min')));
+            $('#slide-range1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #05f1f5), color-stop(' + valPercent + ', #074FA8))');
+            /****************End of set color**************************************/
+            var loanterm = $('#term1').val();
+            installmentEstimator(newVal, loanterm);
+        });
+        $('#input-Amount1').on('input', function () {
+            var loan = $(this).val();
+            if (parseInt(loan) < 2000 || parseInt(loan) > 250000 || loan == "") {
+                $('#error-loanamount1').css('display', 'block');
+                $('#error-loanamount1').text('Please enter loan amount in between R2000 to R250000');
+                $('#btnApply').addClass('disabled');
+            }
+            else {
+                $('#slide-range1').val(loan);
+                var loanterm = $('#term1').val();
+                installmentEstimator(loan, loanterm);
+                $('#error-loanamount1').text('');
+                $('#error-loanamount1').css('display', 'none');
+                $('#btnApply').removeClass('disabled');
+            }
+            /********************Set color for range slider**********************/
+            var valPercent = (loan - parseInt($('#slide-range1').attr('min'))) /
+                (parseInt($('#slide-range1').attr('max')) - parseInt($('#slide-range1').attr('min')));
+            $('#slide-range1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #05f1f5), color-stop(' + valPercent + ', #074FA8))');
+            /****************End of set color**************************************/
+        });
+
+        $('#term1').on('input', function () {
+            var newVal = $(this).val();
+            $("#input-month1").val(newVal);
+            var loan = $("#input-Amount1").val();
+            installmentEstimator(loan, newVal);
+            /******set color for range slider********************/
+            var valPercent = (newVal - parseInt($('#input-month1').attr('min'))) /
+                (parseInt($('#input-month1').attr('max')) - parseInt($('#input-month1').attr('min')));
+            $('#input-month1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #05f1f5), color-stop(' + valPercent + ', #074FA8))');
+            /***************** End of set color**********************/
+        });
+        $('#input-month1').on('input', function () {
+            var loanterm = $(this).val();
+            var newloanterm;
+            if (loanterm >= 3 && loanterm <= 5)
+                newloanterm = 3;
+            else if (loanterm >= 6 && loanterm <= 11)
+                newloanterm = 6;
+            else if (loanterm >= 12 && loanterm <= 47)
+                newloanterm = 12;
+            else if (loanterm >= 48 && loanterm <= 59)
+                newloanterm = 48;
+            else if (loanterm >= 60 && loanterm <= 71)
+                newloanterm = 60;
+            else
+                newloanterm = 72
+            $('#term1').val(newloanterm);
+            var loan = $("#input-Amount1").val();
+            installmentEstimator(loan, newloanterm);
+            /******set color for range slider********************/
+            var valPercent = (loanterm - parseInt($('#input-month1').attr('min'))) /
+                (parseInt($('#input-month1').attr('max')) - parseInt($('#input-month1').attr('min')));
+            $('#input-month1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #05f1f5), color-stop(' + valPercent + ', #074FA8))');
+            /***************** End of set color**********************/
+        });
+
+        function installmentEstimator(loan, loanterm) {
+            var loan_amount = parseInt(loan);
+            var term = loanterm;
+            var initiation_fee = 0;
+            var principal_debt = 0;
+            var installment = 0;
+            //var loan_amount = 50000.00;
+            //var term = 72;
+            var vat = 0.15;
+            var repo = .0375;
+            var interest_rate = 0.2475;
+            var insurance_premium = 0.0045;
+            initiation_fee = Math.max(Math.min(Math.min(165 + (loan_amount - 1000) * 0.1, 1050), loan_amount * 0.15), 0);
+            principal_debt = loan_amount + initiation_fee * 1.15;
+            var service_fee = 60 * 1.15;
+            installment = ((principal_debt * interest_rate / 12) / (1 - 1 / Math.pow((1 + interest_rate / 12), term)) + insurance_premium * principal_debt + service_fee).toFixed(2);
+            $('#installment_calc1').val(installment);
+        }
+        /********************************************* Loan Size Estimator *******************************************************************************************/
+        $('#slide-range2').on('input', function () {
+            var newVal = $(this).val();
+            $("#input-Amount2").val(newVal);
+            /******************* Display value bubble****************/
+            var newValue = Number((newVal - $('#slide-range2').attr('min')) * 100 / ($('#slide-range2').attr('max') - $('#slide-range2').attr('min')));
+            var newPosition = 10 - (newValue * 0.2);
+            $('#rangeV2').append('<span>' + newVal + '</span>');
+            $('#rangeV2').css('left', 'calc(' + newValue + '% + (' + newPosition + 'px))');
+            /****************End of display value bubble******************/
+            /********************Set color for range slider**********************/
+            var valPercent = (newVal - parseInt($('#slide-range2').attr('min'))) /
+                (parseInt($('#slide-range2').attr('max')) - parseInt($('#slide-range2').attr('min')));
+            $('#slide-range2').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #05f1f5), color-stop(' + valPercent + ', #074FA8))');
+            /**********************End of set colour*************************/
+            var loanterm = $('#term2').val();
+            var affordibility = $("#input-Amount2").val();
+            loanSizeCalculator(affordibility, loanterm);
+        });
+        $('#input-Amount2').on('input', function () {
+            var loan = $(this).val();
+            if (parseInt(loan) < 500 || parseInt(loan) > 50000 || loan == "") {
+                $('#error-loanamount2').css('display', 'block');
+                $('#error-loanamount2').text('Please enter affordibility amount in between R500 to R50000');
+                $('#btnApply').addClass('disabled');
+            }
+            else {
+                $('#slide-range2').val(loan);
+                var loanterm = $('#term2').val();
+                var affordibility = $("#input-Amount2").val();
+                loanSizeCalculator(affordibility, loanterm);
+                $('#error-loanamount2').css('display', 'none');
+                $('#error-loanamount2').text('');
+                $('#btnApply').removeClass('disabled');
+            }
+            /********************Set color for range slider**********************/
+            var valPercent = (loan - parseInt($('#slide-range2').attr('min'))) /
+                (parseInt($('#slide-range2').attr('max')) - parseInt($('#slide-range2').attr('min')));
+            $('#slide-range2').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #05f1f5), color-stop(' + valPercent + ', #074FA8))');
+            /****************End of set color**************************************/
+        });
+        $('#term2').on('input', function () {
+            var newVal = $(this).val();
+            /******set color for range slider********************/
+            var valPercent = (newVal - parseInt($('#input-month2').attr('min'))) /
+                (parseInt($('#input-month2').attr('max')) - parseInt($('#input-month2').attr('min')));
+            $('#input-month2').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #05f1f5), color-stop(' + valPercent + ', #074FA8))');
+            /***************** End of set color**********************/
+            $("#input-month2").val(newVal);
+            var afordibility = $("#input-Amount2").val();
+            loanSizeCalculator(afordibility, newVal);
+        });
+        $('#input-month2').on('input', function () {
+            var loanterm = $(this).val();
+            var newloanterm;
+            if (loanterm >= 3 && loanterm <= 5)
+                newloanterm = 3;
+            else if (loanterm >= 6 && loanterm <= 11)
+                newloanterm = 6;
+            else if (loanterm >= 12 && loanterm <= 47)
+                newloanterm = 12;
+            else if (loanterm >= 48 && loanterm <= 59)
+                newloanterm = 48;
+            else if (loanterm >= 60 && loanterm <= 71)
+                newloanterm = 60;
+            else
+                newloanterm = 72
+            $('#term2').val(newloanterm);
+            var afordibility = $("#input-Amount2").val();
+            loanSizeCalculator(afordibility, newloanterm);
+            /******************set colour for range slider****************/
+            var valPercent = (loanterm - parseInt($('#input-month2').attr('min'))) /
+                (parseInt($('#input-month2').attr('max')) - parseInt($('#input-month2').attr('min')));
+            $('#input-month2').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #05f1f5), color-stop(' + valPercent + ', #074FA8))');
+            /**********************End of set colour************************/
+        });
+
+
+        function loanSizeCalculator(afordibility, loanterm) {
+            var afordibility = parseInt(afordibility);
+            var term = loanterm;
+            var vat = 0.15;
+            var repo = .0375;
+            var interest_rate = 0.15;
+            var insurance_premium = 0.0045;
+            var service_fee = 60 * 1.15;
+            var principal_debt = (((afordibility - service_fee) * (1 - Math.pow((1 + interest_rate / 12), -term))) / (interest_rate / 12 + insurance_premium * (1 - Math.pow((1 + interest_rate / 12), -term)))).toFixed(2);
+            var LC1a = (principal_debt - 165 * (1 + vat)).toFixed(2);
+            var LC1b = ((principal_debt - (165 - 0.1 * 1000) * (1 + vat)) / (1 + 0.1 * (1 + vat))).toFixed(2);
+            var LC1 = (Math.min(LC1a, LC1b)).toFixed(2);
+            var LC2 = (principal_debt - 1050 * (1 + vat)).toFixed(2);
+            var LC3 = (principal_debt / (1 + 0.15 * (1 + vat))).toFixed(2);
+            var loanAmount = (Math.min(Math.max((Math.floor(Math.max(LC1, LC2, LC3) / 50, 0) * 50), 2000), 250000)).toFixed(2);
+            $('#installment_calc2').val(loanAmount);
+        }
+
+    </script>
+}
+*@
+
+
+

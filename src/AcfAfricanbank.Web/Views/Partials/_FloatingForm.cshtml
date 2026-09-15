@@ -1,0 +1,412 @@
+﻿@model AcfAfricanbank.Core.Models.Forms.FloatingFormViewModel
+@using AcfAfricanbank.Core.Controllers.Forms
+@using Web.Helpers;
+
+@{
+    var content = Umbraco.Web.Composing.Current.UmbracoHelper.AssignedContentItem;
+    //var content = new UmbracoHelper(UmbracoContext.Current).AssignedContentItem;
+    var title = content.HasValue("floatingForm") ? content.Value<IPublishedElement>("floatingForm").Value<string>("title") : "";
+
+    //exteral links in call me back section
+    var external_link = content.HasValue("floatingForm") ? content.Value<IPublishedElement>("floatingForm").Value<string>("linkExternal") : "none";
+    var external_link_text = content.HasValue("floatingForm") ? content.Value<IPublishedElement>("floatingForm").Value<string>("externalLabel") : "Submit";
+    var external_link_visible = content.HasValue("floatingForm") ? content.Value<IPublishedElement>("floatingForm").Value<Boolean>("externalLinkVisible") : false;
+    var product_name = content.HasValue("floatingForm") ? content.Value<IPublishedElement>("floatingForm").Value<string>("productIdentification") : "Credit-general";
+
+    //button for call me back
+    var call_me_text = content.HasValue("floatingForm") ? content.Value<IPublishedElement>("floatingForm").Value<string>("callMeBackButtonText") : "Call me Back";
+    var call_me_visible = content.HasValue("floatingForm") ? content.Value<IPublishedElement>("floatingForm").Value<Boolean>("callMeBackVisible") : false;
+
+    //call me back structure settings
+    var call_me_subject = content.Value("ProductSubject");
+    var call_me_contact_type = content.Value("contactType");
+    var prodID = content.Value("productID");
+}
+
+<div class="st-actionContainer right-bottom">
+    <div class="st-panel">
+        <div id="call_me_form">
+            <div class="st-panel__entry">
+                <section id="form-loader">
+                    <div class="loader" id="loader-rates-form-preloader">
+                        <div class="loader-img"></div>
+                    </div>
+                </section>
+                <div class="st-panel-intro">@title</div>
+                <div class="st-panel-tip">
+                    <p>Click call me back to speak to our consultants<br /> or apply to create application online.</p>
+                </div>
+                <div class="st-panel-contents">
+                    <form id="creditAPI">
+                        @Html.AntiForgeryToken()
+                        <div id="form_fields">
+                            <input id="sessionId" type="hidden" value="@(Guid.NewGuid().ToString())" />
+                            <input id="processID" type="hidden" value="" />
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" id="FirstNameInput" name="FormFields.firstName" class="form-control" placeholder="Name*" maxlength="30">
+                            </div>
+                            <div class="form-group">
+                                <label>Surname</label>
+                                <input type="text" id="LastNameInput" name="FormFields.lastName" class="form-control" placeholder="Surname*" required maxlength="30">
+                            </div>
+                            <div class="form-group">
+                                <label>E-mail</label>
+                                <input type="email" id="EmailInput" name="FormFields.email" class="form-control" placeholder="Email*" required maxlength="50">
+                            </div>
+                            <div class="form-group">
+                                <label>SOUTH AFRICAN ID </label>
+                                <input type="text" id="SAIDInput" name="FormFields.identityNumber" class="form-control" placeholder="South African ID*" required
+                                       minlength="13" maxlength="13">
+                            </div>
+                            <div class="form-group">
+                                <label>Cellphone number</label>
+                                <input type="text" id="CellPhoneInput" name="FormFields.mobileNumber" class="form-control" placeholder="Cellphone Number*"
+                                       required maxlength="12">
+                            </div>
+                            <div class="form-group">
+                                <input type="hidden" id="MessageInput" name="FormFields.message" placeholder="Message*" value="Pepe"
+                                       required minlength="90">
+                            </div>
+                            <div class="cntr">
+                                <input id="cbx" name="FormFields.cbx" class="cbx-cover" type="checkbox" />
+                                <label class="cbx" for="cbx"></label>
+                                <label class="lbl" for="cbx">No product market information, thanks. </label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            @{ if (@call_me_visible)
+                                {
+                                    <div class="col-xs-12">
+                                        <button type="button" id="st-panel-submit" onclick="open_call_me()" class="call-me btn-hover-blue">Call me back</button>
+                                    </div>
+                                }
+                            }
+                            @{ if (@external_link_visible)
+                                {
+                                    <div class="col-xs-12">
+                                        <a href="@external_link" target="_blank" class="st-panel-submit btn-hover-green" style="width: 100%;display: block;text-align: center;">@external_link_text</a>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div id="call_me_success">
+            <div class="call_me_success_header">
+                <span class="fa fa-check call_me_success_header_icon"></span><span class="call_me_success_header_title">Request for call back received</span>
+            </div>
+            <p id="call_me_success_body">
+                Thank you for requesting us to call you<br />
+                back. Your request has been sent<br />
+                successfully and one of our consultants<br />
+                will contact you shortly.
+            </p>
+            <div id="call_me_success_fotter">
+                <img src="@Url.Content("~/media/kw1fwvto/icon-creditlife-easyapp.png")" class="icon-open" alt="Consultant">
+            </div>
+        </div>
+    </div>
+    <div class="st-btn-container right-bottom">
+        <div class="st-button-main campaing-call">
+            <img src="@Url.Content("~/images/call-me-back.svg")" class="icon-open" alt="initiate call me back in African Bank" onclick="init_fields();">
+            <img src="@Url.Content("~/images/call-me-back-close.svg")" class="icon-close" alt="End call me back">
+        </div>
+    </div>
+</div>
+<script>
+    function init_fields() {
+        $('#creditAPI').bootstrapValidator({
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok-sign',
+                invalid: 'glyphicon glyphicon-remove-sign',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            onSuccess: function (e) {
+                e.preventDefault();
+
+                if (@prodID ===1  ) {
+
+                    SubmitForm();
+
+                } else if (@prodID === 2){
+
+                    call_me("creditAPI");
+
+                }
+            },
+            fields: {
+                'FormFields.message': {
+                    message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                    validators: {
+                        notEmpty: {
+                            message: '@ResourceHelper.GetResource("GenericContactForm_Message_Required")'
+                        }, stringLength: {
+                            max: 100,
+                            message: '@ResourceHelper.GetResource("GenericContactForm_Message_LenghtValMessage")'
+                        }
+                    },
+                    feedbackIcons: {
+                        valid: '',
+                        invalid: '',
+                        validating: ''
+                    },
+                },
+                'FormFields.firstName': {
+                    message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                    validators: {
+                        notEmpty: {
+                            message: '@ResourceHelper.GetResource("GenericContactForm_FirstName_Required")'
+                        },
+                        regexp: {
+                            regexp: /^[a-zA-Z]+$/,
+                            message: '@ResourceHelper.GetResource("GenericContactForm_FirstName_ValMessage")'
+                        }, stringLength: {
+                            max: 30,
+                            message: '@ResourceHelper.GetResource("GenericContactForm_FirstName_LenghtValMessage")'
+                        }
+
+                    }
+                },
+                "FormFields.lastName": {
+                    message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                    validators: {
+                        notEmpty: {
+                            message: '@ResourceHelper.GetResource("GenericContactForm_LastName_Required")'
+                        },
+                        regexp: {
+                            regexp: /^[a-zA-Z]+$/,
+                            message: '@ResourceHelper.GetResource("GenericContactForm_LastName_ValMessage")'
+                        }, stringLength: {
+                            max: 30,
+                            message: '@ResourceHelper.GetResource("GenericContactForm_LastName_LenghtValMessage")'
+                        }
+                    }
+                },
+                "FormFields.identityNumber": {
+                    validators: {
+                        notEmpty: {
+                            message: '@ResourceHelper.GetResource("GenericContactForm_SAID_Required")'
+                        },
+                        regexp: {
+                            regexp: /^[0-9]{1,13}$/,
+                            message: '@ResourceHelper.GetResource("GenericContactForm_SAID_ValMessage")'
+                        },
+                        stringLength: {
+                            max: 13,
+                            message: '@ResourceHelper.GetResource("GenericContactForm_SAID_LenghtValMessage")'
+                        },
+                        callback: {
+                            callback: function (value, validator, $field) {
+
+                                var idNumber = value;
+
+                            if (null === idNumber || 0 === idNumber.length) return !1;
+                            var correct = !0;
+                            if (13 !== idNumber.length || isNaN(parseFloat(idNumber)) && isFinite(idNumber)) return !1;
+                            var tempDate = new Date(idNumber.substring(0, 2), idNumber.substring(2, 4) - 1, idNumber.substring(4, 6)),
+                                id_date = tempDate.getDate(),
+                                id_month = tempDate.getMonth();
+                            tempDate.getFullYear();
+                            (tempDate.getYear() != idNumber.substring(0, 2) || id_month != idNumber.substring(2, 4) - 1 || id_date != idNumber.substring(4, 6)) && (correct = !1);
+                            for (var tempTotal = 0, checkSum = 0, multiplier = 1, i = 0; 13 > i; ++i) tempTotal = parseInt(idNumber.charAt(i)) * multiplier, tempTotal > 9 && (tempTotal = parseInt(tempTotal.toString().charAt(0)) + parseInt(tempTotal.toString().charAt(1))), checkSum += tempTotal, multiplier = multiplier % 2 === 0 ? 1 : 2;
+                            return checkSum % 10 !== 0 && (correct = !1), correct
+
+                            }
+                        }
+                    }
+                },
+                'FormFields.email': {
+                    message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                    validators: {
+                        notEmpty: {
+                            message: '@ResourceHelper.GetResource("GenericContactForm_Email_Required")'
+                        },
+                        regexp: {
+                            regexp: /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i,
+                            message: '@ResourceHelper.GetResource("GenericContactForm_Email_ValMessage")'
+                        },
+                        stringLength: {
+                            max: 50,
+                            message: '@ResourceHelper.GetResource("GenericContactForm_EMAIL_LenghtValMessage")'
+                        }
+                    }
+                },
+                "FormFields.mobileNumber": {
+                    message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
+                    validators: {
+                        notEmpty: {
+                            message: '@ResourceHelper.GetResource("GenericContactForm_CellPhone_Required")'
+                        },
+                        phone: {
+                            country: 'ZA',
+                            message: '@ResourceHelper.GetResource("NewsletterForm_CellPhone_NumberValMessage")'
+                        },
+                        numeric: {
+                            message: '@ResourceHelper.GetResource("GenericContactForm_CellPhone_NumericValMessage")'
+                        },
+                        stringLength: {
+                            min: 10,
+                            max: 10,
+                            message: '@ResourceHelper.GetResource("GenericContactForm_CellPhone_LenghtValMessage")'
+                        }
+                    }
+                }
+            }
+        });
+    };
+    function SubmitForm( /*hasSubmit*/) {
+                var submitedFormDateTime = new Date().toLocaleString()
+                var data = {
+                    FirstName: $('#FirstNameInput').val().trim(),
+                    LastName: $('#LastNameInput').val().trim(),
+                    Subject: "@call_me_subject" + ' - undefined',
+                    ProductID: "@prodID",
+                    Email: $('#EmailInput').val().trim(),
+                    CellPhone: $('#CellPhoneInput').val().trim(),
+                    SAID: $('#SAIDInput').val(),
+                    HasSubmit: true,
+                    TimeEnteredOnPage: "@DateTime.Now.ToIsoString()",
+                    SessionId: $('#sessionId').val(),
+                    FreeText: $('#MessageInput').val().trim(),
+                    ProcessID: $('#processID').val(),
+                    ContactType:"@call_me_contact_type",
+                    ExtendedProperties:
+                    [
+                        {
+                            "Key": "SubmitedPageDate",
+                            "Value": submitedFormDateTime
+                        },
+                        {
+                            "Key": "CodeName",
+                            "Value": navigator.appCodeName
+                        },
+                        {
+                            "Key": "appName",
+                            "Value": navigator.appName
+                        },
+                        {
+                            "Key": "appVersion",
+                            "Value": navigator.appVersion
+                        },
+                        {
+                            "Key": "userAgent",
+                            "Value": navigator.userAgent
+                        },
+                        {
+                            "Key": "screenWidth",
+                            "Value": screenWidth()
+                        },
+                        {
+                            "Key": "screenHeight",
+                            "Value": screenHeight()
+                        },
+                        {
+                            "Key": "URL",
+                            "Value": window.location.href
+                        }
+                    ]
+                }
+        requestInProgress = true;
+                $("#form-loader").show();
+                AJAX.request('/public/contacform/submit', {
+                    data: data,
+                    success: function (e) {
+                        call_me_success_close();
+                        call_me_success();
+                        $("#form-loader").hide();
+                    },
+                    error: function (req, txt, err) {
+                        $("#form-loader").hide();
+                        call_me_failed();
+                    }
+                });
+    }
+
+    function call_me(form_name) {
+        var data = {};
+        var inputs = document.forms[form_name].getElementsByTagName("input");
+        for (var x = 0; x < inputs.length; x++) {
+            data[inputs[x].id] = inputs[x].value;
+        }
+        $("#form-loader").show();
+        var csrfToken = $("input[name='__RequestVerificationToken']").val();
+        $.ajax({
+            headers: { '__RequestVerificationToken': csrfToken },
+            url: '/umbraco/surface/Custom/call_me_request',
+            type: "POST",
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({ form: data }),
+            success: function (data) {
+                $("#form-loader").hide();
+                if (!data.error) {
+                    call_me_success_close();
+                    call_me_success();
+                } else {
+                    //handling errors
+                    if ($("#st-panel-submit")[0].type == "button") {
+                        open_call_me();
+                        $("#st-panel-submit").submit();
+                    } else if ($("#st-panel-submit")[0].type == "submit")
+                    {
+                        $("#st-panel-submit").submit();
+                    }
+                }
+            },
+            error: function (error) {
+                $("#form-loader").hide();
+                //handling bad request
+                call_me_failed();
+            }
+        });
+    }
+    function screenWidth() {
+        if (window.screen) {
+            return (screen.width);
+        } else {
+            return (0);
+        }
+    }
+    function screenHeight() {
+        if (window.screen) {
+            return (screen.height);
+        } else {
+            return (0);
+        }
+    }
+    function call_me_success() {
+        //Display the correct message if request was successful
+        $('#call_me_form').hide();
+        $('#call_me_success').show();
+    }
+    function call_me_failed() {
+        //Display failed request
+        $('#call_me_form').hide();
+        $('#call_me_success').show();
+        $('.call_me_success_header_title').text("Request failed");
+        $('#call_me_success_body').html("Please try again later.");
+        $('#call_me_success_body').css("color,red");
+        call_me_success_close();
+    }
+
+    function call_me_success_close() {
+             //timeout to remove success message
+             setTimeout(function () {
+                $(".st-panel").removeAttr("style");
+                $('#call_me_form').show();
+                $('#call_me_success').hide(); $("form#creditAPI").bootstrapValidator("destroy");
+                $("form#creditAPI")[0].reset();
+                $('.st-button-main.campaing-call').click();
+                var sbject = "<p>Click call me back to speak to our consultants<br/> or apply to create application online.</p>";
+                $(".st-panel-tip").html(sbject);
+                $("#form_fields").hide();
+                $("#st-panel-submit").prop('type', 'button');
+                $('.call_me_success_header_title').text("Request for call back received");
+                $('#call_me_success_body').html("Thank you for requesting us to call you <br/>back.Your request has been sent <br/>successfully and one of our consultants <br/>will contact you shortly.");
+                $('#call_me_success_body').css("color,#6b6f82");
+            }, 5000);
+    }
+</script>

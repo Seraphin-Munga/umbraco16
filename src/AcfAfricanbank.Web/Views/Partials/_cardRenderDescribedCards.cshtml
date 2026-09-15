@@ -1,0 +1,80 @@
+﻿@model Umbraco.Web.PublishedModels.TabBody
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using System.Configuration;
+@using System.Text.RegularExpressions
+@{
+    var paymentItems = (IEnumerable<IPublishedElement>)Model.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+}
+
+<style type="text/css">
+    /* media only screen and (max-width:850px){
+        .payments-description-section .row .description {
+            max-width: 100%;
+            padding-left: 0px;
+        }
+    } */
+    @@media only screen and (max-width:768px) {
+        .payments-description-section .row .description {
+            max-width: 100%;
+            padding-left: 0px;
+        }
+
+        .card-plain {
+            border-radius: 4px;
+            background-color: #fff;
+            padding: 12px;
+            text-align: center;
+            height: 100%;
+            max-width: 370px;
+            margin: 0 auto;
+        }
+    }
+</style>
+
+<div class="container">
+    <div class="campaign-product-container payments-section full">
+        <div class="margin-top-20 visible-xs"></div>
+        <div class="row">
+            @foreach (var item in paymentItems)
+            {
+                var cardTitle = item.Value<string>("nCcardTitle");
+                var cardDesc = item.Value<string>("nCcardDescription");
+                var mainTitle = item.Value<string>("mainTitle") ?? string.Empty;
+                var Id = Regex.Replace(mainTitle, @"[^0-9a-zA-Z]+", "");
+                <div class="col-sm-4 margin-bottom-20">
+                    <div class="card-plain">
+                        <div class="text-left">
+                            <div class="icon">
+                                <span class="icon-repayment"></span>
+                            </div>
+                            <div class="title text-uppercase">@cardTitle</div>
+                            <p class="">@cardDesc</p>
+                            <a href="#@Id"><div class="download-icon"><i class="fas fa-long-arrow-alt-down" aria-hidden="true"></i></div></a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="payments-description-section full">
+        @foreach (var item in paymentItems)
+        {
+            var mainTitle = item.Value<string>("mainTitle") ?? string.Empty;
+            var mainDesc = item.Value("mainDescription");
+            var Id = Regex.Replace(mainTitle, @"[^0-9a-zA-Z]+", "");
+            <div class="row" id="@Id">
+                <div class="icon">
+                    <span class="icon-repayment"></span>
+                </div>
+                <div class="title">
+                    <span>@mainTitle</span>
+                </div>
+                <div class="description">
+                    @Html.Raw(mainDesc)
+                </div>
+            </div>
+        }
+    </div>
+</div>

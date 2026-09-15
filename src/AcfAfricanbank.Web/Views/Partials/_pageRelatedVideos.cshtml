@@ -1,0 +1,36 @@
+﻿@model ICollection<NChelpGuide>
+@{
+    var videos = (ICollection<NChelpGuide>)Model;
+    var domainDirectory = System.Web.HttpContext.Current.Request.Url.AbsoluteUri.Replace(System.Web.HttpContext.Current.Request.Url.AbsolutePath, "");
+    string currentDirectory = domainDirectory;
+    int resultIndex = currentDirectory.IndexOf("?path");
+    if (resultIndex != -1)
+    {
+        currentDirectory = currentDirectory.Substring(0, resultIndex);
+    }
+}
+<div id="video-body">
+    <div class="row">
+        @foreach (var videoData in videos)
+        {
+            var title = videoData.Value("question");
+            var videoUrl = videoData.Value("answer");
+            var thumbnail = videoData.Value("Description");
+            var description = videoData.Value("name"); // videoData.Name;
+            <div class="col-md-3 col-sm-6 video_list_item hover-related-video" style="max-width: 300px;" onclick='playVideoPlatform("@videoUrl")'>
+                <div data-video="@videoUrl*@title*@description" class="">
+                    <div class="row">
+                        <div class="col-md-12 related-video-header-desc">
+                            @title
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="sharethis-inline-share-buttons" data-url="@currentDirectory@videoUrl"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

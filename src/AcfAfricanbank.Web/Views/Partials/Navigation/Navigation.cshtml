@@ -1,10 +1,878 @@
-@*
-    Placeholder - the real v8 navigation markup for this partial was never
-    present in this checkout (Platform/Web/Views/Partials/Navigation was
-    already empty in the source). Replace this file with the actual content
-    once it's available; every layout (master.cshtml, masterPublic.cshtml,
-    MasterNew.cshtml, MasterHeaderOnly.cshtml, ebankITMasterPublic.cshtml)
-    renders it unconditionally, so an empty/missing file was crashing every
-    page.
-*@
-<nav class="navbar"></nav>
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using Umbraco.Web
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers;
+@using Web.Entities;
+@using System.Linq;
+@{
+
+    TopNavigation menu = null;
+
+    HomePageElements homePageElements = null;
+    
+    var modelNav = Umbraco.Content("18201");
+
+    if (Model.Children.Where(o => o is HomePageElements).FirstOrDefault() != null)
+    {
+        homePageElements = (HomePageElements)Model.Children.Where(o => o is HomePageElements).FirstOrDefault();
+    }
+    else if (Model.Parent.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault() != null)
+    {
+        homePageElements = (HomePageElements)Model.Parent.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+    }
+    else
+    {
+        homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+    }
+    menu = (TopNavigation)modelNav;
+}
+
+
+
+<style>
+.active {
+     text-decoration: none !important; 
+    color: #89BC47 !important;
+}
+
+
+/*
+Start of the Blog and contact us nav
+
+New Styles 
+date 2024/11/12 
+
+*/
+.horizontal-list {
+  position: relative;
+  right: 0; /* Aligns the list container to the left of its positioned parent */
+  list-style-type: none; /* Removes bullets */
+  padding: 0px 0px 0px 60px; /* Adds left padding only */
+  margin: 0;
+  display: flex;
+  justify-content: flex-start; /* Ensures items are aligned to the left in the row */
+}
+
+
+.horizontal-list li {
+  margin-right: 8px; /* Add spacing between items */
+}
+
+.horizontal-list li a {
+  color: #fff;
+  text-decoration: none; /* Remove underline from links */
+  opacity: 0.6; /* Set opacity to 60% */
+}
+
+.horizontal-list li a:hover {
+  text-decoration: none; /* Optional: underline on hover */
+  opacity: 0.5; /* Restore full opacity on hover */
+}
+
+
+/*
+Start of the Blog and contact us nav
+
+New Styles 
+date 2024/11/12 
+
+*/
+
+
+.navbar-default .navbar-nav>li>a.login-btn {
+    background: #5dc300 !important;
+    text-align: center;
+    padding: 10px 25px;
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 12px;
+    margin-top: 33px;
+    border-radius: 30px !important;
+}
+.navbar-default i {
+    padding-left: 2px;
+    margin-top: 4px !important;
+    font-size: 12px;
+}
+
+.navbar-default .navbar-nav>li>a {
+    font-weight: 600 !important;
+}
+
+.fa-2x {
+    position: relative;
+    right: 10px;
+    font-size: 1em !important;
+}
+
+.navbar-brand {
+    position: relative;
+    padding:25px 70px 0px 0px !important;
+}
+    .dropdown-container.navbar-default .navbar-collapse {
+        margin-top: 3px !important;
+    }
+
+    /*Menu Icons*/
+    .fa-products:before {
+        content: "\f07a";
+    }
+
+    .fa-onlinebanking:before {
+        content: "\f0ac";
+    }
+
+    .fa-talktous:before {
+        content: "\f10b";
+    }
+
+    .fa-branches:before {
+        content: "\f041";
+    }
+
+    .fa-more:before {
+        content: "\f067";
+    }
+
+    .fa-investors:before {
+        content: "\f0c0";
+    }
+
+    .menu-icon {
+        vertical-align: top;
+        margin-top: 1px;
+        color: #88bc47;
+        padding-right: 10px;
+        padding-left: 15px;
+    }
+
+    .menu-block {
+        border-left: solid 1px rgba(0,0,0,.2);
+    }
+
+    .menu-burger {
+        border-left: solid 1px rgba(0,0,0,.2);
+    }
+
+    .menu-search {
+        border-right: solid 1px rgba(0,0,0,.2);
+    }
+
+    .MobileMenuDivWrapper {
+        height: 100vh;
+        min-height: 100vh;
+        width: 100%;
+        overflow-y: scroll;
+        -webkit-overflow-scrolling: touch;
+        z-index: 9999;
+        background-image: url('/media/51095/blog_patterns_1.jpg');
+    }
+    
+    
+    
+
+             /*modal css start here*/
+     
+.lineUp {
+  animation: 1s anim-lineUp ease-in ;
+}
+
+@@media (min-width: 768px) {
+    .navbar>.container .navbar-brand, .navbar>.container-fluid .navbar-brand {
+        margin-left: 10px;
+    }
+}
+@@media (min-width: 360px) and (max-width: 768px){
+
+.dropdown-container.navbar-default .navbar-collapse {
+    position: relative;
+    z-index: 10000;
+    background: #002b60;
+    margin-top: 22px !important;
+}
+
+.navbar-default .navbar-brand #Layer_2 {
+    position: relative;
+    left: 10px;
+    top: 21px;
+    height: 38px;
+ }   
+.navbar-default {
+    height: 100px !important;
+}
+#banner {
+    position: relative;
+}
+}
+@@keyframes anim-lineUp {
+  0% {
+    opacity: 0;
+    transform: translateY(80%);
+  }
+  20% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(0%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0%);
+  }
+}
+
+
+     .nav-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 20;
+    }
+
+
+    .nav-modal {
+      display: none;
+      flex-direction: column;
+      width: 500px;
+      height:220px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+      z-index: 3;
+      border-radius: 30px 30px 30px 30px;
+      position: relative;
+    }
+    
+    .nav-modal-container {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav-modal-header {
+      display: flex;
+      background-color: white;
+      color: #128C7E;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      border-radius: 25px;
+    }
+
+    .nav-modal-tab {
+      flex: 1;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      font-weight: normal;
+      font-size: 14px;
+      color: grey;
+      background: white;
+      padding: 10px;
+    }
+
+    .nav-modal-tab.active {
+      background-color: #fff;
+      color: #0D0D0D;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .nav-modal-tab.active::after {
+      content: '';
+      display: block;
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 50%;
+      height: 2px;
+      background-color: #88BC47;
+      transform: translateX(-50%);
+    }
+
+    .nav-modal-tab-content {
+      display: none;
+      padding: 67px;
+      border-radius: 0 0 30px 30px;
+    }
+    
+     .nav-modal-tab-content1 {
+      padding: 67px;
+    }
+
+
+    .nav-modal-tab-content.active {
+      display: block;
+    }
+   
+    .text-with-icon {
+      display: flex;
+      align-items: center;
+    }
+
+  
+    .redirect-Text  {
+        transition: transform .2s; 
+        font-weight:bold;
+        color:#021A44;
+      
+    }
+    
+    .redirect-Text:hover { 
+  -ms-transform: scale(1.2); /* Adjust the scale value as needed */
+  -webkit-transform: scale(1.2); /* Adjust the scale value as needed */
+  transform: scale(1.2); /* Adjust the scale value as needed */
+		} 
+    
+    .long-Text{
+        margin-bottom: 16px;
+         font-size: 13px;
+         color:#010101;
+         margin-top: -16%;
+    }
+        .long-Text2{
+        margin-bottom: 16px;
+        font-size: 20px !important;
+        color: #112768 !important ;
+        margin-top: -16%;
+        font-weight: 700;
+        font-size: 29px;
+        line-height: 1.2;
+
+    }
+    
+    .grid-container-element { 
+        padding-top:2%;
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    width: 100%; 
+    } 
+    .grid-child-element {
+        margin-top: -9px;
+    }
+
+
+.modal-Icon{
+    padding-left: 35px;
+    padding-top:3.5%;
+}
+
+    .close-button 
+    {
+    -top: -22px;
+    right: -21px;
+
+  
+        
+    }
+
+
+.close-btn-bg-dot {
+  height: 25px;
+  width: 25px;
+  background-color: #fff;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+
+.nav-modal-close-btn{
+  height: 0px;
+  line-height: 0px;  
+  width: 0px;  
+  font-size: 2em;
+  font-weight: bold;
+  color:white;
+  border-radius: 50%;
+  background-color: white;
+  text-align: center;
+  cursor: pointer;
+}
+
+.nav-modal-flex-container {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.circle-background {
+   top: -18px;
+    cursor: pointer;
+    position: absolute;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 32px;
+    font-size: 40px;
+   }
+
+@@media (min-width: 1200px) and (max-width: 2000px) {
+    .dropdown-container.navbar-default .navbar-collapse {
+        margin-top: 3px;
+    }
+}
+ 
+@@media only screen and (max-width: 530px) {
+    
+    .nav-modal-tab.active::after {
+      content: '';
+      display: block;
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 85%;
+      height: 2px;
+      background-color: #88BC47;
+      transform: translateX(-50%);
+    }
+    
+    .nav-modal {
+      width: 90%;
+      max-width: 400px; /* You can adjust this value as needed for the modal width */
+      height: auto;
+      padding: 20px;
+    }
+
+    .nav-modal-header {
+      padding: 10px;
+    }
+
+    .nav-modal-tab {
+      padding: 8px;
+      font-size: 14px;
+    }
+
+    .nav-modal-tab-content {
+      padding: 20px;
+    }
+
+    .grid-container-element {
+      grid-template-columns: 1fr 1fr;
+       cursor: pointer;
+    }
+
+    .modal-Icon {
+      padding-top: 5%;
+      padding-left: 100%;
+    }
+
+    .close-button 
+    {
+    
+    right: -17px;
+    top: -12px;
+    }
+
+    .nav-modal-close-btn{
+      color:black;
+      cursor: pointer;
+    }
+.circle-background {
+top: -26px;
+    cursor: pointer;
+    position: absolute;
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    background-color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    font-size: 33px;
+     
+    }
+    .redirect-Text {
+        font-size: 15px;
+    }
+    .long-Text{
+         
+         font-size: 13px;
+         color:#010101;
+         margin-top: -8%;
+    }
+  }
+
+
+@@media (min-width: 768px) and (max-width: 1199px){
+.dropdown-container.navbar-default .navbar-nav>li:first-child>a {
+    padding-left: 30px !important;
+}
+   } 
+    /*modal css end here*/
+
+</style>
+
+<div class="header-container">
+    <nav class="navbar navbar-default dropdown-container new-navbar-ab">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed padding-left-20 padding-right-15" data-toggle="collapse"
+                        data-target=".navbar-collapse" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                  @*
+                 <a class="navbar-brand" href="~/en/home/"><img src=" /media/lqpdwuh4/logo.png"  alt="African Bank"></a>
+              
+                <a class="navbar-brand" href="~/en/home/"><img src="@Url.Content("~/images/africanbank-logo-white.svg")" width="227" alt="African Bank"></a>
+                
+                <a class="navbar-brand" href="~/en/home/"><img src=" /media/lqpdwuh4/logo.png"  alt="African Bank"></a>
+                *@
+                    <a class="navbar-brand" href="~/en/home/">
+    <svg id="Layer_2" height="65px" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 396.81 127.43">
+              <defs>
+                <style>
+                  .cls-1 {
+                    fill: url(#linear-gradient);
+                  }
+            
+                  .cls-1, .cls-2, .cls-3, .cls-4 {
+                    stroke-width: 0px;
+                  }
+            
+                  .cls-2 {
+                    fill: #fff;
+                  }
+            
+                  .cls-3 {
+                    fill: url(#linear-gradient-2);
+                  }
+            
+                  .cls-4 {
+                    fill: url(#linear-gradient-3);
+                  }
+                </style>
+                <linearGradient id="linear-gradient" x1="-3003.03" y1="2372.22" x2="-2944.19" y2="2286.57" gradientTransform="translate(554.55 -3686.67) rotate(-45)" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="#84d3ec"/>
+                  <stop offset=".75" stop-color="#00a6d5"/>
+                  <stop offset=".8" stop-color="#019fd0"/>
+                  <stop offset=".88" stop-color="#038bc5"/>
+                  <stop offset=".96" stop-color="#086cb2"/>
+                  <stop offset="1" stop-color="#0b5ca9"/>
+                </linearGradient>
+                <linearGradient id="linear-gradient-2" x1="-3063.26" y1="2262.81" x2="-2935.17" y2="2262.81" gradientTransform="translate(554.55 -3686.67) rotate(-45)" gradientUnits="userSpaceOnUse">
+                  <stop offset=".1" stop-color="#1e582c"/>
+                  <stop offset=".18" stop-color="#357934"/>
+                  <stop offset=".26" stop-color="#48963c"/>
+                  <stop offset=".34" stop-color="#56ab41"/>
+                  <stop offset=".42" stop-color="#5fb744"/>
+                  <stop offset=".5" stop-color="#62bc46"/>
+                  <stop offset=".75" stop-color="#c4d92f"/>
+                  <stop offset=".83" stop-color="#a8d035"/>
+                  <stop offset="1" stop-color="#63bc45"/>
+                  <stop offset="1" stop-color="#62bc46"/>
+                </linearGradient>
+                <linearGradient id="linear-gradient-3" x1="-3019.54" y1="2354.65" x2="-3054.6" y2="2287.56" gradientTransform="translate(554.55 -3686.67) rotate(-45)" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="#1d2f5e"/>
+                  <stop offset=".36" stop-color="#0b5ca9"/>
+                  <stop offset=".5" stop-color="#1864af"/>
+                  <stop offset=".68" stop-color="#2069b3"/>
+                  <stop offset="1" stop-color="#236bb5"/>
+                  <stop offset="1" stop-color="#fff"/>
+                </linearGradient>
+              </defs>
+              <g id="Layer_1-2" data-name="Layer 1">
+                <g>
+                  <g>
+                    <path class="cls-1" d="m88.65,88.65c0,.84-.03,1.67-.05,2.5-.23,9.21-3.86,18.35-10.89,25.37l38.82-38.82c14.54-14.54,14.54-38.11,0-52.65-5.03-5.03-11.13-8.31-17.57-9.87-8.62-2.08-17.84-1.04-25.86,3.11l-2.91,1.59c12.57,21.1,18.73,44.95,18.46,68.75Z"/>
+                    <path class="cls-3" d="m15.19,98.96c-2.08-8.62-1.04-17.84,3.12-25.86,0,0,1.05-1.95,1.59-2.91,5.76-10.24,12.99-19.87,21.71-28.58,8.71-8.71,18.35-15.95,28.58-21.71.97-.54,2.91-1.59,2.91-1.59,8.02-4.15,17.24-5.19,25.86-3.11L47.83,1.53c-12.66-3.75-26.93-.62-36.92,9.37C1.03,20.78-2.14,34.83,1.4,47.38l13.78,51.58Z"/>
+                    <path class="cls-4" d="m15.19,98.96c-2.08-8.62-1.04-17.84,3.12-25.86,0,0,1.05-1.95,1.59-2.91,21.1,12.57,44.95,18.73,68.75,18.46,0,0-.03,1.67-.05,2.5-.23,9.21-3.86,18.35-10.89,25.37-14.54,14.54-38.11,14.54-52.65,0-5.03-5.03-8.31-11.13-9.87-17.57Z"/>
+                  </g>
+                  <path class="cls-2" d="m236.91,75.77v-19.09c0-4.97-4.04-9-9-9s-9,4.04-9,9v19.09h-7.69v-19.09c0-9.21,7.49-16.7,16.7-16.7s16.7,7.49,16.7,16.7v19.09h-7.69Zm-163.5-26.93c-1.57-2.7-3.71-4.87-6.38-6.44-1.59-.93-3.31-1.59-5.15-1.97h0s0,0,0,0c-7.87-1.59-13.12,3-13.59,7.89,2.97-1.29,11.22-2.64,15.46.6h0s0,0,0,0c1.27.9,2.3,2.07,3.07,3.49.88,1.63,1.33,3.52,1.33,5.61s-.45,3.92-1.33,5.55c-.88,1.63-2.1,2.93-3.63,3.86-1.52.93-3.28,1.4-5.24,1.4s-3.67-.47-5.21-1.41c-1.27-.77-2.34-1.79-3.17-3.03h0s0,0,0,0c-3.69-5.39-2.57-12.29-1.28-16.09-6.9,1.26-9.29,8.82-7.53,15.03h0c.36,1.34.85,2.62,1.49,3.81,1.44,2.69,3.44,4.85,5.94,6.42,2.51,1.58,5.38,2.38,8.52,2.38s6.02-.8,8.52-2.38c.96-.61,1.85-1.3,2.66-2.08v4.27h7.86v-18.25h0c-.08-3.19-.87-6.1-2.36-8.68Zm23.53-23.04c-2.67.08-5.07.72-7.15,1.92-2.22,1.29-3.98,3.11-5.22,5.41-1.23,2.29-1.86,5.02-1.86,8.11v.28h-5.58v6.87h5.58v27.38h7.86v-27.38h9.23v-6.87h-9.23v-.9c0-1.56.29-2.92.87-4.05.57-1.1,1.38-1.98,2.41-2.61,1.03-.62,2.25-.94,3.63-.94,0,0,0,0,.01,0h3.92v-7.24h-4.48v.02Zm107.02,23.04c1.57,2.71,2.37,5.8,2.37,9.18v17.74h-7.86v-4.27c-.81.78-1.7,1.47-2.66,2.08-2.51,1.58-5.38,2.38-8.52,2.38s-6.02-.8-8.52-2.38c-2.5-1.57-4.5-3.73-5.94-6.42-1.44-2.68-2.17-5.75-2.17-9.13s.8-6.48,2.36-9.18c1.57-2.7,3.72-4.87,6.41-6.44,2.69-1.57,5.75-2.37,9.09-2.37s6.39.8,9.06,2.37c2.66,1.57,4.81,3.74,6.38,6.44Zm-5.24,9.18c0-2.09-.45-3.98-1.33-5.61-.88-1.63-2.1-2.92-3.63-3.86-1.52-.93-3.28-1.4-5.24-1.4s-3.66.47-5.21,1.41c-1.55.94-2.79,2.24-3.69,3.86-.9,1.63-1.36,3.52-1.36,5.61s.46,3.91,1.36,5.54c.9,1.63,2.14,2.93,3.69,3.86,1.54.93,3.3,1.41,5.21,1.41s3.71-.47,5.24-1.4c1.53-.94,2.75-2.23,3.63-3.86.88-1.63,1.33-3.5,1.33-5.55Zm175.13,2.45l13.12,15.3h9.84l-16.66-19.43,16.05-16.05h-10.55l-11.79,11.79v-23.73h-7.86v47.42h7.86v-15.3ZM116.78,40.3c-2.67.08-5.07.72-7.15,1.92-2.22,1.29-3.98,3.11-5.22,5.41-1.23,2.29-1.86,5.02-1.86,8.11v20.03h7.86v-20.65c0-1.56.29-2.92.87-4.05.57-1.1,1.38-1.98,2.41-2.61,1.03-.62,2.25-.94,3.63-.94,0,0,0,0,.01,0h3.92v-7.24h-4.48v.02Zm46.63,25.32c-.65.72-1.4,1.34-2.23,1.84-1.52.91-3.31,1.38-5.3,1.38s-3.78-.46-5.3-1.38c-1.53-.92-2.75-2.19-3.62-3.8-.88-1.61-1.33-3.51-1.33-5.64s.45-4.04,1.33-5.67c.88-1.62,2.1-2.91,3.62-3.83,1.52-.91,3.31-1.38,5.3-1.38s3.78.46,5.3,1.38c.83.5,1.58,1.12,2.22,1.85l.54.61,5.3-5.3-.54-.54c-1.07-1.09-2.3-2.03-3.65-2.81-2.67-1.53-5.76-2.3-9.18-2.3s-6.57.77-9.24,2.3c-2.67,1.53-4.8,3.67-6.33,6.36-1.53,2.69-2.3,5.83-2.3,9.33s.77,6.58,2.3,9.27c1.53,2.69,3.66,4.83,6.33,6.36,2.67,1.53,5.77,2.3,9.24,2.3s6.57-.77,9.24-2.3c1.34-.77,2.56-1.7,3.62-2.78l.54-.54-5.32-5.32-.54.61Zm-33.7-39.83c-1.32,0-2.47.48-3.42,1.43-.95.95-1.43,2.1-1.43,3.42s.48,2.47,1.43,3.42c.95.95,2.1,1.43,3.42,1.43s2.47-.48,3.42-1.43c.95-.95,1.43-2.1,1.43-3.42s-.48-2.47-1.43-3.42c-.95-.95-2.1-1.43-3.42-1.43Zm-3.93,18.42s0,0,0,0v27.57s0,0,0,0v3.99h7.86v-7.86h0v-19.77h0v-7.86h-7.86v3.92Zm210,12.47c0-4.97,4.04-9,9-9s9,4.04,9,9v19.09h7.69v-19.09c0-9.21-7.49-16.7-16.7-16.7s-16.7,7.49-16.7,16.7v19.09h7.69v-19.09Zm-59.12,11.06c-2.97,1.29-11.22,2.64-15.46-.6h0c-1.27-.9-2.3-2.07-3.07-3.49-.88-1.63-1.33-3.52-1.33-5.61s.45-3.92,1.33-5.55c.88-1.63,2.1-2.93,3.63-3.86,1.52-.93,3.28-1.4,5.24-1.4s3.67.47,5.21,1.41c1.27.77,2.34,1.79,3.17,3.03h0s0,0,0,0c3.69,5.39,2.57,12.29,1.28,16.09,6.9-1.26,9.29-8.82,7.53-15.03h0c-.36-1.34-.85-2.62-1.49-3.81-1.44-2.69-3.44-4.85-5.94-6.42-2.51-1.58-5.38-2.38-8.52-2.38s-6.02.8-8.52,2.38c-.96.61-1.85,1.3-2.66,2.08v-16.21h-7.86v30.19h0c.08,3.19.87,6.1,2.36,8.68,1.57,2.7,3.71,4.87,6.38,6.44,1.59.93,3.31,1.59,5.14,1.97h0c7.87,1.6,13.12-2.99,13.59-7.88Zm44.55-18.9c1.57,2.71,2.37,5.8,2.37,9.18v17.74h-7.86v-4.27c-.81.78-1.7,1.47-2.66,2.08-2.51,1.58-5.38,2.38-8.52,2.38s-6.02-.8-8.52-2.38c-2.5-1.57-4.5-3.73-5.94-6.42-1.44-2.68-2.17-5.75-2.17-9.13s.8-6.48,2.36-9.18c1.57-2.7,3.72-4.87,6.41-6.44,2.69-1.57,5.75-2.37,9.09-2.37s6.39.8,9.06,2.37c2.66,1.57,4.81,3.74,6.38,6.44Zm-5.24,9.18c0-2.09-.45-3.98-1.33-5.61-.88-1.63-2.1-2.92-3.63-3.86-1.52-.93-3.28-1.4-5.24-1.4s-3.66.47-5.21,1.41c-1.55.94-2.79,2.24-3.69,3.86-.9,1.63-1.36,3.52-1.36,5.61s.46,3.91,1.36,5.54c.9,1.63,2.14,2.93,3.69,3.86,1.54.93,3.3,1.41,5.21,1.41s3.71-.47,5.24-1.4c1.53-.94,2.75-2.23,3.63-3.86.88-1.63,1.33-3.5,1.33-5.55Z"/>
+                </g>
+              </g>
+            </svg>
+</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse">
+
+                <ul class="nav navbar-nav dropdown-container left-nav">
+
+                    <li><a href="https://ib.africanbank.co.za/modules/Registration/Public/Register.aspx" target="_blank" class="register-btn visible-xs"><span>Register</span></a></li>
+                    <li><a href="https://ib.africanbank.co.za/" target="_blank" class="register-btn visible-xs"><span>Login</span></a></li>
+
+                    <li><a href="~/en/home/" class="no-left-padding">
+                        @*
+                        <span class="icon-home nav-home-icon hidden-xs">
+                        *@    
+                        </span> <span class="visible-xs">Home</span></a></li>
+                    <!-- Loop starts here -->
+
+                    @{
+                        if (menu != null)
+                        {
+                            foreach (var menuData in (IEnumerable<NCmenuCategory>)menu.Value("MenuInfo"))
+                            {
+                                foreach (var relatedLink in (IEnumerable<Umbraco.Web.Models.Link>)menuData.Value("menuName"))
+                                {
+                                    if (relatedLink.Url != "#")
+                                    {
+                                        <li><a href="@relatedLink.Url">@relatedLink.Name</a></li>
+                                    }
+                                    else if (relatedLink.Target != "")
+                                    {
+                                        <li class="header-mega-menu dropdown">
+                                            <a href="~/en/home/" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                                @relatedLink.Name
+
+                                                @if (menuData.Value("menus") != null)
+                                                {
+                                                    <i class="fa fa-angle-down"></i>
+                                                }
+                                            </a>
+                                            @if (menuData.Value("menus") != null)
+                                            {
+
+                                                <div class="dropdown-menu">
+                                                    <div class="container">
+                                                        <div class="row eq-height">
+                                                            @{
+
+                                                                List<NCmenuContent> categoryItems = (List<NCmenuContent>)menuData.Value("menus");
+                                                                string cssStyleLastCat = null;
+                                                               @* var lastItem = categoryItems.Last();*@
+                                                                foreach (var categoryItem in categoryItems)
+                                                                {
+                                                                 @*   if (categoryItem != lastItem) { cssStyleLastCat = ""; }
+                                                                    else { cssStyleLastCat = "border-right: 0px !important; "; }*@
+
+                                                                    var categoryName = categoryItem.Value("categoryName");
+                                                                    var linkData = categoryItem.Value("link");
+                                                                    <div class="col-sm-3">
+                                                                        <div class="mega-menu-product" style="@cssStyleLastCat">
+                                                                            <div class="product-category">@categoryItem.Value("categoryName")</div>
+
+                                                                            @foreach (var linkValue in (IEnumerable<NCmenuList>)linkData)
+                                                                            {
+                                                                                string pageSection = "";
+                                                                                if (linkValue.Value("pageSection") != null)
+                                                                                {
+                                                                                    pageSection = linkValue.Value("pageSection").ToString();
+                                                                                }
+                                                                                string _linkString = null;
+                                                                                if (linkValue.Value("menuList") != null)
+                                                                                {
+                                                                                    foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)linkValue.Value<IEnumerable<Umbraco.Web.Models.Link>>("menuList"))
+                                                                                    {
+                                                                                        if (pageSection != "")
+                                                                                        {
+                                                                                            _linkString = link.Url + pageSection;
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            _linkString = link.Url;
+                                                                                        }
+
+                                                                                        <div class="product">
+                                                                                            <a class="title" href=@_linkString>@link.Name</a>
+                                                                                            <p class="descr">@linkValue.Value("menuDescription")</p>
+                                                                                        </div>
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        </div>
+                                                                    </div>
+                                                                }
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li><a href="@System.Configuration.ConfigurationManager.AppSettings["online_upload"]" target="_blank">Upload documents</a></li>
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    <!-- Loop ends here -->
+             
+                </ul>
+                
+                <ul class="horizontal-list">
+                  <li><a>Blog</a></li>
+                  <li><a>Contact Us</a></li>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right " style="margin-top: -20px;">
+                    <!--<li><a c target="_blank" class="register-btn hidden-xs" style="margin-left: -13px;"><span>Register</span></a></li>-->
+                    <!--<li><a href="https://ib.africanbank.co.za/" target="_blank" class="login-btn hidden-xs">Login</a></li>-->
+                   <li>
+                        <a href="#" class="search-icon globalSearch" data-toggle="tooltip" data-placement="bottom" data-original-title="" title="">
+                            <span class="hidden-md hidden-lg hidden-sm search-text">Search</span>
+                            <span class="fa fa-search fa-2x"></span>
+
+                        </a>
+                    </li>
+                    <li><a class="login-btn hidden-xs" onclick="openNavModal()" style="cursor: pointer;">Register/Login</a></li>
+                     
+                </ul>
+            </div>
+        </div>
+
+        <!--START Ebankit change -->
+        <div class="global-search-bar">
+            <div class="area_search">
+                <div class="global-search-new-close-btn"></div>
+                <form id="site_search" class="search-placeholder-text" method="get">
+                    <input type="text" autocomplete="off" class="form-control global-search-text" id="search_box" placeholder="PlaceholderSearch">
+                </form>
+                <div class="global-search-results">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <h5> Top Results</h5>
+                            </div>
+                            <div class="col-xs-12">
+                                <ul id="search_results"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--END Ebankit change -->
+    </nav>
+</div>
+<!--BreadCrumb start here -->
+@*<div class="container">
+     @Html.Partial("_breadcrumb") 
+</div>*@
+<!--BreadCrum end-->
+        <!-- modal Start here-->
+            <div class="nav-modal-overlay" id="nav-modal-overlay" style="display: none;">
+       
+            <div class="nav-modal" id="nav-modal" style="display: none;">
+                
+                <div class="nav-modal-flex-container">
+                    <div class="close-button" id="closeModalBtn">
+                        <div class="x-class">
+                            <div class="circle-background">×</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="nav-modal-container">
+                    
+                    <div class="nav-modal-header">
+                        <div class="nav-modal-tab active" onclick="toggleTab(0)">Personal</div>
+                        <div class="nav-modal-tab" onclick="toggleTab(1)">Business</div>
+                    </div>
+                    
+                    
+                    <div class="nav-modal-tab-content active">
+                
+                        <p class="long-Text lineUp">To access your <b>personal</b> online banking please proceed below</p>
+
+                        <div class="grid-container-element lineUp">
+                            
+                            <div class="grid-child-element lineUp ">
+                                <h5 class="redirect-Text lineUp"><a href="https://ib.africanbank.co.za/" target="_blank" style="white-space: nowrap;"><span>Access Online Banking</span></a></h5>
+                            </div>
+
+                            <div class="grid-child-element modal-Icon lineUp">
+                                <i class"modal-icon="" lineup"="">
+                                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66.91 122.88" style="enable-background: new 0 0 66.91 122.88; width: 12px; height: 12px; color: #021A44" xml:space="preserve"><g><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z"></path></g></svg>
+
+                                </i>
+                            </div>
+                        </div>
+                        
+                        <div class="lineUp grid-container-element">
+                            <div class="lineUp grid-child-element ">
+                                <h5 class="lineUp redirect-Text"><a href="https://ib.africanbank.co.za/Modules/Subscription/Controls/AB/Onboarding/ABOnboarding.aspx" target="_blank"><span>Register</span></a></h5>
+                            </div>
+                            <div class="lineUp grid-child-element modal-Icon" href="https://ib.africanbank.co.za/modules/Registration/Public/Register.aspx" target="_blank">
+                                <i class"modal-icon"="">
+                                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66.91 122.88" style="enable-background: new 0 0 66.91 122.88; width: 12px; height: 12px; color: #021A44" xml:space="preserve"><g><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z"></path></g></svg>
+
+                                </i>
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                    
+                    <div class="nav-modal-tab-content">
+                        
+                        <p class="long-Text lineUp">To access your <b>business</b> online banking please proceed below</p>
+
+                        <div class="grid-container-element lineUp">
+                            
+                            <div class="grid-child-element lineUp ">
+                                <h5 class="redirect-Text lineUp"><a href="https://qa.del.africanbank.co.za/apps/OnlineBaking" target="_blank" style="white-space: nowrap;"><span>Access Online Banking</span></a></h5>
+                            </div>
+
+                            <div class="grid-child-element modal-Icon lineUp">
+                                <i class"modal-icon="" lineup"="">
+                                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66.91 122.88" style="enable-background: new 0 0 66.91 122.88; width: 12px; height: 12px; color: #021A44" xml:space="preserve"><g><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z"></path></g></svg>
+
+                                </i>
+                            </div>
+                        </div>
+                        
+                        <div class="lineUp grid-container-element">
+                            <div class="lineUp grid-child-element ">
+
+                                <h5 class="lineUp redirect-Text"><a href="https://qa.del.africanbank.co.za/apps/OnlineBaking" target="_blank"><span>Register</span></a></h5>
+                            </div>
+                            <div class="lineUp grid-child-element modal-Icon" href="https://qa.del.africanbank.co.za/apps/OnlineBaking" target="_blank">
+                                <i class"modal-icon"="">
+                                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66.91 122.88" style="enable-background: new 0 0 66.91 122.88; width: 12px; height: 12px; color: #021A44" xml:space="preserve"><g><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z"></path></g></svg>
+
+                                </i>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- modal End here-->
+        
+            <!--modal script-->
+    <script>
+
+   function openNavModal() {
+            $('#nav-modal-overlay').css('display', 'flex');
+            $("body").css("overflow", "hidden");
+            $('#nav-modal').css('display', 'flex');
+        }
+
+       // $(document).ready(function () {
+
+            // Close modal
+            $("#closeModalBtn").click(function () {
+                $("#nav-modal").fadeOut();
+                $("body").css("overflow", "auto");
+                $('#nav-modal-overlay').css('display', 'none');
+            });
+      //  });
+
+
+        function toggleTab(tabIndex) {
+            $('.nav-modal-tab').removeClass('active');
+            $('.nav-modal-tab-content').removeClass('active');
+
+            $('.nav-modal-tab').eq(tabIndex).addClass('active');
+            $('.nav-modal-tab-content').eq(tabIndex).addClass('active');
+        }
+
+
+   
+</script>

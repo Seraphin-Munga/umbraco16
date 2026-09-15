@@ -1,0 +1,39 @@
+﻿@{
+                /**/
+
+                string query = null;
+                if (Model.GetType() == typeof(String))
+                {
+                    query = Model;
+                }
+                else
+                {
+                    query = null;
+                }
+}
+
+@{
+    if (query != null)
+    {
+        <div class="input-group addon">
+            <span class="input-group-addon" style="background-color:white; border:none"><i class="fa fa-search" style="color:#88bc47"></i></span>
+            <input class="form-control" type="text" ng-model="searchTerm" ng-init="searchTerm = '@query.ToString()'" placeholder="Search Term" onkeyup="ValidateSearch();" />
+        </div>
+        <br />
+        <div id="notFoundDiv" style="color: red; font-weight: bold; display:none;">No Records Found</div>
+
+        <script src="~/scripts/searchInput.min.js"></script>
+    }
+    else
+    {
+        <div class="input-group addon">
+            <span class="input-group-addon" style="background-color:white; border:none"><i class="fa fa-search" style="color:#88bc47"></i></span>
+            <input value="SearchKeyUp" id="SearchKeyUp" class="form-control" type="text" ng-model="searchTerm" ng-init="searchTerm = ''" placeholder="Search Term" onkeyup="ValidateSearch();" />
+        </div>
+        <br />
+        <div id="notFoundDiv" style="color: red; font-weight: bold; display:none;">No Records Found</div>
+
+        <script src="~/scripts/searchInput.min.js"></script>
+    }
+}
+

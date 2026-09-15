@@ -1,0 +1,81 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.BottomNavigation>
+
+@using Umbraco.Web.Models;
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using System.Linq;
+@{
+    BottomNavigation footer = null;
+    var _model = Model;
+}
+
+@{
+
+
+    foreach (var menuData in (IEnumerable<IPublishedElement>)_model.LinkItems)
+    {
+        if (menuData.Value("linkItems") != null)
+        {
+            <div class="col-sm-3 footer-category">
+                <div class="heading">@menuData.Value("categoryName")</div>
+                <ul>
+                    @foreach (var relatedLink in (IEnumerable<IPublishedElement>)menuData.Value("linkItems"))
+                    {
+                        if (relatedLink.Value("nCurlLink") != null)
+                        {
+                            string pageSection = "";
+                            
+                            if (relatedLink.Value("nCpageSection") != null)
+                            {
+                                pageSection = relatedLink.Value("nCpageSection").ToString();
+                            }
+                            foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)relatedLink.Value("nCurlLink"))
+                            {
+                                if (link.Url != "#")
+                                {
+                                    string _linkString = null;
+                                    if (pageSection != "")
+                                    {
+                                        _linkString = link.Url + pageSection;
+                                    }
+                                    else
+                                    {
+                                        _linkString = link.Url;
+                                    }
+                                    <li><a href="@_linkString">@link.Name</a></li>
+                                }
+                                else 
+                                {
+                                    var filePath = ((ContentModels.File)relatedLink.Value("nCdocument")).UmbracoFile.ToString();
+                                    <li><a href="@filePath" target="_blank">@relatedLink.Value("nCtext")</a></li>
+                                    
+                                }
+                            }
+                        }
+                        
+                    }
+                </ul>
+            </div>
+        }
+    }
+    <div class="col-sm-3 footer-category">
+        
+        @foreach (var menuData in (IEnumerable<IPublishedElement>)Model.LinkItems)
+        {
+            if (menuData.Value("listOfRichTextItems") != null)
+            {
+
+                <div class="heading">@menuData.Value("categoryName")</div>
+                <ul>
+                    <li></li>
+                    @foreach (var richTextEditor in (IEnumerable<IPublishedElement>)menuData.Value("listOfRichTextItems"))
+                    {
+                        @Html.Raw(richTextEditor.Value("nCtextEditor"))
+                    }
+                </ul>
+
+            }
+        }
+        
+    </div>
+
+}

@@ -1,0 +1,23 @@
+﻿@model Web.Utilities.FinancialReportsViewModel
+
+<div class="row investor-dropdown" style="margin: auto !important">
+    <div class="col-sm-2 margin-top-10">
+        <div class="dropdown-label pull-left">
+            {{year}}
+        </div>
+    </div>
+
+    <div class="col-sm-5 margin-top-10">
+        <div class="press-release-dropdown" style="background-image: url('/images/calendar-grid-58.svg');">
+            <select ng-model="year" ng-init="year = '@(Model.LatestYear)'">
+                @foreach (var year in Model.Years)
+                {
+                    <option>@year</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="col-sm-5 margin-top-10">
+        @Html.Partial("_searchInput")
+    </div>
+</div>

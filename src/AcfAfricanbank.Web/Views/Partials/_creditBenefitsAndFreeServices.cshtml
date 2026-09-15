@@ -1,0 +1,38 @@
+﻿@model Umbraco.Web.PublishedModels.FeaturesAndFreeServices
+
+@if (Model.ContentLists != null && Model.ContentLists.Any())
+{
+    
+    <div class="container">
+        <div class="padded-white">
+            <div class="row">
+                @foreach (ContentList list in Model.ContentLists)
+                {
+                    var header = list.ListHeader;
+                    var description = list.ListDescription;
+                    var items = list.ListItems ?? new List<NCstringItem>();
+                    var footerText = list.ListFooterText;
+                    <div class="col-sm-6">
+                        <h4>@header</h4>
+                        <p class="body-content text-left no-margin">
+                            @description
+                        </p>
+                        <ul class="checklist">
+                                @foreach (var item in items)
+                                {
+                                    var value = item.Value("nCvalue").ToString();
+
+                                    <li>
+                                        @value
+                                    </li>
+                                }
+                        </ul>
+                        <p class="body-content text-left no-margin">
+                            @footerText
+                        </p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}

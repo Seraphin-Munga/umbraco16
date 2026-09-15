@@ -1,0 +1,243 @@
+﻿
+@model string 
+
+<script src="/scripts/Businessloancalculator.js"></script>
+
+<style>
+    .calculator-section{
+    display: flex;
+    height: 600px;
+    justify-content: space-around;
+    align-items: center;
+}
+/* calculator css*/
+
+.image-wrapper img {
+      max-width: 90%;
+      border-radius: 12px;
+    }
+
+    .form-section h2 {
+      color: #012B60;
+      margin-bottom: 15px;
+    }
+
+    input[type="text"] {
+        width: 100%;
+        padding: 12px;
+        margin: 0px 0px 15px 0;
+        border: 1px solid #B4BBD2;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .term-buttons button {
+      background: transparent;
+      padding: 8px 15px;
+      cursor: pointer;
+      color: #012B60;
+      font-weight: 700;
+      margin-right: 10px;
+      border-radius: 4px;
+      border: 0.5px solid var(--Brand-AB-Blue, #012B60);
+    }
+    
+    .term-buttons .selected {
+        border: solid 2px #32A852;
+        font-size: 16px;
+    }
+    
+    .section-600 {
+
+    height: 600px;
+    display: flex;
+    align-items: center;
+
+}
+  .section-327 {
+    min-height: 327px;
+    display: flex;
+    align-items: center;
+    }
+    /*.term-buttons button {*/
+    /*    background-color: #fff;*/
+    /*    color: #a9a9a9;*/
+    /*    border: solid 1px #a9a9a9;*/
+    /*}*/
+    
+    .term-buttons .selected{
+        border:solid 2px #32A852;
+    }
+
+    .term-buttons .selected {
+      background-color: #fff;
+      color: #32A852;
+    }
+
+    .disclaimer {
+      font-size: 12px;
+      color: #777;
+      margin-top: 10px;
+    }
+
+    .right-section {
+      line-height: 2;
+    }
+
+    .repayment-details p {
+      font-weight: 600;
+      margin: 8px 0;
+    }
+
+    .amount {
+      font-size: 40px;
+      color: #012B60;
+      font-weight: 600;
+      margin: -34px 0px 0px 0px;
+    }
+
+    .amount.green {
+        color: #5DC303;
+    }
+
+    .apply-button {
+      background-color: #5DC303;
+      color: white;
+      padding: 0px;
+      border: none;
+      border-radius: 32px;
+      cursor: pointer;
+      font-weight: bold;
+      width: 10pc;
+    }
+    
+    .margin-top-bottom-50 {
+        margin: 50px 0px;
+}
+
+    .margin-top-50{
+        margin-top: 50px ;
+}
+
+  .custom-bullets {
+    list-style-type: none;
+    padding-left: 0px;
+  }
+  
+.custom-bullets li {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+  }
+  /*calculator css*/
+   .section-bg-white{
+        background-color: white; 
+    }
+.cal-btn-green-class:hover, .cal-btn-green-class {
+color: var(--text-primary, #FFF);
+
+/* Body/Small/Semibold */
+font-family: Montserrat;
+font-size: 14px;
+font-style: normal;
+font-weight: 600;
+line-height: 20px; /* 142.857% */
+display: flex;
+width: 200px;
+height: 48px;
+padding: 12px 16px;
+justify-content: center;
+align-items: center;
+gap: 8px;
+flex-shrink: 0;
+border-radius: var(--border-radius-md, 32px);
+background: var(--surface-action, #5DC400);
+border: 1px solid transparent;
+/* Shadows Light Mode/SM */
+box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.11);
+}
+    
+@@media (max-width: 767px) {
+
+    .calculator-section {
+        display: flex;
+        height: 150vh;
+    }
+    
+    .amount {
+        line-height: 85px;
+        font-size: 30px;
+    }
+
+    .text-wrap {
+        font-size: 20px;
+        margin-left: 0px;
+        white-space: normal !important;
+        word-wrap: break-word;
+        overflow: visible !important;
+    }
+    
+    .highlight-text {
+        margin: 16px 0px;
+    }
+}
+</style>
+
+ <section class="section-bg-white calculator-section" id="calculator-1">
+    <div class="container">
+        <div class="row calculator-container">
+      @* Left Section *@
+      <div class="col-sm-4 left-section">
+        <div class="image-wrapper">
+          <img src="/media/4j4bxyha/image-5.png" alt="Happy Customer">
+        </div>
+      </div>
+
+      @* Form Section *@
+      <div class="col-sm-4 form-section">
+          <div class="row-sm-4">
+              <h5 class="btn-font-color">How much does your business need?</h5>
+              <input type="text" id="amount" class="form-control" placeholder="R 0">
+              <p class="font-color-grey" style="margin: 10px 0px;">Enter your desired amount R20 000 - R5 000 000</p>
+          </div>
+          <div class="row-sm-4">
+            <p class="margin-top-50 btn-font-color">Term in months</p>
+            <div class="term-buttons">
+              <button class="btn btn-default term-btn" data-term="3">3</button>
+              <button class="btn btn-success term-btn selected" data-term="6">6</button>
+              <button class="btn btn-default term-btn" data-term="9">9</button>
+              <button class="btn btn-default term-btn" data-term="12">12</button>
+            </div>
+          </div>
+          <div class="row-sm-4">
+              <p class="disclaimer margin-top-50 btn-font-color">
+                *This is only an estimate. <b>Apply now</b> and get your fees.
+              </p>
+          </div>
+        
+    
+
+      </div>
+
+      @* Right Section *@
+      <div class="col-sm-4 right-section">
+          <div class="row-sm-3">
+            <p class="btn-font-color"><strong>Monthly repayments</strong></p>
+            <p id="monthly-repayment" class="amount green">R0</p>
+          </div>
+          <div class="row-sm-3">
+            <p class="btn-font-color"><strong>Cost of finance</strong></p>
+            <p id="cost-of-finance" class="amount">R0</p>
+          </div>
+          <div class="row-sm-3">
+            <p class="btn-font-color"><strong>Total repayments</strong></p>
+            <p id="total-repayment" class="amount">R0</p>
+          </div>
+          <div class="row-sm-3">
+            <a href="https://businessloan.africanbank.co.za/auth/register" class="btn btn-primary cal-btn-green-class" id="@Model">Apply now</a>
+          </div>
+        </div>
+    </div>
+    </div>
+ </section>
+

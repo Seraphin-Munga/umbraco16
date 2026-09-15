@@ -1,0 +1,38 @@
+﻿@model Umbraco.Web.PublishedModels.TabBody
+@using ContentModels = Umbraco.Web.PublishedModels;
+
+@{ 
+    var documentArchive = (IEnumerable<IPublishedElement>)Model.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+    ICollection<IPublishedElement> documents = new List<IPublishedElement>();
+    foreach (var documentCollection in (ICollection<object>)documentArchive.Select(x => x.Value("nCdocuments")).ToList())
+    {
+        foreach (var _documentData in (ICollection<NcArchieve>)documentCollection)
+        {
+            documents.Add(_documentData);
+        }
+    } 
+}
+@{
+    var years = documents.Select(x => x.Value<DateTime>("date").Year).Distinct().OrderByDescending(x => x).ToList();
+    var latestYear = years.FirstOrDefault();
+    <div class="container margin-bottom-minus-60" ng-controller="ReportsAndArchievesController">
+        <div class="campaign-product-container press-release-section investor full">
+            <div class="margin-top-20 visible-xs"></div>
+            @{
+                var reportModel = new Web.Utilities.FinancialReportsViewModel
+                {
+                    Years = years.ToArray(),
+                    LatestYear = latestYear,
+                };
+            }
+            @Html.Partial("_financialReportsSearchRow", reportModel)
+            @foreach (var year in years)
+            {
+                var items = documents.Where(x => x.Value<DateTime>("date").Year == year).OrderByDescending(x => x.Value<DateTime>("date")).ToList();
+                <div class="row" ng-show="year === '@year'">
+                    @Html.Partial("_reportDownloadItems", items.Select(i => i as NcArchieve))
+                </div>
+            }
+        </div>
+    </div>
+}

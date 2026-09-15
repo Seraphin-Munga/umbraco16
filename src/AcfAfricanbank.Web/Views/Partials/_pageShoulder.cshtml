@@ -1,0 +1,90 @@
+﻿@model Umbraco.Web.PublishedModels.HeroShoulder
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using System.Configuration;
+@using Umbraco.Core.Models;
+@using Umbraco.Core.PropertyEditors;
+@using Umbraco.Web.Composing;
+
+@{
+   @* var shoulderButton = Model.Children.Where(c => c is ContentModels.EbankItabstractButton).FirstOrDefault() as ContentModels.EbankItabstractButton;
+    var shoulderButtonLink = "#";
+    var dropDownVal = shoulderButton?.Value("externalLinkType")?.ToString();
+    if (!string.IsNullOrEmpty(dropDownVal))
+    {
+        /*var selectedShoulderButtonVal = (!string.IsNullOrEmpty(dropDownVal)) ?
+            umbraco.library.GetPreValueAsString(int.Parse(dropDownVal)) :
+            string.Empty;*/
+        var selectedShoulderButtonVal = string.Empty;
+        shoulderButtonLink = ConfigurationManager.AppSettings[selectedShoulderButtonVal];
+    }
+    else
+    {
+        shoulderButtonLink = string.IsNullOrEmpty(shoulderButton?.EbankItbuttonInternalLink?.Url) ?
+            shoulderButton?.EbankItbuttonExternalLink :
+            shoulderButton.EbankItbuttonInternalLink?.Url;
+    }
+    shoulderButtonLink = (string.IsNullOrEmpty(shoulderButtonLink)) ? "#" : shoulderButtonLink;*@
+
+    string strPageUrl= Request.RawUrl;
+    var shoulderButton = Model.Children.Where(c => c is ContentModels.EbankItabstractButton).FirstOrDefault() as ContentModels.EbankItabstractButton;
+    var shoulderButtonLink = "#";
+    var dropDownVal = shoulderButton?.Value("externalLinkType")?.ToString();
+    if (!string.IsNullOrEmpty(dropDownVal))
+    {
+        /*var selectedShoulderButtonVal = (!string.IsNullOrEmpty(dropDownVal)) ?
+            umbraco.library.GetPreValueAsString(int.Parse(dropDownVal)) :
+            string.Empty;*/
+        var selectedShoulderButtonVal = string.Empty;
+        shoulderButtonLink = ConfigurationManager.AppSettings[selectedShoulderButtonVal];
+    }
+    else
+    {
+        shoulderButtonLink = string.IsNullOrEmpty(shoulderButton?.EbankItbuttonInternalLink?.Url) ?
+            shoulderButton?.EbankItbuttonExternalLink :
+            shoulderButton.EbankItbuttonInternalLink?.Url;
+    }
+    shoulderButtonLink = (string.IsNullOrEmpty(shoulderButtonLink)) ? "#" : shoulderButtonLink;
+    if (strPageUrl.Contains("?"))
+    {
+        var strendUrl = strPageUrl.Split('?').Last();
+        if (shoulderButtonLink.Contains("#"))
+        {
+            var strstarturl= strPageUrl.Split('?').First();
+            shoulderButtonLink = String.Format("{0}{1}{2}", strPageUrl, "/",shoulderButtonLink);
+        }
+        else
+        {
+
+            shoulderButtonLink = String.Format("{0}{1}{2}", shoulderButtonLink, "?", strendUrl);
+        }
+
+    }
+    else
+    {
+        //shoulderButtonLink = shoulderButton.EbankItbuttonExternalLink;
+    }
+}
+<div class="container">
+    <div class="hero-static-caption">
+        <div class="text_header">
+            <h1 class="hero-static-title">@Model.ShoulderTitle</h1>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 col-md-9">
+                <div class="hero-static-description">
+                    <p style="width:100%">
+                        @Model.ShouderDescription
+                    </p>
+                </div>
+            </div>
+            @if (shoulderButton != null)
+            {
+                <div class="col-sm-12 col-md-3">
+                    <a href="@shoulderButtonLink" target="_blank" class="button primary button-styler">
+                        @shoulderButton.EbankItbuttonText
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

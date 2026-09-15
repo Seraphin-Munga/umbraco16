@@ -1,0 +1,34 @@
+﻿@model Umbraco.Web.PublishedModels.TabBody
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using System.Configuration;
+
+@{
+    var tbody = Model.GetProperty("tabBodyContent");
+    var cardData = Model.TabBodyContent.ToList();
+}
+<div class="container">
+    <div class="campaign-product-container connect-online-section full">
+        <div class="margin-top-20 visible-xs"></div>
+        <div class="row">
+            @foreach (var item in cardData)
+            {
+                var data = item.Value<IEnumerable<IPublishedElement>>("sectionContent");
+                foreach (var info in data)
+                {
+                    <div class="col-sm-3">
+                        <div class="card-plain">
+                            <div class="text-left">
+                                <div class="icon">
+                                    <span class=@info.Value("nCiconClass")></span>
+                                </div>
+                                <div class="title text-uppercase">@info.Value("nCebankITIconTitle")</div>
+                                <p class="">@info.Value("nCebankITIconContent")</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+

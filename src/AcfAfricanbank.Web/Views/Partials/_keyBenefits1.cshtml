@@ -1,0 +1,59 @@
+﻿@model Web.Models.HowToApplyDataContainer
+@using System.Configuration;
+
+
+@{
+    var button = Model.ApplyButton;
+    var cards = Model.DocumentsCards ?? new List<Card>();
+    var cardRows = new List<List<Card>>();
+    var currentCardRow = new List<Card>();
+    
+
+    foreach (var c in cards)
+    {
+        currentCardRow.Add(c);
+        if (currentCardRow.Count() == 2 || c.Equals(cards.Last()))
+        {
+            cardRows.Add(currentCardRow);
+            currentCardRow = new List<Card>();
+        }
+    }
+
+}
+<div class="section pt-40 pb-40">
+    <div class="container">
+        <h1 class="color-brand-1 mb-20" style="padding-bottom:10px;text-align:center">@Model.Header</h1>
+        <div class="row">
+            @if (Model.DocumentsCards != null)
+            {
+                <div class="row "> @* eq-height *@
+                    @foreach (var row in Model.DocumentsCards) //   cardRows)
+                    {
+                        <div class="col-md-3 col-sm-12">
+                            <div class="center-align">
+                                @{
+                                    if (row.CardIcon != null)
+                                    {
+                                        <img class="myWorld-campaign-images" src="@row.CardIcon.Url" alt="@row.CardIcon.Value("altTag")" />
+                                    }
+                                    else
+                                    {
+                                        <img class="myWorld-campaign-images" src="@row.CardDescription" alt="@row.CardTitle" /> @* ... a work around - umbraco icon null failover *@
+                                    }
+                                }
+                                <p class="font-md color-brand-1 ">
+                                    @Html.Raw(row.CardDescriptionLongText)
+                                    @*@(rowCard.CardDescription ?? rowCard.CardTitle) *@
+                                </p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+       
+    </div>
+</div>
+
+
+

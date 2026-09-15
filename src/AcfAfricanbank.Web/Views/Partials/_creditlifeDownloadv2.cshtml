@@ -1,0 +1,129 @@
+﻿@model Umbraco.Web.PublishedModels.HeroKnees
+@using System.Text.RegularExpressions
+@{
+    var kneesTabHeaders = Model?.Children?.Select(c => c.Value("title")?.ToString()).ToList();
+    var findOutMoreTab = Model?.Children?
+        .Where(c => c.ContentType.Alias.ToLower() == "findoutmore").FirstOrDefault();
+    var creditLifeInsuranceTab = Model?.Children?
+        .Where(c => c.ContentType.Alias.ToLower() == "creditlifeinsurance").FirstOrDefault();
+    var creditLifeInsuranceTab_Credit = Model?.Children?
+    .Where(c => c.ContentType.Alias.ToLower() == "creditlifeinsurancecredit").FirstOrDefault();
+}
+
+
+  
+          @*  @if (creditLifeInsuranceTab != null)
+            {
+                var tabTitle = creditLifeInsuranceTab.Value("title")?.ToString();
+                var Id = Regex.Replace(tabTitle, @"[^0-9a-zA-Z]+", "");
+                var description = creditLifeInsuranceTab.Value("description");
+                var contentCards = creditLifeInsuranceTab.Children()?.Where(c => c.ContentType.Alias.ToLower() == "card");
+                var cssClass = creditLifeInsuranceTab.Equals(Model?.Children.First()) ? "tab-pane active" : "tab-pane";
+                var tabHighlights = creditLifeInsuranceTab.Value<IEnumerable<NCcard>>("footerCards");
+                var disclaimer = creditLifeInsuranceTab.Value("disclaimer");
+                
+                        
+                  
+                    
+                 
+              
+            }*@
+         @*   @if (creditLifeInsuranceTab_Credit != null)
+            {
+                var tabTitle = creditLifeInsuranceTab_Credit.Value("title")?.ToString();
+                var Id = Regex.Replace(tabTitle, @"[^0-9a-zA-Z]+", "");
+                var tabDescription = creditLifeInsuranceTab_Credit.Value("description");
+                var contentList = creditLifeInsuranceTab_Credit.Value("tabListItems") as string[];
+                var tabImage = creditLifeInsuranceTab_Credit.Value<IPublishedContent>("tabImage");
+                var tabHighlights = creditLifeInsuranceTab_Credit.Value<IEnumerable<NCcard>>("footerCards") ?? new List<NCcard>();
+                var disclaimer = creditLifeInsuranceTab_Credit.Value("disclaimer");
+                var cssClass = creditLifeInsuranceTab_Credit.Equals(Model?.Children.First()) ? "tab-pane active" : "tab-pane";
+                <div role="tabpanel" class="@cssClass" id="@Id">
+                    <div class="row">
+                        <div class="col-sm-10 col-sm-offset-1">
+                            <p class="text-center">
+                                @tabDescription
+                            </p>
+                            <div class="row eq-height margin-top-30">
+                                <div class="col-sm-6">
+                                    <div class="campaign-list text-only">
+                                        <ul>
+                                            @foreach (var item in contentList)
+                                            {
+                                                <li class="download-item">
+                                                    @item
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="campaign-more-info-img" style="background-image: url('@tabImage.Url');">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="margin-top-80 hidden-xs"></div>
+                    <div class="row eq-height">
+                        @foreach (var highlight in tabHighlights)
+                        {
+                            var cardDescription = highlight.Value("nCcardDescription").ToString();
+                            <div class="col-sm-4">
+                                <div class="campaign-more-highlights">
+                                    @cardDescription
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    @if (disclaimer != null)
+                    {
+                        <div class="margin-top-30 campaign-terms">
+                            @disclaimer
+                        </div>
+                    }
+                </div>
+            }*@
+            @if (findOutMoreTab != null)
+            {
+                var tabTitle = findOutMoreTab.Value("title")?.ToString();
+                var Id = Regex.Replace(tabTitle, @"[^0-9a-zA-Z]+", "");
+                var downloadItems = findOutMoreTab.Value<IEnumerable<DownloadItem>>("downloadItems");
+                var items = downloadItems?.Select(item => item as DownloadItem);
+                var cssClass = findOutMoreTab.Equals(Model?.Children.First()) ? "tab-pane active" : "tab-pane";
+                string disclaimer = findOutMoreTab.Value("disclaimer").ToString();
+                var tabHighlights = findOutMoreTab.Value<IEnumerable<NCcard>>("footerCards");
+                var tabDescription = findOutMoreTab.Value("description");
+               @* <div role="tabpanel" class="@cssClass" id="@Id">
+                    <div class="col-sm-10 col-sm-offset-1">
+                        <p class="text-center">
+                            @tabDescription
+                        </p>
+                    </div>*@
+                    @Html.Partial("_downloadListv2", items ?? new List<DownloadItem>())
+                    if (tabHighlights != null)
+                    {
+                     @*   <div class="row eq-height">
+                            @foreach (var highlight in tabHighlights)
+                            {
+                                var cardDescription = highlight.Value("nCcardDescription").ToString();
+
+                                <div class="col-sm-4">
+                                    <div class="campaign-more-highlights">
+                                        @cardDescription
+                                    </div>
+                                </div>
+                            }
+                        </div>*@
+                    }
+                  @*  @if (!disclaimer.IsNullOrWhiteSpace())
+                    {
+                        <div class="margin-top-30 campaign-terms">
+                            <p class="bold">Updated terms and conditions</p>
+                            @disclaimer
+                        </div>
+                    }
+                </div>*@
+            }
+    
+

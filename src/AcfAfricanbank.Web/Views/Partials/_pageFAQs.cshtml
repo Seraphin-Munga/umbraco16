@@ -1,0 +1,41 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@model Dictionary<string, List<string>>
+
+@{
+    foreach (var faqData in Model)
+    {
+        var oMycustomclassname = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(faqData.Value.ToList()[0].ToString());
+        foreach (var value in (IEnumerable<object>)oMycustomclassname)
+        {
+            string _groupName = null;
+            foreach (var page in (Newtonsoft.Json.Linq.JObject)value)
+            {
+
+                // KeyValuePair<string, Newtonsoft.Json.Linq.JToken>
+                if (page.Key == "groupName")
+                {
+                    _groupName = page.Value.ToString();
+                }
+                if (page.Key == "questionsAndAnswers")
+                {
+                    dynamic dynJson = Newtonsoft.Json.JsonConvert.DeserializeObject(page.Value.ToString());
+                    foreach (var item in dynJson)
+                    {
+                        if (item.name.ToString().Contains(faqData.Key.ToString().Split(',')[1].ToString()))
+                        {
+                            string urlFAQs = "../frequently-asked-questions";
+                            urlFAQs = urlFAQs + "?searchString=" + faqData.Key.ToString().Split(',')[1].ToString();
+                            <p style="font-size: 14px" class="css-color-change">
+                                @_groupName
+                            </p>
+                            <a class="margin-left-20" href="@urlFAQs" target="_self"><b>Read</b></a>
+                            <hr />
+                        }
+
+                    }
+                }
+            }
+            // var sss = (System.Collections.Generic.KeyValuePair<string, Newtonsoft.Json.Linq.JToken>)value;
+        }
+    }
+}

@@ -1,0 +1,71 @@
+﻿@model Web.Models.Benefits
+@*<div class="text-center spacer">
+    <h3>@Model.Header</h3>
+    <p>@Model.Description</p>
+</div>
+@if (Model.BenefitCards != null && Model.BenefitCards.Any())
+{
+    int iterator = 0;
+
+    <div class="row eq-height @(Model.BenefitCards.Count > 3 ? "card-slider" : "") margin-top-50">
+        @foreach (Card benefit in Model.BenefitCards)
+        {
+           String cardIdTag = "card" + iterator.ToString();
+            <div class="col-sm-4">
+                <div class="card-plain">
+                    <div class="center-icon-text">
+                        <div class="image">
+                            @if (benefit.CardIcon != null)
+                            {
+                                <img src="@benefit.CardIcon.Url" alt="@benefit.CardIcon.Value("altTag")" />
+                            }
+                        </div>
+                        <div class="title text-uppercase">@benefit.CardTitle</div>
+                        <p class="descr">@benefit.CardDescription</p>
+                    </div>
+                </div>
+            </div>
+
+            ++iterator;
+        }
+    </div>
+}
+
+
+@if (Model.BenefitCards1 != null && Model.BenefitCards1.Any())
+{
+    int iterator = 0;
+
+    <div class="row eq-height @(Model.BenefitCards1.Count > 3 ? "card-slider" : "") margin-top-50">
+        @foreach (NCcard benefit in Model.BenefitCards1)
+        {
+            String cardIdTag = "card" + iterator.ToString();
+            <div class="col-sm-4">
+                <div class="card-plain">
+                    <div class="center-icon-text">
+                        <div class="image">
+                            @if (benefit.NCcardIcon != null)
+                            {
+                                <img src="@benefit.NCcardIcon.Url" alt="@benefit.NCcardIcon.Value("altTag")" />
+                            }
+                        </div>
+                        <div class="title text-uppercase">@benefit.NCcardTitle.ToString()</div>
+                        <p class="descr">@benefit.NCcardDescription</p>
+                    </div>
+                </div>
+            </div>
+
+            ++iterator;
+        }
+    </div>
+}*@
+@{
+if (Model.BenefitCards1 != null && Model.BenefitCards1.Any())
+{
+ foreach (NCcard benefit in Model.BenefitCards1)
+        {
+        var cardDescmedium = benefit.Value<string>("mediumDescription");
+@Html.Raw(cardDescmedium)
+}
+}
+}

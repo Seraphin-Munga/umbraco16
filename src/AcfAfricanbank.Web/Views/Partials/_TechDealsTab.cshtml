@@ -1,0 +1,1510 @@
+﻿
+@using CustomModels = Web.Models;
+
+@model Umbraco.Web.PublishedModels.HeroChest
+
+@{
+   Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var children = Model.Children;
+
+    // Get specific Children
+   
+    var heroChest = Model.Children.Where(c => c.ContentType.Alias.ToLower() == "herochestvad").FirstOrDefault();
+   
+    var chestCards = heroChest.Children.Where(c => c.ContentType.Alias.ToLower() == "card");
+    
+
+    var heroBody = children?.Where(c => c is HeroBody).FirstOrDefault();
+    var applicationRequirements = heroBody.Children(x => x.ContentType.Alias.ToLower() == "herobodycontactus").FirstOrDefault();
+    var footerDescription = heroBody.Value("richTextBox").ToString();
+
+    var oneNumberControl = heroBody.Children.Where(c => c is RichTextEditor).FirstOrDefault();
+    var bodyTitle = heroBody.Value("bodyTitle").ToString();
+    var bodyDescription = heroBody.Value("bodyDescription").ToString();
+
+    var benefitsModel = new CustomModels.Benefits
+    {
+        Header = bodyTitle,
+        Description = bodyDescription,
+        BenefitCards = chestCards.Select(c => c as Card).ToList()
+    };
+
+    var documents = ((Umbraco.Web.PublishedModels.HeroBody)heroBody).Documents;
+    string brochurePath = documents.FirstOrDefault().File.Url;
+
+    var testimonialTab = children?.Where(c => c.ContentType.Alias.ToLower() == "testimonials").FirstOrDefault();
+    var mobileDevicePoppup = children?.Where(c => c.ContentType.Alias.ToLower() == "pagepopup").FirstOrDefault();
+     
+    var homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+
+    // Get Specific grand children
+    var mainTabs = heroChest?.Children.Where(c => c.ContentType.Alias.ToLower() == "valueaddeddeal");
+
+    var cellPhonesTab = mainTabs.Where(c => c.Value("tabType")?.ToString().ToLower() == "cellphones").FirstOrDefault();
+    var tabletsTab = mainTabs.Where(c => c.Value("tabType")?.ToString().ToLower() == "tablets").FirstOrDefault();
+
+   @* ContainerViewModel containerViewModel = new ContainerViewModel();*@
+
+    
+    var heroChest1 = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
+    var chestTitle = heroChest1?.Value("chestTitle").ToString();
+    var chestDescription = heroChest1?.Value("chestDescription").ToString();
+    var chestCards1 = heroChest1?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+    var heroTitle = heroChest1.Children.Where(c => c is RichTextEditor).FirstOrDefault();
+    var TechDealModel = new CustomModels.Benefits
+    {
+        Header = chestTitle,
+        Description = chestDescription,
+        BenefitCards = chestCards1.Select(c => c as Card).ToList()
+    };
+    
+    var heroChest2 = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").Last();
+    var chestTitle1 = heroChest2?.Value("chestTitle").ToString();
+    var chestDescription1 = heroChest2?.Value("chestDescription").ToString();
+    var chestCards2 = heroChest2?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+    var heroTitle1 = heroChest2.Children.Where(c => c is RichTextEditor).FirstOrDefault();
+    var DealModel = new CustomModels.Benefits
+    {
+        Header = chestTitle1,
+        Description = chestDescription1,
+        BenefitCards = chestCards2.Select(c => c as Card).ToList()
+    };
+
+}
+<style>
+
+  html, body{
+        overflow-x: hidden;
+        width: 100%;
+    }
+    .device-details-popup-specifications{
+        font-size:14px;
+    }
+ .offer-devices-list {
+        height: 200px;
+       /*font-size: 11px;*/
+        color: #002963;
+      /*  font-weight: bold;*/
+        margin-top: 30px;
+        margin-bottom: 10px;
+        width: 150px;
+        padding: 8px;
+        font: normal normal bold 12px Montserrat;
+        left: 3%;
+    }
+    .new-icon{
+        padding:24px;
+        width:100%;
+    }
+    .loan-product-container {
+        top: 0px !important;
+    }
+
+    .hero-static-caption, .hero-static-description {
+        top: 0px !important;
+        color:black;
+    }
+    .hero-static-caption {
+       background: #f7f7f7 !important;
+    }
+    .hero-static-caption .hero-static-title, .hero-static-caption h1 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-weight: 600;
+        font-size: 21px;
+        line-height: 1.03;
+        color: #000000;
+    }
+    .hero-static-caption .button {
+       width: fit-content;
+       margin-top: 12px;
+    }
+    .loan-summary-container {
+        top: 63px;
+    }
+
+    .padding-50 {
+        padding: 57px 57px 19px 57px;
+    }
+
+    .card-slide {
+        width: 100% !important;
+        display: inline-block !important;
+    }
+
+    .slick-slide {
+        width: 100% !important;
+        display: inline-block !important;
+    }
+
+    @*second page styles*@
+    
+    .category-device-list.fade {
+        display:none !important;
+    }
+    .category-device-list.fade.in {
+        display: block !important;
+    }
+    .sort{
+        appearance: auto;
+        font-size:10px;
+    }
+    select {
+       padding: 10px 15px;
+    }
+    .btn-back {
+        background: #EFEFEF 0% 0% no-repeat padding-box;
+        border-radius: 12px;
+        border: none;
+        font: normal normal normal 12px Segoe UI;
+        letter-spacing: 0px;
+        color: #000000;
+        opacity: 1;
+        padding: 8px;
+        width: 5%;
+    }
+    .sort-by-btn{
+        text-align:center;
+        left:2%;
+    }
+    .btn-techdeal-devices{
+    padding: 9px 30px;
+    border-radius: 100px;
+    background-color: none; 
+    color: #002963;
+    font-weight: 400;
+    font-size: 12px;
+    display: table;
+    border: 1px solid #002963;
+    }
+
+    .display-devices {
+        display: none;
+    }
+    .panel {
+        border:none;
+        -webkit-box-shadow: none ;
+        box-shadow: none;
+    }
+    .panel-default>.panel-heading {
+
+         background-color:transparent;
+         border-color: none;
+    }
+    .nav-tabs {
+         border-bottom: none;
+         margin-left: -3%;
+    }
+    .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+        border: none;
+        color:#002963;;
+    }
+    .nav-tabs>li>a:hover {
+       background-color:  transparent; 
+       font-weight:bold;
+    }
+    .nav>li>a:focus {
+    
+    background-color:  transparent;
+}
+.nav-tabs>li>a:hover {
+    
+    border: transparent;
+}
+    .panel-heading {
+        border-bottom:none;
+    }
+    .active {
+        font: normal normal bold 15px Montserrat;
+        letter-spacing: 0px;
+        color: #002963;
+        opacity: 1;
+        display:block;
+    }
+  
+    select {
+        background: #111111 0% 0% no-repeat padding-box;
+        border-radius: 12px;
+        opacity: 1;
+        color: #EEEEEE;
+    }
+    
+    .device-names {
+        font: normal normal medium 12px Montserrat;
+        letter-spacing: 0px;
+        color: #000000;
+        opacity: 1;
+    }
+    .category {
+        font: normal normal bold 12px Montserrat;
+        letter-spacing: 0px;
+        color: #000000;
+        opacity: 1;
+        padding-left: 15px;
+    }
+    
+    .device-names:hover {
+    
+        border-bottom: 1px solid black;
+     }
+     
+     .device-names-all :hover{
+        
+        border-bottom: 1px solid black; 
+     }
+     
+     
+    .icon:hover{
+         box-shadow: 0px 5px 11px #00000035;
+         transition: 0.35s;
+    }
+    
+    .newdivice:hover {
+        box-shadow: 0px 5px 11px #00000035;
+        transition: 0.35s;
+    }
+    .device-details-popup{
+        padding-bottom: 8%;
+    }
+
+    .device-details-popup-title{
+        font-size: 20px;
+        color: #1E1E1E;
+        font-weight: bold;
+        text-align: left;
+        width:115%;
+    }
+    
+    .device-details-popup-storage{
+        color: #1E1E1E;
+        font-size: 18px;
+    }
+    .device-details-popup-price{
+        color: #88BC47;
+        font-weight: 600;
+    }
+    
+    .device-details-popup-image{
+        background-color: #EFEFEF; 
+        border-radius: 30px; 
+        text-align:center; 
+        width: 450px;
+        height: 380px;
+        left:8%;
+    }
+    .device-details-popup-image1{
+        background-color: #EFEFEF; 
+        border-radius: 30px; 
+        text-align:center;
+        width:120px;
+        height:110px;
+        margin-top: 40px;
+        margin-left: 50%;
+    }
+    .device-details-popup-image2{
+        background-color: #EFEFEF; 
+        border-radius: 30px; 
+        text-align:center;
+        width:120px;
+        height:110px;
+        margin-left: 50%;
+        margin-top: 20px;  
+    }
+    .device-details-popup-image3{
+        background-color: #EFEFEF; 
+        border-radius: 30px; 
+        text-align:center;
+        width:120px;
+        height:110px;
+        margin-top: 20px;
+        margin-left: 50%;
+    }
+    .display-img{
+        margin-top:-12%;
+    }
+    .icon{
+        cursor: pointer;
+    }
+    .category-bg{
+      background-color: #EFEFEF; 
+      padding: 10px; 
+      padding-left: 0px;
+      width: 77%;
+      border-radius: 10px;
+    }
+    .category-names{
+      cursor: pointer;
+     @* width: 20%; *@
+      display:none; 
+      font-size: 10px; 
+      font-weight:bold; 
+      margin-left:80px;
+      
+    }
+    .sortoption{
+        text-align:center;
+    }
+    .tab-content{
+        width:115%;
+    }
+    .FirstTab{
+     text-align:inherit; 
+     right:3%;
+     padding-top: 5%;
+     padding-bottom:5%;
+    
+    }
+    .device-backgrnd:hover {
+    transform: translateY(-10px);
+    cursor:pointer;
+}
+    .device-backgrnd{
+     background-color:  #EFEFEF; 
+     border-radius: 30px; 
+     text-align:center; 
+     width:200px;
+     height:128px;
+     cursor: pointer;
+    }
+    .SecondTab{
+       text-align:inherit; 
+       right:3%;
+       padding-top: 5%;
+        padding-bottom:5%;
+    }
+    .device-title{
+     font: normal normal bold 14px Montserrat;
+     letter-spacing: 0px; 
+     color: #1E1E1E; 
+     margin-top:10px;
+     margin-top: 18px;
+     height: 36px; 
+     width: 60%;
+    }
+    .storage{
+      font: normal normal bold 14px Montserrat; 
+      letter-spacing: 0px;
+      color: #1E1E1E;
+    }
+    .price{
+    font: normal normal bold 16px Montserrat; 
+    letter-spacing: 0px;
+    color: #88BC47;
+    }
+    .sortDropdown {
+        background: #111111 0% 0% no-repeat padding-box;
+        border-radius: 12px;
+        opacity: 1;
+        color: #EEEEEE;
+        cursor:pointer;
+    }
+    .catagory-images {
+        display: none;
+    }
+    
+    .device-details-popup {
+        display: none;
+    }
+     .btn-back-device{
+        background: #EFEFEF 0% 0% no-repeat padding-box;
+        border-radius: 12px;
+        border: none;
+        font: normal normal normal 12px Segoe UI;
+        letter-spacing: 0px;
+        color: #000000;
+        opacity: 1;
+        padding: 8px;
+        width: 5%;  
+     }
+    .btn-back-last{
+    display:none;
+    
+    }
+            @*loader style*@
+            
+ #loader {
+  position: absolute;
+  left: 50%;
+  top: 200px;
+  z-index: 10000;
+  width: 50px;
+  height: 50px;
+  margin: -46px 0 0 -76px;
+  border: 5px solid #f3f3f3;
+  border-radius: 100%;
+  border-top: 5px solid #3498db;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+@@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Add animation to "page content" */
+.animate-bottom {
+  position: relative;
+  -webkit-animation-name: animatebottom;
+  -webkit-animation-duration: 1s;
+  animation-name: animatebottom;
+  animation-duration: 1s
+}
+
+@@-webkit-keyframes animatebottom {
+  from { bottom:-100px; opacity:0 } 
+  to { bottom:0px; opacity:1 }
+}
+
+@@keyframes animatebottom { 
+  from{ bottom:-100px; opacity:0 } 
+  to{ bottom:0; opacity:1 }
+}
+
+
+
+
+
+
+    
+    
+    
+    
+     @@media(max-width: 767px) and (min-width: 256px) {
+     
+     #loader {
+  
+  left: 60%;
+  top: 250px;
+  }
+     
+     .btn-back-last{
+     padding-top:0px !important;
+     }
+     
+     .popup-small-images{
+     
+     display:flex;
+     }
+     
+     .icon:hover , .icon:hover_effect{
+     box-shadow: 0px 5px 11px #00000035;
+         transition: 0.35s;
+     }
+     .icon{
+         padding:0px;
+     }
+     .offer-devices-list {
+        height: 100px;
+        font-size: 11px;
+        color: #002963;
+        @*margin-top: 0px;*@
+        margin-bottom: 20px;
+        width: 115px;
+        padding: 6px;
+        font: normal normal bold 12px Montserrat;
+        left: 3%;
+      }
+      .newdivice{
+      height:25%;
+      }
+     .new-icon {
+        padding: 0px;
+        width: 50px;
+        height: 50px;
+        margin-left: 10px;
+      }
+     .btn-back {
+         width: 15%;
+         margin-left: 6px;
+       }
+       .btn-back-device {
+         width: 15%;
+        
+       }
+       .device-details-popup-image {
+       width: 320px;
+       height: 215px;
+   
+       }
+       .device-details-popup-image1 {
+        @* margin-left: 80%;
+         margin-top: 40%;*@
+         width: 100px;
+        height: 100px;
+        margin-top: 40px;
+        margin-left: 20%;
+       }
+        .device-details-popup-image2 {
+         @* margin-left: 80%;
+          margin-top: 40%;*@
+          
+          width: 100px;
+        height: 100px;
+        margin-left: 20%;
+        margin-top: 40px;
+       }
+        .device-details-popup-image3 {
+         @* margin-left: 80%;
+          margin-top: 40%;*@
+          
+          width: 100px;
+        height: 100px;
+        margin-top: 40px;
+        margin-left: 20%;
+       }
+       
+       .display-img {
+          margin-top: 10%;
+       }
+       .final-img{
+       width: 300px;
+       height: 300px;
+       margin-top: -50px;
+       }
+       .category-bg{
+       padding-bottom:33px !important;
+       left: -10px;
+       height:70px;
+       width: 100%;
+       }
+       .category-box{
+         margin-left: 2%;
+       }
+       .category-names {
+        @* width: 100px;*@
+         margin-bottom: 6%;
+         margin-left: 60px;
+         width: 400px;
+         white-space: nowrap;
+       }
+       
+     .sort-by-btn{
+     @*padding-top:30px;*@
+     text-align: center !important;
+     @*left: -1%;*@
+     
+     }
+      .sortDropdown{
+        left: 25%;
+     }
+     
+     .techdeal-name{
+       margin-left: 2% !important;
+     }
+    
+     .FirstTab{
+     padding-top:20% !important;
+     right: -10%;
+     }
+      .SecondTab{
+     padding-top:20% !important;
+      right: -10%;
+     }
+     .nav-tabs>li {
+      width: auto;
+     }
+     .panel-heading {
+        padding: 0px; 
+    
+      }
+     .panel-heading-nav{
+      @* min-width: 150px;*@
+        width: 120%;
+        overflow-x: scroll;
+       }
+     .nav-tabs{
+          min-width: 700px;
+          overflow-x: scroll;
+        }
+        .device-details-popup-title {
+           width: 70%;
+           }
+           
+           .category-scroll{
+           
+           overflow:scroll;
+           }
+    }
+     
+     @@media (min-width: 300px) and (max-width: 320px) {
+    .offer-devices-list {
+        width: 100px;
+     }
+      .newdivice{
+      height:25%;
+      }
+       .category-names {
+         width: 85px;
+       }
+       .compare-text{
+       margin-left:-10px !important;
+       }
+   }
+  @@media (min-width: 350px) and (max-width: 370px) {
+    .offer-devices-list {
+        width: 110px;
+     }
+      .newdivice{
+      height:25%;
+      }
+      .category-names {
+         width: 90px;
+       }
+       .panel-heading-nav {
+         width: 130%;
+        }
+   }
+   @@media (min-width: 400px) and (max-width: 666px) {
+    .offer-devices-list {
+        width: 130px !important;
+     }
+      .newdivice{
+      height:25%;
+      }
+      
+      .popup-small-images {
+           
+            width: 41%;
+        }
+   }
+ @@media (min-width: 376px) and (max-width: 414px) {
+      .offer-devices-list {
+        width: 120px;
+       }
+        .newdivice{
+      height:25%;
+      }
+    }
+     @@media only s(min-width: 450px) and (max-width: 900px) {
+      .offer-devices-list {
+        width: 130px;
+       }
+        .newdivice{
+      height:25%;
+      }
+    }
+    
+     @@media(max-width: 640px) and (min-width: 600px) {
+        .btn-back-first{
+        margin-left: 2%;
+        }
+        .btn-back {
+           width: 10%;
+         }
+        .panel-heading {
+          padding: 10px 15px;
+        }
+         .FirstTab {
+           padding-top: 10% !important;
+           right: -20%;
+          }
+          .SecondTab {
+           padding-top: 10% !important;
+           right: -20%;
+          }
+          .popup-small-images {
+                width: 50%;
+            }
+    }
+    
+    @@media(max-width: 768px) {
+   
+        .loan-product-container {
+            top: -24px;
+        }
+        .number-to-call {
+            margin-top: 70px;
+        }
+        .loan-product-container {
+            padding-bottom: 14px;
+        }
+    }
+    @@media only screen and (max-width: 414px) {
+        .mega-tabs .nav-tabs>li.active:after {
+            bottom: -18px;
+            top: unset;
+        }
+        .number-to-call {
+            margin-top: 70px;
+        }
+    }
+    @@media(min-width: 768px) and (max-width: 1024px) {
+    
+    @*.new-icon {
+      padding: 10px !important;
+    }*@
+    .shoulder-img {
+       margin-top: -10px !important;
+     }
+     
+     .offer-devices-list {
+        width: 135px;
+        left:5%;
+       }
+       
+        .welcome-title{
+       padding-left:8%;
+       
+       }
+        .loan-product-container {
+            top: -52px;
+        }
+        .loan-product-container {
+            padding-bottom: 14px;
+        }
+        .btn-back {
+          width: 10%;
+       }
+       .btn-back-device{
+       width:10%;
+       }
+       .category-bg{
+         padding-bottom:5%;
+         @*width:57% !important;*@
+         width:100% !important;
+        }
+       .sort-by-btn{
+       left:15% !important;
+       }
+        .FirstTab {
+         right:4%;
+        }
+        .compare-text{
+        margin-left:10px !important;
+        }
+        .offer-devices-list{
+        margin-top:0px;
+        }
+        .popup-small-images{
+        display:flex;
+        }
+        .device-details-popup-image2 {
+   
+            margin-top: 40px;
+        }
+        .device-details-popup-image3 {
+   
+            margin-top: 40px;
+        }
+    }
+    
+   
+     @@media(max-width: 1280px) and (min-width: 800px) {
+     
+     .offer-devices-list {
+        width: 140px !important;
+        left:4% !important;
+       }
+       .welcome-title{
+       padding-left:8%;
+       padding-right:0% !important;
+       }
+       .category-bg{
+         padding-bottom:2% !important;
+         width:65%;
+        }
+        .sort-by-btn{
+        left:2% !important;
+        }
+       
+    }
+
+    @@media(max-width: 1280px) and (min-width: 1024px) {
+    
+    
+     .offer-devices-list {
+        width: 120px !important;
+        margin-top: 30px !important;
+       }
+       .icon{
+       padding:10px !important;
+       }
+        .loan-product-container {
+            top: -60px;
+        }
+        .sort-by-btn {
+          left: 40% !important;
+         }
+         .nav-tabs {
+              width: 110%;
+              }
+              .popup-small-images {
+                display: flow;
+            }
+    }
+
+    @@media(max-width: 3840px) and (min-width: 2560px) {
+        .loan-product-container {
+            top: -105px;
+        }
+    }
+
+    @@media(max-width: 1896px) and (min-width: 1564px) {
+        .loan-product-container {
+            top: -82px;
+        }
+    }
+    
+</style>
+
+<!-- First page  -->
+<div class="container">
+    <!-- Tech Deal welcome title -->
+    <div class="welcome-page">
+        
+
+        @if (TechDealModel.BenefitCards != null && TechDealModel.BenefitCards.Any())
+        {
+            int iterator = 0;
+            <div class="row" style=" margin-bottom:30px !important;">
+                <div class="col-md-4 welcome-title" style="height:200px; padding-right:5%;">
+                    @Html.Raw(@heroTitle.Value("textEditor"))
+                   
+                </div>
+                @foreach (Card benefitTech in TechDealModel.BenefitCards)
+                {
+                    <div class="col-md-1 col-xs-6 offer-devices-list">
+                        <div class="newdivice" style="text-align:center;">@benefitTech.CardTitle</div>
+                        <div class="icon" style="background:#f7f7f7; border-radius: 25px; margin-top: 10px; padding: 15px;">
+                            @if (benefitTech.CardIcon != null)
+                            {
+                                <img class="new-icon" src="@benefitTech.CardIcon.Url" alt="@benefitTech.CardIcon.Value("altTag")" width="100" height="100" />
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+    </div>
+</div>
+
+<!-- Hero Product-->
+
+
+<!-- End First page  -->
+<div class="container">
+    <!--second Page-->
+    <div class="display-devices">
+        <div class="row techdeal-name" style="padding-top:20px; margin-left: 0%;">
+           
+ <p style="text-align: left; font: normal normal normal 12px Segoe UI; letter-spacing: 0px; color: #707070; opacity: 0.51;"><a href="/en/home/tech-deals-new/">Tech Deals</a>/<span class="tabChange" >   </span><span  class="SubCate"></span></p>
+
+           
+        </div>
+        <div class="row btn-back-first" style="padding-top:20px; margin-left: 0%;">
+            <button class="btn-back">Back</button>
+        </div>
+         <div class="row btn-back-last" style="padding-top:20px; margin-left: 0%;">
+            <button class="btn-back-device">Back</button>
+        </div>
+        
+        <div class="row device-details-popup">
+            <div class="col-md-3 col-sm-3" style="padding-top:5%">
+                <h4 class="device-details-popup-title">
+                    
+                <h4>
+                <p class="device-details-popup-storage">
+                   
+                </p>
+               <p class="device-details-popup-specifications">
+        
+                </p>
+                <p class="device-details-popup-price">
+                    
+                </p>
+                 
+                <div class="row">
+                    <div class="col-md-6 col-xs-6">
+                        <a href="" target="" class="btn-techdeal-devices">
+                            <div class="caption-text" style="color: #002963; margin: inherit;">ApplyNow</div>
+                        </a>
+                    </div>
+                   @* <div class="col-md-6  col-xs-6">
+                        <a href="Url" target="">
+                            <div class="caption-text" style="color: #002963; margin: inherit; padding-top: 8px; padding-left: 20px; font-weight: normal; font-size:15px;">Compare</div>
+                        </a>
+                    </div>*@
+                </div>
+            </div>
+             <div class="col-md-4 col-sm-4 col-xs-6 device-details-popup-image">
+                 <div class="display-img"><img class="final-img" src="/media/bypcu0ce/iphone-14.png" width="450" height="520"></div>
+                 
+            </div>
+             <div class="col-md-3 col-sm-3 col-xs-3 popup-small-images">
+                 <img class="device-details-popup-image1 side-image" src=" " width="200" height="200">
+                  <img class="device-details-popup-image2 side-image" src=" " width="200" height="200">
+                   <img class="device-details-popup-image3 side-image" src=" " width="200" height="200">
+            </div>
+        </div>
+
+        <div class="offers-tab-container row col-md-12">
+              @*loader div*@
+                        
+                        <div id="loader" style="display:none;"></div> 
+            <div class="panel panel-default">
+                @* Second page Device tabs*@
+                <div class=" panel-heading panel-heading-nav">
+                    <ul class="nav nav-tabs">
+                        @{
+                            int looper = 0;
+                            foreach (var tab in mainTabs)
+                            {
+                                var cssClass = tab.Equals(mainTabs.First()) ? "active campaign-more" : "campaign-more";
+                                var title = tab.Value("title").ToString();
+                                var tabId = title.Replace(" ", string.Empty);
+                                <li role="presentation" class="col-md-2  device-list">
+                                    <a href="#@tabId" aria-controls="home" class="offer-device-types" role="tab" data-toggle="tab">
+                                        @if (looper > 0)
+                                        {
+                                            <span class="tabName">@title</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="tabName">@title</span>
+                                        }
+                                    </a>
+                                </li>
+                                ++looper;
+                            }
+                        }
+                    </ul>
+                </div>
+                <div class="panel-body">
+                    <div class="row category-box">
+                        @* Second page Category tabs *@
+                        <div class="col-md-9 col-sm-8 category-bg">
+                            <p class="category">Category</p>
+                            <div class="category-scroll" style="display:flex;">
+                            <div class="device-names-all category-names-all All" style="padding-left: 15px;font-weight:bold;font-size:10px;cursor:pointer;">
+                                                    <a  aria-controls="home" style="text-decoration:none;">All</a>
+                                                </div>
+                            
+                            @foreach (var techDeal in heroChest.Children.Where(c => c.ContentType.Alias.ToLower() == "valueaddeddeal"))
+                            {
+                                var title = techDeal.Value("title").ToString();
+                                var catalogItems = ((Umbraco.Web.PublishedModels.ValueAddedDeal)techDeal).CatalogCards;
+                                if (catalogItems != null)
+                                {
+                                  List<String> categorylist=new  List<String>();
+                                  
+                                    foreach (var highlight in catalogItems)
+                                    {
+                                        var categorytab = highlight.Value("vADTechDealCategory");
+                                        var deviceTitle = highlight.Value("vADTechDealSubTitle").ToString();
+                                        String categorytabValue= Convert.ToString(categorytab);
+                                        if (title == deviceTitle && !categorylist.Contains(categorytabValue))
+                                        {
+                                          categorylist.Add(categorytabValue);
+                                               
+                                           
+                                               <div class=" device-names category-names @deviceTitle">
+                                                    <a  aria-controls="home" style="text-decoration:none;">@categorytab</a>
+                                                </div>
+                                          
+                                                
+                                           
+                                              
+                                           
+                                        }
+                                    }
+                                }
+                            }
+ </div>
+                        </div>
+                          @*  <div class="col-md-4"></div>*@
+                        <div class="col-md-2 col-xs-9 col-sm-8 sort-by-btn">
+                            <div class="dropdown sort">
+                                <button class="btn btn-default dropdown-toggle sortDropdown" type="button" id="sortDropdown" data-toggle="dropdown">
+                                    <span style="font-size: 10px;padding: 10px;">@chestTitle1</span>
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu sortDropdown" role="menu" aria-labelledby="menu1">
+                                    @if (DealModel.BenefitCards != null && DealModel.BenefitCards.Any())
+                                       {
+                                           int iterator = 0;
+                                           foreach (Card benefitTech1 in DealModel.BenefitCards)
+                                           {
+                                                <li class="sortoption" role="presentation">@benefitTech1.CardTitle</li>
+                                            }
+                                           
+                                    }
+                                </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                      
+                        
+                     <div class="tab-content">
+                        @foreach (var techDeal in heroChest.Children.Where(c => c.ContentType.Alias.ToLower() == "valueaddeddeal"))
+                        {
+                            var title = techDeal.Value("title").ToString();
+                            @*var tabtype = techDeal.Value("tabType").ToString();*@
+                            var tabId = title.Replace(" ", string.Empty);
+                            var cssClass = techDeal.Equals(mainTabs.First()) ? "tab-pane active" : "tab-pane";
+                            var description = techDeal.Value("description").ToString();
+                            var catalogItems = ((Umbraco.Web.PublishedModels.ValueAddedDeal)techDeal).CatalogCards;
+                            var applyButtonLink = "https://ib.africanbank.co.za/";
+                            
+                            @*Display devices based on Tabs selection(Cellphones, Tablets,...) *@    
+                           <div role="tabpanel" class="tab-pane fade my-offer-devices" id="@tabId">
+                                @{
+                                    if (catalogItems != null)
+                                    {
+                                        foreach (var highlight in catalogItems)
+                                        {
+                                            var img = highlight.Value<IPublishedContent>("vADTechDealImage");
+                                            var buttonRedirectLink = highlight.Value<IPublishedContent>("vADTechDealButtonRedirectLink2");
+                                            var buttonLabel = highlight.Value("vADTechDealButtonLabel").ToString();
+                                            var deviceTitle = highlight.Value("vADTechDealTitle");
+                                            var deviceSpace = highlight.Value("vADTechDealStorageSpace");
+                                            var devicePrice = highlight.Value("vADTechDealDevicePrice");
+                                            var category = highlight.Value("vADTechDealCategory");
+                                            var specifications = highlight.Value("VADTechDealDeviceDescription");
+                                            var image1 = highlight.Value<IPublishedContent>("VADTechDealImage1");
+                                            var image2 = highlight.Value<IPublishedContent>("VADTechDealImage2");
+                                            var image3 = highlight.Value<IPublishedContent>("VADTechDealImage3");
+                                             
+                                           <div class="col-sm-4 FirstTab">
+                                            
+                                                <div class="catagory-images d-none">
+                                                    <div class="image1">@image1.Url</div>
+                                                    <div class="image2">@image2.Url</div>
+                                                    <div class="image3">@image3.Url</div>
+                                                    <div class="specifications">@specifications</div>
+                                                </div>
+                                            
+                                                    <div class="device-backgrnd">
+                                                        <img src="@img.Url" width="200" height="200" style="margin-top: -20%;">
+                                                    </div>
+                                                    <p class="device-title">@deviceTitle</p>
+                                                    <p class="storage">@deviceSpace</p>
+                                                    <p  class="price">@devicePrice</p>
+                                                    <div class="row">
+                                                        <div class="col-md-6 col-xs-6">
+                                                            <a href="@applyButtonLink" target="" class="btn-techdeal-devices">
+                                                                <div class="caption-text" style=" color: #002963; margin: inherit;">@buttonLabel</div>
+                                                            </a>
+                                                        </div>
+                                                      @*  <div class="col-md-6 col-xs-6">
+                                                            <a href="Url" target="">
+                                                                <div class="caption-text compare-text" style="color: #002963; margin-left: -40px; padding-top: 8px;font-weight: normal;">Compare</div>
+                                                            </a>
+                                                        </div>*@
+                                                    </div>
+                                                    
+                                            </div>
+                                              
+                                              
+                        
+                                            @*Display devices based on Category selection *@    
+                                            <div  class=" category-device-list @category" >
+                                                <div class="col-sm-4 SecondTab">
+                                                <div class="catagory-images d-none">
+                                                    <div class="image1">@image1.Url</div>
+                                                    <div class="image2">@image2.Url</div>
+                                                    <div class="image3">@image3.Url</div>
+                                                    <div class="specifications">@specifications</div>
+                                                </div>
+                                                    <div class="device-backgrnd">
+                                                        <img class="ss" src="@img.Url" width="200" height="200" style="margin-top: -20%;">
+                                                    </div>
+                                                    <p class="device-title">@deviceTitle</p>
+                                                    <p class="storage">@deviceSpace</p>
+                                                    <p class="price">@devicePrice</p>
+                                                    <div class="row">
+                                                        <div class="col-md-6 col-xs-6">
+                                                            <a href="@applyButtonLink" target="" class="btn-techdeal-devices">
+                                                                <div class="caption-text" style=" margin: inherit;">@buttonLabel</div>
+                                                            </a>
+                                                        </div>
+                                                      @*  <div class="col-md-6 col-xs-6">
+                                                            <a href="Url" target="">
+                                                                <div class="caption-text" style=" margin: inherit; padding-top: 8px; margin-left: -40px; font-weight: normal;">Compare</div>
+                                                            </a>
+                                                        </div>*@
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @*End categories *@    
+                                           
+                                        }
+                                    }
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!--second Ends Here-->
+
+    
+
+    <div class="campaign-apply">
+        @Html.Raw(applicationRequirements.Value("mainHeaderText"))
+    </div>
+
+    <div class="campaign-product-container full">
+        <div class="text-center spacer">
+            <h4 style="font-size: 28px;">@Html.Raw(benefitsModel.Header)</h4>
+        </div>
+        @if (benefitsModel.BenefitCards != null && benefitsModel.BenefitCards.Any())
+        {
+            int iterator = 0;
+
+            <div class="row eq-height @(benefitsModel.BenefitCards.Count > 3 ? "card-slider" : "") margin-top-50">
+                @foreach (Card benefit in benefitsModel.BenefitCards)
+                {
+                    String cardIdTag = "card" + iterator.ToString();
+                    <div class="col-sm-4">
+                        <div class="card-plain">
+                            <div class="center-icon-text">
+                                <div class="image">
+                                    @if (benefit.CardIcon != null)
+                                    {
+                                        <img src="@benefit.CardIcon.Url" alt="@benefit.CardIcon.Value("altTag")" />
+                                    }
+                                </div>
+                                <div class="title text-uppercase">@benefit.Name</div>
+                                <p class="descr">@benefit.CardDescription</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    ++iterator;
+                }
+            </div>
+        }
+    </div>
+
+</div>
+<div class="number-to-call">@Html.Raw(@oneNumberControl.Value("textEditor"))</div>
+
+<!-- CALL BACK FORM -->
+
+
+@section scripts
+{
+    <script type="text/javascript">
+    
+    
+         $(document).ready(function () {
+             
+             
+             
+             $(".side-image").click(function() { // code to display side images in large image
+                 var imagePath = $('.final-img').attr('src');
+                  var currentimagePath = $(this).attr('src');
+                  $(".final-img").attr("src",currentimagePath);
+                  $(this).attr("src",currentimagePath);
+             });
+             
+             $('.sortoption').click(function () {  //code for sorting based on price and space
+                
+                 var selectedValue = $(this).text();
+                  if(selectedValue !== "")
+                  {
+                 var cardList = $('.my-offer-devices.active'); 
+                 var cards = cardList.find('.FirstTab , .category-device-list');
+                  $("#sortDropdown").text(selectedValue);
+                 cards.detach();
+                 // Sort the cards based on the selected value
+            if (selectedValue === 'Price: Low-High') {
+                cards.sort(function (a, b) {
+                    var priceA = parseFloat($(a).find('.price').text().replace(/[^\d.-]/g, ''));
+                    var priceB = parseFloat($(b).find('.price').text().replace(/[^\d.-]/g, ''));
+                    return priceA - priceB;
+                });
+            } else if (selectedValue === 'Price: High-Low') {
+                cards.sort(function (a, b) {
+                    var priceA = parseFloat($(a).find('.price').text().replace(/[^\d.-]/g, ''));
+                    var priceB = parseFloat($(b).find('.price').text().replace(/[^\d.-]/g, ''));
+                    return priceB - priceA;
+                });
+            }
+            else if (selectedValue === 'Storage: High-Low') {
+                cards.sort(function (a, b) {
+                    var storageA = parseFloat($(a).find('.storage').text().replace(/[^\d.-]/g, ''));
+                    var storageB = parseFloat($(b).find('.storage').text().replace(/[^\d.-]/g, ''));
+                    return storageB - storageA;
+                });
+            }
+            else if (selectedValue === 'Storage: Low-High') {
+                cards.sort(function (a, b) {
+                    var storageA = parseFloat($(a).find('.storage').text().replace(/[^\d.-]/g, ''));
+                    var storageB = parseFloat($(b).find('.storage').text().replace(/[^\d.-]/g, ''));
+                    return storageA - storageB;
+                });
+            }
+            
+                // Re-arrange the sorted cards in the cardList
+                    cardList.empty();
+                    cards.each(function () {
+                        cardList.append($(this));
+                    });
+                  }
+             });
+             
+             $('#sortDropdown').change(function () {  //code for sorting based on price and space
+                
+                 var selectedValue = $(this).val();
+                  if(selectedValue !== "")
+                  {
+                 var cardList = $('.my-offer-devices.active'); 
+                 var cards = cardList.find('.FirstTab , .category-device-list');
+                  
+                 cards.detach();
+                 // Sort the cards based on the selected value
+            if (selectedValue === 'price-low-high') {
+                cards.sort(function (a, b) {
+                    var priceA = parseFloat($(a).find('.price').text().replace(/[^\d.-]/g, ''));
+                    var priceB = parseFloat($(b).find('.price').text().replace(/[^\d.-]/g, ''));
+                    return priceA - priceB;
+                });
+            } else if (selectedValue === 'price-high-low') {
+                cards.sort(function (a, b) {
+                    var priceA = parseFloat($(a).find('.price').text().replace(/[^\d.-]/g, ''));
+                    var priceB = parseFloat($(b).find('.price').text().replace(/[^\d.-]/g, ''));
+                    return priceB - priceA;
+                });
+            }
+            else if (selectedValue === 'storage-high-low') {
+                cards.sort(function (a, b) {
+                    var storageA = parseFloat($(a).find('.storage').text().replace(/[^\d.-]/g, ''));
+                    var storageB = parseFloat($(b).find('.storage').text().replace(/[^\d.-]/g, ''));
+                    return storageB - storageA;
+                });
+            }
+            else if (selectedValue === 'storage-low-high') {
+                cards.sort(function (a, b) {
+                    var storageA = parseFloat($(a).find('.storage').text().replace(/[^\d.-]/g, ''));
+                    var storageB = parseFloat($(b).find('.storage').text().replace(/[^\d.-]/g, ''));
+                    return storageA - storageB;
+                });
+            }
+                // Re-arrange the sorted cards in the cardList
+                    cardList.empty();
+                    cards.each(function () {
+                    cardList.append($(this));
+                    });
+                  }
+             });
+             
+               
+            });
+
+            $(".btn_ok_modal").click(function () {
+                $('#generic').modal('hide');
+            });
+ 
+        $(".offer-devices-list").click(function ()
+        {
+            $(".display-devices").css("display", "block");
+            $(".welcome-page").css("display", "none");
+            $(".hero-product-container").css("display", "none");
+            $(".campaign-apply").css("display", "none");
+            $(".campaign-product-container").css("display", "none");
+            $(".hero-richtext").css("display", "none");
+            $(".btn-back-last").css("display", "none");
+            $(".btn-back-device").css("display", "none");
+            
+            var tabtext = $(this).first().find("div").text().trim("").trim(" ").replace(" ", "");
+            $("a[href='#" + tabtext + "'").click();
+        });
+        
+        $(".All").click(function() {
+          $("#loader").css("display" , "block");
+        
+        setTimeout(function(){
+            $(".category-device-list").css("display", "block");
+               $("#loader").css("display" , "none");
+             
+              },3000);
+            
+            
+        });
+      
+         $(".offer-device-types").click(function ()
+                {
+                 var catagorytext = $(this).text();
+                 $("#loader").css("display" , "block");
+                 
+                  setTimeout(function(){
+                 
+                 
+                  var catgoryClass = catagorytext.trim().split(" ")[0];
+                  
+                 $(".category-names").css("display", "none");
+                
+                 $("." + catgoryClass).css("display", "block");
+                 $(".FirstTab").css("display", "block");
+                 $(".SecondTab").css("display" , "none");
+                 $(".offer-device-types").css("display" , "block");
+                 $(".tabChange").text(catagorytext);
+                 $(".SubCate").text("");
+                 
+                  $("#loader").css("display" , "none");
+             
+              },3000);
+                });
+                
+        $(".btn-back").click(function ()
+        {
+            $(".display-devices").css("display", "none");
+            $(".welcome-page").css("display", "block");
+            $(".hero-product-container").css("display", "block");
+            $(".campaign-apply").css("display", "block");
+            $(".campaign-product-container").css("display", "block");
+            $(".hero-richtext").css("display", "block");
+           
+        });
+        
+        
+         $(".btn-back-last").click(function ()
+        {
+              $(".offers-tab-container").css("display", "block");
+            $(".welcome-page").css("display", "none");
+            $(".hero-product-container").css("display", "none");
+            $(".campaign-apply").css("display", "none");
+            $(".campaign-product-container").css("display", "none");
+            $(".hero-richtext").css("display", "none");
+            $(".techdeal-name").css("display", "block");
+            $(".number-to-call").css("display", "block");
+            $(".btn-back").css("display", "block");
+            $(".device-details-popup").css("display", "none");
+            $(".catagory-images").css("display", "none");
+            $(".btn-back-device").css("display", "none");
+            $(".btn-back-last").css("display", "none");
+            
+           
+        });
+        
+    
+        
+        $(".device-backgrnd").click(function()
+        {
+       
+        
+        
+            $(".offers-tab-container").css("display", "none");
+            $(".welcome-page").css("display", "none");
+            $(".hero-product-container").css("display", "none");
+            $(".campaign-apply").css("display", "none");
+            $(".campaign-product-container").css("display", "none");
+            $(".hero-richtext").css("display", "none");
+            $(".techdeal-name").css("display", "block");  @*none*@
+            $(".number-to-call").css("display", "none");
+            $(".btn-back").css("display", "none");
+            $(".btn-back-device").css("display", "block");
+            $(".btn-back-last").css("display", "block");
+            
+          
+            $(this).parent().find(".catagory-images").css("display", "block");
+            $(".device-details-popup").css("display", "block");
+            
+            var image1Url = $(this).parent().find(".image1").text();
+            var image2Url = $(this).parent().find(".image2").text();
+            var image3Url = $(this).parent().find(".image3").text();
+            var specificationsText = $(this).parent().find(".specifications").text();
+             var devicetitle = $(this).parent().find(".device-title").text();
+             var storage = $(this).parent().find(".storage").text();
+             var price = $(this).parent().find(".price").text();
+             var mainImage = $(this).parent().find(".device-backgrnd img").attr("src");
+           
+            $(".device-details-popup-title").text(devicetitle);
+            $(".device-details-popup-storage").text(storage);
+            $(".device-details-popup-price").text(price);
+            $(".device-details-popup-specifications").text(specificationsText);
+            $(".device-details-popup-image1").attr('src', image1Url);
+            $(".device-details-popup-image2").attr('src', image2Url);
+            $(".device-details-popup-image3").attr('src', image3Url);
+            
+            
+           $('html, body').animate({scrollTop:0},'50');
+           
+        });
+       @*  $(".device-backgrnd").click(function()
+        {
+            $(".offers-tab-container").css("display", "none");
+            $(".welcome-page").css("display", "none");
+            $(".hero-product-container").css("display", "none");
+            $(".campaign-apply").css("display", "none");
+            $(".campaign-product-container").css("display", "none");
+            $(".hero-richtext").css("display", "none");
+            $(".techdeal-name").css("display", "block");  
+            $(".number-to-call").css("display", "none");
+            $(".btn-back").css("display", "none");
+            $(".btn-back-device").css("display", "block");
+            $(".btn-back-last").css("display", "block");
+          
+            $(this).parent().find(".catagory-images").css("display", "block");
+            $(".device-details-popup").css("display", "block");
+            
+            var image1Url = $(this).find(".image1").text();
+            var image2Url = $(this).find(".image2").text();
+            var image3Url = $(this).find(".image3").text();
+            var specificationsText = $(this).find(".specifications").text();
+             var devicetitle = $(this).find(".device-title").text();
+             var storage = $(this).find(".storage").text();
+             var price = $(this).find(".price").text();
+             var mainImage = $(this).find(".device-backgrnd img").attr("src");
+           
+            $(".device-details-popup-title").text(devicetitle);
+            $(".device-details-popup-storage").text(storage);
+            $(".device-details-popup-price").text(price);
+            $(".device-details-popup-specifications").text(specificationsText);
+            $(".device-details-popup-image1").attr('src', image1Url);
+            $(".device-details-popup-image2").attr('src', image2Url);
+            $(".device-details-popup-image3").attr('src', image3Url);
+        });
+       *@
+      
+       
+        $(".device-names").click(function ()
+        {
+        @* document.getElementById("loader").style.display = "block";*@
+        $("#loader").css("display" , "block");
+        
+          var categorybtn= $(this).find("a");
+          setTimeout(function(){
+          
+            $(".FirstTab").css("display" , "none");
+            $(".SecondTab").css("display" , "block");
+            $(".offer-device-types").css("display" , "block");
+            
+             @*code for display category devices based on selection*@
+            if(categorybtn && categorybtn.length >0)
+            {
+                $(".category-device-list").css("display" , "none");
+                $(".SubCate").text("/ " +  categorybtn[0].text);
+                var catClassname = categorybtn[0].text.split(' ');
+                if(catClassname && catClassname.length > 0) {
+                  var btntext=catClassname[0];
+                  $("." + btntext.trim()).css("display" , "block");
+                }
+           
+            }
+          
+           @*document.getElementById("loader").style.display = "none";*@
+           
+           $("#loader").css("display" , "none");
+           
+          },3000);
+         
+
+        });
+    </script>
+}

@@ -1,0 +1,27 @@
+﻿@model Umbraco.Web.PublishedModels.TabBody
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using System.Configuration;
+
+@{
+    var tbody = Model.GetProperty("tabBodyContent");
+    var numbers = Model.TabBodyContent.ToList();
+}
+<div class="container-fluid" id="talk-to-us-numnbers">
+    <div class="row">
+        @{
+            foreach (var row in numbers)
+            {
+                var data = row.Value<IEnumerable<IPublishedElement>>("sectionContent");
+                foreach (var info in data)
+                {
+                    <div class="col-md-4">
+                        <div class="number-block">
+                            <div class="text-18">@info.Value("nCbodyTitle")</div>
+                            @Html.Raw(@info.Value("nCbodyDescription"))
+                        </div>
+                    </div>
+                }
+            }
+        }
+    </div>
+</div>

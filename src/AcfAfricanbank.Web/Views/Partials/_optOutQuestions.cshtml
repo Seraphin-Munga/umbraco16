@@ -1,0 +1,788 @@
+﻿@model Umbraco.Web.PublishedModels.TabBody
+@using ContentModels = Umbraco.Web.PublishedModels;
+
+<style type="text/css">
+    .calculator-wrap {
+        background: #EFEFEF;
+        background-size: contain;
+        background-attachment: scroll;
+        background-repeat: no-repeat;
+        background-position: 20% 50%;
+        z-index: -1;
+        width: 100%;
+    }
+
+    .padding-row {
+        margin-left: 15px !important;
+        margin-right: 15px !important;
+    }
+
+    .investment-calculator {
+        background: unset;
+    }
+
+    .padding-30 {
+        padding-top: 25px;
+    }
+
+    .isLandlineNumber, .isCellForSMS, .isEmailAddress {
+        width: 2em;
+        height: 2em;
+    }
+
+    .notifiedText {
+        font-size: 16px;
+        font-weight: 400;
+    }
+
+    .form-horizontal .form-group {
+        margin-left: unset;
+        margin-right: unset;
+    }
+
+    .lblNotificationsOnlyOn {
+        border: solid 1px #ababab80;
+        background: none;
+        color: #8EB931;
+        font-weight: 600;
+        font-size: 18px;
+        padding: 8px;
+        width: 100%;
+    }
+
+    .lblNotificationsOnlyOnLabel {
+        color: white !important;
+        font-size: 18px;
+    }
+
+    .calculator-form {
+        text-align: center;
+    }
+
+    .loan-calc-wrap {
+        text-align: center;
+        background: #FAFAFA;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0px 10px 14px #0000000d;
+    }
+
+    .page-title h1 {
+        font-size: 24px;
+        font-weight: 900;
+        line-height: 30px;
+        color: #002B60;
+        margin-top: 20px;
+        margin-bottom: 30px;
+    }
+
+    .customlabel {
+        font-size: 14px;
+        font-weight: 500;
+        color: #011420;
+        margin-bottom: 0px;
+        width: 300px;
+        text-align: left;
+    }
+
+    .customlabelCenter {
+        font-size: 14px;
+        font-weight: 500;
+        color: #011420;
+        margin-bottom: 0px;
+        width: 100%;
+        text-align: center;
+        font-weight: 500 !important;
+    }
+
+    .custom-input {
+        padding: 0px 20px;
+        border-radius: 25px;
+        border: none;
+        outline: none;
+        -webkit-outline: none;
+        width: 100%;
+        max-width: 300px;
+        height: 50px;
+        margin-top: 10px;
+        margin-bottom: 30px;
+    }
+
+        .custom-input:focus {
+            transition: 0.5s;
+            border: 2px solid #259CD8;
+        }
+
+    .calculator-form input {
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .lblNotifications {
+        border: solid 1px #ababab80;
+        background: lightgrey;
+        color: #00285B;
+        font-weight: 600;
+        font-size: 16px;
+        padding: 8px;
+        width: 200px;
+        height: 70px;
+    }
+
+    .btn-wrap {
+        display: block;
+        position: relative;
+        padding-left: 35px;
+        margin-bottom: 12px;
+        cursor: pointer;
+        font-size: 16px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        display: flex;
+        align-items: center;
+    }
+
+        .btn-wrap input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+    .checkmark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 25px;
+        width: 25px;
+        border: solid 1px #003B61;
+        border-radius: 4px;
+        transition: 0.35s;
+    }
+
+    .btn-wrap input:checked ~ .checktext {
+        font-weight: bold
+    }
+
+    .btn-wrap.dice input:checked ~ .checktext {
+        transition: 0.35s;
+        font-weight: bold;
+        background: #1F2F43;
+        color: #fff;
+    }
+
+    .btn-wrap input:checked ~ .checkmark:after {
+        transition: 0.35s;
+        display: block;
+    }
+
+    .btn-wrap input:checked ~ .checkmark {
+        border: solid 1px #003B61;
+        border-radius: 7px;
+    }
+
+    .btn-wrap .checkmark:after {
+        transition: 0.35s;
+        left: 8px;
+        top: 4px;
+        width: 9px;
+        height: 14px;
+        border: solid #259CD8;
+        border-radius: 2px;
+        border-width: 0 4px 4px 0;
+        box-shadow: 0px 2px 2px #00000015;
+        -webkit-transform: rotate( 45deg );
+        -ms-transform: rotate(45deg);
+        transform: rotate(45deg);
+    }
+
+    .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+
+    .primary-ghost-btn {
+        transition: 0.5s;
+        border: solid 2px #00285B;
+        padding: 9px 14px;
+        width: 200px;
+        height: 50px;
+        border-radius: 25px;
+        margin: 10px auto;
+        font-size: 14px;
+        font-weight: 600;
+        outline: none;
+        -webkit-outline: none;
+        background: none;
+        color: #00285B;
+        cursor: pointer;
+    }
+
+        .primary-ghost-btn:hover {
+            transition: 0.5s;
+            background: #00285B;
+            color: #fff;
+            box-shadow: 0px 10px 20px #0000045;
+        }
+
+    .btn-wrap.dice {
+        background: #fefefe;
+        height: 90px;
+        padding: 0px;
+    }
+
+    .btn-wrap input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+    }
+
+    .checktext.dice {
+        transition: 0.35s;
+        background: #ECECEC;
+        height: 90px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: left;
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .checkmark.dice {
+        background: #fff;
+        top: auto;
+        left: auto;
+        right: -6px;
+        bottom: -6px;
+    }
+
+    .checktext {
+        font-size: 1.7rem;
+    }
+
+    .custom-radio {
+        text-align: center;
+    }
+
+    .page-title {
+        padding: 25px;
+    }
+    /****Custom Radio Buttons****/
+
+    /* The container */
+    .radio-wrap {
+        display: flex;
+        position: relative;
+        padding-left: 30px;
+        margin-bottom: 12px;
+        cursor: pointer;
+        font-size: 22px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+        /* Hide the browser's default radio button */
+        .radio-wrap input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+    /* Create a custom radio button */
+    .checkmark.radio {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 25px;
+        width: 25px;
+        border-radius: 50%;
+    }
+
+    /* On mouse-over, add a grey background color */
+    .radio-wrap:hover input ~ .checkmark {
+    }
+
+    /* When the radio button is checked, add a blue background */
+    .radio-wrap input:checked ~ .checkmark {
+    }
+
+    /* Create the indicator (the dot/circle - hidden when not checked) */
+    .radio-wrap > * .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+
+    /* Show the indicator (dot/circle) when checked */
+    .radio-wrap input:checked ~ .checkmark:after {
+        display: block;
+    }
+
+    /* Style the indicator (dot/circle) */
+    .radio-wrap .checkmark:after {
+        transition: 0.35s;
+        top: 4px;
+        left: 4px;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        background: #259CD8;
+        box-shadow: 0px 2px 4px #00000010;
+    }
+
+
+    .radio-text {
+        font-size: 12px;
+    }
+
+    .form-horizontal .radio, .form-horizontal .checkbox {
+        min-height: 0px;
+    }
+
+    .ab-options-3 {
+        width: 330px;
+        display: inline-flex;
+        min-height: 50px;
+        align-items: center;
+        margin-bottom: 25px;
+        margin-top: 10px;
+    }
+
+    .custom-margin {
+        margin-top: 10px;
+    }
+
+    hr {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        border: 0;
+        border-top: 1px solid rgba(0,0,0,.1);
+    }
+
+    @@media (min-width: 1200px) {
+        .page-title.mid h1 {
+            font-size: 24px;
+            line-height: 4rem;
+        }
+
+        .radio-text {
+            font-size: 16px;
+        }
+
+        .btn-wrap .checkmark:after {
+            transition: 0.35s;
+            left: 8px;
+            top: 4px;
+            width: 9px;
+            height: 14px;
+            border: solid #259CD8;
+            border-radius: 2px;
+            border-width: 0 4px 4px 0;
+            box-shadow: 0px 2px 2px #00000015;
+            -webkit-transform: rotate( 45deg );
+            -ms-transform: rotate(45deg);
+            transform: rotate( 45deg );
+        }
+
+        .radio-wrap {
+            display: flex;
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 22px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .primary-ghost-btn {
+            transition: 0.5s;
+            border: solid 2px #00285B;
+            padding: 9px 14px;
+            width: 220px;
+            height: 50px;
+            border-radius: 25px;
+            margin: 10px auto;
+            font-size: 14px;
+            font-weight: 600;
+            outline: none;
+            -webkit-outline: none;
+            background: none;
+            color: #00285B;
+            cursor: pointer;
+        }
+
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 25px;
+            width: 25px;
+            border: solid 1px #003B61;
+            border-radius: 7px;
+            transition: 0.35s;
+        }
+
+        .checktext {
+            font-size: 14px;
+        }
+
+        .custom-margin {
+            margin-top: 0px;
+        }
+
+        .btn-wrap {
+            display: block;
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .checktext.dice {
+            transition: 0.35s;
+            background: #ECECEC;
+            height: 90px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .custom-align {
+            text-align: left
+        }
+
+        .custom-input {
+            padding: 0px 20px;
+            border-radius: 25px;
+            border: none;
+            outline: none;
+            -webkit-outline: none;
+            width: 300px;
+            height: 50px;
+            margin-top: 10px;
+            margin-bottom: 30px;
+        }
+    }
+
+    @@media (min-width: 1025px) and (max-width: 1441px) {
+        .custom-margin {
+            margin-top: 0px;
+        }
+
+        .radio-text {
+            font-size: 16px;
+        }
+
+        .btn-wrap .checkmark:after {
+            transition: 0.35s;
+            left: 8px;
+            top: 4px;
+            width: 9px;
+            height: 14px;
+            border: solid #259CD8;
+            border-radius: 2px;
+            border-width: 0 4px 4px 0;
+            box-shadow: 0px 2px 2px #00000015;
+            -webkit-transform: rotate( 45deg );
+            -ms-transform: rotate(45deg);
+            transform: rotate( 45deg );
+        }
+
+        .radio-wrap {
+            display: flex;
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 22px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .primary-ghost-btn {
+            transition: 0.5s;
+            border: solid 2px #00285B;
+            padding: 9px 14px;
+            width: 220px;
+            height: 50px;
+            border-radius: 25px;
+            margin: 10px auto;
+            font-size: 14px;
+            font-weight: 600;
+            outline: none;
+            -webkit-outline: none;
+            background: none;
+            color: #00285B;
+            cursor: pointer;
+        }
+
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 25px;
+            width: 25px;
+            border: solid 1px #003B61;
+            border-radius: 7px;
+            transition: 0.35s;
+        }
+
+        .page-title.mid h1 {
+            font-size: 24px;
+            line-height: 4rem;
+        }
+
+        .custom-radio {
+            text-align: left;
+        }
+
+        .btn-wrap {
+            display: block;
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .customlabel {
+            font-size: 14px;
+            font-weight: 500;
+            color: #011420;
+            margin-bottom: 0px;
+            width: 300px;
+            text-align: right;
+        }
+
+        .checktext.dice {
+            transition: 0.35s;
+            background: #ECECEC;
+            height: 90px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .btn-wrap.dice {
+            background: #fefefe;
+            height: 90px;
+            padding: 0px;
+        }
+
+        .checktext {
+            font-size: 14px;
+        }
+
+        .custom-align {
+            text-align: left
+        }
+
+        .custom-input {
+            padding: 0px 20px;
+            border-radius: 25px;
+            border: none;
+            outline: none;
+            -webkit-outline: none;
+            width: 300px;
+            height: 50px;
+            margin-top: 10px;
+            margin-bottom: 30px;
+        }
+    }
+</style>
+
+<div class="calculator-wrap" style="padding: 83px 0px 80px 0px;">
+    <div class="container">
+        <div class="row padding-row">
+            <div class="calculator-form loan-calc-wrap col-md-push-1 col-md-10 col-xs-12">
+                <div id="takeSurvey" class="col-sm-12 page-title">
+                    <h1>Complete the information below to unsubscribe.</h1>
+                </div>
+                <div class="">
+                    <div class="calculator-form">
+                        <form class="form-horizontal" method="post" id="frmMarketingConsent">
+                            @Html.AntiForgeryToken()
+                            @Html.Hidden("ddInputResult1")
+                            @Html.Hidden("ddInputResult2")
+                            @Html.Hidden("ddInputResult3")
+                            @Html.Hidden("howCanBankAddMore")
+                            <div class="form-group">
+
+                                <div class="col-md-6">
+                                    <label class="customlabel">Can we inform you of African Bank specials and offers?</label>
+                                </div>
+                                <div class="col-md-6 custom-margin">
+                                    <div class="col-sm-3 hidden-lg hidden-md"></div>
+                                    <div class="col-md-3 col-xs-4">
+                                        <label class="radio-wrap">
+                                            <span class="radio-text">Yes</span>
+                                            <input type="radio" id="rdbYes" name="option" value="1" class="myRadio" checked="checked">
+                                            <span class="checkmark radio"></span>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-2 col-xs-3">
+                                        <label class="radio-wrap">
+                                            <span class="radio-text">No</span>
+                                            <input type="radio" id="rdbNo" name="option" value="0" class="myRadio">
+                                            <span class="checkmark radio"></span>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-8">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-6 ">
+                                    <label class="customlabel padding-30">Your name:</label>
+                                </div>
+                                <div class="col-md-6 custom-align" style="">
+                                    <input type="text" class="custom-input" id="firstName" name="firstName" placeholder="Name" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-6">
+                                    <label class="customlabel padding-30">Your surname:</label>
+                                </div>
+                                <div class="col-md-6 custom-align" style="">
+                                    <input type="text" class="custom-input" id="surName" name="surName" placeholder="Surname" />
+                                </div>
+                            </div>
+                             <div class="form-group">
+                                <div class="col-md-6 ">
+                                    <label class="customlabel padding-30">South African ID:</label>
+                                </div>
+                                <div class="col-md-6 custom-align" style="">
+                                    <input type="text" class="custom-input" id="southAfricanID" maxlength="13" name="southAfricanID" placeholder="South African ID" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-6">
+                                    <label class="customlabel padding-30">Your cell number:</label>
+                                </div>
+                                <div class="col-md-6 custom-align" style="">
+                                    <input type="text" class="custom-input" id="cellPhone" name="cellPhone" placeholder="Cell Number for SMS" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-6">
+                                    <label class="customlabel padding-30">Your alternate number (Optional):</label>
+                                </div>
+                                <div class="col-md-6 custom-align" style="">
+                                    <input type="text" class="custom-input" id="alternateNumber" name="alternateNumber" placeholder="Alternate number for call" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-6">
+                                    <label class="customlabel padding-30">Your email address (Optional):</label>
+                                </div>
+                                <div class="col-md-6 custom-align" style="">
+                                    <input type="text" maxlength="50" class="custom-input" id="email" name="email" placeholder="Email" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-6">
+                                    <label class="customlabel">What is your preferred method of communication?:</label>
+                                </div>
+                                <div class="col-md-6 custom-margin ab-options-3">
+                                    <div class="col-md-4 col-xs-3">
+                                        <label class="btn-wrap abstandardcheckbox">
+                                            <input class="" type="checkbox" id="chkIsSms"><span class="checktext">SMS</span>
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-4 col-xs-3">
+                                        <label class="btn-wrap abstandardcheckbox">
+                                            <input class="" type="checkbox" id="chkIsCall"><span class="checktext">Call</span>
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-4 col-xs-3">
+                                        <label class="btn-wrap abstandardcheckbox">
+                                            <input class="" type="checkbox" id="chkIsEmail"><span class="checktext">Email</span>
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="form-group">
+                                <div class="col-md-12">
+                                    <p class="notifiedText">I would like to receive notifications of specials and offers on:</p>
+                                </div>
+                            </div>
+                            <div class="form-group custom-margin">
+                                <div class="col-md-push-2 col-md-4 col-xs-6">
+                                    <label class="btn-wrap dice">
+                                        <input class="myCheckBox" type="checkbox" id="chkIsInvestment"><span class="checktext dice">Investments</span>
+                                        <span class="checkmark dice"></span>
+                                    </label>
+                                </div>
+                                <div class="col-md-push-2 col-md-4 col-xs-6">
+                                    <label class="btn-wrap dice">
+                                        <input class="myCheckBox" type="checkbox" id="chkIsInsurance"><span class="checktext dice">Insurance</span>
+                                        <span class="checkmark dice"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-push-2 col-md-4 col-xs-6">
+                                    <label class="btn-wrap dice">
+                                        <input class="myCheckBox" type="checkbox" id="chkIsLoan"><span class="checktext dice">Loan and Credit Cards</span>
+                                        <span class="checkmark dice"></span>
+                                    </label>
+                                </div>
+                                <div class="col-md-push-2 col-md-4 col-xs-6">
+                                    <label class="btn-wrap dice">
+                                        <input class="myCheckBox" type="checkbox" id="chkIsBanking"><span class="checktext dice">Transactional Banking</span>
+                                        <span class="checkmark dice"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-12">
+                                    <button type="button" id="sendOptOut" class="primary-ghost-btn">Submit</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

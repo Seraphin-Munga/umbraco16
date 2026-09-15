@@ -1,0 +1,37 @@
+﻿@using System.Collections
+@using SerpApi
+@using Newtonsoft.Json.Linq
+
+@{
+    string apiKey = "your_serpapi_key";
+    var ht = new Hashtable
+    {
+        { "q", "Coffee" },
+        { "hl", "en" },
+        { "gl", "us" },
+        { "google_domain", "google.com" }
+    };
+
+    JArray results = null;
+
+    try
+    {
+        var search = new GoogleSearch(ht, apiKey);
+        JObject data = search.GetJson();
+        results = (JArray)data["organic_results"];
+    }
+    catch (SerpApiSearchException ex)
+    {
+        <div class="error">API Error: @ex.Message</div>
+    }
+}
+
+@if (results != null)
+{
+    <ul>
+    @foreach (JObject result in results)
+    {
+        <li>@result["title"]</li>
+    }
+    </ul>
+}

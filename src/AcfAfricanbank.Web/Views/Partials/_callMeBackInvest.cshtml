@@ -1,0 +1,341 @@
+﻿@model Umbraco.Web.PublishedModels.CallMeBack
+@using Web.Helpers;
+@using AcfAfricanbank.Core.Models.Forms
+@using ContentModels = Umbraco.Web.PublishedModels;
+
+@{
+
+    var _floatingFormSetting = Model.FloatingFormSetting.FirstOrDefault();
+    var _title = _floatingFormSetting.Value("Title");
+
+    ContentModels.TabBody panelWarnings = (TabBody)Model.Root().Children.ToList()[0].Children.ToList().FirstOrDefault().Children.ToList().Where(c => c is HomePageElements).FirstOrDefault().Children.ToList().Where(x => x is HeroBody).FirstOrDefault().Children.Where(xx => xx is TabBody).FirstOrDefault();
+    var panelItemWarning = (IEnumerable<IPublishedElement>)panelWarnings.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+    var _successIcon = Model.Value<IPublishedContent>("successIcon");
+    
+    FloatingFormButtonSettings _CallMeBack = null;
+    FloatingFormButtonSettings _ApplyOnline = null;
+    FloatingFormButtonSettings _QuickLoan = null;
+    FloatingFormButtonSettings _applicationTracker = null;
+
+    foreach (FloatingFormButtonSettings formSetting in ((FloatingFormSetting)_floatingFormSetting).ButtonSettings)
+    {
+        if (formSetting.Value("ButtonDescription").ToString().ToLower() == "call_me_back")
+        {
+            _CallMeBack = formSetting;
+        }
+        else if (formSetting.Value("ButtonDescription").ToString().ToLower() == "apply_online")
+        {
+            _ApplyOnline = formSetting;
+        }
+    }
+
+    //exteral links in Apply Online
+    var external_link_visible = _ApplyOnline.IsButtonVisible;
+    var _external_link_text = _ApplyOnline.InternalLink.FirstOrDefault().Name;
+    var _NameQ = _ApplyOnline.Value("OptionalLink").ToString().ToLower();
+
+    string _external_link = _ApplyOnline.InternalLink.FirstOrDefault().Url; // "https://ib.africanbank.co.za/";
+
+    var product_name = Model.Value<string>("ProductIdentification").ToString();
+    //button for call me back
+    var call_me_text =_CallMeBack.InternalLink.FirstOrDefault().Name;
+    var call_me_visible = (Boolean)_CallMeBack.Value("IsButtonVisible");
+    var iconPath = _CallMeBack.Value("iconProperty");
+
+
+    //call me back structure settings
+    var call_me_subject = Model.Value("ProductSubject") ?? "";
+    var call_me_contact_type = Model.Value("contactType") ?? "";
+    var prodID = Model.Value("productId") ?? "";
+}
+<style type="text/css">
+    .lblID {
+        text-transform: none;
+    }
+    .animate {
+      animation: fadeIn 500ms ease-out;
+    }
+    
+    @@keyframes fadeIn {
+      from {
+        transform: translateX(50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0px);
+        opacity: 1;
+      }
+    }
+    #loan-tracker-submit, #st-panel-submit, #st-panel-submit1, .st-panel-submit, .disclaimer-note-label  {
+        text-transform: unset;
+    }
+    #form_tracker_fields {
+        margin-top: 30px;
+        display: none; 
+    }
+    .loan-tracker-btn-hover-blue {
+        background-color: #002b60 !important;
+    }
+    #loan-tracker {
+        margin-top: 12px;
+    }
+    .no-padding {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+    .top-padding {
+        padding-top:20px;
+    }
+    
+
+    .styles_pin_tracker, .styles_pin_main {
+        display: none;
+        border-top: 12px solid white;
+        width: 10px;
+        height: 10px;
+        position: absolute;
+       top: 0 !important;
+        right: 24px;
+        transform: translate(-50%,-50%);
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        transform: rotate(360deg);
+    }
+
+    .styles_arrow_main {
+        cursor: pointer;
+        width: 10px;
+        height: 10px;
+        margin-left: 23px;
+        padding-top:15px;
+        padding-bottom:7px;
+        transform: translate(-50%,-50%);
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        transform: rotate(-0deg);
+        display: none;
+    }
+    .styles_arrow {
+        cursor: pointer;
+        width: 10px;
+        height: 10px;
+        margin-left: 23px;
+        padding-top:10px;
+        color: #fff;
+        font-size: 22px;
+        right: 12px;
+        transform: translate(-50%,-50%);
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        transform: rotate(-0deg);
+        display: none;
+        
+        
+        /* start : radius */
+        transition: all 0.25s ease 0s; 
+        width: 40px; 
+        height: 40px; 
+        border-radius: 60px; 
+        /* background: rgb(243, 243, 243);
+        end : radius */
+        
+    }
+    .styles_arrow:hover {
+        background: rgb(149 144 144) /* rgb(243, 243, 243)  #88bc47 */;
+    }
+    .placer {
+        right: 100%;
+    }
+    .placer_main {
+        right: 93%;
+    }
+    
+    .column{
+       float:left;
+       width:100%;
+     }
+     
+     .row-call{
+       content:"";
+       display:table;
+       clear:both;
+     }
+     
+     .st-panel .st-panel-intro{
+         width:100%;
+         font-size: 32px !important;
+     }
+     
+     .arrow-back-call{
+        margin-top: -40px;
+        margin-left: -13px;
+        font-size: 21px;
+     }
+     .pop-title{
+       font-size: 24px !important;
+     }
+     .st-panel{
+         zoom: 100% !important;
+     }
+     .st-panel-contents
+      {
+       @*overflow-x: scroll;*@
+        max-height: 500px;
+      }
+       
+        @@media only screen and (min-device-width: 992px){
+            .st-panel{
+             height: auto !important;
+              zoom: 84% !important;
+          }
+          
+        @@media only screen and (min-device-width: 1200px){
+            .st-panel{
+             height: auto !important;
+               zoom: 84% !important;
+          }
+          
+      @@media only screen and (min-device-width: 768px){
+            .st-panel{
+             height: auto !important;
+               zoom: 84% !important;
+          }
+          
+      }
+      
+      
+    
+</style>
+
+<div class="st-actionContainer right-bottom">
+    <div class="st-panel">
+         <div id="call_me_form">
+            <div class="st-panel__entry">
+                <section id="form-loader">
+                    <div class="loader" id="loader-rates-form-preloader">
+                        <div class="loader-img"></div>
+                    </div>
+                </section>
+                
+                <div class="st-panel-intro row-call">
+                    <div class="column">
+                          <span class="pop-title">@_title</span>
+                    </div>
+                    
+                  <div class="column arrow-back-call">
+                         <i class="fa fa-arrow-left styles_arrow_main placer_main" style="display: none;"></i>
+                         <i class="fa fa-arrow-left styles_arrow placer" style="display: none;"></i>
+                    </div>
+                    
+                 </div>
+                
+                <div class="st-panel-tip">
+                    <p class="bodyDescription">Click call me back to speak to our consultants<br /> or apply to create an application online.</p>
+                </div>
+                
+                
+              <div class="st-panel-contents">
+                     <form id="frmLoanTracker">
+                        <div id="form_tracker_fields">
+                            <input id="sessionId" type="hidden" value="@(Guid.NewGuid().ToString())" />
+                            <input id="processID" type="hidden" value="" />
+                            <div class="form-group">
+                                <div class=" no-padding">
+                                    <label class="lblID">Enter South African ID</label>
+                                    <input type="text" id="ltSAIDInput" name="FormFields.identityNumber" class="form-control" placeholder="@ResourceHelper.GetResource("Identity Number")" required
+                                           minlength="13" maxlength="13">
+                                </div>
+                            </div>
+                            <div class="no-padding">
+                                <button type="button" id="loan-tracker" class="st-panel-submit call-me loan-tracker-btn-hover-blue">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                    <form id="frmCallMeBack">
+                        @Html.AntiForgeryToken()
+                        <div id="form_fields">
+                            <input id="sessionId" type="hidden" value="@(Guid.NewGuid().ToString())" />
+                            <input id="processID" type="hidden" value="" />
+                            <div class="form-group">
+                                <label>* @ResourceHelper.GetResource("Name")</label>
+                                <input type="text" id="FirstNameInput" name="FormFields.firstName" class="form-control" placeholder="@ResourceHelper.GetResource("Name")" maxlength="30">
+                            </div>
+                            <div class="form-group">
+                                <label>* @ResourceHelper.GetResource("Surname")</label>
+                                <input type="text" id="LastNameInput" name="FormFields.lastName" class="form-control" placeholder="@ResourceHelper.GetResource("Surname")" required maxlength="30">
+                            </div>
+                            <div class="form-group">
+                                <label>* @ResourceHelper.GetResource("Email")</label>
+                                <input type="email" id="EmailInput" name="FormFields.email" class="form-control" placeholder="@ResourceHelper.GetResource("Email")" required maxlength="50">
+                            </div>
+                            <div class="form-group">
+                                <label>* @ResourceHelper.GetResource("Identity Number") </label>
+                                <input type="text" id="SAIDInput" name="FormFields.identityNumber" class="form-control" placeholder="@ResourceHelper.GetResource("Identity Number")" required
+                                       minlength="13" maxlength="13">
+                            </div>
+                            <div class="form-group">
+                                <label>* @ResourceHelper.GetResource("Cell Phone Number")</label>
+                                <input type="text" id="CellPhoneInput" name="FormFields.mobileNumber" class="form-control" placeholder="@ResourceHelper.GetResource("Cell Phone Number")"
+                                       required maxlength="12">
+                            </div>
+                            <div class="form-group">
+                                <input type="hidden" id="MessageInput" name="FormFields.message" placeholder="Message*" value="Pepe"
+                                       required minlength="90">
+                            </div>
+                            <div class="cntr">
+                                <input id="cbx" name="FormFields.cbx" class="cbx-cover" type="checkbox" />
+                                <label class="cbx" for="cbx"></label>
+                                <label class="lbl" for="cbx">No product market information, thanks. </label>
+                            </div>
+                            <div class="disclaimer-note"> @**@
+                                <label class="disclaimer-note-label">@Html.Raw(panelItemWarning.Last().Value("nCbodyDescription"))</label>
+                            </div>
+                            <div class="no-padding">
+                                <button type="button" id="st-panel-submit" onclick="open_call_me()" class="st-panel-submit call-me loan-tracker-btn-hover-blue">Submit</button>
+                            </div>
+                            <div class="styles_pin_main" style="display: block;margin-top:43em;"></div>
+                        </div>
+                        <div class="row button-row">
+                            @{ if (call_me_visible)
+                                {
+                                    <div class="col-xs-12">
+                                        <button type="button" id="st-panel-submiter" onclick="open_call_me_prep('@_title')" class="st-panel-submit call-me btn-hover-blue">@call_me_text</button>
+                                    </div>
+                                }
+                                if (external_link_visible) 
+                                {
+                                    <div class="col-xs-12">
+                                        <a href="@_external_link" target="" class="st-panel-submit btn-hover-green" style="width: 100%;margin-bottom:12px;display: block;text-align: center;">@_external_link_text</a>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </form>
+                </div>
+                
+            </div>
+        </div>
+        
+        <div id="call_me_success">
+            <div class="call_me_success_header">
+                <span class="fa fa-check call_me_success_header_icon"></span><span class="call_me_success_header_title">Request for call back received</span>
+            </div>
+            <p id="call_me_success_body">
+                Thank you for using our call me back<br />
+                option. We will be in touch soon<br /><br />
+                From the bank where Everybody is Somebody.
+
+            </p>
+            <div id="call_me_success_fotter">
+                <img src="@_successIcon.Url" class="icon-open" alt="Consultant"> 
+            </div>
+        </div>
+    </div>
+    
+    <div class="st-btn-container right-bottom">
+        <div class="st-button-main campaing-call">
+            <img src="@Url.Content("~/images/call-me-back.svg")" class="icon-open" alt="call-me-back" onclick="init_fields();">
+            <img src="@Url.Content("~/images/call-me-back-close.svg")" class="icon-close" alt="call-me-back-close" onclick="clear_validation();">
+        </div>
+    </div>
+</div>

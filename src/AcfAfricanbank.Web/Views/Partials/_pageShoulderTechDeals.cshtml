@@ -1,0 +1,174 @@
+﻿@model Umbraco.Web.PublishedModels.HeroShoulder
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using System.Configuration;
+@using Umbraco.Core.Models;
+@using Umbraco.Core.PropertyEditors;
+@using Umbraco.Web.Composing;
+
+<style>
+.hero-static-caption {
+    display: flow;
+}
+.button.primary{
+    transition: 0.5s;
+    border: solid 1px #88bc47;
+    padding: 5px 14px;
+    width: 200px;
+   /* height: 50px;*/
+    border-radius: 25px;
+    margin: 10px auto;
+    font-size: 14px;
+    font-weight: 600;
+    outline: none;
+    -webkit-outline: none;
+    background: #88bc47;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: none;
+}
+.shoulder-img{
+   margin-top: -90px;
+    margin-bottom: -20px;
+}
+.hero-static-caption .button.primary:hover {
+    background-color: #88bc47;
+    color: #fff;
+}
+.hero-static-caption {
+padding-top: 20px !important;
+    padding-bottom: 0px !important;
+}
+@*.hero-static-caption .hero-static-description, .hero-static-caption p {
+    
+    line-height: 2.00;
+}*@
+ @@media(max-width: 767px) and (min-width: 256px) {
+ .shoulder-img{
+    margin-top:0px;
+}
+.hero-static-title{
+text-align:left;
+}
+.shoulder-phone-img{
+   height:200px !important;
+}
+.hero-static-caption {
+    margin-bottom: 10px;
+    
+}
+ }
+</style>
+@{
+   @* var shoulderButton = Model.Children.Where(c => c is ContentModels.EbankItabstractButton).FirstOrDefault() as ContentModels.EbankItabstractButton;
+    var shoulderButtonLink = "#";
+    var dropDownVal = shoulderButton?.Value("externalLinkType")?.ToString();
+    if (!string.IsNullOrEmpty(dropDownVal))
+    {
+        /*var selectedShoulderButtonVal = (!string.IsNullOrEmpty(dropDownVal)) ?
+            umbraco.library.GetPreValueAsString(int.Parse(dropDownVal)) :
+            string.Empty;*/
+        var selectedShoulderButtonVal = string.Empty;
+        shoulderButtonLink = ConfigurationManager.AppSettings[selectedShoulderButtonVal];
+    }
+    else
+    {
+        shoulderButtonLink = string.IsNullOrEmpty(shoulderButton?.EbankItbuttonInternalLink?.Url) ?
+            shoulderButton?.EbankItbuttonExternalLink :
+            shoulderButton.EbankItbuttonInternalLink?.Url;
+    }
+    shoulderButtonLink = (string.IsNullOrEmpty(shoulderButtonLink)) ? "#" : shoulderButtonLink;*@
+
+    string strPageUrl= Request.RawUrl;
+    var shoulderButton = Model.Children.Where(c => c is ContentModels.EbankItabstractButton).FirstOrDefault() as ContentModels.EbankItabstractButton;
+    var shoulderButtonLink = "#";
+    var dropDownVal = shoulderButton?.Value("externalLinkType")?.ToString();
+    if (!string.IsNullOrEmpty(dropDownVal))
+    {
+        /*var selectedShoulderButtonVal = (!string.IsNullOrEmpty(dropDownVal)) ?
+            umbraco.library.GetPreValueAsString(int.Parse(dropDownVal)) :
+            string.Empty;*/
+        var selectedShoulderButtonVal = string.Empty;
+        shoulderButtonLink = ConfigurationManager.AppSettings[selectedShoulderButtonVal];
+    }
+    else
+    {
+        shoulderButtonLink = string.IsNullOrEmpty(shoulderButton?.EbankItbuttonInternalLink?.Url) ?
+            shoulderButton?.EbankItbuttonExternalLink :
+            shoulderButton.EbankItbuttonInternalLink?.Url;
+    }
+    shoulderButtonLink = (string.IsNullOrEmpty(shoulderButtonLink)) ? "#" : shoulderButtonLink;
+    if (strPageUrl.Contains("?"))
+    {
+        var strendUrl = strPageUrl.Split('?').Last();
+        if (shoulderButtonLink.Contains("#"))
+        {
+            var strstarturl= strPageUrl.Split('?').First();
+            shoulderButtonLink = String.Format("{0}{1}{2}", strPageUrl, "/",shoulderButtonLink);
+        }
+        else
+        {
+
+            shoulderButtonLink = String.Format("{0}{1}{2}", shoulderButtonLink, "?", strendUrl);
+        }
+
+    }
+    else
+    {
+        //shoulderButtonLink = shoulderButton.EbankItbuttonExternalLink;
+    }
+}
+
+<div class="row hero-product-container" style="background: #efefef; padding-left: 12%; padding-right: 12%; width:100%; padding-bottom:2%; padding-top: 2%;margin-left: 0; margin-right: 0;">
+    <div class="row">
+   <div class="col-md-6">
+       <h3 class="hero-static-title" style="margin-bottom: 0; color:#0f356c; font-weight:bold;">
+           @Model.ShoulderTitle
+       </h3>
+       <h3 class="hero-static-title" style="font-size: 40px; color: #163c70; font-weight: 400;">
+           @Model.ShouderDescription
+       </h3>
+   </div> 
+    
+   </div>
+   
+   
+        <div class="hero-static-caption plugandgo" style="padding-bottom: 0px;border-radius: 20px; padding-top:2%; cursor:poniter;">
+            @*<div class="text_header">
+                <h1 class="hero-static-title"></h1>
+            </div>*@
+            <div class="row">
+                <div class="col-sm-12 col-md-6">
+                    <div class="hero-static-description">
+                       @Html.Raw(@Model.RichTextEditor)
+                        
+                        @if (shoulderButton != null)
+                        {
+                           <a href="@shoulderButtonLink" target="_blank" class="button primary button-styler" style="z-index:10000;">
+                            @shoulderButton.EbankItbuttonText
+                        </a>
+                        }
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-6 shoulder-img">
+                  @*  <img src="/media/40cfrpgc/hero.png" width="100%" style="height:230px">*@
+                    <img class="shoulder-phone-img" src="/media/2xmeuwlk/samsung-galaxy-s24-front.png" width="" style="height:350px">
+                </div>
+                
+            </div>
+        </div>
+    
+    
+</div>
+ <script>
+     @*   $(document).ready(function () {
+             $('.plugandgo').on('click', function (e) {
+                 if($(e.target).is('a')){
+                  e.stopPropagation();
+                 }
+                 else{
+                       window.location.href="/en/home/tech-deals-new/?DeviceType=Bundle%20Deal&DeviceName=Samsung%20A33%20+%20Pinnacle%202GB%20TopUp";
+                 }
+            });
+
+        });*@
+</script>

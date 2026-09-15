@@ -1,0 +1,75 @@
+﻿@inherits UmbracoViewPage<dynamic>
+@using Umbraco.Web.Templates
+@using Newtonsoft.Json.Linq
+@using Web.Helpers
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+
+@{
+    var CurrentPage = Umbraco.AssignedContentItem;
+    var currLang = CurrentPage.AncestorsOrSelf(1).FirstOrDefault();
+
+    //Get general properties to site settings
+    //var siteSettings = currLang.Children().Where("ContentType.Alias ==\"ebanKITSiteSettings\"").FirstOrDefault();
+
+}
+<!-- Modal -->
+<div class="modal fade in" id="myModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><b>×</b></button>
+                <h4 class="modal-title" id="modal-title">Mecer Xpression 14" Notebook value bundle</h4>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="deal">
+                        <div id="image">
+                            <img id="deal_img" src="~/media/locb3vnb/3pcdp1810_004_online_dp-popups_500x500-1.png">
+                        </div>
+                        <div id="deal-content">
+                            <div class="table-data">
+                                <span class="deal-head">Device Specs</span>
+                                <div id="list_data" style="border-bottom: solid 2px #002B60;">
+                                    <ul id="spec-item-style">
+                                        <li>Mecer Xpression 14" Notebook value bundle</li>
+                                        <li>14" Display</li>
+                                        <li>Built-in Front Facing Built-in Front Facing 2.0 MP Webcam</li>
+                                        <li>Built-in stereo speakers</li>
+                                        <li>One year 7GB One Drive storage</li>
+                                        <li>Windows 10 Home</li>
+                                        <li>Intel® Quad Core Processor</li>
+                                        <li>2GB RAM</li>
+                                        <li>32GBStorage</li>
+                                        <li>USB, Bluetooth 4.0, HDMI, Micro SD card reader</li>
+                                        <li>10000 mAh Battery, 10000 mAh Battery</li>
+                                    </ul>
+                                </div>
+                                <span class="deal-head">Included in the package</span>
+                                <div id="includes">
+                                    <ul id="included-item-style">
+                                        <li>Laptop, Laptop bag, 10GB Free Vast WiFi voucher (2 months), 1 year free MyTopDog Education voucher</li>
+                                        <li>Direct to client delivery</li>
+                                        <li>Tech Guru Assistance • HP Deskjet 3in1 printer</li>
+                                        <li>2 year Warranty - collect and return</li>
+                                        <li>R200 HP shop ink voucher</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $("#deal_pop_up").click(function () {
+
+        //  window.open($("#linkib").val(), "_blank");
+        $('#myModal').modal('show');
+    });
+</script>

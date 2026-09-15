@@ -1,0 +1,27 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@model Dictionary<string, List<string>> 
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using System.Configuration;
+@using System.Text.RegularExpressions
+
+@{ 
+    foreach (var data in Model)
+    {
+        if (data.Value.ToList()[0].ToString() == "39746")
+        {
+
+            var stringHeader = data.Value.ToList()[0].ToString();
+            var stringValue = data.Value.ToList()[1].ToString();
+            string linkPart = "../video-hub";
+            string linkStringValue = linkPart + "?path=Knowledge Centre/~" + data.Key + "&selected=" + data.Key;
+            <div>
+                <h5>@data.Key.ToString()</h5>
+                <a href="@linkStringValue">Go to >></a>
+                <hr />
+
+            </div>
+         }
+    }
+}
+
+    

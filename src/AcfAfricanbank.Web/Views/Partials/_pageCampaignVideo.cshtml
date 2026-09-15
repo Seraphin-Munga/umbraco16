@@ -1,0 +1,30 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@model Umbraco.Web.PublishedContentModels.HeroHeader
+@{
+
+    var headerVideo = Model?.GetPropertyValue<IPublishedContent>("video")?.Url;
+    var headerImage_medium = Model?.GetPropertyValue<IPublishedContent>("imageMedium")?.Url;
+    var headerImage_small = Model?.GetPropertyValue<IPublishedContent>("imageSmall")?.Url;
+    var breadcrumbItems = Model?.GetPropertyValue("breadcrumb")?.ToString()?.Split(',')?.ToList();
+}
+<div class="hero-static-container">
+    <div class="container-fluid">
+        <div class="row no-gutter">
+            <div class="col-sm-12">
+                <span class="fa fa-play-circle video_list_item" data-video="@headerVideo"></span>
+                @*<div class="hero-static-banner" id="heroHeader" style="background-image: url('@headerImage_large');">
+                    <ol class="breadcrumb">
+                        @if (breadcrumbItems != null)
+                        {
+                            foreach (string breadcrumItem in breadcrumbItems)
+                            {
+                                var cssClass = breadcrumItem == breadcrumbItems.Last() ? "active" : string.Empty;
+                                <li class="@cssClass">@breadcrumItem</li>
+                            }
+                        }
+                    </ol>
+            </div>*@
+            </div>
+        </div>
+    </div>
+</div>

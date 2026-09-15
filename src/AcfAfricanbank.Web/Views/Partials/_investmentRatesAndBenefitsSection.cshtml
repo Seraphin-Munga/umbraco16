@@ -1,0 +1,154 @@
+﻿@model Web.Models.InvestmentRatesAndBenefits
+@using Web.Helpers;
+
+<style>
+    @*styling for the new table tier*@
+table {
+  border: 1px solid #ccc;
+  border-collapse: collapse;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.text-center {
+text-align: center;
+}
+
+
+.table-head-bg {
+background: #011F44;
+color: #fff;
+}
+
+.table-head-bg-2 {
+background: #002552;
+color: #fff;
+}
+
+.table-head-border-right {
+    border-radius: 0px 15px 0px 0px;
+}
+
+.table-head-border-left {
+    border-radius: 15px 0px 0px 0px;
+}
+
+table caption {
+  font-size: 1.5em;
+  margin: .5em 0 .75em;
+}
+
+table tr {
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+}
+
+table th,
+table td {
+  padding: 21px;
+}
+
+
+table td {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.table-rates {
+    color: #88BC5E !important;
+}
+
+table th {
+  font-size: 18px;
+  letter-spacing: .1em;
+}
+
+@@media screen and (max-width: 600px) {
+  table {
+    border: 0;
+  }
+
+  table caption {
+    font-size: 1.3em;
+  }
+  
+  table thead {
+    border: none;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+  }
+  
+  table tr {
+    border-bottom: 3px solid #ddd;
+    display: block;
+    margin-bottom: .625em;
+  }
+  
+  table td {
+    border-bottom: 1px solid #ddd;
+    display: block;
+    font-size: .8em;
+    text-align: right;
+  }
+  
+  table td::before {
+    /*
+    * aria-label has no advantage, it won't be read inside a table
+    content: attr(aria-label);
+    */
+    content: attr(data-label);
+    float: left;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  
+  table td:last-child {
+    border-bottom: 0;
+  }
+}
+</style>
+<div class="container">
+
+        @Html.Partial("_benefitsSection", Model.Benefits)
+    <div class="campaign-product-container full">
+        <!--START Ebankit-change rates-->
+        <script type="text/javascript">
+           
+        </script>
+        <div class="ajax-form-success ajax-alert alert alert-success square errorrates" style="display: none;">@ResourceHelper.GetResource("ErrorRates")</div>
+       @* <section id="rates-form-preloader">
+            <div class="loader" id="loader-rates-form-preloader">
+                <div class="loader-img"></div>
+            </div>
+        </section>
+        <div id="rates-container"></div>*@
+       
+        @if (Model != null)
+        {
+            <ul class="table-terms">
+                @if (Model.RatesTermsAndConditions != null)
+                {
+                    foreach (var term in Model.RatesTermsAndConditions)
+                    {
+                        <li>
+                            @term
+                        </li>
+                    }
+                }
+            </ul>
+               <div class="text-center margin-top-40 info-grpahic">
+                <p class="body-content">@Model.CalculatorIntroduction</p>
+               
+                <a href="~/media/2x3bzlvo/lr_in1811_003_fixed-deposit_infographic.pdf" target="_blank" class="button primary" style="display:none;">View Infographic</a>
+                </div>
+
+        }
+    </div>
+</div>

@@ -1,0 +1,108 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+
+<div class="investment-calculator top-minus-60" id="submit-claim">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8">
+                <h2>Submit your claim.</h2>
+            </div>
+            <div class="col-sm-4 text-center">
+                <a class="button secondary margin-top-10" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                    Submit claim
+                </a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-8 col-sm-offset-2">
+                <div class="collapse margin-top-50" id="collapseExample">
+                    <form class="form-horizontal" id="funeral_claim">
+
+                        <div class="col-md-8 col-md-offset-4 padding-top-20">
+                            <div id="ajax-form-success-log-claim" class="ajax-form-success ajax-alert alert alert-success square" style="display: none">Thank you for logging a claim. We will attend to this shortly for any queries please contact our call centre on 0861888786</div>
+                            <div id="ajax-form-error-log-claim" class="ajax-form-error ajax-alert alert alert-danger square" style="display: none">An error occurred while trying to submit the information.For any queries please contact our call centre on 0861888786</div>
+                        </div>
+
+                        <input id="sessionId" type="hidden" value="@(Guid.NewGuid().ToString())" />
+                        <input id="processID" type="hidden" value="" />
+
+                        <div class="form-group">
+                            <label for="invest-amount" class="col-md-4 control-label">Subject *</label>
+                            <div class="col-md-8">
+                                <select class="form-control select_input_form" id="SubjectInput" name="FormFields.Subject">
+                                    <option value="">-- Please choose an option --</option>
+                                    <option selected="selected" value="Log a Claim">Log a Claim</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="invest-amount" class="col-md-4 control-label">First Name *</label>
+                            <div class="col-md-8">
+                                <input class="form-control input_form" id="FirstNameInput" name="FormFields.FirstName" placeholder="First Name" type="text" value="" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="invest-amount" class="col-md-4 control-label">Surname *</label>
+                            <div class="col-md-8">
+                                <input class="form-control input_form" id="LastNameInput" name="FormFields.LastName" placeholder="Surname" type="text" value="" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="invest-amount" class="col-md-4 control-label">ID/Passport Number *</label>
+                            <div class="col-md-8">
+                                <input class="form-control input_form" id="SAIDInput" maxlength="13" name="FormFields.IdNumber" placeholder="ID / Passport Number" type="text" value="" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="invest-amount" class="col-md-4 control-label">Cellphone Number *</label>
+                            <div class="col-md-8">
+                                <input class="form-control input_form " id="CellPhoneInput" maxlength="10" name="FormFields.CellPhone" placeholder="Mobile Number" type="text" value="" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="invest-amount" class="col-md-4 control-label">Email *</label>
+                            <div class="col-md-8">
+                                <input class="form-control input_form" id="EmailInput" name="FormFields.Email" placeholder="Email" type="text" value="" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="invest-amount" class="col-md-4 control-label">Message *</label>
+                            <div class="col-md-8">
+<textarea class="form-control textarea_input" cols="20" id="MessageInput" name="FormFields.Message" placeholder="Message" rows="6" type="text">
+</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-8 col-md-offset-4">
+
+                                <div class="row">
+                                    <div class="col-md-6 margin-bottom-20">
+
+                                        <button class="btn cancel-button button default btn-full-width" type="button">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                    <div class="col-md-6 margin-bottom-20">
+
+                                        <button id="applyButton" class="btn button secondary btn-full-width" type="submit">
+                                            Log a Claim
+                                        </button>
+                                    </div>
+
+                                </div>
+                                <div class="row margin-bottom-20">
+                                    <section id="log-claim-preloader">
+                                        <div class="loader">
+                                            <div class="loader-img"></div>
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

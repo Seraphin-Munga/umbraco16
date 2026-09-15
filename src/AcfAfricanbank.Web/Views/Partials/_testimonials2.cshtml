@@ -1,0 +1,63 @@
+﻿@model Testimonials
+
+<div class="testimonials-container white-bg">
+    <div class="container">
+        <h3 class="text-center margin-top-60">How we fared</h3>
+        <div class="testimonials-carousel">
+            <div id="testimonials" class="carousel slide" data-ride="carousel" data-interval="false">
+                <!-- Indicators -->
+                @if (Model != null)
+                {
+                    var testimonies = Model.TestimonialItems;
+                    <ol class="carousel-indicators">
+                        @{
+                            if (testimonies != null)
+                            {
+                                int counter = 0;
+                                foreach (var testimonyItem in testimonies)
+                                {
+                                    <li data-target="#hero-banner" data-slide-to="@counter" class="@((counter == 0) ? "active" : "")"></li>
+                                    counter++;
+                                }
+                            }
+                        }
+                    </ol>
+                    <!-- Wrapper for slides -->
+                    <div class="carousel-inner">
+                        @{
+                            int newCounter = 0;
+                            if (testimonies != null)
+                            {
+                                foreach (var testimonyItem in testimonies)
+                                {
+                                    var Avatar = testimonyItem.Value<IPublishedContent>("testimonialAvatar");
+                                    <div class="item @((newCounter == 0) ? "active" : "")">
+                                        <div class="testimonial">
+                                            <div class="avatar">
+                                                <img src="@Avatar.Url" alt="@Avatar.Value("altTag")">
+                                            </div>
+                                             <br/>
+                                            <div class="descr">
+                                            <div class="TestimonialName">@testimonyItem.Value("testimonialName")</div>
+                                                @testimonyItem.Value("testimonialStory")
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                    newCounter++;
+                                }
+                            }
+                        }
+                    </div>
+                }
+                <!-- Controls -->
+                <a class="left carousel-control" href="#testimonials" role="button" data-slide="prev">
+                    <span class="icon-arrow-left"></span>
+                </a>
+                <a class="right carousel-control" href="#testimonials" role="button" data-slide="next">
+                    <span class="icon-arrow-right"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

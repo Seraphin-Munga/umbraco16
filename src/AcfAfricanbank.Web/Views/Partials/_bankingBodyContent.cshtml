@@ -1,0 +1,73 @@
+﻿@model Umbraco.Web.PublishedModels.TabBody
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using System.Configuration;
+
+@{
+    var tbody = Model.GetProperty("tabBodyContent");
+    var bodyData = Model.TabBodyContent.ToList();
+}
+<div class="campaign-banking-container connect-online-section full">
+
+        @foreach (var item in bodyData)
+        {
+            var data = item.Value<IEnumerable<IPublishedElement>>("sectionContent");
+            int iterator = 0;
+            bool isSwappedClass = false;
+            string col_md_swapped = "col-md-8";
+            string col_md_un_swapped = "col-md-4";
+            string padding_size = "75px 0px";
+            foreach (var info in data)
+            {
+                if (iterator == 1)
+                {
+                    isSwappedClass = true;
+                    col_md_un_swapped = "";
+                    col_md_swapped = "col-md-4";
+                    padding_size = "64px 0px";
+                }
+                var image = info.Value("tabSubItemImage");
+                var altTagData = ((ContentModels.Image)((IPublishedContent)info.Value("tabSubItemImage")));
+                var imageAltTag = altTagData.Value("altTag");
+                String cardId = "card" + iterator.ToString();
+
+                Umbraco.Web.Models.Link itemLink = null;
+                foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)info.Value("tabSubItemLinks"))
+                {
+                    itemLink = link;
+                    break;
+                }
+                String url = ((IPublishedContent)image).Url.ToString();
+
+
+                <div class="@(isSwappedClass ? "" : "swapped-banking-row")">
+                    <div class="container">
+                        <div class="@col_md_un_swapped">
+                            <div id="@cardId" class="@(isSwappedClass ? "internet-banking-row-swapped " : "")">
+                                    <img src="@url" alt="@imageAltTag" width="310px">
+                            </div>
+                        </div>
+                        <div class="col_md_swapped" style="padding: @padding_size;">
+                                <div class="article-content">
+                                    <div class="title text-uppercase">@info.Value("tabSubItemTitle")</div>
+                                    <div class="">
+                                        @Html.Raw(info.Value("tabSubItemTextContent"))
+                                        @if (itemLink != null)
+                                        {
+                                            <a class="button primary span-buttons" href="@itemLink.Url" target="_blank" style="color: white;margin-top: 35px;">@itemLink.Name</a>
+                                        }
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+                isSwappedClass = false;
+                col_md_un_swapped = "col-md-4";
+                col_md_swapped = "col-md-8";
+                padding_size = "75px 0px";
+                ++iterator;
+            }
+        }
+</div>
+
+
+

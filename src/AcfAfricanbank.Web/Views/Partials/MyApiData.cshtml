@@ -1,0 +1,33 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using System.Net
+
+@{
+    var apiResult = string.Empty;
+
+    using (var client = new WebClient())
+    {
+        client.Headers.Add("X-API-KEY", "JSBHZA2nQO2YgtwsGArat1b1xIYaWkHz41nYFimU");
+        client.Headers.Add("X-User", "GRINROD");
+        client.Headers.Add("X-System", "GRINROD");
+        client.Headers.Add("X-Channel", "APP");
+        client.Headers.Add("X-Service-Operation", "auth");
+        client.Headers.Add("X-Session-Id", "67768678678");
+        client.Headers.Add("api-key", "JSBHZA2nQO2YgtwsGArat1b1xIYaWkHz41nYFimU");
+
+        try
+        {
+            apiResult = client.DownloadString("https://stg.api.africanbank.co.za/v2/clients/investments/169/accounts");
+        }
+        catch (WebException ex)
+        {
+            apiResult = "Error: " + ex.Message;
+        }
+    }
+}
+
+<div>
+    <h3>API Response</h3>
+    <pre>@Html.Raw(apiResult)</pre>
+</div>
+
+

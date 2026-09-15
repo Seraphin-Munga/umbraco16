@@ -1,0 +1,176 @@
+﻿
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models;
+@using Web.Helpers
+@using Umbraco.Web.Models
+@using System.Text.RegularExpressions
+@model Umbraco.Web.PublishedModels.RichTextEditor
+@{
+    string[] paramValues = ViewBag.ModelData;
+    var campaignBlurp = Model.Value("TextEditor");
+}
+
+<div>
+    <div style="background-image: url(https://www.africanbank.co.za/media/53699/african-bank-web-form-background-1935-255.jpg);background-size: 1772px;position: relative;background-color: #002B60;padding: 83px 0px 80px 0px;">
+
+        <div class="container payments-section full blue-button" style="margin-bottom: 50px;">
+            <div class="row myworld-campaign-section-container">
+                <div class="row">
+                    <div class="col-xs-12 col-md-12 col-lg-12">
+                        @Html.Raw(campaignBlurp)
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container payments-section full blue-button">
+            <div class="margin-top-20 visible-xs"></div>
+            <div class="row myworld-campaign-section-container">
+                <div class="row">
+                    <div id="takeSurvey" class="col-sm-12 title-text">
+                        <p>Please enter details below for the referral</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-8 col-sm-offset-2">
+                        <div class="" margin-top-50" id="">
+
+                            <div id="formMessageContainer" style="display: none;">
+                                <div id="formMessage" class="content-block message message-danger margin-top-20"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-10 col-sm-offset-1 alert-danger-email padding-top-20" style="display: none;">
+                                    <div class="alert alert-danger square">error occurred</div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-sm-12">
+                                <div class="user-details-form">
+                                    <form autocomplete="off" class="form-horizontal" method="post">
+                                        @Html.AntiForgeryToken()
+
+                                        @Html.Hidden("ddInputResult2", "utm_source:" + paramValues[0])
+                                        @Html.Hidden("ddInputResult3", "utm_medium:" + paramValues[1])
+                                        @Html.Hidden("howCanBankAddMore", "utm_campaign:" + paramValues[2])
+
+                                        <div class="row margin-bottom-20">
+                                            <div class="col-md-4 control-label">
+                                                <div class="form-group">
+                                                    <label for="firstName" class="text-white label_form">Your name</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="form-group">
+                                                    <div class="growit-col">
+                                                        <input type="text" class="form-control" id="firstName" name="firstName" required placeholder="Enter your name" />
+                                                        <i id="firstNameError" class="form-control-feedback bv-no-label glyphicon glyphicon-ok-sign" aria-hidden="true" data-bv-icon-for="firstName"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><div class="row margin-bottom-20">
+                                            <div class="col-md-4 control-label">
+                                                <div class="form-group">
+                                                    <label for="surName" class="text-white label_form">Your Surname</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="form-group">
+                                                    <div class="growit-col">
+                                                        <input type="text" class="form-control" id="ddInputResult1" name="ddInputResult1" required placeholder="Enter your surname" />
+                                                        <i class="form-control-feedback bv-no-label glyphicon glyphicon-ok-sign" aria-hidden="true" data-bv-icon-for="ddInputResult1"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row margin-bottom-20">
+                                            <div class="col-md-4 control-label">
+                                                <div class="form-group">
+                                                    <label for="firstName" class="text-white label_form">South African Id</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="form-group">
+                                                    <div class="growit-col">
+                                                        <input type="text" maxlength="13" class="form-control" id="ddInputResult0" name="ddInputResult0" required placeholder="SOUTH AFRICAN ID" />
+                                                        <i class="form-control-feedback bv-no-label glyphicon glyphicon-ok-sign" aria-hidden="true" data-bv-icon-for="ddInputResult0"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row margin-bottom-20">
+                                            <div class="col-md-4 control-label">
+                                                <div class="form-group">
+                                                    <label for="cellPhone" class="text-white label_form">Your Cellphone number</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="form-group">
+                                                    <div class="growit-col">
+                                                        <input type="text" maxlength="10" class="form-control" id="cellPhone" name="cellPhone" required placeholder="Cell Phone Number" />
+                                                        <i class="form-control-feedback bv-no-label glyphicon glyphicon-ok-sign" aria-hidden="true" data-bv-icon-for="cellPhone"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row margin-bottom-20">
+                                            <div class="col-md-4 control-label">
+                                                <div class="form-group">
+                                                    <label for="email" class="text-white label_form">Your email address</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="form-group">
+                                                    <div class="growit-col">
+                                                        <input type="text" class="form-control" id="email" name="email" required placeholder="name@domain.co.za" />
+                                                        <i class="form-control-feedback bv-no-label glyphicon glyphicon-ok-sign" aria-hidden="true" data-bv-icon-for="cellPhone"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row margin-bottom-20 margin-top-20">
+                                            <div class="col-md-8 col-lg-offset-4">
+                                                <div class="row">
+                                                    <div class="col-md-6 margin-bottom-20">
+                                                        <button class="btn campaign-button" type="button">
+                                                            Cancel
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-6 margin-bottom-20">
+                                                        <button type="submit" id="sendOptOut"
+                                                                class="button-create-pdf button btn-lg primary">
+                                                            Submit
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </form>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="container hang-tight ">
+                        <h4 style="display: block;text-align: center;color: white;">Please wait... Your referral is being sent.</h4>
+                        <div id="results-wait-loader" class="container">
+                            <div class="loader" id="loader-rates-form-preloader">
+                                <div class="loader-img"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts
+ {
+    <script type="text/javascript">
+        $(document).ready(function () { });
+    </script>
+}
+

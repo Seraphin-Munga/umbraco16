@@ -1,0 +1,37 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@inherits UmbracoViewPage<dynamic>
+@using Umbraco.Web.Templates
+@using Newtonsoft.Json.Linq
+@using Web.Helpers;
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+
+@{
+//var currLang = CurrentPage.AncestorsOrSelf(1).FirstOrDefault();
+////Get general properties to site settings
+//var siteSettings = currLang.Children().Where("DocumentTypeAlias ==\"ebanKITSiteSettings\"").FirstOrDefault();
+}
+<!-- Modal -->
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">@ResourceHelper.GetResource("TitlePopup")</h4>
+            </div>
+            <div class="modal-body">
+                <p class="sub_title">@ResourceHelper.GetResource("SubTitlePopUp")</p>
+                <p>@ResourceHelper.GetResource("ContentPopUp")</p>
+                <input type="hidden" id="linkib" value="@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Url.Login"]" />
+            </div>
+            <div class="modal-footer">
+                @*<button type="button" class="button primary btn_ok_modal">OK</button>*@
+
+                <a href="@System.Configuration.ConfigurationManager.AppSettings["login"]" class="button primary btn_ok_modal">
+                    Ok
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

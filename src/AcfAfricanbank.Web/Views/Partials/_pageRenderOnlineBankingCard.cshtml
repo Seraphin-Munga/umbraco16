@@ -1,0 +1,299 @@
+﻿@model Umbraco.Web.PublishedModels.TabBody
+@using Web.Helpers
+
+@{
+    var tbody = Model.GetProperty("tabBodyContent");
+    var cardData = Model.TabBodyContent.ToList();
+
+    ContainerViewModel containerViewModel = new ContainerViewModel();
+
+    // Create Mail Modal Data
+    var popupTitle = "Create a free email Account";
+    var popupImage2 = "/media/ohqn45h1/vodacom_icon_ws2_v2.png";
+    var popupDescription2 = "Register for My Vodacom & automatically get a Vodamail account.";
+    var popupButton2 = "Create Account";
+
+    var popupImage = "/media/lo5p0hdl/icon-gmail.png";
+    var popupDescription = "Create your free email address with GMAIL, powered by Google. You also get 15 GBs of email storage for free.";
+    var popupButton = "Create Account";
+    // Create Mail Modal Data End
+
+    // Mobile App Modal Data
+    var popupAppTitle = "Download African App using one of the following";
+    var popQRCode = "/media/ylalxyxb/image001.png";
+    var popAndroidApp = "/media/mtjfxi5f/googleplaystoredownloadimagelink.png";
+    var popIOsApp = "/media/5pdkgij3/appstoredownloadimagelink.png";
+    var popHuaweiApp = "/media/l2dls1tu/huaweiappgallery.png";
+    String androidLnk = "/media/mtjfxi5f/googleplaystoredownloadimagelink.png";
+    String huawaeiLnk = "/media/20220624/Appstoredownloadimagelink.png";
+    String iOSLnk = "/media/20220624/Googleplaystoredownloadimagelink.png";
+
+    String AB = "";
+
+}
+
+<style type="text/css">
+
+    .pop-up-container {
+        max-width: 500px;
+        margin: auto;
+        text-align: center;
+        margin-top: 7%;
+        background: #fff;
+        box-shadow: 1px 2px 20px rgba(0,0,0,0.3)
+    }
+
+    .pop-up-title {
+        color: #fff;
+        background: #002B60;
+        text-align: center;
+        padding: 10PX;
+        font-size: 18px;
+        font-weight: 100;
+    }
+
+
+
+
+    @@media (min-width: 1000px) and (max-width: 10000px) {
+
+        .left-col {
+            border-right: none !important;
+            margin-left: 210px;
+        }
+
+        #popUpHuawei {
+            margin-right: -45rem;
+            margin-top: -82px;
+        }
+         @@supports (-moz-appearance:none) {
+
+            #popUpHuawei {
+                margin-right: 0px;
+                margin-left: 329px;
+            }
+        }
+
+        .modal-dialog {
+            width: 900px !important;
+        }
+    }
+
+    @@media (min-width: 768px) and (max-width: 1024px) {
+        #popUpHuawei {
+            margin-right: -35rem;
+            margin-top: -68px;
+        }
+
+        .col-sm-6 img {
+            width: 160px;
+        }
+
+        .modal-dialog {
+            width: 790px !important;
+            padding-left: 30px;
+            padding-right: 50px;
+        }
+         @@supports (-moz-appearance:none) 
+         {
+            #popUpHuawei {
+                margin-left: 9rem;
+                margin-top: -68px;
+            }
+          }
+    }
+</style>
+
+<div class="green-pointer"></div>
+<div class="cost-header online-background">
+    <div class="container margin-top-40">
+        @foreach (var item in cardData)
+        {
+            var data = item.Value<IEnumerable<IPublishedElement>>("sectionContent");
+            int iterator = 0;
+            int GetLinks = 0;
+            bool isSwappedClass = false;
+            foreach (var info in data)
+            {
+                if (iterator == 1)
+                {
+                    isSwappedClass = true;
+                }
+                var image = info.Value("tabSubItemImage");
+                String url = ((IPublishedContent)image).Url.ToString();
+                String altTag = ((IPublishedContent)image).Value("altTag").ToString();
+                String cardId = "card" + iterator.ToString();
+                <div class="internet-banking-row eq-height">
+                    <div id="@cardId" class="col-sm-4 @(isSwappedClass ? "internet-banking-row-swapped" : "")">
+                        <img src="@url" alt="@altTag" style="max-height: 250px; " />
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="article-content">
+                            <div class="article-title online-banking">@info.Value("tabSubItemTitle")</div>
+                            <div class="body-content ul-bullets">
+                                @info.Value("tabSubItemTextContent")
+                            </div>
+                            <br>
+                            <br>
+                        </div>
+                    </div>
+                    <div>
+
+                    </div>
+                </div>
+                isSwappedClass = false;
+                ++iterator;
+
+                <div class="borderbottom">
+                    @{
+
+                        @*var subItemCardContent = (IEnumerable<IPublishedContent>)info.Value("genericCardContent");
+                        acf_africanbankv1.Models.Benefits internetBankingCards = null;
+                        if (subItemCardContent != null)
+                        {
+                            internetBankingCards = new acf_africanbankv1.Models.Benefits
+                            {
+                                Header = subItemCardContent.FirstOrDefault().Value("cardTitle").ToString(),
+                                Description = subItemCardContent.FirstOrDefault().Value("cardDescription").ToString(),
+                                BenefitCards = subItemCardContent.Select(c => c as Card).ToList()
+                            };
+                        }*@
+
+                        foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)info.Value("tabSubItemLinks"))
+                        {
+                            if (GetLinks == 3)
+                            {
+                                iOSLnk = link.Url;
+                            }
+
+                            if (GetLinks == 4)
+                            {
+                                huawaeiLnk = link.Url;
+                            }
+
+                            //if (link.Target != "")
+                            //{
+                                if (link.Name.Contains("Whatsapp"))
+                                {
+                                    <div class="ctabuttons">
+                                        <div>
+                                            <a class="button primary span-buttons" href="@link.Url" target="_blank" style="color: white;">Register Now</a>
+                                        </div>
+                                    </div>
+
+                                    <div class="ctabuttons">
+                                        <span class="button primary span-buttons view_OnlineApps downloadNow" data-item="@popupAppTitle*@popQRCode*@popAndroidApp*@popIOsApp" target="_blank">Download Now</span>
+                                    </div>
+                                }
+                                else
+
+                                 if (link.Name.Contains("Android"))
+                                {
+                                    androidLnk = link.Url;
+
+                                    <div class="ctabuttons">
+                                        <span class="button primary span-buttons view_OnlineModal" data-item="@popupTitle*@popupImage*@popupDescription*@popupButton" target="_blank">Create Email</span>
+                                    </div>
+                                    <div class="ctabuttons">
+                                        <span class="button primary span-buttons view_OnlineApps downloadNow" data-item="@popupAppTitle*@popQRCode*@popAndroidApp*@popIOsApp" target="_blank">Download Now</span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    /*<div class="ctabuttons">*/
+                                    if (link.Name.Contains("Create Email"))
+                                    {
+                                        <div class="ctabuttons">
+                                            <span class="button primary span-buttons view_OnlineModal" data-item="@popupTitle*@popupImage*@popupDescription*@popupButton" target="_blank">@link.Name</span>
+                                        </div>
+                                    }
+                                    else if (link.Name.Contains("Register"))
+                                    {
+                                        <div class="ctabuttons">
+                                            <div>
+                                                <a class="button primary span-buttons" href="@link.Url" target="_blank" style="color: white;">@link.Name</a>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    /*</div>*/
+                                }
+
+
+
+                            //}
+
+                            ++GetLinks;
+                        }
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>
+
+
+
+@Html.Partial("_renderPopUpContent", new ContainerViewModel()
+{
+    HTMLContent = @<text>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-md-6 left-col">
+                    <img width="150" id="popUpImage" />
+                    <p id="popUpParaDescription"></p>
+
+                    <div class="ctabuttons">
+                        <span class="">
+                            <a href="https://accounts.google.com/SignUp?hl=en" target="_blank" class="no-deco"><div class="button primary span-buttons" id="popUpButton"></div></a>
+                        </span>
+                    </div>
+
+                </div>
+                @*<div class="col-md-6 right-col">
+                        <img width="150" id="popUpImage2" />
+                        <p id="popUpParaDescription2"></p>
+
+                    </div>*@
+            </div>
+        </div>
+    </text>
+})
+
+@Html.Partial("_renderPopUpContent2", new ContainerViewModel()
+{
+    HTMLContent2 = @<text>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-15">
+
+                    <br /><br />
+
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <a id="AndroidUrl" href="@androidLnk" target="_blank">
+                        <img width="200" id="popUpAndroid" />
+                    </a>
+                </div>
+
+                <div class="col-xs-12 hidden-sm hidden-md hidden-lg"><br></div>
+
+                <div class="col-xs-12 col-sm-6">
+                    <a id="iOSUrl" href="@iOSLnk">
+                        <img width="200" id="popUpIOS" />
+                    </a>
+                </div>
+                <div class="col-xs-12 hidden-sm hidden-md hidden-lg"><br></div>
+
+                <div class="col-xs-12 col-sm-6">
+                    <a href="@huawaeiLnk">
+                        <img loading="lazy" width="200" id="popUpHuawei" src="@popHuaweiApp" />
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </text>
+})
+
+
