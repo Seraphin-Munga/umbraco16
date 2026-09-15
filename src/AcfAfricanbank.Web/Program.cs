@@ -2496,30 +2496,36 @@ if (args.Length > 0 &&
 }
 
 // ============================================================
-// TEMP DIAGNOSTIC - remove once the richTextboxItem IsElement issue is
-// resolved. Visit /diagnostics/richtextboxitem in the browser.
+// TEMP DIAGNOSTIC - remove once content-type-level issues (richTextboxItem's
+// IsElement flip, duplicate homePageElements nodes, ...) are resolved.
+// Visit /diagnostics/contenttype/{alias} in the browser, e.g.
+// /diagnostics/contenttype/richTextboxItem or
+// /diagnostics/contenttype/homePageElements.
 //
 // Deliberately uses IContentService (draft content) instead of the
-// published content API - richTextboxItem's generated model doesn't
+// published content API. richTextboxItem's generated model doesn't
 // implement IPublishedContent (its content type has IsElement=true), so
-// anything going through the published cache for these nodes throws
-// "Factory returned model ... which does not implement IPublishedContent".
-// IContentService works on the raw IContent model instead, with no
-// ModelsBuilder typing involved, so it can list these nodes safely.
+// anything going through the published cache for those nodes throws
+// "Factory returned model ... which does not implement IPublishedContent" -
+// and the same risk applies to any other content type until that's
+// confirmed fixed. IContentService works on the raw IContent model
+// instead, with no ModelsBuilder typing involved, so it can list content
+// of any type safely regardless of that issue.
 // ============================================================
 
-app.MapGet("/diagnostics/richtextboxitem", (
+app.MapGet("/diagnostics/contenttype/{alias}", (
+    string alias,
     IContentTypeService contentTypeService,
     IContentService contentService) =>
 {
-    var contentType = contentTypeService.Get("richTextboxItem");
+    var contentType = contentTypeService.Get(alias);
 
     if (contentType == null)
     {
         return Results.Ok(new
         {
             found = false,
-            message = "No content type with alias 'richTextboxItem' exists."
+            message = $"No content type with alias '{alias}' exists."
         });
     }
 
