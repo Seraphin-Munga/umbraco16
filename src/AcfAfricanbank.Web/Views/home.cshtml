@@ -1,19 +1,23 @@
-﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageHome>
-@using ContentModels = Umbraco.Web.PublishedModels;
-@using Umbraco.Web.Models
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@inject Umbraco.Cms.Core.Models.PublishedContent.IVariationContextAccessor VariationContextAccessor
 @{
     Layout = "Master.cshtml";
-    var homePageElements = (HomePageElements)Model.Children.Where(o => o is HomePageElements).FirstOrDefault();
-    var heroFeet = homePageElements?.Children.Where(c => c is HeroFeet).FirstOrDefault();
-    var bottomNavigation = (BottomNavigation)homePageElements.Children.Where(c => c is BottomNavigation).FirstOrDefault();
-    var testimonials = (Testimonials)heroFeet?.Children.Where(c => c is Testimonials).FirstOrDefault();
+    // Same approach as master.cshtml/Navigation.cshtml: untyped
+    // IPublishedContent/IPublishedElement API (IsDocumentType, Value<T>)
+    // instead of ModelsBuilder-generated classes (HomePageElements,
+    // HeroFeetHome, HomeShoulderItem, ...), since those types don't
+    // reliably exist depending on ModelsBuilder state.
+    var homePageElements = Model.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault();
+    var heroFeet = homePageElements?.Children(VariationContextAccessor).Where(c => c.IsDocumentType("heroFeet")).FirstOrDefault();
+    var bottomNavigation = homePageElements.Children(VariationContextAccessor).Where(c => c.IsDocumentType("bottomNavigation")).FirstOrDefault();
+    var testimonials = heroFeet?.Children(VariationContextAccessor).Where(c => c.IsDocumentType("testimonials")).FirstOrDefault();
 
-    var heroBodyBlog = (HeroBody)homePageElements.Children.Where(x => x is HeroBody).FirstOrDefault();
-    var heroBodyBlogLink = heroBodyBlog.Children.Where(x => x.ContentType.Alias.ToLower() == "link").FirstOrDefault();
+    var heroBodyBlog = homePageElements.Children(VariationContextAccessor).Where(x => x.IsDocumentType("heroBody")).FirstOrDefault();
+    var heroBodyBlogLink = heroBodyBlog.Children(VariationContextAccessor).Where(x => x.ContentType.Alias.ToLower() == "link").FirstOrDefault();
     var lightbox = heroBodyBlog.Value("richTextBox").ToString();
 
-    var tabs = (IEnumerable<IPublishedContent>)heroBodyBlog?.Children.Where(c => c.ContentType.Alias.ToLower() == "tabbody").ToList();
-    ContentModels.TabBody panelWarning = null;
+    var tabs = heroBodyBlog?.Children(VariationContextAccessor).Where(c => c.ContentType.Alias.ToLower() == "tabbody").ToList();
+    IPublishedContent panelWarning = null;
     tabs.ToList().ForEach(x =>
     {
         var partialName = x.Value("partialViewName");
@@ -21,22 +25,22 @@
         switch (partialName.ToString())
         {
             case "panelWarning":
-                panelWarning = (TabBody)x;
+                panelWarning = x;
                 break;
         }
     });
-    var panelItemWarning = (IEnumerable<IPublishedElement>)panelWarning.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+    var panelItemWarning = panelWarning?.Value<IEnumerable<IPublishedElement>>("tabBodyContent").Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
 
-    var whatsNew = homePageElements.Children.Where(x => x.ContentType.Alias.ToString().ToLower() == "ebankititem2").FirstOrDefault();
+    var whatsNew = homePageElements.Children(VariationContextAccessor).Where(x => x.ContentType.Alias.ToString().ToLower() == "ebankititem2").FirstOrDefault();
 
-    Umbraco.Web.Models.Link itemLink = null;
-    foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)heroBodyBlogLink.Value("UrlLink"))
+    Umbraco.Cms.Core.Models.Link itemLink = null;
+    foreach (var link in heroBodyBlogLink.Value<IEnumerable<Umbraco.Cms.Core.Models.Link>>("UrlLink"))
     {
         itemLink = link;
         break;
     }
 
-    var heroFeetHome = (HeroFeetHome)heroFeet?.Children.Where(c => c is HeroFeetHome).FirstOrDefault();
+    var heroFeetHome = heroFeet?.Children(VariationContextAccessor).Where(c => c.IsDocumentType("heroFeetHome")).FirstOrDefault();
 
     // var disclaimersData = homePageElements.Children.Where(o => o.ContentType.Alias == "ebankITListSectionText").ToList();
 
@@ -58,7 +62,7 @@
     //    }
     //}
 
-    var viewName = Path.GetFileNameWithoutExtension(Server.MapPath(VirtualPath)); //used mainly to identify the page
+    var viewName = "home"; //used mainly to identify the page (this view's own name - Server.MapPath/VirtualPath don't exist in ASP.NET Core)
 }
 
 <style type="text/css">
@@ -377,14 +381,15 @@
                                 <div id="hero-banner" class="carousel slide top_extend" data-ride="carousel" data-interval="7000">
                                     <img class="pattern hidden-xs" src="~/images/footer-pattern.svg" alt="footer-pattern" style="display:none">
                                     @{
-                                        var heroHeader = (HeroHeaderHome)homePageElements.Children.Where(o => o is HeroHeaderHome).FirstOrDefault();
+                                        var heroHeader = homePageElements.Children(VariationContextAccessor).Where(o => o.IsDocumentType("heroHeaderHome")).FirstOrDefault();
                                         if (heroHeader != null)
                                         {
+                                            var heroHeaderItems = heroHeader.Value<IEnumerable<IPublishedElement>>("items") ?? Enumerable.Empty<IPublishedElement>();
                                             <!-- Indicators -->
                                             <ol class="carousel-indicators">
                                                 @{
                                                     int counter = 0;
-                                                    foreach (var items in heroHeader.Items)
+                                                    foreach (var items in heroHeaderItems)
                                                     {
                                                         <li data-target="#hero-banner" data-slide-to="@counter" class="@((counter == 0) ? "active" : "")"></li>
                                                         counter++;
@@ -395,10 +400,9 @@
                                             <div class="carousel-inner top_extend">
                                                 @{
                                                     int myCounter = 0;
-                                                    foreach (var heroItem in heroHeader.Items)
+                                                    foreach (var heroItem in heroHeaderItems)
                                                     {
-                                                        //var Avatar = heroItem.Value<IPublishedContent>("heroImage");
-                                                        var Avatar = ((ContentModels.Image)((IPublishedContent)heroItem.Value("heroImage"))).Url;
+                                                        var Avatar = heroItem.Value<IPublishedContent>("heroImage")?.Url();
                                                         <div class="top_extend item @((myCounter == 0) ? "active" : "") lazyimage" style="background-image: url(@Avatar);" data-image-path="background-image: url(@Avatar);">
 
                                                             <div class="hero-caption">
@@ -413,7 +417,7 @@
                                                                 <p class="hero-description">@heroItem.Value("heroTitleDescription")</p>
                                                                 <br />
                                                                 @{
-                                                                    var redirect_links = (IEnumerable<Umbraco.Web.Models.Link>)heroItem.Value("heroRedirectAction");
+                                                                    var redirect_links = heroItem.Value<IEnumerable<Umbraco.Cms.Core.Models.Link>>("heroRedirectAction");
 
                                                                     if (redirect_links.Any())
                                                                     {
@@ -444,9 +448,10 @@
             </div>
             <!-- HERO SHOULDER -->
             @{
-                var heroShoulder = (HeroShoulderHome)homePageElements.Children.Where(o => o is HeroShoulderHome).FirstOrDefault();
+                var heroShoulder = homePageElements.Children(VariationContextAccessor).Where(o => o.IsDocumentType("heroShoulderHome")).FirstOrDefault();
                 if (heroShoulder != null)
                 {
+                    var heroShoulderItems = heroShoulder.Value<IEnumerable<IPublishedElement>>("items") ?? Enumerable.Empty<IPublishedElement>();
                     <div class="loan-summary-container">
                         <div class="container">
                             <div class="mega-tabs">
@@ -454,12 +459,12 @@
                                 <ul id="go_to_tab_content" class="nav nav-tabs eq-height" role="tablist">
                                     @{
                                         var isFirstRow = true;
-                                        foreach (var item in heroShoulder.Items)
+                                        foreach (var tab in heroShoulderItems)
                                         {
-                                            var tab = (HomeShoulderItem)item;
+                                            var tabIcon = tab.Value<IPublishedContent>("tabIcon");
                                             <li role="presentation" class="@(isFirstRow ? "active" : "") loan-summary ">
-                                                <a href="#@tab.TabId.Replace(" ", "")" aria-controls="profile " role="tab" data-toggle="tab">
-                                                    <img loading="lazy" src="@tab.TabIcon.Url" width="36" alt="@tab.TabIcon.Value("altTag")" /> <span class="hidden-xs">@tab.TabName</span>
+                                                <a href="#@tab.Value<string>("tabId")?.Replace(" ", "")" aria-controls="profile " role="tab" data-toggle="tab">
+                                                    <img loading="lazy" src="@tabIcon?.Url()" width="36" alt="@tabIcon?.Value("altTag")" /> <span class="hidden-xs">@tab.Value("tabName")</span>
                                                 </a>
                                             </li>
                                             isFirstRow = false;
@@ -472,69 +477,70 @@
                                 @{
                                     bool isFirstTab = true;
                                     int tabCount = 0;
-                                    foreach (var item in heroShoulder.Items)
+                                    foreach (var tab in heroShoulderItems)
                                     {
                                         string linkValue = null;
-                                        var tab = (HomeShoulderItem)item;
-                                        <div role="tabpanel" class="tab-pane @(isFirstTab ? "active" : "")" id="@tab.TabId.Replace(" ", "")">
+                                        var tabItems = tab.Value<IEnumerable<IPublishedElement>>("items") ?? Enumerable.Empty<IPublishedElement>();
+                                        <div role="tabpanel" class="tab-pane @(isFirstTab ? "active" : "")" id="@tab.Value<string>("tabId")?.Replace(" ", "")">
                                             <div class="tab-category">
-                                                @tab.TabName
+                                                @tab.Value("tabName")
                                             </div>
                                             <h2 class="text-center">
-                                                @tab.TabHeading
+                                                @tab.Value("tabHeading")
                                             </h2>
                                             <div class="row">
                                                 @{
-                                                    if (tab.Items.Count() == 2)
+                                                    if (tabItems.Count() == 2)
                                                     {
                                                         <div class="col-md-3"></div>
                                                     }
                                                 }
-                                                @foreach (var subI in tab.Items)
+                                                @foreach (var subItem in tabItems)
                                                 {
-                                                    var subItem = (StructureBeCardDescription)subI;
+                                                    var subItemLink = subItem.Value<Umbraco.Cms.Core.Models.Link>("link");
+                                                    var benefitCardIcon = subItem.Value<IPublishedContent>("benefitCardIcon");
                                                     <div class="col-sm-6 col-md-3">
                                                         <div class="loan-summary">
                                                             <div class="image">
-                                                                @if ((subItem.FormatIcon) && (subItem.Link != null))
+                                                                @if ((subItem.Value<bool>("formatIcon")) && (subItemLink != null))
                                                                 {
-                                                                    <a href="@subItem.Link.Url">
-                                                                        <div class="img-bg" style="background-image: url(@subItem.BenefitCardIcon.Url);"></div>
+                                                                    <a href="@subItemLink.Url">
+                                                                        <div class="img-bg" style="background-image: url(@benefitCardIcon?.Url());"></div>
                                                                     </a>
                                                                 }
                                                                 else
                                                                 {
-                                                                    <a href="@subItem.Link.Url">
-                                                                        <div class="img-bg" style="background-image: url(@subItem.BenefitCardIcon.Url);"></div>
+                                                                    <a href="@subItemLink?.Url">
+                                                                        <div class="img-bg" style="background-image: url(@benefitCardIcon?.Url());"></div>
                                                                     </a>
                                                                 }
                                                             </div>
                                                             <div class="title">
                                                                 @if (tabCount == 1)
                                                                 {
-                                                                    string bookMarkValue = subItem.BenefitCardTitle.ToString();
+                                                                    string bookMarkValue = subItem.Value("benefitCardTitle").ToString();
                                                                     bookMarkValue = bookMarkValue.Replace(" ", "");
-                                                                    linkValue = subItem.Link.Url + "#" + bookMarkValue;
+                                                                    linkValue = subItemLink?.Url + "#" + bookMarkValue;
                                                                 }
                                                                 else
                                                                 {
-                                                                    linkValue = subItem.Link.Url;
+                                                                    linkValue = subItemLink?.Url;
                                                                 }
-                                                                @if (subItem.Link != null)
+                                                                @if (subItemLink != null)
                                                                 {
                                                                     <a href="@linkValue">
-                                                                        @subItem.BenefitCardTitle
+                                                                        @subItem.Value("benefitCardTitle")
                                                                     </a>
                                                                 }
                                                                 else
                                                                 {
-                                                                    <a href="@subItem.Link.Url">
-                                                                        @subItem.BenefitCardTitle
+                                                                    <a href="@subItemLink?.Url">
+                                                                        @subItem.Value("benefitCardTitle")
                                                                     </a>
                                                                 }
 
                                                             </div>
-                                                            <div class="loan-desc">@subItem.BenefitCardDescription</div>
+                                                            <div class="loan-desc">@subItem.Value("benefitCardDescription")</div>
                                                         </div>
                                                     </div>
                                                 }
@@ -565,11 +571,11 @@
                                         int myCounter = 0;
 
 
-                                        foreach (var blog in blogParent.Children.OrderByDescending(x => x.Children.First().Children.Where(c => c.ContentType.Alias == "heroBodyBlogDetail").First().Value("blogdate")))
+                                        foreach (var blog in blogParent.Children(VariationContextAccessor).OrderByDescending(x => x.Children(VariationContextAccessor).First().Children(VariationContextAccessor).Where(c => c.ContentType.Alias == "heroBodyBlogDetail").First().Value("blogdate")))
                                         {
-                                            if (blog.Children.Any())
+                                            if (blog.Children(VariationContextAccessor).Any())
                                             {
-                                                foreach (var blogElement in blog.Children.FirstOrDefault().Children)
+                                                foreach (var blogElement in blog.Children(VariationContextAccessor).FirstOrDefault().Children(VariationContextAccessor))
                                                 {
                                                     if (blogElement.Value("title") != null)
                                                     {
@@ -579,8 +585,8 @@
 
                                                                 if ((whatsNew != null) && (myCounter == 0))
                                                                 {
-                                                                    Umbraco.Web.Models.Link whatsNewLink = null;
-                                                                    foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)whatsNew.Value("sectionLink"))
+                                                                    Umbraco.Cms.Core.Models.Link whatsNewLink = null;
+                                                                    foreach (var link in whatsNew.Value<IEnumerable<Umbraco.Cms.Core.Models.Link>>("sectionLink"))
                                                                     {
                                                                         whatsNewLink = link;
                                                                         break;
@@ -683,10 +689,11 @@
                             @{
                                 if (testimonials != null)
                                 {
+                                    var testimonialItems = testimonials.Value<IEnumerable<IPublishedElement>>("testimonialItems") ?? Enumerable.Empty<IPublishedElement>();
                                     <ol class="carousel-indicators">
                                         @{
                                             int counter = 0;
-                                            foreach (var testimonyItem in testimonials.TestimonialItems)
+                                            foreach (var testimonyItem in testimonialItems)
                                             {
                                                 <li data-target="#hero-banner" data-slide-to="@counter" class="@((counter == 0) ? "active" : "")"></li>
                                                 counter++;
@@ -697,12 +704,12 @@
                                     <div class="carousel-inner">
                                         @{
                                             int newCounter = 0;
-                                            foreach (var testimonyItem in testimonials.TestimonialItems)
+                                            foreach (var testimonyItem in testimonialItems)
                                             {
                                                 var Avatar = testimonyItem.Value<IPublishedContent>("testimonialAvatar");
                                                 <div class="item @((newCounter == 0) ? "active" : "")">
                                                     <div class="testimonial">
-                                                        <div class="avatar"><img src="@Avatar.Url" alt="@Avatar.Value("altTag")"></div>
+                                                        <div class="avatar"><img src="@Avatar?.Url()" alt="@Avatar?.Value("altTag")"></div>
                                                         <div class="descr">@testimonyItem.Value("testimonialStory")</div>
                                                         <div class="name">@testimonyItem.Value("testimonialName")</div>
                                                     </div>
@@ -729,15 +736,18 @@
                 var isFirstRow = true;
                 <div class="help-container" id="find-us">
                     <div class="container">
-                        <h2 class="text-center">@heroFeetHome.Heading</h2>
+                        <h2 class="text-center">@heroFeetHome.Value("heading")</h2>
+                        @{
+                            var heroFeetHomeLinks = heroFeetHome.Value<IEnumerable<IPublishedElement>>("links") ?? Enumerable.Empty<IPublishedElement>();
+                        }
                         <div class="mega-tabs margin-top-40">
                             <!-- Nav tabs -->
                             <ul class="nav nav-tabs" role="tablist">
-                                @foreach (var link in heroFeetHome.Links)
+                                @foreach (var tab in heroFeetHomeLinks)
                                 {
-                                    var tab = (FeetItem)link;
+                                    var tabIcon = tab.Value<IPublishedContent>("tabIcon");
                                     <li role="presentation" class="@(isFirstRow ? "active" : "") branch-tab" style="width:100%">
-                                        <a href="#@tab.Value("Id")" aria-controls="faq" role="tab" data-toggle="tab"><img loading="lazy" src="@tab.TabIcon.Url" alt="@tab.TabIcon.Value("altTag")" width="30" />@tab.TabName</a>
+                                        <a href="#@tab.Value("Id")" aria-controls="faq" role="tab" data-toggle="tab"><img loading="lazy" src="@tabIcon?.Url()" alt="@tabIcon?.Value("altTag")" width="30" />@tab.Value("tabName")</a>
                                     </li>
                                     isFirstRow = false;
                                 }
@@ -747,22 +757,22 @@
                         <div class="tab-content">
                             @{
                                 bool isFirstTab = true;
-                                foreach (var link in heroFeetHome.Links)
+                                foreach (var tab in heroFeetHomeLinks)
                                 {
-                                    var tab = (FeetItem)link;
-                                    <div role="tabpanel" class="tab-pane @(isFirstTab ? "active" : "")" id="@tab.TabId.Replace(" ", "")">
+                                    var tabItems = tab.Value<IEnumerable<IPublishedElement>>("items") ?? Enumerable.Empty<IPublishedElement>();
+                                    <div role="tabpanel" class="tab-pane @(isFirstTab ? "active" : "")" id="@tab.Value<string>("tabId")?.Replace(" ", "")">
                                         <div class="row">
                                             <div class="col-sm-10 col-sm-offset-1">
                                                 <div class="campaign-list">
                                                     <ul>
-                                                        @foreach (var subI in tab.Items)
+                                                        @foreach (var linkItem in tabItems)
                                                         {
-                                                            var linkItem = (LinkItem)subI;
+                                                            var internalLink = linkItem.Value<IPublishedContent>("internalLink");
                                                             <li>
                                                                 <div class="row no-gutter download-item">
                                                                     <div class="col-sm-9"><div class="download-descr">@linkItem.Value("text")</div></div>
                                                                     <div class="col-sm-3">
-                                                                        <a href="@linkItem.InternalLink.Url?#@linkItem.Value("anchorLink")" class="download-btn">@linkItem.Value("buttonText")</a>
+                                                                        <a href="@internalLink?.Url()?#@linkItem.Value("anchorLink")" class="download-btn">@linkItem.Value("buttonText")</a>
                                                                     </div>
                                                                 </div>
                                                             </li>
@@ -786,7 +796,7 @@
 <!-- CALL BACK FORM -->
 @{
     @*Used for popup START*@
-    var _floatingFormViewModel = homePageElements.Children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+    var _floatingFormViewModel = homePageElements.Children(VariationContextAccessor).Where(c => c.IsDocumentType("callMeBack")).FirstOrDefault();
     // @Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)
 }
 @section scripts
@@ -877,20 +887,17 @@
 
 @functions
     {
+    // Server-side browser sniffing (HttpContext.Current/HttpBrowserCapabilities)
+    // doesn't exist in ASP.NET Core. The original check only allowlisted
+    // Chrome/Opera/Android anyway (didn't even cover Firefox/Safari/Edge,
+    // which also support WebP) - virtually every current browser supports
+    // WebP now, so this just always serves the .webp variant.
     private static bool CanBrowserHandleWebPImages()
     {
-        HttpRequest httpRequest = HttpContext.Current.Request;
-        HttpBrowserCapabilities browser = httpRequest.Browser;
-
-        if (browser.Type.Contains("Chrome") || browser.Type.Contains("Opera") || browser.Type.Contains("Android"))
-        {
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
-    public static MvcHtmlString PlaceImageBackground(string imageUrl)
+    public static Microsoft.AspNetCore.Html.HtmlString PlaceImageBackground(string imageUrl)
     {
         if (CanBrowserHandleWebPImages())
         {
@@ -901,13 +908,13 @@
                 imageUrl = imageUrl.Replace(fileType, ".webp");
             }
 
-            return new MvcHtmlString(String.Format("url('{0}') ", imageUrl));
+            return new Microsoft.AspNetCore.Html.HtmlString(String.Format("url('{0}') ", imageUrl));
         }
 
-        return new MvcHtmlString(String.Format("url('{0}') ", imageUrl));
+        return new Microsoft.AspNetCore.Html.HtmlString(String.Format("url('{0}') ", imageUrl));
     }
 
-    public static MvcHtmlString PlaceImage(string imageUrl, string alt, string cssStyle)
+    public static Microsoft.AspNetCore.Html.HtmlString PlaceImage(string imageUrl, string alt, string cssStyle)
     {
         if (CanBrowserHandleWebPImages())
         {
@@ -918,9 +925,9 @@
                 imageUrl = imageUrl.Replace(fileType, ".webp");
             }
 
-            return new MvcHtmlString(String.Format("<img src=\"{0}\" " + "alt=\"{1}\" " + "style=\"{2}\"  />", imageUrl, alt, cssStyle));
+            return new Microsoft.AspNetCore.Html.HtmlString(String.Format("<img src=\"{0}\" " + "alt=\"{1}\" " + "style=\"{2}\"  />", imageUrl, alt, cssStyle));
         }
 
-        return new MvcHtmlString(String.Format("<img src=\"{0}\" " + "alt=\"{1}\" " + "style=\"{2}\"/>", imageUrl, alt, cssStyle));
+        return new Microsoft.AspNetCore.Html.HtmlString(String.Format("<img src=\"{0}\" " + "alt=\"{1}\" " + "style=\"{2}\"/>", imageUrl, alt, cssStyle));
     }
 }
