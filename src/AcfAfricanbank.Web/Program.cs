@@ -1084,13 +1084,87 @@ if (args.Length > 0 &&
         (await GetDataTypesAsync(source))
             .ToDictionary(x => x.NodeId);
 
+    var allTargetDataTypes =
+        (await dataTypeService.GetAllAsync()).ToList();
+
     var targetDataTypesByEditorAlias =
-        (await dataTypeService.GetAllAsync())
+        allTargetDataTypes
             .GroupBy(x => x.EditorAlias, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(
                 g => g.Key,
                 g => g.First(),
                 StringComparer.OrdinalIgnoreCase);
+
+    // DataType.EditorAlias (e.g. "Umbraco.BlockList") is the legacy storage-
+    // format alias and is all the DataType(editor, serializer) constructor
+    // below sets on its own. The v16 backoffice's client-side editor UI is
+    // looked up separately, by DataType.EditorUiAlias (e.g.
+    // "Umb.PropertyEditorUi.BlockList") - leaving it unset is what produces
+    // "This property editor UI is missing" when a Data Type this migration
+    // created is opened. There's no server-side API or constant for this
+    // mapping; it's extracted from the built-in backoffice client bundle
+    // (Umbraco.Cms.StaticAssets package, packages/*/manifests.js,
+    // propertyEditorSchema entries' defaultPropertyEditorUiAlias field).
+    var editorUiAliases =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Umbraco.BlockList"] = "Umb.PropertyEditorUi.BlockList",
+            ["Umbraco.BlockGrid"] = "Umb.PropertyEditorUi.BlockGrid",
+            ["Umbraco.CheckBoxList"] = "Umb.PropertyEditorUi.CheckBoxList",
+            ["Umbraco.ColorPicker"] = "Umb.PropertyEditorUi.ColorPicker",
+            ["Umbraco.ColorPicker.EyeDropper"] = "Umb.PropertyEditorUi.EyeDropper",
+            ["Umbraco.ContentPicker"] = "Umb.PropertyEditorUi.DocumentPicker",
+            ["Umbraco.DateTime"] = "Umb.PropertyEditorUi.DatePicker",
+            ["Umbraco.Decimal"] = "Umb.PropertyEditorUi.Decimal",
+            ["Umbraco.DropDown.Flexible"] = "Umb.PropertyEditorUi.Dropdown",
+            ["Umbraco.EmailAddress"] = "Umb.PropertyEditorUi.EmailAddress",
+            ["Umbraco.ImageCropper"] = "Umb.PropertyEditorUi.ImageCropper",
+            ["Umbraco.Integer"] = "Umb.PropertyEditorUi.Integer",
+            ["Umbraco.Label"] = "Umb.PropertyEditorUi.Label",
+            ["Umbraco.ListView"] = "Umb.PropertyEditorUi.Collection",
+            ["Umbraco.MarkdownEditor"] = "Umb.PropertyEditorUi.MarkdownEditor",
+            ["Umbraco.MediaPicker3"] = "Umb.PropertyEditorUi.MediaPicker",
+            ["Umbraco.MemberGroupPicker"] = "Umb.PropertyEditorUi.MemberGroupPicker",
+            ["Umbraco.MemberPicker"] = "Umb.PropertyEditorUi.MemberPicker",
+            ["Umbraco.MultiNodeTreePicker"] = "Umb.PropertyEditorUi.ContentPicker",
+            ["Umbraco.MultiUrlPicker"] = "Umb.PropertyEditorUi.MultiUrlPicker",
+            ["Umbraco.MultipleTextstring"] = "Umb.PropertyEditorUi.MultipleTextString",
+            ["Umbraco.RadioButtonList"] = "Umb.PropertyEditorUi.RadioButtonList",
+            ["Umbraco.RichText"] = "Umb.PropertyEditorUi.Tiptap",
+            ["Umbraco.Slider"] = "Umb.PropertyEditorUi.Slider",
+            ["Umbraco.Tags"] = "Umb.PropertyEditorUi.Tags",
+            ["Umbraco.TextArea"] = "Umb.PropertyEditorUi.TextArea",
+            ["Umbraco.TextBox"] = "Umb.PropertyEditorUi.TextBox",
+            ["Umbraco.TrueFalse"] = "Umb.PropertyEditorUi.Toggle",
+            ["Umbraco.UploadField"] = "Umb.PropertyEditorUi.UploadField",
+            ["Umbraco.UserPicker"] = "Umb.PropertyEditorUi.UserPicker",
+        };
+
+    // Self-heal: a run of this migration before EditorUiAlias was set below
+    // may have already created Data Types (including one "Migrated Block
+    // List - X.Y" per Nested Content property in STEP 3B) with a blank
+    // EditorUiAlias. Re-running the migration wouldn't otherwise touch them
+    // again, since they're found as already-existing further down - fix them
+    // here instead so re-running against an already-migrated database
+    // repairs the backoffice, not just a fresh one.
+    foreach (var existingDataType in allTargetDataTypes)
+    {
+        if (string.IsNullOrEmpty(existingDataType.EditorUiAlias) &&
+            editorUiAliases.TryGetValue(
+                existingDataType.EditorAlias,
+                out var healedUiAlias))
+        {
+            existingDataType.EditorUiAlias = healedUiAlias;
+
+            await dataTypeService.UpdateAsync(
+                existingDataType,
+                Constants.Security.SuperUserKey);
+
+            Console.WriteLine(
+                $"HEALED DATATYPE UI ALIAS: {existingDataType.Name} -> " +
+                healedUiAlias);
+        }
+    }
 
     // A handful of editor aliases were renamed between v8 and modern Umbraco.
     // Umbraco.TinyMCE -> Umbraco.RichText is the big one: the Rich Text
@@ -1237,10 +1311,15 @@ if (args.Length > 0 &&
                 autoCreatableEditorAliases.Contains(resolvedEditorAlias) &&
                 propertyEditors.TryGet(resolvedEditorAlias, out var editor))
             {
+                editorUiAliases.TryGetValue(
+                    resolvedEditorAlias,
+                    out var newDataTypeUiAlias);
+
                 var newDataType =
                     new DataType(editor, configurationEditorJsonSerializer)
                     {
-                        Name = $"{resolvedEditorAlias} (migrated)"
+                        Name = $"{resolvedEditorAlias} (migrated)",
+                        EditorUiAlias = newDataTypeUiAlias
                     };
 
                 var createResult =
@@ -1484,6 +1563,7 @@ if (args.Length > 0 &&
                     {
                         Name =
                             $"Migrated Block List - {contentTypeAlias}.{property.Alias}",
+                        EditorUiAlias = "Umb.PropertyEditorUi.BlockList",
                         ConfigurationData =
                             new Dictionary<string, object>
                             {
