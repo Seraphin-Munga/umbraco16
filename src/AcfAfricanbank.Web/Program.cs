@@ -2496,6 +2496,61 @@ if (args.Length > 0 &&
 }
 
 // ============================================================
+// TEMP DIAGNOSTIC - remove once the richTextboxItem IsElement issue is
+// resolved. Visit /diagnostics/richtextboxitem in the browser.
+//
+// Deliberately uses IContentService (draft content) instead of the
+// published content API - richTextboxItem's generated model doesn't
+// implement IPublishedContent (its content type has IsElement=true), so
+// anything going through the published cache for these nodes throws
+// "Factory returned model ... which does not implement IPublishedContent".
+// IContentService works on the raw IContent model instead, with no
+// ModelsBuilder typing involved, so it can list these nodes safely.
+// ============================================================
+
+app.MapGet("/diagnostics/richtextboxitem", (
+    IContentTypeService contentTypeService,
+    IContentService contentService) =>
+{
+    var contentType = contentTypeService.Get("richTextboxItem");
+
+    if (contentType == null)
+    {
+        return Results.Ok(new
+        {
+            found = false,
+            message = "No content type with alias 'richTextboxItem' exists."
+        });
+    }
+
+    var items =
+        contentService.GetPagedOfType(
+            contentType.Id,
+            0,
+            1000,
+            out var totalRecords,
+            null!);
+
+    return Results.Ok(new
+    {
+        found = true,
+        contentTypeId = contentType.Id,
+        isElement = contentType.IsElement,
+        totalRecords,
+        items = items.Select(c => new
+        {
+            id = c.Id,
+            key = c.Key,
+            name = c.Name,
+            parentId = c.ParentId,
+            path = c.Path,
+            trashed = c.Trashed,
+            published = c.Published
+        })
+    });
+});
+
+// ============================================================
 // NORMAL UMBRACO STARTUP
 // ============================================================
 
