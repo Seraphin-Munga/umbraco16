@@ -28,21 +28,6 @@
     menu = homePageElements?.Children(VariationContextAccessor).Where(o => o.IsDocumentType("topNavigation")).FirstOrDefault();
 }
 
-@{
-    var debugHomePageElementsChildren = homePageElements?.Children(VariationContextAccessor).ToList();
-    var debugMenuInfo = menu?.Value<IEnumerable<IPublishedElement>>(PublishedValueFallback, "MenuInfo")?.ToList();
-    var debugFirstItem = debugMenuInfo?.FirstOrDefault();
-}
-<!-- TEMP DEBUG - remove once topNavigation/MenuInfo are confirmed; view page source to read this
-Model: @Model.Name [@Model.ContentType.Alias]
-homePageElements resolved: @(homePageElements?.Name ?? "NOT FOUND") [@(homePageElements?.ContentType.Alias ?? "-")]
-homePageElements children (published, via .Children()): @(debugHomePageElementsChildren != null ? string.Join(" | ", debugHomePageElementsChildren.Select(c => $"{c.Name} [{c.ContentType.Alias}]")) : "n/a (homePageElements itself is null)")
-menu (topNavigation) resolved: @(menu?.Name ?? "NOT FOUND")
-MenuInfo item count: @(debugMenuInfo?.Count.ToString() ?? "null (property itself came back null)")
-First MenuInfo item content type: @(debugFirstItem?.ContentType.Alias ?? "n/a")
-First MenuInfo item property aliases: @(debugFirstItem != null ? string.Join(", ", debugFirstItem.Properties.Select(p => p.Alias)) : "n/a")
--->
-
 
 
 <style>
