@@ -1,25 +1,20 @@
-@inherits UmbracoViewPage<ContentModels.PageHome>
-@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
-@using Umbraco.Cms.Core.Models;
-@using Umbraco.Cms.Core.Models.Blocks;
-@using Umbraco.Cms.Web.Common.Mvc;
-@inject Umbraco.Cms.Core.Models.PublishedContent.IPublishedValueFallback PublishedValueFallback
-@inject Umbraco.Cms.Core.Routing.IPublishedUrlProvider PublishedUrlProvider
-@inject Umbraco.Cms.Core.Models.PublishedContent.IVariationContextAccessor VariationContextAccessor
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageHome>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Umbraco.Web.Models
 @{
     Layout = "~/Views/MasterNew.cshtml";
     ContentModels.PageHome home = Model as ContentModels.PageHome;
-    var homePageElements = (HomePageElements)home.Children(VariationContextAccessor).Where(o => o is HomePageElements).FirstOrDefault();
-    var heroHeader = (HeroHeaderHome)homePageElements.Children(VariationContextAccessor).Where(o => o is HeroHeaderHome).FirstOrDefault();
-    var heroShoulder = (HeroShoulderHome)homePageElements.Children(VariationContextAccessor).Where(o => o is HeroShoulderHome).FirstOrDefault();
-    var heroBody = (HeroBody)homePageElements.Children(VariationContextAccessor).Where(x => x is HeroBody).FirstOrDefault();
+    var homePageElements = (HomePageElements)home.Children.Where(o => o is HomePageElements).FirstOrDefault();
+    var heroHeader = (HeroHeaderHome)homePageElements.Children.Where(o => o is HeroHeaderHome).FirstOrDefault();
+    var heroShoulder = (HeroShoulderHome)homePageElements.Children.Where(o => o is HeroShoulderHome).FirstOrDefault();
+    var heroBody = (HeroBody)homePageElements.Children.Where(x => x is HeroBody).FirstOrDefault();
     //var heroBodyGetLoans = (StructureBodyTextWithImageAndLink)heroBody.Children.Where(y => y is StructureBodyTextWithImageAndLink).FirstOrDefault();
-    var heroBodySections = heroBody?.Children(VariationContextAccessor)?.Where(y => y is StructureBodyTextWithImageAndLink).ToList();
-    var heroFeetNew = homePageElements?.Children(VariationContextAccessor).Where(c => c is HeroFeet).FirstOrDefault();
-    var testimonialsNew = (Testimonials)heroFeetNew?.Children(VariationContextAccessor).Where(c => c is Testimonials).FirstOrDefault();
-    var heroBodyBlog = (HeroBody)homePageElements.Children(VariationContextAccessor).Where(x => x is HeroBody).FirstOrDefault();
-    var heroBodyBlogLink = heroBodyBlog.Children(VariationContextAccessor).Where(x => x.ContentType.Alias.ToLower() == "link").FirstOrDefault();
-    var bottomNavigation = (BottomNavigation)homePageElements.Children(VariationContextAccessor).Where(c => c is BottomNavigation).FirstOrDefault();
+    var heroBodySections = heroBody?.Children?.Where(y => y is StructureBodyTextWithImageAndLink).ToList();
+    var heroFeetNew = homePageElements?.Children.Where(c => c is HeroFeet).FirstOrDefault();
+    var testimonialsNew = (Testimonials)heroFeetNew?.Children.Where(c => c is Testimonials).FirstOrDefault();
+    var heroBodyBlog = (HeroBody)homePageElements.Children.Where(x => x is HeroBody).FirstOrDefault();
+    var heroBodyBlogLink = heroBodyBlog.Children.Where(x => x.ContentType.Alias.ToLower() == "link").FirstOrDefault();
+    var bottomNavigation = (BottomNavigation)homePageElements.Children.Where(c => c is BottomNavigation).FirstOrDefault();
     var htmlStringUtilities = new HtmlStringUtilities();
 }
 
@@ -34,14 +29,11 @@
         <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
             <ol class="carousel-indicators">
                 @{
-                    if (heroHeader != null)
+                    int counter = 0;
+                    foreach (var items in heroHeader.Items)
                     {
-                        int counter = 0;
-                        foreach (var items in heroHeader.Items)
-                        {
-                            <li data-target="#carouselExampleIndicators" data-slide-to="@counter" class="@((counter == 0) ? "active" : "")"></li>
-                            counter++;
-                        }
+                        <li data-target="#carouselExampleIndicators" data-slide-to="@counter" class="@((counter == 0) ? "active" : "")"></li>
+                        counter++;
                     }
                 }
             </ol>
@@ -53,10 +45,9 @@
                         int myCounters = 0;
                         foreach (var heroItem in heroHeader.Items)
                         {
-                            var heroContent = heroItem.Content;
-                            var heroImageUrl = ((ContentModels.Image)((IPublishedContent)heroContent.Value(PublishedValueFallback, "heroImage")))?.Url(PublishedUrlProvider);
-                            Umbraco.Cms.Core.Models.Link redirect_links = null;
-                            foreach (var link in (IEnumerable<Umbraco.Cms.Core.Models.Link>)heroContent.Value(PublishedValueFallback, "heroRedirectAction"))
+                            var heroImageUrl = ((ContentModels.Image)((IPublishedContent)heroItem.Value("heroImage"))).Url;
+                            Umbraco.Web.Models.Link redirect_links = null;
+                            foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)heroItem.Value("heroRedirectAction"))
                             {
                                 redirect_links = link;
                                 break;
@@ -66,17 +57,17 @@
                                     <img class="d-block w-100" src="@heroImageUrl" alt="First slide" width="100%" height="100%">
                                 </div>
                                 <div class="carousel-caption">
-                                    <h1 class="ab-jumbo-title"> @heroContent.Value(PublishedValueFallback, "heroTitle")</h1>
-                                    <h2 class="ab-jumbo-discription">@heroContent.Value(PublishedValueFallback, "heroProductDescription")<span></span></h2>
+                                    <h1 class="ab-jumbo-title"> @heroItem.Value("heroTitle")</h1>
+                                    <h2 class="ab-jumbo-discription">@heroItem.Value("heroProductDescription")<span></span></h2>
                                     <div class="primary-btn">
                                         @{
                                             if (redirect_links != null)
                                             {
-                                                var buttonText = heroContent.Value(PublishedValueFallback, "heroButtonLabel");
+                                                var buttonText = heroItem.Value("heroButtonLabel");
                                                 <a href="@redirect_links.Url"><button> @buttonText</button></a>
                                             }
                                         }
-                                        @*<a href=""><button>@heroContent.Value(PublishedValueFallback, "heroButtonLabel")</button></a>*@
+                                        @*<a href=""><button>@heroItem.Value("heroButtonLabel")</button></a>*@
                                     </div>
                                 </div>
                             </div>
@@ -102,25 +93,23 @@
                     {
                         foreach (var item in heroShoulder.Items)
                         {
-                            var itemContent = item.Content;
-                            var tabName = itemContent.Value(PublishedValueFallback, "tabName")?.ToString() ?? string.Empty;
                             string imgshoulderWidth = "40";
                             string linkValue = null;
-                            if (tabName == "Borrow")
+                            if (item.Value("tabName").ToString() == "Borrow")
                             {
                                 imgshoulderWidth = "55";
 
                             }
                             string tabBgColor = "";
-                            if (tabName == "Bank")
+                            if (item.Value("tabName").ToString() == "Bank")
                             {
                                 tabBgColor = "ab-bank-service";
                             }
-                            else if (tabName == "Borrow")
+                            else if (item.Value("tabName").ToString() == "Borrow")
                             {
                                 tabBgColor = "ab-borrow-service";
                             }
-                            else if (tabName == "Invest")
+                            else if (item.Value("tabName").ToString() == "Invest")
                             {
                                 tabBgColor = "ab-invest-service";
                             }
@@ -128,30 +117,30 @@
                             {
                                 tabBgColor = "ab-insure-service";
                             }
-                            foreach (var subI in itemContent.Value<BlockListModel>(PublishedValueFallback, "items") ?? Enumerable.Empty<BlockListItem>())
+                            foreach (var subI in item.Items)
                             {
-                                var subItem = (StructureBeCardDescription)subI.Content;
+                                var subItem = (StructureBeCardDescription)subI;
                                 <div class="col-md-3 col-6">
 
                                     <div class="container @tabBgColor.ToString()">
                                         @if ((subItem.FormatIcon) && (subItem.Link != null))
                                         {
-                                            <img src="@subItem.BenefitCardIcon?.Url(PublishedUrlProvider)" alt="@subItem.BenefitCardIcon?.Value(PublishedValueFallback, "altTag")" width=@imgshoulderWidth.ToString() height="50">
+                                            <img src="@subItem.BenefitCardIcon.Url" alt="@subItem.BenefitCardIcon.Value("altTag")" width=@imgshoulderWidth.ToString() height="50">
                                         }
                                         else
                                         {
-                                            <img src="@subItem.BenefitCardIcon?.Url(PublishedUrlProvider)" alt="@subItem.BenefitCardIcon?.Value(PublishedValueFallback, "altTag")" width=@imgshoulderWidth.ToString() height="50">
+                                            <img src="@subItem.BenefitCardIcon.Url" alt="@subItem.BenefitCardIcon.Value("altTag")" width=@imgshoulderWidth.ToString() height="50">
                                         }
-                                        <p>@subItem.Value(PublishedValueFallback, "benefitCardTitle")<br />@subItem.Value(PublishedValueFallback, "benefitCardDescription")</p>
+                                        <p>@subItem.Value("benefitCardTitle")<br />@subItem.Value("benefitCardDescription")</p>
 
                                         <div class="secondary-btn-dark">
                                             @if (subItem.Link != null)
                                             {
-                                                <a href="@subItem.Link.Url(PublishedUrlProvider)"><button>@tabName</button></a>
+                                                <a href="@subItem.Link.Url"><button>@item.Value("tabName")</button></a>
                                             }
                                             else
                                             {
-                                                <a href="@linkValue"><button>@tabName</button></a>
+                                                <a href="@linkValue"><button>@item.Value("tabName")</button></a>
                                             }
                                         </div>
                                     </div>
@@ -175,8 +164,8 @@
         {
             if (getLoanCount == 0)
             {
-                Umbraco.Cms.Core.Models.Link getLoansLink = null;
-                foreach (var link in (IEnumerable<Umbraco.Cms.Core.Models.Link>)getGetLoans.Value(PublishedValueFallback, "sectionLink"))
+                Umbraco.Web.Models.Link getLoansLink = null;
+                foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)getGetLoans.Value("sectionLink"))
                 {
                     getLoansLink = link;
                     break;
@@ -184,18 +173,18 @@
                 <div class="ab-below-fold-section special-margin" data-aos="fade-up" data-aos-easing="linear" data-aos-duration="1500" style="">
                     <div class="container row section-a h-100">
                         <div class="col-md-6  section-artwork">
-                            @if (getGetLoans.Value(PublishedValueFallback, "ebankItimage") != null)
+                            @if (getGetLoans.Value("ebankItimage") != null)
                             {
-                                var sectionImageUrl = ((ContentModels.Image)((IPublishedContent)getGetLoans.Value(PublishedValueFallback, "ebankItimage")))?.Url(PublishedUrlProvider);
-                                <img src="@sectionImageUrl" width="90%" alt="@getGetLoans.Value(PublishedValueFallback, "altTag")" width="90%" height="100%">
+                                var sectionImageUrl = ((ContentModels.Image)((IPublishedContent)getGetLoans.Value("ebankItimage"))).Url;
+                                <img src="@sectionImageUrl" width="90%" alt="@getGetLoans.Value("altTag")" width="90%" height="100%">
                             }else{
-                                <img src="" width="90%" alt="@getGetLoans.Value(PublishedValueFallback, "altTag")">
+                                <img src="" width="90%" alt="@getGetLoans.Value("altTag")">
                             }
                         </div>
                         <div class="col-md-6 section-content my-auto">
-                            <h2 class="ab-section-title">@getGetLoans.Value(PublishedValueFallback, "ebankITTitle")</h2>
-                            <h3 class="ab-section-discription">@getGetLoans.Value(PublishedValueFallback, "ebankITContent")</h3>
-                            <p>@getGetLoans.Value(PublishedValueFallback, "sectionHeroBodyDescription")</p>
+                            <h2 class="ab-section-title">@getGetLoans.Value("ebankITTitle")</h2>
+                            <h3 class="ab-section-discription">@getGetLoans.Value("ebankITContent")</h3>
+                            <p>@getGetLoans.Value("sectionHeroBodyDescription")</p>
                             <div class="primary-btn instant-loan">
 
                                 @if (getLoansLink != null)
@@ -225,25 +214,25 @@
             {
                 if (myWorldCount == 1)
                 {
-                    Umbraco.Cms.Core.Models.Link getWorldLink = null;
-                    foreach (var link in (IEnumerable<Umbraco.Cms.Core.Models.Link>)getMyWorldBank.Value(PublishedValueFallback, "sectionLink"))
+                    Umbraco.Web.Models.Link getWorldLink = null;
+                    foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)getMyWorldBank.Value("sectionLink"))
                     {
                         getWorldLink = link;
                         break;
                     }
                     <div class="col-md-6 section-artwork my-auto">
-                        @if (getMyWorldBank.Value(PublishedValueFallback, "ebankItimage") != null)
+                        @if (getMyWorldBank.Value("ebankItimage") != null)
                         {
-                            var bankImageUrl = ((ContentModels.Image)((IPublishedContent)getMyWorldBank.Value(PublishedValueFallback, "ebankITImage")))?.Url(PublishedUrlProvider);
+                            var bankImageUrl = ((ContentModels.Image)((IPublishedContent)getMyWorldBank.Value("ebankITImage"))).Url;
                             <img src="@bankImageUrl" width="60%" alt="MyWorld Bank">
                         }else{
                             <img src="" alt="">
                         }
                     </div>
                     <div class="col-md-6 section-content">
-                        <h2 class="ab-section-title-myworld">@getMyWorldBank.Value(PublishedValueFallback, "ebankITTitle")</h2>
-                        <h3 class="ab-section-discription-myworld">@getMyWorldBank.Value(PublishedValueFallback, "ebankITContent")</h3>
-                        <p class="ab-body-desc-myworld">@Html.StripHtml(@getMyWorldBank.Value(PublishedValueFallback, "sectionHeroBodyDescription")?.ToString() ?? "", new[] { "p" })</p>
+                        <h2 class="ab-section-title-myworld">@getMyWorldBank.Value("ebankITTitle")</h2>
+                        <h3 class="ab-section-discription-myworld">@getMyWorldBank.Value("ebankITContent")</h3>
+                        <p class="ab-body-desc-myworld">@Html.StripHtml(@getMyWorldBank.Value("sectionHeroBodyDescription").ToString(),"p")</p>
                         <div class="primary-btn myworld-button-padding">
                             @if (getWorldLink != null)
                             {
@@ -270,10 +259,10 @@
                 <div class="container row section-a custom-margin h-100">
 
                     <div class="col-md-6  section-artwork my-auto">
-                        @if (getSupportData.Value(PublishedValueFallback, "ebankItimage") != null)
+                        @if (getSupportData.Value("ebankItimage") != null)
                         {
-                            var supportImageUrl = ((ContentModels.Image)((IPublishedContent)getSupportData.Value(PublishedValueFallback, "ebankITImage")))?.Url(PublishedUrlProvider);
-                            <img src="@supportImageUrl" width="90%" height="100%" alt="@getSupportData.Value(PublishedValueFallback, "ebankITTitle")">
+                            var supportImageUrl = ((ContentModels.Image)((IPublishedContent)getSupportData.Value("ebankITImage"))).Url;
+                            <img src="@supportImageUrl" width="90%" height="100%" alt="@getSupportData.Value("ebankITTitle")">
                         }
                         else
                         {
@@ -281,9 +270,9 @@
                         }
                     </div>
                     <div class="col-md-6 section-content my-auto">
-                        <h2 class="ab-section-title">@getSupportData.Value(PublishedValueFallback, "ebankITTitle")</h2>
-                        <h3 class="ab-section-discription">@getSupportData.Value(PublishedValueFallback, "ebankITContent")</h3>
-                        <p>@getSupportData.Value(PublishedValueFallback, "sectionHeroBodyDescription")</p>
+                        <h2 class="ab-section-title">@getSupportData.Value("ebankITTitle")</h2>
+                        <h3 class="ab-section-discription">@getSupportData.Value("ebankITContent")</h3>
+                        <p>@getSupportData.Value("sectionHeroBodyDescription")</p>
                         <p><a href="#">LIVE CHAT</a> | <a href="#">CALL ME BACK</a> | <a href="#">ONLINE INSTANT APPLICATION</a> </p>
 
                     </div>
@@ -299,18 +288,18 @@
     <div class="container text-center section-blog">
         @{
             int blogSectionCount = 0;
-            Umbraco.Cms.Core.Models.Link blogPageLink = null;
+            Umbraco.Web.Models.Link blogPageLink = null;
             foreach (var getblogSection in heroBodySections)
             {
                 if (blogSectionCount == 3)
                 {
-                  foreach (var link in (IEnumerable<Umbraco.Cms.Core.Models.Link>)getblogSection.Value(PublishedValueFallback, "sectionLink"))
+                  foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)getblogSection.Value("sectionLink"))
                     {
                         blogPageLink = link;
                         break;
                     }
-                    <h1 class="blog-title">@getblogSection.Value(PublishedValueFallback, "ebankITTitle")</h1>
-                    <h2 class="blog-discription">@getblogSection.Value(PublishedValueFallback, "ebankITContent")</h2>
+                    <h1 class="blog-title">@getblogSection.Value("ebankITTitle")</h1>
+                    <h2 class="blog-discription">@getblogSection.Value("ebankITContent")</h2>
                 }
                 blogSectionCount++;
             }
@@ -324,14 +313,14 @@
                 {
                     int myCounter = 0;
                     int blogcount = 0;
-                    foreach (var blog in blogParent.Children(VariationContextAccessor).Take(3))
+                    foreach (var blog in blogParent.Children.Take(3))
                     {
-                        if (blog.Children(VariationContextAccessor).Any())
+                        if (blog.Children.Any())
                         {
 
-                            foreach (var blogElement in blog.Children(VariationContextAccessor).LastOrDefault().Children(VariationContextAccessor))
+                            foreach (var blogElement in blog.Children.LastOrDefault().Children)
                             {
-                                if (blogElement.Value(PublishedValueFallback, "title") != null)
+                                if (blogElement.Value("title") != null)
                                 {
 
                                     string blogBoxClass = "";
@@ -349,15 +338,15 @@
                                         blogBoxClass = "blog-third-box";
                                     }
 
-                                    var blogHeader = blog.Children(VariationContextAccessor).FirstOrDefault().Children(VariationContextAccessor).Where(c => c is HeroHeaderBlogDetail).FirstOrDefault();
-                                    var ImageUrl = ((IPublishedContent)blogHeader?.Value(PublishedValueFallback, "image"))?.Url(PublishedUrlProvider)?.ToString() ?? "";
+                                    var blogHeader = blog.Children.FirstOrDefault().Children.Where(c => c is HeroHeaderBlogDetail).FirstOrDefault();
+                                    var ImageUrl = ((IPublishedContent)blogHeader.Value("image")).Url?.ToString() ?? "";
                                     <div class="col-md-4 col-12">
-                                        <div class="container @blogBoxClass.ToString()"
+                                        <div class="container @blogBoxClass.ToString()" 
                                         style="background-image:linear-gradient(rgba(128,128,128,0),rgba(0,0,0,1)),url(@ImageUrl);background-position:center;background-repeat:no-repeat; background-size: cover;border-radius: 10px;Width: 95%; Margin:auto">
-                                            <p class="ab-thumbnail-card">@blogElement.Value(PublishedValueFallback, "title")</p>
-                                            <p class="ab-thumbnail-desc limited-text">@htmlStringUtilities.Truncate(@blogElement.Value(PublishedValueFallback, "introductionDescription")?.ToString() ?? "", 85, true, false)</p>
-                                            <div class="ab-blog-button"><a href="@blog.Url(PublishedUrlProvider)"><button>Read More</button></a></div>
-                                            <p class="ab-thumbnail-desc" style="padding-top:10px; padding-bottom:10px">Published: @(blogElement.Value<DateTime>(PublishedValueFallback, "blogDate").ToShortDateString())</p>
+                                            <p class="ab-thumbnail-card">@blogElement.Value("title")</p>
+                                            <p class="ab-thumbnail-desc limited-text">@htmlStringUtilities.Truncate(@blogElement.Value("introductionDescription").ToString(), 85, true, false)</p>
+                                            <div class="ab-blog-button"><a href="@blog.Url"><button>Read More</button></a></div>
+                                            <p class="ab-thumbnail-desc" style="padding-top:10px; padding-bottom:10px">Published: @(blogElement.Value<DateTime>("blogDate").ToShortDateString())</p>
                                         </div>
                                     </div>
                                     myCounter++;
@@ -458,7 +447,7 @@
 <!---------Testimonial part start--------------->
 <div class="container text-center">
     <h1 class="ab-test-title">Testimonials</h1>
-    <h2 class="test-header">@testimonialsNew.Value(PublishedValueFallback, "testimonialHeading")</h2>
+    <h2 class="test-header">@testimonialsNew.Value("testimonialHeading")</h2>
     <div id="carouselExample" class="carousel slide ab-test-adjust" data-ride="carousel">
         @{
             if (testimonialsNew != null)
@@ -468,17 +457,16 @@
                         int newCounter = 0;
                         foreach (var testimonyItem in testimonialsNew.TestimonialItems)
                         {
-                            var testimonyContent = testimonyItem.Content;
-                            var Avatar = ((ContentModels.Image)((IPublishedContent)testimonyContent.Value(PublishedValueFallback, "testimonialAvatar")))?.Url(PublishedUrlProvider);
+                            var Avatar = ((ContentModels.Image)((IPublishedContent)testimonyItem.Value("testimonialAvatar"))).Url;
                             <div class="carousel-item @((newCounter == 0) ? "active" : "")">
                                 <div class="row h-100">
                                     <div class="col col-sm-3 col-sm-offset-4 overlay-img my-auto align-items-center">
                                         <img class="overlay-img" src="@Avatar" loading="lazy" width="90%" height="100%">
                                     </div>
                                     <div class="col col-sm-7 test-desc w-100">
-                                        @testimonyContent.Value(PublishedValueFallback, "testimonialStory")
+                                        @testimonyItem.Value("testimonialStory")
                                         <p class="ab-test-border"></p>
-                                        <p class="ab-test-footer">@testimonyContent.Value(PublishedValueFallback, "testimonialName")</p>
+                                        <p class="ab-test-footer">@testimonyItem.Value("testimonialName")</p>
                                     </div>
                                 </div>
                             </div>
