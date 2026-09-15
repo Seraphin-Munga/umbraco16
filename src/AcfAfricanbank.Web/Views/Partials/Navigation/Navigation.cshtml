@@ -8,9 +8,11 @@
     // classes, so this view compiles regardless of ModelsBuilder state.
     IPublishedContent menu = null;
 
-    IPublishedContent homePageElements = null;
+    IPublishedContent homePageElements = null; 
 
-    var modelNav = Umbraco.Content(Guid.Parse("2493f2cf-9e1c-489f-9cf3-f93490557eed"));
+
+
+    var modelNav = Umbraco.Content(Guid.Parse("9bd96777-5a67-488d-8c70-465a6ce7d84b"));
 
     if (Model.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault() != null)
     {
