@@ -1,31 +1,29 @@
-﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
-@using ContentModels = Umbraco.Web.PublishedModels
-@using Umbraco.Core
-@using System.Web.Optimization
+﻿@inherits UmbracoViewPage
+@inject Umbraco.Cms.Core.Models.PublishedContent.IPublishedValueFallback PublishedValueFallback
+@inject Umbraco.Cms.Core.Models.PublishedContent.IVariationContextAccessor VariationContextAccessor
 @{
     Layout = null;
-    ContentModels.PageHome home = Model.Root() as ContentModels.PageHome;
     HomePageElements homePageElements = null;
-    if (Model.Children.Where(o => o is HomePageElements).FirstOrDefault() != null)
+    if (Model.Children(VariationContextAccessor).Where(o => o is HomePageElements).FirstOrDefault() != null)
     {
-        homePageElements = (HomePageElements)Model.Children.Where(o => o is HomePageElements).FirstOrDefault();
+        homePageElements = (HomePageElements)Model.Children(VariationContextAccessor).Where(o => o is HomePageElements).FirstOrDefault();
     }
-    else if (Model.Parent.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault() != null)
+    else if (Model.Parent.Parent.Children(VariationContextAccessor).Where(o => o is HomePageElements).FirstOrDefault() != null)
     {
-        homePageElements = (HomePageElements)Model.Parent.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+        homePageElements = (HomePageElements)Model.Parent.Parent.Children(VariationContextAccessor).Where(o => o is HomePageElements).FirstOrDefault();
     }
     else
     {
-        homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+        homePageElements = (HomePageElements)Model.Parent.Children(VariationContextAccessor).Where(o => o is HomePageElements).FirstOrDefault();
     }
-    var disclaimersData = homePageElements.Children.Where(o => o.ContentType.Alias == "ebankITListSectionText").ToList();
-    var disclaimers = disclaimersData.FirstOrDefault().Children;
+    var disclaimersData = homePageElements?.Children(VariationContextAccessor).Where(o => o.ContentType.Alias == "ebankITListSectionText").ToList();
+    var disclaimers = disclaimersData?.FirstOrDefault()?.Children(VariationContextAccessor) ?? Enumerable.Empty<IPublishedContent>();
     IPublishedContent disclaimerValue = null;
     foreach (var content in disclaimers)
     {
-        if (HttpContext.Current.Request.Path.ToString().Contains("/banking"))
+        if (Context.Request.Path.ToString().Contains("/banking"))
         {
-            if (content.Value("ebankITTitle").ToString().Contains("Banking"))
+            if ((content.Value(PublishedValueFallback, "ebankITTitle")?.ToString() ?? "").Contains("Banking"))
             {
                 disclaimerValue = content;
             }
@@ -36,7 +34,7 @@
             break;
         }
     }
-    var bottomNavigation = (BottomNavigation)homePageElements.Children.Where(c => c is BottomNavigation).FirstOrDefault();
+    var bottomNavigation = (BottomNavigation)homePageElements?.Children(VariationContextAccessor).Where(c => c is BottomNavigation).FirstOrDefault();
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -80,7 +78,7 @@
                     <div class="col-sm-7 col-sm-pull-5">
                         <img src="~/images/africanbank-logo-white.svg" width="170" alt="African Bank">
                         <div class="copyright-text">
-                            @Html.Raw(disclaimerValue.Value("ebankITContent"))
+                            @Html.Raw(disclaimerValue?.Value(PublishedValueFallback, "ebankITContent"))
                         </div>
                     </div>
                     <div class="col-sm-5 col-sm-push-7">
