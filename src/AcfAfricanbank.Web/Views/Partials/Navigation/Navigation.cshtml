@@ -32,16 +32,35 @@
     var debugHomePageElementsChildren = homePageElements?.Children(VariationContextAccessor).ToList();
     var debugMenuInfo = menu?.Value<IEnumerable<IPublishedElement>>(PublishedValueFallback, "MenuInfo")?.ToList();
     var debugFirstItem = debugMenuInfo?.FirstOrDefault();
+
+    var debugData = new
+    {
+        model = new { name = Model.Name, docType = Model.ContentType.Alias },
+        homePageElements = homePageElements == null
+            ? null
+            : new { name = homePageElements.Name, docType = homePageElements.ContentType.Alias },
+        homePageElementsChildren = debugHomePageElementsChildren?
+            .Select(c => new { name = c.Name, docType = c.ContentType.Alias })
+            .ToList(),
+        menu = menu == null ? null : new { name = menu.Name, docType = menu.ContentType.Alias },
+        menuInfoItemCount = debugMenuInfo?.Count,
+        firstMenuInfoItem = debugFirstItem == null
+            ? null
+            : new
+            {
+                docType = debugFirstItem.ContentType.Alias,
+                propertyAliases = debugFirstItem.Properties.Select(p => p.Alias).ToList()
+            }
+    };
+
+    var debugJson = System.Text.Json.JsonSerializer.Serialize(debugData);
 }
-<!-- TEMP DEBUG - remove once topNavigation/MenuInfo are confirmed; view page source to read this
-Model: @Model.Name [@Model.ContentType.Alias]
-homePageElements resolved: @(homePageElements?.Name ?? "NOT FOUND") [@(homePageElements?.ContentType.Alias ?? "-")]
-homePageElements children (published, via .Children()): @(debugHomePageElementsChildren != null ? string.Join(" | ", debugHomePageElementsChildren.Select(c => $"{c.Name} [{c.ContentType.Alias}]")) : "n/a (homePageElements itself is null)")
-menu (topNavigation) resolved: @(menu?.Name ?? "NOT FOUND")
-MenuInfo item count: @(debugMenuInfo?.Count.ToString() ?? "null (property itself came back null)")
-First MenuInfo item content type: @(debugFirstItem?.ContentType.Alias ?? "n/a")
-First MenuInfo item property aliases: @(debugFirstItem != null ? string.Join(", ", debugFirstItem.Properties.Select(p => p.Alias)) : "n/a")
--->
+<!-- TEMP DEBUG - remove once topNavigation/MenuInfo are confirmed; logged to the browser console -->
+<script>
+    $(function () {
+        console.log("Navigation.cshtml debug:", @Html.Raw(debugJson));
+    });
+</script>
 
 
 
