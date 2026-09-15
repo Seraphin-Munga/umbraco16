@@ -28,8 +28,6 @@
     menu = homePageElements?.Children(VariationContextAccessor).Where(o => o.IsDocumentType("topNavigation")).FirstOrDefault();
 }
 
-<<<<<<< HEAD
-=======
 @{
     var debugHomePageElementsChildren = homePageElements?.Children(VariationContextAccessor).ToList();
     var debugMenuInfo = menu?.Value<IEnumerable<IPublishedElement>>(PublishedValueFallback, "MenuInfo")?.ToList();
