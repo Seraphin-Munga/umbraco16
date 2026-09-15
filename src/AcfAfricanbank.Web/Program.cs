@@ -5,6 +5,7 @@ using Microsoft.Data.SqlClient;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -1777,6 +1778,217 @@ if (args.Length > 0 &&
     }
 
     // ========================================================
+    // STEP 7
+    // USERS
+    // ========================================================
+    //
+    // Password hashes are NOT migrated - Umbraco 8 and 16 use different
+    // hashing schemes, so copying the hash bytes would produce a login
+    // that looks migrated but doesn't actually work. Each migrated user
+    // gets a fresh Umbraco-generated initial password instead (printed
+    // below), not a working v8 password - they (or whoever administers
+    // this) need that password or a reset link to actually log in.
+    //
+    // The whole step is wrapped in one try/catch: umbracoUser/
+    // umbracoUserGroup/umbracoUser2UserGroup column names are trusted at
+    // face value here (unlike cmsTemplate/cmsDataType, which turned out
+    // to differ from assumptions on this exact database) - if they're
+    // wrong too, this logs a clear error and the rest of migrate still
+    // completes rather than crashing over user accounts.
+
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine("STEP 7 - USERS");
+    Console.WriteLine("=================================================");
+
+    try
+    {
+        var userGroupService =
+            app.Services.GetRequiredService<IUserGroupService>();
+
+        var userService =
+            app.Services.GetRequiredService<IUserService>();
+
+        var sourceUserGroups =
+            await GetUserGroupsAsync(source);
+
+        Console.WriteLine(
+            $"Found {sourceUserGroups.Count} user groups.");
+
+        var userGroupMap =
+            new Dictionary<int, Guid>();
+
+        foreach (var group in sourceUserGroups)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(group.Alias))
+                {
+                    continue;
+                }
+
+                var existingGroup =
+                    await userGroupService.GetAsync(group.Alias);
+
+                if (existingGroup != null)
+                {
+                    userGroupMap[group.Id] =
+                        existingGroup.Key;
+
+                    Console.WriteLine(
+                        $"EXISTS USER GROUP: {group.Alias}");
+
+                    continue;
+                }
+
+                var newGroup =
+                    new UserGroup(
+                        shortStringHelper,
+                        0,
+                        group.Alias,
+                        string.IsNullOrWhiteSpace(group.Name)
+                            ? group.Alias
+                            : group.Name,
+                        "icon-users");
+
+                var createGroupResult =
+                    await userGroupService.CreateAsync(
+                        newGroup,
+                        Constants.Security.SuperUserKey);
+
+                if (!createGroupResult.Success)
+                {
+                    Console.WriteLine(
+                        $"ERROR CREATE USER GROUP: {group.Alias} - " +
+                        $"{createGroupResult.Status}");
+
+                    continue;
+                }
+
+                userGroupMap[group.Id] =
+                    createGroupResult.Result.Key;
+
+                Console.WriteLine(
+                    $"CREATED USER GROUP: {group.Alias}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    $"ERROR USER GROUP {group.Id}: {ex.Message}");
+            }
+        }
+
+        var sourceUsers =
+            await GetUsersAsync(source);
+
+        Console.WriteLine(
+            $"Found {sourceUsers.Count} users.");
+
+        var sourceMemberships =
+            await GetUserGroupMembershipsAsync(source);
+
+        var existingUsersByEmail =
+            userService
+                .GetAll(
+                    0,
+                    1000,
+                    out _,
+                    "Username",
+                    Direction.Ascending,
+                    null,
+                    null,
+                    null)
+                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
+                .GroupBy(u => u.Email, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.First().Key,
+                    StringComparer.OrdinalIgnoreCase);
+
+        foreach (var user in sourceUsers)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(user.Email))
+                {
+                    Console.WriteLine(
+                        $"SKIP USER {user.Id}: no email.");
+
+                    continue;
+                }
+
+                if (existingUsersByEmail.ContainsKey(user.Email))
+                {
+                    Console.WriteLine(
+                        $"EXISTS USER: {user.Email}");
+
+                    continue;
+                }
+
+                var groupKeys =
+                    sourceMemberships
+                        .Where(m => m.UserId == user.Id)
+                        .Select(m =>
+                            userGroupMap.TryGetValue(
+                                m.UserGroupId,
+                                out var key)
+                                ? key
+                                : (Guid?)null)
+                        .Where(k => k.HasValue)
+                        .Select(k => k!.Value)
+                        .ToHashSet();
+
+                var model =
+                    new UserCreateModel
+                    {
+                        Name =
+                            string.IsNullOrWhiteSpace(user.Name)
+                                ? user.Email
+                                : user.Name,
+                        Email = user.Email,
+                        UserName =
+                            string.IsNullOrWhiteSpace(user.Login)
+                                ? user.Email
+                                : user.Login,
+                        Kind = UserKind.Default,
+                        UserGroupKeys = groupKeys
+                    };
+
+                var createResult =
+                    await userService.CreateAsync(
+                        Constants.Security.SuperUserKey,
+                        model,
+                        approveUser: true);
+
+                if (!createResult.Success)
+                {
+                    Console.WriteLine(
+                        $"ERROR CREATE USER: {user.Email} - " +
+                        $"{createResult.Status}");
+
+                    continue;
+                }
+
+                Console.WriteLine(
+                    $"CREATED USER: {user.Email} " +
+                    $"(initial password: {createResult.Result.InitialPassword})");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    $"ERROR USER {user.Id}/{user.Email}: {ex.Message}");
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(
+            $"ERROR STEP 7 USERS: {ex.Message}");
+        Console.WriteLine(
+            "Skipping user migration - the rest of migrate will continue.");
+    }
+
+    // ========================================================
     // RESULT
     // ========================================================
 
@@ -2914,6 +3126,105 @@ static async Task<List<SourceDictionary>>
 }
 
 
+static async Task<List<SourceUserGroup>> GetUserGroupsAsync(
+    SqlConnection connection)
+{
+    var result = new List<SourceUserGroup>();
+
+    const string sql = """
+        SELECT
+            id,
+            ISNULL(userGroupAlias, ''),
+            ISNULL(userGroupName, '')
+        FROM umbracoUserGroup
+        ORDER BY id
+        """;
+
+    await using var command =
+        new SqlCommand(sql, connection);
+
+    await using var reader =
+        await command.ExecuteReaderAsync();
+
+    while (await reader.ReadAsync())
+    {
+        result.Add(
+            new SourceUserGroup(
+                reader.GetInt32(0),
+                reader.GetString(1),
+                reader.GetString(2)));
+    }
+
+    return result;
+}
+
+
+static async Task<List<SourceUser>> GetUsersAsync(
+    SqlConnection connection)
+{
+    var result = new List<SourceUser>();
+
+    const string sql = """
+        SELECT
+            id,
+            ISNULL(userName, ''),
+            ISNULL(userLogin, ''),
+            ISNULL(userEmail, '')
+        FROM umbracoUser
+        ORDER BY id
+        """;
+
+    await using var command =
+        new SqlCommand(sql, connection);
+
+    await using var reader =
+        await command.ExecuteReaderAsync();
+
+    while (await reader.ReadAsync())
+    {
+        result.Add(
+            new SourceUser(
+                reader.GetInt32(0),
+                reader.GetString(1),
+                reader.GetString(2),
+                reader.GetString(3)));
+    }
+
+    return result;
+}
+
+
+static async Task<List<SourceUserGroupMembership>>
+    GetUserGroupMembershipsAsync(
+        SqlConnection connection)
+{
+    var result = new List<SourceUserGroupMembership>();
+
+    const string sql = """
+        SELECT
+            userId,
+            userGroupId
+        FROM umbracoUser2UserGroup
+        """;
+
+    await using var command =
+        new SqlCommand(sql, connection);
+
+    await using var reader =
+        await command.ExecuteReaderAsync();
+
+    while (await reader.ReadAsync())
+    {
+        result.Add(
+            new SourceUserGroupMembership(
+                reader.GetInt32(0),
+                reader.GetInt32(1)));
+    }
+
+    return result;
+}
+
+
 // ============================================================
 // RECORDS
 // ============================================================
@@ -3004,3 +3315,18 @@ record SourceDictionary(
     Guid Id,
     Guid? Parent,
     string Key);
+
+record SourceUserGroup(
+    int Id,
+    string Alias,
+    string Name);
+
+record SourceUser(
+    int Id,
+    string Name,
+    string Login,
+    string Email);
+
+record SourceUserGroupMembership(
+    int UserId,
+    int UserGroupId);
