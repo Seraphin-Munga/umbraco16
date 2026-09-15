@@ -28,6 +28,43 @@
     menu = homePageElements?.Children(VariationContextAccessor).Where(o => o.IsDocumentType("topNavigation")).FirstOrDefault();
 }
 
+<<<<<<< HEAD
+=======
+@{
+    var debugHomePageElementsChildren = homePageElements?.Children(VariationContextAccessor).ToList();
+    var debugMenuInfo = menu?.Value<IEnumerable<IPublishedElement>>(PublishedValueFallback, "MenuInfo")?.ToList();
+    var debugFirstItem = debugMenuInfo?.FirstOrDefault();
+
+    var debugData = new
+    {
+        model = new { name = Model.Name, docType = Model.ContentType.Alias },
+        homePageElements = homePageElements == null
+            ? null
+            : new { name = homePageElements.Name, docType = homePageElements.ContentType.Alias },
+        homePageElementsChildren = debugHomePageElementsChildren?
+            .Select(c => new { name = c.Name, docType = c.ContentType.Alias })
+            .ToList(),
+        menu = menu == null ? null : new { name = menu.Name, docType = menu.ContentType.Alias },
+        menuInfoItemCount = debugMenuInfo?.Count,
+        firstMenuInfoItem = debugFirstItem == null
+            ? null
+            : new
+            {
+                docType = debugFirstItem.ContentType.Alias,
+                propertyAliases = debugFirstItem.Properties.Select(p => p.Alias).ToList()
+            }
+    };
+
+    var debugJson = System.Text.Json.JsonSerializer.Serialize(debugData);
+}
+<!-- TEMP DEBUG - remove once topNavigation/MenuInfo are confirmed; logged to the browser console -->
+<script>
+    $(function () {
+        console.log("Navigation.cshtml debug:", @Html.Raw(debugJson));
+    });
+</script>
+
+>>>>>>> 5a714ac944fba1c5356a3f81e6c1f7be9506ad4f
 
 
 <style>
