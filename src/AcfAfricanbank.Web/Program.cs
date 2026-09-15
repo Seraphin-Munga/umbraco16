@@ -14,6 +14,32 @@ using Umbraco.Cms.Core.Strings;
 var builder = WebApplication.CreateBuilder(args);
 
 // ============================================================
+// DATA DIRECTORY
+// ============================================================
+//
+// |DataDirectory| in the LocalDB connection string has nothing pinning
+// it, so it falls back to .NET's default (the build output folder,
+// bin/Debug/net9.0) - confirmed by the exact path SQL Server reported
+// in an earlier LocalDB attach error. That folder isn't stable: clean
+// builds/IDE rebuilds touch it, and where it resolves can even differ
+// depending on how the app gets launched (dotnet run vs an IDE's F5 vs
+// running the .exe directly), which is the likely explanation for
+// "old data" reappearing after a reset - a stale .mdf sitting in or
+// getting restored to that folder, separate from whatever was just
+// cleared. Pin it explicitly to the umbraco/Data folder instead -
+// already the project's dedicated, git-ignored spot for exactly this
+// kind of persistent local file (Umbraco's own Logs/TEMP already live
+// there) - so it resolves identically every time regardless of launch
+// method.
+
+AppDomain.CurrentDomain.SetData(
+    "DataDirectory",
+    System.IO.Path.Combine(
+        builder.Environment.ContentRootPath,
+        "umbraco",
+        "Data"));
+
+// ============================================================
 // SOURCE UMBRACO 8 DATABASE
 // ============================================================
 
