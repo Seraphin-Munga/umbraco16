@@ -54,7 +54,7 @@
                         foreach (var heroItem in heroHeader.Items)
                         {
                             var heroContent = heroItem.Content;
-                            var heroImageUrl = ((ContentModels.Image)((IPublishedContent)heroContent.Value(PublishedValueFallback, "heroImage"))).Url(PublishedUrlProvider);
+                            var heroImageUrl = ((ContentModels.Image)((IPublishedContent)heroContent.Value(PublishedValueFallback, "heroImage")))?.Url(PublishedUrlProvider);
                             Umbraco.Cms.Core.Models.Link redirect_links = null;
                             foreach (var link in (IEnumerable<Umbraco.Cms.Core.Models.Link>)heroContent.Value(PublishedValueFallback, "heroRedirectAction"))
                             {
@@ -136,11 +136,11 @@
                                     <div class="container @tabBgColor.ToString()">
                                         @if ((subItem.FormatIcon) && (subItem.Link != null))
                                         {
-                                            <img src="@subItem.BenefitCardIcon.Url(PublishedUrlProvider)" alt="@subItem.BenefitCardIcon.Value(PublishedValueFallback, "altTag")" width=@imgshoulderWidth.ToString() height="50">
+                                            <img src="@subItem.BenefitCardIcon?.Url(PublishedUrlProvider)" alt="@subItem.BenefitCardIcon?.Value(PublishedValueFallback, "altTag")" width=@imgshoulderWidth.ToString() height="50">
                                         }
                                         else
                                         {
-                                            <img src="@subItem.BenefitCardIcon.Url(PublishedUrlProvider)" alt="@subItem.BenefitCardIcon.Value(PublishedValueFallback, "altTag")" width=@imgshoulderWidth.ToString() height="50">
+                                            <img src="@subItem.BenefitCardIcon?.Url(PublishedUrlProvider)" alt="@subItem.BenefitCardIcon?.Value(PublishedValueFallback, "altTag")" width=@imgshoulderWidth.ToString() height="50">
                                         }
                                         <p>@subItem.Value(PublishedValueFallback, "benefitCardTitle")<br />@subItem.Value(PublishedValueFallback, "benefitCardDescription")</p>
 
@@ -186,7 +186,7 @@
                         <div class="col-md-6  section-artwork">
                             @if (getGetLoans.Value(PublishedValueFallback, "ebankItimage") != null)
                             {
-                                var sectionImageUrl = ((ContentModels.Image)((IPublishedContent)getGetLoans.Value(PublishedValueFallback, "ebankItimage"))).Url(PublishedUrlProvider);
+                                var sectionImageUrl = ((ContentModels.Image)((IPublishedContent)getGetLoans.Value(PublishedValueFallback, "ebankItimage")))?.Url(PublishedUrlProvider);
                                 <img src="@sectionImageUrl" width="90%" alt="@getGetLoans.Value(PublishedValueFallback, "altTag")" width="90%" height="100%">
                             }else{
                                 <img src="" width="90%" alt="@getGetLoans.Value(PublishedValueFallback, "altTag")">
@@ -234,7 +234,7 @@
                     <div class="col-md-6 section-artwork my-auto">
                         @if (getMyWorldBank.Value(PublishedValueFallback, "ebankItimage") != null)
                         {
-                            var bankImageUrl = ((ContentModels.Image)((IPublishedContent)getMyWorldBank.Value(PublishedValueFallback, "ebankITImage"))).Url(PublishedUrlProvider);
+                            var bankImageUrl = ((ContentModels.Image)((IPublishedContent)getMyWorldBank.Value(PublishedValueFallback, "ebankITImage")))?.Url(PublishedUrlProvider);
                             <img src="@bankImageUrl" width="60%" alt="MyWorld Bank">
                         }else{
                             <img src="" alt="">
@@ -243,7 +243,7 @@
                     <div class="col-md-6 section-content">
                         <h2 class="ab-section-title-myworld">@getMyWorldBank.Value(PublishedValueFallback, "ebankITTitle")</h2>
                         <h3 class="ab-section-discription-myworld">@getMyWorldBank.Value(PublishedValueFallback, "ebankITContent")</h3>
-                        <p class="ab-body-desc-myworld">@Html.StripHtml(@getMyWorldBank.Value(PublishedValueFallback, "sectionHeroBodyDescription").ToString(), new[] { "p" })</p>
+                        <p class="ab-body-desc-myworld">@Html.StripHtml(@getMyWorldBank.Value(PublishedValueFallback, "sectionHeroBodyDescription")?.ToString() ?? "", new[] { "p" })</p>
                         <div class="primary-btn myworld-button-padding">
                             @if (getWorldLink != null)
                             {
@@ -272,7 +272,7 @@
                     <div class="col-md-6  section-artwork my-auto">
                         @if (getSupportData.Value(PublishedValueFallback, "ebankItimage") != null)
                         {
-                            var supportImageUrl = ((ContentModels.Image)((IPublishedContent)getSupportData.Value(PublishedValueFallback, "ebankITImage"))).Url(PublishedUrlProvider);
+                            var supportImageUrl = ((ContentModels.Image)((IPublishedContent)getSupportData.Value(PublishedValueFallback, "ebankITImage")))?.Url(PublishedUrlProvider);
                             <img src="@supportImageUrl" width="90%" height="100%" alt="@getSupportData.Value(PublishedValueFallback, "ebankITTitle")">
                         }
                         else
@@ -350,12 +350,12 @@
                                     }
 
                                     var blogHeader = blog.Children(VariationContextAccessor).FirstOrDefault().Children(VariationContextAccessor).Where(c => c is HeroHeaderBlogDetail).FirstOrDefault();
-                                    var ImageUrl = ((IPublishedContent)blogHeader.Value(PublishedValueFallback, "image")).Url(PublishedUrlProvider)?.ToString() ?? "";
+                                    var ImageUrl = ((IPublishedContent)blogHeader?.Value(PublishedValueFallback, "image"))?.Url(PublishedUrlProvider)?.ToString() ?? "";
                                     <div class="col-md-4 col-12">
                                         <div class="container @blogBoxClass.ToString()"
                                         style="background-image:linear-gradient(rgba(128,128,128,0),rgba(0,0,0,1)),url(@ImageUrl);background-position:center;background-repeat:no-repeat; background-size: cover;border-radius: 10px;Width: 95%; Margin:auto">
                                             <p class="ab-thumbnail-card">@blogElement.Value(PublishedValueFallback, "title")</p>
-                                            <p class="ab-thumbnail-desc limited-text">@htmlStringUtilities.Truncate(@blogElement.Value(PublishedValueFallback, "introductionDescription").ToString(), 85, true, false)</p>
+                                            <p class="ab-thumbnail-desc limited-text">@htmlStringUtilities.Truncate(@blogElement.Value(PublishedValueFallback, "introductionDescription")?.ToString() ?? "", 85, true, false)</p>
                                             <div class="ab-blog-button"><a href="@blog.Url(PublishedUrlProvider)"><button>Read More</button></a></div>
                                             <p class="ab-thumbnail-desc" style="padding-top:10px; padding-bottom:10px">Published: @(blogElement.Value<DateTime>(PublishedValueFallback, "blogDate").ToShortDateString())</p>
                                         </div>
@@ -469,7 +469,7 @@
                         foreach (var testimonyItem in testimonialsNew.TestimonialItems)
                         {
                             var testimonyContent = testimonyItem.Content;
-                            var Avatar = ((ContentModels.Image)((IPublishedContent)testimonyContent.Value(PublishedValueFallback, "testimonialAvatar"))).Url(PublishedUrlProvider);
+                            var Avatar = ((ContentModels.Image)((IPublishedContent)testimonyContent.Value(PublishedValueFallback, "testimonialAvatar")))?.Url(PublishedUrlProvider);
                             <div class="carousel-item @((newCounter == 0) ? "active" : "")">
                                 <div class="row h-100">
                                     <div class="col col-sm-3 col-sm-offset-4 overlay-img my-auto align-items-center">
