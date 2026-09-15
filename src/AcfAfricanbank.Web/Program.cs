@@ -1394,6 +1394,65 @@ if (args.Length > 0 &&
                 continue;
             }
 
+            // ------------------------------------------------
+            // Check for an already-migrated match first. This step
+            // previously had no idempotency check at all (unlike
+            // STEP 1B/3, which do check), so every re-run of migrate
+            // created a full duplicate copy of every content node -
+            // confirmed via the schema command: umbracoDocument ended
+            // up at ~13x the source row count after repeated runs.
+            // Match on (parent, name, content type), the closest
+            // available equivalent to a v8 source node's identity.
+            // ------------------------------------------------
+
+            IContent existingContent = null;
+
+            if (item.ParentId <= 0)
+            {
+                existingContent =
+                    contentService.GetRootContent()
+                        .FirstOrDefault(c =>
+                            c.Name == item.Name &&
+                            c.ContentType.Alias.Equals(
+                                contentTypeAlias,
+                                StringComparison.OrdinalIgnoreCase));
+            }
+            else if (contentMap.TryGetValue(
+                item.ParentId,
+                out var existingParentKey))
+            {
+                var parentContent =
+                    contentService.GetById(existingParentKey);
+
+                if (parentContent != null)
+                {
+                    existingContent =
+                        contentService
+                            .GetPagedChildren(
+                                parentContent.Id,
+                                0,
+                                10000,
+                                out _)
+                            .FirstOrDefault(c =>
+                                c.Name == item.Name &&
+                                c.ContentType.Alias.Equals(
+                                    contentTypeAlias,
+                                    StringComparison.OrdinalIgnoreCase));
+                }
+            }
+
+            if (existingContent != null)
+            {
+                contentMap[item.NodeId] =
+                    existingContent.Key;
+
+                Console.WriteLine(
+                    $"EXISTS CONTENT: " +
+                    $"{item.NodeId} -> {item.Name}");
+
+                continue;
+            }
+
             IContent content;
 
             // ------------------------------------------------
