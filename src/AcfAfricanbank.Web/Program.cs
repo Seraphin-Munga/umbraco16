@@ -1,11 +1,8 @@
-using System.Text;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using Microsoft.Data.SqlClient;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -37,118 +34,6 @@ if (string.IsNullOrWhiteSpace(targetConnectionString))
 {
     throw new Exception(
         "Target Umbraco connection string 'umbracoDbDSN' was not found.");
-}
-
-// ============================================================
-// RESET COMMAND
-// ============================================================
-//
-// Drops EVERY table in the TARGET database only - sourceConnectionString
-// is never referenced anywhere in this block, so the v8 database cannot
-// be touched by this command no matter what. Needed because STEP 4 (in
-// the migrate command below) had no idempotency check until this
-// session's fix, so earlier runs left the target with ~13x duplicated
-// content - see MIGRATION.md. Runs BEFORE Umbraco boots (unlike
-// migrate/schema below, which need Umbraco's services) so dropping
-// tables out from under an already-booted runtime's own lock/cache
-// machinery is never a concern.
-
-if (args.Length > 0 &&
-    args[0].Equals("reset", StringComparison.OrdinalIgnoreCase))
-{
-    Console.WriteLine();
-    Console.WriteLine("=================================================");
-    Console.WriteLine(" RESET TARGET DATABASE - DROPS EVERY TABLE");
-    Console.WriteLine("=================================================");
-    Console.WriteLine();
-
-    await using var target =
-        new SqlConnection(targetConnectionString);
-
-    await target.OpenAsync();
-
-    Console.WriteLine(
-        $"Target: {target.DataSource} / {target.Database}");
-    Console.WriteLine();
-    Console.WriteLine(
-        "This permanently drops EVERY table in the database above.");
-    Console.WriteLine(
-        "The source Umbraco 8 database is never touched by this command.");
-    Console.WriteLine();
-    Console.Write(
-        $"Type the database name ({target.Database}) to confirm: ");
-
-    var confirmation = Console.ReadLine();
-
-    if (!string.Equals(
-            confirmation,
-            target.Database,
-            StringComparison.Ordinal))
-    {
-        Console.WriteLine();
-        Console.WriteLine(
-            "Confirmation did not match. Aborted - nothing was changed.");
-
-        return;
-    }
-
-    Console.WriteLine();
-    Console.WriteLine("Disabling foreign key constraints...");
-
-    await ExecuteSqlAsync(
-        target,
-        """
-        DECLARE @sql NVARCHAR(MAX) = N'';
-        SELECT @sql += 'ALTER TABLE ' + QUOTENAME(SCHEMA_NAME(schema_id)) + '.' + QUOTENAME(name) + ' NOCHECK CONSTRAINT ALL;'
-        FROM sys.tables;
-        EXEC sp_executesql @sql;
-        """);
-
-    Console.WriteLine("Dropping foreign key constraints...");
-
-    await ExecuteSqlAsync(
-        target,
-        """
-        DECLARE @sql NVARCHAR(MAX) = N'';
-        SELECT @sql += 'ALTER TABLE ' + QUOTENAME(SCHEMA_NAME(t.schema_id)) + '.' + QUOTENAME(t.name) + ' DROP CONSTRAINT ' + QUOTENAME(fk.name) + ';'
-        FROM sys.foreign_keys fk
-        INNER JOIN sys.tables t ON fk.parent_object_id = t.object_id;
-        EXEC sp_executesql @sql;
-        """);
-
-    Console.WriteLine("Dropping tables...");
-
-    await ExecuteSqlAsync(
-        target,
-        """
-        DECLARE @sql NVARCHAR(MAX) = N'';
-        SELECT @sql += 'DROP TABLE ' + QUOTENAME(SCHEMA_NAME(schema_id)) + '.' + QUOTENAME(name) + ';'
-        FROM sys.tables;
-        EXEC sp_executesql @sql;
-        """);
-
-    var remainingTables =
-        await GetTableListAsync(target);
-
-    Console.WriteLine();
-    Console.WriteLine(
-        $"Done. {remainingTables.Count} tables remain (should be 0).");
-
-    if (remainingTables.Count > 0)
-    {
-        foreach (var t in remainingTables)
-        {
-            Console.WriteLine($"  {t.Name}");
-        }
-    }
-
-    Console.WriteLine();
-    Console.WriteLine(
-        "Next: run the app normally once (no args) to let Umbraco");
-    Console.WriteLine(
-        "rebuild its schema fresh, then run 'migrate' again.");
-
-    return;
 }
 
 // ============================================================
@@ -995,22 +880,14 @@ if (args.Length > 0 &&
             ["Umbraco.MediaPicker"] = "Umbraco.MediaPicker3",
             ["Umbraco.MultipleMediaPicker"] = "Umbraco.MediaPicker3",
             ["Umbraco.TinyMCE"] = "Umbraco.RichText",
-            // Umbraco.Grid was removed in v16 (replaced by Block Grid, a
-            // different value format with no reliable automated layout
-            // conversion). Rather than lose the content, properties land on
-            // the built-in RichText editor instead, and STEP 5 below
-            // flattens each Grid property's rows/areas/controls into plain
-            // HTML (rte/textstring/headline/quote text, media as <img>) when
-            // it applies values - content over exact layout.
-            ["Umbraco.Grid"] = "Umbraco.RichText",
         };
 
     // These editors still exist in Umbraco 16, but a fresh install doesn't
     // seed a default Data Type for them (unlike Textstring/RichText/Date/
     // etc.) - create one on demand instead of skipping every property that
-    // uses them. Umbraco.NestedContent is genuinely gone in v16 (replaced by
-    // Block List) and is NOT here - see STEP 3B below, which converts it to
-    // a real Block List Data Type instead of just remapping the alias.
+    // uses them. Editors that are genuinely gone in v16 (Umbraco.Grid,
+    // Umbraco.NestedContent - see MIGRATION.md) are deliberately not here;
+    // those need real data conversion, not just a new Data Type.
     var autoCreatableEditorAliases =
         new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -1184,286 +1061,6 @@ if (args.Length > 0 &&
     }
 
     // ========================================================
-    // STEP 3B
-    // NESTED CONTENT -> BLOCK LIST
-    // ========================================================
-    //
-    // Umbraco.NestedContent has no equivalent Data Type to create in v16
-    // (replaced by Block List, a different value format), so STEP 3 above
-    // deliberately skips these properties. Rather than trust the v8 data
-    // type's own prevalue/config (a schema we're not certain of on this DB -
-    // guessing table names has already failed twice for cmsTemplate and
-    // cmsDataType), the element types actually used are discovered directly
-    // from the real stored JSON values, which is accurate regardless of
-    // schema drift. STEP 5 below converts each item's JSON into Block
-    // List's wire format when it applies property values.
-    //
-    // Known limitation: sub-property values are carried over as-is. Text/
-    // richtext/number sub-properties transfer correctly since their raw
-    // value format didn't change, but a media picker sub-property nested
-    // inside a Nested Content item keeps its old v8 integer ID, which won't
-    // resolve in v16's UDI-based MediaPicker3 format.
-
-    Console.WriteLine();
-    Console.WriteLine("=================================================");
-    Console.WriteLine("STEP 3B - NESTED CONTENT -> BLOCK LIST");
-    Console.WriteLine("=================================================");
-
-    propertyEditors.TryGet("Umbraco.BlockList", out var blockListEditor);
-
-    var nestedContentProperties =
-        properties
-            .Where(p =>
-                sourceDataTypes.TryGetValue(p.DataTypeId, out var dt) &&
-                dt.EditorAlias.Equals(
-                    "Umbraco.NestedContent",
-                    StringComparison.OrdinalIgnoreCase))
-            .ToList();
-
-    Console.WriteLine(
-        $"Found {nestedContentProperties.Count} Nested Content properties.");
-
-    // property.Id (source cmsPropertyType.id) -> target Block List IDataType.
-    // Populated below and reused in STEP 5 to know which values need
-    // converting instead of copying straight across.
-    var nestedContentDataTypes =
-        new Dictionary<int, IDataType>();
-
-    if (nestedContentProperties.Count == 0)
-    {
-        // nothing to do
-    }
-    else if (blockListEditor == null)
-    {
-        Console.WriteLine(
-            "SKIP: Umbraco.BlockList editor not found - " +
-            "Nested Content properties will stay empty.");
-    }
-    else
-    {
-        var allPropertyValues =
-            await GetPropertyValuesAsync(source);
-
-        foreach (var property in nestedContentProperties)
-        {
-            try
-            {
-                if (!contentTypeMap.TryGetValue(
-                        property.ContentTypeId,
-                        out var contentTypeAlias))
-                {
-                    continue;
-                }
-
-                var elementTypeAliases =
-                    new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
-
-                foreach (var value in allPropertyValues)
-                {
-                    if (value.PropertyTypeId != property.Id ||
-                        string.IsNullOrWhiteSpace(value.TextValue))
-                    {
-                        continue;
-                    }
-
-                    try
-                    {
-                        using var doc =
-                            JsonDocument.Parse(value.TextValue);
-
-                        if (doc.RootElement.ValueKind != JsonValueKind.Array)
-                            continue;
-
-                        foreach (var item in doc.RootElement.EnumerateArray())
-                        {
-                            if (item.TryGetProperty(
-                                    "ncContentTypeAlias",
-                                    out var aliasEl) &&
-                                aliasEl.ValueKind == JsonValueKind.String)
-                            {
-                                elementTypeAliases.Add(aliasEl.GetString()!);
-                            }
-                        }
-                    }
-                    catch (JsonException)
-                    {
-                        // Not valid JSON for this value - other items for
-                        // the same property can still convert fine.
-                    }
-                }
-
-                if (elementTypeAliases.Count == 0)
-                {
-                    Console.WriteLine(
-                        $"SKIP NESTED CONTENT: {contentTypeAlias}.{property.Alias} " +
-                        "(no items found to infer element types from)");
-
-                    continue;
-                }
-
-                // ConfigurationObject on DataType is a read-only value
-                // computed FROM ConfigurationData - the raw dictionary shape
-                // the Block List config editor's JSON round-trips into
-                // ({"blocks":[{"contentElementTypeKey":"<guid>"}]}), so that
-                // raw dictionary is what actually gets set below.
-                var blockConfigs =
-                    new List<Dictionary<string, object>>();
-
-                foreach (var elementAlias in elementTypeAliases)
-                {
-                    var elementType =
-                        contentTypeService.Get(elementAlias);
-
-                    if (elementType == null)
-                    {
-                        Console.WriteLine(
-                            $"SKIP NESTED CONTENT ELEMENT: {elementAlias} " +
-                            "(content type not migrated)");
-
-                        continue;
-                    }
-
-                    if (!elementType.IsElement)
-                    {
-                        elementType.IsElement = true;
-                        contentTypeService.Save(elementType);
-                    }
-
-                    blockConfigs.Add(
-                        new Dictionary<string, object>
-                        {
-                            ["contentElementTypeKey"] =
-                                elementType.Key.ToString()
-                        });
-                }
-
-                if (blockConfigs.Count == 0)
-                {
-                    continue;
-                }
-
-                var newDataType =
-                    new DataType(blockListEditor, configurationEditorJsonSerializer)
-                    {
-                        Name =
-                            $"Migrated Block List - {contentTypeAlias}.{property.Alias}",
-                        ConfigurationData =
-                            new Dictionary<string, object>
-                            {
-                                ["blocks"] = blockConfigs
-                            }
-                    };
-
-                var createResult =
-                    await dataTypeService.CreateAsync(
-                        newDataType,
-                        Constants.Security.SuperUserKey);
-
-                if (!createResult.Success)
-                {
-                    Console.WriteLine(
-                        $"ERROR CREATE BLOCKLIST DATATYPE: " +
-                        $"{contentTypeAlias}.{property.Alias} - " +
-                        $"{createResult.Status}");
-
-                    continue;
-                }
-
-                nestedContentDataTypes[property.Id] =
-                    createResult.Result;
-
-                Console.WriteLine(
-                    $"CREATED BLOCKLIST DATATYPE: " +
-                    $"{contentTypeAlias}.{property.Alias} " +
-                    $"({blockConfigs.Count} element type(s))");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(
-                    $"ERROR NESTED CONTENT DATATYPE " +
-                    $"{property.ContentTypeId}/{property.Alias}: {ex.Message}");
-            }
-        }
-
-        // Now add the actual PropertyType to each content type, same
-        // pattern as STEP 3, using the new Block List Data Type.
-        foreach (var property in nestedContentProperties)
-        {
-            if (!nestedContentDataTypes.TryGetValue(
-                    property.Id,
-                    out var dataType))
-            {
-                continue;
-            }
-
-            try
-            {
-                if (!contentTypeMap.TryGetValue(
-                        property.ContentTypeId,
-                        out var contentTypeAlias))
-                {
-                    continue;
-                }
-
-                var contentType =
-                    contentTypeService.Get(contentTypeAlias);
-
-                if (contentType == null)
-                    continue;
-
-                var existing =
-                    contentType.PropertyTypes
-                        .FirstOrDefault(x =>
-                            x.Alias.Equals(
-                                property.Alias,
-                                StringComparison.OrdinalIgnoreCase));
-
-                if (existing != null)
-                    continue;
-
-                string? groupName = null;
-
-                if (property.PropertyGroupId.HasValue)
-                {
-                    groupName =
-                        propertyGroups
-                            .FirstOrDefault(x =>
-                                x.Id == property.PropertyGroupId.Value)
-                            ?.Name;
-                }
-
-                var propertyType =
-                    new PropertyType(shortStringHelper, dataType, property.Alias)
-                    {
-                        Name =
-                            string.IsNullOrWhiteSpace(property.Name)
-                                ? property.Alias
-                                : property.Name,
-                        SortOrder = property.SortOrder,
-                        Mandatory = property.Mandatory,
-                        Description = property.Description
-                    };
-
-                contentType.AddPropertyType(
-                    propertyType,
-                    groupName ?? "content");
-
-                contentTypeService.Save(contentType);
-
-                Console.WriteLine(
-                    $"CREATED NESTED CONTENT PROPERTY: " +
-                    $"{contentTypeAlias}.{property.Alias}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(
-                    $"ERROR NESTED CONTENT PROPERTY " +
-                    $"{property.ContentTypeId}/{property.Alias}: {ex.Message}");
-            }
-        }
-    }
-
-    // ========================================================
     // STEP 4
     // CONTENT
     // ========================================================
@@ -1503,65 +1100,6 @@ if (args.Length > 0 &&
                 Console.WriteLine(
                     $"SKIP CONTENT {item.NodeId}: " +
                     "content type not mapped.");
-
-                continue;
-            }
-
-            // ------------------------------------------------
-            // Check for an already-migrated match first. This step
-            // previously had no idempotency check at all (unlike
-            // STEP 1B/3, which do check), so every re-run of migrate
-            // created a full duplicate copy of every content node -
-            // confirmed via the schema command: umbracoDocument ended
-            // up at ~13x the source row count after repeated runs.
-            // Match on (parent, name, content type), the closest
-            // available equivalent to a v8 source node's identity.
-            // ------------------------------------------------
-
-            IContent existingContent = null;
-
-            if (item.ParentId <= 0)
-            {
-                existingContent =
-                    contentService.GetRootContent()
-                        .FirstOrDefault(c =>
-                            c.Name == item.Name &&
-                            c.ContentType.Alias.Equals(
-                                contentTypeAlias,
-                                StringComparison.OrdinalIgnoreCase));
-            }
-            else if (contentMap.TryGetValue(
-                item.ParentId,
-                out var existingParentKey))
-            {
-                var parentContent =
-                    contentService.GetById(existingParentKey);
-
-                if (parentContent != null)
-                {
-                    existingContent =
-                        contentService
-                            .GetPagedChildren(
-                                parentContent.Id,
-                                0,
-                                10000,
-                                out _)
-                            .FirstOrDefault(c =>
-                                c.Name == item.Name &&
-                                c.ContentType.Alias.Equals(
-                                    contentTypeAlias,
-                                    StringComparison.OrdinalIgnoreCase));
-                }
-            }
-
-            if (existingContent != null)
-            {
-                contentMap[item.NodeId] =
-                    existingContent.Key;
-
-                Console.WriteLine(
-                    $"EXISTS CONTENT: " +
-                    $"{item.NodeId} -> {item.Name}");
 
                 continue;
             }
@@ -1648,17 +1186,6 @@ if (args.Length > 0 &&
     Console.WriteLine(
         $"Found {propertyValues.Count} property values.");
 
-    // Properties whose value needs converting rather than copying straight
-    // across - populated in STEP 3B (Nested Content) and derived here from
-    // the same source-editor-alias lookup STEP 3 uses (Grid).
-    var gridPropertyIds =
-        properties
-            .Where(p =>
-                sourceDataTypes.TryGetValue(p.DataTypeId, out var dt) &&
-                dt.EditorAlias.Equals("Umbraco.Grid", StringComparison.OrdinalIgnoreCase))
-            .Select(p => p.Id)
-            .ToHashSet();
-
     var valuesByNode =
         propertyValues
             .GroupBy(x => x.NodeId);
@@ -1698,26 +1225,8 @@ if (args.Length > 0 &&
                         continue;
                     }
 
-                    object? actualValue;
-
-                    if (nestedContentDataTypes.ContainsKey(value.PropertyTypeId) &&
-                        !string.IsNullOrWhiteSpace(value.TextValue))
-                    {
-                        actualValue =
-                            ConvertNestedContentToBlockList(
-                                value.TextValue,
-                                alias => contentTypeService.Get(alias));
-                    }
-                    else if (gridPropertyIds.Contains(value.PropertyTypeId) &&
-                        !string.IsNullOrWhiteSpace(value.TextValue))
-                    {
-                        actualValue =
-                            ConvertGridToRichText(value.TextValue);
-                    }
-                    else
-                    {
-                        actualValue = GetValue(value);
-                    }
+                    var actualValue =
+                        GetValue(value);
 
                     if (actualValue == null)
                         continue;
@@ -1778,217 +1287,6 @@ if (args.Length > 0 &&
     }
 
     // ========================================================
-    // STEP 7
-    // USERS
-    // ========================================================
-    //
-    // Password hashes are NOT migrated - Umbraco 8 and 16 use different
-    // hashing schemes, so copying the hash bytes would produce a login
-    // that looks migrated but doesn't actually work. Each migrated user
-    // gets a fresh Umbraco-generated initial password instead (printed
-    // below), not a working v8 password - they (or whoever administers
-    // this) need that password or a reset link to actually log in.
-    //
-    // The whole step is wrapped in one try/catch: umbracoUser/
-    // umbracoUserGroup/umbracoUser2UserGroup column names are trusted at
-    // face value here (unlike cmsTemplate/cmsDataType, which turned out
-    // to differ from assumptions on this exact database) - if they're
-    // wrong too, this logs a clear error and the rest of migrate still
-    // completes rather than crashing over user accounts.
-
-    Console.WriteLine();
-    Console.WriteLine("=================================================");
-    Console.WriteLine("STEP 7 - USERS");
-    Console.WriteLine("=================================================");
-
-    try
-    {
-        var userGroupService =
-            app.Services.GetRequiredService<IUserGroupService>();
-
-        var userService =
-            app.Services.GetRequiredService<IUserService>();
-
-        var sourceUserGroups =
-            await GetUserGroupsAsync(source);
-
-        Console.WriteLine(
-            $"Found {sourceUserGroups.Count} user groups.");
-
-        var userGroupMap =
-            new Dictionary<int, Guid>();
-
-        foreach (var group in sourceUserGroups)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(group.Alias))
-                {
-                    continue;
-                }
-
-                var existingGroup =
-                    await userGroupService.GetAsync(group.Alias);
-
-                if (existingGroup != null)
-                {
-                    userGroupMap[group.Id] =
-                        existingGroup.Key;
-
-                    Console.WriteLine(
-                        $"EXISTS USER GROUP: {group.Alias}");
-
-                    continue;
-                }
-
-                var newGroup =
-                    new UserGroup(
-                        shortStringHelper,
-                        0,
-                        group.Alias,
-                        string.IsNullOrWhiteSpace(group.Name)
-                            ? group.Alias
-                            : group.Name,
-                        "icon-users");
-
-                var createGroupResult =
-                    await userGroupService.CreateAsync(
-                        newGroup,
-                        Constants.Security.SuperUserKey);
-
-                if (!createGroupResult.Success)
-                {
-                    Console.WriteLine(
-                        $"ERROR CREATE USER GROUP: {group.Alias} - " +
-                        $"{createGroupResult.Status}");
-
-                    continue;
-                }
-
-                userGroupMap[group.Id] =
-                    createGroupResult.Result.Key;
-
-                Console.WriteLine(
-                    $"CREATED USER GROUP: {group.Alias}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(
-                    $"ERROR USER GROUP {group.Id}: {ex.Message}");
-            }
-        }
-
-        var sourceUsers =
-            await GetUsersAsync(source);
-
-        Console.WriteLine(
-            $"Found {sourceUsers.Count} users.");
-
-        var sourceMemberships =
-            await GetUserGroupMembershipsAsync(source);
-
-        var existingUsersByEmail =
-            userService
-                .GetAll(
-                    0,
-                    1000,
-                    out _,
-                    "Username",
-                    Direction.Ascending,
-                    null,
-                    null,
-                    null)
-                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
-                .GroupBy(u => u.Email, StringComparer.OrdinalIgnoreCase)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.First().Key,
-                    StringComparer.OrdinalIgnoreCase);
-
-        foreach (var user in sourceUsers)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(user.Email))
-                {
-                    Console.WriteLine(
-                        $"SKIP USER {user.Id}: no email.");
-
-                    continue;
-                }
-
-                if (existingUsersByEmail.ContainsKey(user.Email))
-                {
-                    Console.WriteLine(
-                        $"EXISTS USER: {user.Email}");
-
-                    continue;
-                }
-
-                var groupKeys =
-                    sourceMemberships
-                        .Where(m => m.UserId == user.Id)
-                        .Select(m =>
-                            userGroupMap.TryGetValue(
-                                m.UserGroupId,
-                                out var key)
-                                ? key
-                                : (Guid?)null)
-                        .Where(k => k.HasValue)
-                        .Select(k => k!.Value)
-                        .ToHashSet();
-
-                var model =
-                    new UserCreateModel
-                    {
-                        Name =
-                            string.IsNullOrWhiteSpace(user.Name)
-                                ? user.Email
-                                : user.Name,
-                        Email = user.Email,
-                        UserName =
-                            string.IsNullOrWhiteSpace(user.Login)
-                                ? user.Email
-                                : user.Login,
-                        Kind = UserKind.Default,
-                        UserGroupKeys = groupKeys
-                    };
-
-                var createResult =
-                    await userService.CreateAsync(
-                        Constants.Security.SuperUserKey,
-                        model,
-                        approveUser: true);
-
-                if (!createResult.Success)
-                {
-                    Console.WriteLine(
-                        $"ERROR CREATE USER: {user.Email} - " +
-                        $"{createResult.Status}");
-
-                    continue;
-                }
-
-                Console.WriteLine(
-                    $"CREATED USER: {user.Email} " +
-                    $"(initial password: {createResult.Result.InitialPassword})");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(
-                    $"ERROR USER {user.Id}/{user.Email}: {ex.Message}");
-            }
-        }
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine(
-            $"ERROR STEP 7 USERS: {ex.Message}");
-        Console.WriteLine(
-            "Skipping user migration - the rest of migrate will continue.");
-    }
-
-    // ========================================================
     // RESULT
     // ========================================================
 
@@ -2026,95 +1324,6 @@ if (args.Length > 0 &&
     Console.WriteLine();
     Console.WriteLine(
         "Migration command completed.");
-
-    return;
-}
-
-// ============================================================
-// SCHEMA COMMAND
-// ============================================================
-//
-// Deliberately NOT a v8-table -> v16-table name mapping. There isn't a
-// reliable 1:1 correspondence to guess at - the schema changed too much
-// between versions (cmsTemplate losing its master/design columns and
-// cmsDataType not existing at all under that name, both discovered the
-// hard way earlier in this migration, are exactly the kind of surprise
-// a guessed mapping would produce more of). Instead this lists both
-// databases' REAL tables and row counts side by side, so the actual
-// schema can be checked directly instead of assumed.
-
-if (args.Length > 0 &&
-    args[0].Equals("schema", StringComparison.OrdinalIgnoreCase))
-{
-    Console.WriteLine();
-    Console.WriteLine("=================================================");
-    Console.WriteLine(" DATABASE SCHEMA - SOURCE (v8) vs TARGET (v16)");
-    Console.WriteLine("=================================================");
-
-    await using var source =
-        new SqlConnection(sourceConnectionString);
-
-    await source.OpenAsync();
-
-    await using var target =
-        new SqlConnection(targetConnectionString);
-
-    await target.OpenAsync();
-
-    var sourceTables = await GetTableListAsync(source);
-    var targetTables = await GetTableListAsync(target);
-
-    Console.WriteLine();
-    Console.WriteLine("=================================================");
-    Console.WriteLine($"SOURCE (v8) - {sourceTables.Count} tables");
-    Console.WriteLine("=================================================");
-
-    foreach (var t in sourceTables)
-    {
-        Console.WriteLine($"  {t.Name,-45} {t.RowCount,12:N0} rows");
-    }
-
-    Console.WriteLine();
-    Console.WriteLine("=================================================");
-    Console.WriteLine($"TARGET (v16) - {targetTables.Count} tables");
-    Console.WriteLine("=================================================");
-
-    foreach (var t in targetTables)
-    {
-        Console.WriteLine($"  {t.Name,-45} {t.RowCount,12:N0} rows");
-    }
-
-    var sourceNames =
-        sourceTables
-            .Select(t => t.Name)
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-    var sameNameBothSides =
-        targetTables
-            .Select(t => t.Name)
-            .Where(sourceNames.Contains)
-            .OrderBy(x => x)
-            .ToList();
-
-    Console.WriteLine();
-    Console.WriteLine("=================================================");
-    Console.WriteLine(
-        $"SAME TABLE NAME ON BOTH SIDES - {sameNameBothSides.Count}");
-    Console.WriteLine(
-        "(a starting point only - most v8 tables were renamed or");
-    Console.WriteLine(
-        "restructured rather than kept verbatim, so an unmatched v8");
-    Console.WriteLine(
-        "table here doesn't necessarily mean data was lost.)");
-    Console.WriteLine("=================================================");
-
-    foreach (var name in sameNameBothSides)
-    {
-        Console.WriteLine($"  {name}");
-    }
-
-    Console.WriteLine();
-    Console.WriteLine("Schema listing complete.");
 
     return;
 }
@@ -2351,59 +1560,6 @@ static async Task<List<SourceDocumentTypeTemplate>>
                 reader.GetInt32(0),
                 reader.GetInt32(1),
                 reader.GetBoolean(2)));
-    }
-
-    return result;
-}
-
-
-static async Task ExecuteSqlAsync(
-    SqlConnection connection,
-    string sql)
-{
-    await using var command =
-        new SqlCommand(sql, connection)
-        {
-            CommandTimeout = 120
-        };
-
-    await command.ExecuteNonQueryAsync();
-}
-
-
-static async Task<List<TableInfo>> GetTableListAsync(
-    SqlConnection connection)
-{
-    var result = new List<TableInfo>();
-
-    // sys.tables/sys.partitions are standard SQL Server system catalog
-    // views (not Umbraco-specific), so unlike Umbraco's own tables there's
-    // nothing to guess here - this works identically against any SQL
-    // Server database regardless of schema/version.
-    const string sql = """
-        SELECT
-            t.name,
-            SUM(p.rows)
-        FROM sys.tables t
-        INNER JOIN sys.partitions p
-            ON t.object_id = p.object_id
-            AND p.index_id IN (0, 1)
-        GROUP BY t.name
-        ORDER BY t.name
-        """;
-
-    await using var command =
-        new SqlCommand(sql, connection);
-
-    await using var reader =
-        await command.ExecuteReaderAsync();
-
-    while (await reader.ReadAsync())
-    {
-        result.Add(
-            new TableInfo(
-                reader.GetString(0),
-                reader.GetInt64(1)));
     }
 
     return result;
@@ -2805,7 +1961,6 @@ static async Task<List<SourcePropertyValue>>
 
     const string sql = """
         SELECT
-            pt.id,
             cv.nodeId,
             pt.Alias,
             pd.varcharValue,
@@ -2834,8 +1989,11 @@ static async Task<List<SourcePropertyValue>>
         result.Add(
             new SourcePropertyValue(
                 reader.GetInt32(0),
-                reader.GetInt32(1),
-                reader.GetString(2),
+                reader.GetString(1),
+
+                reader.IsDBNull(2)
+                    ? null
+                    : reader.GetString(2),
 
                 reader.IsDBNull(3)
                     ? null
@@ -2843,19 +2001,15 @@ static async Task<List<SourcePropertyValue>>
 
                 reader.IsDBNull(4)
                     ? null
-                    : reader.GetString(4),
+                    : reader.GetInt32(4),
 
                 reader.IsDBNull(5)
                     ? null
-                    : reader.GetInt32(5),
+                    : reader.GetDecimal(5),
 
                 reader.IsDBNull(6)
                     ? null
-                    : reader.GetDecimal(6),
-
-                reader.IsDBNull(7)
-                    ? null
-                    : reader.GetDateTime(7)));
+                    : reader.GetDateTime(6)));
     }
 
     return result;
@@ -2881,211 +2035,6 @@ static object? GetValue(
         return value.DateValue.Value;
 
     return null;
-}
-
-
-// ============================================================
-// NESTED CONTENT -> BLOCK LIST
-// ============================================================
-//
-// Hand-built rather than serialized from the strongly-typed
-// Umbraco.Cms.Core.Models.Blocks.* classes: those model classes are meant
-// for reading an already-stored value back out, and it isn't clear their
-// default (de)serialization round-trips into the exact wire format the
-// Block List property editor expects to read on the way in. This is the
-// well-documented, stable Block List storage shape instead:
-// { "layout": { "Umbraco.BlockList": [ { "contentUdi": "umb://element/<guid>" } ] },
-//   "contentData": [ { "contentTypeKey": "<guid>", "udi": "umb://element/<guid>", ...propValues } ] }
-
-static string? ConvertNestedContentToBlockList(
-    string sourceJson,
-    Func<string, IContentType?> getContentType)
-{
-    JsonDocument doc;
-
-    try
-    {
-        doc = JsonDocument.Parse(sourceJson);
-    }
-    catch (JsonException)
-    {
-        return null;
-    }
-
-    using (doc)
-    {
-        if (doc.RootElement.ValueKind != JsonValueKind.Array)
-            return null;
-
-        var layoutItems = new JsonArray();
-        var contentData = new JsonArray();
-
-        foreach (var item in doc.RootElement.EnumerateArray())
-        {
-            if (!item.TryGetProperty("ncContentTypeAlias", out var aliasEl) ||
-                aliasEl.ValueKind != JsonValueKind.String)
-            {
-                continue;
-            }
-
-            var elementType = getContentType(aliasEl.GetString()!);
-
-            if (elementType == null)
-                continue;
-
-            var blockKey = Guid.NewGuid();
-            var udi = $"umb://element/{blockKey:N}";
-
-            layoutItems.Add(new JsonObject { ["contentUdi"] = udi });
-
-            var contentEntry = new JsonObject
-            {
-                ["contentTypeKey"] = elementType.Key.ToString(),
-                ["udi"] = udi
-            };
-
-            foreach (var prop in item.EnumerateObject())
-            {
-                if (prop.NameEquals("key") ||
-                    prop.NameEquals("name") ||
-                    prop.NameEquals("ncContentTypeAlias"))
-                {
-                    continue;
-                }
-
-                contentEntry[prop.Name] = JsonNode.Parse(prop.Value.GetRawText());
-            }
-
-            contentData.Add(contentEntry);
-        }
-
-        if (contentData.Count == 0)
-            return null;
-
-        var result = new JsonObject
-        {
-            ["layout"] = new JsonObject { ["Umbraco.BlockList"] = layoutItems },
-            ["contentData"] = contentData
-        };
-
-        return result.ToJsonString();
-    }
-}
-
-
-// ============================================================
-// GRID -> FLATTENED RICH TEXT
-// ============================================================
-//
-// Umbraco.Grid's row/area/control layout has no reliable automated
-// conversion to Block Grid (a different, more complex value format) - see
-// the STEP 3 editorAliasRemap comment. This is a deliberately "content
-// over layout" best-effort conversion: every control's text/HTML is
-// concatenated in document order into a single RichText value. Multi-
-// column layouts collapse to a single stacked column; macro/embed
-// controls are skipped rather than guessed at.
-
-static string? ConvertGridToRichText(string sourceJson)
-{
-    JsonDocument doc;
-
-    try
-    {
-        doc = JsonDocument.Parse(sourceJson);
-    }
-    catch (JsonException)
-    {
-        return null;
-    }
-
-    using (doc)
-    {
-        var html = new StringBuilder();
-
-        if (doc.RootElement.TryGetProperty("sections", out var sections) &&
-            sections.ValueKind == JsonValueKind.Array)
-        {
-            foreach (var section in sections.EnumerateArray())
-            {
-                if (!section.TryGetProperty("rows", out var rows) ||
-                    rows.ValueKind != JsonValueKind.Array)
-                {
-                    continue;
-                }
-
-                foreach (var row in rows.EnumerateArray())
-                {
-                    if (!row.TryGetProperty("areas", out var areas) ||
-                        areas.ValueKind != JsonValueKind.Array)
-                    {
-                        continue;
-                    }
-
-                    foreach (var area in areas.EnumerateArray())
-                    {
-                        if (!area.TryGetProperty("controls", out var controls) ||
-                            controls.ValueKind != JsonValueKind.Array)
-                        {
-                            continue;
-                        }
-
-                        foreach (var control in controls.EnumerateArray())
-                        {
-                            AppendGridControlHtml(control, html);
-                        }
-                    }
-                }
-            }
-        }
-
-        var result = html.ToString().Trim();
-
-        return string.IsNullOrWhiteSpace(result) ? null : result;
-    }
-}
-
-static void AppendGridControlHtml(JsonElement control, StringBuilder html)
-{
-    if (!control.TryGetProperty("editor", out var editorEl) ||
-        !editorEl.TryGetProperty("alias", out var aliasEl) ||
-        aliasEl.ValueKind != JsonValueKind.String)
-    {
-        return;
-    }
-
-    if (!control.TryGetProperty("value", out var value))
-        return;
-
-    switch (aliasEl.GetString())
-    {
-        case "rte":
-            if (value.ValueKind == JsonValueKind.String)
-            {
-                html.AppendLine(value.GetString());
-            }
-            break;
-
-        case "media":
-            if (value.ValueKind == JsonValueKind.Object &&
-                value.TryGetProperty("image", out var imageEl) &&
-                imageEl.ValueKind == JsonValueKind.String)
-            {
-                html.AppendLine($"<img src=\"{imageEl.GetString()}\" />");
-            }
-            break;
-
-        case "headline":
-        case "quote":
-        case "textstring":
-            if (value.ValueKind == JsonValueKind.String)
-            {
-                html.AppendLine($"<p>{value.GetString()}</p>");
-            }
-            break;
-
-        // macro/embed and anything else: not safely convertible to plain
-        // HTML, deliberately skipped rather than guessed at.
-    }
 }
 
 
@@ -3126,112 +2075,9 @@ static async Task<List<SourceDictionary>>
 }
 
 
-static async Task<List<SourceUserGroup>> GetUserGroupsAsync(
-    SqlConnection connection)
-{
-    var result = new List<SourceUserGroup>();
-
-    const string sql = """
-        SELECT
-            id,
-            ISNULL(userGroupAlias, ''),
-            ISNULL(userGroupName, '')
-        FROM umbracoUserGroup
-        ORDER BY id
-        """;
-
-    await using var command =
-        new SqlCommand(sql, connection);
-
-    await using var reader =
-        await command.ExecuteReaderAsync();
-
-    while (await reader.ReadAsync())
-    {
-        result.Add(
-            new SourceUserGroup(
-                reader.GetInt32(0),
-                reader.GetString(1),
-                reader.GetString(2)));
-    }
-
-    return result;
-}
-
-
-static async Task<List<SourceUser>> GetUsersAsync(
-    SqlConnection connection)
-{
-    var result = new List<SourceUser>();
-
-    const string sql = """
-        SELECT
-            id,
-            ISNULL(userName, ''),
-            ISNULL(userLogin, ''),
-            ISNULL(userEmail, '')
-        FROM umbracoUser
-        ORDER BY id
-        """;
-
-    await using var command =
-        new SqlCommand(sql, connection);
-
-    await using var reader =
-        await command.ExecuteReaderAsync();
-
-    while (await reader.ReadAsync())
-    {
-        result.Add(
-            new SourceUser(
-                reader.GetInt32(0),
-                reader.GetString(1),
-                reader.GetString(2),
-                reader.GetString(3)));
-    }
-
-    return result;
-}
-
-
-static async Task<List<SourceUserGroupMembership>>
-    GetUserGroupMembershipsAsync(
-        SqlConnection connection)
-{
-    var result = new List<SourceUserGroupMembership>();
-
-    const string sql = """
-        SELECT
-            userId,
-            userGroupId
-        FROM umbracoUser2UserGroup
-        """;
-
-    await using var command =
-        new SqlCommand(sql, connection);
-
-    await using var reader =
-        await command.ExecuteReaderAsync();
-
-    while (await reader.ReadAsync())
-    {
-        result.Add(
-            new SourceUserGroupMembership(
-                reader.GetInt32(0),
-                reader.GetInt32(1)));
-    }
-
-    return result;
-}
-
-
 // ============================================================
 // RECORDS
 // ============================================================
-
-record TableInfo(
-    string Name,
-    long RowCount);
 
 record SourceDataType(
     int NodeId,
@@ -3302,7 +2148,6 @@ record SourceContent(
     int SortOrder);
 
 record SourcePropertyValue(
-    int PropertyTypeId,
     int NodeId,
     string Alias,
     string? VarcharValue,
@@ -3315,18 +2160,3 @@ record SourceDictionary(
     Guid Id,
     Guid? Parent,
     string Key);
-
-record SourceUserGroup(
-    int Id,
-    string Alias,
-    string Name);
-
-record SourceUser(
-    int Id,
-    string Name,
-    string Login,
-    string Email);
-
-record SourceUserGroupMembership(
-    int UserId,
-    int UserGroupId);
