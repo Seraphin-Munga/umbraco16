@@ -101,23 +101,24 @@
                         foreach (var item in heroShoulder.Items)
                         {
                             var itemContent = item.Content;
+                            var tabName = itemContent.Value(PublishedValueFallback, "tabName")?.ToString() ?? string.Empty;
                             string imgshoulderWidth = "40";
                             string linkValue = null;
-                            if (itemContent.Value(PublishedValueFallback, "tabName").ToString() == "Borrow")
+                            if (tabName == "Borrow")
                             {
                                 imgshoulderWidth = "55";
 
                             }
                             string tabBgColor = "";
-                            if (itemContent.Value(PublishedValueFallback, "tabName").ToString() == "Bank")
+                            if (tabName == "Bank")
                             {
                                 tabBgColor = "ab-bank-service";
                             }
-                            else if (itemContent.Value(PublishedValueFallback, "tabName").ToString() == "Borrow")
+                            else if (tabName == "Borrow")
                             {
                                 tabBgColor = "ab-borrow-service";
                             }
-                            else if (itemContent.Value(PublishedValueFallback, "tabName").ToString() == "Invest")
+                            else if (tabName == "Invest")
                             {
                                 tabBgColor = "ab-invest-service";
                             }
@@ -144,11 +145,11 @@
                                         <div class="secondary-btn-dark">
                                             @if (subItem.Link != null)
                                             {
-                                                <a href="@subItem.Link.Url"><button>@itemContent.Value(PublishedValueFallback, "tabName")</button></a>
+                                                <a href="@subItem.Link.Url"><button>@tabName</button></a>
                                             }
                                             else
                                             {
-                                                <a href="@linkValue"><button>@itemContent.Value(PublishedValueFallback, "tabName")</button></a>
+                                                <a href="@linkValue"><button>@tabName</button></a>
                                             }
                                         </div>
                                     </div>
