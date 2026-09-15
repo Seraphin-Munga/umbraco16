@@ -29,10 +29,14 @@
 }
 
 @{
+    var debugHomePageElementsChildren = homePageElements?.Children(VariationContextAccessor).ToList();
     var debugMenuInfo = menu?.Value<IEnumerable<IPublishedElement>>(PublishedValueFallback, "MenuInfo")?.ToList();
     var debugFirstItem = debugMenuInfo?.FirstOrDefault();
 }
-<!-- TEMP DEBUG - remove once the MenuInfo item shape is confirmed; view page source to read this
+<!-- TEMP DEBUG - remove once topNavigation/MenuInfo are confirmed; view page source to read this
+Model: @Model.Name [@Model.ContentType.Alias]
+homePageElements resolved: @(homePageElements?.Name ?? "NOT FOUND") [@(homePageElements?.ContentType.Alias ?? "-")]
+homePageElements children (published, via .Children()): @(debugHomePageElementsChildren != null ? string.Join(" | ", debugHomePageElementsChildren.Select(c => $"{c.Name} [{c.ContentType.Alias}]")) : "n/a (homePageElements itself is null)")
 menu (topNavigation) resolved: @(menu?.Name ?? "NOT FOUND")
 MenuInfo item count: @(debugMenuInfo?.Count.ToString() ?? "null (property itself came back null)")
 First MenuInfo item content type: @(debugFirstItem?.ContentType.Alias ?? "n/a")
