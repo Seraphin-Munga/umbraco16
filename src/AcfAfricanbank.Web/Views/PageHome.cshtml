@@ -128,7 +128,7 @@
                             {
                                 tabBgColor = "ab-insure-service";
                             }
-                            foreach (var subI in itemContent.Value<BlockListModel>(PublishedValueFallback, "items"))
+                            foreach (var subI in itemContent.Value<BlockListModel>(PublishedValueFallback, "items") ?? Enumerable.Empty<BlockListItem>())
                             {
                                 var subItem = (StructureBeCardDescription)subI.Content;
                                 <div class="col-md-3 col-6">
