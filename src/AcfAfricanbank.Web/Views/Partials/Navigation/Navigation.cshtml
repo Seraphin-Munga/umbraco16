@@ -32,12 +32,12 @@
 <script>
     $(function () {
         [
-            { alias: 'richTextboxItem', childAlias: null },
-            { alias: 'homePageElements', childAlias: 'topNavigation' }
+            { alias: 'richTextboxItem', withChildren: false },
+            { alias: 'homePageElements', withChildren: true }
         ].forEach(function (check) {
             var url = '/diagnostics/contenttype/' + check.alias;
-            if (check.childAlias) {
-                url += '?childAlias=' + check.childAlias;
+            if (check.withChildren) {
+                url += '?withChildren=true';
             }
             $.getJSON(url, function (data) {
                 console.log(check.alias + ' diagnostic:', data);
