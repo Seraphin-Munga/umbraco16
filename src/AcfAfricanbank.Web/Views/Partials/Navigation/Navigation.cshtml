@@ -8,11 +8,7 @@
     // classes, so this view compiles regardless of ModelsBuilder state.
     IPublishedContent menu = null;
 
-    IPublishedContent homePageElements = null; 
-
-
-
-    var modelNav = Umbraco.Content(Guid.Parse("9bd96777-5a67-488d-8c70-465a6ce7d84b"));
+    IPublishedContent homePageElements = null;
 
     if (Model.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault() != null)
     {
@@ -26,7 +22,10 @@
     {
         homePageElements = Model.Parent.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault();
     }
-    menu = modelNav;
+
+    // MenuInfo lives on the topNavigation child of HomePageElements, not on
+    // HomePageElements itself.
+    menu = homePageElements?.Children(VariationContextAccessor).Where(o => o.IsDocumentType("topNavigation")).FirstOrDefault();
 }
 
 
