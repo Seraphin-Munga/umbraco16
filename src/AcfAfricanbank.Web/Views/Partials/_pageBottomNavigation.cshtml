@@ -5,6 +5,11 @@
 @using System.Linq;
 @inject Umbraco.Cms.Core.Models.PublishedContent.IPublishedValueFallback PublishedValueFallback
 @{
+    if (Model == null)
+    {
+        return;
+    }
+
     var _model = Model;
 }
 
