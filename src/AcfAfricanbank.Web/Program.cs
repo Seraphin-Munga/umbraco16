@@ -39,6 +39,118 @@ if (string.IsNullOrWhiteSpace(targetConnectionString))
 }
 
 // ============================================================
+// RESET COMMAND
+// ============================================================
+//
+// Drops EVERY table in the TARGET database only - sourceConnectionString
+// is never referenced anywhere in this block, so the v8 database cannot
+// be touched by this command no matter what. Needed because STEP 4 (in
+// the migrate command below) had no idempotency check until this
+// session's fix, so earlier runs left the target with ~13x duplicated
+// content - see MIGRATION.md. Runs BEFORE Umbraco boots (unlike
+// migrate/schema below, which need Umbraco's services) so dropping
+// tables out from under an already-booted runtime's own lock/cache
+// machinery is never a concern.
+
+if (args.Length > 0 &&
+    args[0].Equals("reset", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" RESET TARGET DATABASE - DROPS EVERY TABLE");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    await using var target =
+        new SqlConnection(targetConnectionString);
+
+    await target.OpenAsync();
+
+    Console.WriteLine(
+        $"Target: {target.DataSource} / {target.Database}");
+    Console.WriteLine();
+    Console.WriteLine(
+        "This permanently drops EVERY table in the database above.");
+    Console.WriteLine(
+        "The source Umbraco 8 database is never touched by this command.");
+    Console.WriteLine();
+    Console.Write(
+        $"Type the database name ({target.Database}) to confirm: ");
+
+    var confirmation = Console.ReadLine();
+
+    if (!string.Equals(
+            confirmation,
+            target.Database,
+            StringComparison.Ordinal))
+    {
+        Console.WriteLine();
+        Console.WriteLine(
+            "Confirmation did not match. Aborted - nothing was changed.");
+
+        return;
+    }
+
+    Console.WriteLine();
+    Console.WriteLine("Disabling foreign key constraints...");
+
+    await ExecuteSqlAsync(
+        target,
+        """
+        DECLARE @sql NVARCHAR(MAX) = N'';
+        SELECT @sql += 'ALTER TABLE ' + QUOTENAME(SCHEMA_NAME(schema_id)) + '.' + QUOTENAME(name) + ' NOCHECK CONSTRAINT ALL;'
+        FROM sys.tables;
+        EXEC sp_executesql @sql;
+        """);
+
+    Console.WriteLine("Dropping foreign key constraints...");
+
+    await ExecuteSqlAsync(
+        target,
+        """
+        DECLARE @sql NVARCHAR(MAX) = N'';
+        SELECT @sql += 'ALTER TABLE ' + QUOTENAME(SCHEMA_NAME(t.schema_id)) + '.' + QUOTENAME(t.name) + ' DROP CONSTRAINT ' + QUOTENAME(fk.name) + ';'
+        FROM sys.foreign_keys fk
+        INNER JOIN sys.tables t ON fk.parent_object_id = t.object_id;
+        EXEC sp_executesql @sql;
+        """);
+
+    Console.WriteLine("Dropping tables...");
+
+    await ExecuteSqlAsync(
+        target,
+        """
+        DECLARE @sql NVARCHAR(MAX) = N'';
+        SELECT @sql += 'DROP TABLE ' + QUOTENAME(SCHEMA_NAME(schema_id)) + '.' + QUOTENAME(name) + ';'
+        FROM sys.tables;
+        EXEC sp_executesql @sql;
+        """);
+
+    var remainingTables =
+        await GetTableListAsync(target);
+
+    Console.WriteLine();
+    Console.WriteLine(
+        $"Done. {remainingTables.Count} tables remain (should be 0).");
+
+    if (remainingTables.Count > 0)
+    {
+        foreach (var t in remainingTables)
+        {
+            Console.WriteLine($"  {t.Name}");
+        }
+    }
+
+    Console.WriteLine();
+    Console.WriteLine(
+        "Next: run the app normally once (no args) to let Umbraco");
+    Console.WriteLine(
+        "rebuild its schema fresh, then run 'migrate' again.");
+
+    return;
+}
+
+// ============================================================
 // BUILD UMBRACO
 // ============================================================
 
@@ -2030,6 +2142,20 @@ static async Task<List<SourceDocumentTypeTemplate>>
     }
 
     return result;
+}
+
+
+static async Task ExecuteSqlAsync(
+    SqlConnection connection,
+    string sql)
+{
+    await using var command =
+        new SqlCommand(sql, connection)
+        {
+            CommandTimeout = 120
+        };
+
+    await command.ExecuteNonQueryAsync();
 }
 
 
