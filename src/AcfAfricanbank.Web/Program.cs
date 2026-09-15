@@ -976,6 +976,89 @@ if (args.Length > 0 &&
     Console.WriteLine(
         $"Found {propertyGroups.Count} property groups.");
 
+    // Every cmsPropertyTypeGroup row in Umbraco 8 is a top-level Tab (v8 has
+    // no Tab/Group nesting - the table has no parent column). Umbraco 16's
+    // AddPropertyType convenience overload used in STEP 3/3B below only
+    // creates a loose Group nested under an implicit "Generic" tab when
+    // given a bare name - it does NOT recreate a real Tab, which is why the
+    // Design canvas can end up looking empty/unstructured for content types
+    // that had real tabs in v8. Explicitly create a Tab-type PropertyGroup
+    // per source group here instead, and hand STEP 3/3B its alias.
+    var propertyGroupAliasMap =
+        new Dictionary<(int ContentTypeId, int SourceGroupId), string>();
+
+    var propertyGroupTabsCreated = 0;
+
+    foreach (var grouping in propertyGroups.GroupBy(x => x.ContentTypeId))
+    {
+        if (!contentTypeMap.TryGetValue(
+                grouping.Key,
+                out var contentTypeAlias))
+        {
+            continue;
+        }
+
+        var contentType =
+            contentTypeService.Get(contentTypeAlias);
+
+        if (contentType == null)
+        {
+            continue;
+        }
+
+        var changed = false;
+
+        foreach (var sourceGroup in grouping)
+        {
+            var groupAlias =
+                shortStringHelper.CleanStringForSafeAlias(sourceGroup.Name);
+
+            if (string.IsNullOrWhiteSpace(groupAlias))
+            {
+                continue;
+            }
+
+            var existingGroup =
+                contentType.PropertyGroups
+                    .FirstOrDefault(x =>
+                        x.Alias.Equals(
+                            groupAlias,
+                            StringComparison.OrdinalIgnoreCase));
+
+            if (existingGroup == null)
+            {
+                contentType.AddPropertyGroup(groupAlias, sourceGroup.Name);
+
+                existingGroup =
+                    contentType.PropertyGroups
+                        .FirstOrDefault(x =>
+                            x.Alias.Equals(
+                                groupAlias,
+                                StringComparison.OrdinalIgnoreCase));
+
+                if (existingGroup != null)
+                {
+                    existingGroup.Type = PropertyGroupType.Tab;
+                    existingGroup.SortOrder = sourceGroup.SortOrder;
+
+                    changed = true;
+                    propertyGroupTabsCreated++;
+                }
+            }
+
+            propertyGroupAliasMap[(grouping.Key, sourceGroup.Id)] =
+                groupAlias;
+        }
+
+        if (changed)
+        {
+            contentTypeService.Save(contentType);
+        }
+    }
+
+    Console.WriteLine(
+        $"Created {propertyGroupTabsCreated} property group tab(s).");
+
     // ========================================================
     // STEP 3
     // PROPERTIES
@@ -1158,16 +1241,14 @@ if (args.Length > 0 &&
                 continue;
             }
 
-            string? groupName = null;
+            var groupAlias = "content";
 
-            if (property.PropertyGroupId.HasValue)
+            if (property.PropertyGroupId.HasValue &&
+                propertyGroupAliasMap.TryGetValue(
+                    (property.ContentTypeId, property.PropertyGroupId.Value),
+                    out var resolvedGroupAlias))
             {
-                groupName =
-                    propertyGroups
-                        .FirstOrDefault(x =>
-                            x.Id ==
-                            property.PropertyGroupId.Value)
-                        ?.Name;
+                groupAlias = resolvedGroupAlias;
             }
 
             var propertyType =
@@ -1192,7 +1273,7 @@ if (args.Length > 0 &&
 
             contentType.AddPropertyType(
                 propertyType,
-                groupName ?? "content");
+                groupAlias);
 
             contentTypeService.Save(contentType);
 
@@ -1447,15 +1528,14 @@ if (args.Length > 0 &&
                 if (existing != null)
                     continue;
 
-                string? groupName = null;
+                var groupAlias = "content";
 
-                if (property.PropertyGroupId.HasValue)
+                if (property.PropertyGroupId.HasValue &&
+                    propertyGroupAliasMap.TryGetValue(
+                        (property.ContentTypeId, property.PropertyGroupId.Value),
+                        out var resolvedGroupAlias))
                 {
-                    groupName =
-                        propertyGroups
-                            .FirstOrDefault(x =>
-                                x.Id == property.PropertyGroupId.Value)
-                            ?.Name;
+                    groupAlias = resolvedGroupAlias;
                 }
 
                 var propertyType =
@@ -1472,7 +1552,7 @@ if (args.Length > 0 &&
 
                 contentType.AddPropertyType(
                     propertyType,
-                    groupName ?? "content");
+                    groupAlias);
 
                 contentTypeService.Save(contentType);
 
