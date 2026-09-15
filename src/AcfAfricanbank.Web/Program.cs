@@ -1648,6 +1648,95 @@ if (args.Length > 0 &&
 }
 
 // ============================================================
+// SCHEMA COMMAND
+// ============================================================
+//
+// Deliberately NOT a v8-table -> v16-table name mapping. There isn't a
+// reliable 1:1 correspondence to guess at - the schema changed too much
+// between versions (cmsTemplate losing its master/design columns and
+// cmsDataType not existing at all under that name, both discovered the
+// hard way earlier in this migration, are exactly the kind of surprise
+// a guessed mapping would produce more of). Instead this lists both
+// databases' REAL tables and row counts side by side, so the actual
+// schema can be checked directly instead of assumed.
+
+if (args.Length > 0 &&
+    args[0].Equals("schema", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" DATABASE SCHEMA - SOURCE (v8) vs TARGET (v16)");
+    Console.WriteLine("=================================================");
+
+    await using var source =
+        new SqlConnection(sourceConnectionString);
+
+    await source.OpenAsync();
+
+    await using var target =
+        new SqlConnection(targetConnectionString);
+
+    await target.OpenAsync();
+
+    var sourceTables = await GetTableListAsync(source);
+    var targetTables = await GetTableListAsync(target);
+
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine($"SOURCE (v8) - {sourceTables.Count} tables");
+    Console.WriteLine("=================================================");
+
+    foreach (var t in sourceTables)
+    {
+        Console.WriteLine($"  {t.Name,-45} {t.RowCount,12:N0} rows");
+    }
+
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine($"TARGET (v16) - {targetTables.Count} tables");
+    Console.WriteLine("=================================================");
+
+    foreach (var t in targetTables)
+    {
+        Console.WriteLine($"  {t.Name,-45} {t.RowCount,12:N0} rows");
+    }
+
+    var sourceNames =
+        sourceTables
+            .Select(t => t.Name)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+    var sameNameBothSides =
+        targetTables
+            .Select(t => t.Name)
+            .Where(sourceNames.Contains)
+            .OrderBy(x => x)
+            .ToList();
+
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(
+        $"SAME TABLE NAME ON BOTH SIDES - {sameNameBothSides.Count}");
+    Console.WriteLine(
+        "(a starting point only - most v8 tables were renamed or");
+    Console.WriteLine(
+        "restructured rather than kept verbatim, so an unmatched v8");
+    Console.WriteLine(
+        "table here doesn't necessarily mean data was lost.)");
+    Console.WriteLine("=================================================");
+
+    foreach (var name in sameNameBothSides)
+    {
+        Console.WriteLine($"  {name}");
+    }
+
+    Console.WriteLine();
+    Console.WriteLine("Schema listing complete.");
+
+    return;
+}
+
+// ============================================================
 // NORMAL UMBRACO STARTUP
 // ============================================================
 
@@ -1879,6 +1968,45 @@ static async Task<List<SourceDocumentTypeTemplate>>
                 reader.GetInt32(0),
                 reader.GetInt32(1),
                 reader.GetBoolean(2)));
+    }
+
+    return result;
+}
+
+
+static async Task<List<TableInfo>> GetTableListAsync(
+    SqlConnection connection)
+{
+    var result = new List<TableInfo>();
+
+    // sys.tables/sys.partitions are standard SQL Server system catalog
+    // views (not Umbraco-specific), so unlike Umbraco's own tables there's
+    // nothing to guess here - this works identically against any SQL
+    // Server database regardless of schema/version.
+    const string sql = """
+        SELECT
+            t.name,
+            SUM(p.rows)
+        FROM sys.tables t
+        INNER JOIN sys.partitions p
+            ON t.object_id = p.object_id
+            AND p.index_id IN (0, 1)
+        GROUP BY t.name
+        ORDER BY t.name
+        """;
+
+    await using var command =
+        new SqlCommand(sql, connection);
+
+    await using var reader =
+        await command.ExecuteReaderAsync();
+
+    while (await reader.ReadAsync())
+    {
+        result.Add(
+            new TableInfo(
+                reader.GetString(0),
+                reader.GetInt64(1)));
     }
 
     return result;
@@ -2604,6 +2732,10 @@ static async Task<List<SourceDictionary>>
 // ============================================================
 // RECORDS
 // ============================================================
+
+record TableInfo(
+    string Name,
+    long RowCount);
 
 record SourceDataType(
     int NodeId,
