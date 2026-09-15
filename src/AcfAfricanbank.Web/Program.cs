@@ -1162,9 +1162,39 @@ if (args.Length > 0 &&
 
             if (existing != null)
             {
-                Console.WriteLine(
-                    $"EXISTS PROPERTY: " +
-                    $"{contentTypeAlias}.{property.Alias}");
+                // A run before STEP 2's Tab-type property groups existed
+                // may have left this property under a loose auto-created
+                // group instead of the real Tab created above - move it
+                // now so re-running migrate against an already-populated
+                // database still fixes the Design canvas, not just a
+                // fresh one.
+                var existingGroupAlias = "content";
+
+                if (property.PropertyGroupId.HasValue &&
+                    propertyGroupAliasMap.TryGetValue(
+                        (property.ContentTypeId, property.PropertyGroupId.Value),
+                        out var resolvedExistingGroupAlias))
+                {
+                    existingGroupAlias = resolvedExistingGroupAlias;
+                }
+
+                if (contentType.MovePropertyType(
+                        property.Alias,
+                        existingGroupAlias))
+                {
+                    contentTypeService.Save(contentType);
+
+                    Console.WriteLine(
+                        $"MOVED PROPERTY TO TAB: " +
+                        $"{contentTypeAlias}.{property.Alias} -> " +
+                        $"{existingGroupAlias}");
+                }
+                else
+                {
+                    Console.WriteLine(
+                        $"EXISTS PROPERTY: " +
+                        $"{contentTypeAlias}.{property.Alias}");
+                }
 
                 continue;
             }
@@ -1525,9 +1555,6 @@ if (args.Length > 0 &&
                                 property.Alias,
                                 StringComparison.OrdinalIgnoreCase));
 
-                if (existing != null)
-                    continue;
-
                 var groupAlias = "content";
 
                 if (property.PropertyGroupId.HasValue &&
@@ -1536,6 +1563,21 @@ if (args.Length > 0 &&
                         out var resolvedGroupAlias))
                 {
                     groupAlias = resolvedGroupAlias;
+                }
+
+                if (existing != null)
+                {
+                    // Same self-healing move as STEP 3 above - re-parent
+                    // properties left under a loose group by an earlier
+                    // run into the real Tab created in STEP 2.
+                    if (contentType.MovePropertyType(
+                            property.Alias,
+                            groupAlias))
+                    {
+                        contentTypeService.Save(contentType);
+                    }
+
+                    continue;
                 }
 
                 var propertyType =
