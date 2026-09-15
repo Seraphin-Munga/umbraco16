@@ -28,37 +28,6 @@
     menu = homePageElements?.Children(VariationContextAccessor).Where(o => o.IsDocumentType("topNavigation")).FirstOrDefault();
 }
 
-@{
-    // Site-wide search for every published homePageElements node, to check
-    // for duplicates (e.g. leftovers from the migration's pre-idempotency
-    // duplicate-content bug) that could make .FirstOrDefault() above pick
-    // the wrong one depending on sort order.
-    var allHomePageElements = Umbraco.ContentAtRoot()
-        .SelectMany(r => r.DescendantsOrSelf(VariationContextAccessor))
-        .Where(o => o.IsDocumentType("homePageElements"))
-        .Select(o => new
-        {
-            id = o.Id,
-            key = o.Key,
-            name = o.Name,
-            path = o.Path,
-            parentName = o.Parent?.Name,
-            parentDocType = o.Parent?.ContentType.Alias
-        })
-        .ToList();
-
-    var duplicateCheckJson = System.Text.Json.JsonSerializer.Serialize(new
-    {
-        count = allHomePageElements.Count,
-        items = allHomePageElements
-    });
-}
-<!-- TEMP DEBUG - remove once duplicate check is confirmed; logged to the browser console -->
-<script>
-    $(function () {
-        console.log("homePageElements site-wide check:", @Html.Raw(duplicateCheckJson));
-    });
-</script>
 
 <style>
 .active {
