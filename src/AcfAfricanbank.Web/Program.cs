@@ -1713,6 +1713,28 @@ if (args.Length > 0 &&
     var contentMap =
         new Dictionary<int, Guid>();
 
+    // GetRootContent()/GetPagedChildren() below only search LIVE content -
+    // they don't see anything sitting in the Recycle Bin. If a node this
+    // migration already created was manually trashed since the last run
+    // (e.g. cleaning up duplicates from before the idempotency check
+    // existed), the live-only search below finds nothing and creates
+    // *another* duplicate instead of reusing/restoring the one already
+    // there. Check the bin too, and restore a match instead of duplicating.
+    IContent? FindTrashedMatch(string name, string typeAlias)
+    {
+        var trashed =
+            contentService.GetPagedContentInRecycleBin(
+                0,
+                10000,
+                out _);
+
+        return trashed.FirstOrDefault(c =>
+            c.Name == name &&
+            c.ContentType.Alias.Equals(
+                typeAlias,
+                StringComparison.OrdinalIgnoreCase));
+    }
+
     // --------------------------------------------------------
     // Create parents before children.
     // --------------------------------------------------------
@@ -1757,6 +1779,22 @@ if (args.Length > 0 &&
                             c.ContentType.Alias.Equals(
                                 contentTypeAlias,
                                 StringComparison.OrdinalIgnoreCase));
+
+                if (existingContent == null)
+                {
+                    var trashedMatch =
+                        FindTrashedMatch(item.Name, contentTypeAlias);
+
+                    if (trashedMatch != null)
+                    {
+                        contentService.Move(trashedMatch, -1);
+                        existingContent = trashedMatch;
+
+                        Console.WriteLine(
+                            $"RESTORED FROM RECYCLE BIN: " +
+                            $"{item.NodeId} -> {item.Name}");
+                    }
+                }
             }
             else if (contentMap.TryGetValue(
                 item.ParentId,
@@ -1779,6 +1817,25 @@ if (args.Length > 0 &&
                                 c.ContentType.Alias.Equals(
                                     contentTypeAlias,
                                     StringComparison.OrdinalIgnoreCase));
+
+                    if (existingContent == null)
+                    {
+                        var trashedMatch =
+                            FindTrashedMatch(item.Name, contentTypeAlias);
+
+                        if (trashedMatch != null)
+                        {
+                            contentService.Move(
+                                trashedMatch,
+                                parentContent.Id);
+
+                            existingContent = trashedMatch;
+
+                            Console.WriteLine(
+                                $"RESTORED FROM RECYCLE BIN: " +
+                                $"{item.NodeId} -> {item.Name}");
+                        }
+                    }
                 }
             }
 
