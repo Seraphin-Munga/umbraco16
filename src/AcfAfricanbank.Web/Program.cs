@@ -1844,9 +1844,29 @@ if (args.Length > 0 &&
                 contentMap[item.NodeId] =
                     existingContent.Key;
 
-                Console.WriteLine(
-                    $"EXISTS CONTENT: " +
-                    $"{item.NodeId} -> {item.Name}");
+                // Keep the tree ordered the same as the v8 source even for
+                // content this loop isn't (re-)creating - a node created
+                // out of source order by an earlier/interrupted run, or
+                // just-restored from the recycle bin, otherwise keeps
+                // whatever sort order it happened to get instead of
+                // matching its siblings' v8 order.
+                if (existingContent.SortOrder != item.SortOrder)
+                {
+                    var previousSortOrder = existingContent.SortOrder;
+
+                    existingContent.SortOrder = item.SortOrder;
+                    contentService.Save(existingContent);
+
+                    Console.WriteLine(
+                        $"FIXED SORT ORDER: {item.NodeId} -> {item.Name} " +
+                        $"({previousSortOrder} -> {item.SortOrder})");
+                }
+                else
+                {
+                    Console.WriteLine(
+                        $"EXISTS CONTENT: " +
+                        $"{item.NodeId} -> {item.Name}");
+                }
 
                 continue;
             }
@@ -1890,6 +1910,7 @@ if (args.Length > 0 &&
             }
 
             content.Name = item.Name;
+            content.SortOrder = item.SortOrder;
 
             var result =
                 contentService.Save(content);
@@ -3112,6 +3133,13 @@ static async Task<List<SourceContent>> GetContentAsync(
 {
     var result = new List<SourceContent>();
 
+    // Without the nodeObjectType filter this also matches Media/Member rows
+    // (umbracoContent is the shared base table for all three) - harmless in
+    // practice since their contentTypeId never resolves against contentMap,
+    // built from Document types only, so they'd just get silently skipped.
+    // Without "trashed = 0" though, content deleted in the v8 source shows
+    // up as live content here and gets recreated in the target - the v16
+    // tree ends up with nodes v8's own tree didn't actually have.
     const string sql = """
         SELECT
             n.id,
@@ -3123,6 +3151,8 @@ static async Task<List<SourceContent>> GetContentAsync(
         FROM umbracoNode n
         INNER JOIN umbracoContent c
             ON c.nodeId = n.id
+        WHERE n.nodeObjectType = 'c66ba18e-eaf3-4cff-8a22-41b16d66a972'
+            AND n.trashed = 0
         ORDER BY
             n.level,
             n.sortOrder,
