@@ -1,30 +1,30 @@
-﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
-@using Umbraco.Web
-@using ContentModels = Umbraco.Web.PublishedModels;
-@using Web.Helpers;
-@using Web.Entities;
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@inject Umbraco.Cms.Core.Models.PublishedContent.IVariationContextAccessor VariationContextAccessor
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 @using System.Linq;
 @{
+    // Same approach as master.cshtml: untyped IPublishedContent API
+    // (IsDocumentType/Value<T>) instead of ModelsBuilder-generated model
+    // classes, so this view compiles regardless of ModelsBuilder state.
+    IPublishedContent menu = null;
 
-    TopNavigation menu = null;
+    IPublishedContent homePageElements = null;
 
-    HomePageElements homePageElements = null;
-    
     var modelNav = Umbraco.Content("18201");
 
-    if (Model.Children.Where(o => o is HomePageElements).FirstOrDefault() != null)
+    if (Model.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault() != null)
     {
-        homePageElements = (HomePageElements)Model.Children.Where(o => o is HomePageElements).FirstOrDefault();
+        homePageElements = Model.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault();
     }
-    else if (Model.Parent.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault() != null)
+    else if (Model.Parent.Parent.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault() != null)
     {
-        homePageElements = (HomePageElements)Model.Parent.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+        homePageElements = Model.Parent.Parent.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault();
     }
     else
     {
-        homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+        homePageElements = Model.Parent.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault();
     }
-    menu = (TopNavigation)modelNav;
+    menu = modelNav;
 }
 
 
@@ -612,9 +612,9 @@ top: -26px;
                     @{
                         if (menu != null)
                         {
-                            foreach (var menuData in (IEnumerable<NCmenuCategory>)menu.Value("MenuInfo"))
+                            foreach (var menuData in menu.Value<IEnumerable<IPublishedElement>>("MenuInfo"))
                             {
-                                foreach (var relatedLink in (IEnumerable<Umbraco.Web.Models.Link>)menuData.Value("menuName"))
+                                foreach (var relatedLink in menuData.Value<IEnumerable<Umbraco.Cms.Core.Models.Link>>("menuName"))
                                 {
                                     if (relatedLink.Url != "#")
                                     {
@@ -639,21 +639,21 @@ top: -26px;
                                                         <div class="row eq-height">
                                                             @{
 
-                                                                List<NCmenuContent> categoryItems = (List<NCmenuContent>)menuData.Value("menus");
+                                                                var categoryItems = menuData.Value<IEnumerable<IPublishedElement>>("menus")?.ToList();
                                                                 string cssStyleLastCat = null;
                                                                @* var lastItem = categoryItems.Last();*@
-                                                                foreach (var categoryItem in categoryItems)
+                                                                foreach (var categoryItem in categoryItems ?? Enumerable.Empty<IPublishedElement>())
                                                                 {
                                                                  @*   if (categoryItem != lastItem) { cssStyleLastCat = ""; }
                                                                     else { cssStyleLastCat = "border-right: 0px !important; "; }*@
 
                                                                     var categoryName = categoryItem.Value("categoryName");
-                                                                    var linkData = categoryItem.Value("link");
+                                                                    var linkData = categoryItem.Value<IEnumerable<IPublishedElement>>("link");
                                                                     <div class="col-sm-3">
                                                                         <div class="mega-menu-product" style="@cssStyleLastCat">
                                                                             <div class="product-category">@categoryItem.Value("categoryName")</div>
 
-                                                                            @foreach (var linkValue in (IEnumerable<NCmenuList>)linkData)
+                                                                            @foreach (var linkValue in linkData ?? Enumerable.Empty<IPublishedElement>())
                                                                             {
                                                                                 string pageSection = "";
                                                                                 if (linkValue.Value("pageSection") != null)
@@ -663,7 +663,7 @@ top: -26px;
                                                                                 string _linkString = null;
                                                                                 if (linkValue.Value("menuList") != null)
                                                                                 {
-                                                                                    foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)linkValue.Value<IEnumerable<Umbraco.Web.Models.Link>>("menuList"))
+                                                                                    foreach (var link in linkValue.Value<IEnumerable<Umbraco.Cms.Core.Models.Link>>("menuList"))
                                                                                     {
                                                                                         if (pageSection != "")
                                                                                         {
@@ -693,7 +693,7 @@ top: -26px;
                                     }
                                     else
                                     {
-                                        <li><a href="@System.Configuration.ConfigurationManager.AppSettings["online_upload"]" target="_blank">Upload documents</a></li>
+                                        <li><a href="@Configuration["online_upload"]" target="_blank">Upload documents</a></li>
                                     }
                                 }
                             }
