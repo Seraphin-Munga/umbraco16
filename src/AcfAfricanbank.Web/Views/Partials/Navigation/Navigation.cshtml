@@ -1,5 +1,6 @@
 ﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @inject Umbraco.Cms.Core.Models.PublishedContent.IVariationContextAccessor VariationContextAccessor
+@inject Umbraco.Cms.Core.Models.PublishedContent.IPublishedValueFallback PublishedValueFallback
 @inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 @using System.Linq;
 @{
@@ -612,9 +613,9 @@ top: -26px;
                     @{
                         if (menu != null)
                         {
-                            foreach (var menuData in menu.Value<IEnumerable<IPublishedElement>>("MenuInfo"))
+                            foreach (var menuData in menu.Value<IEnumerable<IPublishedElement>>(PublishedValueFallback, "MenuInfo") ?? Enumerable.Empty<IPublishedElement>())
                             {
-                                foreach (var relatedLink in menuData.Value<IEnumerable<Umbraco.Cms.Core.Models.Link>>("menuName"))
+                                foreach (var relatedLink in menuData.Value<IEnumerable<Umbraco.Cms.Core.Models.Link>>(PublishedValueFallback, "menuName") ?? Enumerable.Empty<Umbraco.Cms.Core.Models.Link>())
                                 {
                                     if (relatedLink.Url != "#")
                                     {
@@ -626,12 +627,12 @@ top: -26px;
                                             <a href="~/en/home/" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                                                 @relatedLink.Name
 
-                                                @if (menuData.Value("menus") != null)
+                                                @if (menuData.Value(PublishedValueFallback, "menus") != null)
                                                 {
                                                     <i class="fa fa-angle-down"></i>
                                                 }
                                             </a>
-                                            @if (menuData.Value("menus") != null)
+                                            @if (menuData.Value(PublishedValueFallback, "menus") != null)
                                             {
 
                                                 <div class="dropdown-menu">
@@ -639,7 +640,7 @@ top: -26px;
                                                         <div class="row eq-height">
                                                             @{
 
-                                                                var categoryItems = menuData.Value<IEnumerable<IPublishedElement>>("menus")?.ToList();
+                                                                var categoryItems = menuData.Value<IEnumerable<IPublishedElement>>(PublishedValueFallback, "menus")?.ToList();
                                                                 string cssStyleLastCat = null;
                                                                @* var lastItem = categoryItems.Last();*@
                                                                 foreach (var categoryItem in categoryItems ?? Enumerable.Empty<IPublishedElement>())
@@ -647,23 +648,23 @@ top: -26px;
                                                                  @*   if (categoryItem != lastItem) { cssStyleLastCat = ""; }
                                                                     else { cssStyleLastCat = "border-right: 0px !important; "; }*@
 
-                                                                    var categoryName = categoryItem.Value("categoryName");
-                                                                    var linkData = categoryItem.Value<IEnumerable<IPublishedElement>>("link");
+                                                                    var categoryName = categoryItem.Value(PublishedValueFallback, "categoryName");
+                                                                    var linkData = categoryItem.Value<IEnumerable<IPublishedElement>>(PublishedValueFallback, "link");
                                                                     <div class="col-sm-3">
                                                                         <div class="mega-menu-product" style="@cssStyleLastCat">
-                                                                            <div class="product-category">@categoryItem.Value("categoryName")</div>
+                                                                            <div class="product-category">@categoryItem.Value(PublishedValueFallback, "categoryName")</div>
 
                                                                             @foreach (var linkValue in linkData ?? Enumerable.Empty<IPublishedElement>())
                                                                             {
                                                                                 string pageSection = "";
-                                                                                if (linkValue.Value("pageSection") != null)
+                                                                                if (linkValue.Value(PublishedValueFallback, "pageSection") != null)
                                                                                 {
-                                                                                    pageSection = linkValue.Value("pageSection").ToString();
+                                                                                    pageSection = linkValue.Value(PublishedValueFallback, "pageSection").ToString();
                                                                                 }
                                                                                 string _linkString = null;
-                                                                                if (linkValue.Value("menuList") != null)
+                                                                                if (linkValue.Value(PublishedValueFallback, "menuList") != null)
                                                                                 {
-                                                                                    foreach (var link in linkValue.Value<IEnumerable<Umbraco.Cms.Core.Models.Link>>("menuList"))
+                                                                                    foreach (var link in linkValue.Value<IEnumerable<Umbraco.Cms.Core.Models.Link>>(PublishedValueFallback, "menuList") ?? Enumerable.Empty<Umbraco.Cms.Core.Models.Link>())
                                                                                     {
                                                                                         if (pageSection != "")
                                                                                         {
@@ -676,7 +677,7 @@ top: -26px;
 
                                                                                         <div class="product">
                                                                                             <a class="title" href=@_linkString>@link.Name</a>
-                                                                                            <p class="descr">@linkValue.Value("menuDescription")</p>
+                                                                                            <p class="descr">@linkValue.Value(PublishedValueFallback, "menuDescription")</p>
                                                                                         </div>
                                                                                     }
                                                                                 }
