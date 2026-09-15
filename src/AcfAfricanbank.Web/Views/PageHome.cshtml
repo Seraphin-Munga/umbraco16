@@ -145,7 +145,7 @@
                                         <div class="secondary-btn-dark">
                                             @if (subItem.Link != null)
                                             {
-                                                <a href="@subItem.Link.Url"><button>@tabName</button></a>
+                                                <a href="@subItem.Link.Url(PublishedUrlProvider)"><button>@tabName</button></a>
                                             }
                                             else
                                             {
