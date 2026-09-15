@@ -704,11 +704,36 @@ if (args.Length > 0 &&
                 mediaParentId = mappedParentId;
             }
 
-            var media =
-                mediaService.CreateMedia(
-                    mediaItem.Name,
+            // Unlike content types/content elsewhere in this script, media
+            // has no natural unique key to check against (no alias) - match
+            // on name within the same parent instead, so re-running migrate
+            // doesn't create a fresh duplicate set every time, and so an
+            // item created by an earlier broken run (e.g. before
+            // SourceMediaRootPath was fixed) gets its file filled in now
+            // instead of being skipped as "already there".
+            var existingSiblings =
+                mediaService.GetPagedChildren(
                     mediaParentId,
-                    mediaItem.MediaTypeAlias);
+                    0,
+                    int.MaxValue,
+                    out _);
+
+            var media =
+                existingSiblings.FirstOrDefault(x => x.Name == mediaItem.Name);
+
+            if (media != null)
+            {
+                Console.WriteLine(
+                    $"EXISTS MEDIA: {mediaItem.NodeId} -> {mediaItem.Name}");
+            }
+            else
+            {
+                media =
+                    mediaService.CreateMedia(
+                        mediaItem.Name,
+                        mediaParentId,
+                        mediaItem.MediaTypeAlias);
+            }
 
             if (sourceMediaFileValues.TryGetValue(
                     mediaItem.NodeId,
