@@ -158,16 +158,23 @@ function mapMenuInfoItem(props: Record<string, unknown>): MenuInfoItem {
 // came back with menuDescription/menuName fully populated, but their own
 // "menus" property (itself a Block List, one level deeper) came back as a
 // bare `null` rather than even an empty `{ items: [] }` - not a converted-
-// but-empty value, an unexpanded one. Each further level of Block List
-// nesting needs its own explicit `properties.<alias>.items.content.
-// properties[$all]` path chained onto the last one; there's no wildcard
-// that cascades through every depth by itself.
-const TOP_NAVIGATION_EXPAND = [
-  'properties[$all]',
-  'properties.menuInfo.items.content.properties[$all]',
-  'properties.menuInfo.items.content.properties.menus.items.content.properties[$all]',
-  'properties.menuInfo.items.content.properties.menus.items.content.properties.link.items.content.properties[$all]',
-].join(',');
+// but-empty value, an unexpanded one.
+//
+// The `expand` parameter is NOT dot-notation (an earlier version of this
+// constant wrongly assumed it was) - it's a bracket tree, decompiled
+// straight from the installed Umbraco.Cms.Api.Common package
+// (ElementOnlyOutputExpansionStrategy.Node.Parse + GetNextProperties):
+// `key[child,child]` nests, commas separate siblings. At each level,
+// GetNextProperties checks for a direct "$all" child first, then falls
+// back to a "properties" child and looks inside *that* for "$all" or the
+// specific property alias - and since it's a FirstOrDefault over a
+// mixed "$all"/alias predicate, a specific alias must be listed BEFORE
+// "$all" in the same bracket to actually be picked over the wildcard.
+// Verified by simulating this exact algorithm in Python against the
+// string below before using it - not just derived from the decompile
+// and hoped to be right.
+const TOP_NAVIGATION_EXPAND =
+  'properties[menuInfo[properties[menus[properties[link[properties[$all]],$all]],$all]],$all]';
 
 /**
  * Fetches the site's `topNavigation` content item: its `menuInfo` block list
