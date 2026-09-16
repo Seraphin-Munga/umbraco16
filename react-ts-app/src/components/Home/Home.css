@@ -1,105 +1,1090 @@
 /*
-  Unlike Platform.Umbraco16/PageHome.cshtml's carousels (Bootstrap-4-only
-  class names, needing a hand-written polyfill since this app only loads
-  Bootstrap 3), home.cshtml's carousels use Bootstrap 3's own native class
-  names (.item, .carousel-control.left/.right, .carousel-indicators li) -
-  already fully covered by public/vendor/bootstrap.min.css and
-  public/vendor/main.min.css, so no carousel-mechanics CSS is needed here
-  at all. The one genuine gap: .whatsnew* only ever existed in home.cshtml's
-  own inline <style> block (lines 138-348), never in the shared vendor
-  files, so it's reproduced here.
+  Ported from the live home page's own inline <style> block. The nav/login
+  modal rules that block also contained (.nav-modal*, .lineUp, .redirect-Text,
+  .long-Text*, .grid-container-element, .modal-Icon, .close-button,
+  .close-btn-bg-dot, .circle-background, and their dedicated media queries)
+  are intentionally NOT reproduced here - they're header-owned and already
+  covered by Header.css/NavModal.tsx.
 */
 
-.whatsnew-sibling {
+.card-wrapper {
+  width: 98%;
+  margin: 15px auto;
+  height: 70vh;
+  border-radius: 29px;
+  background-color: #000;
+  box-sizing: border-box;
+}
+
+.carousel {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.jumbotron-slide {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1.2s ease-in-out;
+  background-size: cover;
+  background-position: center;
+  border-top-left-radius: 29px;
+  border-bottom-left-radius: 29px;
+}
+
+.jumbotron-slide.active {
+  opacity: 1;
+}
+
+.carousel-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-top-left-radius: 29px;
+  border-bottom-left-radius: 29px;
+  height: 100%;
+  width: 100%;
+  background: transparent linear-gradient(270deg, #002A602E 0%, #002A6085 38%, #002A60BA 100%) 0% 0% no-repeat padding-box;
+  z-index: 2;
+}
+
+.carousel-caption-left {
+  position: absolute;
+  bottom: 80px;
+  left: 30px;
+  z-index: 3;
+  color: #fff;
+  text-align: left;
+  max-width: 90%;
+}
+
+.card-content {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  border-radius: 29px;
+  overflow: hidden;
+  position: relative;
+}
+
+#heroSlider {
+  flex: 1;
+  position: relative;
+}
+
+.static-grid {
+  width: 300px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0;
+  box-sizing: border-box;
+  background-color: #002d66;
+  height: 100%;
+}
+
+.static-grid > .grid-card:only-child,
+.static-grid > .grid-card:last-child:nth-child(odd):nth-last-child(1) {
+  grid-column: span 2;
+}
+
+.grid-card {
+  background-color: #003B85;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: bold;
+  color: white;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: transform 0.2s ease;
+  font-size: 12px;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.grid-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.05));
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.grid-card:hover {
+  background-color: #002d66;
+}
+
+.grid-card .prod-title {
+  margin-top: 0px;
+  color: #fff;
+}
+
+.grid-card .prod-icon {
+  height: 35px;
+}
+
+.grid-card .icon-style {
+  color: white;
+  opacity: 0.5;
+}
+
+/* Carousel tracker styles */
+.carousel-tracker {
+  display: flex;
+  justify-content: flex-start;
+  position: absolute;
+  bottom: 15px;
+  left: 35px;
+  z-index: 3;
+}
+
+.tracker-button {
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background-color: #fff;
+  opacity: 0.6;
+  transition: transform 0.2s ease, opacity 0.3s ease;
+  cursor: pointer;
+}
+
+.tracker-button.active {
+  transform: scale(1.5);
+  background-color: #112768;
+  border: 2px #B6D133 solid;
+  opacity: 1;
+}
+
+.p-0 {
+  padding: 0px !important;
+}
+
+.testimonial-section {
+  padding: 60px 15px;
+  background: linear-gradient(152deg, rgba(0, 43, 96, 1) 33%, rgba(4, 24, 49, 1) 51%);
+  text-align: center;
+}
+
+.testimonial {
+  background: #fff;
+  padding: 30px 20px;
+  margin-bottom: 30px;
+  border-radius: 30px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  height: 100%;
+}
+
+.testimonial img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+}
+
+.testimonial h4 {
+  margin: 10px 0 5px;
+  font-weight: bold;
+  color: #112768 !important;
+}
+
+.testimonial p.title {
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.testimonial p.quote {
+  font-style: italic;
+}
+
+.section-container {
+  display: flex;
+  padding: 50px 15px;
+}
+
+.text-slider-carousel {
+  width: 100%;
+  margin: 0px !important;
+  position: relative;
+}
+
+.carousel-indicators {
+  bottom: -40px;
+}
+
+.carousel-indicators li {
+  background-color: #ccc;
+  border: 2px #B6D133 solid;
+  border: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.carousel-indicators .active {
+  background-color: #112768;
+  border: 2px #B6D133 solid;
+}
+
+.slide-number {
+  position: absolute;
+  bottom: -35px;
+  left: 20px;
+  font-size: 1rem;
+  color: #666;
+  font-weight: 400;
+}
+
+.slide-number .current-slide {
+  font-size: 1.2rem;
+  color: #002B60;
+}
+
+.slide-number .divider,
+.slide-number .total-slides {
+  font-size: .6rem;
+}
+
+.video-section {
+  display: flex;
+  align-items: center;
+}
+
+.video-placeholder {
+  position: relative;
+  cursor: pointer;
+  width: 100%;
+  border-radius: 29px;
+  background-color: #112768;
+}
+
+.modal {
+  display: none;
+  overflow: hidden;
+  position: fixed;
+  top: 24% !important;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1050;
+  -webkit-overflow-scrolling: touch;
+  outline: 0;
+}
+
+.video-placeholder img {
+  width: 100%;
+  height: auto;
+  display: block;
+  background-size: cover;
+  background-position: center;
+  border-radius: 29px;
+}
+
+.video-placeholder .play-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60px;
+  height: 60px;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-placeholder .play-btn:after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 0;
+  border-left: 20px solid white;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+}
+
+.card-stack {
+  display: flex;
+  padding: 20px;
+  color: #fff;
+  font-size: 30px;
+  font-weight: 600;
+  border-radius: 29px;
+  margin-bottom: 15px;
+  height: 200px;
+  width: 100%;
+}
+
+.card-stack-bg-1 {
+  background: #002B60;
+}
+
+.borrow-section {
+  background: #F2F2F2 !important;
+  padding-top: 100px;
+  padding-bottom: 100px;
+  margin-top: -55px;
+}
+
+.span-green {
+  color: #5dc300 !important;
+}
+
+.image-skew {
+  display: flex;
+  align-items: center;
+  height: 350px;
+  width: 600px;
+  rotate: -23deg;
+}
+
+.centered-text {
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+
+.card-stack-bg-2 {
+  background: #5DC300;
+}
+
+.mtb-60 {
+  margin: 60px 0;
+}
+
+.section-rounded-edge {
+  display: flex;
+  align-items: center;
+  padding-bottom: 40px;
+  width: 100%;
+  min-height: 800px;
+}
+
+.section-rounded-edge-3 {
+  display: flex;
+  align-items: center;
+  padding-bottom: 10px;
+  width: 100%;
+  min-height: 60vh;
+}
+
+.tap-2-glass-image-holder {
+  max-height: 350px;
+  border-radius: 29px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.tap-2-glass-image-holder img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 29px;
   display: block;
 }
 
-.bank-story-caption {
-  margin-left: 0px;
+.section-rounded-edge-2 {
+  display: flex;
+  align-items: center;
+  padding-bottom: 40px;
+  width: 100%;
+  min-height: 350px;
 }
 
-.whatsnew-title {
-  font-size: 30px;
-  font-weight: 200;
-  line-height: 1.18;
-  letter-spacing: -0.7px;
+.section-800 {
+  display: flex;
+  align-items: center;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  width: 100%;
+  min-height: 800px;
+}
+
+.bg-white {
+  background-color: #fff;
+}
+
+.row-eq-height {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.box {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 15px;
+  height: 100%;
+}
+
+.major-title {
+  font-weight: 200 !important;
+  font-size: 65px !important;
+  line-height: 1;
+}
+
+.span-major-title {
+  font-weight: 700 !important;
+  font-size: 65px !important;
+}
+
+.align-items-end {
+  align-items: end;
+}
+
+.align-items-start {
+  align-items: flex-start;
+}
+
+.home-loan-calculator {
+  background-color: #8095AF;
+  margin: 15px;
+  border-radius: 29px;
+  width: calc(100% - 30px);
+}
+
+.btn-brand-link {
+  font-weight: 600;
+  color: #5DC300;
+}
+
+select {
+  text-align-last: center;
+  padding-right: 30px;
+}
+
+select > option {
+  background: #fff !important;
+}
+
+.calculator-form > label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #011420;
+  margin-bottom: 0px;
+  width: 300px;
+  text-align: left;
+}
+
+.calculator-form > input,
+.calculator-form > select {
+  padding: 0px 20px;
+  border-radius: 25px;
+  border: none;
+  outline: none;
+  -webkit-outline: none;
+  width: 100%;
+  height: 50px;
   margin-top: 10px;
+  margin-bottom: 30px;
+  font-size: 24px;
 }
 
-.whatsnew-copy {
-  color: white;
+.calculator-form input {
+  font-size: 24px;
+  font-weight: 300;
+  color: #000000;
 }
 
-.whatsnew {
+.calculator-form > select {
+  transition: 0.35s;
+  background: #fff url("https://www.africanbank.co.za/media/1pzbuq4v/dropdown-select.svg") center;
+  background-position: 93% 50%;
+  background-repeat: no-repeat;
+  -webkit-appearance: none;
+  color: #000000;
+}
+
+.calculator-form > select.active {
+  transition: 0.35s;
+  background: #fff url("https://www.africanbank.co.za/media/kw5nb3e2/dropdown-select-up.svg") center;
+  background-position: 93% 50%;
+  background-repeat: no-repeat;
+  -webkit-appearance: none;
+}
+
+.calculator-form > select:hover {
+  cursor: pointer;
+  box-shadow: 0px 5px 5px #0000000a;
+}
+
+.calculator-form {
   text-align: center;
-  width: unset;
-  background: none;
-  margin-left: unset !important;
-  width: 50%;
 }
 
-@media (min-width: 768px) and (max-width: 1025px) {
-  .whatsnew-sibling {
-    display: none !important;
+.calculator-form > label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 900;
+  color: #002B60;
+  margin-bottom: 0px;
+  width: 300px;
+  text-align: left;
+}
+
+.calculator-form input {
+  font-size: 24px;
+  font-weight: 900;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.calculator-form > input::placeholder {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.calculator-form > input:focus {
+  transition: 0.5s;
+  border: 2px solid #259CD8;
+  background: #fff;
+}
+
+button {
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.primary-btn {
+  width: 220px;
+  transition: 0.5s;
+  background: #C4D82E;
+  padding: 15px 25px;
+  height: 50px;
+  border-radius: 25px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.primary-btn a {
+  text-decoration: none;
+  color: #fff;
+}
+
+.primary-btn:hover {
+  transition: 0.5s;
+  background: #C4D82E;
+}
+
+.primary-ghost-btn {
+  transition: 0.5s;
+  padding: 9px 14px;
+  width: 220px;
+  height: 50px;
+  border-radius: 25px;
+  margin: 10px auto;
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+  -webkit-outline: none;
+  background: #C4D82E;
+  color: #fff;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.primary-ghost-btn:hover {
+  transition: 0.5s;
+  background: #00285B;
+  color: #fff;
+  box-shadow: 0px 10px 20px #0000045;
+}
+
+.investment-results {
+  margin-bottom: 35px;
+  box-shadow: 0px 10px 14px #00000045;
+  border-radius: 10px;
+  overflow: hidden;
+  position: absolute;
+  left: -5000px;
+}
+
+.loan-disclaimer {
+  text-align: left;
+  font-size: 14px;
+  margin-top: 15px;
+}
+
+.terms-con > a {
+  float: left;
+  color: #000000;
+  font-size: 14px;
+}
+
+.col-xs-1 {
+  width: 10%;
+  margin-left: 15px;
+}
+
+.col-1 {
+  margin-top: -15px;
+  margin-bottom: 15px;
+  color: #000000;
+}
+
+.col-2 {
+  margin-top: -34px;
+  margin-bottom: 15px;
+  color: #000000;
+}
+
+.loan-range {
+  background: #002B60;
+}
+
+.loan-range:hover {
+  background-color: #002B60;
+}
+
+#input-Amount1 {
+  color: #0D1622;
+}
+
+#installment_calc1 {
+  color: #002B60;
+}
+
+.arrow-right {
+  color: #5dc300 !important;
+}
+
+.card-offer {
+  background-color: #fff;
+}
+
+.calculator-form > label {
+  font-size: 18px;
+  font-weight: bold;
+  color: #002b60;
+  margin-bottom: 0px;
+  width: 100%;
+  text-align: left;
+}
+
+.calculator-form input {
+  font-size: 21px;
+  font-weight: bold;
+}
+
+.calculator-form > input::placeholder {
+  font-size: 14px;
+  font-weight: 600;
+  color: #696969;
+}
+
+.calculator-form > input:focus {
+  transition: 0.5s;
+  border: 2px solid #259CD8;
+}
+
+button {
+  cursor: pointer;
+}
+
+.primary-btn {
+  width: 220px;
+  transition: 0.5s;
+  background: #88BC47;
+  padding: 15px 25px;
+  height: 50px;
+  border-radius: 25px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.primary-btn a {
+  text-decoration: none;
+  color: #fff;
+}
+
+.primary-btn:hover {
+  transition: 0.5s;
+  background: #65922B;
+}
+
+.primary-ghost-btn {
+  transition: 0.5s;
+  border: solid 2px #88bc47;
+  padding: 9px 14px;
+  width: 220px;
+  height: 50px;
+  border-radius: 25px;
+  margin: 10px auto;
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+  -webkit-outline: none;
+  background: #88bc47;
+  color: #fff;
+  cursor: pointer;
+}
+
+.primary-ghost-btn:hover {
+  transition: 0.5s;
+  background: #88bc47;
+  color: #fff;
+  box-shadow: 0px 10px 20px #0000045;
+}
+
+.investment-results {
+  margin-bottom: 35px;
+  box-shadow: 0px 10px 14px #00000045;
+  border-radius: 10px;
+  overflow: hidden;
+  position: absolute;
+  left: -5000px;
+}
+
+.cta-button {
+  text-align: center;
+}
+
+.loan-disclaimer {
+  text-align: left;
+  font-size: 14px !important;
+  color: #808080 !important;
+  margin-top: 15px;
+}
+
+.terms-con > a {
+  float: left;
+  color: #000000;
+  font-size: 14px;
+  margin-top: -10px;
+}
+
+#input-Amount1 {
+  text-align: center;
+  color: #000000;
+  background: #fff;
+}
+
+#installment_calc1 {
+  color: #002B60;
+  background: #fff;
+  text-align: center;
+}
+
+.line-sep {
+  border: 1px solid #808080;
+  opacity: 1;
+  margin-top: 0px;
+}
+
+.loan-range {
+  background: #002B60;
+}
+
+.loan-range:hover {
+  background-color: #002B60;
+}
+
+.bg-gradient-container {
+  display: flex;
+  justify-content: center;
+  background: linear-gradient(152deg, rgba(0, 43, 96, 1) 22%, rgba(4, 24, 49, 1) 50%);
+  margin: 15px;
+  border-radius: 30px;
+  width: 100%;
+  height: 370px;
+}
+
+.carousel-inner-height {
+  min-height: 180px;
+}
+
+.card-upsale {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid #f2f2f2;
+  padding: 20px;
+  margin-bottom: 15px;
+  border-radius: 29px;
+  height: 170px;
+  box-shadow: rgba(50, 50, 105, 0.10) 0px 2px 15px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
+}
+
+/* to handle zoom in animation */
+.zoom-in {
+  opacity: 0;
+  transform: scale(0.85);
+  transition: transform 1s ease, opacity 1s ease;
+  will-change: transform, opacity;
+}
+
+.zoom-in.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@media (min-width: 820px) and (max-width: 1180px) {
+  .carousel-indicators {
+    bottom: 20px !important;
   }
 
-  .whatsnew {
+  .slide-number {
+    bottom: 20px;
+  }
+}
+
+@keyframes slideLeft {
+  0% {
+    transform: translateX(-90%);
+  }
+}
+
+@media (min-width: 768px) {
+  .calculator-form > label {
+    margin-top: 15px;
+  }
+
+  .calculator-results {
+    padding: 0;
+  }
+
+  .inv-other-ico {
+    width: 45px;
+  }
+}
+
+@media (min-width: 992px) {
+  .calculator-form > label {
+    margin-top: 15px;
+  }
+
+  .calculator-results {
+    padding: 10px;
+  }
+
+  .inv-other-ico {
+    width: 64px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .calculator-form > label {
+    margin-top: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .section-rounded-edge-2 {
+    min-height: unset;
+  }
+
+  .section-rounded-edge-2 img {
+    max-width: 50%;
+  }
+
+  .loan-select-term {
+    text-align: center;
+  }
+
+  #input-Amount1 {
     width: 100%;
   }
-}
 
-@media only screen and (max-width: 767px) {
-  .whatsnew {
+  #installment_calc1 {
     width: 100%;
   }
 
-  .bank-story-caption {
-    margin-left: 0px;
-  }
-}
-
-@media (min-width: 1025px) and (max-width: 1239px) {
-  .bank-story-caption {
-    width: 50% !important;
+  .calculator-form > label {
+    text-align: center;
+    margin-top: 15px;
   }
 
-  .whatsnew {
-    width: 50%;
+  .calculator-form > select {
+    text-align: center;
+    width: 100%;
+  }
+
+  .loan-disclaimer {
+    padding-left: 40px;
+    padding-right: 30px;
+  }
+
+  .modal {
+    top: 40% !important;
+  }
+
+  .bg-gradient-container {
+    display: flex;
+    justify-content: center;
+    background: linear-gradient(152deg, rgba(0, 43, 96, 1) 22%, rgba(4, 24, 49, 1) 50%);
+    margin: 15px;
+    border-radius: 30px;
+    width: 100%;
+    height: 115px;
+  }
+
+  .image-skew {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 113px;
+    width: 100%;
+    rotate: -23deg;
+  }
+
+  .video-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 70px;
+  }
+
+  .borrow-section {
+    background: #F2F2F2 !important;
+    padding-top: 100px;
+    padding-bottom: 20px;
+    margin-top: -100px;
+  }
+
+  .font-lg {
+    font-size: 14px;
+  }
+
+  .combo-btn {
+    align-items: start;
+  }
+
+  .calculator-form .combo-btn {
+    align-items: center;
+  }
+
+  .btn.btn-brand-1 {
+    min-width: unset;
+    padding: 15px 44px 15px 20px !important;
+  }
+
+  .major-title,
+  .span-major-title {
+    font-size: 20px;
+  }
+
+  .card-content {
+    flex-direction: column;
+  }
+
+  .carousel-tracker {
+    display: none;
+  }
+
+  .card-wrapper {
+    height: 70vh;
+  }
+
+  .section-rounded-edge-3 {
+    display: flex;
+    align-items: center;
+    padding-bottom: 10px;
+    width: 100%;
+    min-height: 200px;
+  }
+
+  #heroSlider {
+    height: 15vh;
+    order: -1;
+  }
+
+  .static-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(30%, 1fr));
+    width: 100%;
+    box-sizing: border-box;
+    order: 1;
+    overflow: hidden;
+    height: auto;
+  }
+
+  .grid-card {
+    height: 10vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 10px;
+  }
+
+  .grid-card .prod-icon {
+    margin-top: 2px;
+    height: 30px;
+  }
+
+  .jumbotron-slide,
+  .carousel-overlay {
+    border-radius: 0 !important;
+  }
+
+  .carousel-caption-left {
+    bottom: 35px;
+    left: 20px;
+    right: 20px;
+    max-width: 90%;
+    text-align: left;
+  }
+
+  .carousel-caption-left .combo-btn {
+    align-items: flex-start;
+  }
+
+  .carousel-caption-left h1 {
+    font-size: 20px !important;
+  }
+
+  .major-title,
+  .span-major-title {
+    font-size: 20px !important;
+  }
+
+  .md-text-center {
+    text-align: left;
+  }
+
+  .mtb-120 {
+    margin: 40px 0;
+  }
+
+  .grid-card .prod-title {
+    font-size: 10px;
+    color: #fff;
+  }
+
+  .grid-card .icon-style {
+    font-size: 14px;
   }
 }
 
 @media (max-width: 767px) {
-  .whatsnew-copy {
-    color: white;
-  }
-
-  .whatsnew {
-    width: unset;
+  .modal-video iframe {
+    height: 250px;
   }
 }
 
-@media only screen and (max-width: 768px) {
-  .whatsnew {
-    width: unset;
+@media (min-width: 320px) and (max-width: 326px) {
+  .card-wrapper {
+    height: 107vh;
   }
 }
 
-@media (max-width: 412px) {
-  .whatsnew-copy {
-    color: unset;
+@media (min-width: 320px) and (max-width: 640px) {
+  .calculator-form > label {
+    margin-top: 15px;
   }
 
-  .whatsnew {
-    width: unset;
-  }
-}
-
-@media (max-width: 360px) {
-  .whatsnew-copy {
-    color: white;
-  }
-
-  .whatsnew {
-    width: unset;
+  .loan-disclaimer {
+    padding-left: 40px;
+    padding-right: 30px;
   }
 }
