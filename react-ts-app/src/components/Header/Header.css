@@ -788,3 +788,78 @@ top: -26px;
       }
    }
     /*modal css end here*/
+
+/* React-only additions (no jQuery/Bootstrap JS in this app) */
+
+.nav-status {
+  padding: 15px 20px;
+  color: #fff;
+  opacity: 0.7;
+}
+
+.nav-status--error {
+  color: #ff8a8a;
+}
+
+.global-search-new-close-btn {
+  cursor: pointer;
+}
+
+/* Mega-menu dropdown content (menus -> link -> menuList) needs NO styling
+   here - /vendor/navigation.css (loaded in index.html) already has the
+   real, complete rules for .header-mega-menu .dropdown-menu,
+   .mega-menu-product/.product-category/.product/.title/.descr. */
+
+/* Navigation.cshtml hardcodes .col-sm-3 for each category column,
+   regardless of how many categories a given menu actually has - fine for
+   a 4-category menu, but a 6-category one would wrap onto a second row
+   instead of the single full-width row the design calls for. This keeps
+   everything on one line and splits the width evenly between however many
+   categories there are. */
+.mega-menu-row {
+  display: flex;
+  flex-wrap: nowrap;
+  margin-left: -15px;
+  margin-right: -15px;
+}
+
+.mega-menu-column {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+/* Bootstrap 4 only keeps .navbar-nav horizontal and .navbar-collapse
+   visible without JS on navbars carrying a .navbar-expand-* class (ours
+   doesn't - it's ported from a Bootstrap 3 navbar). Without the first
+   rule, everything inside .navbar-collapse stays hidden on every screen
+   size until the mobile toggle is clicked; without the second, nav items
+   stack vertically instead of in a row. .navbar-right is a Bootstrap-3-
+   only class Bootstrap 4 dropped - margin-left: auto is the flex-based
+   equivalent of its old float: right. */
+@media (min-width: 768px) {
+  .new-navbar-ab .navbar-collapse {
+    display: flex !important;
+    flex-basis: auto;
+  }
+
+  .new-navbar-ab .navbar-nav {
+    flex-direction: row;
+  }
+
+  .new-navbar-ab .navbar-right {
+    margin-left: auto;
+    align-items: center;
+  }
+
+  .new-navbar-ab .navbar-nav > li > a {
+    margin-top: 0;
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
+
+  .new-navbar-ab .navbar-nav > li > a.login-btn {
+    margin-top: 0;
+  }
+}
