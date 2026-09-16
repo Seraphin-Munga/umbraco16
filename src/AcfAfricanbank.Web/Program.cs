@@ -1496,6 +1496,9 @@ if (args.Length > 0 &&
                 var elementTypeAliases =
                     new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
 
+                // Direct case: this property's own values are stored as
+                // their own cmsPropertyData rows (true for a top-level
+                // Nested Content property like menuInfo).
                 foreach (var value in allPropertyValues)
                 {
                     if (value.PropertyTypeId != property.Id ||
@@ -1527,6 +1530,43 @@ if (args.Length > 0 &&
                     {
                         // Not valid JSON for this value - other items for
                         // the same property can still convert fine.
+                    }
+                }
+
+                // Nested case: this property belongs to an element type
+                // used *inside* Nested Content (e.g. nCMenuCategory.menus),
+                // so v8 never stored its values as a cmsPropertyData row of
+                // its own - they only exist embedded inside whichever outer
+                // property's JSON blob contains an nCMenuCategory item. Walk
+                // every stored Nested Content value looking for objects
+                // whose ncContentTypeAlias matches this property's OWNING
+                // content type and which carry a same-named array.
+                if (contentTypeAlias != null)
+                {
+                    foreach (var value in allPropertyValues)
+                    {
+                        if (!nestedContentProperties.Any(p => p.Id == value.PropertyTypeId) ||
+                            string.IsNullOrWhiteSpace(value.TextValue))
+                        {
+                            continue;
+                        }
+
+                        try
+                        {
+                            using var doc =
+                                JsonDocument.Parse(value.TextValue);
+
+                            CollectNestedElementTypeAliases(
+                                doc.RootElement,
+                                contentTypeAlias,
+                                property.Alias,
+                                elementTypeAliases);
+                        }
+                        catch (JsonException)
+                        {
+                            // Not valid JSON for this value - other items
+                            // can still convert fine.
+                        }
                     }
                 }
 
@@ -2614,6 +2654,45 @@ app.MapGet("/diagnostics/contenttype/{alias}", (
 });
 
 // ============================================================
+// TEMP DIAGNOSTIC - remove once the topNavigation/MenuInfo schema is
+// confirmed. Visit /diagnostics/schema/search?q=menu in the browser -
+// lists every content/element type whose alias or name contains the
+// search term, with its full property list (alias, name, editor).
+// Settles "is property X missing" directly against the schema instead of
+// reading it off backoffice screenshots.
+// ============================================================
+
+app.MapGet("/diagnostics/schema/search", (
+    string q,
+    IContentTypeService contentTypeService) =>
+{
+    var matches = contentTypeService.GetAll()
+        .Where(ct =>
+            ct.Alias.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+            ct.Name!.Contains(q, StringComparison.OrdinalIgnoreCase))
+        .Select(ct => new
+        {
+            alias = ct.Alias,
+            name = ct.Name,
+            isElement = ct.IsElement,
+            properties = ct.PropertyTypes.Select(pt => new
+            {
+                alias = pt.Alias,
+                name = pt.Name,
+                editor = pt.PropertyEditorAlias
+            })
+        })
+        .ToList();
+
+    return Results.Ok(new
+    {
+        query = q,
+        count = matches.Count,
+        contentTypes = matches
+    });
+});
+
+// ============================================================
 // NORMAL UMBRACO STARTUP
 // ============================================================
 
@@ -3520,6 +3599,78 @@ static bool IsNestedContentArray(JsonElement element)
     }
 
     return true;
+}
+
+// Walks a stored Nested Content JSON tree (any depth) looking for objects
+// whose ncContentTypeAlias matches ownerContentTypeAlias and which carry a
+// property named propertyAlias holding a Nested Content array - and
+// collects every ncContentTypeAlias found inside *that* array.
+//
+// Needed because v8 only stores a Nested Content property's own array as
+// its own cmsPropertyData row when that property belongs directly to a
+// real content node. A property defined on an element type that's only
+// ever used *inside* Nested Content (e.g. nCMenuCategory.menus) has no
+// such row of its own - its values only exist embedded wherever an
+// nCMenuCategory item happens to appear in some other property's stored
+// JSON. This is the STEP 3B element-type-discovery equivalent of what
+// ConvertNestedContentArray does for value conversion.
+static void CollectNestedElementTypeAliases(
+    JsonElement element,
+    string ownerContentTypeAlias,
+    string propertyAlias,
+    SortedSet<string> result)
+{
+    if (element.ValueKind == JsonValueKind.Array)
+    {
+        foreach (var item in element.EnumerateArray())
+        {
+            CollectNestedElementTypeAliases(
+                item,
+                ownerContentTypeAlias,
+                propertyAlias,
+                result);
+        }
+
+        return;
+    }
+
+    if (element.ValueKind != JsonValueKind.Object)
+        return;
+
+    var isMatchingOwner =
+        element.TryGetProperty("ncContentTypeAlias", out var ownerAliasEl) &&
+        ownerAliasEl.ValueKind == JsonValueKind.String &&
+        ownerAliasEl.GetString()!.Equals(
+            ownerContentTypeAlias,
+            StringComparison.OrdinalIgnoreCase);
+
+    foreach (var prop in element.EnumerateObject())
+    {
+        if (isMatchingOwner &&
+            prop.NameEquals(propertyAlias) &&
+            prop.Value.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var nestedItem in prop.Value.EnumerateArray())
+            {
+                if (nestedItem.ValueKind == JsonValueKind.Object &&
+                    nestedItem.TryGetProperty(
+                        "ncContentTypeAlias",
+                        out var aliasEl) &&
+                    aliasEl.ValueKind == JsonValueKind.String)
+                {
+                    result.Add(aliasEl.GetString()!);
+                }
+            }
+        }
+
+        // Keep recursing regardless - the matching owner could be nested
+        // several levels below where we currently are.
+        CollectNestedElementTypeAliases(
+            prop.Value,
+            ownerContentTypeAlias,
+            propertyAlias,
+            result);
+    }
 }
 
 
