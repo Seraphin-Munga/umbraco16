@@ -3418,62 +3418,108 @@ static string? ConvertNestedContentToBlockList(
 
     using (doc)
     {
-        if (doc.RootElement.ValueKind != JsonValueKind.Array)
-            return null;
+        return ConvertNestedContentArray(doc.RootElement, getContentType)
+            ?.ToJsonString();
+    }
+}
 
-        var layoutItems = new JsonArray();
-        var contentData = new JsonArray();
+// v8 Nested Content can nest arbitrarily deep - a nested content item can
+// itself have a property that's another Nested Content array (e.g.
+// topNavigation.MenuInfo[].menus, itself containing .link[].menuList).
+// The original version of this function only converted the OUTER array
+// and copied every sub-property's raw v8 JSON verbatim, including nested
+// arrays - which left properties like "menus" holding the old v8 shape
+// instead of the { layout, contentData } shape Block List expects.
+// Umbraco's value converter can't parse that mismatch, so it silently
+// reads as empty even though the backoffice's own (more lenient) editor
+// still displays something. Recursing here converts every level, not
+// just the first.
+static JsonObject? ConvertNestedContentArray(
+    JsonElement arrayElement,
+    Func<string, IContentType?> getContentType)
+{
+    if (arrayElement.ValueKind != JsonValueKind.Array)
+        return null;
 
-        foreach (var item in doc.RootElement.EnumerateArray())
+    var layoutItems = new JsonArray();
+    var contentData = new JsonArray();
+
+    foreach (var item in arrayElement.EnumerateArray())
+    {
+        if (!item.TryGetProperty("ncContentTypeAlias", out var aliasEl) ||
+            aliasEl.ValueKind != JsonValueKind.String)
         {
-            if (!item.TryGetProperty("ncContentTypeAlias", out var aliasEl) ||
-                aliasEl.ValueKind != JsonValueKind.String)
-            {
-                continue;
-            }
-
-            var elementType = getContentType(aliasEl.GetString()!);
-
-            if (elementType == null)
-                continue;
-
-            var blockKey = Guid.NewGuid();
-            var udi = $"umb://element/{blockKey:N}";
-
-            layoutItems.Add(new JsonObject { ["contentUdi"] = udi });
-
-            var contentEntry = new JsonObject
-            {
-                ["contentTypeKey"] = elementType.Key.ToString(),
-                ["udi"] = udi
-            };
-
-            foreach (var prop in item.EnumerateObject())
-            {
-                if (prop.NameEquals("key") ||
-                    prop.NameEquals("name") ||
-                    prop.NameEquals("ncContentTypeAlias"))
-                {
-                    continue;
-                }
-
-                contentEntry[prop.Name] = JsonNode.Parse(prop.Value.GetRawText());
-            }
-
-            contentData.Add(contentEntry);
+            continue;
         }
 
-        if (contentData.Count == 0)
-            return null;
+        var elementType = getContentType(aliasEl.GetString()!);
 
-        var result = new JsonObject
+        if (elementType == null)
+            continue;
+
+        var blockKey = Guid.NewGuid();
+        var udi = $"umb://element/{blockKey:N}";
+
+        layoutItems.Add(new JsonObject { ["contentUdi"] = udi });
+
+        var contentEntry = new JsonObject
         {
-            ["layout"] = new JsonObject { ["Umbraco.BlockList"] = layoutItems },
-            ["contentData"] = contentData
+            ["contentTypeKey"] = elementType.Key.ToString(),
+            ["udi"] = udi
         };
 
-        return result.ToJsonString();
+        foreach (var prop in item.EnumerateObject())
+        {
+            if (prop.NameEquals("key") ||
+                prop.NameEquals("name") ||
+                prop.NameEquals("ncContentTypeAlias"))
+            {
+                continue;
+            }
+
+            contentEntry[prop.Name] =
+                IsNestedContentArray(prop.Value)
+                    ? ConvertNestedContentArray(prop.Value, getContentType)
+                    : JsonNode.Parse(prop.Value.GetRawText());
+        }
+
+        contentData.Add(contentEntry);
     }
+
+    if (contentData.Count == 0)
+        return null;
+
+    return new JsonObject
+    {
+        ["layout"] = new JsonObject { ["Umbraco.BlockList"] = layoutItems },
+        ["contentData"] = contentData
+    };
+}
+
+// A v8 Nested Content value is a JSON array of objects each carrying
+// "ncContentTypeAlias" - distinguishes that shape from any other
+// array-typed property (e.g. a plain string list) a sub-property might
+// hold. An empty array is treated as "not nested content" (ambiguous
+// otherwise) so it round-trips as a plain empty array.
+static bool IsNestedContentArray(JsonElement element)
+{
+    if (element.ValueKind != JsonValueKind.Array ||
+        element.GetArrayLength() == 0)
+    {
+        return false;
+    }
+
+    foreach (var item in element.EnumerateArray())
+    {
+        if (item.ValueKind != JsonValueKind.Object ||
+            !item.TryGetProperty("ncContentTypeAlias", out var aliasEl) ||
+            aliasEl.ValueKind != JsonValueKind.String)
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 
