@@ -1,372 +1,446 @@
-/*
-  Ported from the inline <style> block in the LIVE production site
-  (www.africanbank.co.za, fetched directly and diffed against this file -
-  it's evolved since the migrated Navigation.cshtml this was originally
-  based on: different navbar-brand/navbar-default sizing, a higher
-  nav-modal z-index, a fit-content modal height, and extra responsive
-  breakpoints). Chat-widget (#chatIconImg, #openChatButton, karaboChat) and
-  mobile-accordion (.accordion, .click, .myPanel) rules from that same
-  block are deliberately left out - unrelated page features, not part of
-  this header. Base navbar classes (.navbar-default, .register-btn,
-  .login-btn, .new-navbar-ab, ...) come from the site's own
-  public/vendor/navigation.css + Bootstrap 4 (public/vendor/bootstrap.css)
-  + bootstrap3-compat.css, all loaded globally in index.html - this file
-  only carries the rules that lived directly in the view.
-*/
+.container-fluid {
+   padding-left: 32px !important;
+   padding-right: 32px !important;
+}
+ #chatIconImg {
+    height: 119px !important;
+    max-height: 119px !important;
+    }
+
+   #iframe-karaboChat-speechBubble {
+    position: fixed;
+        bottom: 105px !important;
+        right: 40px !important;
+        color: rgb(255, 255, 255);
+        background-color:#00A5D7!important;
+        padding: 10px 14px;
+        border-radius: 16px 16px 0px;
+        box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 5px;
+        z-index: 200;
+        font-size: 10px !important;
+}
+
+#openChatButton {
+    background-color: transparent;
+    border-radius: 60px;
+    position: fixed;
+    bottom: 20px;
+    right: -20px !important;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    z-index: 200;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+footer .footer-copyright .pattern{
+    display:none;
+}
+.nav-business{
+   padding-top:27px !important;
+}
+.toggleAccessLink{
+  grid-template-columns: 2fr 1fr !important;
+}
+.business-hr{
+    margin-right:-63px;
+    border-color: #D5D7DA;
+}
+.bankingList{
+     display: none;
+     color: #002b60;
+     font-weight: 600;
+     font-size: 12px;
+     line-height: 30px;
+     list-style-type: none;
+     padding-left: 0;
+     max-height: 200px;
+     overflow-y: auto;
+}
+.bankingList::-webkit-scrollbar {
+        width: 6px; /* Set the width of the scrollbar */
+    }
+
+    .bankingList::-webkit-scrollbar-thumb {
+        background: #888; /* Color of the scrollbar thumb */
+        border-radius: 10px; /* Round the edges of the thumb */
+    }
+
+    .bankingList::-webkit-scrollbar-thumb:hover {
+        background: #555; /* Darker color when hovering over the thumb */
+    }
+
+    .bankingList::-webkit-scrollbar-track {
+        background: #f1f1f1; /* Light background for the scrollbar track */
+        border-radius: 10px; /* Round the edges of the track */
+    }
+ .accordion {
+                 font-weight: bold; /* Explicitly setting font-weight */
+                 font-family: Montserrat, sans-serif; /* Specifying the font family */
+
+                 color: #012B60;
+                 cursor: pointer;
+                 padding: 18px;
+                 width: 100%;
+                 text-align: left;
+                 font-size: 15px;
+                 transition: 0.4s;
+                background: none;
+                 border: none;
+                 position: relative; /* Needed for absolute positioning of the arrow */
+                 padding-left: 0px;
+               }
+
+               .accordion::after {
+                 content: '\276F'; /* Heavy Chevron Unicode character */
+                 font-size: 15px; /* Adjust as needed */
+                 color: #012B60;
+                 position: absolute;
+                 right: 20px;
+                 top: 50%;
+                 transform: translateY(-50%)rotate(90deg);
+                 transition: transform 0.4s;
+                 display:none;
+               }
+
+              button.accordion.active{
+                 color: #002b60 !important;
+              }
+              button.click.active{
+                 color: #002b60 !important;
+              }
+              .click{
+                       display: flex;
+
+                        padding: 4px 0px 9px 0px;
+
+                        border: none;
+                        background: none;
+                        color: #002b60;
+                        font-size: 14px;
+                        font-weight: bold;
+                        border-bottom: 1px solid #D5D7DA;
+              }
+                .click::after{
+                  transform: translateY(-50%)rotate(90deg);
+                }
+               .active::after {
+                 transform: translateY(-50%) rotate(270deg);
+               }
+
+               .myPanel {
+
+                    font-family: Montserrat, sans-serif;
+                    padding: 37px 50px 25px 0px;
+                    font-size: 13px;
+                    line-height: 38px !important;
+                    color: #002b60;
+                    display: none;
+                    overflow: hidden;
+
+                    margin-top: -20px !important;
+               }
+
+               .myPanel p {
+                       font-weight: 400;
+               }
+ .header {
+        padding: 0px 0px !important ;
+    }
+
+
+.navbar-default {
+
+    height: 111px !important;
+
+}
+
+.nav-home-icon {
+
+    display: none !important;
+}
 
 .active {
-  text-decoration: none !important;
-  color: #89bc47 !important;
+
+     text-decoration: none !important;
+
+
+
 }
 
-.container-fluid {
-  padding-left: 32px !important;
-  padding-right: 32px !important;
-}
+.navbar-default .navbar-nav>li>a.login-btn {
 
-.horizontal-list {
-  position: relative;
-  right: 0;
-  list-style-type: none;
-  padding: 0px 0px 0px 60px;
-  margin: 0;
-  display: flex;
-  justify-content: flex-start;
-}
+    background: #5dc300 !important;
 
-.horizontal-list li {
-  margin-right: 8px;
-}
+    text-align: center;
 
-.horizontal-list li a {
-  color: #fff;
-  text-decoration: none;
-  opacity: 0.6;
-}
+    padding: 10px 25px;
 
-.horizontal-list li a:hover {
-  text-decoration: none;
-  opacity: 0.5;
-}
+    color: #fff;
 
-.navbar-default .navbar-nav > li > a.login-btn {
-  background: #5dc300 !important;
-  text-align: center;
-  padding: 10px 25px;
-  color: #fff;
-  text-transform: uppercase;
-  font-size: 12px;
-  margin-top: 33px;
-  border-radius: 30px !important;
+    text-transform: uppercase;
+
+    font-size: 12px;
+
+    margin-top: 33px;
+
+    border-radius: 30px !important;
+
 }
 
 .navbar-default i {
-  padding-left: 2px;
-  margin-top: 4px !important;
-  font-size: 12px;
+    padding-left: 2px;
+
+    margin-top: 4px !important;
+
+    font-size: 12px;
 }
 
-.navbar-default .navbar-nav > li > a {
-  font-weight: 600 !important;
+.navbar-default .navbar-nav>li>a {
+
+    font-weight: 600 !important;
+
 }
 
 .fa-2x {
-  position: relative;
-  right: 10px;
-  font-size: 1em !important;
+
+    position: relative;
+
+    right: 10px;
+
+    font-size: 1em !important;
+
 }
 
 .navbar-brand {
-  width: 230px;
-  top: 35px;
-  position: relative;
-  padding: 0px 70px 0px 0px !important;
+    width: 230px;
+    top: 35px;
+    position: relative;
+    padding: 0px 70px 0px 0px !important;
 }
 
-.navbar-default {
-  height: 111px !important;
-}
+    .dropdown-container.navbar-default .navbar-collapse {
+        margin-top: 3px !important;
+    }
+    .nav-modal a:hover {
 
-.dropdown-container.navbar-default .navbar-collapse {
-  margin-top: 3px !important;
-}
+  color: rgb(0, 43, 96) ;
+    }
+    /*Menu Icons*/
+    .fa-products:before {
+        content: "\f07a";
+    }
 
-.nav-modal a:hover {
-  color: rgb(0, 43, 96);
-}
+    .fa-onlinebanking:before {
+        content: "\f0ac";
+    }
 
-/* Menu Icons */
-.fa-products:before {
-  content: '\f07a';
-}
-.fa-onlinebanking:before {
-  content: '\f0ac';
-}
-.fa-talktous:before {
-  content: '\f10b';
-}
-.fa-branches:before {
-  content: '\f041';
-}
-.fa-more:before {
-  content: '\f067';
-}
-.fa-investors:before {
-  content: '\f0c0';
-}
+    .fa-talktous:before {
+        content: "\f10b";
+    }
 
-.menu-icon {
-  vertical-align: top;
-  margin-top: 1px;
-  color: #88bc47;
-  padding-right: 10px;
-  padding-left: 15px;
-}
+    .fa-branches:before {
+        content: "\f041";
+    }
 
-.menu-block {
-  border-left: solid 1px rgba(0, 0, 0, 0.2);
-}
+    .fa-more:before {
+        content: "\f067";
+    }
 
-.menu-burger {
-  border-left: solid 1px rgba(0, 0, 0, 0.2);
-}
+    .fa-investors:before {
+        content: "\f0c0";
+    }
 
-.menu-search {
-  border-right: solid 1px rgba(0, 0, 0, 0.2);
-}
+    .menu-icon {
+        vertical-align: top;
+        margin-top: 1px;
+        color: #88bc47;
+        padding-right: 10px;
+        padding-left: 15px;
+    }
 
-.MobileMenuDivWrapper {
-  height: 100vh;
-  min-height: 100vh;
-  width: 100%;
-  overflow-y: scroll;
-  -webkit-overflow-scrolling: touch;
-  z-index: 9999;
-  background-image: url('/media/51095/blog_patterns_1.jpg');
-}
+    .menu-block {
+        border-left: solid 1px rgba(0,0,0,.2);
+    }
 
-/* modal css start here */
+    .menu-burger {
+        border-left: solid 1px rgba(0,0,0,.2);
+    }
+
+    .menu-search {
+        border-right: solid 1px rgba(0,0,0,.2);
+    }
+
+    .MobileMenuDivWrapper {
+        height: 100vh;
+        min-height: 100vh;
+        width: 100%;
+        overflow-y: scroll;
+        -webkit-overflow-scrolling: touch;
+        z-index: 9999;
+        background-image: url('/media/51095/blog_patterns_1.jpg');
+    }
+       /*modal css start here*/
 
 .lineUp {
-  animation: 1s anim-lineUp ease-in;
+  animation: 1s anim-lineUp ease-in ;
+}
+     .nav-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .nav-modal {
+      display: none;
+      flex-direction: column;
+      width: 500px;
+     height:fit-content;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+      z-index: 3;
+      border-radius: 30px 30px 30px 30px;
+      position: relative;
+    }
+
+    .nav-modal-container {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav-modal-header {
+      display: flex;
+      background-color: white;
+      color: #128C7E;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      border-radius: 25px;
+    }
+
+    .nav-modal-tab {
+      flex: 1;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      font-weight: normal;
+      font-size: 14px;
+      color: grey;
+      background: white;
+      padding: 10px;
+    }
+
+    .nav-modal-tab.active {
+      background-color: #fff;
+      color: #0D0D0D !important;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .nav-modal-tab.active::after {
+      content: '';
+      display: block;
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 50%;
+      height: 2px;
+      background-color: #88BC47;
+      transform: translateX(-50%);
+    }
+
+    .nav-modal-tab-content {
+      display: none;
+      padding: 67px;
+      border-radius: 0 0 30px 30px;
+    }
+
+     .nav-modal-tab-content1 {
+      padding: 67px;
+    }
+
+
+    .nav-modal-tab-content.active {
+      display: block;
+    }
+
+    .text-with-icon {
+      display: flex;
+      align-items: center;
+    }
+
+
+    .redirect-Text  {
+        transition: transform .2s;
+        font-weight:bold;
+        color:#021A44;
+
+    }
+
+    .redirect-Text:hover {
+  -ms-transform: scale(1.2); /* Adjust the scale value as needed */
+  -webkit-transform: scale(1.2); /* Adjust the scale value as needed */
+  transform: scale(1.2); /* Adjust the scale value as needed */
+		}
+
+    .long-Text{
+      margin-bottom: 16px;
+         font-size: 13px;
+         color:#010101;
+         margin-top: -16%;
+    }
+      .long-Text2{
+
+        margin-bottom: 16px;
+
+        font-size: 20px !important;
+
+        color: #112768 !important ;
+
+        margin-top: -16%;
+
+        font-weight: 700;
+
+        font-size: 29px;
+
+        line-height: 1.2;
+
+
+
+    }
+    .grid-container-element {
+        padding-top:2%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    }
+    .grid-child-element {
+        margin-top: -9px;
+    }
+
+
+.modal-Icon{
+    padding-left: 35px;
+    padding-top:3.5%;
 }
 
-@media (min-width: 768px) {
-  .navbar > .container .navbar-brand,
-  .navbar > .container-fluid .navbar-brand {
-    margin-left: 10px;
-  }
-}
+    .close-button
+    {
+    -top: -22px;
+    right: -21px;
 
-@media (min-width: 256px) and (max-width: 768px) {
-  .dropdown-container.navbar-default .navbar-collapse {
-    position: relative;
-    z-index: 1000;
-    background: #002b60;
-  }
 
-  /* Real site sizes an <img> logo here; ours is the inline SVG from
-     Navigation.cshtml (Logo.tsx, id="Layer_2") - same idea, different
-     selector, since there's no equivalent img rule to port. */
-  .navbar-default .navbar-brand #Layer_2 {
-    position: relative;
-    left: 10px;
-    top: 21px;
-    height: 38px;
-  }
 
-  .navbar-brand {
-    top: 7px !important;
-    position: relative;
-    padding: 0px 70px 0px 9px !important;
-  }
+    }
 
-  .navbar-default {
-    height: 67px !important;
-  }
-
-  .dropdown-container .navbar-right {
-    top: -51px;
-  }
-
-  .search-text {
-    margin-right: 5%;
-  }
-
-  #banner {
-    position: relative;
-  }
-}
-
-@media (min-width: 800px) and (max-width: 1024px) {
-  .dropdown-container .navbar-right {
-    margin-top: 44px;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1199px) {
-  .dropdown-container .navbar-header {
-    margin-top: 35px !important;
-  }
-}
-
-@keyframes anim-lineUp {
-  0% {
-    opacity: 0;
-    transform: translateY(80%);
-  }
-  20% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-    transform: translateY(0%);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0%);
-  }
-}
-
-.nav-modal-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.nav-modal {
-  display: none;
-  flex-direction: column;
-  width: 500px;
-  height: fit-content;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-  background-color: #fff;
-  z-index: 3;
-  border-radius: 30px 30px 30px 30px;
-  position: relative;
-}
-
-.nav-modal-container {
-  display: flex;
-  flex-direction: column;
-}
-
-.nav-modal-header {
-  display: flex;
-  background-color: white;
-  color: #128c7e;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px;
-  border-radius: 25px;
-}
-
-.nav-modal-tab {
-  flex: 1;
-  text-align: center;
-  cursor: pointer;
-  position: relative;
-  font-weight: normal;
-  font-size: 14px;
-  color: grey;
-  background: white;
-  padding: 10px;
-}
-
-.nav-modal-tab.active {
-  background-color: #fff;
-  color: #0d0d0d !important;
-  font-weight: bold;
-  font-size: 20px;
-}
-
-.nav-modal-tab.active::after {
-  content: '';
-  display: block;
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  width: 50%;
-  height: 2px;
-  background-color: #88bc47;
-  transform: translateX(-50%);
-}
-
-.nav-modal-tab-content {
-  display: none;
-  padding: 67px;
-  border-radius: 0 0 30px 30px;
-}
-
-.nav-modal-tab-content1 {
-  padding: 67px;
-}
-
-.nav-modal-tab-content.active {
-  display: block;
-}
-
-.text-with-icon {
-  display: flex;
-  align-items: center;
-}
-
-.redirect-Text {
-  transition: transform 0.2s;
-  font-weight: bold;
-  color: #021a44;
-}
-
-.redirect-Text:hover {
-  -ms-transform: scale(1.2);
-  -webkit-transform: scale(1.2);
-  transform: scale(1.2);
-}
-
-.long-Text {
-  margin-bottom: 16px;
-  font-size: 13px;
-  color: #010101;
-  margin-top: -16%;
-}
-
-.long-Text2 {
-  margin-bottom: 16px;
-  font-size: 20px !important;
-  color: #112768 !important;
-  margin-top: -16%;
-  font-weight: 700;
-  font-size: 29px;
-  line-height: 1.2;
-}
-
-.grid-container-element {
-  padding-top: 2%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  width: 100%;
-}
-
-.grid-child-element {
-  margin-top: -9px;
-}
-
-.modal-Icon {
-  padding-left: 35px;
-  padding-top: 3.5%;
-}
-
-.close-button {
-  -top: -22px;
-  right: -21px;
-}
 
 .close-btn-bg-dot {
   height: 25px;
@@ -376,13 +450,14 @@
   display: inline-block;
 }
 
-.nav-modal-close-btn {
+
+.nav-modal-close-btn{
   height: 0px;
   line-height: 0px;
   width: 0px;
   font-size: 2em;
   font-weight: bold;
-  color: white;
+  color:white;
   border-radius: 50%;
   background-color: white;
   text-align: center;
@@ -395,80 +470,274 @@
 }
 
 .circle-background {
-  top: -18px;
-  cursor: pointer;
-  position: absolute;
+   top: -18px;
+    cursor: pointer;
+    position: absolute;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 32px;
+    font-size: 40px;
+   }
+
+.tooltip {
+
+  position: relative;
+
   display: inline-block;
-  width: 30px;
-  height: 30px;
-  background-color: white;
-  border-radius: 50%;
-  text-align: center;
-  line-height: 32px;
-  font-size: 40px;
+
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+
 }
 
-@media (min-width: 1200px) and (max-width: 2000px) {
-  .dropdown-container.navbar-default .navbar-collapse {
-    margin-top: 3px;
+
+
+/* Tooltip text */
+
+.tooltip .tooltiptext {
+
+  visibility: hidden;
+
+  width: 120px;
+
+  background-color: black;
+
+  color: #fff;
+
+  text-align: center;
+
+  padding: 5px 0;
+
+  border-radius: 6px;
+
+
+
+  /* Position the tooltip text - see examples below! */
+
+  position: absolute;
+
+  z-index: 1;
+
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+
+.tooltip:hover .tooltiptext {
+
+  visibility: visible;
+}
+
+@media (min-width: 768px) {
+    .navbar>.container .navbar-brand, .navbar>.container-fluid .navbar-brand {
+        margin-left: 10px;
+    }
+
+}
+
+@media (min-width: 256px) and (max-width: 768px){
+ #chatIconImg {
+    height: 119px !important;
+    max-height: 119px !important;
+    }
+
+   #iframe-karaboChat-speechBubble {
+    position: fixed;
+        bottom: 76px !important;
+        right: 52px !important;
+        color: rgb(255, 255, 255);
+        padding: 10px 14px;
+        border-radius: 16px 16px 0px;
+        box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 5px;
+        z-index: 200;
+        font-size: 10px !important;
+}
+
+#openChatButton {
+    background-color: transparent;
+    border-radius: 60px;
+    position: fixed;
+    bottom:0px;
+    right: -20px !important;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    z-index: 200;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.bankingList{
+     font-size: 8px;
+
+     }
+.search-text {
+    margin-right: 5%;
+}
+    .dropdown-container .navbar-right {
+
+        top: -51px;
+
+        }
+.dropdown-container.navbar-default .navbar-collapse {
+
+    position: relative;
+
+    z-index: 1000;
+
+    background: #002b60;
+
+
+
+}
+
+.navbar-brand {
+    top: 7px !important;
+
+    position: relative;
+
+    padding: 0px 70px 0px 9px !important;
+
+}
+    .navbar-default .navbar-brand img {
+
+        width: 130px;
+
+        position: relative;
+
+        left: 0px;
+
+        top: 5px;
+
+        height: 40px;
+
+        }
+
+.navbar-default {
+
+    height: 67px !important;
+
+}
+
+#banner {
+
+    position: relative;
+
+}
+}
+
+@keyframes anim-lineUp {
+
+  0% {
+
+    opacity: 0;
+
+    transform: translateY(80%);
+
   }
+
+  20% {
+
+    opacity: 0;
+
+  }
+
+  50% {
+
+    opacity: 1;
+
+    transform: translateY(0%);
+
+  }
+
+  100% {
+
+    opacity: 1;
+
+    transform: translateY(0%);
+
+  }
+
+}
+
+
+@media (min-width: 1200px) and (max-width: 2000px) {
+
+.dropdown-container .navbar-header {
+
+                    margin-top: 1px !important;
+
+                }
+
+
+
+    .dropdown-container.navbar-default .navbar-collapse {
+
+        margin-top: 3px;
+
+    }
+
 }
 
 @media only screen and (max-width: 530px) {
-  .nav-modal-tab.active::after {
-    content: '';
-    display: block;
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: 85%;
-    height: 2px;
-    background-color: #88bc47;
-    transform: translateX(-50%);
-  }
 
-  .nav-modal {
-    width: 90%;
-    max-width: 400px;
-    height: auto;
-    padding: 20px;
-  }
+    .nav-modal-tab.active::after {
+      content: '';
+      display: block;
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 85%;
+      height: 2px;
+      background-color: #88BC47;
+      transform: translateX(-50%);
+    }
 
-  .nav-modal-header {
-    padding: 10px;
-  }
+    .nav-modal {
+      width: 90%;
+      max-width: 400px; /* You can adjust this value as needed for the modal width */
+      height: auto;
+      padding: 20px;
+    }
 
-  .nav-modal-tab {
-    padding: 8px;
-    font-size: 14px;
-  }
+    .nav-modal-header {
+      padding: 10px;
+    }
 
-  .nav-modal-tab-content {
-    padding: 20px;
-  }
+    .nav-modal-tab {
+      padding: 8px;
+      font-size: 14px;
+    }
 
-  .grid-container-element {
-    grid-template-columns: 1fr 1fr;
-    cursor: pointer;
-  }
+    .nav-modal-tab-content {
+      padding: 20px;
+    }
 
-  .modal-Icon {
-    padding-top: 5%;
-    padding-left: 100%;
-  }
+    .grid-container-element {
+      grid-template-columns: 1fr 1fr;
+       cursor: pointer;
+    }
 
-  .close-button {
+    .modal-Icon {
+      padding-top: 5%;
+      padding-left: 100%;
+    }
+
+    .close-button
+    {
+
     right: -17px;
     top: -12px;
-  }
+    }
 
-  .nav-modal-close-btn {
-    color: black;
-    cursor: pointer;
-  }
-
-  .circle-background {
-    top: -26px;
+    .nav-modal-close-btn{
+      color:black;
+      cursor: pointer;
+    }
+.circle-background {
+top: -26px;
     cursor: pointer;
     position: absolute;
     display: inline-block;
@@ -479,145 +748,43 @@
     text-align: center;
     line-height: 28px;
     font-size: 33px;
-  }
 
-  .redirect-Text {
-    font-size: 15px;
+    }
+    .redirect-Text {
+        font-size: 15px;
+    }
+    .long-Text{
+         font-size: 13px;
+         color:#010101;
+         margin-top: -8%;
+    }
   }
+@media (min-width: 800px) and (max-width: 1024px) {
+    .dropdown-container .navbar-right {
+        margin-top: 44px;
+    }
+}
+@media (min-width: 768px) and (max-width: 1199px) {
+    .dropdown-container .navbar-header {
+        margin-top: 35px !important;
+    }
 
-  .long-Text {
-    font-size: 13px;
-    color: #010101;
-    margin-top: -8%;
-  }
 }
 
-@media (min-width: 767px) and (max-width: 1199px) {
-  .dropdown-container.navbar-default .navbar-nav > li:first-child > a {
+@media (min-width: 767px) and (max-width: 1199px){
+.dropdown-container.navbar-default .navbar-nav>li:first-child>a {
     padding-left: 30px !important;
-  }
+}
+.navbar-default {
 
-  .navbar-default {
     height: 196px !important;
-  }
 
-  .navbar-default .navbar-nav > li > a.login-btn {
-    margin-top: 0px;
-  }
-}
-/* modal css end here */
-
-/* React-only additions (no jQuery/Bootstrap JS in this app) */
-
-.nav-status {
-  padding: 15px 20px;
-  color: #fff;
-  opacity: 0.7;
 }
 
-.nav-status--error {
-  color: #ff8a8a;
-}
+.navbar-default .navbar-nav>li>a.login-btn {
 
-.global-search-new-close-btn {
-  cursor: pointer;
-}
+      margin-top: 0px;
 
-/* Mega-menu dropdown content (menus -> link -> menuList) needs NO styling
-   here - /vendor/navigation.css (loaded in index.html) already has the
-   real, complete rules: .header-mega-menu .dropdown-menu (full-width,
-   #002b60 dark background), .mega-menu-product/.product-category/.product/
-   .title/.descr (the FontAwesome chevron + category/link list inside it).
-   An earlier version of this file duplicated a DIFFERENT, wrong set of
-   rules adapted from wwwroot/css/style.css's unrelated narrow/light
-   .dropdown-menu - since this stylesheet loads after the vendor <link>
-   tags, those rules were actively overriding the correct ones instead of
-   just being redundant. Confirmed by grepping the vendored navigation.css
-   directly for the same selectors. */
-
-/* Navigation.cshtml hardcodes .col-sm-3 (Bootstrap's fixed 4-per-row grid
-   class) for each category column, regardless of how many categories a
-   given menu actually has - fine for a 4-category menu (PRODUCTS), but a
-   6-category one would wrap onto a second row instead of the single full-
-   width row the design calls for. .row's flex-wrap: wrap (from Bootstrap)
-   is what causes that; this keeps everything on one line and splits the
-   width evenly between however many categories there are, instead of
-   assuming a fixed column count. */
-.mega-menu-row {
-  display: flex;
-  flex-wrap: nowrap;
-  margin-left: -15px;
-  margin-right: -15px;
-}
-
-.mega-menu-column {
-  flex: 1 1 0;
-  min-width: 0;
-  padding-left: 15px;
-  padding-right: 15px;
-}
-
-/* Bootstrap 4 only keeps .navbar-nav horizontal and .navbar-collapse visible
-   without JS on navbars carrying a .navbar-expand-* class (ours doesn't -
-   it's ported from a Bootstrap 3 navbar, always visible and horizontal
-   above the mobile breakpoint by default). Without the first rule, the
-   whole menu/search/register area - anything inside .navbar-collapse -
-   stays hidden on every screen size until the mobile toggle is clicked;
-   without the second, nav items stack vertically instead of in a row.
-   .navbar-right (pushes search/register-login to the far edge) is also a
-   Bootstrap-3-only class Bootstrap 4 dropped - margin-left: auto is the
-   flex-based equivalent of its old float: right.
-
-   .login-btn's margin-top: 33px (further up, and also in navigation.css)
-   and navbar-right's old inline marginTop: -20 (removed from Header.tsx)
-   were both tuned for the previous non-centered layout - .navbar-collapse
-   now flex-centers its children itself, so those fixed offsets just
-   pushed things out of alignment instead of into it.
-
-   navigation.css's own base rule (.navbar-default .navbar-nav > li > a)
-   goes further: margin-top: 20px plus 44px of padding top AND bottom -
-   108px of vertical offset per plain link, clearly sized for the old
-   tall-navbar-centered-via-padding technique. Combined with login-btn's
-   much smaller padding, every item ended up a different height inside
-   the same flex row - not just off-center, visibly inconsistent with
-   each other. Reset only here, at the same breakpoint the centering
-   turns on - the base rule's own values still apply on mobile, where
-   nav items stack instead. */
-@media (min-width: 768px) {
-  .new-navbar-ab .navbar-collapse {
-    display: flex !important;
-    /* Bootstrap 4's own .navbar-collapse rule sets flex-basis: 100%,
-       meant to be overridden to auto by a .navbar-expand-* class at this
-       breakpoint - without one, it always claims a full line of its own
-       and wraps below navbar-brand instead of sitting beside it. */
-    flex-basis: auto;
-  }
-
-  .new-navbar-ab .navbar-nav {
-    flex-direction: row;
-  }
-
-  .new-navbar-ab .navbar-right {
-    margin-left: auto;
-    align-items: center;
-  }
-
-  /* .navbar-nav's own align-items computes to normal/stretch, so its two
-     <li>s (search icon, login button) stretch to match whichever is
-     naturally taller - then the plain inline .login-btn inside that
-     stretched <li> doesn't center itself, it just sits near the top with
-     its padding visually extending the pill both ways from there. That's
-     what made it render noticeably higher than the plain nav links, which
-     don't have this internal-stretch problem since their own content is
-     already short. Verified with Playwright against the running app
-     (getBoundingClientRect + computed styles), not just visually guessed. */
-  .new-navbar-ab .navbar-nav > li > a {
-    margin-top: 0;
-    padding-top: 15px;
-    padding-bottom: 15px;
-  }
-
-  .new-navbar-ab .navbar-nav > li > a.login-btn {
-    margin-top: 0;
-  }
-}
+      }
+   }
+    /*modal css end here*/
