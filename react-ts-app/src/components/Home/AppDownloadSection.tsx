@@ -1,3 +1,5 @@
+import { Button } from '../ui/Button/Button';
+
 // Ported from the "Download the African Bank App" section of the current
 // live home page markup. Static content passed as props with defaults so it
 // stays reusable.
@@ -32,7 +34,7 @@ export function AppDownloadSection({
             <p className="font-md color-brand-1">{description}</p>
 
             <div className="mt-50 text-start">
-              <a href={downloadUrl} className="btn btn-brand-1 hover-up">
+              <Button href={downloadUrl}>
                 {downloadLabel}{' '}
                 <svg
                   stroke="currentColor"
@@ -52,7 +54,7 @@ export function AppDownloadSection({
                     d="M320 336h76c55 0 100-21.21 100-75.6s-53-73.47-96-75.6C391.11 99.74 329 48 256 48c-69 0-113.44 45.79-128 91.2-60 5.7-112 35.88-112 98.4S70 336 136 336h56m0 64.1 64 63.9 64-63.9M256 224v224.03"
                   />
                 </svg>
-              </a>
+              </Button>
             </div>
           </div>
 

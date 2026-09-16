@@ -2,8 +2,8 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Header } from './components/Header/Header'
 import { Footer } from './components/Footer/Footer'
 import { Home } from './components/Home/Home'
-import { PagePlaceholder } from './components/PagePlaceholder/PagePlaceholder'
 import { PERSONAL_MENU_PAGES } from './routes/personalMenuPages'
+import { PERSONAL_MENU_PAGE_COMPONENTS } from './routes/personalMenuPageComponents'
 
 function App() {
   return (
@@ -14,13 +14,10 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/en/home/" replace />} />
             <Route path="/en/home/" element={<Home />} />
-            {PERSONAL_MENU_PAGES.map((page) => (
-              <Route
-                key={page.path}
-                path={page.path}
-                element={<PagePlaceholder title={page.title} description={page.description} />}
-              />
-            ))}
+            {PERSONAL_MENU_PAGES.map((page) => {
+              const PageComponent = PERSONAL_MENU_PAGE_COMPONENTS[page.path]
+              return <Route key={page.path} path={page.path} element={<PageComponent />} />
+            })}
             <Route path="*" element={<Navigate to="/en/home/" replace />} />
           </Routes>
         </main>
