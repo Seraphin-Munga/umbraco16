@@ -37,7 +37,7 @@ export function Header() {
   return (
     <div className="header-container">
       <nav className="navbar navbar-default dropdown-container new-navbar-ab">
-        <div className="container">
+        <div className="container-fluid">
           <div className="navbar-header">
             <button
               type="button"
