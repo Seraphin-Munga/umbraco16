@@ -488,11 +488,15 @@
 .mega-menu-row {
   display: flex;
   flex-wrap: nowrap;
+  margin-left: -15px;
+  margin-right: -15px;
 }
 
 .mega-menu-column {
   flex: 1 1 0;
   min-width: 0;
+  padding-left: 15px;
+  padding-right: 15px;
 }
 
 /* Bootstrap 4 only keeps .navbar-nav horizontal and .navbar-collapse visible
