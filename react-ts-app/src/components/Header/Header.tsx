@@ -123,9 +123,9 @@ export function Header() {
                           {menuItem.menus.length > 0 && (
                             <div className={`dropdown-menu${isOpen ? ' show' : ''}`}>
                               <div className="container">
-                                <div className="row mega-menu-row">
+                                <div className="row eq-height">
                                   {menuItem.menus.map((category, categoryIndex) => (
-                                    <div className="mega-menu-column" key={categoryIndex}>
+                                    <div className="col-sm-3" key={categoryIndex}>
                                       <div className="mega-menu-product">
                                         <div className="product-category">
                                           {category.categoryName}

@@ -76,8 +76,7 @@ export function NavModal({ open, onClose }: NavModalProps) {
   const tab = TABS[activeTab];
 
   return (
-    <>
-      <div className="nav-modal-overlay" style={{ display: 'flex' }} />
+    <div className="nav-modal-overlay" style={{ display: 'flex' }}>
       <div className="nav-modal" style={{ display: 'flex' }}>
         <div className="nav-modal-flex-container">
           <div className="close-button" onClick={onClose}>
@@ -133,6 +132,6 @@ export function NavModal({ open, onClose }: NavModalProps) {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
