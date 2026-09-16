@@ -2614,6 +2614,45 @@ app.MapGet("/diagnostics/contenttype/{alias}", (
 });
 
 // ============================================================
+// TEMP DIAGNOSTIC - remove once the topNavigation/MenuInfo schema is
+// confirmed. Visit /diagnostics/schema/search?q=menu in the browser -
+// lists every content/element type whose alias or name contains the
+// search term, with its full property list (alias, name, editor).
+// Settles "is property X missing" directly against the schema instead of
+// reading it off backoffice screenshots.
+// ============================================================
+
+app.MapGet("/diagnostics/schema/search", (
+    string q,
+    IContentTypeService contentTypeService) =>
+{
+    var matches = contentTypeService.GetAll()
+        .Where(ct =>
+            ct.Alias.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+            ct.Name!.Contains(q, StringComparison.OrdinalIgnoreCase))
+        .Select(ct => new
+        {
+            alias = ct.Alias,
+            name = ct.Name,
+            isElement = ct.IsElement,
+            properties = ct.PropertyTypes.Select(pt => new
+            {
+                alias = pt.Alias,
+                name = pt.Name,
+                editor = pt.PropertyEditorAlias
+            })
+        })
+        .ToList();
+
+    return Results.Ok(new
+    {
+        query = q,
+        count = matches.Count,
+        contentTypes = matches
+    });
+});
+
+// ============================================================
 // NORMAL UMBRACO STARTUP
 // ============================================================
 
