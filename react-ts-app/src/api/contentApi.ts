@@ -112,27 +112,17 @@ function mapBlocks<T>(
 function mapLinks(value: unknown): DeliveryLink[] {
   if (!Array.isArray(value)) return [];
 
-  return value.map((raw: Record<string, unknown>) => {
-    // The Delivery API's ApiLink keeps url and queryString as separate
-    // fields - confirmed against the installed Umbraco.Core assembly
-    // (Umbraco.Cms.Core.Models.DeliveryApi.ApiLink). Umbraco's internal
-    // Link model (what Navigation.cshtml reads server-side) has no
-    // separate QueryString property at all, so its own .Url getter
-    // concatenates url + queryString - which is exactly how a menu
-    // trigger with no real destination ends up with Url == "#": raw v8
-    // data has url:"" and queryString:"#". Without combining them here
-    // the same way, that comparison against "#" in Header.tsx never
-    // matches, and every mega-menu trigger falls through to being
-    // rendered as a plain (non-dropdown) link instead.
-    const url = typeof raw?.url === 'string' ? raw.url : '';
-    const queryString = typeof raw?.queryString === 'string' ? raw.queryString : '';
-
-    return {
-      url: url || queryString ? `${url}${queryString}` : '#',
-      title: typeof raw?.title === 'string' ? raw.title : String(raw?.name ?? ''),
-      target: typeof raw?.target === 'string' ? raw.target : null,
-    };
-  });
+  // Confirmed against a live response: ApiLink.url already comes back as
+  // "#" for a menu trigger with no real destination (not "" with the "#"
+  // only in queryString, which an earlier version of this function
+  // wrongly assumed and then concatenated - producing "##" and breaking
+  // the `!== '#'` check in Header.tsx worse than before). queryString
+  // isn't needed for that comparison at all.
+  return value.map((raw: Record<string, unknown>) => ({
+    url: typeof raw?.url === 'string' ? raw.url : '#',
+    title: typeof raw?.title === 'string' ? raw.title : String(raw?.name ?? ''),
+    target: typeof raw?.target === 'string' ? raw.target : null,
+  }));
 }
 
 function mapRichText(value: unknown): string {
