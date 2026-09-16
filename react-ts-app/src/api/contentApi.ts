@@ -153,6 +153,22 @@ function mapMenuInfoItem(props: Record<string, unknown>): MenuInfoItem {
   };
 }
 
+// `expand=properties[$all]` only expands one level of Block List content -
+// confirmed against a live response: menuInfo's own items (nCMenuCategory)
+// came back with menuDescription/menuName fully populated, but their own
+// "menus" property (itself a Block List, one level deeper) came back as a
+// bare `null` rather than even an empty `{ items: [] }` - not a converted-
+// but-empty value, an unexpanded one. Each further level of Block List
+// nesting needs its own explicit `properties.<alias>.items.content.
+// properties[$all]` path chained onto the last one; there's no wildcard
+// that cascades through every depth by itself.
+const TOP_NAVIGATION_EXPAND = [
+  'properties[$all]',
+  'properties.menuInfo.items.content.properties[$all]',
+  'properties.menuInfo.items.content.properties.menus.items.content.properties[$all]',
+  'properties.menuInfo.items.content.properties.menus.items.content.properties.link.items.content.properties[$all]',
+].join(',');
+
 /**
  * Fetches the site's `topNavigation` content item: its `menuInfo` block list
  * (normalized into a clean array) and the CMS-authored `registerLogin`
@@ -162,7 +178,7 @@ function mapMenuInfoItem(props: Record<string, unknown>): MenuInfoItem {
  */
 export async function fetchTopNavigation(signal?: AbortSignal): Promise<TopNavigation> {
   const [topNavigation] = await fetchContent(
-    '?filter=contentType:topNavigation&expand=properties[$all]&take=1',
+    `?filter=contentType:topNavigation&expand=${TOP_NAVIGATION_EXPAND}&take=1`,
     signal,
   );
 
