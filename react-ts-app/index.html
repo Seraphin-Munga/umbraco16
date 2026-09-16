@@ -23,6 +23,13 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
     />
+    <!--
+      Bootstrap 4 dropped several Bootstrap-3-only utility classes the ported
+      markup still uses (hidden-xs/sm/md/lg, visible-xs, pull-right, the
+      col-sm-push/pull grid modifiers) - loaded last so it isn't overridden
+      by the stylesheets above. See the file itself for the full story.
+    -->
+    <link rel="stylesheet" href="/vendor/bootstrap3-compat.css" />
   </head>
   <body>
     <div id="root"></div>

@@ -1,0 +1,63 @@
+/*
+  Header.tsx and Footer.tsx were ported from markup that predates the site's
+  move to Bootstrap 4 (confirmed as what MasterNew.cshtml actually loads -
+  see the Footer commit). A handful of Bootstrap-3-only utility classes
+  survived the port (hidden-xs/sm/md/lg, visible-xs, pull-right, the
+  col-sm-push/pull grid modifiers) that Bootstrap 4 dropped entirely, which
+  is why the register/login button, mobile-only search label, and the
+  footer's logo/pattern column order all looked broken once bootstrap.css
+  was swapped from v3 to v4. Rather than load two conflicting Bootstrap
+  versions, this patches in just those specific classes - values copied
+  verbatim from this project's own Bootstrap 3 build
+  (wwwroot/css/bootstrap.css) rather than reconstructed from memory.
+*/
+
+.pull-right {
+  float: right !important;
+}
+
+.pull-left {
+  float: left !important;
+}
+
+@media (max-width: 767px) {
+  .hidden-xs {
+    display: none !important;
+  }
+
+  .visible-xs {
+    display: block !important;
+  }
+}
+
+.visible-xs {
+  display: none !important;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  .hidden-sm {
+    display: none !important;
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+  .hidden-md {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  .hidden-lg {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .col-sm-pull-5 {
+    right: 41.66667%;
+  }
+
+  .col-sm-push-7 {
+    left: 58.33333%;
+  }
+}
