@@ -67,7 +67,7 @@ export function Footer() {
 
         <div className="footer-copyright">
           <div className="row">
-            <div className="col-sm-7 col-sm-pull-5">
+            <div className="col-sm-7">
               <img src="/images/africanbank-logo-white.svg" width="170" alt="African Bank" />
               <div
                 className="copyright-text"
@@ -75,7 +75,7 @@ export function Footer() {
               />
             </div>
 
-            <div className="col-sm-5 col-sm-push-7">
+            <div className="col-sm-5">
               <img className="pattern hidden-xs" src="/images/footer-pattern.svg" alt="footer-pattern" />
               <div className="pull-right">
                 <a href="#" target="_blank" rel="noreferrer">
