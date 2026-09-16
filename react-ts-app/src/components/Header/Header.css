@@ -502,6 +502,11 @@
 @media (min-width: 768px) {
   .new-navbar-ab .navbar-collapse {
     display: flex !important;
+    /* Bootstrap 4's own .navbar-collapse rule sets flex-basis: 100%,
+       meant to be overridden to auto by a .navbar-expand-* class at this
+       breakpoint - without one, it always claims a full line of its own
+       and wraps below navbar-brand instead of sitting beside it. */
+    flex-basis: auto;
   }
 
   .new-navbar-ab .navbar-nav {
@@ -510,8 +515,18 @@
 
   .new-navbar-ab .navbar-right {
     margin-left: auto;
+    align-items: center;
   }
 
+  /* .navbar-nav's own align-items computes to normal/stretch, so its two
+     <li>s (search icon, login button) stretch to match whichever is
+     naturally taller - then the plain inline .login-btn inside that
+     stretched <li> doesn't center itself, it just sits near the top with
+     its padding visually extending the pill both ways from there. That's
+     what made it render noticeably higher than the plain nav links, which
+     don't have this internal-stretch problem since their own content is
+     already short. Verified with Playwright against the running app
+     (getBoundingClientRect + computed styles), not just visually guessed. */
   .new-navbar-ab .navbar-nav > li > a {
     margin-top: 0;
     padding-top: 15px;
