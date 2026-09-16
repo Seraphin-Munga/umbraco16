@@ -2,12 +2,28 @@ import { useEffect, useState } from 'react';
 import { fetchTopNavigation, type MenuInfoItem } from '../../api/contentApi';
 import { Logo } from './Logo';
 import { NavModal } from './NavModal';
+import {
+  PERSONAL_MENU_CATEGORY_ORDER,
+  PERSONAL_MENU_EXTERNAL_LINKS,
+  PERSONAL_MENU_PAGES,
+} from '../../routes/personalMenuPages';
 import './Header.css';
 
 // Mirrors Configuration["online_upload"] in Navigation.cshtml, used for the
 // fallback "Upload documents" link when a menu item's link has neither a
 // real URL nor a Target set.
 const ONLINE_UPLOAD_URL = import.meta.env.VITE_ONLINE_UPLOAD_URL || '#';
+
+// The "PERSONAL" top-level item's dropdown is rendered from our own ported
+// route list instead of the CMS fetch below - it always shows and links to
+// real routes in this app regardless of the Umbraco backend being reachable.
+// Every other top-level item (Business, etc.) still comes from
+// fetchTopNavigation as before.
+const PERSONAL_MENU_GROUPS = PERSONAL_MENU_CATEGORY_ORDER.map((category) => ({
+  category,
+  pages: PERSONAL_MENU_PAGES.filter((page) => page.category === category),
+  externalLinks: PERSONAL_MENU_EXTERNAL_LINKS.filter((link) => link.category === category),
+}));
 
 export function Header() {
   const [menu, setMenu] = useState<MenuInfoItem[]>([]);
@@ -61,7 +77,7 @@ export function Header() {
             </a>
           </div>
 
-          <div className={`collapse navbar-collapse${navOpen ? ' show' : ''}`}>
+          <div className={`collapse navbar-collapse${navOpen ? ' in' : ''}`}>
             <ul className="nav navbar-nav dropdown-container left-nav">
               <li>
                 <a
@@ -101,12 +117,13 @@ export function Header() {
                     // both a real target and no target at all, i.e. null).
                     if (link.target !== '') {
                       const isOpen = openMegaMenuKey === key;
-                      const hasMegaMenu = menuItem.menus.length > 0;
+                      const isPersonalMenu = link.title.trim().toUpperCase() === 'PERSONAL';
+                      const hasMegaMenu = isPersonalMenu || menuItem.menus.length > 0;
 
                       return (
                         <li
                           key={key}
-                          className={`header-mega-menu dropdown${isOpen ? ' show' : ''}`}
+                          className={`header-mega-menu dropdown${isOpen ? ' open' : ''}`}
                         >
                           <a
                             href="/en/home/"
@@ -123,38 +140,62 @@ export function Header() {
                             {hasMegaMenu && <i className="fa fa-angle-down" />}
                           </a>
                           {hasMegaMenu && (
-                            <div className={`dropdown-menu${isOpen ? ' show' : ''}`}>
+                            <div className="dropdown-menu">
                               <div className="container">
                                 <div className="row eq-height">
-                                  {menuItem.menus.map((category, categoryIndex) => (
-                                    <div className="col-sm-3" key={categoryIndex}>
-                                      <div className="mega-menu-product">
-                                        <div className="product-category">
-                                          {category.categoryName}
+                                  {isPersonalMenu
+                                    ? PERSONAL_MENU_GROUPS.map((group) => (
+                                        <div className="col-sm-3" key={group.category}>
+                                          <div className="mega-menu-product">
+                                            <div className="product-category">{group.category}</div>
+                                            {group.pages.map((page) => (
+                                              <div className="product" key={page.path}>
+                                                <a className="title" href={page.path}>
+                                                  {page.title}
+                                                </a>
+                                                <p className="descr">{page.description}</p>
+                                              </div>
+                                            ))}
+                                            {group.externalLinks.map((externalLink) => (
+                                              <div className="product" key={externalLink.url}>
+                                                <a className="title" href={externalLink.url}>
+                                                  {externalLink.title}
+                                                </a>
+                                                <p className="descr">{externalLink.description}</p>
+                                              </div>
+                                            ))}
+                                          </div>
                                         </div>
-                                        {category.link.map((linkGroup, linkGroupIndex) =>
-                                          linkGroup.menuList.map((productLink, productLinkIndex) => (
-                                            <div
-                                              className="product"
-                                              key={`${linkGroupIndex}-${productLinkIndex}`}
-                                            >
-                                              <a
-                                                className="title"
-                                                href={
-                                                  linkGroup.pageSection
-                                                    ? `${productLink.url}${linkGroup.pageSection}`
-                                                    : productLink.url
-                                                }
-                                              >
-                                                {productLink.title}
-                                              </a>
-                                              <p className="descr">{linkGroup.menuDescription}</p>
+                                      ))
+                                    : menuItem.menus.map((category, categoryIndex) => (
+                                        <div className="col-sm-3" key={categoryIndex}>
+                                          <div className="mega-menu-product">
+                                            <div className="product-category">
+                                              {category.categoryName}
                                             </div>
-                                          )),
-                                        )}
-                                      </div>
-                                    </div>
-                                  ))}
+                                            {category.link.map((linkGroup, linkGroupIndex) =>
+                                              linkGroup.menuList.map((productLink, productLinkIndex) => (
+                                                <div
+                                                  className="product"
+                                                  key={`${linkGroupIndex}-${productLinkIndex}`}
+                                                >
+                                                  <a
+                                                    className="title"
+                                                    href={
+                                                      linkGroup.pageSection
+                                                        ? `${productLink.url}${linkGroup.pageSection}`
+                                                        : productLink.url
+                                                    }
+                                                  >
+                                                    {productLink.title}
+                                                  </a>
+                                                  <p className="descr">{linkGroup.menuDescription}</p>
+                                                </div>
+                                              )),
+                                            )}
+                                          </div>
+                                        </div>
+                                      ))}
                                 </div>
                               </div>
                             </div>
