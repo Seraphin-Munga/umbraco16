@@ -482,7 +482,23 @@
    without the second, nav items stack vertically instead of in a row.
    .navbar-right (pushes search/register-login to the far edge) is also a
    Bootstrap-3-only class Bootstrap 4 dropped - margin-left: auto is the
-   flex-based equivalent of its old float: right. */
+   flex-based equivalent of its old float: right.
+
+   .login-btn's margin-top: 33px (further up, and also in navigation.css)
+   and navbar-right's old inline marginTop: -20 (removed from Header.tsx)
+   were both tuned for the previous non-centered layout - .navbar-collapse
+   now flex-centers its children itself, so those fixed offsets just
+   pushed things out of alignment instead of into it.
+
+   navigation.css's own base rule (.navbar-default .navbar-nav > li > a)
+   goes further: margin-top: 20px plus 44px of padding top AND bottom -
+   108px of vertical offset per plain link, clearly sized for the old
+   tall-navbar-centered-via-padding technique. Combined with login-btn's
+   much smaller padding, every item ended up a different height inside
+   the same flex row - not just off-center, visibly inconsistent with
+   each other. Reset only here, at the same breakpoint the centering
+   turns on - the base rule's own values still apply on mobile, where
+   nav items stack instead. */
 @media (min-width: 768px) {
   .new-navbar-ab .navbar-collapse {
     display: flex !important;
@@ -494,5 +510,15 @@
 
   .new-navbar-ab .navbar-right {
     margin-left: auto;
+  }
+
+  .new-navbar-ab .navbar-nav > li > a {
+    margin-top: 0;
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
+
+  .new-navbar-ab .navbar-nav > li > a.login-btn {
+    margin-top: 0;
   }
 }

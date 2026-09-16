@@ -146,7 +146,7 @@ export function Header() {
               </li>
             </ul>
 
-            <ul className="nav navbar-nav navbar-right" style={{ marginTop: -20 }}>
+            <ul className="nav navbar-nav navbar-right">
               <li>
                 <a
                   href="#"
