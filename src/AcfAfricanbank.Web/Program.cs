@@ -1775,6 +1775,17 @@ if (args.Length > 0 &&
     var contentMap =
         new Dictionary<int, Guid>();
 
+    // Source Umbraco 8 node GUID (umbracoNode.uniqueId)
+    // ->
+    // Target Umbraco 16 content GUID
+    //
+    // Internal links (MultiUrlPicker, etc.) reference content by this v8
+    // GUID, not the v8 integer ID - needed in STEP 5 to remap a Link's
+    // "udi" so it points at the same content's new v16 GUID instead of a
+    // v8 GUID nothing in the target database has.
+    var contentUdiMap =
+        new Dictionary<Guid, Guid>();
+
     // GetRootContent()/GetPagedChildren() below only search LIVE content -
     // they don't see anything sitting in the Recycle Bin. If a node this
     // migration already created was manually trashed since the last run
@@ -1906,6 +1917,9 @@ if (args.Length > 0 &&
                 contentMap[item.NodeId] =
                     existingContent.Key;
 
+                contentUdiMap[item.UniqueId] =
+                    existingContent.Key;
+
                 // Keep the tree ordered the same as the v8 source even for
                 // content this loop isn't (re-)creating - a node created
                 // out of source order by an earlier/interrupted run, or
@@ -1986,6 +2000,9 @@ if (args.Length > 0 &&
             }
 
             contentMap[item.NodeId] =
+                content.Key;
+
+            contentUdiMap[item.UniqueId] =
                 content.Key;
 
             Console.WriteLine(
@@ -2074,7 +2091,10 @@ if (args.Length > 0 &&
                         actualValue =
                             ConvertNestedContentToBlockList(
                                 value.TextValue,
-                                alias => contentTypeService.Get(alias));
+                                alias => contentTypeService.Get(alias),
+                                udi => contentUdiMap.TryGetValue(udi, out var newKey)
+                                    ? newKey
+                                    : null);
                     }
                     else if (gridPropertyIds.Contains(value.PropertyTypeId) &&
                         !string.IsNullOrWhiteSpace(value.TextValue))
@@ -3341,6 +3361,7 @@ static async Task<List<SourceContent>> GetContentAsync(
     const string sql = """
         SELECT
             n.id,
+            n.uniqueId,
             ISNULL(n.parentId, -1),
             c.contentTypeId,
             ISNULL(n.text, ''),
@@ -3368,11 +3389,12 @@ static async Task<List<SourceContent>> GetContentAsync(
         result.Add(
             new SourceContent(
                 reader.GetInt32(0),
-                reader.GetInt32(1),
+                reader.GetGuid(1),
                 reader.GetInt32(2),
-                reader.GetString(3),
-                reader.GetInt32(4),
-                reader.GetInt32(5)));
+                reader.GetInt32(3),
+                reader.GetString(4),
+                reader.GetInt32(5),
+                reader.GetInt32(6)));
     }
 
     return result;
@@ -3482,7 +3504,8 @@ static object? GetValue(
 
 static string? ConvertNestedContentToBlockList(
     string sourceJson,
-    Func<string, IContentType?> getContentType)
+    Func<string, IContentType?> getContentType,
+    Func<Guid, Guid?> remapContentUdi)
 {
     JsonDocument doc;
 
@@ -3497,7 +3520,7 @@ static string? ConvertNestedContentToBlockList(
 
     using (doc)
     {
-        return ConvertNestedContentArray(doc.RootElement, getContentType)
+        return ConvertNestedContentArray(doc.RootElement, getContentType, remapContentUdi)
             ?.ToJsonString();
     }
 }
@@ -3515,7 +3538,8 @@ static string? ConvertNestedContentToBlockList(
 // just the first.
 static JsonObject? ConvertNestedContentArray(
     JsonElement arrayElement,
-    Func<string, IContentType?> getContentType)
+    Func<string, IContentType?> getContentType,
+    Func<Guid, Guid?> remapContentUdi)
 {
     if (arrayElement.ValueKind != JsonValueKind.Array)
         return null;
@@ -3557,7 +3581,10 @@ static JsonObject? ConvertNestedContentArray(
             }
 
             contentEntry[prop.Name] =
-                ConvertNestedContentPropertyValue(prop.Value, getContentType);
+                ConvertNestedContentPropertyValue(
+                    prop.Value,
+                    getContentType,
+                    remapContentUdi);
         }
 
         contentData.Add(contentEntry);
@@ -3584,14 +3611,19 @@ static JsonObject? ConvertNestedContentArray(
 // nested Block List property's value needs to look for Block List's own
 // value converter to read it the same way it reads a top-level one.
 // Anything else (plain text, MultiUrlPicker's own Link JSON, etc.) is
-// copied through unchanged.
+// copied through as-is except for internal link "udi" references, which
+// get remapped from the v8 content's GUID to its new v16 one - otherwise
+// every internal link nested inside a converted Block List (menuList's
+// links to real pages, for instance) would point at a GUID nothing in the
+// target database has, since migrated content gets a fresh GUID.
 static JsonNode? ConvertNestedContentPropertyValue(
     JsonElement value,
-    Func<string, IContentType?> getContentType)
+    Func<string, IContentType?> getContentType,
+    Func<Guid, Guid?> remapContentUdi)
 {
     if (IsNestedContentArray(value))
     {
-        return ConvertNestedContentArray(value, getContentType);
+        return ConvertNestedContentArray(value, getContentType, remapContentUdi);
     }
 
     if (value.ValueKind == JsonValueKind.String &&
@@ -3599,12 +3631,111 @@ static JsonNode? ConvertNestedContentPropertyValue(
     {
         using (innerDoc)
         {
-            return ConvertNestedContentArray(innerDoc!.RootElement, getContentType)
+            return ConvertNestedContentArray(innerDoc!.RootElement, getContentType, remapContentUdi)
                 ?.ToJsonString();
         }
     }
 
-    return JsonNode.Parse(value.GetRawText());
+    return ParseAndRemapUdis(value, remapContentUdi);
+}
+
+// Parses a property's raw value and remaps any internal "udi": "umb://
+// document/<guid>" references it contains to the same content's new v16
+// GUID. The value may be plain JSON (most properties) or - like
+// MultiUrlPicker's own array-of-Link value - a string that is itself
+// JSON-encoded text; either way, the result is re-encoded back into
+// whatever shape it arrived in.
+static JsonNode? ParseAndRemapUdis(
+    JsonElement value,
+    Func<Guid, Guid?> remapContentUdi)
+{
+    if (value.ValueKind == JsonValueKind.String)
+    {
+        var raw = value.GetString();
+        JsonNode? parsedAsJson = null;
+
+        if (!string.IsNullOrEmpty(raw))
+        {
+            try
+            {
+                parsedAsJson = JsonNode.Parse(raw);
+            }
+            catch (JsonException)
+            {
+                // Genuinely plain text, not JSON-encoded text - fall
+                // through to copying the string as-is below.
+            }
+        }
+
+        if (parsedAsJson != null)
+        {
+            RemapUdisInPlace(parsedAsJson, remapContentUdi);
+            return parsedAsJson.ToJsonString();
+        }
+
+        return JsonNode.Parse(value.GetRawText());
+    }
+
+    var node = JsonNode.Parse(value.GetRawText());
+    RemapUdisInPlace(node, remapContentUdi);
+    return node;
+}
+
+static void RemapUdisInPlace(
+    JsonNode? node,
+    Func<Guid, Guid?> remapContentUdi)
+{
+    if (node is JsonObject obj)
+    {
+        if (obj.TryGetPropertyValue("udi", out var udiNode) &&
+            udiNode is JsonValue udiValue &&
+            udiValue.TryGetValue<string>(out var udiString) &&
+            TryRemapContentUdi(udiString, remapContentUdi, out var remapped))
+        {
+            obj["udi"] = remapped;
+        }
+
+        foreach (var prop in obj)
+        {
+            RemapUdisInPlace(prop.Value, remapContentUdi);
+        }
+    }
+    else if (node is JsonArray arr)
+    {
+        foreach (var item in arr)
+        {
+            RemapUdisInPlace(item, remapContentUdi);
+        }
+    }
+}
+
+static bool TryRemapContentUdi(
+    string? udi,
+    Func<Guid, Guid?> remapContentUdi,
+    out string? remapped)
+{
+    remapped = null;
+
+    const string prefix = "umb://document/";
+
+    if (udi == null ||
+        !udi.StartsWith(prefix, StringComparison.Ordinal))
+    {
+        return false;
+    }
+
+    var hex = udi.Substring(prefix.Length);
+
+    if (!Guid.TryParseExact(hex, "N", out var sourceGuid))
+        return false;
+
+    var newGuid = remapContentUdi(sourceGuid);
+
+    if (newGuid == null)
+        return false;
+
+    remapped = prefix + newGuid.Value.ToString("N");
+    return true;
 }
 
 // A v8 Nested Content value is a JSON array of objects each carrying
@@ -4114,6 +4245,7 @@ record SourceProperty(
 
 record SourceContent(
     int NodeId,
+    Guid UniqueId,
     int ParentId,
     int ContentTypeId,
     string Name,
