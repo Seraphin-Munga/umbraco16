@@ -472,3 +472,27 @@
 .header-mega-menu .dropdown-toggle::after {
   display: none;
 }
+
+/* Bootstrap 4 only keeps .navbar-nav horizontal and .navbar-collapse visible
+   without JS on navbars carrying a .navbar-expand-* class (ours doesn't -
+   it's ported from a Bootstrap 3 navbar, always visible and horizontal
+   above the mobile breakpoint by default). Without the first rule, the
+   whole menu/search/register area - anything inside .navbar-collapse -
+   stays hidden on every screen size until the mobile toggle is clicked;
+   without the second, nav items stack vertically instead of in a row.
+   .navbar-right (pushes search/register-login to the far edge) is also a
+   Bootstrap-3-only class Bootstrap 4 dropped - margin-left: auto is the
+   flex-based equivalent of its old float: right. */
+@media (min-width: 768px) {
+  .new-navbar-ab .navbar-collapse {
+    display: flex !important;
+  }
+
+  .new-navbar-ab .navbar-nav {
+    flex-direction: row;
+  }
+
+  .new-navbar-ab .navbar-right {
+    margin-left: auto;
+  }
+}

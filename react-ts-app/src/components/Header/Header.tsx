@@ -59,7 +59,7 @@ export function Header() {
             </a>
           </div>
 
-          <div className={`collapse navbar-collapse${navOpen ? ' in' : ''}`}>
+          <div className={`collapse navbar-collapse${navOpen ? ' show' : ''}`}>
             <ul className="nav navbar-nav dropdown-container left-nav">
               <li>
                 <a
