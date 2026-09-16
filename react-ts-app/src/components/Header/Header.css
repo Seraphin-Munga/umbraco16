@@ -2,6 +2,34 @@
    padding-left: 32px !important;
    padding-right: 32px !important;
 }
+
+/* .horizontal-list (Blog / Contact Us) is this app's own markup, not part
+   of the real site's <style> block - it needs its own rules since nothing
+   else styles it. */
+.horizontal-list {
+  position: relative;
+  right: 0;
+  list-style-type: none;
+  padding: 0px 0px 0px 60px;
+  margin: 0;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.horizontal-list li {
+  margin-right: 8px;
+}
+
+.horizontal-list li a {
+  color: #fff;
+  text-decoration: none;
+  opacity: 0.6;
+}
+
+.horizontal-list li a:hover {
+  text-decoration: none;
+  opacity: 0.5;
+}
  #chatIconImg {
     height: 119px !important;
     max-height: 119px !important;
