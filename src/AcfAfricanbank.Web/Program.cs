@@ -14,6 +14,27 @@ using Umbraco.Cms.Core.Strings;
 var builder = WebApplication.CreateBuilder(args);
 
 // ============================================================
+// CORS FOR THE REACT DEV SERVER
+// ============================================================
+//
+// react-ts-app (Vite, localhost:5173) calls the Delivery API directly
+// (src/api/contentApi.ts) rather than through a same-origin proxy, so the
+// browser sends a real cross-origin request - without this, every fetch
+// fails before a response is even received ("Failed to fetch"), since the
+// Delivery API has no CORS settings of its own to opt an origin in.
+
+const string ReactDevClientCorsPolicy = "ReactDevClientCorsPolicy";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(ReactDevClientCorsPolicy, policy =>
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
+
+// ============================================================
 // DATA DIRECTORY
 // ============================================================
 //
@@ -2599,6 +2620,7 @@ app.MapGet("/diagnostics/contenttype/{alias}", (
 app.UseUmbraco()
     .WithMiddleware(u =>
     {
+        u.AppBuilder.UseCors(ReactDevClientCorsPolicy);
         u.UseBackOffice();
         u.UseWebsite();
     })

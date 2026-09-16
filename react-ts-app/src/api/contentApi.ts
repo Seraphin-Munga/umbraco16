@@ -33,6 +33,12 @@ interface RawBlockItem {
   };
 }
 
+// Block List properties (MenuInfo, menus, link) come back wrapped as
+// { "items": [...] }, not a bare array - confirmed against a live v2 response.
+interface RawBlockListValue {
+  items?: RawBlockItem[];
+}
+
 interface RawContentItem {
   contentType: string;
   properties: Record<string, unknown>;
@@ -44,15 +50,18 @@ interface RawContentResponse {
 }
 
 const API_BASE = (import.meta.env.VITE_UMBRACO_API_BASE_URL ?? '').replace(/\/+$/, '');
-const DELIVERY_API_CONTENT_PATH = '/umbraco/delivery/api/v1/content';
+// v1 404s on this backend - the live instance only serves v2.
+const DELIVERY_API_CONTENT_PATH = '/umbraco/delivery/api/v2/content';
 
 function mapBlocks<T>(
   value: unknown,
   map: (props: Record<string, unknown>) => T,
 ): T[] {
-  if (!Array.isArray(value)) return [];
+  const items = (value as RawBlockListValue | null | undefined)?.items;
 
-  return (value as RawBlockItem[])
+  if (!Array.isArray(items)) return [];
+
+  return items
     .map((item) => item?.content?.properties)
     .filter((props): props is Record<string, unknown> => !!props)
     .map(map);
