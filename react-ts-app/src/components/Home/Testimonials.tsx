@@ -1,60 +1,55 @@
-import { useState } from 'react';
-import type { TestimonialItem } from './types';
+// Ported from the "testimonial-section" video grid in the current live home
+// page markup - replaces this file's old API-driven avatar/story carousel
+// entirely. Static content passed as props with defaults so it stays
+// reusable. The data-toggle="modal" / data-target="#videoModal" wiring on
+// each placeholder is dropped since no #videoModal markup exists anywhere
+// in the ported source (same reasoning as BusinessAudacitySection.tsx).
+const BASE_URL = 'https://www.africanbank.co.za';
 
-// Ported from the "#testimonials" carousel in home.cshtml (lines 678-722) -
-// no heading text is rendered here (unlike Platform.Umbraco16/
-// PageHome.cshtml's not-yet-live redesign, which adds an "Testimonials"
-// title + testimonialHeading subtitle). No Bootstrap JS is loaded here (see
-// Header.tsx's own comment), so this is plain React state.
-interface TestimonialsProps {
-  items: TestimonialItem[];
+export interface VideoTestimonial {
+  id: string;
+  videoId: string;
+  thumbnailUrl: string;
 }
 
-export function Testimonials({ items }: TestimonialsProps) {
-  const [activeIndex, setActiveIndex] = useState(0);
+const DEFAULT_VIDEOS: VideoTestimonial[] = [
+  {
+    id: 'video-1',
+    videoId: '9Cbuqa8Gog4',
+    thumbnailUrl: `${BASE_URL}/media/raxb5uwg/placeholder-thumbnails.png`,
+  },
+  {
+    id: 'video-2',
+    videoId: '3DSeauqrIpI',
+    thumbnailUrl: `${BASE_URL}/media/5pnhzvlc/placeholder-thumbnails4.png`,
+  },
+];
 
-  if (items.length === 0) return null;
+interface TestimonialsProps {
+  videos?: VideoTestimonial[];
+}
 
-  const goTo = (index: number) => setActiveIndex((index + items.length) % items.length);
-
+export function Testimonials({ videos = DEFAULT_VIDEOS }: TestimonialsProps) {
   return (
-    <div className="testimonials-container">
+    <section className="testimonial-section">
       <div className="container">
-        <div className="testimonials-carousel">
-          <div id="testimonials" className="carousel slide">
-            <ol className="carousel-indicators">
-              {items.map((_, index) => (
-                <li
-                  key={index}
-                  className={index === activeIndex ? 'active' : ''}
-                  onClick={() => goTo(index)}
-                />
-              ))}
-            </ol>
-
-            <div className="carousel-inner">
-              {items.map((item, index) => (
-                <div className={`item${index === activeIndex ? ' active' : ''}`} key={index}>
-                  <div className="testimonial">
-                    <div className="avatar">
-                      <img src={item.avatarUrl} alt="" />
-                    </div>
-                    <div className="descr">{item.story}</div>
-                    <div className="name">{item.name}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <a className="left carousel-control" role="button" onClick={() => goTo(activeIndex - 1)}>
-              <span className="icon-arrow-left" />
-            </a>
-            <a className="right carousel-control" role="button" onClick={() => goTo(activeIndex + 1)}>
-              <span className="icon-arrow-right" />
-            </a>
+        <div className="row">
+          <div className="col-md-12 mb-50">
+            <h1 className="text-white span-major-title">Testimonials</h1>
           </div>
         </div>
+
+        <div className="row">
+          {videos.map((video) => (
+            <div className="col-md-4 col-sm-4 col-xs-12 mb-20" key={video.id}>
+              <div className="video-placeholder">
+                <img src={video.thumbnailUrl} alt="Video Preview" />
+                <div className="play-btn" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
