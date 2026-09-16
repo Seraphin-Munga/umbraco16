@@ -1,446 +1,264 @@
-.container-fluid {
-   padding-left: 32px !important; 
-   padding-right: 32px !important;
-}
- #chatIconImg {
-    height: 119px !important;
-    max-height: 119px !important;
-    }
-    
-   #iframe-karaboChat-speechBubble {
-    position: fixed;
-        bottom: 105px !important;
-        right: 40px !important;
-        color: rgb(255, 255, 255);
-        background-color:#00A5D7!important;
-        padding: 10px 14px;
-        border-radius: 16px 16px 0px;
-        box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 5px;
-        z-index: 200;
-        font-size: 10px !important;
-}
-
-#openChatButton {
-    background-color: transparent;
-    border-radius: 60px;
-    position: fixed;
-    bottom: 20px;
-    right: -20px !important;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    z-index: 200;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-footer .footer-copyright .pattern{
-    display:none;
-}
-.nav-business{
-   padding-top:27px !important;   
-}
-.toggleAccessLink{
-  grid-template-columns: 2fr 1fr !important;  
-}
-.business-hr{
-    margin-right:-63px;
-    border-color: #D5D7DA;
-}
-.bankingList{
-     display: none;
-     color: #002b60;
-     font-weight: 600;
-     font-size: 12px;
-     line-height: 30px; 
-     list-style-type: none; 
-     padding-left: 0; 
-     max-height: 200px; 
-     overflow-y: auto;
-}
-.bankingList::-webkit-scrollbar {
-        width: 6px; /* Set the width of the scrollbar */
-    }
-
-    .bankingList::-webkit-scrollbar-thumb {
-        background: #888; /* Color of the scrollbar thumb */
-        border-radius: 10px; /* Round the edges of the thumb */
-    }
-
-    .bankingList::-webkit-scrollbar-thumb:hover {
-        background: #555; /* Darker color when hovering over the thumb */
-    }
-
-    .bankingList::-webkit-scrollbar-track {
-        background: #f1f1f1; /* Light background for the scrollbar track */
-        border-radius: 10px; /* Round the edges of the track */
-    }
- .accordion {
-                 font-weight: bold; /* Explicitly setting font-weight */
-                 font-family: Montserrat, sans-serif; /* Specifying the font family */
-                 
-                 color: #012B60;
-                 cursor: pointer;
-                 padding: 18px;
-                 width: 100%;
-                 text-align: left;
-                 font-size: 15px;
-                 transition: 0.4s;
-                background: none;
-                 border: none;
-                 position: relative; /* Needed for absolute positioning of the arrow */
-                 padding-left: 0px;
-               }
-               
-               .accordion::after {
-                 content: '\276F'; /* Heavy Chevron Unicode character */
-                 font-size: 15px; /* Adjust as needed */
-                 color: #012B60;
-                 position: absolute;
-                 right: 20px;
-                 top: 50%;
-                 transform: translateY(-50%)rotate(90deg);
-                 transition: transform 0.4s;
-                 display:none;
-               }
-               
-              button.accordion.active{
-                 color: #002b60 !important; 
-              }
-              button.click.active{
-                 color: #002b60 !important; 
-              }
-              .click{
-                       display: flex;
-                       
-                        padding: 4px 0px 9px 0px;
-                        
-                        border: none;
-                        background: none;
-                        color: #002b60;
-                        font-size: 14px;
-                        font-weight: bold;
-                        border-bottom: 1px solid #D5D7DA;
-              }
-                .click::after{
-                  transform: translateY(-50%)rotate(90deg);
-                }
-               .active::after {
-                 transform: translateY(-50%) rotate(270deg);
-               }
-               
-               .myPanel {
-                    
-                    font-family: Montserrat, sans-serif;
-                    padding: 37px 50px 25px 0px;
-                    font-size: 13px;
-                    line-height: 38px !important;
-                    color: #002b60;
-                    display: none;
-                    overflow: hidden;
-                    
-                    margin-top: -20px !important;
-               }
-               
-               .myPanel p {
-                       font-weight: 400;
-               }
- .header {
-        padding: 0px 0px !important ;
-    }
-
-
-.navbar-default {
-
-    height: 111px !important;
-
-}
-
-.nav-home-icon {
-
-    display: none !important;
-}
+/*
+  Ported from the inline <style> block in Navigation.cshtml (lines 51-529).
+  public/vendor/navigation.css (copied from wwwroot/css/navigation.css)
+  already covers the bulk of the header/mega-menu look, so only the rules
+  that block doesn't have - or that Navigation.cshtml overrides with
+  !important - are reproduced here: the nav-modal (Register/Login popup),
+  the lineUp animation it uses, the Blog/Contact Us horizontal-list, and a
+  handful of brand/icon overrides.
+*/
 
 .active {
-
-     text-decoration: none !important; 
-
-    
-
+  text-decoration: none !important;
+  color: #89bc47 !important;
 }
 
-.navbar-default .navbar-nav>li>a.login-btn {
-
-    background: #5dc300 !important;
-
-    text-align: center;
-
-    padding: 10px 25px;
-
-    color: #fff;
-
-    text-transform: uppercase;
-
-    font-size: 12px;
-
-    margin-top: 33px;
-
-    border-radius: 30px !important;
-
+.horizontal-list {
+  position: relative;
+  right: 0;
+  list-style-type: none;
+  padding: 0 0 0 60px;
+  margin: 0;
+  display: flex;
+  justify-content: flex-start;
 }
 
-.navbar-default i {
-    padding-left: 2px;
-
-    margin-top: 4px !important;
-
-    font-size: 12px;
+.horizontal-list li {
+  margin-right: 8px;
 }
 
-.navbar-default .navbar-nav>li>a {
+.horizontal-list li a {
+  color: #fff;
+  text-decoration: none;
+  opacity: 0.6;
+}
 
-    font-weight: 600 !important;
-
+.horizontal-list li a:hover {
+  text-decoration: none;
+  opacity: 0.5;
 }
 
 .fa-2x {
-
-    position: relative;
-
-    right: 10px;
-
-    font-size: 1em !important;
-
+  position: relative;
+  right: 10px;
+  font-size: 1em !important;
 }
 
 .navbar-brand {
-    width: 230px;
-    top: 35px;
+  position: relative;
+  padding: 25px 70px 0px 0px !important;
+}
+
+.container-fluid {
+  padding-left: 32px !important;
+  padding-right: 32px !important;
+}
+
+@media (min-width: 768px) {
+  .navbar > .container .navbar-brand,
+  .navbar > .container-fluid .navbar-brand {
+    margin-left: 10px;
+  }
+}
+
+@media (min-width: 360px) and (max-width: 768px) {
+  .dropdown-container.navbar-default .navbar-collapse {
     position: relative;
-    padding: 0px 70px 0px 0px !important;
+    z-index: 10000;
+    background: #002b60;
+    margin-top: 22px !important;
+  }
+
+  .navbar-default .navbar-brand #Layer_2 {
+    position: relative;
+    left: 10px;
+    top: 21px;
+    height: 38px;
+  }
+
+  .navbar-default {
+    height: 100px !important;
+  }
+
+  #banner {
+    position: relative;
+  }
 }
 
-    .dropdown-container.navbar-default .navbar-collapse {
-        margin-top: 3px !important;
-    }
-    .nav-modal a:hover {
+@media (min-width: 1200px) and (max-width: 2000px) {
+  .dropdown-container.navbar-default .navbar-collapse {
+    margin-top: 3px;
+  }
+}
 
-  color: rgb(0, 43, 96) ;
-    }
-    /*Menu Icons*/
-    .fa-products:before {
-        content: "\f07a";
-    }
+@media (min-width: 768px) and (max-width: 1199px) {
+  .dropdown-container.navbar-default .navbar-nav > li:first-child > a {
+    padding-left: 30px !important;
+  }
+}
 
-    .fa-onlinebanking:before {
-        content: "\f0ac";
-    }
+/* Register/Login modal ("nav-modal") */
 
-    .fa-talktous:before {
-        content: "\f10b";
-    }
-
-    .fa-branches:before {
-        content: "\f041";
-    }
-
-    .fa-more:before {
-        content: "\f067";
-    }
-
-    .fa-investors:before {
-        content: "\f0c0";
-    }
-
-    .menu-icon {
-        vertical-align: top;
-        margin-top: 1px;
-        color: #88bc47;
-        padding-right: 10px;
-        padding-left: 15px;
-    }
-
-    .menu-block {
-        border-left: solid 1px rgba(0,0,0,.2);
-    }
-
-    .menu-burger {
-        border-left: solid 1px rgba(0,0,0,.2);
-    }
-
-    .menu-search {
-        border-right: solid 1px rgba(0,0,0,.2);
-    }
-
-    .MobileMenuDivWrapper {
-        height: 100vh;
-        min-height: 100vh;
-        width: 100%;
-        overflow-y: scroll;
-        -webkit-overflow-scrolling: touch;
-        z-index: 9999;
-        background-image: url('/media/51095/blog_patterns_1.jpg');
-    }
-       /*modal css start here*/
-     
 .lineUp {
-  animation: 1s anim-lineUp ease-in ;
-}
-     .nav-modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .nav-modal {
-      display: none;
-      flex-direction: column;
-      width: 500px;
-     height:fit-content;
-      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-      background-color: #fff;
-      z-index: 3;
-      border-radius: 30px 30px 30px 30px;
-      position: relative;
-    }
-    
-    .nav-modal-container {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .nav-modal-header {
-      display: flex;
-      background-color: white;
-      color: #128C7E;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px;
-      border-radius: 25px;
-    }
-
-    .nav-modal-tab {
-      flex: 1;
-      text-align: center;
-      cursor: pointer;
-      position: relative;
-      font-weight: normal;
-      font-size: 14px;
-      color: grey;
-      background: white;
-      padding: 10px;
-    }
-
-    .nav-modal-tab.active {
-      background-color: #fff;
-      color: #0D0D0D !important;
-      font-weight: bold;
-      font-size: 20px;
-    }
-
-    .nav-modal-tab.active::after {
-      content: '';
-      display: block;
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      width: 50%;
-      height: 2px;
-      background-color: #88BC47;
-      transform: translateX(-50%);
-    }
-
-    .nav-modal-tab-content {
-      display: none;
-      padding: 67px;
-      border-radius: 0 0 30px 30px;
-    }
-    
-     .nav-modal-tab-content1 {
-      padding: 67px;
-    }
-
-
-    .nav-modal-tab-content.active {
-      display: block;
-    }
-   
-    .text-with-icon {
-      display: flex;
-      align-items: center;
-    }
-
-  
-    .redirect-Text  {
-        transition: transform .2s; 
-        font-weight:bold;
-        color:#021A44;
-      
-    }
-    
-    .redirect-Text:hover { 
-  -ms-transform: scale(1.2); /* Adjust the scale value as needed */
-  -webkit-transform: scale(1.2); /* Adjust the scale value as needed */
-  transform: scale(1.2); /* Adjust the scale value as needed */
-		} 
-    
-    .long-Text{
-      margin-bottom: 16px;
-         font-size: 13px;
-         color:#010101;
-         margin-top: -16%;
-    }
-      .long-Text2{
-
-        margin-bottom: 16px;
-
-        font-size: 20px !important;
-
-        color: #112768 !important ;
-
-        margin-top: -16%;
-
-        font-weight: 700;
-
-        font-size: 29px;
-
-        line-height: 1.2;
-
-
-
-    }
-    .grid-container-element { 
-        padding-top:2%;
-    display: grid; 
-    grid-template-columns: 1fr 1fr; 
-    width: 100%; 
-    } 
-    .grid-child-element {
-        margin-top: -9px;
-    }
-
-
-.modal-Icon{
-    padding-left: 35px;
-    padding-top:3.5%;
+  animation: 1s anim-lineUp ease-in;
 }
 
-    .close-button 
-    {
-    -top: -22px;
-    right: -21px;
+@keyframes anim-lineUp {
+  0% {
+    opacity: 0;
+    transform: translateY(80%);
+  }
+  20% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(0%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0%);
+  }
+}
 
-  
-        
-    }
+.nav-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 20;
+}
 
+.nav-modal {
+  display: none;
+  flex-direction: column;
+  width: 500px;
+  height: 220px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  z-index: 3;
+  border-radius: 30px 30px 30px 30px;
+  position: relative;
+}
+
+.nav-modal-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-modal-header {
+  display: flex;
+  background-color: white;
+  color: #128c7e;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  border-radius: 25px;
+}
+
+.nav-modal-tab {
+  flex: 1;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  font-weight: normal;
+  font-size: 14px;
+  color: grey;
+  background: white;
+  padding: 10px;
+}
+
+.nav-modal-tab.active {
+  background-color: #fff;
+  color: #0d0d0d;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.nav-modal-tab.active::after {
+  content: '';
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 50%;
+  height: 2px;
+  background-color: #88bc47;
+  transform: translateX(-50%);
+}
+
+.nav-modal-tab-content {
+  display: none;
+  padding: 67px;
+  border-radius: 0 0 30px 30px;
+}
+
+.nav-modal-tab-content1 {
+  padding: 67px;
+}
+
+.nav-modal-tab-content.active {
+  display: block;
+}
+
+.text-with-icon {
+  display: flex;
+  align-items: center;
+}
+
+.redirect-Text {
+  transition: transform 0.2s;
+  font-weight: bold;
+  color: #021a44;
+}
+
+.redirect-Text:hover {
+  -ms-transform: scale(1.2);
+  -webkit-transform: scale(1.2);
+  transform: scale(1.2);
+}
+
+.long-Text {
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #010101;
+  margin-top: -16%;
+}
+
+.long-Text2 {
+  margin-bottom: 16px;
+  font-size: 29px;
+  color: #112768 !important;
+  margin-top: -16%;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.grid-container-element {
+  padding-top: 2%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+}
+
+.grid-child-element {
+  margin-top: -9px;
+}
+
+.modal-Icon {
+  padding-left: 35px;
+  padding-top: 3.5%;
+}
+
+.close-button {
+  top: -22px;
+  right: -21px;
+}
 
 .close-btn-bg-dot {
   height: 25px;
@@ -450,14 +268,13 @@ footer .footer-copyright .pattern{
   display: inline-block;
 }
 
-
-.nav-modal-close-btn{
+.nav-modal-close-btn {
   height: 0px;
-  line-height: 0px;  
-  width: 0px;  
+  line-height: 0px;
+  width: 0px;
   font-size: 2em;
   font-weight: bold;
-  color:white;
+  color: white;
   border-radius: 50%;
   background-color: white;
   text-align: center;
@@ -470,274 +287,74 @@ footer .footer-copyright .pattern{
 }
 
 .circle-background {
-   top: -18px;
-    cursor: pointer;
-    position: absolute;
-    display: inline-block;
-    width: 30px;
-    height: 30px;
-    background-color: white;
-    border-radius: 50%;
-    text-align: center;
-    line-height: 32px;
-    font-size: 40px;
-   }
-
-.tooltip {
-
-  position: relative;
-
-  display: inline-block;
-
-  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
-
-}
-
-
-
-/* Tooltip text */
-
-.tooltip .tooltiptext {
-
-  visibility: hidden;
-
-  width: 120px;
-
-  background-color: black;
-
-  color: #fff;
-
-  text-align: center;
-
-  padding: 5px 0;
-
-  border-radius: 6px;
-
- 
-
-  /* Position the tooltip text - see examples below! */
-
+  top: -18px;
+  cursor: pointer;
   position: absolute;
-
-  z-index: 1;
-
-}
-
-/* Show the tooltip text when you mouse over the tooltip container */
-
-.tooltip:hover .tooltiptext {
-
-  visibility: visible;
-}
-
-@media (min-width: 768px) {
-    .navbar>.container .navbar-brand, .navbar>.container-fluid .navbar-brand {
-        margin-left: 10px;
-    }
-
-}
-
-@media (min-width: 256px) and (max-width: 768px){
- #chatIconImg {
-    height: 119px !important;
-    max-height: 119px !important;
-    }
-    
-   #iframe-karaboChat-speechBubble {
-    position: fixed;
-        bottom: 76px !important;
-        right: 52px !important;
-        color: rgb(255, 255, 255);
-        padding: 10px 14px;
-        border-radius: 16px 16px 0px;
-        box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 5px;
-        z-index: 200;
-        font-size: 10px !important;
-}
-
-#openChatButton {
-    background-color: transparent;
-    border-radius: 60px;
-    position: fixed;
-    bottom:0px;
-    right: -20px !important;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    z-index: 200;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.bankingList{
-     font-size: 8px;
-
-     }
-.search-text {
-    margin-right: 5%;
-}
-    .dropdown-container .navbar-right {
-
-        top: -51px;
-
-        }
-.dropdown-container.navbar-default .navbar-collapse {
-
-    position: relative;
-
-    z-index: 1000;
-
-    background: #002b60;
-
-  
-
-}
-
-.navbar-brand {
-    top: 7px !important;
-
-    position: relative;
-
-    padding: 0px 70px 0px 9px !important;
-
-}
-    .navbar-default .navbar-brand img {
-
-        width: 130px;
-
-        position: relative;
-
-        left: 0px;
-
-        top: 5px;
-
-        height: 40px;
-
-        }   
-
-.navbar-default {
-
-    height: 67px !important;
-
-}
-
-#banner {
-
-    position: relative;
-
-}
-}
-
-@keyframes anim-lineUp {
-
-  0% {
-
-    opacity: 0;
-
-    transform: translateY(80%);
-
-  }
-
-  20% {
-
-    opacity: 0;
-
-  }
-
-  50% {
-
-    opacity: 1;
-
-    transform: translateY(0%);
-
-  }
-
-  100% {
-
-    opacity: 1;
-
-    transform: translateY(0%);
-
-  }
-
-}
-
-
-@media (min-width: 1200px) and (max-width: 2000px) {
-
-.dropdown-container .navbar-header {
-
-                    margin-top: 1px !important;
-
-                }
-
-                
-
-    .dropdown-container.navbar-default .navbar-collapse {
-
-        margin-top: 3px;
-
-    }
-
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  background-color: white;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 32px;
+  font-size: 40px;
 }
 
 @media only screen and (max-width: 530px) {
-    
-    .nav-modal-tab.active::after {
-      content: '';
-      display: block;
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      width: 85%;
-      height: 2px;
-      background-color: #88BC47;
-      transform: translateX(-50%);
-    }
-    
-    .nav-modal {
-      width: 90%;
-      max-width: 400px; /* You can adjust this value as needed for the modal width */
-      height: auto;
-      padding: 20px;
-    }
+  .nav-modal-tab.active::after {
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 85%;
+    height: 2px;
+    background-color: #88bc47;
+    transform: translateX(-50%);
+  }
 
-    .nav-modal-header {
-      padding: 10px;
-    }
+  .nav-modal {
+    width: 90%;
+    max-width: 400px;
+    height: auto;
+    padding: 20px;
+  }
 
-    .nav-modal-tab {
-      padding: 8px;
-      font-size: 14px;
-    }
+  .nav-modal-header {
+    padding: 10px;
+  }
 
-    .nav-modal-tab-content {
-      padding: 20px;
-    }
+  .nav-modal-tab {
+    padding: 8px;
+    font-size: 14px;
+  }
 
-    .grid-container-element {
-      grid-template-columns: 1fr 1fr;
-       cursor: pointer;
-    }
+  .nav-modal-tab-content {
+    padding: 20px;
+  }
 
-    .modal-Icon {
-      padding-top: 5%;
-      padding-left: 100%;
-    }
+  .grid-container-element {
+    grid-template-columns: 1fr 1fr;
+    cursor: pointer;
+  }
 
-    .close-button 
-    {
-    
+  .modal-Icon {
+    padding-top: 5%;
+    padding-left: 100%;
+  }
+
+  .close-button {
     right: -17px;
     top: -12px;
-    }
+  }
 
-    .nav-modal-close-btn{
-      color:black;
-      cursor: pointer;
-    }
-.circle-background {
-top: -26px;
+  .nav-modal-close-btn {
+    color: black;
+    cursor: pointer;
+  }
+
+  .circle-background {
+    top: -26px;
     cursor: pointer;
     position: absolute;
     display: inline-block;
@@ -748,43 +365,15 @@ top: -26px;
     text-align: center;
     line-height: 28px;
     font-size: 33px;
-     
-    }
-    .redirect-Text {
-        font-size: 15px;
-    }
-    .long-Text{
-         font-size: 13px;
-         color:#010101;
-         margin-top: -8%;
-    }
   }
-@media (min-width: 800px) and (max-width: 1024px) {
-    .dropdown-container .navbar-right {
-        margin-top: 44px;
-    }
+
+  .redirect-Text {
+    font-size: 15px;
+  }
+
+  .long-Text {
+    font-size: 13px;
+    color: #010101;
+    margin-top: -8%;
+  }
 }
-@media (min-width: 768px) and (max-width: 1199px) {
-    .dropdown-container .navbar-header {
-        margin-top: 35px !important;
-    }
-        
-}
-
-@media (min-width: 767px) and (max-width: 1199px){
-.dropdown-container.navbar-default .navbar-nav>li:first-child>a {
-    padding-left: 30px !important;
-}
-.navbar-default {
-
-    height: 196px !important;
-
-}
-
-.navbar-default .navbar-nav>li>a.login-btn {
-
-      margin-top: 0px;
-
-      }
-   } 
-    /*modal css end here*/
