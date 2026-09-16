@@ -54,6 +54,18 @@ body {
   margin: 0;
 }
 
+/* Pins Footer to the bottom of the viewport instead of it sitting right
+   under Header when app-main has no page content in it yet. */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-main {
+  flex: 1;
+}
+
 h1,
 h2 {
   font-family: var(--heading);
