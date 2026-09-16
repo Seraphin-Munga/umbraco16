@@ -465,58 +465,34 @@
   cursor: pointer;
 }
 
-/* Mega-menu dropdown content (menus -> link -> menuList), ported verbatim
-   from wwwroot/css/style.css - .dropdown-menu (base panel), .mega-menu-product/
-   .product-category/.product/.title/.descr (the category + link list inside
-   it). Confirmed those are the only rules that actually apply: the site's
-   full-width ".megamenu > .dropdown-menu" variant targets a "megamenu"
-   wrapper class Navigation.cshtml's markup never uses (it's "header-mega-menu"),
-   and there's no "header-mega-menu"-specific override anywhere in style.css. */
-.dropdown-menu {
-  border: none;
-  border-radius: 10px;
-  transition: 1s;
-  box-shadow: 1px 3px 15px rgba(0, 0, 0, 0.2);
-  font-size: 13px;
-  width: 310px;
+/* Mega-menu dropdown content (menus -> link -> menuList) needs NO styling
+   here - /vendor/navigation.css (loaded in index.html) already has the
+   real, complete rules: .header-mega-menu .dropdown-menu (full-width,
+   #002b60 dark background), .mega-menu-product/.product-category/.product/
+   .title/.descr (the FontAwesome chevron + category/link list inside it).
+   An earlier version of this file duplicated a DIFFERENT, wrong set of
+   rules adapted from wwwroot/css/style.css's unrelated narrow/light
+   .dropdown-menu - since this stylesheet loads after the vendor <link>
+   tags, those rules were actively overriding the correct ones instead of
+   just being redundant. Confirmed by grepping the vendored navigation.css
+   directly for the same selectors. */
+
+/* Navigation.cshtml hardcodes .col-sm-3 (Bootstrap's fixed 4-per-row grid
+   class) for each category column, regardless of how many categories a
+   given menu actually has - fine for a 4-category menu (PRODUCTS), but a
+   6-category one would wrap onto a second row instead of the single full-
+   width row the design calls for. .row's flex-wrap: wrap (from Bootstrap)
+   is what causes that; this keeps everything on one line and splits the
+   width evenly between however many categories there are, instead of
+   assuming a fixed column count. */
+.mega-menu-row {
+  display: flex;
+  flex-wrap: nowrap;
 }
 
-.mega-menu-product {
-  font-weight: normal;
-  padding: 15px 30px;
-  height: 100%;
-}
-
-.mega-menu-product .product-category {
-  text-transform: uppercase;
-  color: #88bc47;
-  margin-bottom: 15px;
-  -webkit-font-smoothing: antialiased;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.mega-menu-product .product {
-  display: block;
-  margin-bottom: 10px;
-}
-
-.mega-menu-product .product .title {
-  color: #001d42;
-  margin-bottom: 0;
-  font-size: 12px;
-  text-decoration: none;
-}
-
-.mega-menu-product .product .title:hover {
-  color: #88bc47;
-}
-
-.mega-menu-product .product .descr {
-  font-weight: 300;
-  color: #666;
-  font-size: 11px;
-  margin-bottom: 0;
+.mega-menu-column {
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 /* Bootstrap 4 only keeps .navbar-nav horizontal and .navbar-collapse visible
