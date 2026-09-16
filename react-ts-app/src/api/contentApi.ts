@@ -17,13 +17,14 @@
 
 import type {
   BlogPost,
-  BlogSectionHeading,
-  ContentSectionData,
+  HelpLink,
+  HelpTab,
   HeroSlide,
   HomePageData,
   ShoulderCard,
   ShoulderTab,
   TestimonialItem,
+  WhatsNew,
 } from '../components/Home/types';
 
 export interface DeliveryLink {
@@ -351,37 +352,34 @@ export async function fetchFooter(signal?: AbortSignal): Promise<Footer> {
   return { categories, disclaimerMarkup };
 }
 
+
 // ============================================================
-// HOME PAGE (heroHeaderHome / heroShoulderHome / heroBody / testimonials)
+// HOME PAGE (heroHeaderHome / heroShoulderHome / heroFeetHome / testimonials)
 // ============================================================
 //
-// Ported from PageHome.cshtml. Unlike topNavigation/bottomNavigation (single
-// content nodes whose Block List properties hold everything), the homepage
-// spreads its content across several separate content nodes under
-// homePageElements, each fetched here by its own contentType filter -
-// heroHeaderHome, heroShoulderHome, heroBody (whose four
-// structureBodyTextWithImageAndLink children are fetched separately, same
-// `fetch=children:<id>` pattern as fetchFooterDisclaimer above), and
-// testimonials.
+// Ported from Platform/Web/Views/home.cshtml, NOT Platform.Umbraco16/
+// PageHome.cshtml - that one is a redesign that isn't live yet (see
+// src/components/Home/*.tsx's own comments for the section-by-section
+// differences: real tabs instead of a flat grid, a single blended blog/
+// "what's new" carousel instead of three separate promo sections, a
+// simpler headingless testimonials carousel, and an extra help/FAQ tabs
+// section this file didn't have before).
 //
 // Property aliases below come from legacy/Models/*.generated.cs
-// (Umbraco.ModelsBuilder v8.1.0 output - the actual source of truth for
-// property aliases, same as PageHome.cshtml itself compiles against) rather
-// than a live Delivery API response, since no backend is reachable in this
-// environment. Two things follow from that:
-// - Media/content-picker fields (heroImage, tabIcon, benefitCardIcon,
-//   ebankItimage, testimonialAvatar) are mapped with the same mapMediaUrl
-//   shape already confirmed for topNavigation/bottomNavigation's own media
-//   fields - that part is on solid ground.
-// - `structureBeCardDescription.link` is the one field on this page that's
-//   a plain content/media picker (IPublishedContent) rather than a Link
-//   picker (DeliveryLink) - see mapContentPickerUrl's own comment.
-// If the real API disagrees with either of the above, expect the shoulder
-// tiles' "read more" links to be the first thing that's wrong.
+// (Umbraco.ModelsBuilder v8.1.0 output - the same source PageHome.cshtml's
+// port already leaned on) for heroHeaderHome/heroShoulderHome/testimonials,
+// which is solid ground. `ebankItitem2` (whatsNew) and `heroFeetHome`/
+// `FeetItem`/`LinkItem` (help tabs) are NOT in that research - home.cshtml
+// only gives late-bound `.Value("...")` calls for those, so their content-
+// type aliases and property names below are best-effort guesses, not
+// confirmed against any generated model or live response. Both are wrapped
+// in try/catch (whatsNew) or degrade to an empty section (help tabs) so a
+// wrong guess there doesn't break the rest of the homepage.
 
 const HERO_HEADER_EXPAND = 'properties[items[properties[$all]],$all]';
 const HERO_SHOULDER_EXPAND = 'properties[items[properties[items[properties[$all]],$all]],$all]';
 const TESTIMONIALS_EXPAND = 'properties[testimonialItems[properties[$all]],$all]';
+const HERO_FEET_HOME_EXPAND = 'properties[links[properties[items[properties[$all]],$all]],$all]';
 
 function mapHeroSlide(props: Record<string, unknown>): HeroSlide {
   const link = mapLinks(props.heroRedirectAction)[0];
@@ -389,20 +387,21 @@ function mapHeroSlide(props: Record<string, unknown>): HeroSlide {
   return {
     imageUrl: mapMediaUrl(props.heroImage),
     title: typeof props.heroTitle === 'string' ? props.heroTitle : '',
-    description: typeof props.heroProductDescription === 'string' ? props.heroProductDescription : '',
+    productDescription:
+      typeof props.heroProductDescription === 'string' ? props.heroProductDescription : '',
+    titleDescription: typeof props.heroTitleDescription === 'string' ? props.heroTitleDescription : '',
     buttonLabel: typeof props.heroButtonLabel === 'string' ? props.heroButtonLabel : null,
     buttonUrl: link && link.url !== '#' ? link.url : null,
+    buttonStyle: typeof props.buttonStyler === 'string' ? props.buttonStyler : null,
   };
 }
 
 // `link` on structureBeCardDescription is a single content/media picker
-// (IPublishedContent per HomeShoulderItem.generated.cs), not a Link picker
-// like every other link-shaped field on this page - so it doesn't have the
-// guaranteed {url,title,target} shape DeliveryLink does. Content-item
-// references in the Delivery API are documented to expose their page route
-// as `route.path`; this also falls back to a plain `.url` in case it comes
-// back closer to a media reference instead. Unverified against a live
-// response either way.
+// (IPublishedContent), not a Link picker like every other link-shaped
+// field on this page. Content-item references in the Delivery API are
+// documented to expose their page route as `route.path`; this also falls
+// back to a plain `.url` in case it comes back closer to a media
+// reference instead. Unverified against a live response either way.
 function mapContentPickerUrl(value: unknown): string | null {
   const first = Array.isArray(value) ? value[0] : value;
   if (!first || typeof first !== 'object') return null;
@@ -414,41 +413,35 @@ function mapContentPickerUrl(value: unknown): string | null {
 }
 
 function mapShoulderCard(props: Record<string, unknown>): ShoulderCard {
-  const title = typeof props.benefitCardTitle === 'string' ? props.benefitCardTitle : '';
-
   return {
     iconUrl: mapMediaUrl(props.benefitCardIcon),
-    // The icon media item's own "altTag" property would need a second
-    // level of `expand` to reach reliably (unverified whether media items
-    // even need that the same way content items do) - the card's own
-    // title is a reasonable, always-available stand-in.
-    iconAlt: title,
-    title,
+    title: typeof props.benefitCardTitle === 'string' ? props.benefitCardTitle : '',
     description: typeof props.benefitCardDescription === 'string' ? props.benefitCardDescription : '',
     linkUrl: mapContentPickerUrl(props.link),
   };
 }
 
 function mapShoulderTab(props: Record<string, unknown>): ShoulderTab {
+  const tabName = typeof props.tabName === 'string' ? props.tabName : '';
+
   return {
-    tabName: typeof props.tabName === 'string' ? props.tabName : '',
+    tabId: typeof props.tabId === 'string' ? props.tabId.replace(/\s/g, '') : '',
+    tabName,
+    tabHeading: typeof props.tabHeading === 'string' ? props.tabHeading : '',
+    tabIconUrl: mapMediaUrl(props.tabIcon),
+    tabIconAlt: tabName,
     cards: mapBlocks(props.items, mapShoulderCard),
   };
 }
 
-function mapContentSection(props: Record<string, unknown>): ContentSectionData {
-  const links = mapLinks(props.sectionLink);
-  const link = links.find((candidate) => candidate.url !== '#') ?? links[0];
-  const title = typeof props.ebankITTitle === 'string' ? props.ebankITTitle : '';
+function mapWhatsNew(item: RawContentItem): WhatsNew {
+  const link = mapLinks(item.properties.sectionLink)[0];
 
   return {
-    title,
-    subtitle: mapRichText(props.ebankITContent),
-    description: mapRichText(props.sectionHeroBodyDescription),
-    imageUrl: mapMediaUrl(props.ebankItimage),
-    imageAlt: title,
-    linkLabel: link && link.url !== '#' ? link.title : null,
-    linkUrl: link && link.url !== '#' ? link.url : null,
+    title: typeof item.properties.ebankITTitle === 'string' ? item.properties.ebankITTitle : '',
+    contentMarkup: mapRichText(item.properties.ebankITContent),
+    linkUrl: link?.url ?? '#',
+    linkLabel: link?.title ?? '',
   };
 }
 
@@ -460,100 +453,124 @@ function mapTestimonialItem(props: Record<string, unknown>): TestimonialItem {
   };
 }
 
+function mapHelpLink(props: Record<string, unknown>): HelpLink {
+  const link = mapLinks(props.internalLink)[0];
+  const anchor = typeof props.anchorLink === 'string' ? props.anchorLink : '';
+
+  return {
+    text: typeof props.text === 'string' ? props.text : '',
+    buttonText: typeof props.buttonText === 'string' ? props.buttonText : '',
+    url: link ? `${link.url}${anchor ? `#${anchor}` : ''}` : '#',
+  };
+}
+
+function mapHelpTab(props: Record<string, unknown>): HelpTab {
+  const tabName = typeof props.tabName === 'string' ? props.tabName : '';
+
+  return {
+    tabId: typeof props.tabId === 'string' ? props.tabId.replace(/\s/g, '') : '',
+    tabName,
+    tabIconUrl: mapMediaUrl(props.tabIcon),
+    tabIconAlt: tabName,
+    links: mapBlocks(props.items, mapHelpLink),
+  };
+}
+
+// Ensures every tab has a non-empty, unique id even if the CMS field came
+// back empty - React keys and the tab/pane anchor link both depend on it.
+function withFallbackIds<T extends { tabId: string }>(tabs: T[], prefix: string): T[] {
+  return tabs.map((tab, index) => (tab.tabId ? tab : { ...tab, tabId: `${prefix}-${index}` }));
+}
+
 export async function fetchHomePage(signal?: AbortSignal): Promise<HomePageData> {
-  const [heroHeaderNode, heroShoulderNode, heroBodyNode, testimonialsNode] = await Promise.all([
+  const [heroHeaderNode, heroShoulderNode, testimonialsNode, heroFeetHomeNode] = await Promise.all([
     fetchOne(`?filter=contentType:heroHeaderHome&expand=${HERO_HEADER_EXPAND}&take=1`, signal),
     fetchOne(`?filter=contentType:heroShoulderHome&expand=${HERO_SHOULDER_EXPAND}&take=1`, signal),
-    fetchOne('?filter=contentType:heroBody&take=1', signal),
     fetchOne(`?filter=contentType:testimonials&expand=${TESTIMONIALS_EXPAND}&take=1`, signal),
+    fetchOne(`?filter=contentType:heroFeetHome&expand=${HERO_FEET_HOME_EXPAND}&take=1`, signal),
   ]);
-
-  // heroBody's own properties aren't used by PageHome.cshtml - only its 4
-  // structureBodyTextWithImageAndLink children are (order 0-3: get loans,
-  // MyWORLD banking, support, blog heading).
-  const bodySections = heroBodyNode
-    ? await fetchContent(`?fetch=children:${heroBodyNode.id}&expand=properties[$all]&take=4`, signal)
-    : [];
-  const bodySectionProps = bodySections.map((item) => item.properties);
-
-  const blogHeadingProps = bodySectionProps[3];
-  const blogHeading: BlogSectionHeading | null = blogHeadingProps
-    ? {
-        title: typeof blogHeadingProps.ebankITTitle === 'string' ? blogHeadingProps.ebankITTitle : '',
-        description: mapRichText(blogHeadingProps.ebankITContent),
-        viewMoreUrl: mapLinks(blogHeadingProps.sectionLink)[0]?.url ?? null,
-      }
-    : null;
 
   return {
     hero: heroHeaderNode ? mapBlocks(heroHeaderNode.properties.items, mapHeroSlide) : [],
-    shoulder: heroShoulderNode ? mapBlocks(heroShoulderNode.properties.items, mapShoulderTab) : [],
-    sections: bodySectionProps.slice(0, 3).map(mapContentSection),
-    blogHeading,
-    testimonialsHeading:
-      typeof testimonialsNode?.properties.testimonialHeading === 'string'
-        ? testimonialsNode.properties.testimonialHeading
-        : '',
+    shoulderTabs: heroShoulderNode
+      ? withFallbackIds(mapBlocks(heroShoulderNode.properties.items, mapShoulderTab), 'shoulder')
+      : [],
+    helpHeading:
+      typeof heroFeetHomeNode?.properties.heading === 'string' ? heroFeetHomeNode.properties.heading : '',
+    helpTabs: heroFeetHomeNode
+      ? withFallbackIds(mapBlocks(heroFeetHomeNode.properties.links, mapHelpTab), 'help')
+      : [],
     testimonials: testimonialsNode
       ? mapBlocks(testimonialsNode.properties.testimonialItems, mapTestimonialItem)
       : [],
   };
 }
 
+/**
+ * Fetches the "what's new" content item (contentType guessed as
+ * `ebankItitem2` - home.cshtml only compares it case-insensitively via
+ * `.ToLower() == "ebankititem2"`, never spells the real alias). Best-effort:
+ * swallows its own errors so a wrong guess here doesn't break the rest of
+ * the homepage - the bank-story carousel just falls back to plain blog
+ * slides with no featured split slide.
+ */
+export async function fetchWhatsNew(signal?: AbortSignal): Promise<WhatsNew | null> {
+  try {
+    const node = await fetchOne(
+      '?filter=contentType:ebankItitem2&expand=properties[$all]&take=1',
+      signal,
+    );
+    return node ? mapWhatsNew(node) : null;
+  } catch {
+    return null;
+  }
+}
+
 // ============================================================
 // BLOG (blogLanding / blog / blogDetailsElements)
 // ============================================================
 
-const BLOG_DESCRIPTION_MAX_LENGTH = 85;
-
-// Mirrors HtmlStringUtilities.Truncate(text, 85, addElipsis: true,
-// treatTagsAsContent: false) in PageHome.cshtml (line 358): cut at the
-// last word boundary before the limit, append an ellipsis.
-function truncateBlogDescription(text: string): string {
-  if (text.length <= BLOG_DESCRIPTION_MAX_LENGTH) return text;
-
-  const cut = text.slice(0, BLOG_DESCRIPTION_MAX_LENGTH);
-  const lastSpace = cut.lastIndexOf(' ');
-  return `${cut.slice(0, lastSpace > 0 ? lastSpace : BLOG_DESCRIPTION_MAX_LENGTH)}…`;
-}
-
 /**
- * Fetches the 3 latest posts shown in the homepage's blog teaser section.
- * Ported from PageHome.cshtml lines 318-373, which reads a hardcoded
- * content id (`Umbraco.Content(2855)`) instead of a contentType filter -
- * home.cshtml's own commented-out predecessor of that same line
- * (`//Umbraco.TypedContentSingleAtXPath("//blogLanding")`) confirms 2855 is
- * the blogLanding node, so this looks it up by contentType instead: content
- * ids aren't stable across environments/database restores the way
- * contentType aliases are, and the Delivery API can't take an internal int
- * id as a filter anyway.
+ * Fetches the posts shown in the homepage's "African Bank Stories"
+ * carousel, newest first - home.cshtml reads every child of the
+ * blogLanding node (no .Take()), ordered by
+ * `blog.Children.First().Children.Where(heroBodyBlogDetail).First().blogdate`
+ * descending (lines 561-568). `take=20` below is a practical cap this port
+ * adds (unbounded fetch-then-sort doesn't make sense client-side), not
+ * something in the source.
  *
- * Walks blogLanding -> blog (latest 3) -> blogDetailsElements (blog's own
- * single child, inferred - not confirmed against a live tree) ->
- * heroHeaderBlogDetail (image) + heroBodyBlogDetail (title/
- * introductionDescription/blogDate), per master.cshtml's own
- * IsDocumentType walk and a repo-wide check for which generated model
- * actually has `introductionDescription` (only HeroBodyBlogDetail does).
- * Not verified against a live response. Best-effort: swallows its own
- * errors so a schema mismatch here doesn't break the rest of the homepage.
+ * Reads a hardcoded content id (`Umbraco.Content(2855)`) in the source;
+ * this looks it up by contentType instead (`blogLanding`, confirmed via
+ * this same file's commented-out predecessor,
+ * `//Umbraco.TypedContentSingleAtXPath("//blogLanding")`) since content ids
+ * aren't stable across environments/database restores and the Delivery API
+ * can't filter on an internal int id anyway.
+ *
+ * Walks blogLanding -> blog (all) -> blog's first child -> that child's own
+ * children, taking the one with contentType heroBodyBlogDetail for title/
+ * introductionDescription/blogDate (matches the source's own
+ * `blog.Children.FirstOrDefault().Children` walk exactly - no image is
+ * read here, unlike Platform.Umbraco16/PageHome.cshtml's not-yet-live
+ * version, which does use heroHeaderBlogDetail's image). Not verified
+ * against a live response. Best-effort: swallows its own errors so a
+ * schema mismatch here doesn't break the rest of the homepage.
  */
 export async function fetchLatestBlogPosts(signal?: AbortSignal): Promise<BlogPost[]> {
   try {
     const blogLanding = await fetchOne('?filter=contentType:blogLanding&take=1', signal);
     if (!blogLanding) return [];
 
-    const blogs = await fetchContent(`?fetch=children:${blogLanding.id}&take=3`, signal);
+    const blogs = await fetchContent(`?fetch=children:${blogLanding.id}&take=20`, signal);
 
     const posts = await Promise.all(
       blogs.map(async (blog): Promise<BlogPost | null> => {
-        const detailElementsNode = await fetchOne(`?fetch=children:${blog.id}&take=1`, signal);
-        if (!detailElementsNode) return null;
+        const firstChild = await fetchOne(`?fetch=children:${blog.id}&take=1`, signal);
+        if (!firstChild) return null;
 
         const elements = await fetchContent(
-          `?fetch=children:${detailElementsNode.id}&expand=properties[$all]&take=10`,
+          `?fetch=children:${firstChild.id}&expand=properties[$all]&take=10`,
           signal,
         );
-        const heroHeader = elements.find((el) => el.contentType === 'heroHeaderBlogDetail');
         const heroBody = elements.find((el) => el.contentType === 'heroBodyBlogDetail');
         if (!heroBody || typeof heroBody.properties.title !== 'string') return null;
 
@@ -561,9 +578,8 @@ export async function fetchLatestBlogPosts(signal?: AbortSignal): Promise<BlogPo
           title: heroBody.properties.title,
           description:
             typeof heroBody.properties.introductionDescription === 'string'
-              ? truncateBlogDescription(heroBody.properties.introductionDescription)
+              ? heroBody.properties.introductionDescription
               : '',
-          imageUrl: heroHeader ? mapMediaUrl(heroHeader.properties.image) : '',
           url: blog.route?.path ?? '#',
           publishedDate:
             typeof heroBody.properties.blogDate === 'string' ? heroBody.properties.blogDate : '',
@@ -571,7 +587,9 @@ export async function fetchLatestBlogPosts(signal?: AbortSignal): Promise<BlogPo
       }),
     );
 
-    return posts.filter((post): post is BlogPost => post !== null);
+    return posts
+      .filter((post): post is BlogPost => post !== null)
+      .sort((a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime());
   } catch {
     return [];
   }

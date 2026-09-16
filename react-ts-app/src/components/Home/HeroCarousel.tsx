@@ -1,12 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import type { HeroSlide } from './types';
 
-// Ported from the "HERO HEADER" block in PageHome.cshtml (lines 33-96): a
-// Bootstrap carousel (data-ride="carousel"). No Bootstrap JS is loaded in
-// this app (see Header.tsx's own comment on the same point), so the slide
-// advance/prev/next/indicator behavior is plain React state here instead -
-// Bootstrap's default data-ride="carousel" interval is 5000ms, matched below.
-const AUTO_ADVANCE_MS = 5000;
+// Ported from the "#hero-banner" carousel in home.cshtml (lines 372-444).
+// No Bootstrap JS is loaded in this app (see Header.tsx's own comment on
+// the same point), so the slide advance/indicator behavior is plain React
+// state here instead - matches the source's own data-interval="7000".
+const AUTO_ADVANCE_MS = 7000;
+
+// heroItem.Value("buttonStyler") is a raw inline CSS string (e.g.
+// "background-color:#88bc47") applied directly as `style="..."` in
+// home.cshtml - React's `style` prop needs an object, so this parses it
+// into one instead of dropping it.
+function parseInlineStyle(css: string): CSSProperties {
+  return Object.fromEntries(
+    css
+      .split(';')
+      .map((rule) => rule.split(':').map((part) => part.trim()))
+      .filter(([prop, value]) => prop && value)
+      .map(([prop, value]) => [prop.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase()), value]),
+  );
+}
 
 interface HeroCarouselProps {
   slides: HeroSlide[];
@@ -28,49 +41,58 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
   const goTo = (index: number) => setActiveIndex((index + slides.length) % slides.length);
 
   return (
-    <div className="carousel slide">
-      <ol className="carousel-indicators">
-        {slides.map((_, index) => (
-          <li
-            key={index}
-            className={index === activeIndex ? 'active' : ''}
-            onClick={() => goTo(index)}
-          />
-        ))}
-      </ol>
+    <div className="top-header">
+      <div className="hero-container top_extend">
+        <div className="container-fluid top_extend">
+          <div className="row no-gutter top_extend">
+            <div className="top_extend">
+              <div id="hero-banner" className="carousel slide top_extend">
+                <ol className="carousel-indicators">
+                  {slides.map((_, index) => (
+                    <li
+                      key={index}
+                      className={index === activeIndex ? 'active' : ''}
+                      onClick={() => goTo(index)}
+                    />
+                  ))}
+                </ol>
 
-      <div className="carousel-inner">
-        {slides.map((slide, index) => (
-          <div className={`carousel-item${index === activeIndex ? ' active' : ''}`} key={index}>
-            <div className="slider-gradient">
-              <img className="d-block w-100" src={slide.imageUrl} alt="" width="100%" height="100%" />
-            </div>
-            <div className="carousel-caption">
-              <h1 className="ab-jumbo-title">{slide.title}</h1>
-              <h2 className="ab-jumbo-discription">
-                {slide.description}
-                <span />
-              </h2>
-              {slide.buttonUrl && slide.buttonLabel && (
-                <div className="primary-btn">
-                  <a href={slide.buttonUrl}>
-                    <button>{slide.buttonLabel}</button>
-                  </a>
+                <div className="carousel-inner top_extend">
+                  {slides.map((slide, index) => {
+                    const HeadingTag = index === 0 ? 'h1' : 'h2';
+                    return (
+                      <div
+                        className={`top_extend item${index === activeIndex ? ' active' : ''}`}
+                        key={index}
+                        style={{ backgroundImage: `url(${slide.imageUrl})` }}
+                      >
+                        <div className="hero-caption">
+                          <HeadingTag className="hero-title">
+                            <span className="cap-title">{slide.productDescription}</span>
+                            <br />
+                            {slide.title}
+                          </HeadingTag>
+                          <p className="hero-description">{slide.titleDescription}</p>
+                          <br />
+                          {slide.buttonUrl && slide.buttonLabel && (
+                            <a
+                              className="button primary clearfix"
+                              style={slide.buttonStyle ? parseInlineStyle(slide.buttonStyle) : undefined}
+                              href={slide.buttonUrl}
+                            >
+                              {slide.buttonLabel}
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              )}
+              </div>
             </div>
           </div>
-        ))}
+        </div>
       </div>
-
-      <a className="carousel-control-prev" role="button" onClick={() => goTo(activeIndex - 1)}>
-        <span className="carousel-control-prev-icon" aria-hidden="true" />
-        <span className="sr-only">Previous</span>
-      </a>
-      <a className="carousel-control-next" role="button" onClick={() => goTo(activeIndex + 1)}>
-        <span className="carousel-control-next-icon" aria-hidden="true" />
-        <span className="sr-only">Next</span>
-      </a>
     </div>
   );
 }
