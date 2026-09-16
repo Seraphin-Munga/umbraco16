@@ -465,12 +465,58 @@
   cursor: pointer;
 }
 
-/* Bootstrap 4 auto-adds a caret to any .dropdown-toggle via ::after. The
-   mega-menu trigger items (PRODUCTS/BUSINESS/MORE/INVESTORS) keep that class
-   for its styling but have no real dropdown behind them (see contentApi.ts -
-   the schema has no nested "menus" data), so the caret would be misleading. */
-.header-mega-menu .dropdown-toggle::after {
-  display: none;
+/* Mega-menu dropdown content (menus -> link -> menuList), ported verbatim
+   from wwwroot/css/style.css - .dropdown-menu (base panel), .mega-menu-product/
+   .product-category/.product/.title/.descr (the category + link list inside
+   it). Confirmed those are the only rules that actually apply: the site's
+   full-width ".megamenu > .dropdown-menu" variant targets a "megamenu"
+   wrapper class Navigation.cshtml's markup never uses (it's "header-mega-menu"),
+   and there's no "header-mega-menu"-specific override anywhere in style.css. */
+.dropdown-menu {
+  border: none;
+  border-radius: 10px;
+  transition: 1s;
+  box-shadow: 1px 3px 15px rgba(0, 0, 0, 0.2);
+  font-size: 13px;
+  width: 310px;
+}
+
+.mega-menu-product {
+  font-weight: normal;
+  padding: 15px 30px;
+  height: 100%;
+}
+
+.mega-menu-product .product-category {
+  text-transform: uppercase;
+  color: #88bc47;
+  margin-bottom: 15px;
+  -webkit-font-smoothing: antialiased;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.mega-menu-product .product {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.mega-menu-product .product .title {
+  color: #001d42;
+  margin-bottom: 0;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.mega-menu-product .product .title:hover {
+  color: #88bc47;
+}
+
+.mega-menu-product .product .descr {
+  font-weight: 300;
+  color: #666;
+  font-size: 11px;
+  margin-bottom: 0;
 }
 
 /* Bootstrap 4 only keeps .navbar-nav horizontal and .navbar-collapse visible

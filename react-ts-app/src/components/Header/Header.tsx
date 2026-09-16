@@ -19,6 +19,10 @@ export function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
+  // No Bootstrap JS is loaded in this app (index.html only pulls in its
+  // CSS) - data-toggle="dropdown" alone does nothing, same reason navOpen/
+  // searchOpen above are plain React state instead of Bootstrap's own JS.
+  const [openMegaMenuKey, setOpenMegaMenuKey] = useState<string | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -109,17 +113,63 @@ export function Header() {
                     // Razor view's `relatedLink.Target != ""` - true for
                     // both a real target and no target at all, i.e. null).
                     if (link.target !== '') {
+                      const isOpen = openMegaMenuKey === key;
+
                       return (
-                        <li key={key} className="header-mega-menu dropdown">
+                        <li
+                          key={key}
+                          className={`header-mega-menu dropdown${isOpen ? ' show' : ''}`}
+                        >
                           <a
                             href="/en/home/"
                             className="dropdown-toggle"
                             role="button"
                             aria-haspopup="true"
-                            aria-expanded="false"
+                            aria-expanded={isOpen}
+                            onClick={(event) => {
+                              event.preventDefault();
+                              setOpenMegaMenuKey((current) => (current === key ? null : key));
+                            }}
                           >
                             {link.title}
                           </a>
+                          {menuItem.menus.length > 0 && (
+                            <div className={`dropdown-menu${isOpen ? ' show' : ''}`}>
+                              <div className="container">
+                                <div className="row eq-height">
+                                  {menuItem.menus.map((category, categoryIndex) => (
+                                    <div className="col-sm-3" key={categoryIndex}>
+                                      <div className="mega-menu-product">
+                                        <div className="product-category">
+                                          {category.categoryName}
+                                        </div>
+                                        {category.link.map((linkGroup, linkGroupIndex) =>
+                                          linkGroup.menuList.map((productLink, productLinkIndex) => (
+                                            <div
+                                              className="product"
+                                              key={`${linkGroupIndex}-${productLinkIndex}`}
+                                            >
+                                              <a
+                                                className="title"
+                                                href={
+                                                  linkGroup.pageSection
+                                                    ? `${productLink.url}${linkGroup.pageSection}`
+                                                    : productLink.url
+                                                }
+                                              >
+                                                {productLink.title}
+                                              </a>
+                                              <p className="descr">{linkGroup.menuDescription}</p>
+                                            </div>
+                                          )),
+                                        )}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </li>
                       );
                     }
