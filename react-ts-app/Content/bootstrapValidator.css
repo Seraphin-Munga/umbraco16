@@ -1,0 +1,95 @@
+/*!
+ * BootstrapValidator (http://bootstrapvalidator.com)
+ * The best jQuery plugin to validate form fields. Designed to use with Bootstrap 3
+ *
+ * @author      http://twitter.com/nghuuphuoc
+ * @copyright   (c) 2013 - 2014 Nguyen Huu Phuoc
+ * @license     MIT
+ */
+
+/*.bv-form .help-block {
+    margin-bottom: 0;
+}*/
+.bv-form .tooltip-inner {
+    text-align: left;
+}
+/*.nav-tabs li.bv-tab-success > a {
+    color: #3c763d;
+}*/
+/*.nav-tabs li.bv-tab-error > a {
+    color: #a94442;
+}*/
+
+.bv-form .bv-icon-no-label {
+    top: 0;
+}
+
+.bv-form .bv-icon-input-group {
+    top: 0;
+    z-index: 100;
+}
+
+.bv-form .help-block {
+    margin-bottom: 0;
+}
+
+.nav-tabs li.bv-tab-success > a {
+    color: #89BC47;
+}
+
+.nav-tabs li.bv-tab-error > a {
+    color: #d0011d;
+}
+
+.registerForm .form-control-feedback.glyphicon,
+.registerForm .form-control-feedback.ab-glyphs {
+    font-size: 2rem;
+}
+
+.registerForm .has-success i.glyphicon,
+.registerForm .has-success i.ab-glyphs {
+    color: #89BC47;
+}
+
+.registerForm .has-error i.glyphicon,
+.registerForm .has-error i.ab-glyphs {
+    color: #d0011d;
+}
+
+.registerForm .select-wrapper .has-success i.glyphicon,
+.registerForm .select-wrapper .has-success i.ab-glyphs {
+    color: #89BC47;
+    position: absolute;
+    right: 60px;
+    top: 9px;
+}
+
+.registerForm .select-wrapper .has-error i.glyphicon,
+.registerForm .select-wrapper .has-error i.ab-glyphs {
+    color: #d0011d;
+    position: absolute;
+    right: 60px;
+    top: 9px;
+}
+
+.has-success .help-block {
+    color: #89BC47;
+    margin-left: 1rem;
+}
+
+.has-error .help-block {
+    color: #d0011d;
+    margin-left: 1rem;
+}
+
+.bg-ab-blue .has-error .help-block {
+    color: #d0011d;
+    font-size: 1.4rem;
+    padding: 0.7rem;
+    line-height: 1.8rem;
+}
+
+.registerForm .has-feedback label ~ .form-control-feedback {
+    right: 7px;
+    top: 43px;
+}
