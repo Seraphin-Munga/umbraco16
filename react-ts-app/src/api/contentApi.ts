@@ -1,10 +1,19 @@
 // Client for Umbraco's Content Delivery API (Umbraco.CMS.Global.DeliveryApi in
-// appsettings.json). Shapes below are confirmed against a live response from
-// this backend's topNavigation content item, NOT just inferred from
-// Navigation.cshtml's untyped IPublishedContent walk - notably, the real
-// `menuInfo` items (contentType "nCMenuCategory") only carry menuDescription
-// + menuName; there's no nested "menus" categories/products block despite
-// the Razor view having a branch that reads one.
+// appsettings.json). Shapes below are confirmed against the actual DTOs in
+// the installed Umbraco.Cms.Api.Delivery/Umbraco.Core packages (ApiBlockListModel,
+// ApiElement, ApiLink), NOT just inferred from Navigation.cshtml's untyped
+// IPublishedContent walk.
+//
+// menuInfo nests four levels deep, confirmed against the real v8 source
+// schema (sqlcmd against cmsContentType/cmsPropertyType) and the migration
+// fixes that make it convert correctly (Program.cs STEP 3B + the
+// string-encoded-nesting + internal-link-UDI-remap fixes):
+//   topNavigation.menuInfo      (nCMenuCategory: menuDescription, menuName, menus)
+//     -> menus                 (nCMenuContent: categoryName, link)
+//       -> link                (nCMenuList: menuList, pageSection, menuDescription)
+// An earlier version of this file only mapped menuDescription + menuName
+// because "menus" genuinely didn't exist on the migrated schema yet at the
+// time - that's fixed now, so this maps the full tree.
 
 export interface DeliveryLink {
   url: string;
@@ -12,9 +21,21 @@ export interface DeliveryLink {
   target: string | null;
 }
 
+export interface MenuListItem {
+  menuDescription: string | null;
+  pageSection: string | null;
+  menuList: DeliveryLink[];
+}
+
+export interface MenuCategoryItem {
+  categoryName: string | null;
+  link: MenuListItem[];
+}
+
 export interface MenuInfoItem {
   menuDescription: string | null;
   menuName: DeliveryLink[];
+  menus: MenuCategoryItem[];
 }
 
 interface RawBlockItem {
@@ -103,10 +124,26 @@ function mapRichText(value: unknown): string {
   return typeof markup === 'string' ? markup : '';
 }
 
+function mapMenuListItem(props: Record<string, unknown>): MenuListItem {
+  return {
+    menuDescription: typeof props.menuDescription === 'string' ? props.menuDescription : null,
+    pageSection: typeof props.pageSection === 'string' ? props.pageSection : null,
+    menuList: mapLinks(props.menuList),
+  };
+}
+
+function mapMenuCategoryItem(props: Record<string, unknown>): MenuCategoryItem {
+  return {
+    categoryName: typeof props.categoryName === 'string' ? props.categoryName : null,
+    link: mapBlocks(props.link, mapMenuListItem),
+  };
+}
+
 function mapMenuInfoItem(props: Record<string, unknown>): MenuInfoItem {
   return {
     menuDescription: typeof props.menuDescription === 'string' ? props.menuDescription : null,
     menuName: mapLinks(props.menuName),
+    menus: mapBlocks(props.menus, mapMenuCategoryItem),
   };
 }
 
