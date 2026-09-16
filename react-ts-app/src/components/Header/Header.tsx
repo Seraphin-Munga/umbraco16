@@ -9,6 +9,22 @@ import './Header.css';
 // real URL nor a Target set.
 const ONLINE_UPLOAD_URL = import.meta.env.VITE_ONLINE_UPLOAD_URL || '#';
 
+// Navigation.cshtml's own <style> declares .fa-products/.fa-onlinebanking/
+// .fa-talktous/.fa-branches/.fa-more/.fa-investors + .menu-icon, one per top
+// -level item, but never actually applies them in that file's markup - the
+// CMS-driven nav has no field to say which icon goes where. Positional,
+// matching the live site's item order (Personal, Business, Talk to us,
+// Branches, More, Investors); items past the 6th (or the "Upload documents"
+// fallback) render no icon.
+const TOP_NAV_ICONS = [
+  'fa-products',
+  'fa-onlinebanking',
+  'fa-talktous',
+  'fa-branches',
+  'fa-more',
+  'fa-investors',
+];
+
 export function Header() {
   const [menu, setMenu] = useState<MenuInfoItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -83,95 +99,105 @@ export function Header() {
 
               {!loading &&
                 !error &&
-                menu.map((menuItem, menuIndex) =>
-                  menuItem.menuName.map((link, linkIndex) => {
-                    const key = `${menuIndex}-${linkIndex}`;
+                (() => {
+                  let topNavIndex = -1;
 
-                    // Real destination -> plain link.
-                    if (link.url !== '#') {
-                      return (
-                        <li key={key}>
-                          <a href={link.url}>{link.title}</a>
-                        </li>
-                      );
-                    }
+                  return menu.map((menuItem, menuIndex) =>
+                    menuItem.menuName.map((link, linkIndex) => {
+                      const key = `${menuIndex}-${linkIndex}`;
+                      topNavIndex += 1;
+                      const iconClass = TOP_NAV_ICONS[topNavIndex];
 
-                    // No URL but Target isn't the empty string (matches the
-                    // Razor view's `relatedLink.Target != ""` - true for
-                    // both a real target and no target at all, i.e. null).
-                    if (link.target !== '') {
-                      const isOpen = openMegaMenuKey === key;
+                      // Real destination -> plain link.
+                      if (link.url !== '#') {
+                        return (
+                          <li key={key}>
+                            <a href={link.url}>
+                              {iconClass && <i className={`fa ${iconClass} menu-icon`} />}
+                              {link.title}
+                            </a>
+                          </li>
+                        );
+                      }
 
-                      return (
-                        <li
-                          key={key}
-                          className={`header-mega-menu dropdown${isOpen ? ' show' : ''}`}
-                        >
-                          <a
-                            href="/en/home/"
-                            className="dropdown-toggle"
-                            role="button"
-                            aria-haspopup="true"
-                            aria-expanded={isOpen}
-                            onClick={(event) => {
-                              event.preventDefault();
-                              setOpenMegaMenuKey((current) => (current === key ? null : key));
-                            }}
+                      // No URL but Target isn't the empty string (matches the
+                      // Razor view's `relatedLink.Target != ""` - true for
+                      // both a real target and no target at all, i.e. null).
+                      if (link.target !== '') {
+                        const isOpen = openMegaMenuKey === key;
+
+                        return (
+                          <li
+                            key={key}
+                            className={`header-mega-menu dropdown${isOpen ? ' show' : ''}`}
                           >
-                            {link.title}
-                          </a>
-                          {menuItem.menus.length > 0 && (
-                            <div className={`dropdown-menu${isOpen ? ' show' : ''}`}>
-                              <div className="container">
-                                <div className="row eq-height">
-                                  {menuItem.menus.map((category, categoryIndex) => (
-                                    <div className="col-sm-3" key={categoryIndex}>
-                                      <div className="mega-menu-product">
-                                        <div className="product-category">
-                                          {category.categoryName}
-                                        </div>
-                                        {category.link.map((linkGroup, linkGroupIndex) =>
-                                          linkGroup.menuList.map((productLink, productLinkIndex) => (
-                                            <div
-                                              className="product"
-                                              key={`${linkGroupIndex}-${productLinkIndex}`}
-                                            >
-                                              <a
-                                                className="title"
-                                                href={
-                                                  linkGroup.pageSection
-                                                    ? `${productLink.url}${linkGroup.pageSection}`
-                                                    : productLink.url
-                                                }
+                            <a
+                              href="/en/home/"
+                              className="dropdown-toggle"
+                              role="button"
+                              aria-haspopup="true"
+                              aria-expanded={isOpen}
+                              onClick={(event) => {
+                                event.preventDefault();
+                                setOpenMegaMenuKey((current) => (current === key ? null : key));
+                              }}
+                            >
+                              {iconClass && <i className={`fa ${iconClass} menu-icon`} />}
+                              {link.title}
+                            </a>
+                            {menuItem.menus.length > 0 && (
+                              <div className={`dropdown-menu${isOpen ? ' show' : ''}`}>
+                                <div className="container">
+                                  <div className="row eq-height">
+                                    {menuItem.menus.map((category, categoryIndex) => (
+                                      <div className="col-sm-3" key={categoryIndex}>
+                                        <div className="mega-menu-product">
+                                          <div className="product-category">
+                                            {category.categoryName}
+                                          </div>
+                                          {category.link.map((linkGroup, linkGroupIndex) =>
+                                            linkGroup.menuList.map((productLink, productLinkIndex) => (
+                                              <div
+                                                className="product"
+                                                key={`${linkGroupIndex}-${productLinkIndex}`}
                                               >
-                                                {productLink.title}
-                                              </a>
-                                              <p className="descr">{linkGroup.menuDescription}</p>
-                                            </div>
-                                          )),
-                                        )}
+                                                <a
+                                                  className="title"
+                                                  href={
+                                                    linkGroup.pageSection
+                                                      ? `${productLink.url}${linkGroup.pageSection}`
+                                                      : productLink.url
+                                                  }
+                                                >
+                                                  {productLink.title}
+                                                </a>
+                                                <p className="descr">{linkGroup.menuDescription}</p>
+                                              </div>
+                                            )),
+                                          )}
+                                        </div>
                                       </div>
-                                    </div>
-                                  ))}
+                                    ))}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          )}
+                            )}
+                          </li>
+                        );
+                      }
+
+                      // No URL, Target is the empty string -> fallback
+                      // "Upload documents" link.
+                      return (
+                        <li key={key}>
+                          <a href={ONLINE_UPLOAD_URL} target="_blank" rel="noreferrer">
+                            Upload documents
+                          </a>
                         </li>
                       );
-                    }
-
-                    // No URL, Target is the empty string -> fallback
-                    // "Upload documents" link.
-                    return (
-                      <li key={key}>
-                        <a href={ONLINE_UPLOAD_URL} target="_blank" rel="noreferrer">
-                          Upload documents
-                        </a>
-                      </li>
-                    );
-                  }),
-                )}
+                    }),
+                  );
+                })()}
             </ul>
 
             <ul className="horizontal-list">
