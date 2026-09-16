@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Local dev config (per-machine backend URL, etc.) - .env.example is the
+# tracked template.
+.env
+.env.local
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
