@@ -36,6 +36,7 @@ interface RawRichTextValue {
 }
 
 interface RawContentItem {
+  id: string;
   contentType: string;
   properties: Record<string, unknown>;
 }
@@ -53,6 +54,25 @@ export interface TopNavigation {
 const API_BASE = (import.meta.env.VITE_UMBRACO_API_BASE_URL ?? '').replace(/\/+$/, '');
 // v1 404s on this backend - the live instance only serves v2.
 const DELIVERY_API_CONTENT_PATH = '/umbraco/delivery/api/v2/content';
+
+async function fetchContent(
+  query: string,
+  signal?: AbortSignal,
+): Promise<RawContentItem[]> {
+  const response = await fetch(`${API_BASE}${DELIVERY_API_CONTENT_PATH}${query}`, {
+    headers: { Accept: 'application/json' },
+    signal,
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Umbraco Content Delivery API request failed: ${response.status} ${response.statusText}`,
+    );
+  }
+
+  const data: RawContentResponse = await response.json();
+  return data.items ?? [];
+}
 
 function mapBlocks<T>(
   value: unknown,
@@ -98,23 +118,10 @@ function mapMenuInfoItem(props: Record<string, unknown>): MenuInfoItem {
  * appsettings.json) so no API key is needed.
  */
 export async function fetchTopNavigation(signal?: AbortSignal): Promise<TopNavigation> {
-  const url =
-    `${API_BASE}${DELIVERY_API_CONTENT_PATH}` +
-    `?filter=contentType:topNavigation&expand=properties[$all]&take=1`;
-
-  const response = await fetch(url, {
-    headers: { Accept: 'application/json' },
+  const [topNavigation] = await fetchContent(
+    '?filter=contentType:topNavigation&expand=properties[$all]&take=1',
     signal,
-  });
-
-  if (!response.ok) {
-    throw new Error(
-      `Umbraco Content Delivery API request failed: ${response.status} ${response.statusText}`,
-    );
-  }
-
-  const data: RawContentResponse = await response.json();
-  const topNavigation = data.items?.[0];
+  );
 
   if (!topNavigation) {
     return { menu: [], registerLoginMarkup: '' };
@@ -124,4 +131,139 @@ export async function fetchTopNavigation(signal?: AbortSignal): Promise<TopNavig
     menu: mapBlocks(topNavigation.properties.menuInfo, mapMenuInfoItem),
     registerLoginMarkup: mapRichText(topNavigation.properties.registerLogin),
   };
+}
+
+// ============================================================
+// FOOTER (bottomNavigation content type)
+// ============================================================
+//
+// Ported from Views/MasterNew.cshtml (the layout PageHome.cshtml actually
+// uses) + its Views/Partials/_pageBottomNavigation.cshtml. bottomNavigation's
+// LinkItems block list mixes two kinds of category elements, discriminated
+// here by which of their two mutually-exclusive properties is present
+// (mirroring the Razor view's own `if (menuData.Value(..., "linkItems") !=
+// null)` / `if (menuData.Value(..., "listOfRichTextItems") != null)` checks):
+// a list of links, or a block of raw rich-text items (used for the
+// "Contact Us" column's icons/address).
+
+export interface FooterLink {
+  url: string;
+  title: string;
+}
+
+export interface FooterLinkCategory {
+  kind: 'links';
+  categoryName: string | null;
+  links: FooterLink[];
+}
+
+export interface FooterRichTextCategory {
+  kind: 'richText';
+  categoryName: string | null;
+  html: string;
+}
+
+export type FooterCategory = FooterLinkCategory | FooterRichTextCategory;
+
+export interface Footer {
+  categories: FooterCategory[];
+  disclaimerMarkup: string;
+}
+
+function mapMediaUrl(value: unknown): string {
+  const first = Array.isArray(value) ? value[0] : value;
+  const url = (first as { url?: unknown } | null | undefined)?.url;
+  return typeof url === 'string' ? url : '';
+}
+
+// One "relatedLink" item from a link category's nested linkItems block list.
+// Its nCurlLink is itself a list (usually one entry) - Razor loops it, so
+// this can return more than one FooterLink per relatedLink item.
+function mapFooterLinkItem(props: Record<string, unknown>): FooterLink[] {
+  const pageSection = typeof props.nCpageSection === 'string' ? props.nCpageSection : '';
+  const links = mapLinks(props.nCurlLink);
+
+  return links.map((link) => {
+    if (link.url !== '#') {
+      return {
+        url: pageSection ? `${link.url}${pageSection}` : link.url,
+        title: link.title,
+      };
+    }
+
+    // No real URL -> fall back to an attached document's file URL, same
+    // as the Razor view's relatedLink.Value("nCdocument") branch.
+    return {
+      url: mapMediaUrl(props.nCdocument),
+      title: typeof props.nCtext === 'string' ? props.nCtext : '',
+    };
+  });
+}
+
+function mapFooterCategory(props: Record<string, unknown>): FooterCategory | null {
+  const categoryName = typeof props.categoryName === 'string' ? props.categoryName : null;
+
+  if (props.linkItems) {
+    return {
+      kind: 'links',
+      categoryName,
+      links: mapBlocks(props.linkItems, mapFooterLinkItem).flat(),
+    };
+  }
+
+  if (props.listOfRichTextItems) {
+    return {
+      kind: 'richText',
+      categoryName,
+      html: mapBlocks(props.listOfRichTextItems, (itemProps) =>
+        mapRichText(itemProps.nCtextEditor),
+      ).join(''),
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Fetches the copyright/disclaimer rich-text block shown under the footer
+ * logo. Ported from the non-`/banking`-path branch of MasterNew.cshtml's
+ * disclaimerValue lookup only - the `/banking`-specific variant depends on
+ * the current page's route, which this SPA doesn't have yet. Best-effort:
+ * swallows its own errors so a schema mismatch here doesn't break the rest
+ * of the footer.
+ */
+async function fetchFooterDisclaimer(signal?: AbortSignal): Promise<string> {
+  try {
+    const [container] = await fetchContent(
+      '?filter=contentType:ebankITListSectionText&take=1',
+      signal,
+    );
+    if (!container) return '';
+
+    const [disclaimer] = await fetchContent(
+      `?fetch=children:${container.id}&expand=properties[$all]&take=1`,
+      signal,
+    );
+
+    return mapRichText(disclaimer?.properties.ebankITContent);
+  } catch {
+    return '';
+  }
+}
+
+export async function fetchFooter(signal?: AbortSignal): Promise<Footer> {
+  const [bottomNavigation] = await fetchContent(
+    '?filter=contentType:bottomNavigation&expand=properties[$all]&take=1',
+    signal,
+  );
+
+  const categories = bottomNavigation
+    ? mapBlocks(bottomNavigation.properties.linkItems, mapFooterCategory).filter(
+        (category): category is FooterCategory => category !== null,
+      )
+    : [];
+
+  const disclaimerMarkup = await fetchFooterDisclaimer(signal);
+
+  return { categories, disclaimerMarkup };
 }

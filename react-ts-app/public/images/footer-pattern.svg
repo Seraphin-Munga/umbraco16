@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="189px" height="74px" viewBox="0 0 189 74" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
+    <title>Triangles</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="footer_mobile" transform="translate(0.000000, -1517.000000)">
+            <g id="Triangles" transform="translate(0.000000, 1517.000000)">
+                <polygon id="Fill-32" fill="#88BC47" points="21.1165685 61.4784736 0.130656087 49.2389621 21.1165685 37.0003296"></polygon>
+                <polygon id="Fill-33" fill="#021867" points="0.130656087 24.7608621 21.1165685 37.0003736 0.130656087 49.2390061"></polygon>
+                <polygon id="Fill-34" fill="#88BC47" points="0.130656087 0.283025715 21.1165685 12.5220977 0.130656087 24.7607302"></polygon>
+                <polygon id="Fill-35" fill="#88BC47" points="42.1016019 24.7608621 21.1165685 12.5217901 42.1016019 0.283157563"></polygon>
+                <polygon id="Fill-36" fill="#EFEFEF" points="63.0875143 61.4784736 42.1016019 49.2389621 63.0875143 37.0003296"></polygon>
+                <polygon id="Fill-37" fill="#021867" points="63.0875143 37.0002417 42.1016019 24.7607302 63.0875143 12.5220977"></polygon>
+                <polygon id="Fill-38" fill="#EFEFEF" points="63.0875143 37.0002417 84.0725476 49.2393137 63.0875143 61.4783857"></polygon>
+                <polygon id="Fill-39" fill="#EFEFEF" points="63.0875143 12.5219659 84.0725476 24.7610379 63.0875143 37.0001099"></polygon>
+                <polygon id="Fill-40" fill="#EFEFEF" points="84.0723719 49.2391379 105.058284 61.4786494 84.0723719 73.7168424"></polygon>
+                <polygon id="Fill-42" fill="#EFEFEF" points="126.043977 73.7169743 105.058504 61.4783418 126.043977 49.2392698"></polygon>
+                <polygon id="Fill-43" fill="#EFEFEF" points="147.029054 61.4784736 126.044021 49.2389621 147.029054 37.0003296"></polygon>
+                <polygon id="Fill-44" fill="#EFEFEF" points="147.029054 37.0002417 168.014967 49.2393137 147.029054 61.4783857"></polygon>
+                <polygon id="Fill-45" fill="#EFEFEF" points="168.014967 49.2391379 189 61.4786494 168.014967 73.7168424"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

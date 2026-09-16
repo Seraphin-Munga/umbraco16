@@ -6,13 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>react-ts-app</title>
     <!--
-      Bootstrap 3 + navigation.css: copied from AcfAfricanbank.Web/wwwroot/css
-      so the ported Header component's Bootstrap 3 markup (navbar-default,
-      navbar-toggle, dropdown-menu, col-sm-3, ...) renders the same as it did
-      server-side. Font Awesome supplies the fa-search / fa-angle-down icons.
+      Copied from AcfAfricanbank.Web/wwwroot/css, matching what MasterNew.cshtml
+      actually loads for the homepage (confirmed via PageHome.cshtml's Layout):
+      Bootstrap 4 + style.css (site-wide: footer, search, etc.) + media-query.css
+      (responsive overrides). navigation.css isn't in MasterNew.cshtml's own
+      <head> but is the only place header-mega-menu/navbar-default/nav-modal/
+      register-btn/login-btn are styled at all, so it's kept regardless. Font
+      Awesome (4.x, matching font-awesome-4-1-0 loaded server-side) supplies
+      fa-search/fa-angle-down/fa-facebook/fa-twitter/fa-instagram/fa-linkedin.
     -->
     <link rel="stylesheet" href="/vendor/bootstrap.css" />
     <link rel="stylesheet" href="/vendor/navigation.css" />
+    <link rel="stylesheet" href="/vendor/style.css" />
+    <link rel="stylesheet" href="/vendor/media-query.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
