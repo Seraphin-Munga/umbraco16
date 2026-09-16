@@ -1,16 +1,55 @@
 /*
   Ported from the inline <style> block in Navigation.cshtml (lines 51-529).
-  public/vendor/navigation.css (copied from wwwroot/css/navigation.css)
-  already covers the bulk of the header/mega-menu look, so only the rules
-  that block doesn't have - or that Navigation.cshtml overrides with
-  !important - are reproduced here: the nav-modal (Register/Login popup),
-  the lineUp animation it uses, the Blog/Contact Us horizontal-list, and a
-  handful of brand/icon overrides.
+  public/vendor/navigation.css (copied from wwwroot/css/navigation.css) has
+  a lot of overlapping header/mega-menu rules too, but it isn't linked from
+  index.html - main.min.css's own copies of those same selectors are what's
+  actually live, and pulling navigation.css in alongside it just makes the
+  two fight (its FontAwesome-4-only `.product:before` font-family beats
+  main.min.css's working one, its `.descr` rules hide the product
+  description text, etc). So only the rules genuinely missing everywhere -
+  not "prefer this file's version of an existing rule" - are reproduced
+  here: the nav-modal (Register/Login popup), the lineUp animation it uses,
+  the Blog/Contact Us horizontal-list, the six .fa-<item>/.menu-icon top-nav
+  icons, and a handful of brand/container overrides.
 */
 
 .active {
   text-decoration: none !important;
   color: #89bc47 !important;
+}
+
+/* Top-nav item icons (Personal/Business/Talk to us/Branches/More/Investors) */
+
+.menu-icon {
+  vertical-align: top;
+  margin-top: 1px;
+  color: #88bc47;
+  padding-right: 10px;
+  padding-left: 15px;
+}
+
+.fa-products:before {
+  content: '\f07a';
+}
+
+.fa-onlinebanking:before {
+  content: '\f0ac';
+}
+
+.fa-talktous:before {
+  content: '\f10b';
+}
+
+.fa-branches:before {
+  content: '\f041';
+}
+
+.fa-more:before {
+  content: '\f067';
+}
+
+.fa-investors:before {
+  content: '\f0c0';
 }
 
 .horizontal-list {
