@@ -1,8 +1,10 @@
 // Client for Umbraco's Content Delivery API (Umbraco.CMS.Global.DeliveryApi in
-// appsettings.json). Shapes below mirror the property aliases read directly in
-// Navigation.cshtml (topNavigation.MenuInfo -> menuName / menus -> categoryName,
-// link -> pageSection / menuList / menuDescription), so this is the React
-// equivalent of that Razor view's untyped IPublishedContent walk.
+// appsettings.json). Shapes below are confirmed against a live response from
+// this backend's topNavigation content item, NOT just inferred from
+// Navigation.cshtml's untyped IPublishedContent walk - notably, the real
+// `menuInfo` items (contentType "nCMenuCategory") only carry menuDescription
+// + menuName; there's no nested "menus" categories/products block despite
+// the Razor view having a branch that reads one.
 
 export interface DeliveryLink {
   url: string;
@@ -10,20 +12,9 @@ export interface DeliveryLink {
   target: string | null;
 }
 
-export interface MenuLinkItem {
-  pageSection: string | null;
-  menuList: DeliveryLink[];
-  menuDescription: string | null;
-}
-
-export interface MenuCategoryItem {
-  categoryName: string | null;
-  link: MenuLinkItem[];
-}
-
 export interface MenuInfoItem {
+  menuDescription: string | null;
   menuName: DeliveryLink[];
-  menus: MenuCategoryItem[];
 }
 
 interface RawBlockItem {
@@ -33,10 +24,15 @@ interface RawBlockItem {
   };
 }
 
-// Block List properties (MenuInfo, menus, link) come back wrapped as
-// { "items": [...] }, not a bare array - confirmed against a live v2 response.
+// Block List properties (menuInfo) come back wrapped as { "items": [...] },
+// not a bare array - confirmed against a live v2 response.
 interface RawBlockListValue {
   items?: RawBlockItem[];
+}
+
+// Rich Text properties (registerLogin) come back as { "markup": "<...>", "blocks": [] }.
+interface RawRichTextValue {
+  markup?: string;
 }
 
 interface RawContentItem {
@@ -47,6 +43,11 @@ interface RawContentItem {
 interface RawContentResponse {
   total: number;
   items: RawContentItem[];
+}
+
+export interface TopNavigation {
+  menu: MenuInfoItem[];
+  registerLoginMarkup: string;
 }
 
 const API_BASE = (import.meta.env.VITE_UMBRACO_API_BASE_URL ?? '').replace(/\/+$/, '');
@@ -77,35 +78,26 @@ function mapLinks(value: unknown): DeliveryLink[] {
   }));
 }
 
-function mapMenuLinkItem(props: Record<string, unknown>): MenuLinkItem {
-  return {
-    pageSection: typeof props.pageSection === 'string' ? props.pageSection : null,
-    menuList: mapLinks(props.menuList),
-    menuDescription: typeof props.menuDescription === 'string' ? props.menuDescription : null,
-  };
-}
-
-function mapMenuCategoryItem(props: Record<string, unknown>): MenuCategoryItem {
-  return {
-    categoryName: typeof props.categoryName === 'string' ? props.categoryName : null,
-    link: mapBlocks(props.link, mapMenuLinkItem),
-  };
+function mapRichText(value: unknown): string {
+  const markup = (value as RawRichTextValue | null | undefined)?.markup;
+  return typeof markup === 'string' ? markup : '';
 }
 
 function mapMenuInfoItem(props: Record<string, unknown>): MenuInfoItem {
   return {
+    menuDescription: typeof props.menuDescription === 'string' ? props.menuDescription : null,
     menuName: mapLinks(props.menuName),
-    menus: mapBlocks(props.menus, mapMenuCategoryItem),
   };
 }
 
 /**
- * Fetches the site's `topNavigation` content item and returns its `MenuInfo`
- * block list, normalized into a clean tree. Requires
+ * Fetches the site's `topNavigation` content item: its `menuInfo` block list
+ * (normalized into a clean array) and the CMS-authored `registerLogin`
+ * rich-text markup for the register/login modal. Requires
  * Umbraco:CMS:DeliveryApi:Enabled + PublicAccess (already true in
  * appsettings.json) so no API key is needed.
  */
-export async function fetchTopNavigation(signal?: AbortSignal): Promise<MenuInfoItem[]> {
+export async function fetchTopNavigation(signal?: AbortSignal): Promise<TopNavigation> {
   const url =
     `${API_BASE}${DELIVERY_API_CONTENT_PATH}` +
     `?filter=contentType:topNavigation&expand=properties[$all]&take=1`;
@@ -125,8 +117,11 @@ export async function fetchTopNavigation(signal?: AbortSignal): Promise<MenuInfo
   const topNavigation = data.items?.[0];
 
   if (!topNavigation) {
-    return [];
+    return { menu: [], registerLoginMarkup: '' };
   }
 
-  return mapBlocks(topNavigation.properties.MenuInfo, mapMenuInfoItem);
+  return {
+    menu: mapBlocks(topNavigation.properties.menuInfo, mapMenuInfoItem),
+    registerLoginMarkup: mapRichText(topNavigation.properties.registerLogin),
+  };
 }
