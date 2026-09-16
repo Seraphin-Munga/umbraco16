@@ -11,7 +11,6 @@ const ONLINE_UPLOAD_URL = import.meta.env.VITE_ONLINE_UPLOAD_URL || '#';
 
 export function Header() {
   const [menu, setMenu] = useState<MenuInfoItem[]>([]);
-  const [registerLoginMarkup, setRegisterLoginMarkup] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,9 +27,8 @@ export function Header() {
     const controller = new AbortController();
 
     fetchTopNavigation(controller.signal)
-      .then(({ menu, registerLoginMarkup }) => {
+      .then(({ menu }) => {
         setMenu(menu);
-        setRegisterLoginMarkup(registerLoginMarkup);
       })
       .catch((err: unknown) => {
         if (err instanceof DOMException && err.name === 'AbortError') return;
@@ -260,11 +258,7 @@ export function Header() {
         </div>
       </nav>
 
-      <NavModal
-        open={modalOpen}
-        markup={registerLoginMarkup}
-        onClose={() => setModalOpen(false)}
-      />
+      <NavModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </div>
   );
 }

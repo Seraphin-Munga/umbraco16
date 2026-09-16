@@ -69,7 +69,6 @@ interface RawContentResponse {
 
 export interface TopNavigation {
   menu: MenuInfoItem[];
-  registerLoginMarkup: string;
 }
 
 const API_BASE = (import.meta.env.VITE_UMBRACO_API_BASE_URL ?? '').replace(/\/+$/, '');
@@ -177,11 +176,11 @@ const TOP_NAVIGATION_EXPAND =
   'properties[menuInfo[properties[menus[properties[link[properties[$all]],$all]],$all]],$all]';
 
 /**
- * Fetches the site's `topNavigation` content item: its `menuInfo` block list
- * (normalized into a clean array) and the CMS-authored `registerLogin`
- * rich-text markup for the register/login modal. Requires
- * Umbraco:CMS:DeliveryApi:Enabled + PublicAccess (already true in
- * appsettings.json) so no API key is needed.
+ * Fetches the site's `topNavigation` content item: its `menuInfo` block list,
+ * normalized into a clean array. The register/login modal itself is static
+ * markup ported directly into NavModal.tsx (see its own comment) - there is
+ * no CMS property behind it. Requires Umbraco:CMS:DeliveryApi:Enabled +
+ * PublicAccess (already true in appsettings.json) so no API key is needed.
  */
 export async function fetchTopNavigation(signal?: AbortSignal): Promise<TopNavigation> {
   const [topNavigation] = await fetchContent(
@@ -190,12 +189,11 @@ export async function fetchTopNavigation(signal?: AbortSignal): Promise<TopNavig
   );
 
   if (!topNavigation) {
-    return { menu: [], registerLoginMarkup: '' };
+    return { menu: [] };
   }
 
   return {
     menu: mapBlocks(topNavigation.properties.menuInfo, mapMenuInfoItem),
-    registerLoginMarkup: mapRichText(topNavigation.properties.registerLogin),
   };
 }
 
