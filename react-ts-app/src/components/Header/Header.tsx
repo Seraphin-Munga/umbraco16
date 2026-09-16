@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { fetchTopNavigation, type MenuInfoItem } from '../../api/contentApi';
 import { Logo } from './Logo';
-import { NavModal, type NavModalTab } from './NavModal';
+import { NavModal } from './NavModal';
 import './Header.css';
 
 // Mirrors Configuration["online_upload"] in Navigation.cshtml, used for the
@@ -11,6 +11,7 @@ const ONLINE_UPLOAD_URL = import.meta.env.VITE_ONLINE_UPLOAD_URL || '#';
 
 export function Header() {
   const [menu, setMenu] = useState<MenuInfoItem[]>([]);
+  const [registerLoginMarkup, setRegisterLoginMarkup] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,13 +19,15 @@ export function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<NavModalTab>(0);
 
   useEffect(() => {
     const controller = new AbortController();
 
     fetchTopNavigation(controller.signal)
-      .then(setMenu)
+      .then(({ menu, registerLoginMarkup }) => {
+        setMenu(menu);
+        setRegisterLoginMarkup(registerLoginMarkup);
+      })
       .catch((err: unknown) => {
         if (err instanceof DOMException && err.name === 'AbortError') return;
         setError(err instanceof Error ? err.message : 'Failed to load navigation.');
@@ -102,10 +105,10 @@ export function Header() {
                       );
                     }
 
-                    // No URL but a Target set -> mega-menu trigger.
-                    if (link.target) {
-                      const hasCategories = menuItem.menus.length > 0;
-
+                    // No URL but Target isn't the empty string (matches the
+                    // Razor view's `relatedLink.Target != ""` - true for
+                    // both a real target and no target at all, i.e. null).
+                    if (link.target !== '') {
                       return (
                         <li key={key} className="header-mega-menu dropdown">
                           <a
@@ -116,51 +119,13 @@ export function Header() {
                             aria-expanded="false"
                           >
                             {link.title}
-                            {hasCategories && <i className="fa fa-angle-down" />}
                           </a>
-
-                          {hasCategories && (
-                            <div className="dropdown-menu">
-                              <div className="container">
-                                <div className="row eq-height">
-                                  {menuItem.menus.map((category, categoryIndex) => (
-                                    <div className="col-sm-3" key={categoryIndex}>
-                                      <div className="mega-menu-product">
-                                        <div className="product-category">
-                                          {category.categoryName}
-                                        </div>
-
-                                        {category.link.map((linkValue, linkValueIndex) =>
-                                          linkValue.menuList.map((productLink, productLinkIndex) => {
-                                            const href = linkValue.pageSection
-                                              ? `${productLink.url}${linkValue.pageSection}`
-                                              : productLink.url;
-
-                                            return (
-                                              <div
-                                                className="product"
-                                                key={`${linkValueIndex}-${productLinkIndex}`}
-                                              >
-                                                <a className="title" href={href}>
-                                                  {productLink.title}
-                                                </a>
-                                                <p className="descr">{linkValue.menuDescription}</p>
-                                              </div>
-                                            );
-                                          }),
-                                        )}
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            </div>
-                          )}
                         </li>
                       );
                     }
 
-                    // No URL, no Target -> fallback "Upload documents" link.
+                    // No URL, Target is the empty string -> fallback
+                    // "Upload documents" link.
                     return (
                       <li key={key}>
                         <a href={ONLINE_UPLOAD_URL} target="_blank" rel="noreferrer">
@@ -247,8 +212,7 @@ export function Header() {
 
       <NavModal
         open={modalOpen}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
+        markup={registerLoginMarkup}
         onClose={() => setModalOpen(false)}
       />
     </div>
