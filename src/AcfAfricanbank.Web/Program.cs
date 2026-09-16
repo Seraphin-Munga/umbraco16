@@ -3606,10 +3606,16 @@ static JsonObject? ConvertNestedContentArray(
 // e.g. menuInfo's own stored value) or - one level of nesting or deeper,
 // confirmed against real data - a string holding that same array as
 // escaped JSON text (menus, link, menuList all arrive this way). Either
-// way it gets recursively converted; when the source was string-encoded,
-// the converted result is re-encoded as a string too, matching how a
-// nested Block List property's value needs to look for Block List's own
-// value converter to read it the same way it reads a top-level one.
+// way it gets recursively converted into the { layout, contentData }
+// shape and embedded as a NATIVE object either way - re-encoding it back
+// into a string here (an earlier version of this function did, reasoning
+// that the source was string-encoded so the output should be too) was
+// wrong: BlockEditorDataConverter/JsonBlockValueConverter deserialize a
+// nested Block List property's value expecting a JSON object directly,
+// not a string containing one. That mismatch is exactly what threw
+// "System.Text.Json.JsonException: Expected start object" the moment the
+// Delivery API tried to read menus back, confirmed from a live stack
+// trace pulled from the server's own log during a failed publish.
 // Anything else (plain text, MultiUrlPicker's own Link JSON, etc.) is
 // copied through as-is except for internal link "udi" references, which
 // get remapped from the v8 content's GUID to its new v16 one - otherwise
@@ -3631,8 +3637,7 @@ static JsonNode? ConvertNestedContentPropertyValue(
     {
         using (innerDoc)
         {
-            return ConvertNestedContentArray(innerDoc!.RootElement, getContentType, remapContentUdi)
-                ?.ToJsonString();
+            return ConvertNestedContentArray(innerDoc!.RootElement, getContentType, remapContentUdi);
         }
     }
 
