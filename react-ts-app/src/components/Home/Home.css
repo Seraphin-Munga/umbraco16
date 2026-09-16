@@ -1,0 +1,78 @@
+/*
+  style.css/media-query.css (linked in index.html) style the AB-specific
+  parts of the carousels used on this page (.carousel-caption,
+  .carousel-indicators, the control icons) but not the underlying slide
+  mechanics - those come from Bootstrap 4's carousel.css, and this app only
+  loads Bootstrap 3 (see Header.tsx's own comment on why: navigation.css
+  already assumes Bootstrap 4's grid/carousel elsewhere, and mixing both
+  frameworks site-wide is its own can of worms). Rather than pull in a
+  second full Bootstrap version for two components, the handful of rules
+  actually needed - "only the active slide is visible", "controls sit on
+  the vertical center of the sides" - are reproduced here instead,
+  independent of whichever Bootstrap version index.html ends up on.
+*/
+
+.carousel {
+  position: relative;
+}
+
+.carousel-inner {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.carousel-item {
+  display: none;
+  position: relative;
+  width: 100%;
+}
+
+.carousel-item.active {
+  display: block;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 5%;
+  color: #fff;
+  text-align: center;
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+  opacity: 0.9;
+}
+
+.carousel-control-prev {
+  left: 0;
+}
+
+.carousel-control-next {
+  right: 0;
+}
+
+.carousel-indicators li {
+  box-sizing: content-box;
+  flex: 0 1 auto;
+  width: 30px;
+  height: 3px;
+  margin-right: 3px;
+  margin-left: 3px;
+  cursor: pointer;
+  background-color: #fff;
+  opacity: 0.5;
+}
+
+.carousel-indicators li.active {
+  opacity: 1;
+}
