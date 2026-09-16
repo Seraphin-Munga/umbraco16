@@ -65,22 +65,11 @@ export function Header() {
             <ul className="nav navbar-nav dropdown-container left-nav">
               <li>
                 <a
-                  href="https://ib.africanbank.co.za/modules/Registration/Public/Register.aspx"
-                  target="_blank"
-                  rel="noreferrer"
                   className="register-btn visible-xs"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => setModalOpen(true)}
                 >
-                  <span>Register</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://ib.africanbank.co.za/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="register-btn visible-xs"
-                >
-                  <span>Login</span>
+                  <span>Register/Login</span>
                 </a>
               </li>
               <li>
@@ -214,7 +203,7 @@ export function Header() {
                   style={{ cursor: 'pointer' }}
                   onClick={() => setModalOpen(true)}
                 >
-                  Register/Login
+                  Register <span style={{ fontWeight: 100 }}>|</span> Login
                 </a>
               </li>
             </ul>

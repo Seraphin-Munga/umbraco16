@@ -1,10 +1,17 @@
 /*
-  Ported from the inline <style> block in Navigation.cshtml. Base navbar
-  classes (.navbar-default, .register-btn, .login-btn, .new-navbar-ab, ...)
-  come from the site's own public/vendor/navigation.css + Bootstrap 4
-  (public/vendor/bootstrap.css) + bootstrap3-compat.css, all loaded globally
-  in index.html - this file only carries the rules that lived directly in
-  the view.
+  Ported from the inline <style> block in the LIVE production site
+  (www.africanbank.co.za, fetched directly and diffed against this file -
+  it's evolved since the migrated Navigation.cshtml this was originally
+  based on: different navbar-brand/navbar-default sizing, a higher
+  nav-modal z-index, a fit-content modal height, and extra responsive
+  breakpoints). Chat-widget (#chatIconImg, #openChatButton, karaboChat) and
+  mobile-accordion (.accordion, .click, .myPanel) rules from that same
+  block are deliberately left out - unrelated page features, not part of
+  this header. Base navbar classes (.navbar-default, .register-btn,
+  .login-btn, .new-navbar-ab, ...) come from the site's own
+  public/vendor/navigation.css + Bootstrap 4 (public/vendor/bootstrap.css)
+  + bootstrap3-compat.css, all loaded globally in index.html - this file
+  only carries the rules that lived directly in the view.
 */
 
 .active {
@@ -65,8 +72,14 @@
 }
 
 .navbar-brand {
+  width: 230px;
+  top: 35px;
   position: relative;
-  padding: 25px 70px 0px 0px !important;
+  padding: 0px 70px 0px 0px !important;
+}
+
+.navbar-default {
+  height: 111px !important;
 }
 
 .dropdown-container.navbar-default .navbar-collapse {
@@ -136,14 +149,16 @@
   }
 }
 
-@media (min-width: 360px) and (max-width: 768px) {
+@media (min-width: 256px) and (max-width: 768px) {
   .dropdown-container.navbar-default .navbar-collapse {
     position: relative;
-    z-index: 10000;
+    z-index: 1000;
     background: #002b60;
-    margin-top: 22px !important;
   }
 
+  /* Real site sizes an <img> logo here; ours is the inline SVG from
+     Navigation.cshtml (Logo.tsx, id="Layer_2") - same idea, different
+     selector, since there's no equivalent img rule to port. */
   .navbar-default .navbar-brand #Layer_2 {
     position: relative;
     left: 10px;
@@ -151,12 +166,38 @@
     height: 38px;
   }
 
+  .navbar-brand {
+    top: 7px !important;
+    position: relative;
+    padding: 0px 70px 0px 9px !important;
+  }
+
   .navbar-default {
-    height: 100px !important;
+    height: 67px !important;
+  }
+
+  .dropdown-container .navbar-right {
+    top: -51px;
+  }
+
+  .search-text {
+    margin-right: 5%;
   }
 
   #banner {
     position: relative;
+  }
+}
+
+@media (min-width: 800px) and (max-width: 1024px) {
+  .dropdown-container .navbar-right {
+    margin-top: 44px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .dropdown-container .navbar-header {
+    margin-top: 35px !important;
   }
 }
 
@@ -188,14 +229,14 @@
   background: rgba(0, 0, 0, 0.5);
   justify-content: center;
   align-items: center;
-  z-index: 20;
+  z-index: 1000;
 }
 
 .nav-modal {
   display: none;
   flex-direction: column;
   width: 500px;
-  height: 220px;
+  height: fit-content;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   background-color: #fff;
   z-index: 3;
@@ -232,7 +273,7 @@
 
 .nav-modal-tab.active {
   background-color: #fff;
-  color: #0d0d0d;
+  color: #0d0d0d !important;
   font-weight: bold;
   font-size: 20px;
 }
