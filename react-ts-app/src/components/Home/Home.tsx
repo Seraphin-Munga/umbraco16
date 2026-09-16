@@ -1,3 +1,6 @@
+import { useEffect } from 'react';
+import { useAppDispatch } from '../../store/hooks';
+import { fetchHome } from '../../store/slices/homeSlice';
 import { HeroCarousel } from './HeroCarousel';
 import { BankWithAudacity } from './BankWithAudacity';
 import { LoanCalculator } from './LoanCalculator';
@@ -20,7 +23,18 @@ import './Home.css';
 // comment for its source section) - the CMS-driven hero carousel,
 // testimonials carousel, bank story carousel, "help" tabs, and loan-summary
 // shoulder tabs that used to live here have all been replaced or removed.
+//
+// Still dispatches the home slice's fetch (src/store/slices/homeSlice.ts,
+// backed by src/services/homeService.ts) on mount so that data is in the
+// store, ready for a section to switch over to once one needs it again.
 export function Home() {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const promise = dispatch(fetchHome());
+    return () => promise.abort();
+  }, [dispatch]);
+
   return (
     <div id="page">
       <div id="content">

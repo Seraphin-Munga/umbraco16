@@ -1,4 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
+import headerReducer from './slices/headerSlice';
+import footerReducer from './slices/footerSlice';
+import homeReducer from './slices/homeSlice';
 import personalLoanReducer from './slices/personalLoanSlice';
 import consolidationLoanReducer from './slices/consolidationLoanSlice';
 import twelvePercentLoanReducer from './slices/twelvePercentLoanSlice';
@@ -22,6 +25,9 @@ import audaciousRewardsReducer from './slices/audaciousRewardsSlice';
 
 export const store = configureStore({
   reducer: {
+    header: headerReducer,
+    footer: footerReducer,
+    home: homeReducer,
     personalLoan: personalLoanReducer,
     consolidationLoan: consolidationLoanReducer,
     twelvePercentLoan: twelvePercentLoanReducer,
