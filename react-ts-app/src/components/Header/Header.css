@@ -19,6 +19,11 @@
   color: #89bc47 !important;
 }
 
+.container-fluid {
+  padding-left: 32px !important;
+  padding-right: 32px !important;
+}
+
 .horizontal-list {
   position: relative;
   right: 0;
@@ -84,6 +89,10 @@
 
 .dropdown-container.navbar-default .navbar-collapse {
   margin-top: 3px !important;
+}
+
+.nav-modal a:hover {
+  color: rgb(0, 43, 96);
 }
 
 /* Menu Icons */
@@ -483,9 +492,17 @@
   }
 }
 
-@media (min-width: 768px) and (max-width: 1199px) {
+@media (min-width: 767px) and (max-width: 1199px) {
   .dropdown-container.navbar-default .navbar-nav > li:first-child > a {
     padding-left: 30px !important;
+  }
+
+  .navbar-default {
+    height: 196px !important;
+  }
+
+  .navbar-default .navbar-nav > li > a.login-btn {
+    margin-top: 0px;
   }
 }
 /* modal css end here */

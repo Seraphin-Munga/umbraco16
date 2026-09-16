@@ -1,0 +1,39 @@
+﻿.page404 {
+    margin:48px 0 102px;
+    h1 {
+        font-family: Montserrat;
+        font-size: 60px;
+        font-weight: 200;
+        font-style: normal;
+        color: #464855;
+        margin-bottom:20px;
+        @media (max-width:500px){
+            font-size:44px;
+            margin-bottom:12px;
+        }
+    }
+    p {
+        font-family: Montserrat;
+        font-size: 14px;
+        font-weight: 300;
+        color: #464855;
+    }
+    &__box {
+        .box-image {
+        display:inline-block;
+        margin-top:16px;
+            img {
+                margin-left:8%;
+                width:100%;
+                max-width:450px;
+            }
+        }
+    }
+    .bottom-message {
+        line-height:2;
+        margin-top:6px;
+        .btn-rounded-green div {
+        display:inline;
+        }
+    }
+}

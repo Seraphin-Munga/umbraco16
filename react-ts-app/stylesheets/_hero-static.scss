@@ -1,0 +1,147 @@
+﻿.hero-static-container {
+    background: #f6f6f6;
+
+    &.darker {
+        background: #d8d8d8;
+    }
+}
+
+.hero-static-banner {
+    height: 440px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+
+    .pattern {
+        position: absolute;
+        bottom: 100px;
+        left: -42px;
+    }
+
+    &.less-height {
+        height: 400px;
+    }
+}
+
+.hero-static-caption {
+    background: #88bc47;
+    padding: 50px;
+    color: #ffffff;
+    border-radius: 8px 8px 0 0;
+    position: relative;
+    top: -60px;
+
+    .hero-static-title, h1 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-weight: bold;
+        font-size: 62px;
+        line-height: 1.03;
+  }
+
+  .hero-static-description, p {
+      font-size: 18px;
+      font-weight: 300;
+      line-height: 1.78;
+  }
+
+  p {
+      width:75%;
+      margin-bottom:0;
+      @media (max-width: $screen-md-max) {
+          width:100%;
+      }
+  }
+
+  .button.primary {
+      &:hover {
+          background-color:#fff;
+          color:$color-blue;
+      }
+  }
+}
+
+.hero-blog-caption {
+    width: 50%;
+    height: 100%;
+    background-color: rgba(136, 188, 71, 0.9);
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 50px;
+    color: #ffffff;
+    z-index: 9;
+
+    .hero-blog-title {
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-weight: bold;
+        font-size: 38px;
+        line-height: 1.05;
+        letter-spacing: -0.9px;
+    }
+
+    .hero-blog-description {
+        font-size: 18px;
+        font-weight: 300;
+        letter-spacing: -0.4px;
+    }
+
+    .hero-blog-author {
+        font-size: 13px;
+        font-weight: 300;
+        letter-spacing: -0.3px;
+    }
+}
+
+@media (max-width: 767px) {
+  .hero-static-caption {
+      margin-left: -15px;
+      margin-right: -15px;
+      border-radius: 0;
+      text-align: center;
+      padding: 35px;
+      top: 0;
+
+      .hero-static-title, h1 {
+          font-size: 30px;
+      }
+
+      .hero-static-description, p {
+          font-size: 14px;
+          font-weight: 200;
+          line-height: 1.5;
+      }
+
+      .button {
+          width: 100%;
+          margin-top: 30px;
+      }
+  }
+
+    .hero-blog-caption {
+        background-color: rgba(136, 188, 71, 1);
+        position: relative;
+        width: 100%;
+        text-align: center;
+
+        .hero-blog-title {
+            font-size: 30px;
+        }
+
+        .hero-blog-author {
+            img {
+                display: block;
+                margin: 0 auto 15px;
+            }
+        }
+    }
+
+  .hero-static-banner {
+      .pattern {
+          left: 0;
+          bottom: 150px;
+      }
+  }
+}

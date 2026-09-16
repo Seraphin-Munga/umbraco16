@@ -1,0 +1,122 @@
+﻿/*#region BANNER*/
+/*Global Overlay Style Vars*/
+/*Slider Style Vars*/
+/*#endregion BANNER*/
+#investor-feature-items-container {
+  background: #f9f9fa;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+#investor-feature-items-container .right-border {
+  border-left-width: 1px;
+  border-left-style: solid;
+  border-left-color: #dddddd;
+}
+#investor-reports-items-container a {
+  color: #88bc47 !important;
+  text-decoration: underline !important;
+}
+.form-error,
+.form-error label,
+.form-error select {
+  color: red !important;
+}
+.signupForm .has-feedback label ~ .form-control-feedback {
+  right: 7px;
+  top: 43px;
+}
+.signupForm .has-feedback .select-wrapper .form-control-feedback {
+  right: 11px;
+  top: 9px;
+}
+.signupForm .has-error i.glyphicon,
+.signupForm .has-error i.ab-glyphs {
+  color: #f37053;
+}
+.signupForm .form-control-feedback.glyphicon,
+.signupForm .form-control-feedback.ab-glyphs {
+  font-size: 2rem;
+}
+.has-feedback label ~ .form-control-feedback {
+  top: 19px;
+}
+.has-error .form-control-feedback {
+  color: #618432;
+}
+#clickEater {
+  height: 45px;
+  border: 1px solid;
+  width: 123px;
+  float: right;
+}
+.picture-heading {
+  padding: 0;
+  margin: 0;
+  margin-top: 15px;
+}
+.back-next-links a {
+  padding: 10px;
+  border-radius: 30px;
+  margin-bottom: 10px;
+  text-decoration: none;
+}
+.back-next-links a.back-button {
+  border: 1px solid #001d38;
+}
+.back-next-links a.right-button {
+  color: white;
+  background-color: #88bc47;
+  padding: 10px;
+}
+.call-to-action .input-group-btn button[type="submit"].btn-ab-green {
+  min-width: 121px;
+}
+.back-next-links a fa-arrow-left,
+.back-next-links a fa-arrow-right {
+  font-size: 30px;
+}
+.podcast {
+  max-height: 250px;
+  padding: 27px 20px;
+}
+@media (max-width: 767px) {
+  #investor-feature-items-container .right-border {
+    margin-bottom: 15px;
+  }
+  #financial-reporting .breadcrumbs-banner img {
+    display: block;
+  }
+  #financial-reporting .breadcrumbs-banner {
+    max-height: 27rem;
+  }
+}
+.wrapper {
+  position: relative;
+  width: 100%;
+}
+#preloader,
+#BranchPreLoader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ffffff;
+  z-index: 9999;
+  display: block;
+}
+#preloader .loader {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: -30px 0 0 -30px;
+  text-align: center;
+}
+#preloader .loader .loader-img {
+  width: 60px;
+  height: 60px;
+  display: block;
+}
+/*# sourceMappingURL=custom-styles.css.map */

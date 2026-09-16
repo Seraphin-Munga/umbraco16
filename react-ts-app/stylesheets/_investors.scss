@@ -1,0 +1,223 @@
+.press-release-section{
+  &.investor{
+    .investor-dropdown{
+      max-width:870px;
+      margin:0 auto;
+
+      .dropdown-label{
+        font-size: 24px;
+        text-align: right;
+        line-height:41px;
+        color:#88bc47;
+        font-weight:500;
+      }
+    }
+
+    .download-date{
+      font-size: 14px;
+      line-height: 2;
+      color:#88bc47;
+      font-weight:500;
+    }
+  }
+}
+
+.text-container{
+  max-width:770px;
+
+  &.reporting{
+    h3{
+      text-transform: uppercase;
+      font-size: 18px;
+      font-weight: 600;
+      line-height:18px;
+    }
+
+    .report-files{
+      display:flex;
+      justify-content: center;
+      margin-top:90px;
+      margin-bottom:90px;
+      flex-wrap:wrap;
+
+      .report-item{
+        max-width:223px;
+        margin:2%;
+
+        .report-content{
+          background-color:#FFFFFF;
+        }
+
+        h4{
+          font-size:14px;
+          font-weight:600;
+          text-transform: uppercase;
+          padding:14px 20px 0px 20px;
+          margin:0px;
+        }
+
+        p{
+          padding:0px 20px 14px 20px;
+          margin-bottom:0px;
+          text-align:left;
+        }
+
+        .download-btn {
+          text-decoration:none;
+          div{
+            padding: 9px 30px;
+            border-radius: 100px;
+            background-color: #88bc47;
+            color: #ffffff;
+            font-weight: 400;
+            font-size: 12px;
+            display: table;
+            margin:0 auto;
+            margin-top:20px;
+          }
+          &:hover {
+            text-decoration:none;
+            div {
+                background-color:#002b60;
+            }
+        }
+        }
+      }
+    }
+  }
+
+  &.full{
+    max-width:100%;
+
+    h2{
+      text-align:center;
+      margin-bottom:50px;
+    }
+
+    .row{
+      &.section{
+        margin-bottom:50px;
+      }
+    }
+
+    p{
+      margin:0 auto;
+      margin-bottom:50px;
+      max-width:830px;
+      text-align:center;
+    }
+
+    .investor{
+      padding:0px;
+    }
+  }
+
+  margin:0 auto;
+
+  span{
+    &.text-heading{
+      text-transform: uppercase;
+      font-size: 18px;
+      font-weight:600;
+    }
+  }
+
+  h2{
+    font-size: 38px;
+    font-weight: 200;
+    line-height: 1.42;
+  }
+
+  h3{
+    font-size: 24px;
+    font-weight: 200;
+    line-height: 2.25;
+    margin-top:20px;
+  }
+
+  .investor{
+    display:block;
+    position:static;
+    padding:50px 0px;
+
+    ul{
+      li{
+        margin-bottom:0px;
+      }
+    }
+
+    .download-section-heading{
+      font-size: 38px;
+      font-weight: 200;
+      line-height: 1.42;
+      text-align:center;
+      margin:35px 0px;
+    }
+
+    .download-descr{
+      font-size: 14px;
+      line-height: 2;
+    }
+  }
+
+  ul{
+    padding:0px;
+    padding-left:16px;
+    margin:0px;
+
+    li{
+      margin-bottom:5px;
+      font-size:20px;
+      line-height:normal;
+      span{
+        font-size:14px;
+      }
+    }
+  }
+}
+
+.signup-container{
+  position: relative;
+  top: -60px;
+  background-color:#002b60;
+  padding:55px 20px;
+
+  .signup-inside{
+    margin:0 auto;
+    display:flex;
+    color:#FFFFFF;
+    align-items:center;
+
+    .signup-heading, h2{
+      width:50%;
+      font-size: 36px;
+      font-weight: 200;
+      line-height: 1.19;
+    }
+
+    h2 {
+        color:#ffffff;
+        text-align:left;
+    }
+
+    .signup-form{
+      width:50%;
+
+      input{
+        padding:11px 38px;
+        color:#6b6f82;
+        width:60%;
+        margin-top:1px;
+        margin-right:-3px;
+      }
+
+      button{
+        padding:11px 43px;
+        line-height: 1.71;
+        background-color: #88bc47;
+        border:none;
+      }
+    }
+  }
+
+}

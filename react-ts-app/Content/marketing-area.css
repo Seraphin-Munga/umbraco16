@@ -1,0 +1,599 @@
+/*
+        Mobile first (XS)
+    */
+
+.ab-form h1 {
+    color: #002b60;
+    font-size: 2rem;
+    margin-bottom: 0;
+    margin-top: 0;
+    text-align: left;
+}
+
+.homepage .products_menu_block {
+    padding: 0px;
+    width: 33.3%;
+    float: left;
+    position: relative;
+}
+
+@media screen and (max-width: 1200px) {
+    .homepage .products_menu_block {
+        width: 400px;
+    }
+}
+
+@media screen and (max-width: 992px) {
+    .homepage .products_menu_block {
+        width: 100% !important;
+    }
+}
+
+.marketing-area {
+    padding: 0;
+    background-color: #002b60;
+    color: #555;
+    position: relative;
+}
+
+@media screen and (max-width: 992px) {
+    .div_img_snniper_mobile {
+        width: 40px;
+        height: 40px;
+        float: none;
+        margin: 0 auto;
+    }
+
+    .div_text_snniper_mobile {
+        float: none;
+        margin-top: 15px;
+        text-align: center;
+        font-size: 16px;
+        margin-left: 0px;
+    }
+}
+
+@media screen and (max-width: 450px)
+{
+.div_text_snniper_mobile {
+    display: block;
+    font-size: 12px;
+}
+}
+@media screen and (max-width: 320px)
+{
+.div_text_snniper_mobile {
+    display: block;
+    font-size: 11px;
+}
+}
+
+body.page-home.fullscreen .widget-fullscreen {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    z-index: 98;
+}
+
+.call-to-action-group {
+    margin-top: 12rem;
+}
+
+#saveInvest_Panel, #insure_Panel {
+    padding: 20px;
+    overflow-y: hidden;
+}
+
+/* ----------------------------------------------------------------------//
+        Applications widget
+    */
+.applications-widget {
+    height: auto;
+    position: relative;
+    padding: 0px;
+    width: 100%;
+    float: left;
+}
+
+    .applications-widget .products-content-group div.loader-container {
+        opacity: 1 !important;
+        z-index: 2 !important;
+        background-color: #fff;
+    }
+
+    .applications-widget .loader-container {
+        padding-top: 5rem;
+    }
+
+    .applications-widget .products-menu {
+        font-size: 0.9rem;
+        margin-bottom: 0;
+    }
+
+body.page-home.fullscreen .applications-widget .products-menu {
+    display: none;
+}
+
+body.page-home.fullscreen .applications-widget {
+    width: 100%;
+    position: relative;
+    z-index: 99;
+    margin: 9rem auto 0;
+}
+
+body.page-home.fullscreen .ab-site-footer {
+    display: none;
+}
+
+.applications-widget .products-menu > li {
+    border-right: 1px solid #fff;
+    float: left;
+    font-size: 1rem;
+    height: 100px;
+    line-height: 50px;
+    position: relative;
+    text-align: center;
+    width: 25%;
+    -ms-word-break: keep-all;
+    word-break: keep-all;
+}
+
+    .applications-widget .products-menu > li > a .objectcenter {
+        display: table-cell;
+        vertical-align: middle;
+    }
+
+        .applications-widget .products-menu > li > a .objectcenter .active_icon_products {
+            display: none;
+        }
+
+        .applications-widget .products-menu > li > a .objectcenter > img {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 20px;
+        }
+
+    .applications-widget .products-menu > li:last-child {
+        border-right: none;
+    }
+
+    .applications-widget .products-menu > li > a {
+        background-color: #002b60;
+        bottom: 0;
+        color: #fff;
+        left: 0;
+        line-height: 0px;
+        position: absolute;
+        right: 0;
+        text-align: center;
+        text-decoration: none;
+        top: 0;
+        -webkit-transition: all 0.5s; /* Safari */
+        -moz-transition: all 0.5s;
+        -o-transition: all 0.5s;
+        transition: all 0.5s;
+        display: table;
+        vertical-align: middle;
+        height: 100%;
+        width: 100%;
+    }
+
+        .applications-widget .products-menu > li > a:hover {
+            color: #fff;
+        }
+
+        .applications-widget .products-menu > li > a.active-panel {
+            background-color: #fff;
+            color: #002b60;
+            border: none;
+        }
+
+        .applications-widget .products-menu > li > a .ab-glyphs {
+            color: #fff;
+            font-size: 2.6rem;
+            left: calc(50% - 1.3rem);
+            position: absolute;
+            top: 7px;
+            -webkit-transition: all 0.5s; /* Safari */
+            -moz-transition: all 0.5s;
+            -o-transition: all 0.5s;
+            transition: all 0.5s;
+        }
+
+        .applications-widget .products-menu > li > a.active-panel .ab-glyphs {
+            color: #002b60;
+        }
+
+.applications-widget .products-content-group {
+    position: relative;
+}
+
+body.page-home.fullscreen .applications-widget .products-content-group {
+    left: 0;
+}
+
+.applications-widget .products-content-group div.product-content {
+    background-color: #fff;
+    font-size: 1.2rem;
+    height: 100%;
+    width: 90%;
+    position: absolute;
+    -webkit-transition: all 0.5s ease-out;
+    -moz-transition: all 0.5s ease-out;
+    -o-transition: all 0.5s ease-out;
+    transition: all 0.5s ease-out;
+    opacity: 0;
+    overflow: hidden;
+    z-index: 0;
+    margin-left: 5%;
+}
+
+    .applications-widget .products-content-group div.product-content .heading {
+        font-size: 1.5rem;
+    }
+
+.applications-widget .product-links-group {
+    margin-top: 2rem;
+    width: 99%;
+}
+
+    .applications-widget .product-links-group .product-link {
+        color: #777;
+        padding-top: 1.2rem;
+        line-height: 3rem;
+        padding-right: 2rem;
+        text-decoration: none;
+    }
+
+    .applications-widget .product-links-group .product-link-title {
+        color: #555555;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+
+    .applications-widget .product-links-group .product-link-description {
+        font-weight: normal;
+        line-height: 2rem;
+    }
+
+    .applications-widget .product-links-group .link-icon {
+        position: absolute;
+        left: 0;
+        top: calc(50% - 2rem);
+    }
+
+    .applications-widget .product-links-group .link-arrow {
+        font-size: 2rem;
+        position: absolute;
+        right: -5px;
+        -webkit-transition: all 0.2s ease-out;
+        -moz-transition: all 0.2s ease-out;
+        -o-transition: all 0.2s ease-out;
+        transition: all 0.2s ease-out;
+        top: calc(50% - 1rem);
+    }
+
+    .applications-widget .product-links-group > li > a:hover .link-arrow {
+        right: -12px;
+    }
+
+    .applications-widget .product-links-group > li {
+        border-top: 1px solid #f7f7f7;
+        height: 105px;
+        position: relative;
+    }
+
+        .applications-widget .product-links-group > li > a {
+            bottom: 0;
+            display: inline-block;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+
+/* Reveals the selected panel's content when class is added via jQuery */
+.applications-widget .products-content-group div.active-panel {
+    opacity: 1;
+    z-index: 1;
+}
+
+.applications-widget .products-content-group > iframe {
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+}
+
+/* ----------------------------------------------------------------------//
+        Marketing widget
+    */
+.marketing-slider-widget {
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    color: #fff;
+    display: block;
+    height: 220px;
+    overflow: hidden;
+    position: relative;
+}
+
+body.page-home.fullscreen .marketing-slider-widget {
+    display: none;
+}
+
+.marketing-slider-widget .slide-banner {
+    background-size: cover;
+    background-repeat: no-repeat;
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 0;
+}
+
+.marketing-slider-widget .description-text-area {
+    background-color: rgba(34, 82, 93, 0.7);
+    bottom: 0;
+    font-size: 1rem;
+    left: 0;
+    padding: 24px 40px 35px 50px;
+    position: absolute;
+    right: 0;
+}
+
+    .marketing-slider-widget .description-text-area .description-heading {
+        color: #fff;
+        float: left;
+        font-size: 2rem;
+        margin-top: 0;
+        width: 70%;
+    }
+
+    .marketing-slider-widget .description-text-area .slide-button {
+        float: right;
+        line-height: 1rem;
+        text-align: center;
+        width: 30%;
+    }
+
+        .marketing-slider-widget .description-text-area .slide-button > a {
+            position: relative;
+            padding-right: 5rem;
+        }
+
+            .marketing-slider-widget .description-text-area .slide-button > a > i {
+                font-size: 3rem;
+                position: absolute;
+                right: 1rem;
+                top: 0.5rem;
+            }
+
+.marketing-slider-widget .slides-menu {
+    bottom: 0;
+    height: 3.5rem;
+    left: 0;
+    line-height: 3.5rem;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    z-index: 2;
+}
+
+    .marketing-slider-widget .slides-menu > ul {
+        margin: 0;
+    }
+
+    .marketing-slider-widget .slides-menu .slide-bullet {
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 3rem;
+        height: 0.6rem;
+        width: 0.6rem;
+    }
+
+        .marketing-slider-widget .slides-menu .slide-bullet.active-slide {
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+
+.marketing-slider-widget .description-text-area {
+    visibility: hidden;
+}
+
+/*
+        SM <
+    */
+
+@media (min-width: 768px) {
+    .applications-widget .products-menu > li > a {
+        font-size: 1.4rem;
+    }
+
+    body.page-home.fullscreen .applications-widget {
+        width: 100%;
+    }
+
+    body.page-home.fullscreen .applications-widget {
+        margin: 4rem auto 0;
+    }
+
+    .marketing-slider-widget {
+        height: 280px;
+    }
+
+        .marketing-slider-widget .description-text-area,
+        .marketing-slider-widget .slides-menu {
+            visibility: visible;
+        }
+}
+
+.call-to-action-group {
+    margin-top: 12rem;
+}
+
+/*
+        SM < MD
+    */
+@media (min-width: 768px) and (max-width: 991px) {
+    .products-content-group {
+        min-height: 581px;
+    }
+
+    .marketing-slider-widget {
+        height: 400px;
+    }
+
+    .applications-widget .products-menu > li > a {
+        line-height: 0px;
+    }
+
+        .applications-widget .products-menu > li > a .ab-glyphs {
+            font-size: 3rem;
+            left: 2rem;
+            top: 11px;
+        }
+}
+
+/*
+        MD
+    */
+@media (min-width: 992px) {
+    #saveInvest_Panel, #insure_Panel {
+        padding: 20px;
+        overflow-y: auto;
+    }
+
+    .applications-widget {
+        border-right: 2px solid #fff;
+        height: 100%;
+        /*left: 0; eBankIT*/
+        position: absolute;
+        /*width: 391px; eBankIT*/
+    }
+
+    body.page-home.fullscreen .applications-widget {
+        width: 85%;
+    }
+
+    body.page-home.fullscreen .applications-widget {
+        margin: 1rem auto 0;
+    }
+
+    .applications-widget .products-menu {
+        width: 120px;
+        height: 100%;
+    }
+
+        .applications-widget .products-menu > li {
+            border: none;
+            border-bottom: 1px solid #fff;
+            float: none;
+            height: 25%;
+            width: 100%;
+        }
+
+            .applications-widget .products-menu > li > a .objectcenter {
+                display: table-cell;
+                vertical-align: middle;
+            }
+
+                .applications-widget .products-menu > li > a .objectcenter .active_icon_products {
+                    display: none;
+                }
+
+                .applications-widget .products-menu > li > a .objectcenter > img {
+                    width: 50px;
+                    height: 50px;
+                    margin-bottom: 20px;
+                }
+
+            .applications-widget .products-menu > li:last-child {
+                border-bottom: none;
+            }
+
+            .applications-widget .products-menu > li > a {
+                line-height: 0px;
+                display: table;
+                vertical-align: middle;
+                position: absolute;
+                height: 100%;
+                width: 100%;
+            }
+}
+
+.applications-widget .products-menu > li > a .ab-glyphs {
+    font-size: 4rem;
+    left: calc(50% - 2rem);
+    top: 40px;
+}
+
+.applications-widget .products-content-group {
+    bottom: 0;
+    width: calc(100% - 120px);
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.marketing-area {
+    height: 100%;
+    position: relative;
+}
+
+.marketing-slider-widget {
+    height: 100%;
+    position: absolute;
+    right: 0;
+    width: 580px;
+}
+
+.products-content-group .loader {
+    position: relative;
+}
+
+.call-to-action-group {
+    margin-top: 0;
+}
+
+/*
+        LG
+    */
+@media (min-width: 1200px) {
+    .applications-widget .products-menu > li {
+        float: none;
+        width: 100%;
+    }
+
+    .marketing-slider-widget {
+        width: 780px;
+    }
+}
+
+@media (max-width: 992px) {
+    .applications-widget .products-content-group {
+        bottom: 0;
+        right: 0;
+        top: 0;
+        position: relative;
+        height: auto;
+        height: 585px;
+        width: 100%;
+    }
+
+    .applications-widget {
+        margin-bottom: 30px;
+        padding-bottom: 10px;
+    }
+}
+
+body.page-home.fullscreen .products-content-group {
+    margin-top: 16px;
+}
+
+.page-home.fullscreen .products-content-group {
+    border-top: 0;
+}

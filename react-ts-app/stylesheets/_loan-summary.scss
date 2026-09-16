@@ -1,0 +1,121 @@
+.loan-summary-container {
+    position: relative;
+    top: -30px;
+
+    .container-vad {
+        padding: 0 50px;
+    }
+}
+
+.loan-product-container {
+    background: #f7f7f7;
+    position: relative;
+    top: -60px;
+}
+
+.product-category-title {
+    font-size: 60px;
+    font-weight: 200;
+    line-height: 1.05;
+    text-align: left;
+    color: #464855;
+}
+
+.loan-summary {
+    text-align: center;
+    padding: 20px;
+
+    .icon-oval {
+        margin: 0 auto;
+        width: 100px;
+        height: 100px;
+        border-radius: 100px;
+        background-color: #f4f5fa;
+        padding-top: 27px;
+
+        [class^="icon-"], [class*=" icon-"] {
+            font-size: 37px;
+            color: #88bc47;
+        }
+    }
+
+    .image {
+        img {
+            margin: 0 auto;
+            width: 100px;
+        }
+        .img-bg {
+            width: 100px;
+            height: 100px;
+            border-radius: 50px;
+            background-position: center center;
+            background-size: cover;
+            margin: 0 auto;
+        }
+    }
+
+    .loan-desc {
+        font-size: 14px;
+        font-weight: 300;
+        line-height: 1.71;
+        color: #6b6f82;
+        padding-top: 25px;
+        min-height:94px;
+        @media (max-width:1199px){
+            min-height:118px;
+        }
+        @media (max-width:991px){
+            min-height:initial
+        }
+    }
+
+    .title {
+        padding-top: 25px;
+        font-size: 16px;
+        line-height: 1.75;
+        font-weight: 400;
+        color: #464855;
+    }
+}
+
+.watch-and-learn {
+    font-size: 24px;
+    font-weight: 200;
+    line-height: 1.58;
+    color: #464855;
+}
+
+.anim-image {
+    width: 80%;
+}
+
+@media (max-width: 767px) {
+    .product-category-title {
+        font-size: 30px;
+        text-align: center;
+    }
+
+    .loan-summary {
+        padding: 20px;
+    }
+
+    .watch-and-learn {
+        margin-bottom: 30px;
+    }
+
+    .loan-summary-container {
+        position: relative;
+        top: -30px;
+
+        .container-vad {
+            padding: 0 0;
+            background-color:white;
+        }
+    }
+
+    .loan-product-container {
+        background: white;
+        position: relative;
+        top: 10px;
+    }
+}

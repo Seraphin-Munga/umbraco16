@@ -1,0 +1,153 @@
+body {
+  background-color: #fff;
+  font-family: 'Montserrat', Helvetica Neue, Arial, sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  font-style: normal;
+  -webkit-text-size-adjust: 100%;
+  color: #6b6f81;
+}
+
+@-moz-document url-prefix() {
+  fieldset { display: table-cell; }
+}
+
+a {
+  color: #002b60;
+  text-decoration: none;
+
+  &.link-colour {
+      color: #0000EE;
+  }
+}
+
+ul.checklist {
+    list-style-type:none;
+    padding-left:0 !important;
+    li {
+        line-height:2.14;
+        &:before {
+            content: "\e013";
+            font-family: 'Glyphicons Halflings';
+            font-size:12px;
+            margin-right:12px;
+            color:$color-green;
+        }
+    }
+}
+
+a[href^="mailto:"] {
+    text-decoration: underline;
+}
+
+.download-btn {
+    text-decoration:none !important;
+    &:hover {
+        background-color:#002b60 !important;
+    }
+}
+
+.btn-rounded-green {
+    text-decoration:none;
+    div {
+        padding: 9px 30px;
+        border-radius: 100px;
+        background-color: $color-green;
+        color: #ffffff;
+        font-weight: 400;
+        font-size: 12px;
+        display: table;
+        margin: 0 auto;
+        margin-top: 20px;
+    }
+    &:hover {
+        text-decoration:none;
+        div {
+            background-color:$color-blue;
+        }
+    }
+}
+
+p {
+    font-weight: 300;
+
+    &.body-content {
+        font-size: 14px;
+        line-height: 1.71;
+        color: #6b6f82;
+        margin-bottom: 30px;
+
+        &.white {
+            color: #ffffff;
+        }
+    }
+
+    &.text-18 {
+        font-size: 18px;
+    }
+}
+
+.body-content {
+    p {
+        font-size: 14px;
+        line-height: 1.71;
+        color: #6b6f82;
+        margin-bottom: 30px;
+    }
+}
+
+h2 {
+    font-size: 60px;
+    font-weight: 200;
+    line-height: 1.05;
+    color: #464855;
+    margin-top: 0;
+}
+
+h3 {
+    font-size: 36px;
+    font-weight: 200;
+    color: #464855;
+    margin-top: 0;
+}
+
+h4 {
+    font-size: 24px;
+    font-weight: 200;
+    color: #464855;
+    margin-top: 0;
+}
+
+div {
+    word-wrap: break-word;
+}
+
+@media (max-width: 767px) {
+    h2 {
+        font-size: 30px;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    h3 {
+        font-size: 30px;
+        text-align: center;
+    }
+
+    p.body-content {
+        text-align: center;
+    }
+}
+
+.relative {
+    position:relative;
+}
+
+.container-fluid--bordered {
+    border-top: 1px solid $color-border;
+    border-bottom: 1px solid $color-border;
+    @media (max-width: 767px){
+        border:none;
+    }
+}
+
