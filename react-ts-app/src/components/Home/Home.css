@@ -1,78 +1,105 @@
 /*
-  style.css/media-query.css (linked in index.html) style the AB-specific
-  parts of the carousels used on this page (.carousel-caption,
-  .carousel-indicators, the control icons) but not the underlying slide
-  mechanics - those come from Bootstrap 4's carousel.css, and this app only
-  loads Bootstrap 3 (see Header.tsx's own comment on why: navigation.css
-  already assumes Bootstrap 4's grid/carousel elsewhere, and mixing both
-  frameworks site-wide is its own can of worms). Rather than pull in a
-  second full Bootstrap version for two components, the handful of rules
-  actually needed - "only the active slide is visible", "controls sit on
-  the vertical center of the sides" - are reproduced here instead,
-  independent of whichever Bootstrap version index.html ends up on.
+  Unlike Platform.Umbraco16/PageHome.cshtml's carousels (Bootstrap-4-only
+  class names, needing a hand-written polyfill since this app only loads
+  Bootstrap 3), home.cshtml's carousels use Bootstrap 3's own native class
+  names (.item, .carousel-control.left/.right, .carousel-indicators li) -
+  already fully covered by public/vendor/bootstrap.min.css and
+  public/vendor/main.min.css, so no carousel-mechanics CSS is needed here
+  at all. The one genuine gap: .whatsnew* only ever existed in home.cshtml's
+  own inline <style> block (lines 138-348), never in the shared vendor
+  files, so it's reproduced here.
 */
 
-.carousel {
-  position: relative;
-}
-
-.carousel-inner {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-}
-
-.carousel-item {
-  display: none;
-  position: relative;
-  width: 100%;
-}
-
-.carousel-item.active {
+.whatsnew-sibling {
   display: block;
 }
 
-.carousel-control-prev,
-.carousel-control-next {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 5%;
-  color: #fff;
+.bank-story-caption {
+  margin-left: 0px;
+}
+
+.whatsnew-title {
+  font-size: 30px;
+  font-weight: 200;
+  line-height: 1.18;
+  letter-spacing: -0.7px;
+  margin-top: 10px;
+}
+
+.whatsnew-copy {
+  color: white;
+}
+
+.whatsnew {
   text-align: center;
-  opacity: 0.5;
-  cursor: pointer;
+  width: unset;
+  background: none;
+  margin-left: unset !important;
+  width: 50%;
 }
 
-.carousel-control-prev:hover,
-.carousel-control-next:hover {
-  opacity: 0.9;
+@media (min-width: 768px) and (max-width: 1025px) {
+  .whatsnew-sibling {
+    display: none !important;
+  }
+
+  .whatsnew {
+    width: 100%;
+  }
 }
 
-.carousel-control-prev {
-  left: 0;
+@media only screen and (max-width: 767px) {
+  .whatsnew {
+    width: 100%;
+  }
+
+  .bank-story-caption {
+    margin-left: 0px;
+  }
 }
 
-.carousel-control-next {
-  right: 0;
+@media (min-width: 1025px) and (max-width: 1239px) {
+  .bank-story-caption {
+    width: 50% !important;
+  }
+
+  .whatsnew {
+    width: 50%;
+  }
 }
 
-.carousel-indicators li {
-  box-sizing: content-box;
-  flex: 0 1 auto;
-  width: 30px;
-  height: 3px;
-  margin-right: 3px;
-  margin-left: 3px;
-  cursor: pointer;
-  background-color: #fff;
-  opacity: 0.5;
+@media (max-width: 767px) {
+  .whatsnew-copy {
+    color: white;
+  }
+
+  .whatsnew {
+    width: unset;
+  }
 }
 
-.carousel-indicators li.active {
-  opacity: 1;
+@media only screen and (max-width: 768px) {
+  .whatsnew {
+    width: unset;
+  }
+}
+
+@media (max-width: 412px) {
+  .whatsnew-copy {
+    color: unset;
+  }
+
+  .whatsnew {
+    width: unset;
+  }
+}
+
+@media (max-width: 360px) {
+  .whatsnew-copy {
+    color: white;
+  }
+
+  .whatsnew {
+    width: unset;
+  }
 }

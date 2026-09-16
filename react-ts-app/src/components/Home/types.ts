@@ -1,73 +1,82 @@
-// Shapes for the homepage content, ported from PageHome.cshtml's five
-// homePageElements children: HeroHeaderHome (hero carousel),
-// HeroShoulderHome (Bank/Borrow/Invest/Insure tiles), HeroBody's four
-// StructureBodyTextWithImageAndLink children (the "Section 1-4" blocks -
-// only the first three render a body block; the fourth is the blog
-// section's own heading), and Testimonials.
+// Shapes for the homepage content, ported from Platform/Web/Views/home.cshtml
+// (the live site's actual template - Layout = "Master.cshtml" - not the
+// in-progress Platform.Umbraco16/PageHome.cshtml redesign, which has a
+// different, not-yet-live section layout).
 
 export interface HeroSlide {
   imageUrl: string;
   title: string;
-  description: string;
+  // The "cap-title" span shown above the title (heroProductDescription).
+  productDescription: string;
+  // heroTitleDescription - the paragraph under the title. Not present on
+  // Platform.Umbraco16's HeroStructure model, only this live one.
+  titleDescription: string;
   buttonLabel: string | null;
   buttonUrl: string | null;
+  // heroItem.Value("buttonStyler") is applied as a raw inline `style`
+  // attribute in the source - kept as an opaque string rather than parsed.
+  buttonStyle: string | null;
 }
 
 export interface ShoulderCard {
   iconUrl: string;
-  iconAlt: string;
   title: string;
   description: string;
   linkUrl: string | null;
 }
 
 export interface ShoulderTab {
+  tabId: string;
   tabName: string;
+  tabHeading: string;
+  tabIconUrl: string;
+  tabIconAlt: string;
   cards: ShoulderCard[];
 }
 
-export interface ContentSectionData {
+// The "whatsNew" content item (ebankItitem2) - when present, it takes over
+// the *first* slide of the bank-story carousel, splitting it with that
+// slide's own blog post instead of the blog post filling the whole slide.
+export interface WhatsNew {
   title: string;
-  subtitle: string;
-  description: string;
-  imageUrl: string;
-  imageAlt: string;
-  linkLabel: string | null;
-  linkUrl: string | null;
+  contentMarkup: string;
+  linkUrl: string;
+  linkLabel: string;
 }
 
-export interface BlogSectionHeading {
-  title: string;
-  description: string;
-  viewMoreUrl: string | null;
+export interface HelpLink {
+  text: string;
+  buttonText: string;
+  url: string;
+}
+
+export interface HelpTab {
+  tabId: string;
+  tabName: string;
+  tabIconUrl: string;
+  tabIconAlt: string;
+  links: HelpLink[];
 }
 
 export interface TestimonialItem {
   avatarUrl: string;
   // testimonialStory is a plain string property (not rich text) per the
-  // generated Umbraco model, so it renders as escaped text - unlike the
-  // *Content/*Description fields elsewhere on this page.
+  // generated Umbraco model, so it renders as escaped text.
   story: string;
   name: string;
 }
 
 export interface HomePageData {
   hero: HeroSlide[];
-  shoulder: ShoulderTab[];
-  // heroBodySections[0], [1], [2] in PageHome.cshtml - "Get loans",
-  // "MyWORLD banking", "Support" respectively. Always exactly these three
-  // in this order on the live site; indexed access in Home.tsx mirrors the
-  // Razor view's own getLoanCount/myWorldCount/supportCount == 0/1/2 checks.
-  sections: ContentSectionData[];
-  blogHeading: BlogSectionHeading | null;
-  testimonialsHeading: string;
+  shoulderTabs: ShoulderTab[];
+  helpHeading: string;
+  helpTabs: HelpTab[];
   testimonials: TestimonialItem[];
 }
 
 export interface BlogPost {
   title: string;
   description: string;
-  imageUrl: string;
   url: string;
   publishedDate: string;
 }
