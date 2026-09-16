@@ -3557,9 +3557,7 @@ static JsonObject? ConvertNestedContentArray(
             }
 
             contentEntry[prop.Name] =
-                IsNestedContentArray(prop.Value)
-                    ? ConvertNestedContentArray(prop.Value, getContentType)
-                    : JsonNode.Parse(prop.Value.GetRawText());
+                ConvertNestedContentPropertyValue(prop.Value, getContentType);
         }
 
         contentData.Add(contentEntry);
@@ -3573,6 +3571,40 @@ static JsonObject? ConvertNestedContentArray(
         ["layout"] = new JsonObject { ["Umbraco.BlockList"] = layoutItems },
         ["contentData"] = contentData
     };
+}
+
+// Converts a single sub-property's raw v8 value for the contentData entry
+// being built above. A sub-property that's itself Nested Content shows up
+// one of two ways depending on depth: a native array (the outermost value,
+// e.g. menuInfo's own stored value) or - one level of nesting or deeper,
+// confirmed against real data - a string holding that same array as
+// escaped JSON text (menus, link, menuList all arrive this way). Either
+// way it gets recursively converted; when the source was string-encoded,
+// the converted result is re-encoded as a string too, matching how a
+// nested Block List property's value needs to look for Block List's own
+// value converter to read it the same way it reads a top-level one.
+// Anything else (plain text, MultiUrlPicker's own Link JSON, etc.) is
+// copied through unchanged.
+static JsonNode? ConvertNestedContentPropertyValue(
+    JsonElement value,
+    Func<string, IContentType?> getContentType)
+{
+    if (IsNestedContentArray(value))
+    {
+        return ConvertNestedContentArray(value, getContentType);
+    }
+
+    if (value.ValueKind == JsonValueKind.String &&
+        TryParseNestedContentArrayString(value.GetString(), out var innerDoc))
+    {
+        using (innerDoc)
+        {
+            return ConvertNestedContentArray(innerDoc!.RootElement, getContentType)
+                ?.ToJsonString();
+        }
+    }
+
+    return JsonNode.Parse(value.GetRawText());
 }
 
 // A v8 Nested Content value is a JSON array of objects each carrying
@@ -3599,6 +3631,83 @@ static bool IsNestedContentArray(JsonElement element)
     }
 
     return true;
+}
+
+// A Nested Content sub-property that's itself Nested Content is NOT
+// stored as a native JSON array within its parent item - v8 stores every
+// property's value as text, so a nested one is a JSON *string* holding
+// the array as escaped text (confirmed against real data: menuName,
+// menus, link and menuList all arrive this way, with escaping compounding
+// one level per depth - \" at level 2, \\\" at level 3, \\\\\\\" at level
+// 4). IsNestedContentArray alone only recognizes the native-array shape,
+// so both discovery and value conversion need this to re-parse a string
+// value before they can see what's actually inside it.
+static bool TryParseNestedContentArrayString(
+    string? raw,
+    out JsonDocument? doc)
+{
+    doc = null;
+
+    if (string.IsNullOrWhiteSpace(raw))
+        return false;
+
+    JsonDocument parsed;
+
+    try
+    {
+        parsed = JsonDocument.Parse(raw);
+    }
+    catch (JsonException)
+    {
+        return false;
+    }
+
+    if (!IsNestedContentArray(parsed.RootElement))
+    {
+        parsed.Dispose();
+        return false;
+    }
+
+    doc = parsed;
+    return true;
+}
+
+// Extracts every ncContentTypeAlias out of a Nested Content array value,
+// regardless of whether it's stored as a native array or (as is actually
+// the case one level deep or more) a JSON-encoded string.
+static void CollectDirectElementTypeAliases(
+    JsonElement value,
+    SortedSet<string> result)
+{
+    JsonElement arrayElement;
+    JsonDocument? owned = null;
+
+    if (value.ValueKind == JsonValueKind.Array)
+    {
+        arrayElement = value;
+    }
+    else if (value.ValueKind == JsonValueKind.String &&
+        TryParseNestedContentArrayString(value.GetString(), out owned))
+    {
+        arrayElement = owned!.RootElement;
+    }
+    else
+    {
+        return;
+    }
+
+    using (owned)
+    {
+        foreach (var item in arrayElement.EnumerateArray())
+        {
+            if (item.ValueKind == JsonValueKind.Object &&
+                item.TryGetProperty("ncContentTypeAlias", out var aliasEl) &&
+                aliasEl.ValueKind == JsonValueKind.String)
+            {
+                result.Add(aliasEl.GetString()!);
+            }
+        }
+    }
 }
 
 // Walks a stored Nested Content JSON tree (any depth) looking for objects
@@ -3634,6 +3743,27 @@ static void CollectNestedElementTypeAliases(
         return;
     }
 
+    // A nested property's array only shows up as a native array at the
+    // outermost level (element.RootElement, called from the loop below on
+    // allPropertyValues). Every level past that is a JSON-encoded string -
+    // re-parse it so recursion can keep walking down into it.
+    if (element.ValueKind == JsonValueKind.String)
+    {
+        if (TryParseNestedContentArrayString(element.GetString(), out var innerDoc))
+        {
+            using (innerDoc)
+            {
+                CollectNestedElementTypeAliases(
+                    innerDoc!.RootElement,
+                    ownerContentTypeAlias,
+                    propertyAlias,
+                    result);
+            }
+        }
+
+        return;
+    }
+
     if (element.ValueKind != JsonValueKind.Object)
         return;
 
@@ -3646,21 +3776,9 @@ static void CollectNestedElementTypeAliases(
 
     foreach (var prop in element.EnumerateObject())
     {
-        if (isMatchingOwner &&
-            prop.NameEquals(propertyAlias) &&
-            prop.Value.ValueKind == JsonValueKind.Array)
+        if (isMatchingOwner && prop.NameEquals(propertyAlias))
         {
-            foreach (var nestedItem in prop.Value.EnumerateArray())
-            {
-                if (nestedItem.ValueKind == JsonValueKind.Object &&
-                    nestedItem.TryGetProperty(
-                        "ncContentTypeAlias",
-                        out var aliasEl) &&
-                    aliasEl.ValueKind == JsonValueKind.String)
-                {
-                    result.Add(aliasEl.GetString()!);
-                }
-            }
+            CollectDirectElementTypeAliases(prop.Value, result);
         }
 
         // Keep recursing regardless - the matching owner could be nested
