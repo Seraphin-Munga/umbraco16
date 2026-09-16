@@ -1,9 +1,10 @@
 /*
   Ported from the inline <style> block in Navigation.cshtml. Base navbar
   classes (.navbar-default, .register-btn, .login-btn, .new-navbar-ab, ...)
-  come from the site's own public/vendor/navigation.css + Bootstrap 3
-  (public/vendor/bootstrap.css), both loaded globally in index.html - this
-  file only carries the rules that lived directly in the view.
+  come from the site's own public/vendor/navigation.css + Bootstrap 4
+  (public/vendor/bootstrap.css) + bootstrap3-compat.css, all loaded globally
+  in index.html - this file only carries the rules that lived directly in
+  the view.
 */
 
 .active {
@@ -462,4 +463,12 @@
 
 .global-search-new-close-btn {
   cursor: pointer;
+}
+
+/* Bootstrap 4 auto-adds a caret to any .dropdown-toggle via ::after. The
+   mega-menu trigger items (PRODUCTS/BUSINESS/MORE/INVESTORS) keep that class
+   for its styling but have no real dropdown behind them (see contentApi.ts -
+   the schema has no nested "menus" data), so the caret would be misleading. */
+.header-mega-menu .dropdown-toggle::after {
+  display: none;
 }
