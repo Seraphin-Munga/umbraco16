@@ -112,27 +112,17 @@ function mapBlocks<T>(
 function mapLinks(value: unknown): DeliveryLink[] {
   if (!Array.isArray(value)) return [];
 
-  return value.map((raw: Record<string, unknown>) => {
-    // The Delivery API's ApiLink keeps url and queryString as separate
-    // fields - confirmed against the installed Umbraco.Core assembly
-    // (Umbraco.Cms.Core.Models.DeliveryApi.ApiLink). Umbraco's internal
-    // Link model (what Navigation.cshtml reads server-side) has no
-    // separate QueryString property at all, so its own .Url getter
-    // concatenates url + queryString - which is exactly how a menu
-    // trigger with no real destination ends up with Url == "#": raw v8
-    // data has url:"" and queryString:"#". Without combining them here
-    // the same way, that comparison against "#" in Header.tsx never
-    // matches, and every mega-menu trigger falls through to being
-    // rendered as a plain (non-dropdown) link instead.
-    const url = typeof raw?.url === 'string' ? raw.url : '';
-    const queryString = typeof raw?.queryString === 'string' ? raw.queryString : '';
-
-    return {
-      url: url || queryString ? `${url}${queryString}` : '#',
-      title: typeof raw?.title === 'string' ? raw.title : String(raw?.name ?? ''),
-      target: typeof raw?.target === 'string' ? raw.target : null,
-    };
-  });
+  // Confirmed against a live response: ApiLink.url already comes back as
+  // "#" for a menu trigger with no real destination (not "" with the "#"
+  // only in queryString, which an earlier version of this function
+  // wrongly assumed and then concatenated - producing "##" and breaking
+  // the `!== '#'` check in Header.tsx worse than before). queryString
+  // isn't needed for that comparison at all.
+  return value.map((raw: Record<string, unknown>) => ({
+    url: typeof raw?.url === 'string' ? raw.url : '#',
+    title: typeof raw?.title === 'string' ? raw.title : String(raw?.name ?? ''),
+    target: typeof raw?.target === 'string' ? raw.target : null,
+  }));
 }
 
 function mapRichText(value: unknown): string {
@@ -163,6 +153,22 @@ function mapMenuInfoItem(props: Record<string, unknown>): MenuInfoItem {
   };
 }
 
+// `expand=properties[$all]` only expands one level of Block List content -
+// confirmed against a live response: menuInfo's own items (nCMenuCategory)
+// came back with menuDescription/menuName fully populated, but their own
+// "menus" property (itself a Block List, one level deeper) came back as a
+// bare `null` rather than even an empty `{ items: [] }` - not a converted-
+// but-empty value, an unexpanded one. Each further level of Block List
+// nesting needs its own explicit `properties.<alias>.items.content.
+// properties[$all]` path chained onto the last one; there's no wildcard
+// that cascades through every depth by itself.
+const TOP_NAVIGATION_EXPAND = [
+  'properties[$all]',
+  'properties.menuInfo.items.content.properties[$all]',
+  'properties.menuInfo.items.content.properties.menus.items.content.properties[$all]',
+  'properties.menuInfo.items.content.properties.menus.items.content.properties.link.items.content.properties[$all]',
+].join(',');
+
 /**
  * Fetches the site's `topNavigation` content item: its `menuInfo` block list
  * (normalized into a clean array) and the CMS-authored `registerLogin`
@@ -172,7 +178,7 @@ function mapMenuInfoItem(props: Record<string, unknown>): MenuInfoItem {
  */
 export async function fetchTopNavigation(signal?: AbortSignal): Promise<TopNavigation> {
   const [topNavigation] = await fetchContent(
-    '?filter=contentType:topNavigation&expand=properties[$all]&take=1',
+    `?filter=contentType:topNavigation&expand=${TOP_NAVIGATION_EXPAND}&take=1`,
     signal,
   );
 
