@@ -309,6 +309,57 @@
   border-bottom: 10px solid transparent;
 }
 
+/* Testimonials.tsx's video popup - see its own comment for why this is a
+   plain overlay (matching Header/NavModal.tsx's pattern) rather than
+   Bootstrap's .modal classes, which this app doesn't wire up JS for. */
+.video-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  padding: 20px;
+}
+
+.video-modal-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+}
+
+.video-modal {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.video-modal iframe {
+  border: 0;
+}
+
+/* A sibling of .video-modal (not a child) - .video-modal's own overflow:
+   hidden (for its rounded corners) would otherwise clip this button's
+   negative top offset, hiding it entirely. */
+.video-modal-close {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 32px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
 .card-stack {
   display: flex;
   padding: 20px;

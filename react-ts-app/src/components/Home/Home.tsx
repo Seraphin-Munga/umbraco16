@@ -78,6 +78,33 @@ function bankWithAudacityHeading(text: string): ReactNode | undefined {
   );
 }
 
+// tap2GlassBlock has no separate highlightWord field either - just one
+// plain heading string ("Get The Tap2Glass App"). The bold word here isn't
+// first or last, so bankWithAudacityHeading's rule doesn't apply - this
+// finds "Tap2Glass" itself (the one word that's always the product name,
+// regardless of the surrounding copy) and bolds just that, line-breaking
+// before it, matching the original hardcoded JSX's
+// `Get The <br/><span className="span-major-title">Tap2Glass</span> App`.
+// Falls back to a single bold span if an editor ever removes the word
+// "Tap2Glass" from the heading entirely.
+function tap2GlassHeading(text: string): ReactNode | undefined {
+  if (!text) return undefined;
+
+  const match = text.match(/^(.*?)\b(Tap2Glass)\b(.*)$/i);
+  if (!match) return brandHeading(text);
+
+  const [, before, brand, after] = match;
+
+  return (
+    <>
+      {before.trim()}
+      <br />
+      <span className="span-major-title">{brand}</span>
+      {after}
+    </>
+  );
+}
+
 function renderCmsSections(sections: HomePageSection[]) {
   return sections.map((section, index) => {
     switch (section.kind) {
@@ -147,7 +174,7 @@ function renderCmsSections(sections: HomePageSection[]) {
             imageUrl={section.imageUrl}
             imageAlt={section.imageAlt}
             description={section.description}
-            heading={brandHeading(section.heading)}
+            heading={tap2GlassHeading(section.heading)}
           />
         );
 
