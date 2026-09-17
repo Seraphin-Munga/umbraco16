@@ -146,6 +146,25 @@ async function fetchContentByRoute(path: string, signal?: AbortSignal): Promise<
   return (await response.json()) as RawContentItem;
 }
 
+// Same endpoint as fetchContentByRoute but addressed by content GUID
+// instead of route - Umbraco's Delivery API "item" endpoint accepts either
+// (see that function's own comment re: not verified live). Needed for
+// re-fetching one already-known child (a tabBody node) with a deeper
+// `expand` than the one-level `expand=properties[$all]` fetchChildren uses.
+async function fetchContentById(
+  id: string,
+  expand: string,
+  signal?: AbortSignal,
+): Promise<RawContentItem | undefined> {
+  const response = await fetch(`${API_BASE}/umbraco/delivery/api/v2/content/item/${id}?expand=${expand}`, {
+    headers: { Accept: 'application/json' },
+    signal,
+  });
+
+  if (!response.ok) return undefined;
+  return (await response.json()) as RawContentItem;
+}
+
 function mapBlocks<T>(
   value: unknown,
   map: (props: Record<string, unknown>) => T,
@@ -1018,5 +1037,130 @@ export async function fetchProductLoanPage(path: string, signal?: AbortSignal): 
     };
   } catch {
     return EMPTY_PRODUCT_PAGE;
+  }
+}
+
+// ============================================================
+// PERSONAL LOAN CAMPAIGN (Views/personalLoanCampaign.cshtml)
+// ============================================================
+//
+// This is the template actually live at /en/home/product-personal-loan/ -
+// it supersedes the plain pageLoans sections ported above
+// (fetchProductLoanPage), which is Views/productPersonalLoan.cshtml, a
+// different, apparently-retired template for the same "pageLoans" content
+// type. The campaign page pulls from a *second* heroBody child under the
+// page (source: `heroBodynew = children.Where(heroBody).Last()`, not
+// `.FirstOrDefault()` like every other heroBody usage in this file) and two
+// tabBody children under THAT heroBody - one for the FAQ accordion, one for
+// the credit-life-insurance cards. Every alias/property name is confirmed
+// against legacy/Models/*.generated.cs; the nested tabBody ->
+// tabBodyContent -> sectionContent expand depth is not confirmed against a
+// live response (see fetchContentById's own comment).
+
+export interface CampaignIntroCard {
+  title: string;
+  descriptionHtml: string;
+  imageUrl: string;
+}
+
+export interface CampaignAccordionItem {
+  title: string;
+  bodyHtml: string;
+}
+
+export interface CampaignCreditLifeItem {
+  title: string;
+  mediumDescriptionHtml: string;
+  longDescriptionHtml: string;
+  iconUrl: string;
+}
+
+export interface PersonalLoanCampaignData {
+  introCard: CampaignIntroCard | null;
+  faqItems: CampaignAccordionItem[];
+  creditLifeItems: CampaignCreditLifeItem[];
+}
+
+const EMPTY_CAMPAIGN: PersonalLoanCampaignData = { introCard: null, faqItems: [], creditLifeItems: [] };
+
+// tabBodyContent (IEnumerable<NCtabGenericContent>) and, one level inside
+// each of those, sectionContent (IEnumerable<IPublishedElement>) are both
+// nested-content properties, not child nodes - same "one extra expand
+// bracket per level" shape as TOP_NAVIGATION_EXPAND at the top of this file.
+const CAMPAIGN_TAB_EXPAND = 'properties[tabBodyContent[properties[sectionContent[properties[$all]],$all]],$all]';
+
+interface CampaignSectionCard {
+  title: string;
+  mediumDescriptionHtml: string;
+  longDescriptionHtml: string;
+  iconUrl: string;
+}
+
+function mapCampaignSectionCard(props: Record<string, unknown>): CampaignSectionCard {
+  return {
+    title: typeof props.nCcardTitle === 'string' ? props.nCcardTitle : '',
+    mediumDescriptionHtml: mapRichText(props.mediumDescription),
+    longDescriptionHtml: mapRichText(props.nClongDescription),
+    iconUrl: mapMediaUrl(props.nCcardIcon),
+  };
+}
+
+// tabBodyContent only ever has one entry in practice (every source usage
+// reads `.FirstOrDefault()` off it) - that entry's own sectionContent is
+// the list of nCCard-shaped items this returns.
+async function fetchTabBodySectionCards(tabBodyId: string, signal?: AbortSignal): Promise<CampaignSectionCard[]> {
+  const tabBody = await fetchContentById(tabBodyId, CAMPAIGN_TAB_EXPAND, signal);
+  if (!tabBody) return [];
+
+  const genericContent = mapBlocks(tabBody.properties.tabBodyContent, (props) => props)[0];
+  if (!genericContent) return [];
+
+  return mapBlocks(genericContent.sectionContent, mapCampaignSectionCard);
+}
+
+/**
+ * Fetches the personal loan campaign page's content by route. See this
+ * section's top comment for why every section here is independently
+ * try/caught - the nested tabBody expand depth wasn't checked against a
+ * live response.
+ */
+export async function fetchPersonalLoanCampaign(path: string, signal?: AbortSignal): Promise<PersonalLoanCampaignData> {
+  try {
+    const page = await fetchContentByRoute(path, signal);
+    if (!page) return EMPTY_CAMPAIGN;
+
+    const children = await fetchChildren(page.id, signal);
+    const heroBodyNodes = children.filter((child) => child.contentType.toLowerCase() === 'herobody');
+    const heroBodyNew = heroBodyNodes[heroBodyNodes.length - 1];
+    if (!heroBodyNew) return EMPTY_CAMPAIGN;
+
+    const heroBodyChildren = await fetchChildren(heroBodyNew.id, signal);
+    const cardChildren = heroBodyChildren.filter((child) => child.contentType.toLowerCase() === 'card');
+    const tabBodyChildren = heroBodyChildren.filter((child) => child.contentType.toLowerCase() === 'tabbody');
+
+    const introCardNode = cardChildren[0];
+    const faqTabBody = tabBodyChildren[0];
+    const creditLifeTabBody = tabBodyChildren[tabBodyChildren.length - 1];
+
+    const [faqCards, creditLifeCards] = await Promise.all([
+      faqTabBody ? fetchTabBodySectionCards(faqTabBody.id, signal).catch(() => []) : Promise.resolve([]),
+      creditLifeTabBody && creditLifeTabBody.id !== faqTabBody?.id
+        ? fetchTabBodySectionCards(creditLifeTabBody.id, signal).catch(() => [])
+        : Promise.resolve([]),
+    ]);
+
+    return {
+      introCard: introCardNode
+        ? {
+            title: typeof introCardNode.properties.cardTitle === 'string' ? introCardNode.properties.cardTitle : '',
+            descriptionHtml: mapRichText(introCardNode.properties.cardDescriptionLongText),
+            imageUrl: mapMediaUrl(introCardNode.properties.cardIcon),
+          }
+        : null,
+      faqItems: faqCards.map((card) => ({ title: card.title, bodyHtml: card.mediumDescriptionHtml })),
+      creditLifeItems: creditLifeCards,
+    };
+  } catch {
+    return EMPTY_CAMPAIGN;
   }
 }

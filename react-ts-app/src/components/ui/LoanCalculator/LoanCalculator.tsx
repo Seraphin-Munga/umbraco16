@@ -1,24 +1,32 @@
-import type { KeyboardEvent, ReactNode } from 'react';
+import type { ChangeEvent, KeyboardEvent, ReactNode } from 'react';
+import { useMemo, useState } from 'react';
 import { Button } from '../Button/Button';
 import { Input } from '../Input/Input';
 import { Select } from '../Input/Select';
+import { estimateMonthlyInstallment, formatRand } from '../../../utils/loanCalculator';
 
 // Ported from the "#loan-calculator" section of the current live home page
 // markup (originally src/components/Home/LoanCalculator.tsx, moved here so
-// it can be reused outside Home - see Home.tsx's own usage). Its styling
-// still lives in src/components/Home/Home.css (.home-loan-calculator,
-// .calculator-form, .loan-range, etc.) rather than a CSS file of its own -
-// that's fine at runtime since Vite bundles every imported stylesheet into
-// one global CSS file regardless of which route renders it, but it does
-// mean Home.css can't be deleted while this component is still in use
-// elsewhere. Static display only - the sliders/inputs are uncontrolled and
-// show the source's own default values (amount 2 000, term 7 months,
-// repayment 879.53); no interest-rate formula was provided so nothing
-// recalculates on change. Two things from the source are intentionally
-// dropped: a stray "optioncount += 1;" text node inside the <select>
-// (leftover template output, not real content) and a mangled
-// `<="" div="">` attribute on the <img> tag (a stray closing tag that got
-// merged into it, not a real attribute).
+// it can be reused outside Home - see Home.tsx's own usage, and
+// PersonalLoanPage.tsx's own calculator section, which reuses the
+// estimateMonthlyInstallment formula but not this component, since that
+// page's surrounding layout - disclaimer text instead of an image - is
+// different). Its styling still lives in src/components/Home/Home.css
+// (.home-loan-calculator, .calculator-form, .loan-range, etc.) rather than
+// a CSS file of its own - that's fine at runtime since Vite bundles every
+// imported stylesheet into one global CSS file regardless of which route
+// renders it, but it does mean Home.css can't be deleted while this
+// component is still in use elsewhere.
+//
+// The repayment formula (estimateMonthlyInstallment) was found in
+// personalLoanCampaign.cshtml's `installmentEstimator` JS function - this
+// component now recalculates on every amount/term change instead of only
+// ever showing the source's static default (879.53 for 2 000 over 7
+// months). Two things from the source are intentionally dropped: a stray
+// "optioncount += 1;" text node inside the <select> (leftover template
+// output, not real content) and a mangled `<="" div="">` attribute on the
+// <img> tag (a stray closing tag that got merged into it, not a real
+// attribute).
 function allowDigitsOnly(event: KeyboardEvent<HTMLInputElement>) {
   const charCode = event.charCode;
   const isAllowed = charCode === 8 || charCode === 0 || charCode === 13 || (charCode >= 48 && charCode <= 57);
@@ -38,7 +46,6 @@ export interface LoanCalculatorProps {
   defaultTerm?: number;
   minTerm?: number;
   maxTerm?: number;
-  monthlyRepayment?: string;
   applyUrl?: string;
   imageUrl?: string;
   imageAlt?: string;
@@ -54,19 +61,29 @@ export function LoanCalculator({
   defaultTerm = 7,
   minTerm = 7,
   maxTerm = 72,
-  monthlyRepayment = '879.53',
   applyUrl = '/en/home/get-a-quote/',
   imageUrl = 'https://www.africanbank.co.za/media/gxxokcop/loan-calc.png',
   imageAlt = 'man aplying for a loan',
   imagePosition = 'right',
 }: LoanCalculatorProps) {
+  const [amount, setAmount] = useState(defaultAmount);
+  const [term, setTerm] = useState(defaultTerm);
+
+  const monthlyRepayment = useMemo(() => formatRand(estimateMonthlyInstallment(amount, term)), [amount, term]);
+
+  function handleAmountChange(event: ChangeEvent<HTMLInputElement>) {
+    const digitsOnly = event.target.value.replace(/\D/g, '');
+    if (digitsOnly === '') return;
+    setAmount(Math.min(maxAmount, Math.max(minAmount, Number(digitsOnly))));
+  }
+
   const form: ReactNode = (
     <div className="col-md-6">
       <h1 className="calculator-brand-1 mt-15 mb-20">Loan Calculator</h1>
 
       <div className="calculator-form" aria-describedby="loan-disclaimer">
         <p className="cal-loan-disclaimer" style={{ padding: '5px 0px' }}>
-          Please enter Loan amount between R2 000 to R500 000
+          Please enter Loan amount between {formatRand(minAmount)} to {formatRand(maxAmount)}
         </p>
         <label className="cal-amount" />
 
@@ -74,7 +91,8 @@ export function LoanCalculator({
           id="input-Amount1"
           className="loan-inpt"
           type="text"
-          defaultValue={defaultAmount}
+          value={amount}
+          onChange={handleAmountChange}
           onKeyPress={allowDigitsOnly}
         />
         <div className="range-wrap">
@@ -86,23 +104,29 @@ export function LoanCalculator({
             min={minAmount}
             max={maxAmount}
             step={500}
-            defaultValue={defaultAmount}
+            value={amount}
+            onChange={(event) => setAmount(Number(event.target.value))}
             style={{ backgroundImage: RANGE_GRADIENT }}
           />
         </div>
 
         <div className="loans" aria-hidden="true" style={{ marginBottom: '-7px' }}>
           <div className="col-1" style={{ textAlign: 'left', fontSize: '14px' }}>
-            R2 000
+            {formatRand(minAmount)}
           </div>
           <div />
           <div className="col-2" style={{ textAlign: 'right', fontSize: '14px' }}>
-            R500 000
+            {formatRand(maxAmount)}
           </div>
         </div>
 
         <label className="cal-amount">Repayment Term</label>
-        <Select className="loan-select-term" id="term1" defaultValue={defaultTerm}>
+        <Select
+          className="loan-select-term"
+          id="term1"
+          value={term}
+          onChange={(event) => setTerm(Number(event.target.value))}
+        >
           {termOptions.map((months) => (
             <option value={months} key={months}>
               {months} Months
@@ -118,7 +142,8 @@ export function LoanCalculator({
             className="loan-range"
             min={minTerm}
             max={maxTerm}
-            defaultValue={defaultTerm}
+            value={term}
+            onChange={(event) => setTerm(Number(event.target.value))}
             style={{ backgroundImage: RANGE_GRADIENT }}
           />
         </div>

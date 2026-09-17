@@ -1,10 +1,62 @@
-/* Most classes here (hero-static-*, campaign-*, testimonials-*, st-*) come
-   from the vendor stylesheets loaded globally in index.html
-   (main.min.css/custom_main.min.css/projectmagic.css) - this file only
-   covers the bits that differ because tab/carousel switching here is plain
-   React state instead of Bootstrap's jQuery plugins. */
-.mega-tabs .nav-tabs > li a,
-.testimonials-carousel .carousel-indicators li,
-.testimonials-carousel .carousel-control {
+/* Ported from personalLoanCampaign.cshtml's inline <style> block - this
+   accordion isn't a vendor/bootstrap component, so (unlike most of this
+   page) its styling isn't already covered by the global vendor CSS. */
+.accordion {
+  background-color: #ffffff;
+  box-shadow: 9px 11px 23px 0px rgba(6, 61, 79, 0.12);
+  font-weight: bold;
+  font-family: Montserrat, sans-serif;
+  color: #112768;
   cursor: pointer;
+  padding: 25px;
+  width: 100%;
+  text-align: left;
+  font-size: 15px;
+  transition: 0.4s;
+  border-radius: 50px;
+  border: none;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.accordion::after {
+  content: '\276F';
+  font-size: 15px;
+  color: #112768;
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.4s;
+}
+
+.accordion.active {
+  color: #f9f9f9;
+  border-radius: 30px 30px 0 0;
+  margin-bottom: 0;
+  box-shadow: 9px -19px 23px 0px rgba(6, 61, 79, 0.12) !important;
+}
+
+.accordion.active::after {
+  transform: translateY(-50%) rotate(90deg);
+}
+
+.panel {
+  font-family: Montserrat, sans-serif;
+  padding: 18px 18px 25px 18px;
+  background-color: #ffffff;
+  color: #112768;
+  overflow: hidden;
+  border-radius: 0 0 30px 30px;
+  border-top: none;
+  margin-top: -1px;
+  box-shadow: 9px 11px 23px 0px rgba(6, 61, 79, 0.12);
+}
+
+/* The source's .faqHeader also sets `color: #F9F9F9` (near-white) - dropped
+   here since this heading sits on a plain white section background (no
+   bg-grey-60 like the other sections), and combined with the .color-brand-1
+   class already on the element it would just render illegibly. */
+.faqHeader {
+  font: normal normal bold 42px/52px Montserrat;
 }

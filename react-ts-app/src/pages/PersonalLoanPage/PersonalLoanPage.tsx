@@ -1,18 +1,28 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import './PersonalLoanPage.css';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchPersonalLoan } from '../../store/slices/personalLoanSlice';
-import type { ProductKneeTab } from '../../api/contentApi';
+import { Input } from '../../components/ui/Input/Input';
+import { Select } from '../../components/ui/Input/Select';
+import { estimateMonthlyInstallment, formatRand } from '../../utils/loanCalculator';
 
-// Ported from Views/productPersonalLoan.cshtml + its Partials
-// (_pageHeaderImage, _pageShoulder, _howToApplySection, _heroKneeTabs,
-// _testimonials, _callMeBackForm) - see src/services/personalLoanService.ts
-// and src/api/contentApi.ts's "PRODUCT LOAN PAGES" section for the content
-// fetch/mapping this dispatches. Bootstrap's own JS (tabs, carousel) isn't
-// loaded in this app (only its CSS is, via index.html's <link> tags), so
-// tab/carousel/panel-open state below is plain React state toggling the
-// same "active" classes the vendor CSS already styles - same convention as
-// HeroCarousel.tsx.
+// Ported from Views/personalLoanCampaign.cshtml - the template actually
+// live at /en/home/product-personal-loan/ (see
+// src/services/personalLoanService.ts and src/api/contentApi.ts's
+// "PERSONAL LOAN CAMPAIGN" section for the content fetch this dispatches).
+//
+// One deliberate deviation from the source: it renders the FAQ list twice
+// back to back (two different accordion markups, both reading the same
+// faqItems) - a simple jQuery-driven accordion that actually has a click
+// handler wired up, and a second Bootstrap-style accordion whose own
+// collapse-toggle script is commented out in the source, so it never
+// actually expands on the live site either. That reads as leftover/
+// abandoned markup rather than an intentional double section, so only the
+// working accordion is rendered here.
+const MIN_AMOUNT = 2000;
+const MAX_AMOUNT = 250000;
+const TERM_OPTIONS = [7, 9, 12, 18, 24, 30, 36, 42, 48, 60, 72];
+
 export function PersonalLoanPage() {
   const dispatch = useAppDispatch();
   const { data, status } = useAppSelector((state) => state.personalLoan);
@@ -21,381 +31,261 @@ export function PersonalLoanPage() {
     if (status === 'idle') dispatch(fetchPersonalLoan());
   }, [status, dispatch]);
 
-  const title = 'Personal Loan';
-  const description = 'Get fixed repayments on flexible terms';
+  const introCard = data?.introCard;
+  const faqItems = data?.faqItems ?? [];
+  const creditLifeItems = data?.creditLifeItems ?? [];
 
-  const hero = data?.hero;
-  const shoulder = data?.shoulder;
-  const howToApply = data?.howToApply;
-  const kneeTabs = data?.kneeTabs ?? [];
-  const testimonials = data?.testimonials ?? [];
-  const callMeBack = data?.callMeBack;
+  const [amount, setAmount] = useState(MIN_AMOUNT);
+  const [term, setTerm] = useState(7);
+  const monthlyRepayment = useMemo(() => formatRand(estimateMonthlyInstallment(amount, term)), [amount, term]);
 
-  const [activeKneeTabId, setActiveKneeTabId] = useState<string | null>(null);
-  const activeTabId = activeKneeTabId ?? kneeTabs[0]?.id ?? null;
-
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
-
-  const [isCallMeBackOpen, setIsCallMeBackOpen] = useState(false);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   return (
     <div id="page">
       <div id="content">
         <main>
-          {/* HERO BANNER */}
-          <div className="hero-static-container">
-            <div className="container-fluid">
-              <div className="row no-gutter">
-                <div className="col-sm-12">
+          {/* Intro (heroBodynew's first "card" child) */}
+          <section className="section-800 bg-grey-60">
+            <div className="container">
+              <div className="row d-flex align-items-center row-change md-text-center">
+                <div className="col-xl-6 col-lg-6 col-md-6">
+                  <h1 className="color-brand-1 mt-15 mb-20">{introCard?.title ?? 'Personal Loan'}</h1>
                   <div
-                    className="hero-static-banner"
-                    id="heroHeader"
-                    style={hero?.imageUrl ? { backgroundImage: `url('${hero.imageUrl}')` } : undefined}
-                  >
-                    <ol className="breadcrumb">
-                      {(hero?.breadcrumb ?? [title]).map((item, index, all) => (
-                        <li key={item} className={index === all.length - 1 ? 'active' : ''}>
-                          {item}
-                        </li>
-                      ))}
-                    </ol>
-                  </div>
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        introCard?.descriptionHtml ??
+                        '<p>Get fixed repayments on flexible terms.</p>',
+                    }}
+                  />
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* HERO CONTINUED (shoulder) */}
-          <div className="container">
-            <div className="hero-static-caption">
-              <div className="text_header">
-                <h1 className="hero-static-title">{shoulder?.title ?? title}</h1>
-              </div>
-              <div className="row">
-                <div className="col-sm-12 col-md-9">
-                  <div className="hero-static-description">
-                    <p style={{ width: '100%' }}>{shoulder?.description ?? description}</p>
-                  </div>
-                </div>
-                {shoulder?.buttonText && (
-                  <div className="col-sm-12 col-md-3">
-                    <a href={shoulder.buttonUrl ?? '#'} target="_blank" rel="noreferrer" className="button primary button-styler">
-                      {shoulder.buttonText}
-                    </a>
+                {introCard?.imageUrl && (
+                  <div className="col-xl-6 col-lg-6 col-md-6">
+                    <img className="d-block" src={introCard.imageUrl} alt={introCard.title} />
                   </div>
                 )}
               </div>
             </div>
-          </div>
+          </section>
 
-          {/* HOW TO APPLY */}
-          {howToApply && (
-            <div className="container no-padding">
-              <div className="campaign-apply">
-                <h2>{howToApply.title}</h2>
-                <div className="row margin-top-20">
-                  <div className="col-sm-6">
-                    <p className="body-content">{howToApply.description}</p>
-                    {howToApply.buttonText && (
-                      <div className="margin-top-40">
-                        <a href={howToApply.buttonUrl ?? '#'} className="button primary hidden-xs">
-                          {howToApply.buttonText}
-                        </a>
+          {/* Loan calculator */}
+          <section className="section-800 pt-50 pb-40 home-loan-calculator">
+            <div className="container">
+              <div className="row d-flex align-items-center row-change md-text-center">
+                <div className="col-xl-6 col-lg-6 col-md-6">
+                  <h1 className="color-brand-1 mt-15 mb-20">Apply for a Personal Loan in Minutes</h1>
+                  <p className="font-md color-brand-1">
+                    Experience the convenience of banking, sharing, and saving all in one place with African
+                    Bank&apos;s MyWORLD account!
+                  </p>
+                  <h4 className="color-brand-1 my-3">Disclaimer:</h4>
+                  <p className="font-md color-brand-1 mt-20">
+                    This Loans Calculator provides indicative values only. African Bank provides no guarantees or
+                    warranties on the values displayed. Only a full Loan application, on African Bank's website, the
+                    Banking App or on Online Banking, or in other channels like our Branches and Call Centre, can
+                    provide accurate details pertaining to Loans from African Bank.
+                  </p>
+                </div>
+                <div className="col-md-6">
+                  <h1 className="color-brand-1 mt-15 mb-20">Loan Calculator</h1>
+                  <div className="calculator-form">
+                    <p className="loan-disclaimer" style={{ padding: '5px 0px' }}>
+                      Please enter Loan amount between {formatRand(MIN_AMOUNT)} to {formatRand(MAX_AMOUNT)}
+                    </p>
+                    <label>Amount</label>
+                    <Input
+                      id="input-Amount1"
+                      className="loan-inpt"
+                      type="text"
+                      value={amount}
+                      onChange={(event) => {
+                        const digitsOnly = event.target.value.replace(/\D/g, '');
+                        if (digitsOnly === '') return;
+                        setAmount(Math.min(MAX_AMOUNT, Math.max(MIN_AMOUNT, Number(digitsOnly))));
+                      }}
+                    />
+                    <div className="range-wrap">
+                      <div className="range-value" id="rangeV1" />
+                      <Input
+                        id="slide-range1"
+                        type="range"
+                        className="loan-range"
+                        min={MIN_AMOUNT}
+                        max={MAX_AMOUNT}
+                        step={500}
+                        value={amount}
+                        onChange={(event) => setAmount(Number(event.target.value))}
+                      />
+                    </div>
+                    <div className="loans" style={{ marginBottom: 0 }}>
+                      <div className="col-1" style={{ textAlign: 'left', fontSize: '14px' }}>
+                        {formatRand(MIN_AMOUNT)}
                       </div>
-                    )}
+                      <div />
+                      <div className="col-2" style={{ textAlign: 'right', fontSize: '14px' }}>
+                        {formatRand(MAX_AMOUNT)}
+                      </div>
+                    </div>
+
+                    <label>Repayment Term</label>
+                    <Select
+                      className="loan-select-term"
+                      id="term1"
+                      value={term}
+                      onChange={(event) => setTerm(Number(event.target.value))}
+                    >
+                      {TERM_OPTIONS.map((months) => (
+                        <option value={months} key={months}>
+                          {months} Months
+                        </option>
+                      ))}
+                    </Select>
+                    <div className="range-wrap">
+                      <div className="range-value" id="rangeV2" />
+                      <Input
+                        id="input-month1"
+                        type="range"
+                        className="loan-range"
+                        min={7}
+                        max={72}
+                        value={term}
+                        onChange={(event) => setTerm(Number(event.target.value))}
+                      />
+                    </div>
+                    <div className="Months" style={{ marginBottom: '-7px' }}>
+                      <div className="col-1" style={{ textAlign: 'left', fontSize: '14px' }}>
+                        7 Months
+                      </div>
+                      <div />
+                      <div className="col-2" style={{ textAlign: 'right', fontSize: '14px' }}>
+                        72 Months
+                      </div>
+                    </div>
+
+                    <label>Monthly Repayment will be</label>
+                    <Input
+                      id="installment_calc1"
+                      className="loan-inpt-return"
+                      type="text"
+                      value={monthlyRepayment}
+                      readOnly
+                    />
+
+                    <div className="combo-btn">
+                      <div className="mt-50 text-start column1">
+                        <p className="combo-btn-text primary">
+                          <a
+                            href="https://www.africanbank.co.za/en/home/get-a-quote?utm_source=Website&utm_medium=Productpage&utm_campaign=WebLead"
+                            className="btn btn-brand-1 hover-up"
+                          >
+                            Apply Now
+                          </a>
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  {howToApply.documentCards.length > 0 && (
-                    <div className="col-sm-6 text-center">
-                      <div className="row">
-                        {howToApply.documentCards.map((card) => (
-                          <div className="col-sm-6" key={card.text}>
-                            <img src={card.iconUrl} alt={card.iconAlt} height={80} />
-                            <p className="body-content margin-top-20">{card.text}</p>
-                          </div>
-                        ))}
-                      </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Credit life insurance cards (heroBodynew's last tabBody) */}
+          {creditLifeItems.map((item, index) => (
+            <section className="section-800 bg-grey-60" key={item.title || index}>
+              <div className="container">
+                <div className="row d-flex align-items-center row-change reverse-row md-text-center">
+                  <div className="col-xl-7 col-lg-7 col-md-7">
+                    <h1 className="color-brand-1 mt-15 mb-20">{item.title}</h1>
+                    <div dangerouslySetInnerHTML={{ __html: item.mediumDescriptionHtml }} />
+                    <div className="mt-50 text-start">
+                      <div dangerouslySetInnerHTML={{ __html: item.longDescriptionHtml }} />
+                    </div>
+                  </div>
+                  {item.iconUrl && (
+                    <div className="col-xl-5 col-lg-5 col-md-5">
+                      <img className="d-block" src={item.iconUrl} alt={item.title} />
                     </div>
                   )}
                 </div>
               </div>
-            </div>
-          )}
+            </section>
+          ))}
 
-          {/* CAMPAIGN MORE INFO (knee tabs) */}
-          {kneeTabs.length > 0 && (
-            <div className="campaign-more-container">
-              <div className="hover-block" />
+          {/* FAQ accordion (heroBodynew's first tabBody) */}
+          {faqItems.length > 0 && (
+            <section className="section-800">
               <div className="container">
-                <div className="mega-tabs">
-                  <ul className="nav nav-tabs eq-height" role="tablist">
-                    {kneeTabs.map((tab) => (
-                      <li
-                        key={tab.id}
-                        role="presentation"
-                        className={
-                          (kneeTabs.length > 1 ? 'campaign-more' : 'width-100') +
-                          (tab.id === activeTabId ? ' active' : '')
-                        }
-                      >
-                        <a role="tab" onClick={() => setActiveKneeTabId(tab.id)}>
-                          {tab.title}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="tab-content">
-                  {kneeTabs.map((tab) => (
-                    <KneeTabPanel key={tab.id} tab={tab} active={tab.id === activeTabId} />
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TESTIMONIALS */}
-          {testimonials.length > 0 && (
-            <div className="testimonials-container white-bg">
-              <div className="container">
-                <h3 className="text-center margin-top-60">What our customers are saying</h3>
-                <div className="testimonials-carousel">
-                  <div id="testimonials" className="carousel slide">
-                    <ol className="carousel-indicators">
-                      {testimonials.map((_, index) => (
-                        <li
-                          key={index}
-                          className={index === activeTestimonial ? 'active' : ''}
-                          onClick={() => setActiveTestimonial(index)}
-                        />
-                      ))}
-                    </ol>
-                    <div className="carousel-inner">
-                      {testimonials.map((item, index) => (
-                        <div className={`item${index === activeTestimonial ? ' active' : ''}`} key={index}>
-                          <div className="testimonial">
-                            <div className="avatar">
-                              <img src={item.avatarUrl} alt={item.name} />
-                            </div>
-                            <div className="descr">{item.story}</div>
-                            <div className="name">{item.name}</div>
-                          </div>
+                <div className="row align-items-center d-flex row-change md-text-center">
+                  <div className="col-xl-12 col-lg-12 col-md-12">
+                    <h1 className="color-brand-1 mt-15 mb-20 text-center faqHeader">African Bank Loans FAQs</h1>
+                    {faqItems.map((item, index) => (
+                      <div key={item.title || index}>
+                        <p
+                          className={`accordion${openFaqIndex === index ? ' active' : ''}`}
+                          onClick={() => setOpenFaqIndex((current) => (current === index ? null : index))}
+                        >
+                          {item.title}
+                        </p>
+                        <div className="panel" style={{ display: openFaqIndex === index ? 'block' : 'none' }}>
+                          <p dangerouslySetInnerHTML={{ __html: item.bodyHtml }} />
                         </div>
-                      ))}
-                    </div>
-                    <a
-                      className="left carousel-control"
-                      onClick={() =>
-                        setActiveTestimonial((current) => (current - 1 + testimonials.length) % testimonials.length)
-                      }
-                    >
-                      <span className="icon-arrow-left" />
-                    </a>
-                    <a
-                      className="right carousel-control"
-                      onClick={() => setActiveTestimonial((current) => (current + 1) % testimonials.length)}
-                    >
-                      <span className="icon-arrow-right" />
-                    </a>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
-            </div>
+            </section>
           )}
 
-          {/* CALL BACK FORM */}
-          {/* The panel's read-only content (title/button labels/visibility)
-              comes from contentApi; actual submission isn't wired up here -
-              the source form POSTs to a legacy MVC SurfaceController action
-              (legacy/Controllers/CustomController.cs), not the Delivery API,
-              so there's no confirmed endpoint for this SPA to call yet. */}
-          {callMeBack && (
-            <div className="st-actionContainer right-bottom">
-              {isCallMeBackOpen && (
-                <div className="st-panel">
-                  <div className="st-panel__entry">
-                    <div className="st-panel-intro row-call">
-                      <div className="column">
-                        <span className="pop-title">{callMeBack.title}</span>
+          {/* Cross-sell (static in the source - no CMS binding) */}
+          <section className="section-800 bg-grey-60">
+            <div className="container">
+              <div className="row d-flex align-items-center row-change md-text-center">
+                <div className="col-md-6">
+                  <h1 className="color-brand-1 mt-15 mb-20">Find your ideal loan solution with African Bank.</h1>
+                  <h4>African Bank offers a variety of loan products to fit your unique financial needs.</h4>
+                  <div className="row mt-5">
+                    <div className="col-md-6">
+                      <div className="card-offer hover-up">
+                        <div className="card-info">
+                          <h4 className="color-brand-2">Consolidation Loan:</h4>
+                          <p className="font-sm color-grey-500 mb-15">
+                            For those seeking to streamline their finances into one manageable instalment.
+                          </p>
+                        </div>
                       </div>
                     </div>
-                    <div className="st-panel-tip">
-                      <p className="bodyDescription">
-                        Click call me back to speak to our consultants
-                        <br /> or apply to create an application online.
-                      </p>
+                    <div className="col-md-6">
+                      <div className="card-offer hover-up">
+                        <div className="card-info">
+                          <h4 className="color-brand-2">12% Loan:</h4>
+                          <p className="font-sm color-grey-500 mb-15">
+                            Benefit from our competitive 12% Loan, featuring a low interest rate for loans up to
+                            R50 000.
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                    <div className="st-panel-contents">
-                      <div className="row button-row">
-                        {callMeBack.callMeBackVisible && (
-                          <div className="col-xs-12">
-                            <button type="button" className="st-panel-submit call-me btn-hover-blue">
-                              {callMeBack.callMeBackButtonText ?? 'Call me back'}
-                            </button>
-                          </div>
-                        )}
-                        {callMeBack.quickLoanVisible && (
-                          <div className="col-xs-12">
-                            <a
-                              href={callMeBack.quickLoanUrl ?? '#'}
-                              className="st-panel-submit btn-hover-green"
-                              style={{ width: '100%', marginBottom: 12, display: 'block', textAlign: 'center' }}
-                            >
-                              {callMeBack.quickLoanButtonText ?? 'Get a quote'}
-                            </a>
-                          </div>
-                        )}
-                        {callMeBack.trackLoanVisible && (
-                          <div className="col-xs-12">
-                            <button type="button" className="st-panel-submit call-me loan-tracker-btn-hover-blue">
-                              Track my loan application
-                            </button>
-                          </div>
-                        )}
+                    <div className="col-md-6">
+                      <div className="card-offer hover-up">
+                        <div className="card-info">
+                          <h4 className="color-brand-2">Tech Deals:</h4>
+                          <p style={{ paddingBottom: 19 }} className="font-sm color-grey-500 mb-15">
+                            Explore our deals and add a cellphone, tablet or laptop to any loan.
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              )}
-              <div className="st-btn-container right-bottom">
-                <div className="st-button-main campaing-call">
-                  <img
-                    src={callMeBack.successIconUrl || '/images/call-me-back.svg'}
-                    className="icon-open"
-                    alt="call-me-back"
-                    onClick={() => setIsCallMeBackOpen(true)}
-                  />
-                  <img
-                    src="/images/call-me-back-close.svg"
-                    className="icon-close"
-                    alt="call-me-back-close"
-                    onClick={() => setIsCallMeBackOpen(false)}
-                  />
+                <div className="col-md-6">
+                  <img className="d-block" src="/media/xxadpnw4/find-loan-sol_lp.png" alt="" />
                 </div>
               </div>
             </div>
-          )}
+          </section>
         </main>
       </div>
-    </div>
-  );
-}
-
-function KneeTabPanel({ tab, active }: { tab: ProductKneeTab; active: boolean }) {
-  const cssClass = `tab-pane${active ? ' active' : ''}`;
-
-  if (tab.kind === 'creditLifeInsurance') {
-    return (
-      <div role="tabpanel" className={cssClass} id={tab.id}>
-        <div className="row">
-          <div className="container">
-            <div className="row eq-height margin-top-30 campaign-image-block">
-              {tab.cards.map((card) => (
-                <div className="col-sm-4" key={card.title}>
-                  <div className="text-center margin-bottom-30">
-                    <h4>{card.title}</h4>
-                    <img src={card.iconUrl} alt={card.iconAlt} style={{ height: 90 }} />
-                    <p>{card.description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="margin-top-80 hidden-xs" />
-        <div className="row eq-height">
-          {tab.highlights.map((text, index) => (
-            <div className="col-sm-4" key={index}>
-              <div className="campaign-more-highlights">{text}</div>
-            </div>
-          ))}
-        </div>
-        {tab.disclaimer && <div className="margin-top-30 campaign-terms">{tab.disclaimer}</div>}
-      </div>
-    );
-  }
-
-  if (tab.kind === 'creditLifeInsuranceCredit') {
-    return (
-      <div role="tabpanel" className={cssClass} id={tab.id}>
-        <div className="row">
-          <div className="col-sm-10 col-sm-offset-1">
-            <p className="text-center">{tab.description}</p>
-            <div className="row eq-height margin-top-30">
-              <div className="col-sm-6">
-                <div className="campaign-list text-only">
-                  <ul>
-                    {tab.listItems.map((item, index) => (
-                      <li className="download-item" key={index}>
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-              <div className="col-sm-6">
-                <div
-                  className="campaign-more-info-img"
-                  style={{ backgroundImage: `url('${tab.imageUrl}')` }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="margin-top-80 hidden-xs" />
-        <div className="row eq-height">
-          {tab.highlights.map((text, index) => (
-            <div className="col-sm-4" key={index}>
-              <div className="campaign-more-highlights">{text}</div>
-            </div>
-          ))}
-        </div>
-        {tab.disclaimer && <div className="margin-top-30 campaign-terms">{tab.disclaimer}</div>}
-      </div>
-    );
-  }
-
-  return (
-    <div role="tabpanel" className={cssClass} id={tab.id}>
-      <div className="col-sm-10 col-sm-offset-1">
-        <p className="text-center">{tab.description}</p>
-      </div>
-      <div className="row">
-        <div className="col-sm-10 col-sm-offset-1">
-          <div className="campaign-list">
-            <ul>
-              {tab.downloadItems.map((item, index) => (
-                <li key={index}>
-                  <div className="row no-gutter download-item first">
-                    <div className="col-sm-9">
-                      <div className="download-descr">{item.description}</div>
-                    </div>
-                    <div className="col-sm-3">
-                      <a href={item.buttonUrl} target="_blank" rel="noreferrer" className="download-btn">
-                        {item.buttonText}
-                      </a>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
-      {tab.highlights.length > 0 && (
-        <div className="row eq-height">
-          {tab.highlights.map((text, index) => (
-            <div className="col-sm-4" key={index}>
-              <div className="campaign-more-highlights">{text}</div>
-            </div>
-          ))}
-        </div>
-      )}
-      {tab.disclaimer && (
-        <div className="margin-top-30 campaign-terms">
-          <p className="bold">Updated terms and conditions</p>
-          {tab.disclaimer}
-        </div>
-      )}
     </div>
   );
 }
