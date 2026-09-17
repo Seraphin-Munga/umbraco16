@@ -39,7 +39,20 @@ export function MyWorldAccount({ features, ctaLabel, ctaUrl, heading, subheading
             <div className="mt-30 mb-30 inline-checklist">
               <ul className="list-ticks list-ticks-2">
                 {features.map((feature) => (
-                  <li key={feature}>{feature}</li>
+                  <li key={feature}>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      className="bi bi-check-lg"
+                      viewBox="0 0 16 16"
+                      style={{ color: '#5dc300' }}
+                    >
+                      <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z" />
+                    </svg>
+                    {feature}
+                  </li>
                 ))}
               </ul>
             </div>

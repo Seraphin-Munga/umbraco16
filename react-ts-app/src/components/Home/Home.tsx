@@ -55,6 +55,29 @@ function brandHeading(text: string): ReactNode | undefined {
   return text ? <span className="span-major-title">{text}</span> : undefined;
 }
 
+// bankWithAudacityBlock has no separate highlightWord field the way
+// myWorldAccountBlock does (see that case below) - just one plain heading
+// string ("Bank with audacity"). Splits it into a bold lead ("Bank with")
+// on its own line and a thin last word ("audacity"), matching the
+// two-weight .major-title/.span-major-title look this heading always had
+// when it was hardcoded JSX rather than CMS text.
+function bankWithAudacityHeading(text: string): ReactNode | undefined {
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return undefined;
+  if (words.length === 1) return brandHeading(text);
+
+  const lastWord = words[words.length - 1];
+  const lead = words.slice(0, -1).join(' ');
+
+  return (
+    <>
+      <span className="span-major-title">{lead}</span>
+      <br />
+      {lastWord}
+    </>
+  );
+}
+
 function renderCmsSections(sections: HomePageSection[]) {
   return sections.map((section, index) => {
     switch (section.kind) {
@@ -72,7 +95,11 @@ function renderCmsSections(sections: HomePageSection[]) {
 
       case 'bankWithAudacityBlock':
         return (
-          <BankWithAudacity key={index} cards={section.cards} heading={brandHeading(section.heading)} />
+          <BankWithAudacity
+            key={index}
+            cards={section.cards}
+            heading={bankWithAudacityHeading(section.heading)}
+          />
         );
 
       case 'loanCalculatorBlock':
