@@ -293,6 +293,7 @@ export async function fetchTopNavigation(signal?: AbortSignal): Promise<TopNavig
 export interface FooterLink {
   url: string;
   title: string;
+  target?: '_blank';
 }
 
 export interface FooterLinkCategory {
@@ -344,10 +345,13 @@ function mapFooterLinkItem(props: Record<string, unknown>): FooterLink[] {
     }
 
     // No real URL -> fall back to an attached document's file URL, same
-    // as the Razor view's relatedLink.Value("nCdocument") branch.
+    // as the Razor view's relatedLink.Value("nCdocument") branch - that
+    // branch's own <a> has target="_blank" in the source, unlike a plain
+    // link above.
     return {
       url: mapMediaUrl(props.nCdocument),
       title: typeof props.nCtext === 'string' ? props.nCtext : '',
+      target: '_blank' as const,
     };
   });
 }

@@ -50,7 +50,7 @@ export function Header() {
   return (
     <div className="header-container">
       <nav className="navbar navbar-default dropdown-container new-navbar-ab">
-        <div className="container-fluid">
+        <div className="container">
           <div className="navbar-header">
             <button
               type="button"
@@ -73,11 +73,22 @@ export function Header() {
             <ul className="nav navbar-nav dropdown-container left-nav">
               <li>
                 <a
+                  href="https://ib.africanbank.co.za/modules/Registration/Public/Register.aspx"
+                  target="_blank"
+                  rel="noreferrer"
                   className="register-btn visible-xs"
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => setModalOpen(true)}
                 >
-                  <span>Register/Login</span>
+                  <span>Register</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://ib.africanbank.co.za/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="register-btn visible-xs"
+                >
+                  <span>Login</span>
                 </a>
               </li>
               <li>
@@ -218,11 +229,15 @@ export function Header() {
               </li>
             </ul>
 
-            <ul className="nav navbar-nav navbar-right">
+            <ul className="nav navbar-nav navbar-right" style={{ marginTop: '-20px' }}>
               <li>
                 <a
                   href="#"
                   className="search-icon globalSearch"
+                  data-toggle="tooltip"
+                  data-placement="bottom"
+                  data-original-title=""
+                  title=""
                   onClick={(event) => {
                     event.preventDefault();
                     setSearchOpen((open) => !open);
@@ -238,7 +253,7 @@ export function Header() {
                   style={{ cursor: 'pointer' }}
                   onClick={() => setModalOpen(true)}
                 >
-                  Register <span style={{ fontWeight: 100 }}>|</span> Login
+                  Register/Login
                 </a>
               </li>
             </ul>
