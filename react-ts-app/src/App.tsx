@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Header } from './components/Header/Header'
 import { Footer } from './components/Footer/Footer'
+import { KaraboChat } from './components/KaraboChat/KaraboChat'
 import { Home } from './components/Home/Home'
 import { PERSONAL_MENU_PAGES } from './routes/personalMenuPages'
 import { PERSONAL_MENU_PAGE_COMPONENTS } from './routes/personalMenuPageComponents'
@@ -22,6 +23,7 @@ function App() {
           </Routes>
         </main>
         <Footer />
+        <KaraboChat />
       </div>
     </BrowserRouter>
   )

@@ -1,0 +1,63 @@
+/* #chatIconImg / #openChatButton ported verbatim from the header <style>
+   block the rest of that snippet came from - #iframe-karabochat itself had
+   no rules in that snippet (only an unrelated #iframe-karaboChat-speechBubble
+   id, a tooltip element this widget doesn't have), so its positioning below
+   is this component's own, matching #openChatButton's fixed/bottom-right
+   placement and z-index. */
+#iframe-karabochat {
+  position: fixed;
+  bottom: 100px;
+  right: 20px;
+  z-index: 200;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
+#chatIconImg {
+  height: 119px !important;
+  max-height: 119px !important;
+}
+
+#openChatButton {
+  background-color: transparent;
+  border-radius: 60px;
+  position: fixed;
+  bottom: 20px;
+  right: -20px !important;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  z-index: 200;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media (min-width: 256px) and (max-width: 768px) {
+  #chatIconImg {
+    height: 119px !important;
+    max-height: 119px !important;
+  }
+
+  #openChatButton {
+    background-color: transparent;
+    border-radius: 60px;
+    position: fixed;
+    bottom: 0px;
+    right: -20px !important;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    z-index: 200;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #iframe-karabochat {
+    bottom: 80px;
+    right: 10px;
+  }
+}
