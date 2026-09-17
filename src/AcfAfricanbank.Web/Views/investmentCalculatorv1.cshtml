@@ -9,49 +9,26 @@
   font-size: 0.85em;
   margin-top: 4px;
 }
+
+#loader {
+    display: none;
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    color: black;
+    font-size: 1.25rem;
+   
+}
 </style>
-
-
-              <!DOCTYPE html>
-<!-- saved from url=(0060)https://www.africanbank.co.za/en/home/product-funeral-cover/ -->
-@*<html ng-app="africanBankApp" class="ng-scope"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">*@
-    
-
-    <link rel="shortcut icon" type="ico" href="https://africanbank.co.za/media/cnulovsw/favicon.ico">
 
     <!-- icons  -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined">
 
-    
    
-
-    <meta name="twitter:card" content="summary_large_image">
-
-    <meta name="twitter:title" content="African Bank | African Bank Insurance | Affordable Funeral Cover">
-    <meta name="twitter:description" content="Affordable funeral insurance from African bank guarantees 24-hour pay out &amp; funeral cover that increases every 6 months while your payment remains the same. Enquire now!">
-    <meta name="twitter:image" content="http://cmsdev1.africanbank.net/media/51288/ab-logo_icon_blue_30x30-2.png">
-
-    <meta property="og:title" content="African Bank | African Bank Insurance | Affordable Funeral Cover">
-    <meta property="og:type" content="article">
-
-
-    <meta property="og:url" content="https://www.africanbank.co.za/en/home/product-funeral-cover/">
-    <meta property="og:description" content="Affordable funeral insurance from African bank guarantees 24-hour pay out &amp; funeral cover that increases every 6 months while your payment remains the same. Enquire now!">
-    <meta property="og:image" content="http://cmsdev1.africanbank.net/media/51288/ab-logo_icon_blue_30x30-2.png">
-    <script src="/African Bank Insurance _ Affordable Funeral Cover_files/jquery.min.js.download" type="text/javascript"></script>
-    
-
-    <link href="/African Bank Insurance _ Affordable Funeral Cover_files/bootstrap.min.css" rel="stylesheet">
-    <link href="/African Bank Insurance _ Affordable Funeral Cover_files/main.min.css" rel="stylesheet">
-    <link href="/African Bank Insurance _ Affordable Funeral Cover_files/custom_main.min.css" rel="stylesheet">
-    <link href="/African Bank Insurance _ Affordable Funeral Cover_files/smart_wizard.css" rel="stylesheet">
-    <link href="/African Bank Insurance _ Affordable Funeral Cover_files/smart_wizard_theme_arrows.css" rel="stylesheet">
-    <link href="/African Bank Insurance _ Affordable Funeral Cover_files/cookieconsent.css" rel="stylesheet">
-
-   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
    <link rel="stylesheet" href="/css/projectmagic.css"/>
-<link href="/css/investment1.css" rel="stylesheet">
+ <link href="/css/funeral.css" rel="stylesheet">
 
  <body>
     <section class="container pb-40 pt-40" id="funeral-calculator">
@@ -60,13 +37,15 @@
             <div class="calculator-section">
                 <h1 class="color-brand-1 mb-3">Funeral Calculator</h1>
                 <div class="mb-3">
-                    <label for="funeralType" class="form-label">Funeral Type:</label>
-                    <select id="funeralType" class="form-select" onchange="updateFamilyButtonLabels()" fdprocessedid="osfy5">
-                        <option value="Enhanced">Enhanced</option>
-                        <option value="Staff">Staff</option>
-                        <option value="Foreign">Foreign</option>
+                    <label for="funeralType" class="form-label">Funeral Type</label>
+                    <select id="funeralType" class="form-select" onchange="validateAndApplyButtonState()" fdprocessedid="osfy5">
+                        <option value="ab_enhanced_funeral">Family Funeral Plan</option>
+                        <option value="ab_staff_funeral">Staff Funeral Plan</option>
+                     
                     </select>
                 </div>
+                
+    
                 
                 <div class="mb-3" style="margin-top: 8px;">
                     <label for="" class="form-label">Main Member details</label>
@@ -78,25 +57,28 @@
         <option value="female">Female</option>
     </select>
    <div id="personal-dob-input">
-    <input type="text" id="personal-dob" class="dob-input" placeholder="DOB" />
-<span class="dob-icon glyphicon glyphicon-calendar" style="right: 20px; cursor: pointer;"></span>
+    <input type="text" id="personal-dob" class="dob-input" placeholder="Date of birth" />
+<span class="dob-icon glyphicon glyphicon-calendar" style="right: 11px; cursor: pointer;"></span>
   </div>
 </div>
- <div class="error-message" id="gender-error" style="color:red; font-size: 0.9em;"></div>
-  <div class="error-message" id="dob-error" style="color:red; font-size: 0.9em;"></div>
-                     @**@
+<div class="error-card" id="main-member-errors">
+ <div class="error-message" id="gender-error"></div>
+  <div class="error-message" id="dob-error"></div>
+   </div>                  
                     
                 </div>
 
                 <div class="mb-3" style=" margin-top: 8px;">
-                    <label for="coverAmount" class="form-label">Cover Amount:</label>
-                    <select id="coverAmount" class="form-select" fdprocessedid="s6rzob">
-                        <option value="5000">R5,000</option>
-                        <option value="10000">R10,000</option>
-                        <option value="15000">R15,000</option>
-                        <option value="20000">R20,000</option>
-                        <option value="25000">R25,000</option>
-                        <option value="30000">R30,000</option>
+                    <label for="coverAmount" class="form-label">Cover Amount</label>
+                                        <select id="coverAmount" class="form-select" fdprocessedid="s6rzob">
+
+                       @* <option value="" selected disabled>select DOB first</option>*@
+                       <option value="5000">R5,000</option>
+                       <option value="10000">R10,000</option>
+                       <option value="15000">R15,000</option>
+                       <option value="20000">R20,000</option>
+                       <option value="25000">R25,000</option>
+                       <option value="30000">R30,000</option>
                         <option value="50000">R50,000</option>
                         <option value="100000">R100,000</option>
                     </select>
@@ -105,7 +87,7 @@
                 
                 <!-- Add spouse / ext family / Parent / children buttons -->
                 <div id="addFamilyOptions" class="mb-3" style=" margin-top: 8px;">
-                    <label class="form-label">Add family member(s):</label>
+                    <label class="form-label">Add family member(s)</label>
                     <div id="addFamilyContainer">
                         <div class="extended-family1-row">
                             <div class="family-button" data-label="Child" onclick="openDialog('addModal', 'Child')">
@@ -152,7 +134,7 @@
                  <div class="combo-btn">
                     <div class="mt-50 text-start column1">
                     <p class="combo-btn-text primary">
-                        <button onclick="calculatePremium()" class="cal-btn btn  btn-brand-1 hover-up" fdprocessedid="bxrc2m">Calculate</button>
+                        <button class="cal-btn btn  btn-brand-1 hover-up" fdprocessedid="bxrc2m">Calculate</button>
                         </p>
                     </div>
                     </div>
@@ -162,19 +144,28 @@
         </div>
         <div class="col-md-6">
             <div class="image-section">
-                <img id="defaultImage" src="/media/ysxhravg/loan-calc.png" alt="Funeral Image" loading="lazy">
+                <div class="loader" id="loader" style=" display: none;"></div>
+                <img id="defaultImage" src="https://www.africanbank.co.za/media/gxxokcop/loan-calc.png" alt="Funeral Image" loading="lazy">
                 <div id="premium-display" class="premium-container" style="display: none;">
-                    <h3 class="text-center">Estimated Total Premium</h3>
+                    <h3 class="text-center color-brand-1">Estimated Total Premium</h3>
                     <p class="premium-amount mt-10 text-center">R<span id="premium-value">0.00</span></p>
                     <div class="mt-30 mb-30 inline-checklist">
-                        <h4 class="text-center">Benefits:</h4>
+                        <h4 class="text-center color-brand-1">Benefits:</h4>
                         <ul class="list-ticks list-ticks-2 mt-30">
                             <li>Get cover up to R100 000 each for the main and spouse.</li>
-                            <li>Cover up to R20 000, each, for up to 8 children under the age of 21 years.</li>
+                            <li>Cover up to R20 000, each, for up to 8 children under the age of 25 years.</li>
                             <li>Cover up to R50 000, each, for up to 8 extended family.</li>
                         </ul>
                     </div>
-                    <button id="apply-now" class="apply-btn" onclick="window.location.href='https://ib.africanbank.co.za/SignIn.aspx'">Apply Now</button>
+                     <div class="combo-btn">
+                    <div class="mt-50 text-start column1">
+                    <p class="combo-btn-text primary">
+                        <button id="apply-now" class="apply-btn btn  btn-brand-1 hover-up" onclick="window.location.href='https://ib.africanbank.co.za/SignIn.aspx'">Apply Now</button>
+                        </p>
+                    </div>
+                    </div>
+                
+                    
 
                 </div>
             </div>
@@ -210,7 +201,7 @@
             </div>
             <!-- footer  -->
             <div class="modal_footer">
-               @* <button type="button" id="addExtendedButton" onclick="addMemberRow()">
+               @* <button    <option value="ab_foreigner_funeral">Foreign</option> type="button" id="addExtendedButton" onclick="addMemberRow()">
                     Add Member</button>*@
                      <div class="combo-btn">
                     <div class="mt-50 text-start column1">
@@ -226,760 +217,1213 @@
     </section>
 
  </body>
-    <script src="/African Bank Insurance _ Affordable Funeral Cover_files/bootstrap.bundle.min.js.download"></script>
+   
 
 
    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 
     <!-- Flatpickr JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
-<script>
-function calculateAge(dob) {
-    const birthDate = new Date(dob);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-    }
-    return age;
-}
- document.addEventListener("DOMContentLoaded", function () {
-  document.querySelectorAll(".dob-input").forEach(input => {
-    const fp = flatpickr(input, {
-      dateFormat: "Y-m-d",
-      disableMobile: true,
-      appendTo: document.body
-    });
 
-    const icon = input.parentElement.querySelector(".dob-icon");
-    if (icon) {
-      icon.addEventListener("click", () => input.focus());
-    }
-  });
-});
-
-</script>
-
-
- <script>
- 
- const labelToKeyMap = {
-  "Spouse": "spouse",
-  "Child": "child",
-  "Parent": "parent",
-  "Extended Family": "extended Family"
-};
-
- let savedMembers = []
-
-const memberLimits = {
-  Enhanced: { spouse: 3, child: 8, parent: 4, "extended Family": 8 },
-  Staff: { spouse: 3, child: 8, parent: 4, "extended Family": 8 },
-  Foreign: { spouse: 1, child: 8, parent: 0, "extended Family": 0 }
-};
-
-const memberCounts = {
-  spouse: 0,
-  child: 0,
-  parent: 0,
-  "extended Family": 0
-};
-  
-
-function openDialog(modalId, type = "") {
-  const modal = document.getElementById(modalId);
-  if (!modal) return;
-
-   // Show the modal
-   modal.classList.remove("hidden");
-
-  // Update heading dynamically
-  const headingEl = modal.querySelector(".modal_header .heading h2");
-  if (headingEl) {
-      headingEl.textContent = `${type} Details`;
-  }
-
-  const parsedLabel = headingEl?.textContent?.replace(" Details", "").trim();
-  const normalizedType = labelToKeyMap[parsedLabel];
-
-  updateMemberCountDisplay(normalizedType);
-
-  // Clear and update body container dynamically (if needed)
-  const container = modal.querySelector("#extendedFamilyContainer");
-  if (container) {
-    container.innerHTML = "";
-
-     savedMembers = getMembersFromSession(normalizedType);
-    memberCounts[normalizedType] = savedMembers.length;
-
-    updateMemberCountDisplay(normalizedType);
-
-    if (savedMembers.length > 0) {
-      savedMembers.forEach(member => {
-        const wrapper = document.createElement("div");
-wrapper.classList.add("extended-family-wrapper");
-
-const row = document.createElement("div");
-row.classList.add("extended-family-row");
-row.innerHTML = `
-  <select class="form-select">
-    <option value="" disabled hidden ${!member.gender ? "selected" : ""}>Gender</option>
-    <option value="male" ${member.gender === "male" ? "selected" : ""}>Male</option>
-    <option value="female" ${member.gender === "female" ? "selected" : ""}>Female</option>
-  </select>
-  <input type="text" class="dob-input" value="${member.dateOfBirth || ""}" placeholder="DOB" />
-   <span class="dob-icon glyphicon glyphicon-calendar" style="right: 20px; cursor: pointer;"></span>
-      <select class="form-select cover-amount-select">
-    <option value="5000" ${member.coverAmount == 5000 ? "selected" : ""}>R5,000</option>
-    <option value="10000" ${member.coverAmount == 10000 ? "selected" : ""}>R10,000</option>
-    <option value="15000" ${member.coverAmount == 15000 ? "selected" : ""}>R15,000</option>
-    <option value="20000" ${member.coverAmount == 20000 ? "selected" : ""}>R20,000</option>
-    <option value="25000" ${member.coverAmount == 25000 ? "selected" : ""}>R25,000</option>
-    <option value="30000" ${member.coverAmount == 30000 ? "selected" : ""}>R30,000</option>
-    <option value="50000" ${member.coverAmount == 50000 ? "selected" : ""}>R50,000</option>
-    <option value="100000" ${member.coverAmount == 100000 ? "selected" : ""}>R100,000</option>
-  </select>
-  
-`;
-
-const removeContainer = document.createElement("div");
-removeContainer.classList.add("remove-button-container");
-removeContainer.innerHTML = `
-  <button type="button" onclick="removeExtendedFamilyRow(this.closest('.extended-family-wrapper'), '${normalizedType}')" class="remove-button">
-    <span class="remove-text">Remove</span>
-  </button>
-  <i class="material-icons remove-icon" onclick="removeExtendedFamilyRow(this.closest('.extended-family-wrapper'), '${normalizedType}')">delete</i>
-`;
-
-wrapper.appendChild(row);
-wrapper.appendChild(removeContainer);
-container.appendChild(wrapper);
-
-
-
-        flatpickr(row.querySelector('.dob-input'), {
-          dateFormat: "Y-m-d",
-           disableMobile: true,
-          appendTo: document.body,
-          onChange: () => saveMembersToSession(normalizedType)
-        });
-        
- const dobInput = row.querySelector('.dob-input');
-
-        const calendarIcon = row.querySelector('.dob-icon'); 
-
-
-
-        setupDOBPicker(dobInput, calendarIcon, normalizedType);
-        
-        row.querySelector("select").addEventListener("change", () => {
-          saveMembersToSession(normalizedType);
-        });
-      });
-    } else {
-      const notification = document.createElement("div");
-      notification.classList.add("no-members-message");
-      notification.textContent = "No family members added yet.";
-      notification.style.justifyContent = "center";
-
-      notification.style.textAlign = "center";
-      notification.style.color = "grey";
-      notification.style.marginTop = "1rem";
-      container.appendChild(notification);
-    }
-    toggleNoMembersMessage(normalizedType);
-  }
-}
-function setupDOBPicker(inputEl, iconEl, type = null) {
-
-  const fp = flatpickr(inputEl, {
-
-    dateFormat: "Y-m-d",
-     disableMobile: true,
-    appendTo: document.body,
-
-    onChange: (selectedDates, dateStr) => {
-
-      inputEl.value = dateStr;
-
-      if (type) saveMembersToSession(type);
-
-    }
-
-  });
-
-
-
-  iconEl.addEventListener("click", () => {
-
-    fp.open();
-
-  });
-
-
- 
-}
-function submitModalMembers() {
-  const headingLabel = document.querySelector(".modal_header .heading h2").textContent.replace(" Details", "").trim();
-  const type = labelToKeyMap[headingLabel];
-  const container = document.getElementById("extendedFamilyContainer");
-  const memberRows = container.querySelectorAll(".extended-family-row");
-
-  let updatedMembers = [];
-  let hasErrors = false;
-
-  const selectedFuneralType = document.getElementById("funeralType").value;
-
-  // Clear previous errors
-  container.querySelectorAll(".member-error").forEach(el => el.remove());
-
-  memberRows.forEach(row => {
-    const gender = row.querySelector("select").value;
-    const dob = row.querySelector(".dob-input").value;
-    const coverAmount = parseInt(row.querySelector(".cover-amount-select").value);
-    const age = calculateAge(dob);
-
-    // Create error message container
-    const errorDiv = document.createElement("div");
-    errorDiv.className = "member-error";
-
-    let isValid = true;
-
-    // Age validation by type and funeral plan
-    if (selectedFuneralType === "Enhanced") {
-      if (type === "child" && (age < 0 || age > 25)) {
-        errorDiv.textContent = "Child must be between 0 and 25 years old.";
-        isValid = false;
-      }
-      if (type === "spouse" && (age < 18 || age > 75)) {
-        errorDiv.textContent = "Spouse must be between 18 and 75 years old.";
-        isValid = false;
-      }
-      if (type === "parent" && (age < 18 || age > 85)) {
-        errorDiv.textContent = "Parent must be between 18 and 85 years old.";
-        isValid = false;
-      }
-      if (type === "extended Family" && (age < 0 || age > 75)) {
-        errorDiv.textContent = "Extended Family must be between 0 and 75 years old.";
-        isValid = false;
-      }
-    }
-if (selectedFuneralType === "Staff") {
-      if (type === "child" && (age < 0 || age > 25)) {
-        errorDiv.textContent = "Child must be between 0 and 25 years old.";
-        isValid = false;
-      }
-      if (type === "spouse" && (age < 18 || age > 65)) {
-        errorDiv.textContent = "Spouse must be between 18 and 65 years old.";
-        isValid = false;
-      }
-      if (type === "parent" && (age < 18 || age > 85)) {
-        errorDiv.textContent = "Parent must be between 18 and 85 years old.";
-        isValid = false;
-      }
-      if (type === "extended Family" && (age < 0 || age > 75)) {
-        errorDiv.textContent = "Extended Family must be between 0 and 75 years old.";
-        isValid = false;
-      }
-    }
-
-    if (selectedFuneralType === "Foreign") {
-      if (type === "child" && (age < 0 || age > 25)) {
-        errorDiv.textContent = "Child must be between 0 and 25 years old.";
-        isValid = false;
-      }
-      if (type === "spouse" && (age < 18 || age > 65)) {
-        errorDiv.textContent = "Spouse must be between 18 and 65 years old.";
-        isValid = false;
-      }
-    }
-
-    if (!isValid) {
-      row.closest(".extended-family-wrapper").after(errorDiv); // Attach error message to the row
-      hasErrors = true;
-    } else {
-      updatedMembers.push({ gender, dateOfBirth: dob, coverAmount });
-    }
-  });
-
-  if (hasErrors) return; // Don't proceed
-
-  // Save to global and session
-  savedMembers = updatedMembers;
-  memberCounts[type] = updatedMembers.length;
-  saveMembersToSession(type);
-  updateMemberCountDisplay(type);
-  toggleNoMembersMessage(type);
-  closeDialog("addModal");
-}
-
-function updateMemberCountDisplay(type) {
-  const selectedFuneralType = document.getElementById("funeralType").value;
-  const limit = memberLimits[selectedFuneralType]?.[type] ?? 0;
-  const count = memberCounts[type];
-
-  const modal = document.querySelector(".modal_overlay:not(.hidden)");
-  const countEl = modal?.querySelector(".member-count-display");
-
-  if (countEl) {
-    countEl.textContent = `Members: ${count}/${limit}`;
-    countEl.style.marginTop = "0.25rem";
-    countEl.style.textAlign = "center";
-     countEl.style.fontWeight =  count === limit ? "bold" : "normal";
-    countEl.style.color = count === limit ? "#52AD00" : "grey";
-  }
-  // Update the family button label
-
-  const label = Object.keys(labelToKeyMap).find(key => labelToKeyMap[key] === type);
-
-  const familyButtons = document.querySelectorAll(`.family-button[data-label="${label}"]`);
-
-  
-
-  familyButtons.forEach(button => {
-
-    const span = button.querySelector("span");
-
-    if (span) {
-
-      const reachedLimit = count === limit;
-
-      span.innerHTML = `${label} <span class="button-member-count ${reachedLimit ? 'limit-reached' : ''}">(${count}/${limit})</span>`;
-
-    }
-
-  });
-}
-
-
-
-function toggleNoMembersMessage(type) {
-  const container = document.getElementById("extendedFamilyContainer");
-  const existingMessage = container.querySelector(".no-members-message");
-
-  if (memberCounts[type] === 0) {
-    if (!existingMessage) {
-      const message = document.createElement("div");
-      message.classList.add("no-members-message");
-      message.textContent = "No family members added yet.";
-      message.style.justifyContent = "center";
-      message.style.textAlign = "center";
-      message.style.color = "grey";
-      message.style.marginTop = "1rem";
-      container.appendChild(message);
-    }
-  } else {
-    if (existingMessage) {
-      container.removeChild(existingMessage);
-    }
-  }
-}
-
-
-
-
-function closeDialog(modalId, event = null) {
-    if (!event || event.target.id === modalId) {
-        document.getElementById(modalId).classList.add("hidden");
-    }
-}
-  
-function addMemberRow() {
-  const label = document.querySelector(".modal_header .heading h2").textContent.replace(" Details", "");
-  const type = labelToKeyMap[label]; // normalize
-  const selectedFuneralType = document.getElementById("funeralType").value;
-  const limit = memberLimits[selectedFuneralType][type];
-   const modalBody = document.querySelector('.modal_body');
-
-    const hasVerticalScrollbar = modalBody.scrollHeight > modalBody.clientHeight;
+    <script>
     
-  if (memberCounts[type] >= limit) return;
-
-  const container = document.getElementById("extendedFamilyContainer");
-
-  // Remove the "no members" message if it exists
-  const emptyNotification = container.querySelector(".no-members-message");
-  if (emptyNotification) {
-    container.removeChild(emptyNotification);
-  }
-
-  // Create wrapper div
-  const wrapper = document.createElement("div");
-  wrapper.classList.add("extended-family-wrapper");
-
-  // Create the main row
-  const row = document.createElement("div");
-  row.classList.add("extended-family-row");
-  row.innerHTML = `
-    <select class="form-select">
-      <option value="" disabled selected hidden>Gender</option>
-      <option value="male">Male</option>
-      <option value="female">Female</option>
-    </select>
-    <input type="text" class="dob-input" placeholder="DOB" />
-     <span class="dob-icon glyphicon glyphicon-calendar" style="right: 20px; cursor: pointer;"></span>
-    
-    <select class="form-select cover-amount-select" fdprocessedid="s6rzob">
-                        <option value="5000">R5,000</option>
-                        <option value="10000">R10,000</option>
-                        <option value="15000">R15,000</option>
-                        <option value="20000">R20,000</option>
-                        <option value="25000">R25,000</option>
-                        <option value="30000">R30,000</option>
-                        <option value="50000">R50,000</option>
-                        <option value="100000">R100,000</option>
-                    </select>
-  `;
-
-  // Create the remove button outside the row
-  const removeContainer = document.createElement("div");
-  removeContainer.classList.add("remove-button-container");
-  removeContainer.innerHTML = `
-    <button type="button" onclick="removeExtendedFamilyRow(this.closest('.extended-family-wrapper'), '${type}')" class="remove-button">
-      <span class="remove-text">Remove</span>
-    </button>
-    <i class="material-icons remove-icon" onclick="removeExtendedFamilyRow(this.closest('.extended-family-wrapper'), '${type}')">delete</i>
-  `;
-
-  wrapper.appendChild(row);
-  wrapper.appendChild(removeContainer);
-  container.appendChild(wrapper);
-
-  flatpickr(row.querySelector('.dob-input'), {
-    dateFormat: "Y-m-d",
-     disableMobile: true,
-    appendTo: document.body,
-    onChange: () => saveMembersToSession(type) // updated from normalizedType to type
-  });
-
-
-  const dobInput = row.querySelector('.dob-input');
-
-const calendarIcon = row.querySelector('.dob-icon'); 
-
-
-
-setupDOBPicker(dobInput, calendarIcon, type);
-
-
-  row.querySelector("select").addEventListener("change", () => {
-    saveMembersToSession(type); // updated from normalizedType to type
-  });
-  
-  // Listen to cover amount change
-
-row.querySelector(".cover-amount-select").addEventListener("change", () => {
-
-  saveMembersToSession(type);
-
-});
-
-  memberCounts[type]++;
-  saveMembersToSession(type);
-  toggleNoMembersMessage(type);
-
-  if (memberCounts[type] >= limit) {
-    disableAddButton(type);
-  }
-
-  updateMemberCountDisplay(type);
-  // Smooth scroll to bottom if scrollbar is present
-
-    if (hasVerticalScrollbar) {
-
-    modalBody.scrollTo({
-
-        top: modalBody.scrollHeight,
-
-        behavior: 'smooth'
-
-    });
-
-    }
-}
-
-
-
-function removeExtendedFamilyRow(button, type) {
-  const wrapper = button.closest(".extended-family-wrapper");
-  if (wrapper) {
-    wrapper.remove();
-    memberCounts[type]--;
-
-    const selectedFuneralType = document.getElementById("funeralType").value;
-    const limit = memberLimits[selectedFuneralType][type];
-
-    saveMembersToSession(type);
-    toggleNoMembersMessage(type);
-
-    if (memberCounts[type] < limit) {
-      enableAddButton(type);
-    }
-
-    updateMemberCountDisplay(type);
-  }
-}
-
-  function disableAddButton(type) {
-    document.querySelectorAll(".addExtendedButton").forEach(btn => {
-      const label = btn.textContent.trim().split(" ")[0]; // Spouse, Child, etc.
-      if (labelToKeyMap[label] === type) {
-        btn.classList.add("disabled-button");
-        // btn.disabled = true;
-      }
-    });
-  }
-  
-  function enableAddButton(type) {
-    document.querySelectorAll(".addExtendedButton").forEach(btn => {
-      const label = btn.textContent.trim().split(" ")[0]; // Spouse, Child, etc.
-      if (labelToKeyMap[label] === type) {
-        btn.classList.remove("disabled-button");
-        btn.disabled = false;
-      }
-    });
-  }
-
-  function updateFamilyButtonLabels() {
-    const funeralType = document.getElementById("funeralType").value;
-    const limitConfig = memberLimits[funeralType];
-  
+    document.addEventListener("DOMContentLoaded", function () {
+    const coverSelect = document.getElementById("coverAmount");
+    const funeralTypeSelect = document.getElementById("funeralType");
+    const dobInput = document.getElementById("personal-dob");
+    const memberType = "main_member";
+ 
+    let flatpickrInstance;
+ 
+    initializeFlatpickrOnExistingInputs();
+    wipeSession();
+ 
+    // initially disable all buttons
     document.querySelectorAll(".family-button").forEach((btn) => {
-      const label = btn.getAttribute("data-label"); // e.g., "Child"
-      const key = labelToKeyMap[label];
-  
-      if (key && limitConfig[key] !== undefined) {
-        // Find the span inside the button and update its text
-        const labelSpan = btn.querySelector("span");
-        if (labelSpan) {
-          labelSpan.textContent = `${label} (0/${limitConfig[key]})`;
-        }
-  
-        // Handle the disabled-like state for divs
-        if (limitConfig[key] === 0) {
-          btn.classList.add("disabled");
-          btn.style.pointerEvents = "none";
-          btn.style.opacity = "0.5";
-        } else {
-          btn.classList.remove("disabled");
-          btn.style.pointerEvents = "";
-          btn.style.opacity = "";
-        }
-      }
+      btn.classList.add("disabled");
+      btn.style.pointerEvents = "none";
+      btn.style.opacity = "0.5";
     });
-  }
-
-   function initializeFlatpickrOnExistingInputs() {
-
-  document.querySelectorAll('.dob-input').forEach(input => {
-
-    const fpInstance = flatpickr(input, {
-
-      dateFormat: "Y-m-d",
-      disableMobile: true,
-      appendTo: document.body,
-
-    });
-
-
-
-    // Try to find the corresponding span/icon in the same parent
-
-    const span = input.parentElement.querySelector('.glyphicon-calendar');
-
-
-
-    if (span) {
-
-      span.style.cursor = 'pointer'; // Optional: make it visually clickable
-
-      span.addEventListener('click', () => {
-
-        fpInstance.open();
-
+ 
+    function getCoverOptions(coverType, memberType, age) {
+        const rules = coverRules[coverType]?.[memberType];
+        if (!rules) return [];
+        for (const rule of rules) {
+            if (age >= rule.minAge && age <= rule.maxAge) {
+                return rule.options;
+            }
+        }
+        return [];
+    }
+ 
+    function validateFamilyButtons() {
+      const dob = $('#personal-dob').val();
+      const gender = $('#personal-gender').val();
+      const coverAmount = $('#coverAmount').val();
+ 
+      const allValid = dob && gender && coverAmount;
+ 
+      document.querySelectorAll(".family-button").forEach((btn) => {
+          if (!allValid) {
+              btn.classList.add("disabled");
+              btn.style.pointerEvents = "none";
+              btn.style.opacity = "0.5";
+          } else {
+              btn.classList.remove("disabled");
+              btn.style.pointerEvents = "";
+              btn.style.opacity = "";
+          }
       });
+    }
+ 
+    $('#personal-dob').on('input change', validateAndApplyButtonState);
 
+    $('#coverAmount').on('change', validateAndApplyButtonState);
+    $('#personal-gender').on('change', function () {
+      $('#personal-gender').removeClass('input-error');
+      validateAndApplyButtonState();
+    });
+ 
+ 
+    function calculateAge(dob) {
+        const birthDate = new Date(dob);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age;
+    }
+ 
+    function updateCoverOptions() {
+        const dob = dobInput.value;
+        if (!dob) return;
+ 
+        const age = calculateAge(dob);
+        const coverType = funeralTypeSelect.value;
+        const options = getCoverOptions(coverType, memberType, age);
+ 
+        if (options.length === 0) {
+            $('#main-member-errors').show();
+            $('#dob-error').text(`Main member must be between 18 and 75 years old for ${coverType} funeral cover.`);
+            $('#personal-dob-input').addClass('input-error');
+            coverSelect.disabled = true;
+        } else {
+            $('#main-member-errors').hide();
+            $('#personal-dob-input').removeClass('input-error');
+            coverSelect.innerHTML = options
+                .map(val => `<option value="${val}">R${val.toLocaleString()}</option>`)
+                .join('');
+            coverSelect.disabled = false;
+        }
+ 
+        validateAndApplyButtonState();
+    }
+ 
+ 
+    flatpickrInstance = flatpickr(dobInput, {
+        dateFormat: "Y-m-d",
+        disableMobile: true,
+        appendTo: document.body,
+        onChange: updateCoverOptions,
+    });
+ 
+    const icon = document.querySelector("#personal-dob-input .dob-icon");
+    if (icon) {
+        icon.addEventListener("click", () => dobInput.focus());
+    }
+ 
+    dobInput.addEventListener("change", updateCoverOptions);
+    funeralTypeSelect.addEventListener("change", () => {
+        updateCoverOptions();
+    });
+ 
+});
+ 
+    
+    const labelToKeyMap = {
+        "Spouse": "spouse",
+        "Child": "child",
+        "Parent": "parent",
+        "Extended Family": "extended_family"
+    };
+
+    let savedMembers = []
+
+    const memberLimits = {
+        ab_enhanced_funeral: { spouse: 3, child: 8, parent: 4, extended_family: 8 },
+        ab_staff_funeral: { spouse: 3, child: 8, parent: 4, extended_family: 8 },
+        ab_foreigner_funeral: { spouse: 1, child: 8, parent: 0, extended_family: 0 }
+    };
+
+    const memberCounts = {
+        spouse: 0,
+        child: 0,
+        parent: 0,
+        extended_family: 0
+    };
+
+    const coverRules = {
+        ab_enhanced_funeral: {
+            main_member: [
+                {
+                    minAge: 18,
+                    maxAge: 75,
+                    options: [
+                        5000, 10000, 15000, 20000,25000,30000, 50000, 100000
+                    ]
+                }
+            ],
+            spouse: [
+                { 
+                    minAge: 18, maxAge: 75, options: [5000, 10000, 15000, 20000,25000,30000, 50000, 100000] 
+                }
+            ],
+            child: [
+                { minAge: 0, maxAge: 5, options: [5000, 10000, 15000, 20000] },
+                { minAge: 6, maxAge: 14, options: [5000, 10000, 15000, 20000] },
+                { minAge: 15, maxAge: 25, options: [5000, 10000, 15000, 20000, 25000, 30000, 50000] }
+            ],
+            parent: [
+                { 
+                    minAge: 18, maxAge: 85, options: [5000, 10000, 15000, 20000,25000,30000, 50000] 
+                }
+            ],
+            extended_family: [
+                { minAge: 0, maxAge: 6, options: [5000, 10000, 15000, 20000] },
+                { minAge: 7, maxAge: 18, options: [5000, 10000, 15000, 20000] },
+                { minAge: 19, maxAge: 75, options: [5000, 10000, 15000, 20000, 25000, 30000, 50000] }
+            ]
+        },
+        ab_staff_funeral: {
+            main_member: [
+                {
+                    minAge: 18,
+                    maxAge: 65,
+                    options: [
+                        5000, 10000, 15000, 20000,25000,30000, 50000, 100000
+                    ]
+                }
+            ],
+            spouse: [
+                { 
+                    minAge: 18, maxAge: 65, options: [5000, 10000, 15000, 20000,25000,30000, 50000, 100000] 
+                }
+            ],
+            child: [
+                { minAge: 0, maxAge: 5, options: [5000, 10000, 15000, 20000] },
+                { minAge: 6, maxAge: 14, options: [5000, 10000, 15000, 20000] },
+                { minAge: 15, maxAge: 25, options: [5000, 10000, 15000, 20000, 25000, 30000, 50000] }
+            ],
+            parent: [
+                { 
+                    minAge: 18, maxAge: 85, options: [5000, 10000, 15000, 20000,25000,30000, 50000] 
+                }
+            ],
+            extended_family: [
+                { minAge: 0, maxAge: 6, options: [5000, 10000, 15000, 20000] },
+                { minAge: 7, maxAge: 18, options: [5000, 10000, 15000, 20000] },
+                { minAge: 19, maxAge: 75, options: [5000, 10000, 15000, 20000, 25000, 30000, 50000] }
+            ]
+        },
+        ab_foreigner_funeral: {
+            main_member: [
+                {
+                    minAge: 18,
+                    maxAge: 65,
+                    options: [
+                        5000, 10000, 15000, 20000,25000,30000, 50000, 100000
+                    ]
+                }
+            ],
+            spouse: [
+                { 
+                    minAge: 18, maxAge: 65, options: [5000, 10000, 15000, 20000,25000,30000, 50000, 100000] 
+                }
+            ],
+            child: [
+                { minAge: 0, maxAge: 5, options: [5000, 10000] },
+                { minAge: 6, maxAge: 14, options: [5000, 10000, 15000, 20000, 25000, 30000] },
+                { minAge: 15, maxAge: 25, options: [5000, 10000, 15000, 20000, 25000, 30000, 50000] }
+            ],
+            }
+    };
+
+    function calculateAge(dob) {
+        const birthDate = new Date(dob);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age;
     }
 
-  });
+    function getCoverOptions(coverType, memberType, age) {
+        const rules = coverRules[coverType]?.[memberType] || [];
+        for (const rule of rules) {
+            if (age >= rule.minAge && age <= rule.maxAge) {
+            return rule.options;
+            }
+        }
+        return [];
+    }
 
+    function openDialog(modalId, type = "") {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+ 
+    modal.classList.remove("hidden");
+ 
+    const headingEl = modal.querySelector(".modal_header .heading h2");
+    if (headingEl) {
+        headingEl.textContent = `${type} Details`;
+    }
+ 
+    const parsedLabel = headingEl?.textContent?.replace(" Details", "").trim();
+    const normalizedType = labelToKeyMap[parsedLabel];
+ 
+    updateMemberCountDisplay(normalizedType);
+ 
+    const container = modal.querySelector("#extendedFamilyContainer");
+    if (container) {
+        container.innerHTML = "";
+ 
+        const savedMembers = getMembersFromSession(normalizedType);
+        memberCounts[normalizedType] = savedMembers.length;
+        
+        
+ 
+        updateMemberCountDisplay(normalizedType);
+ 
+        if (savedMembers.length > 0) {
+            savedMembers.forEach(member => {
+                const wrapper = document.createElement("div");
+                wrapper.classList.add("extended-family-wrapper");
+ 
+                const age = member.dateOfBirth ? calculateAge(member.dateOfBirth) : null;
+                const funeralType = document.getElementById("funeralType")?.value || "ab_enhanced_funeral"; // default fallback
+                const options = age !== null
+                    ? getCoverOptions(funeralType, normalizedType, age)
+                    : [];
+ 
+                const coverOptionsHtml = options.length > 0
+                    ? options.map(val => `<option value="${val}" ${member.coverAmount == val ? "selected" : ""}>R${val.toLocaleString()}</option>`).join('')
+                    : `<option disabled>No cover options</option>`;
+ 
+                const row = document.createElement("div");
+                row.classList.add("extended-family-row");
+                row.innerHTML = `
+                    <select class="form-select">
+                        <option value="" disabled hidden ${!member.gender ? "selected" : ""}>Gender</option>
+                        <option value="male" ${member.gender === "male" ? "selected" : ""}>Male</option>
+                        <option value="female" ${member.gender === "female" ? "selected" : ""}>Female</option>
+                    </select>
+                    <input type="text" class="dob-input" value="${member.dateOfBirth || ""}" placeholder="Date of birth" />
+                    <span class="dob-icon glyphicon glyphicon-calendar" style="right: 33px; cursor: pointer;"></span>
+                    <select class="form-select cover-amount-select">
+                        ${coverOptionsHtml}
+                    </select>
+                `;
+ 
+                const removeContainer = document.createElement("div");
+                removeContainer.classList.add("remove-button-container");
+                removeContainer.innerHTML = `
+                  <button type="button" onclick="removeExtendedFamilyRow(this.closest('.extended-family-wrapper'), '${normalizedType}')" class="remove-button">
+                    <span class="remove-text">Remove</span>
+                  </button>
+                  <i class="material-icons remove-icon" onclick="removeExtendedFamilyRow(this.closest('.extended-family-wrapper'), '${normalizedType}')">delete</i>
+                `;
+ 
+                wrapper.appendChild(row);
+                wrapper.appendChild(removeContainer);
+                container.appendChild(wrapper);
+ 
+                flatpickr(row.querySelector('.dob-input'), {
+                  dateFormat: "Y-m-d",
+                  disableMobile: true,
+                  appendTo: document.body,
+                  onChange: () => saveMembersToSession(normalizedType)
+                });
+       
+              const dobInput = row.querySelector('.dob-input');
+ 
+                      const calendarIcon = row.querySelector('.dob-icon');
+ 
+ 
+ 
+                      setupDOBPicker(dobInput, calendarIcon, normalizedType);
+                     
+                      row.querySelector("select").addEventListener("change", () => {
+                        saveMembersToSession(normalizedType);
+                      });
+            });
+        }else {
+                // Add one default member row if none exist
+                addMemberRow(normalizedType);
+            }
+    }
 }
-  
-  
 
+    function setupDOBPicker(inputEl, iconEl, type = null) {
+        const coverSelect = inputEl.closest('.extended-family-row').querySelector('.cover-amount-select');
+        const memberError = inputEl.closest('.extended-family-row').querySelector('.member-error');
 
-function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
+      // ✅ Check if DOB already selected and cover options already exist
 
+        const hasDOB = inputEl.value?.trim() !== "";
 
-document.getElementById("funeralType").addEventListener("change", () => {
-  Object.keys(memberCounts).forEach(k => memberCounts[k] = 0);
-  
-  updateFamilyButtonLabels();
-});
+        const hasCoverOptions = [...coverSelect.options].length > 1; // Excludes just the default placeholder
 
-document.addEventListener("DOMContentLoaded", () => {
-  initializeFlatpickrOnExistingInputs();
- wipeSession();
-});
+        // ✅ Enable or disable based on initial state
 
+        coverSelect.disabled = !(hasDOB && hasCoverOptions);
 
-function saveMembersToSession(type) {
-  const container = document.getElementById("extendedFamilyContainer");
-  const rows = container.querySelectorAll(".extended-family-row");
-
-  const members = Array.from(rows).map(row => {
-    const gender = row.querySelector("select").value;
-    const dateOfBirth = row.querySelector("input").value;
-     const coverAmountStr = row.querySelector(".cover-amount-select").value;
-    const coverAmount  = parseInt(coverAmountStr);
-    
-  return { gender, dateOfBirth, coverAmount };
-  });
-
-  memberCounts[type] = members.length;
-
-  const sessionData = JSON.parse(sessionStorage.getItem("familyMembers") || "{}");
-  sessionData[type] = members;
-  sessionStorage.setItem("familyMembers", JSON.stringify(sessionData));
-
-  updateMemberCountDisplay(type); 
-}
-
-function getMembersFromSession(type) {
-  const sessionData = JSON.parse(sessionStorage.getItem("familyMembers") || "{}");
-  return sessionData[type] || [];
-}
-
-function wipeSession() {
-  sessionStorage.removeItem("familyMembers");
-  Object.keys(memberCounts).forEach(k => memberCounts[k] = 0);
-  updateFamilyButtonLabels();
-}
-
-     
-   $(document).ready(function () {
-
-    function collectFormData() {
-        const funeralType = $('#funeralType').val();
-        const coverAmount = $('#coverAmount').val();
-
-        const personalDetails = {
-            gender: $('#personal-gender').val(),
-    dob: $('#personal-dob').val()
-        };
-
-        const familyData = {
-            Child: [],
-            Parent: [],
-            "Extended Family": [],
-            Spouse: []
-        };
-
-        // Loop through each added family member
-        $('#extendedFamilyContainer .member-row').each(function () {
-            const type = $(this).data('type');
-            const gender = $(this).find('.member-gender').val();
-            const dob = $(this).find('.member-dob').val();
-
-            if (type && gender && dob) {
-                familyData[type].push({ gender, dateOfBirth: dob, coverAmount: 90000.00 });
+        const fp = flatpickr(inputEl, {
+            dateFormat: "Y-m-d",
+            disableMobile: true,
+            appendTo: document.body,
+            onChange: (selectedDates, dateStr) => {
+            inputEl.value = dateStr;
+            updateCoverOptions();
+            if (type) saveMembersToSession(type);
             }
         });
 
-        // Construct the final payload object
-        return {
-            type: "insurance",
-            subType: "ab_enhanced_funeral",
-            personalDetails: {
-                idNumber: "",
-                passportNumber: "",
-                surname: "",
-                firstName: "",
-                dateOfBirth: personalDetails.dob,
-                gender: personalDetails.gender
-            },
-            insuranceDetails: {
-                coverAmount: parseFloat(coverAmount) || 110000.00,
-                spouses: getMembersFromSession("spouse"),
-                children: getMembersFromSession("child"),
-                parents: getMembersFromSession("parent"),
-                extendedFamily:getMembersFromSession("extended Family"),
+        iconEl.addEventListener("click", () => {
+            fp.open();
+        });
+
+        function updateCoverOptions() {
+            const dob = inputEl.value;
+            if (!dob) return;
+
+            const age = calculateAge(dob);
+            const coverType = document.getElementById("funeralType").value;
+            const memberType = type;
+
+            const options = getCoverOptions(coverType, memberType, age);
+
+            if (options.length === 0) {
+                coverSelect.disabled = true;
+
+            } else {
+               // memberError.remove();
+                coverSelect.innerHTML = options
+                    .map(val => `<option value="${val}">R${val.toLocaleString()}</option>`)
+                    .join('');
+                coverSelect.disabled = false;
             }
-        };
-    }
 
-   $('.cal-btn').on('click', function () {
-    let isValid = true;
-
-    // Clear previous error messages
-    $('#gender-error').text('');
-    $('#dob-error').text('');
-    $('#personal-gender').removeClass('input-error');
-    $('#personal-dob-input').removeClass('input-error');
-
-    const personalGender = $('#personal-gender').val();
-    const personalDob = $('#personal-dob').val();
-    const funeralType = $('#funeralType').val();
-
-    if (!personalGender) {
-        $('#gender-error').text('Please select your gender.');
-        $('#personal-gender').addClass('input-error');
-        isValid = false;
-    }
-
-    if (!personalDob) {
-        $('#dob-error').text('Please enter your date of birth.');
-        $('#personal-dob-input').addClass('input-error');
-        isValid = false;
-    }
-
-    // Perform main member age validation based on funeral type
-    if (personalDob) {
-        const age = calculateAge(personalDob);
-
-        if (funeralType === "Enhanced" && (age < 18 || age > 75)) {
-            $('#dob-error').text('Main member must be between 18 and 75 years old for Enhanced funeral cover.');
-            $('#personal-dob-input').addClass('input-error');
-            isValid = false;
-        } else if ((funeralType === "Staff" || funeralType === "Foreign") && (age < 18 || age > 65)) {
-            $('#dob-error').text(`Main member must be between 18 and 65 years old for ${funeralType} funeral cover.`);
-            $('#personal-dob-input').addClass('input-error');
-            isValid = false;
+            if (type) saveMembersToSession(type);
         }
+
+        inputEl.addEventListener("change", updateCoverOptions);
+    }
+function validateMemberAge(dob, type, funeralType) {
+
+        if (!dob) return { valid: false, message: "Please select a valid date of birth." };
+
+
+
+        const birthDate = new Date(dob);
+
+        const now = new Date();
+
+
+
+        if (birthDate > now) {
+
+            return { valid: false, message: "Date of birth cannot be in the future." };
+
+        }
+
+
+
+        const age = calculateAge(dob);
+
+
+
+        if (funeralType === "ab_enhanced_funeral") {
+
+            if (type === "child" && (age < 0 || age > 25)) return { valid: false, message: "Child must be between 0 and 25 years old." };
+
+            if (type === "spouse" && (age < 18 || age > 75)) return { valid: false, message: "Spouse must be between 18 and 75 years old." };
+
+            if (type === "parent" && (age < 18 || age > 85)) return { valid: false, message: "Parent must be between 18 and 85 years old." };
+
+            if (type === "extended_family" && (age < 0 || age > 75)) return { valid: false, message: "Extended Family must be between 0 and 75 years old." };
+
+        }
+
+
+
+        if (funeralType === "ab_staff_funeral") {
+
+            if (type === "child" && (age < 0 || age > 25)) return { valid: false, message: "Child must be between 0 and 25 years old." };
+
+            if (type === "spouse" && (age < 18 || age > 65)) return { valid: false, message: "Spouse must be between 18 and 65 years old." };
+
+            if (type === "parent" && (age < 18 || age > 85)) return { valid: false, message: "Parent must be between 18 and 85 years old." };
+
+            if (type === "extended_family" && (age < 0 || age > 75)) return { valid: false, message: "Extended Family must be between 0 and 75 years old." };
+
+        }
+
+
+
+        if (funeralType === "ab_foreigner_funeral") {
+
+            if (type === "child" && (age < 0 || age > 25)) return { valid: false, message: "Child must be between 0 and 25 years old." };
+
+            if (type === "spouse" && (age < 18 || age > 65)) return { valid: false, message: "Spouse must be between 18 and 65 years old." };
+
+        }
+
+
+
+        return { valid: true };
+
+    }
+   function submitModalMembers() {
+        const headingLabel = document.querySelector(".modal_header .heading h2").textContent.replace(" Details", "").trim();
+        const type = labelToKeyMap[headingLabel];
+        const container = document.getElementById("extendedFamilyContainer");
+        const memberRows = container.querySelectorAll(".extended-family-row");
+ 
+        let updatedMembers = [];
+        let hasErrors = false;
+        
+        const selectedFuneralType = document.getElementById("funeralType").value;
+ 
+         // ✅ Get the main cover amount from the HTML
+    const mainCoverAmount = parseInt(document.getElementById("coverAmount").value);
+ 
+        // Clear previous errors
+        container.querySelectorAll(".member-error").forEach(el => el.remove());
+ 
+        memberRows.forEach(row => {
+            const gender = row.querySelector("select").value;
+            const dob = row.querySelector(".dob-input").value;
+            const coverAmount = parseInt(row.querySelector(".cover-amount-select").value);
+            const age = calculateAge(dob);
+ 
+ 
+ 
+            // Create error message container
+            const errorDiv = document.createElement("div");
+            errorDiv.className = "member-error";
+             
+             
+            let isValid = true;
+ 
+            // ✅ Validation: coverAmount should not exceed mainCoverAmount
+            if (!isNaN(coverAmount) && coverAmount > mainCoverAmount) {
+                                createMemberError(row.closest(".extended-family-wrapper"), `Cover amount cannot exceed main cover amount of R${mainCoverAmount}.`);
+                isValid = false;
+            }
+             
+             if (!isNaN(gender)) {
+                createMemberError(row.closest(".extended-family-wrapper"), `Please Select a gender`);
+                isValid = false;
+            }
+            if (!isNaN(dob)) {
+                createMemberError(row.closest(".extended-family-wrapper"), `Please Select a dob`);
+                isValid = false;
+            }
+            // Age validation by type and funeral plan
+               const validation = validateMemberAge(dob, type, selectedFuneralType);
+
+            if (!validation.valid) {
+
+                createMemberError(row.closest(".extended-family-wrapper"), validation.message);
+                isValid = false;
+            }
+        
+ 
+            if (!isValid) {
+          //  row.closest(".extended-family-wrapper").after(errorDiv); 
+            hasErrors = true;
+            } else {
+                // errorDiv.remove();
+            updatedMembers.push({ gender, dateOfBirth: dob, coverAmount });
+            }
+        });
+ 
+        if (hasErrors) return; // Don't proceed
+ 
+        // Save to global and session
+        savedMembers = updatedMembers;
+        memberCounts[type] = updatedMembers.length;
+        saveMembersToSession(type);
+        updateMemberCountDisplay(type);
+        toggleNoMembersMessage(type);
+        closeDialog("addModal");
     }
 
-    if (!isValid) return;
+    function updateMemberCountDisplay(type) {
+    const selectedFuneralType = document.getElementById("funeralType").value;
+    const limit = memberLimits[selectedFuneralType]?.[type] ?? 0;
+    const count = memberCounts[type];
 
-    const insuranceData = collectFormData(); // get dynamic form data
+    const modal = document.querySelector(".modal_overlay:not(.hidden)");
+    const countEl = modal?.querySelector(".member-count-display");
 
-    $.ajax({
-        url: '/umbraco/Surface/InvestmentCalculator/InvestmentCalculator',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(insuranceData),
-        success: function (res) {
-            console.log(res);
-            $("#premium-value").text(res?.data?.Data?.Premium || "0.00");
+    if (countEl) {
+        countEl.textContent = `Members: ${count}/${limit}`;
+        countEl.style.marginTop = "0.25rem";
+        countEl.style.textAlign = "center";
+        countEl.style.fontWeight =  count === limit ? "bold" : "normal";
+        countEl.style.color = count === limit ? "#52AD00" : "grey";
+    }
+    // Update the family button label
 
-            // Hide the image
-            $("#defaultImage").hide();
+    const label = Object.keys(labelToKeyMap).find(key => labelToKeyMap[key] === type);
 
-            // Show the premium display block
-            $("#premium-display").show();
-        },
-        error: function (err) {
-            console.error(err);
-            alert("An error occurred.");
+    const familyButtons = document.querySelectorAll(`.family-button[data-label="${label}"]`);
+
+    
+
+    familyButtons.forEach(button => {
+
+        const span = button.querySelector("span");
+
+        if (span) {
+
+        const reachedLimit = count === limit;
+
+        span.innerHTML = `${label} <span class="button-member-count ${reachedLimit ? 'limit-reached' : ''}">(${count}/${limit})</span>`;
+
         }
+
     });
-});
+    }
 
 
-});
+
+    function toggleNoMembersMessage(type) {
+    const container = document.getElementById("extendedFamilyContainer");
+    const existingMessage = container.querySelector(".no-members-message");
+
+    if (memberCounts[type] === 0) {
+        if (!existingMessage) {
+        const message = document.createElement("div");
+        message.classList.add("no-members-message");
+        message.textContent = "No family members added yet.";
+        message.style.justifyContent = "center";
+        message.style.textAlign = "center";
+        message.style.color = "grey";
+        message.style.marginTop = "1rem";
+        container.appendChild(message);
+        }
+    } else {
+        if (existingMessage) {
+        container.removeChild(existingMessage);
+        }
+    }
+    }
+
+
+
+
+    function closeDialog(modalId, event = null) {
+        if (!event || event.target.id === modalId) {
+               const sessionData = JSON.parse(sessionStorage.getItem("familyMembers") || "{}");
+            const updatedData = {};
+            let hasModifiedEntry = false;
+            const isMemberModified = (member) =>
+                member.gender && member.dateOfBirth && member.coverAmount;
+
+            for (const [type, members] of Object.entries(sessionData)) {
+
+                const filtered = members.filter(isMemberModified);
+
+                // Update global count for this member type
+
+                memberCounts[type] = filtered.length;
+
+                if (filtered.length > 0) {
+
+                    updatedData[type] = filtered;
+
+                    hasModifiedEntry = true;
+
+                } else {
+
+                    delete updatedData[type];
+
+                }
+                // Refresh display count regardless of whether any are left
+
+                updateMemberCountDisplay(type);
+
+            }
+
+            if (hasModifiedEntry) {
+
+                sessionStorage.setItem("familyMembers", JSON.stringify(updatedData));
+
+            } else {
+
+                sessionStorage.removeItem("familyMembers");
+
+            }
+            document.getElementById(modalId).classList.add("hidden");
+        }
+    }
+    
+   function addMemberRow() {
+        const label = document.querySelector(".modal_header .heading h2").textContent.replace(" Details", "");
+        const type = labelToKeyMap[label]; // normalise
+        const selectedFuneralType = document.getElementById("funeralType").value;
+        const limit = memberLimits[selectedFuneralType][type];
+        const modalBody = document.querySelector('.modal_body');
+ 
+        const hasVerticalScrollbar = modalBody.scrollHeight > modalBody.clientHeight;
+           
+        if (memberCounts[type] >= limit) return;
+ 
+        const container = document.getElementById("extendedFamilyContainer");
+ 
+        // Remove the "no members" message if it exists
+        const emptyNotification = container.querySelector(".no-members-message");
+        if (emptyNotification) {
+            container.removeChild(emptyNotification);
+        }
+ 
+        // Create wrapper div
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("extended-family-wrapper");
+ 
+        // Create the main row
+        const row = document.createElement("div");
+        row.classList.add("extended-family-row");
+        row.innerHTML = `
+            <select class="form-select">
+            <option value="" disabled selected hidden>Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            </select>
+              <input type="text" class="dob-input" readonly placeholder="Date of birth" />
+            <span class="dob-icon glyphicon glyphicon-calendar"></span>
+           
+            <select class="form-select cover-amount-select" fdprocessedid="s6rzob" disabled>
+                <option value="" selected disabled>Amount</option>
+            </select>
+        `;
+ 
+        // Create the remove button outside the row
+        const removeContainer = document.createElement("div");
+        removeContainer.classList.add("remove-button-container");
+        removeContainer.innerHTML = `
+            <button type="button" onclick="removeExtendedFamilyRow(this.closest('.extended-family-wrapper'), '${type}')" class="remove-button">
+            <span class="remove-text">Remove</span>
+            </button>
+            <i class="material-icons remove-icon" onclick="removeExtendedFamilyRow(this.closest('.extended-family-wrapper'), '${type}')">delete</i>
+        `;
+ 
+        wrapper.appendChild(row);
+        wrapper.appendChild(removeContainer);
+        container.appendChild(wrapper);
+ 
+       
+
+        const dobInput = row.querySelector('.dob-input');
+
+
+
+        // Disable keyboard on mobile (readonly) and set dynamic placeholder
+
+        const isMobile = window.innerWidth <= 768;
+
+        dobInput.placeholder = isMobile ? "dob" : "Date of Birth";
+  const genderSelect = row.querySelector("select");
+
+        const coverSelect = row.querySelector(".cover-amount-select");
+
+
+
+         // Get the main cover amount from the HTML
+
+        const mainCoverAmount = parseInt(document.getElementById("coverAmount").value);
+
+        const calendarIcon = row.querySelector('.dob-icon');
+
+ 
+ 
+
+
+
+        dobInput.addEventListener("input", () => {
+
+            const wrapper = row.closest(".extended-family-wrapper");
+
+            const dateValue = dobInput.value;
+
+            const funeralType = document.getElementById("funeralType").value;
+
+
+
+            const validation = validateMemberAge(dateValue, type, funeralType);
+
+            if (!validation.valid) {
+
+                createMemberError(wrapper, validation.message);
+
+            } else {
+
+                removeErrorBelow(wrapper);
+
+            }
+
+
+
+            saveMembersToSession(type);
+        });
+ 
+      //  const genderSelect = row.querySelector("select");
+       // const coverSelect = row.querySelector(".cover-amount-select");
+       
+ 
+     //   const calendarIcon = row.querySelector('.dob-icon');
+ 
+        setupDOBPicker(dobInput, calendarIcon, type);
+ 
+ 
+        row.querySelector("select").addEventListener("change", () => {
+            saveMembersToSession(type); // updated from normalizedType to type
+        });
+       
+        // Listen to cover amount change
+ 
+        row.querySelector(".cover-amount-select").addEventListener("change", () => {
+ 
+        saveMembersToSession(type);
+ 
+        });
+ 
+        // Handle Gender Change
+        genderSelect.addEventListener("change", () => {
+            removeErrorBelow(wrapper);
+            saveMembersToSession(type);
+        });
+ 
+       // Handle Cover Amount Change
+
+        coverSelect.addEventListener("change", () => {
+
+            const wrapper = row.closest(".extended-family-wrapper");
+
+            const selectedCoverValue = parseInt(coverSelect.value);
+
+
+
+            if (!isNaN(selectedCoverValue) && selectedCoverValue > mainCoverAmount) {
+
+                createMemberError(row.closest(".extended-family-wrapper"), `Cover amount cannot exceed main cover amount of R${mainCoverAmount}.`);
+
+            } else {
+
+                removeErrorBelow(wrapper);
+                saveMembersToSession(type);
+            }
+
+
+
+        });
+ 
+        memberCounts[type]++;
+        saveMembersToSession(type);
+        toggleNoMembersMessage(type);
+ 
+        if (memberCounts[type] >= limit) {
+            disableAddButton(type);
+        }
+ 
+        updateMemberCountDisplay(type);
+        // Smooth scroll to bottom if scrollbar is present
+ 
+        if (hasVerticalScrollbar) {
+ 
+        modalBody.scrollTo({
+ 
+            top: modalBody.scrollHeight,
+ 
+            behavior: 'smooth'
+ 
+        });
+ 
+        }
+    }
+   function createMemberError(wrapper, message) {
+
+        removeErrorBelow(wrapper);
+
+        const errorDiv = document.createElement("div");
+
+        errorDiv.className = "member-error";
+
+        errorDiv.textContent = message;
+
+        wrapper.after(errorDiv);
+
+    }
+function removeErrorBelow(wrapper) {
+        const nextSibling = wrapper.nextElementSibling;
+        if (nextSibling && nextSibling.classList.contains("member-error")) {
+            nextSibling.remove();
+        }
+    }
+
+    function removeExtendedFamilyRow(button, type) {
+    const wrapper = button.closest(".extended-family-wrapper");
+        if (wrapper) {
+            // Remove adjacent error message if it exists
+            const nextSibling = wrapper.nextElementSibling;
+            if (nextSibling && nextSibling.classList.contains("member-error")) {
+                nextSibling.remove();
+            }
+           
+            wrapper.remove();
+            memberCounts[type]--;
+ 
+            const selectedFuneralType = document.getElementById("funeralType").value;
+            const limit = memberLimits[selectedFuneralType][type];
+ 
+            saveMembersToSession(type);
+            toggleNoMembersMessage(type);
+ 
+            if (memberCounts[type] < limit) {
+            enableAddButton(type);
+            }
+ 
+            updateMemberCountDisplay(type);
+        }
+    }
+
+    function disableAddButton(type) {
+        document.querySelectorAll(".addExtendedButton").forEach(btn => {
+        const label = btn.textContent.trim().split(" ")[0]; // Spouse, Child, etc.
+        if (labelToKeyMap[label] === type) {
+            btn.classList.add("disabled-button");
+            // btn.disabled = true;
+        }
+        });
+    }
+    
+    function enableAddButton(type) {
+        document.querySelectorAll(".addExtendedButton").forEach(btn => {
+        const label = btn.textContent.trim().split(" ")[0]; // Spouse, Child, etc.
+        if (labelToKeyMap[label] === type) {
+            btn.classList.remove("disabled-button");
+            btn.disabled = false;
+        }
+        });
+    }
+
+    function updateFamilyButtonLabels() {
+        const funeralType = document.getElementById("funeralType").value;
+        const limitConfig = memberLimits[funeralType];
+    
+        document.querySelectorAll(".family-button").forEach((btn) => {
+        const label = btn.getAttribute("data-label"); // e.g., "Child"
+        const key = labelToKeyMap[label];
+    
+        if (key && limitConfig[key] !== undefined) {
+            // Find the span inside the button and update its text
+            const labelSpan = btn.querySelector("span");
+            if (labelSpan) {
+            labelSpan.textContent = `${label} (0/${limitConfig[key]})`;
+            }
+    
+            // Handle the disabled-like state for divs
+            if (limitConfig[key] === 0) {
+            btn.classList.add("disabled");
+            btn.style.pointerEvents = "none";
+            btn.style.opacity = "0.5";
+            } else {
+            btn.classList.remove("disabled");
+            btn.style.pointerEvents = "";
+            btn.style.opacity = "";
+            }
+        }
+        });
+    }
+       function validateAndApplyButtonState() {
+
+      updateFamilyButtonLabels(); // Run this first to apply funeralType limits
+
+
+
+      const dob = $('#personal-dob').val();
+
+      const gender = $('#personal-gender').val();
+
+      const coverAmount = $('#coverAmount').val();
+
+      const allValid = dob && gender && coverAmount;
+
+
+
+      // Then restrict based on required field completion
+
+      document.querySelectorAll(".family-button").forEach((btn) => {
+
+          const label = btn.getAttribute("data-label");
+
+          const key = labelToKeyMap[label];
+
+          const limit = memberLimits[document.getElementById("funeralType").value]?.[key];
+
+
+
+          if (!allValid || limit === 0) {
+
+              btn.classList.add("disabled");
+
+              btn.style.pointerEvents = "none";
+
+              btn.style.opacity = "0.5";
+
+          }
+
+      });
+
+  }
+    function initializeFlatpickrOnExistingInputs() {
+
+    document.querySelectorAll('.dob-input').forEach(input => {
+
+        const fpInstance = flatpickr(input, {
+
+        dateFormat: "Y-m-d",
+        disableMobile: true,
+        appendTo: document.body,
+
+        });
+
+
+
+        // Try to find the corresponding span/icon in the same parent
+
+        const span = input.parentElement.querySelector('.glyphicon-calendar');
+
+
+
+        if (span) {
+
+        span.style.cursor = 'pointer'; // Optional: make it visually clickable
+
+        span.addEventListener('click', () => {
+
+            fpInstance.open();
+
+        });
+
+        }
+
+    });
+
+    }
+    
+    
+
+
+    function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+
+    document.getElementById("funeralType").addEventListener("change", () => {
+    Object.keys(memberCounts).forEach(k => memberCounts[k] = 0);
+    
+    validateAndApplyButtonState();
+    });
+
+    
+
+
+    function saveMembersToSession(type) {
+        const container = document.getElementById("extendedFamilyContainer");
+        const rows = container.querySelectorAll(".extended-family-row");
+
+        const members = Array.from(rows).map(row => {
+            const gender = row.querySelector("select").value;
+            const dateOfBirth = row.querySelector("input").value;
+            const coverAmountStr = row.querySelector(".cover-amount-select").value;
+            const coverAmount  = parseInt(coverAmountStr);
+            
+        return { gender, dateOfBirth, coverAmount };
+        });
+
+        memberCounts[type] = members.length;
+
+        const sessionData = JSON.parse(sessionStorage.getItem("familyMembers") || "{}");
+        sessionData[type] = members;
+        sessionStorage.setItem("familyMembers", JSON.stringify(sessionData));
+
+        updateMemberCountDisplay(type); 
+    }
+
+    function getMembersFromSession(type) {
+    const sessionData = JSON.parse(sessionStorage.getItem("familyMembers") || "{}");
+    return sessionData[type] || [];
+    }
+
+    function wipeSession() {
+    sessionStorage.removeItem("familyMembers");
+    Object.keys(memberCounts).forEach(k => memberCounts[k] = 0);
+    validateAndApplyButtonState();
+    }
+    function showLoader() {
+    document.getElementById('loader').style.display = 'flex';
+    setTimeout(() => {
+        document.getElementById('loader').style.display = 'none';
+    }, 800);
+}  
+        
+    $(document).ready(function () {
+
+        function collectFormData() {
+            const funeralType = $('#funeralType').val();
+            const coverAmount = $('#coverAmount').val();
+
+            const personalDetails = {
+                gender: $('#personal-gender').val(),
+
+                  dob: $('#personal-dob').val()
+            };
+
+            const familyData = {
+                Child: [],
+                Parent: [],
+                "Extended Family": [],
+                Spouse: []
+            };
+
+            // Loop through each added family member
+            $('#extendedFamilyContainer .member-row').each(function () {
+                const type = $(this).data('type');
+                const gender = $(this).find('.member-gender').val();
+                const dob = $(this).find('.member-dob').val();
+
+                if (type && gender && dob) {
+                    familyData[type].push({ gender, dateOfBirth: dob, coverAmount: 90000.00 });
+                }
+            });
+
+            // Construct the final payload object
+            return {
+                type: "insurance",
+                subType: funeralType,
+                personalDetails: {
+                    idNumber: "",
+                    passportNumber: "",
+                    surname: "",
+                    firstName: "",
+                    dateOfBirth: personalDetails.dob,
+                    gender: personalDetails.gender
+                },
+                insuranceDetails: {
+                    coverAmount: parseFloat(coverAmount) || 110000.00,
+                    spouses: getMembersFromSession("spouse"),
+                    children: getMembersFromSession("child"),
+                    parents: getMembersFromSession("parent"),
+                    extendedFamily:getMembersFromSession("extended_family"),
+                }
+            };
+        }
+
+    $('.cal-btn').on('click', function () {
+        let isValid = true;
+
+        // Clear previous error messages
+        $('#main-member-errors').hide();
+        $('#gender-error').text('');
+        $('#dob-error').text('');
+        $('#personal-gender').removeClass('input-error');
+        $('#personal-dob-input').removeClass('input-error');
+
+        const personalGender = $('#personal-gender').val();
+        const personalDob = $('#personal-dob').val();
+        const funeralType = $('#funeralType').val();
+
+        // Validate Gender
+        if (!personalGender) {
+            $('#gender-error').text('Please select your gender.');
+            $('#personal-gender').addClass('input-error');
+            isValid = false;
+        }
+
+        // Validate DOB
+        if (!personalDob) {
+            $('#dob-error').text('Please enter your date of birth.');
+            $('#personal-dob-input').addClass('input-error');
+            isValid = false;
+        }
+
+        // Perform main member age validation based on funeral type
+        if (personalDob) {
+            const age = calculateAge(personalDob);
+
+            if (funeralType === "ab_enhanced_funeral" && (age < 18 || age > 75)) {
+                $('#dob-error').text('Main member must be between 18 and 75 years old for Enhanced funeral cover.');
+                $('#personal-dob-input').addClass('input-error');
+                isValid = false;
+            } else if ((funeralType === "ab_staff_funeral" || funeralType === "ab_foreigner_funeral") && (age < 18 || age > 65)) {
+                $('#main-member-errors').show();
+                $('#dob-error').text(`Main member must be between 18 and 65 years old for ${funeralType} funeral cover.`);
+                $('#personal-dob-input').addClass('input-error');
+                isValid = false;
+            }
+        }
+
+        // Show error container if any validation failed
+        if (!isValid) {
+            $('#main-member-errors').show();
+            return;
+        }
+
+        const insuranceData = collectFormData(); // get dynamic form data
+
+        $.ajax({
+            url: 'https://cxappuat.stg.africanbankdmz.net/businessBanking/CalculateQuote',
+            type: 'POST',
+           headers: {  // <-- should be "headers", not "header"
+        'x-api-key': 'QWRtaW5pc3RyYXRvcjptYW5hZ2U='
+    },
+            contentType: 'application/json',
+            data: JSON.stringify(insuranceData),
+            success: function (res) {
+                console.log(res);
+                $("#premium-value").text(res?.data?.premium || "0.00");
+
+                // Hide the image
+                $("#defaultImage").hide();
+                  showLoader();
+                // Show the premium display block
+                $("#premium-display").show();
+                  // Scroll to premium display on mobile (or always if preferred)
+                if (window.innerWidth <= 768) {
+                    $('html, body').animate({
+                        scrollTop: $("#premium-display").offset().top - 40 // slight padding
+                    }, 600); // duration in ms
+
+                }
+            },
+            error: function (err) {
+                console.error(err);
+                alert("An error occurred.");
+            }
+        });
+    });
+
+
+    });
 
  </script>

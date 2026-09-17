@@ -1,5 +1,1143 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
 }
+
+@* the fun starts here *@
+<style>
+
+* {
+    padding: 0px;
+    margin: 0px;
+}
+
+ .testimonial-carousel {
+      margin: 30px auto;
+      border-radius: 8px;
+/* Shadows Light Mode/MD */
+box-shadow: 0px 9px 18px 0px rgba(0, 0, 0, 0.15);
+    }
+
+    .testimonial-carousel .item {
+      padding: 30px;
+      height: 316px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .testimonial-carousel .carousel-indicators {
+      bottom: -60px;
+    }
+
+    .testimonial-carousel .carousel-indicators li {
+      background-color: #bbb;
+      border: none;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin: 1px;
+    }
+
+    .testimonial-carousel .carousel-indicators .active {
+      background-color: #333;
+    }
+
+
+.btn-primary:hover {
+    color: #fff;
+    background-color: #5DC400;
+    border-color: none;
+}
+
+.text-white {
+    color: #fff !important;
+}
+
+    /*Section 1 style start here*/
+#section-2{
+    height: 550px;
+}
+.customer-container{
+  height:200px;  
+}
+.mtb-40 {
+    margin-top: 40px !important;
+    margin-bottom: 40px !important;
+}
+.mtb-24{
+    margin-top: 24px !important;
+    margin-bottom: 24px !important; 
+}
+
+.mtb-32 {
+    margin: 32px 0px;
+}
+
+.mp-0 {
+    margin: 0px !important;
+    padding: 0px !important;
+}
+
+.p-32 {
+    padding:32px;
+}
+
+
+.mt-40 {
+    margin-top: 40px !important;
+}
+.content-center{
+    display: flex;
+    height: 320px;
+    align-content: center;
+    align-items: center;
+    padding: 0px !important;
+ 
+}
+
+.key-feature-sub {
+    color: var(--Brand-AB-Blue, #012B60);
+    font-family: Montserrat;
+    font-size: 24px !important;
+    font-style: normal;
+    font-weight: 600 !important;
+    line-height: 32px;
+}
+
+.flex__list-container{
+    display: flex;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.bottom-section-2 {
+    background-color: #5dc300 !important;
+    height: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.content-sub-start{
+    display: grid;
+    align-content: start;
+    align-items: start;
+}
+
+    /*section 1 styles end here*/
+    
+    /*section 2 start here*/
+        .tab-content {
+            border-bottom: 1px solid #E9EAEB;
+            padding: 20px 0px;
+            border-top: none;
+            background: #fff;
+        }
+        
+        .tab-content-2 {
+           
+            padding: 20px 0px;
+            border-top: none;
+            background: #fff;
+        }
+
+      .btn-font-color{
+          color : #012B60 !important;
+      }
+          .header-section {
+            line-height: 2;
+            text-align: start;
+            margin-bottom: 40px;
+            margin-top: 50px;
+
+        }
+        .cards-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        
+        .card-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          
+          }
+        .card-text {
+            font-size: 16px;
+        }
+        .card-title {
+
+            
+            color: var(--Brand-AB-Blue, #012B60);
+
+            /* Body/xlarge/Semibold */
+            font-family: Montserrat;
+            font-size: 20px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 30px; /* 150% */
+        }
+        
+        .card {
+            display: grid;
+            width: 242px;
+            height: 242px;
+            padding: 20px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            background: var(--Base-White, #FDFDFD);
+        }
+         .card-body {
+            line-height: 2;
+            display: flex;
+            align-items: center;
+            justify-content:space-evenly ;
+            align-content: center;
+            flex-direction: column;
+            flex-wrap: nowrap;
+          }
+  
+    /*section 3 start here*/
+    .bg-grey{
+    background: linear-gradient(180deg, rgba(245,245,245,1) 81%, rgba(255,255,255,1) 81%);
+    margin-bottom: 150px;
+    }
+    
+    .bg-grey-2{
+    background: #FDFDFD!important;
+    margin-bottom: 20px;
+    height: 520px;
+    }
+    
+      .custom-bullets {
+    list-style-type: none;
+    padding-left: 0px;
+  }
+  
+      .custom-img {
+    max-width: 100%;
+    height: auto;
+    width: 80%; /* Adjust size as needed */
+    margin: 0 auto;
+  } 
+  
+.custom-img-2 {
+    max-width: 100%;
+    height: auto;
+    width: 332px;
+    margin : -130px 0px 0px 0px;
+     
+  }
+  .font-weight-600{
+        font-weight : 600;
+    }
+    .highlight-text {
+      flex: 1;
+    }
+    .bottom-section {
+      background-color: #5dc300 !important;
+      height: 7.906px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .bottom-section-2 {
+      background-color: #5dc300 !important;
+      height:1px;
+      width: 560px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .contact-us {
+          background-color: white;
+  }
+  .section-large-card{
+    background:white;
+    position: relative;
+    padding: 32px;
+    border-radius: 10px;  
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Soft shadow */
+  }
+  
+.section-large-card-2{
+    height: 206px;
+    position: relative;
+    top: 52px;
+    margin: 10px 0px !important;
+    padding: 20px;
+    border-radius: 10px;  
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Soft shadow */
+  }
+  
+ 
+  
+  
+    /*section 3 end here*/
+    /*section 0 start here*/
+    .bg-nothing-white{
+        height:100px;
+        background-color:white;
+        color:#012B60;
+    }
+    /*section 0 end here*/
+    
+    /*Section 5 start here*/
+    .app-btn{
+        border: none;
+        background: none;
+    }
+    
+    /*section 5 end here*/
+    
+    /*Tab section start here*/
+        /* Main container */
+.tabs-container {
+    display: flex;
+    margin: 0px auto;
+    font-family: Arial, sans-serif;
+    border-radius: 8px;
+    overflow: hidden;
+
+}
+
+        /* Main container */
+.tabs-container-2 {
+    display: flex;
+    margin: 0px auto;
+    font-family: Arial, sans-serif;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 500px;
+
+}
+
+/* Tab buttons on the left */
+.tab-buttons {
+    min-height:200px;
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    background: white;
+    border-right: 1px solid #E9EAEB;
+    border-bottom: 1px solid #E9EAEB;
+    color:#012B60;
+}
+
+.doc-size-solution {
+    color: var(--Brand-AB-Blue, #012B60);
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 38px;
+
+}
+
+
+
+/* Add the icon only for active tabs */
+.tab-btn:hover, .tab-btn.active {
+    display: flex;
+    width: 200px;
+    height: 32px;
+    flex-direction: row;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--Brand-AB-Blue, #5DC303) !important;
+    font-family: Montserrat;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 600;
+    }
+    
+    
+    
+.tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between icon and text */
+    width: 200px;
+    height: 32px;
+    flex-shrink: 0;
+    color: var(--Brand-AB-Blue, #012B60) !important;
+    font-family: Montserrat;
+    font-size: 18px;
+    font-weight: 600;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+/* Hide SVG by default */
+.tab-btn span {
+    display: none;
+}
+.active{
+    color: #012B60 !important;
+}
+/* Show SVG only on the active tab */
+.tab-btn.active span {
+    display: inline-flex;
+}
+
+/* Optional: Make sure the tab content is visually appealing */
+.tab-content {
+    flex: 1;
+    padding: 0px 20px;
+    background: transparent;
+}
+.tab-content-p{
+    color: var(--Brand-AB-Blue, #012B60);
+
+/* Body/Medium/Regular */
+font-family: Montserrat;
+font-size: 16px;
+font-style: normal;
+font-weight: 400;
+line-height: 24px; /* 150% */
+}
+
+/* Tab content on the right */
+\
+
+.tab-panel {
+    display: none;
+}
+
+
+.tab-panel.active {
+    display: block;
+    display: flex; /* Align SVG and text inline */
+    align-items: center; /* Ensure vertical alignment */
+    gap: 8px; /* Add spacing between SVG and text */
+}
+
+ 
+    /*Tab section end here*/
+.grey-line {
+    border: none;
+    height: 1px;
+    background-color: #E9EAEB;
+    margin: 40px 20px;
+}
+
+
+#section-1{
+    height: 420px;
+}
+.customer-container{
+  height:200px;  
+}
+
+.image-section{
+    margin-bottom: -200px;
+}
+.image-position {
+    position: relative;
+    top: -80px;
+}
+
+/*Back button start here*/
+.back-section{
+    height:112px;
+    display: flex;
+    background: white;
+    min-height: 50px;
+    align-items: center;
+}
+
+.back-section button{
+    background:none !important;
+    border:none !important;
+}
+
+/*Back button end here*/
+
+.custom-card {
+    overflow: none;
+    border-radius: 10px;
+    background-color:white;
+}
+.custom-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.custom-row {
+    flex-grow: 1;
+}
+.bg-blue{
+    background-color:#002b60;
+    color:white;
+}
+.bg-white{
+    background-color:white;
+    color:#012B60;
+}
+
+.bg-nothing-white{
+    height:100px;
+    background-color:white;
+    color:#012B60;
+}
+.content-center{
+    display: flex;
+    height: 320px;
+    align-content: center;
+    align-items: center;
+ 
+}
+.content-center-2{
+    display: flex;
+    height: 200px;
+    align-content: center;
+    align-items: center;
+ 
+}
+
+.content-sub-start{
+    display: grid;
+    align-content: start;
+    align-items: start;
+}
+
+
+.content-sub-start-2{
+    display: grid;
+    align-content: start;
+    align-items: start;
+}
+
+.content-sub-start-3{
+    display: grid;
+    align-content: start;
+    align-items: start;
+    font-size:15px;
+}
+
+
+/*Cards Css start here*/
+        .business-section {
+            padding: 50px 0;
+            text-align: center;
+        }
+        .business-section h2 {
+            color: #002F6C;
+            font-weight: bold;
+        }
+        .business-section p {
+            color: #4F5B66;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .account-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            min-height: 250px;
+        }
+        .card-divider {
+            width: 100%;
+            height: 2px;
+            background-color: #6FCF97;
+            margin: 10px 0;
+        }
+        .btn-learn {
+            border: 1px solid #002F6C;
+            color: #002F6C;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+        .btn-learn:hover {
+            background-color: #002F6C;
+            color: #fff;
+        }
+        .btn-apply, .btn-download {
+            background-color: #6FCF97;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+        }
+        .btn-apply:hover, .btn-download:hover {
+            background-color: #57B881;
+        }
+        .card-image {
+            position: absolute;
+            top: -15px;
+            right: 10px;
+            width: 80px;
+        }
+        .get-in-touch {
+            position: fixed;
+            right: 0;
+            top: 50%;
+            background: #002F6C;
+            color: white;
+            padding: 10px;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            border-radius: 8px 0 0 8px;
+            cursor: pointer;
+        }
+        .cards-position{
+            top: 50px;
+            position: relative;
+            margin: 55px 0px;  
+        }
+        .font-size-24-weight-600 {
+            font-size: 24px !important;
+            font-weight: 600 !important ;
+        }
+
+/*Cards Css end here*/
+
+.section-1-heading{
+    color: var(--Base-White, #FDFDFD);
+    /* Heading/H1/Semibold */
+    font-family: Montserrat;
+    font-size: 48px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 60px; 
+   
+}
+.section-1-p{
+color: var(--Base-White, #FDFDFD);
+
+/* Body/xlarge/Regular */
+font-family: Montserrat;
+font-size: 20px;
+font-style: normal;
+font-weight: 400;
+line-height: 30px; /* 150% */
+}
+.btn-primary{
+display: flex;
+width: 200px;
+height: 48px;
+padding: 12px 16px;
+justify-content: center;
+align-items: center;
+gap: 8px;
+flex-shrink: 0;
+color: var(--text-primary, #FFF);
+border:none;
+/* Body/Small/Semibold */
+font-family: Montserrat;
+font-size: 14px;
+font-style: normal;
+font-weight: 600;
+line-height: 20px; /* 142.857% */
+
+border-radius: var(--border-radius-md, 2px);
+background: var(--surface-action, #5DC400);
+
+/* Shadows Light Mode/SM */
+box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.11);
+}
+
+.section-2-heading{
+   color: var(--Brand-AB-Blue, #012B60);
+
+/* Heading/H3/Semibold */
+font-family: Montserrat;
+font-size: 30px;
+font-style: normal;
+font-weight: 600;
+line-height: 38px; /* 126.667% */ 
+}
+
+.section-2-p{
+    color: var(--Brand-AB-Blue, #012B60);
+
+/* Body/Medium/Regular */
+font-family: Montserrat;
+font-size: 16px;
+font-style: normal;
+font-weight: 400;
+line-height: 24px; /* 150% */
+}
+
+.section-2-p-1{
+color: #012B60;
+font-family: Montserrat;
+font-size: 16px;
+font-weight: 600;
+line-height: 24px;
+margin-top: 48px;
+}
+
+.key-feature{
+    color: var(--Brand-AB-Blue, #012B60);
+    /* Heading/H3/Semibold */
+    font-family: Montserrat;
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 38px; /* 126.667% */
+}
+
+.pricing-tnc{
+    color: var(--Brand-AB-Blue, #012B60);
+margin-top:100px;
+/* Heading/H3/Semibold */
+font-family: Montserrat;
+font-size: 30px;
+font-style: normal;
+font-weight: 600;
+line-height: 38px; /* 126.667% */
+}
+
+.pricing-tnc-2{
+    color: var(--Brand-AB-Blue, #012B60);
+
+/* Heading/H3/Semibold */
+font-family: Montserrat;
+font-size: 30px;
+font-style: normal;
+font-weight: 600;
+line-height: 38px; /* 126.667% */
+}
+
+.easy-application{
+    color: var(--Brand-AB-Blue, #012B60);
+
+/* Heading/H3/Semibold */
+font-family: Montserrat;
+font-size: 30px;
+font-style: normal;
+font-weight: 600;
+line-height: 38px; /* 126.667% */
+margin-bottom:10px;
+}
+.easy-application-p{
+    color: var(--Brand-AB-Blue, #012B60);
+
+/* Body/xlarge/Regular */
+font-family: Montserrat;
+font-size: 20px;
+font-style: normal;
+font-weight: 400;
+line-height: 30px; /* 150% */
+margin-bottom:21px;
+}
+.doc-heading{
+    color: var(--Brand-AB-Blue, #012B60);
+
+/* Heading/H3/Semibold */
+font-family: Montserrat;
+font-size: 30px;
+font-style: normal;
+font-weight: 600;
+line-height: 38px; /* 126.667% */
+}
+
+.padding-right-svg{
+  padding-right:10px;  
+}
+.padding-left-svg{
+  padding-left:10px;
+  font-size: 16px;
+}
+.mb-48-mt-22{
+    margin: 22px 0px 48px 0px !important
+}
+
+.tab-panel {
+    display: none; /* Hide all tab content by default */
+}
+
+.tab-panel.active {
+    display: block; /* Show only the active tab content */
+}
+
+
+@@media (max-width: 768px) {
+  /* General mobile adjustments */
+  #section-1, #section-2 {
+    height: auto !important;
+    padding: 40px 0 !important;
+  }
+
+  .image-position {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 20px 0 !important;
+  }
+
+  /* Text adjustments */
+  .section-1-heading {
+    font-size: 36px !important;
+    line-height: 45px !important;
+  }
+
+  .section-1-p {
+    font-size: 16px !important;
+    line-height: 24px !important;
+  }
+
+  .section-2-heading,
+  .key-feature,
+  .pricing-tnc,
+  .easy-application,
+  .doc-heading {
+    font-size: 24px !important;
+    line-height: 32px !important;
+  }
+
+  /* Card adjustments */
+  .card {
+    width: 100% !important;
+    height: auto !important;
+    margin: 15px 0;
+    padding: 15px !important;
+  }
+
+  .card-title {
+    font-size: 18px !important;
+    line-height: 24px !important;
+  }
+
+  .card-text {
+    font-size: 14px !important;
+  }
+
+  /* Tab section adjustments */
+  .tabs-container {
+    flex-direction: column;
+  }
+
+  .tab-buttons {
+    width: 100% !important;
+    flex-direction: row;
+    overflow-x: auto;
+    border-right: none;
+  }
+
+  .tab-btn {
+    white-space: nowrap;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+  }
+
+  .tab-btn.active {
+    border-bottom-color: #012B60;
+  }
+
+  /* Button adjustments */
+  .btn-primary {
+    width: 100% !important;
+    margin: 20px 0 !important;
+  }
+
+  /* Image adjustments */
+  .custom-img-2 {
+    width: 100% !important;
+    margin: 20px 0 !important;
+  }
+
+  /* Section spacing */
+  .content-center,
+  .content-center-2 {
+    height: auto !important;
+    padding: 20px 0;
+  }
+
+  .mtb-40, .mt-40 {
+    margin-top: 20px !important;
+    margin-bottom: 20px !important;
+  }
+
+  /* Card grid adjustments */
+  .cards-container {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* Pricing card adjustments */
+  .section-large-card,
+  .section-large-card-2 {
+    top: 0 !important;
+    margin: 20px 0 !important;
+    height: auto !important;
+  }
+}
+</style>
+
+<section class="back-section" id="learn-more-btn-back">
+    <div class="container">
+        <button>
+            <svg width="68" height="24" viewBox="0 0 68 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M4.25 12.2744L19.25 12.2744" stroke="#012B60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M10.2998 18.299L4.2498 12.275L10.2998 6.25" stroke="#012B60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M33.47 17V7.2H37.866C38.9953 7.2 39.8633 7.42867 40.47 7.886C41.0767 8.334 41.38 8.95 41.38 9.734C41.38 10.266 41.2587 10.714 41.016 11.078C40.7827 11.442 40.4653 11.722 40.064 11.918C39.6627 12.114 39.2287 12.212 38.762 12.212L39.014 11.792C39.574 11.792 40.0687 11.89 40.498 12.086C40.9273 12.282 41.268 12.5713 41.52 12.954C41.772 13.3273 41.898 13.794 41.898 14.354C41.898 15.194 41.5807 15.8473 40.946 16.314C40.3207 16.7713 39.3873 17 38.146 17H33.47ZM34.87 15.866H38.09C38.8647 15.866 39.4573 15.7353 39.868 15.474C40.2787 15.2127 40.484 14.802 40.484 14.242C40.484 13.6727 40.2787 13.2573 39.868 12.996C39.4573 12.7347 38.8647 12.604 38.09 12.604H34.744V11.47H37.74C38.4493 11.47 39 11.3393 39.392 11.078C39.784 10.8167 39.98 10.4247 39.98 9.902C39.98 9.37933 39.784 8.98733 39.392 8.726C39 8.46467 38.4493 8.334 37.74 8.334H34.87V15.866ZM48.4757 17V15.432L48.4057 15.138V12.464C48.4057 11.8947 48.2377 11.456 47.9017 11.148C47.575 10.8307 47.0804 10.672 46.4177 10.672C45.979 10.672 45.5497 10.7467 45.1297 10.896C44.7097 11.036 44.355 11.2273 44.0657 11.47L43.5057 10.462C43.8884 10.154 44.3457 9.92067 44.8777 9.762C45.419 9.594 45.9837 9.51 46.5717 9.51C47.589 9.51 48.373 9.75733 48.9237 10.252C49.4744 10.7467 49.7497 11.5027 49.7497 12.52V17H48.4757ZM46.0397 17.084C45.489 17.084 45.0037 16.9907 44.5837 16.804C44.173 16.6173 43.8557 16.3607 43.6317 16.034C43.4077 15.698 43.2957 15.32 43.2957 14.9C43.2957 14.4987 43.389 14.1347 43.5757 13.808C43.7717 13.4813 44.0844 13.22 44.5137 13.024C44.9524 12.828 45.5404 12.73 46.2777 12.73H48.6297V13.696H46.3337C45.6617 13.696 45.209 13.808 44.9757 14.032C44.7424 14.256 44.6257 14.5267 44.6257 14.844C44.6257 15.208 44.7704 15.502 45.0597 15.726C45.349 15.9407 45.7504 16.048 46.2637 16.048C46.7677 16.048 47.2064 15.936 47.5797 15.712C47.9624 15.488 48.2377 15.1613 48.4057 14.732L48.6717 15.656C48.4944 16.0947 48.1817 16.4447 47.7337 16.706C47.2857 16.958 46.721 17.084 46.0397 17.084ZM55.4709 17.084C54.7149 17.084 54.0382 16.9207 53.4409 16.594C52.8529 16.2673 52.3909 15.8193 52.0549 15.25C51.7189 14.6807 51.5509 14.0273 51.5509 13.29C51.5509 12.5527 51.7189 11.8993 52.0549 11.33C52.3909 10.7607 52.8529 10.3173 53.4409 10C54.0382 9.67333 54.7149 9.51 55.4709 9.51C56.1429 9.51 56.7402 9.64533 57.2629 9.916C57.7949 10.1773 58.2056 10.5693 58.4949 11.092L57.4729 11.75C57.2302 11.386 56.9316 11.12 56.5769 10.952C56.2316 10.7747 55.8582 10.686 55.4569 10.686C54.9716 10.686 54.5376 10.7933 54.1549 11.008C53.7722 11.2227 53.4689 11.526 53.2449 11.918C53.0209 12.3007 52.9089 12.758 52.9089 13.29C52.9089 13.822 53.0209 14.284 53.2449 14.676C53.4689 15.068 53.7722 15.3713 54.1549 15.586C54.5376 15.8007 54.9716 15.908 55.4569 15.908C55.8582 15.908 56.2316 15.824 56.5769 15.656C56.9316 15.4787 57.2302 15.208 57.4729 14.844L58.4949 15.488C58.2056 16.0013 57.7949 16.398 57.2629 16.678C56.7402 16.9487 56.1429 17.084 55.4709 17.084ZM61.2312 15.208L61.2592 13.486L65.5292 9.58H67.1532L63.8772 12.8L63.1492 13.416L61.2312 15.208ZM60.1392 17V6.612H61.4832V17H60.1392ZM65.8092 17L62.8972 13.388L63.7652 12.31L67.4612 17H65.8092Z" fill="#012B60"/>
+</svg>
+
+        </button>
+    </div>
+</section>
+
+
+
+<section class="bg-blue" id="section-1">
+    <div class="container">
+  <div class="row mtb-40 justify-content-center">
+        <div class="col-md-12 mp-0" >
+            <div>
+                <h1 class="section-1-heading">Fixed Term Business Loan</h1>
+                
+                <p class="section-1-p">Access fast and flexible funding designed to meet your business needs, and unlock new opportunities.</p>
+                
+                <!--list section-->
+                
+                <ul class="custom-bullets btn-font-color mt-40">
+<li class="flex__list-container">
+<svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<span class="padding-left-svg text-white">
+Get a lump sum for a fixed term to cover your business expenses with transparent fees and flexible repayment options.
+</span>
+  </li>
+<li class="flex__list-container">
+<svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<span class="padding-left-svg text-white">
+Loans amount of R20,000 to R5,000,000.
+</span>
+  </li>
+<li class="flex__list-container">
+<svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<span class="padding-left-svg text-white">
+Funds available wihtin 48 hours of approval.
+</span>
+  </li>
+</ul>
+                
+            </div>
+            <div class="mtb-40">
+                <button class="btn btn-primary">Apply Now</button>
+            </div>
+          <!--end of content-->
+        </div>
+  </div>
+</div>
+</section>
+
+<section class="bg-white">
+    <div class="container">
+            <div class="row">
+                <div class="col-md-12 tab-content-2">
+                <!-- Header Section -->
+                <div class="header-section btn-font-color">
+                    <h1 class="section-2-heading">Who can apply?</h1>
+                    <p class="section-2-p">Our Fixed Term Business Loan is available to a wide range of industries, including Business to Customer and Business to Business sectors.</p>
+                    <p class="section-2-p">Looking for funding above R5,000,000? We offer tailored solutions for larger businesses. </p>
+                </div>
+                
+                 <div class="mtb-40">
+                <button class="btn btn-primary">Contact us</button>
+            </div>
+
+    <!-- Cards Section -->
+</div>
+                </div>
+
+            </div>
+    </div>
+</section>
+<section class="bg-grey-2">
+    <div class="container ">
+<div class="row">
+   <div class="col-md-12 mt-40 ">
+       <h4 class="key-feature">Key features</h4>
+
+   </div> 
+</div>
+
+<div class="row">
+   <div class="clo-md-12 testimonial-carousel">
+  <div id="testimonialCarousel" class="carousel slide" data-ride="carousel" data-interval="5000">
+
+    <!-- Indicators -->
+    <ol class="carousel-indicators">
+      <li data-target="#testimonialCarousel" data-slide-to="0" class="active"></li>
+      <li data-target="#testimonialCarousel" data-slide-to="1"></li>
+      <li data-target="#testimonialCarousel" data-slide-to="2"></li>
+      <li data-target="#testimonialCarousel" data-slide-to="3"></li>
+    </ol>
+
+    <!-- Carousel items -->
+    <div class="carousel-inner" role="listbox">
+
+      <div class="item active">
+        <h4 class="key-feature-sub">Simple and Transparent Pricing</h4>
+          <div class="bottom-section-2 mtb-32"></div>
+        <ul class="custom-bullets btn-font-color mt-40">
+<li class="flex__list-container">
+<svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<span class="padding-left-svg">
+<b>Upfront Fees:</b> Know all the fees from the start no hidden charges.
+</span>
+  </li>
+<li class="flex__list-container">
+<svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<span class="padding-left-svg">
+<b>Usage-Based Charges:</b> Only pay fees based on the amount you withdraw.
+</span>
+  </li>
+<li class="flex__list-container">
+<svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<span class="padding-left-svg">
+<b>No Monthly Fees:</b> Enjoy the benefit of zero monthly or facility fees.
+</span>
+  </li>
+</ul>
+      </div>
+
+      <div class="item">
+        <h4 class="key-feature-sub">Flexible Loan Amount and Terms</h4>
+          <div class="bottom-section-2 mtb-32"></div>
+        <ul class="custom-bullets btn-font-color mt-40">
+<li class="flex__list-container">
+<svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<span class="padding-left-svg">
+Loan amount limit is <b>pre-approved</b> upon application.
+</span>
+  </li>
+<li class="flex__list-container">
+<svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<span class="padding-left-svg">
+Select the amount you need, <b>up to the approved credit limit</b>.
+</span>
+  </li>
+<li class="flex__list-container">
+<svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<span class="padding-left-svg">
+Choose your <b>preferred repayment terms</b>.
+</span>
+  </li>
+<li class="flex__list-container">
+<svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<span class="padding-left-svg">
+Receive a <b>clear finance cost</b> quote upfront..
+</span>
+  </li>
+</ul>
+      </div>
+
+      <div class="item">
+        <h4 class="key-feature-sub">Flexible Loan Amount and Terms</h4>
+          <div class="bottom-section-2 mtb-32"></div>
+        <ul class="custom-bullets btn-font-color mt-40">
+<li class="flex__list-container">
+<svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<span class="padding-left-svg">
+Settle early <b>without penalty</b>.
+</span>
+  </li>
+<li class="flex__list-container">
+<svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<span class="padding-left-svg">
+<b>Save on finance costs</b> by paying off your loan sooner.
+</span>
+  </li>
+</ul>
+      </div>
+      
+      <div class="item">
+        <h4 class="key-feature-sub">Flexible Loan Amount and Terms</h4>
+          <div class="bottom-section-2 mtb-32"></div>
+          
+         <p class="section-2-p">Choose a <b>repayment schedule</b> that works best for your cash flow:</p>
+        <ul class="custom-bullets btn-font-color mt-40">
+<li class="flex__list-container">
+<svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<span class="padding-left-svg">
+Daily, weekly, fortnightly, or monthly repayments.
+</span>
+  </li>
+<li class="flex__list-container">
+<svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<span class="padding-left-svg">
+Options include fixed, variable, or revenue-based.
+</span>
+  </li>
+<li class="flex__list-container">
+<svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<span class="padding-left-svg">
+Collections.
+</span>
+  </li>
+
+</ul>
+      </div>
+
+    </div>
+
+  </div>
+</div> 
+</div>
+</div>
+</section>
+<!--calculator section-->
+ @Html.Partial("_BusinessCalculator")
+ 
+ <!--faq section-->

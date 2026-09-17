@@ -1,4 +1,5 @@
 ﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using AcfAfricanbank.Core.Models.Forms
 @using ContentModels = Umbraco.Web.PublishedModels;
 @using Web.Helpers;
 @using System.Configuration;
@@ -20,6 +21,8 @@
     var homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
 
     // Get Specific grand children
+    
+   
 
     var bodyCards = heroBody?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
     var bodyButton = heroBody?.Children?
@@ -47,8 +50,18 @@
 
 }
 
-<style>
 
+         <link rel="stylesheet" href="/css/projectmagic.css" /> 
+     <link href="~/css/loan-calculator.css" rel="stylesheet" />
+        <link href="~/css/font-awesome.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css"/>
+
+ 
+<style>
+    .mega-tabs .nav-tabs>li.active:after {
+        top: unset !important;
+        bottom: -18px;
+    }
     .control-label {
         text-align: left !important;
         width: 100%;
@@ -81,7 +94,7 @@
 
     .card-shadow.rate-card-fixed-deposit-offer {
         margin: unset;
-        /*text-align: unset;*/
+        text-align: unset;
     }
 
 
@@ -144,11 +157,18 @@
             font-size: 12px;
         }
     }
+
 </style>
+
+
+
+
 
 
 <!-- HERO BANNER -->
 @Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+
 
 <!-- HERO CONTINUED-->
 @Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
@@ -169,7 +189,10 @@
         Benefits = cards
     };
 }
+
+
 @Html.Partial("_investmentRatesAndBenefitsSection", ratesAndBenefitsModel)
+
 
 <!-- INVESTMENT CALCULATOR -->
 @Html.Partial("_calculatorStructure", "calculatornotice-form")
@@ -182,21 +205,18 @@
 <!-- CAMPAIGN MORE INFO -->
 @Html.Partial("_heroKneeTabs", heroKnees as ContentModels.HeroKnees)
 
+
+
 <!-- TESTIMONIALS -->
 @Html.Partial("_testimonials", testimonialTab as Testimonials)
 
 <!-- CALL BACK FORM -->
+
+<!-- CALL BACK FORM 20240215-->
 @*@{
-    var _floatingFormViewModel = homePageElements.Children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
-
-    @Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)
-
-}*@
-
-@{
     var _floatingFormViewModel = children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
-    @Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)
-}
+    @Html.Partial("_callMeBackInvest", _floatingFormViewModel as ContentModels.CallMeBack)
+}*@
 
 <!-- POPUP DIALOG -->
 @Html.Partial("_ebankITModal")
@@ -210,6 +230,458 @@
 <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculatorHandler.min.js")"></script>
 
 <script type="text/javascript">
+@*
+          jQuery(document).ready(function () {
+                    //$('#input-Amount1').autoNumeric('init', { aSep: ' ', aDec: '.', aSign: 'R '});
+    
+                    var curVal = $("#input-Amount1").val();
+                    var view = formatter.format(curVal);
+                    view = view.replace("ZAR",'R');
+                    view = view.replace(","," ");
+    
+                    $("#input-Amount1").val(view);
+    
+                    var loan = $("#input-Amount1").val().slice(0,-3);
+                    var nloan = loan.replace(" ","");
+                    nloan = nloan.substring(1);
+                    nnloan = nloan.replace(/\s/g,'');
+    
+                    //nloan.replace(" ","");
+                    /******set color for range slider********************/
+                    var valPercent = (nnloan - parseInt($('#slide-range1').attr('min'))) /
+                        (parseInt($('#slide-range1').attr('max')) - parseInt($('#slide-range1').attr('min')));
+                    $('#slide-range1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #88BC47), color-stop(' + valPercent + ', #002B60))');
+    
+                    var loanterm = $('.li-hover').attr('data-value');
+                    var loanspan = $('#term1').val();
+    
+                    if (loanterm === ""){
+                        loanterm = loanspan;
+                    }
+    
+                    var valPercent = (loanspan - parseInt($('#input-month1').attr('min'))) /
+                        (parseInt($('#input-month1').attr('max')) - parseInt($('#input-month1').attr('min')));
+                    $('#input-month1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #88BC47), color-stop(' + valPercent + ', #002B60))');
+                    /***************** End of set color**********************/
+                    $('#error-loanamount1').css('display', 'none');
+                    installmentEstimator(nnloan, loanspan);
+    
+                    /**************** value bubble show hide on mouse hover*************************/
+                    $("#slide-range1").on("mouseup", function () {
+                        $("#rangeV1").css("display", "none");
+    
+                    });
+                    $("#slide-range1").on("mousedown", function () {
+                        $("#rangeV1").css("display", "block");
+                    });
+                    $("#slide-range2").on("mouseup", function () {
+                        $("#rangeV2").css("display", "none");
+                    });
+                    $("#slide-range2").on("mousedown", function () {
+                        $("#rangeV2").css("display", "block");
+                    });
+                    /**************** end of bubble show hide on mouse hover*************************/
+    
+    
+                    /**** Dropdown styler/functionality ******/
+    
+                    function DropDown(el) {
+                        this.dd = el;
+                        this.placeholder = this.dd.children('span');
+                        this.opts = this.dd.find('ul.dropdown > li');
+                        this.val = '';
+                        this.index = -1;
+                        this.initEvents();
+                    }
+    
+                    DropDown.prototype = {
+                        initEvents: function () {
+                            var obj = this;
+    
+                            obj.dd.on('click', function (event) {
+                                $(this).toggleClass('active');
+                                $(this).children('input')[0].innerText = $(this)[0].children[1].innerText;
+                                // loop through this: $(this)[0].children[1].children and find a innerHTML = $(this)[0].children[0].innerText + grab i item > $(this)[0].children[1].children[i].dataset.value from there
+                                for (var i = 0; i < $(this)[0].children[2].children.length; ++i) {
+                                    if ($(this)[0].children[1].innerText === $(this)[0].children[2].children[i].innerText) {
+                                        $("#period")[0].value = $(this)[0].children[2].children[i].dataset.value;
+                                    }
+                                }
+    
+                                return false;
+                            });
+    
+                            obj.opts.on('click', function () {
+                                var monthValue = 0;
+                                var opt = $(this);
+                                obj.val = opt.text();
+                                obj.index = opt.index();
+                                monthValue = obj.val;
+                                obj.placeholder.text(obj.val);
+                            });
+                        },
+                        getValue: function () {
+                            return this.val;
+                        },
+                        getIndex: function () {
+                            return this.index;
+                        }
+                    }
+    
+                    $(function () {
+    
+                        var dd = new DropDown($('#dd'));
+    
+                        $(document).click(function () {
+                            // all dropdowns
+                            $('.wrapper-dropdown-3').removeClass('active');
+                        });
+    
+                    });
+                    /********* dropdwon style end *******/
+    
+                });
+    
+    
+                $('#slide-range1').on('input', function () {
+                    var newVal = $(this).val();
+                    var view = formatter.format(newVal);
+                    view = view.replace("ZAR",'R');
+                    view = view.replace(","," ");
+                    $("#input-Amount1").val(view);
+    
+                    /**************display value bubble*********************/
+                    var newValue = Number((newVal - $('#slide-range1').attr('min')) * 100 / ($('#slide-range1').attr('max') - $('#slide-range1').attr('min')));
+                    var newPosition = 10 - (newValue * 0.2);
+                  //  $('#rangeV1').append('<span>' + newVal + '</span>');
+                    $('#rangeV1').css('left', 'calc(' + newValue + '% + (' + newPosition + 'px))');
+                    /******************End of dispaly value bubble********************/
+                    /********************Set color for range slider**********************/
+                    var valPercent = (newVal - parseInt($('#slide-range1').attr('min'))) /
+                        (parseInt($('#slide-range1').attr('max')) - parseInt($('#slide-range1').attr('min')));
+                    $('#slide-range1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #88BC47), color-stop(' + valPercent + ', #002B60))');
+                    /****************End of set color**************************************/
+                    var loanterm = $('#term1').val();
+                    var loanspan = $('#period').val();
+    
+                    if (loanterm === ""){
+                        loanterm = loanspan;
+                    }
+                    installmentEstimator(newVal, loanterm);
+                });
+    
+                $("#input-Amount1").keydown(function (e) {
+                  if (e.keyCode == 13) {
+                    var loan;
+                    var valid_value = $('#input-Amount1').val();
+                    var dot_check = valid_value.includes(".");
+                    valid_value = valid_value.replace(/\s/g,'');
+    
+                    if(dot_check === true){
+                        loan = valid_value.slice(0,-3);
+                        loan = loan.substring(1);
+                    } else {
+                        loan = valid_value.substring(1);
+                    }
+    
+                    if (parseInt(loan) < 2000 ) {
+                        resetCalc();
+                        $('#input-Amount1').val("R 2 000.00");
+                        $('#btnApply').addClass('disabled');
+                    }
+    
+                     if (loan === ""){
+                        resetCalc();
+                        $('#input-Amount1').val("R 2 000.00");
+                        $('#btnApply').addClass('disabled');
+                    }
+                  }
+                });
+    
+                $('#input-Amount1').blur(function () {
+                    var loan;
+                    var valid_value = $('#input-Amount1').val();
+                    var dot_check = valid_value.includes(".");
+                    valid_value = valid_value.replace(/\s/g,'');
+    
+                    if(dot_check === true){
+                        loan = valid_value.slice(0,-3);
+                        loan = loan.substring(1);
+                    } else {
+                        loan = valid_value.substring(1);
+                    }
+    
+                    if (parseInt(loan) < 2000 ) {
+                        resetCalc();
+                        $('#input-Amount1').val("R 2 000.00");
+                        $('#btnApply').addClass('disabled');
+                    }
+    
+                     if (loan === ""){
+                        resetCalc();
+                        $('#input-Amount1').val("R 2 000.00");
+                        $('#btnApply').addClass('disabled');
+                    }
+    
+                });
+    
+                $('#input-Amount1').on('input', function () {
+                    var valid_value = $(this).val();
+                    var dot_check = valid_value.includes(".");
+                    valid_value = valid_value.replace(/\s/g,'');
+    
+                    if(dot_check === true){
+                        valid_value = valid_value.slice(0,-3);
+                        valid_value = valid_value.substring(1);
+    
+                        if(parseInt(valid_value) > 250000){
+                            $('#input-Amount1').val("R 250 000.00");
+                            valid_value = $('#input-Amount1').val().substring(1);
+                        }
+                    }
+                    else {
+    
+                        if(valid_value.length > 2){
+                           valid_value = valid_value.substring(1);
+    
+                            if(parseInt(valid_value) > 250000){
+                                $('#input-Amount1').val("R 250 000.00");
+                                valid_value = $('#input-Amount1').val().substring(1);
+                            }
+                        }
+    
+                    }
+    
+                    var rresult = valid_value.includes(".");
+    
+                    if(rresult === true) {
+                       var ni = valid_value.indexOf(".");
+                       var len_check = valid_value.substring(ni,valid_value.length);
+    
+                       if(len_check.length > 3){
+                           $('#input-Amount1').val("R 2 000.00");
+                       }
+                    }
+    
+                    var loan_amount = "R "+valid_value;
+    
+                    var test_value1;
+    
+                    if (valid_value !== "")
+                    {
+                        var test_value = loan_amount.toString();
+    
+                        test_value = test_value.replace(/\s/g,'');
+    
+                        test_value1 = test_value[test_value.length-3]+test_value[test_value.length-2]+test_value[test_value.length-1];
+    
+                        if (test_value1 === ".00"){
+    
+                            var loan = loan_amount.slice(0,-3);
+                            var nloan = loan.replace(" ","");
+                            nloan = nloan.substring(1);
+                            nloan = nloan.replace(/\s/g,'');
+                            var Test_v = nloan.toString();
+    
+                            if (Test_v.charAt(0) === "0" ){
+                                $("#input-Amount1").val("R 2 000.00");
+                                return;
+                            }
+    
+                            if (Test_v.charAt(0) === "R" ){
+                                $("#input-Amount1").val("R 2 000.00");
+                                return;
+                            }
+    
+                        }
+    
+                        if (test_value.charAt(0) === "R" && test_value.length >= 5){
+    
+                            var result = test_value.includes(".");
+                            //var test_value1 = "";
+    
+                            if(result === true) {
+                                if(test_value1 === ".00"){
+                                     var ni = test_value.indexOf(".");
+                                     test_value1 = test_value.substring(0,ni);
+                                } else {
+                                       $("#input-Amount1").val("R 250 000.00");
+                                       test_value1 = "R250000";
+                                }
+    
+                            } else {
+                                test_value1 = test_value;
+                            }
+    
+                            var loan = test_value1;
+                            var nloan = loan.replace(" ","");
+                            nloan = nloan.substring(1);
+                            nloan = nloan.replace(/\s/g,'');
+                            var Test_v = nloan.toString();
+    
+                            if (Test_v.charAt(0) === "0" ){
+                                $("#input-Amount1").val("R 2 000.00");
+                                return;
+                            }
+    
+                            if (Test_v.charAt(0) === "R" ){
+                                $("#input-Amount1").val("R 2 000.00");
+                                return;
+                            }
+                        }
+    
+                        else {
+                            nloan = test_value.substring(1);
+                        }
+    
+                    } else {
+                        $("#input-Amount1").val("R 2 000.00");
+                    }
+    
+    
+                    
+    
+                if (nloan === undefined){
+                    $('#error-loanamount1').css('display', 'block');
+                    $('#error-loanamount1').text('Please enter loan amount in between R2000 to R250000');
+                    $('#btnApply').addClass('disabled');
+                    return;
+                }
+    
+                if (parseInt(nloan) < 2000 || parseInt(nloan) > 250000 || nloan == "") {
+                    $('#error-loanamount1').css('display', 'block');
+                    $('#error-loanamount1').text('Please enter loan amount in between R2000 to R250000');
+                    $('#btnApply').addClass('disabled');
+                }
+                else {
+                    $('#slide-range1').val(nloan);
+                    var loanterm = $('#term1').val();
+                    installmentEstimator(nloan, loanterm);
+                    $('#error-loanamount1').text('');
+                    $('#error-loanamount1').css('display', 'none');
+                    $('#btnApply').removeClass('disabled');
+                }
+                /********************Set color for range slider**********************/
+    
+                if(parseInt(nloan) >= 2000 && parseInt(nloan) <= 250000){
+    
+                    var valPercent = (nloan - parseInt($('#slide-range1').attr('min'))) /
+                    (parseInt($('#slide-range1').attr('max')) - parseInt($('#slide-range1').attr('min')));
+                    $('#slide-range1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #88BC47), color-stop(' + valPercent + ', #002B60))');
+                }
+                 else
+                {
+                    installmentEstimator(2000, 7);
+                    $('#slide-range1').val(parseInt(2000));
+                    var valPercent = (2000 - parseInt($('#slide-range1').attr('min'))) /
+                    (parseInt($('#slide-range1').attr('max')) - parseInt($('#slide-range1').attr('min')));
+                    $('#slide-range1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #88BC47), color-stop(' + valPercent + ', #002B60))');
+                }
+    
+                /****************End of set color**************************************/
+            });
+    
+            $('.li-hover').click(function(){
+                var newVal = $(this).attr('data-value'); // $("#period").val(); // $(this).val();
+                $("#input-month1").val(newVal);
+                //var loan = $("#input-Amount1").val();
+    
+                var loan = $("#input-Amount1").val().slice(0,-3);
+                var nloan = loan.replace(" ","");
+                nloan = nloan.substring(1);
+                nloan = nloan.replace(" ","");
+    
+                installmentEstimator(nloan, newVal);
+                /******set color for range slider********************/
+                var valPercent = (newVal - parseInt($('#input-month1').attr('min'))) /
+                    (parseInt($('#input-month1').attr('max')) - parseInt($('#input-month1').attr('min')));
+                $('#input-month1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #88BC47), color-stop(' + valPercent + ', #002B60))');
+                /***************** End of set color**********************/
+             });
+    
+            $('#term1').on('input', function () {
+                var newVal = $(this).val();
+                $("#input-month1").val(newVal);
+    
+                var nloan;
+                var dot_check = $("#input-Amount1").val().includes(".");
+                var valid_value = $("#input-Amount1").val();
+                valid_value = valid_value.replace(/\s/g,'');
+    
+    
+                if(dot_check === true){
+                    nloan = valid_value.slice(0,-3);
+                    nloan = nloan.substring(1);
+                }
+    
+                else {
+                    nloan = valid_value.substring(1);
+                }
+    
+                //var loan = $("#input-Amount1").val();
+                installmentEstimator(nloan, newVal);
+                /******set color for range slider********************/
+                var valPercent = (newVal - parseInt($('#input-month1').attr('min'))) /
+                    (parseInt($('#input-month1').attr('max')) - parseInt($('#input-month1').attr('min')));
+                $('#input-month1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #88BC47), color-stop(' + valPercent + ', #002B60))');
+                /***************** End of set color**********************/
+            });
+    
+            $('#input-month1').on('input', function () {
+                var loanterm = $(this).val();
+                var newloanterm;
+                if (loanterm >= 3 && loanterm <= 7)
+                    newloanterm = 7;
+                else if (loanterm >= 8 && loanterm <= 9)
+                    newloanterm = 9;
+                else if (loanterm >= 10 && loanterm <= 12)
+                    newloanterm = 12;
+                else if (loanterm >= 13 && loanterm <= 18)
+                    newloanterm = 18;
+                else if (loanterm >= 19 && loanterm <= 24)
+                    newloanterm = 24;
+                else  if (loanterm >= 25 && loanterm <= 30)
+                    newloanterm = 30;
+                else  if (loanterm >= 31 && loanterm <= 36)
+                    newloanterm = 36;
+                else  if (loanterm >= 37 && loanterm <= 42)
+                    newloanterm = 42;
+                else  if (loanterm >= 43 && loanterm <= 48)
+                    newloanterm = 48;
+                else  if (loanterm >= 49 && loanterm <= 60)
+                    newloanterm = 60;
+                else
+                    newloanterm = 72
+    
+                $('#term1').val(newloanterm);
+                $('#ddSpanner').text(newloanterm+' months');
+    
+                var nloan;
+                var dot_check = $("#input-Amount1").val().includes(".");
+                var valid_value = $("#input-Amount1").val();
+                valid_value = valid_value.replace(/\s/g,'');
+    
+    
+                if(dot_check === true){
+                    nloan = valid_value.slice(0,-3);
+                    nloan = nloan.substring(1);
+                }
+    
+                else {
+                    nloan = valid_value.substring(1);
+                }
+    
+                installmentEstimator(nloan, newloanterm);
+                /******set color for range slider********************/
+                var valPercent = (loanterm - parseInt($('#input-month1').attr('min'))) /
+                    (parseInt($('#input-month1').attr('max')) - parseInt($('#input-month1').attr('min')));
+                $('#input-month1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #88BC47), color-stop(' + valPercent + ', #002B60))');
+                /***************** End of set color**********************/
+            });
+    
+*@
+
+
      $(document).ready(function () {
         var imageBgCss = "url('" + "@headerImage_large" + "')";
         var imageMdCss = "url('" + "@headerImage_medium" + "')";
@@ -240,9 +712,10 @@
             calcFormContainer: '#calculatornotice-form',
             serviceUrl: '@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.Mobile.URL"]',
             headers: [
-                    ['ITSAPP-DEVICE', '@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.ITSAPP-DEVICE"]'],
-                    ['ITSAPP-LANG', 'en-GB'],
-                    ['Content-type', 'application/json']
+                   ['ITSAPP-DEVICE', '@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.ITSAPP-DEVICE"]'],
+                   ['ITSAPP-LANG', 'en-GB'],
+                   ['ITSAPP-DEVICEID', ''],
+                   ['Content-type', 'application/json']
             ],
             translations: {
                 interestPayoutExpiry: '@ResourceHelper.GetResource("InterestPayoutOnExpiry")',

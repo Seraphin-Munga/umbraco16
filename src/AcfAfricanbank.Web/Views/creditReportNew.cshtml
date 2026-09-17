@@ -1,5 +1,190 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCampaign>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models;
+@using Web.Helpers
+@using Umbraco.Web.Models
+@using System.Text.RegularExpressions
+
 @{
-	Layout = null;
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var children = Model.Children;
+
+    // Get specific Children
+ 
+
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+     var bodyFooterTitle = heroBody?.Value("bodyFooterTitle").ToString();
+     
+      var firstsection = heroBody.Children.Where(c => c.Name == "FirstSection").FirstOrDefault();
+      var firstsectioncontent = firstsection.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var firstcontent = firstsectioncontent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+      
+   
+}
+<link rel="stylesheet" href="/css/projectmagic.css" /> 
+<style>
+    .registerLogin {
+        width: unset;
+        text-align: right;
+    }
+
+    .onenumbercall {
+        text-align: center;
+        margin-top: 0;
+        margin-bottom: 10px;
+        line-height: 1.1;
+        display: block;
+    }
+
+@@media (min-width: 360px) and (max-width: 416px) {
+        .hero-static-banner {
+            height: 530px;
+        }
+    }
+
+    @@media (min-width: 428px) and (max-width: 540px) {
+        .hero-static-banner {
+            height: 550px;
+        }
+    }
+
+    @@media (min-width: 540px) and (max-width: 720px) {
+        .hero-static-banner {
+            height: 200px;
+        }
+    }
+
+    @@media (min-width: 768px) and (max-width: 1024px) {
+        .hero-static-banner {
+            height: 285px;
+        }
+
+        .hero-static-caption {
+            top: -40px;
+        }
+    }
+
+    @@media (min-width: 1000px) and (max-width: 10000px) {
+        #popUpHuawei {
+            margin-right: -45rem;
+            margin-top: -82px;
+        }
+
+
+        .modal-dialog {
+            width: 900px !important;
+        }
+    }
+
+    @@media (min-width: 768px) and (max-width: 1024px) {
+        #popUpHuawei {
+            margin-right: -35rem;
+            margin-top: -68px;
+        }
+
+        .col-sm-6 img {
+            width: 160px;
+        }
+
+        .modal-dialog {
+            width: 790px !important;
+            padding-left: 30px;
+            padding-right: 50px;
+        }
+    }
+</style>
+
+
+
+  @{
+         int idIterator = 0;
+           foreach (var item in firstcontent){
+               var tabSubItemImage = item.Value<IPublishedContent>("tabSubItemImage")?.Url;
+               var tabSubItemIcon = item.Value<IPublishedContent>("tabSubItemIcon")?.Url;
+    var title = item.Value<string>("tabSubItemTitle");
+    var description = item.Value<string>("genericCardContent");
+    
+     List<Umbraco.Web.Models.Link> itemLink = new List<Umbraco.Web.Models.Link>();
+     
+                foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)item.Value("tabSubItemLinks"))
+                {
+                    itemLink.Add(link);
+                    
+                }
+    
+                
+                
+                 if (idIterator%2 == 0)
+                    {
+                        <section class="section-800 bg-grey-60">
+                            <div class="container">
+                                <div class="row align-items-center d-flex row-change md-text-center">
+                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                        <h1 class="color-brand-1 mt-15 mb-20">@title</h1>
+                                        <p class="font-md color-brand-1"> @item.Value("tabSubItemTextContent")</p>
+                                       <div class="combo-btn">
+<div class="mt-50 text-start column1">
+<p class="combo-btn-text primary"><a href="@itemLink[0].Url" class="btn  btn-brand-1 hover-up">@itemLink[0].Name</a></p>
+</div>
+</div>
+                                    
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                        <img Class="d-block"
+                                             src="@tabSubItemImage"
+                                             alt="" />
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        }
+                        else{
+                        
+                             <section class="section-800">
+                                <div class="container">
+                                    <div class="row align-items-center row-change d-flex flex-row-reverse md-text-center">
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                            <h1 class="color-brand-1 mb-20">@title</h1>
+                                            <p class="font-md color-grey-500">@item.Value("tabSubItemTextContent")</p>
+                                       
+                
+                                      @if(itemLink.Any(link => link.Name.Contains("DOWNLOAD NOW")))
+{
+                                       <div class="mt-50 text-start"><a class="btn btn-brand-1 hover-up" href="@itemLink[0].Url">@itemLink[0].Name
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="right-icon" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M320 336h76c55 0 100-21.21 100-75.6s-53-73.47-96-75.6C391.11 99.74 329 48 256 48c-69 0-113.44 45.79-128 91.2-60 5.7-112 35.88-112 98.4S70 336 136 336h56m0 64.1 64 63.9 64-63.9M256 224v224.03">
+                </path></svg></a></div>
+                                        }
+                                        
+                                        else{
+                                                                               <div class="combo-btn">
+<div class="mt-50 text-start column1">
+<p class="combo-btn-text primary"><a href="@itemLink[0].Url" class="btn  btn-brand-1 hover-up">@itemLink[0].Name</a></p>
+</div>
+</div>
+                                      
+                                        }
+                 
+                                        </div>
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                             <img
+                                              Class="d-block"
+                                              src="@tabSubItemImage"
+                                             alt="" />
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        }
+          idIterator += 1;
+            }
+        }
+ 
+
+
+@section scripts
+                                            {
+   
 }

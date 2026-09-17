@@ -1,5 +1,444 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageInvestments>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models
+@using Web.Helpers;
+@using System.Collections.Generic;
 @{
-	Layout = null;
+    /**/
+
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var children = Model.Children;
+
+    // Get specific Children
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroBody = children?.Where(c => c is HeroBody).FirstOrDefault();
+     var applicationRequirements = heroBody.Children(x => x.ContentType.Alias.ToLower() == "herobodycontactus").FirstOrDefault();
+
+
+ var bodyCards = heroBody?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+    var applyDocs = bodyCards?.Select(c => c as Card).FirstOrDefault();
+    var cardImage = applyDocs.Value("cardIcon");
+    String cardUrl = ((IPublishedContent)cardImage).Url.ToString();
+    
+   var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
+    var chestTitle = heroChest?.Value("chestTitle").ToString();
+    var chestDescription = heroChest?.Value("chestDescription").ToString();
+    var chestCards = heroChest?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+    
+    var bankingItemsModel = new CustomModels.Benefits
+    {
+        BenefitCards = chestCards.Select(c => c as Card).ToList()
+    };
+
+
+    var headerImage_large = heroHeader?.Value<IPublishedContent>("image")?.Url;
+    var headerImage_medium = heroHeader?.Value<IPublishedContent>("imageMedium")?.Url;
+    var headerImage_small = heroHeader?.Value<IPublishedContent>("imageSmall")?.Url;
+
+
+ var _bankingItemsModel = new CustomModels.Benefits
+    {
+        Header = chestTitle,
+        Description = chestDescription,
+      @*  BenefitCards = sectionCardsContent.Select(c => c as Card).ToList(),
+        BenefitCards1 = sectionCardsContent.Select(c => c as NCcard).ToList()*@
+    };
+
+    // Schema data
+    var description = heroShoulder.Value("shouderDescription");
+    var title = heroShoulder.Value("shoulderTitle");
 }
+<style>
+    a:hover{
+    
+        text-decoration: none;
+    }
+    .eq-height1{
+        display:flow-root;
+        margin-bottom:80px;
+    }
+    
+    .center-icon-text .title {
+        font-weight:500px;
+        font-size: 14px;
+        
+    }
+    .myworld-campaign-section-container{
+        box-shadow:initial;
+    }
+    
+    .blue-white-color{
+       background-color: #002b60;
+       position: relative;
+       bottom: 80px;
+    }
+    .blue-color{
+        font-size:20px
+    }
+    .rich-text{
+        font-weight:350;
+        color:#fff;
+    }
+  @*  .apply-docs-terms{
+        padding-top:50px;
+        padding-bottom:50px;
+    }*@
+    .hero-static-title{
+       font-size:50px!important; 
+    }
+    .campaign-apply{
+        margin-top:-40px;
+        padding-bottom:10px;
+        margin-left: 4%;
+        margin-right: 4%;
+    }
+    .requirements{
+        background-color:#EFEFEF;
+    }
+    .body-content {
+        width: 50%; 
+         }
+    
+     @@media (min-width: 256px) and (max-width: 767px) {
+         .body-content {
+         width: fit-content;
+         }
+       .footerterms{
+       display:grid !important;
+       }
+       .call-to-number{
+          width:auto !important;
+       }
+       .campaign-apply{
+       margin-left:0px !important;
+       margin-right:0px !important;
+       }
+       .mb-terms{
+       margin-bottom:10%;
+       text-align:center;
+       }
+       .terms-img{
+       width:300px;
+       }
+    }
+       @@media (min-width: 768px) and (max-width: 1024px) {
+             .body-content {
+             width: 120%;
+             font-size:10px !important;
+             }
+             .campaign-apply {
+        
+                margin-left: -5%;
+                margin-right: 0%;
+            }
+        }
+  @*  .modal .modal-dialog .modal-content .modal-header {
+        background-color: transparent;
+        border-bottom: 1px solid #eee;
+    }
+     /*AR CARDS STYLING*/
+     
+   .card-block {
+    position: relative;
+    margin: 3.7% 0px;
+    padding: 1em;
+    }
+    
+.card {
+    overflow: hidden;
+    padding: 5;
+    border: none;
+    border-radius: 20px;
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 15px 25px, rgba(0, 0, 0, 0.05) 0px 5px 10px;
+    margin: 20px auto;
+    width: 80%;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.card-title p{
+    font-size: 32px;
+    font-weight: 900;
+    line-height: 1.2;
+    color: #002B60; 
+}
+
+.card-description{
+    font-size: 21px;
+}
+
+.description-span {
+    color:#6B6F81;
+    font-weight: bold;
+}
+
+.footer-content {
+    color:#6B6F81;
+    font-weight: bold;
+}
+
+img{
+    width:100%;
+    height:auto;
+    object-fit:cover;
+}
+
+.modal-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-wrapper {
+    display: flex;
+}
+
+/*updated*/
+
+.space-header {
+    margin-top: 3vh;
+}
+    @@media (min-width: 280px) and (max-width: 540px) {
+        .info-button {
+            text-align: center;
+        }
+        <!--updated-->
+        .card-image {
+            border-radius: 21px !important;
+        }
+    }
+
+    .campaign-myworld-container {
+        background-image: url("/media/ptkpputz/african-banking-1935x255.png");
+        background-size: 1772px;
+        position: relative;
+        background-color: #002b60;
+        padding: 83px 0 80px 0;
+    }
+
+    .disclaimer-text {
+        margin-top: 15px;
+        font-size: 14px !important;
+    }
+
+    .black-card-shared-card {
+        width: 80%;
+    }
+
+    @@media only screen and (max-width: 768px) {
+
+        .black-card-shared-card {
+            width: 80%;
+        }
+        
+        .card {
+            overflow: hidden;
+            padding: 5;
+            border: none;
+            border-radius: 20px;
+            box-shadow: rgba(0, 0, 0, 0.15) 0px 15px 25px, rgba(0, 0, 0, 0.05) 0px 5px 10px;
+            margin: 20px auto;
+            width: 100%;
+}
+        .card-title p{
+        font-size: 21px;
+        }
+        
+        .card-footer {
+            display: none;
+        }
+    }
+
+    .onenumbercall {
+        text-align: center;
+        margin-top: 0;
+        margin-bottom: 10px;
+        line-height: 1.1;
+        display: block;
+    }
+    @@media (min-width: 1200px) and (max-width: 10000px) {
+
+        .left-col {
+            border-right: none !important;
+            margin-left: 210px;
+        }
+        
+        .btn-mobile {
+            display: none;
+        }
+        
+        <!--updated styling-->
+        .card-image {
+            border-radius: 58px !important;
+        }
+        #popUpHuawei {
+            margin-right: -45rem;
+            margin-top: -82px;
+        }
+         @@supports (-moz-appearance:none) {
+
+            #popUpHuawei {
+                margin-right: 0px;
+                margin-left: 329px;
+            }
+        }
+
+        .modal-dialog {
+            width: 900px !important;
+        }
+        
+        .content {
+         padding-left: 20px;
+     }
+     
+    }
+    @@media (max-width: 1114px) {
+        
+        .card-footer {
+            display: none;
+        }
+    }
+
+    @@media (min-width: 768px) and (max-width: 1024px) {
+        #popUpHuawei {
+            margin-right: -35rem;
+            margin-top: -68px;
+        }
+        <!--updated-->
+        .card-image {
+            border-radius: 41px !important;
+        }
+        .col-sm-6 img {
+            width: 160px;
+        }
+
+        .modal-dialog {
+            width: 790px !important;
+            padding-left: 30px;
+            padding-right: 50px;
+        }
+         @@supports (-moz-appearance:none) 
+         {
+            #popUpHuawei {
+                margin-left: 9rem;
+                margin-top: -68px;
+            }
+          }
+    }*@
+</style>
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+<!-- HERO CONTINUED-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+
+@if (bankingItemsModel.BenefitCards != null && bankingItemsModel.BenefitCards.Any())
+{
+    int cardIChestterator = 0;
+
+    <div class="container eq-height eq-height1 @(bankingItemsModel.BenefitCards.Count > 6 ? "card-slider" : "") margin-top-40">
+        @foreach (Card benefit in bankingItemsModel.BenefitCards)
+        {
+            String cardIdTag = "card" + cardIChestterator.ToString();
+            <div class="col-sm-4">
+                <a href="#@cardIdTag">
+                    <div class="card-plain">
+                        <div class="center-icon-text">
+                            <div class="image">
+                                @if (benefit.CardIcon != null)
+                                {
+                                    <img class="own-world-of-banking-icons" src="@benefit.CardIcon.Url" alt="@benefit.CardIcon.Value("altTag")" />
+                                }
+                            </div>
+                            <div class="title text-uppercase">@benefit.CardTitle</div>
+                            <p class="descr">@benefit.CardDescription</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            ++cardIChestterator;
+        }
+    </div>
+}
+
+
+  
+   
+   <div class="requirements">
+             @*<div class="campaign-myworld-container">*@
+                <div class="container payments-section full green-button blue-white-color">
+                    
+                    <div class="row myworld-campaign-section-container green-color">
+                                <div class="col-sm-12 margin-bottom-20 hero-title blue-color">
+                                    <div class="text-left blue-color">
+                                     @*   <p id="TheonlyraceofitsmagnitudesetinatownshipwheresomeofSouthAfrica’sgreatshavewalked!0" class="title heading-text font-size-30" style="font-weight:700;color:#fff;">The only race of its magnitude set in a township where some of South Africa’s greats have walked!</p>*@
+                                        <p class="rich-text">  @Html.Raw(@heroBody.Value("richTextBox"))</p>
+                                    </div>
+                                </div>
+    
+                    </div>
+                </div>
+       @* </div>*@
+        <div class="campaign-apply">
+             @Html.Raw(applicationRequirements.Value("mainHeaderText"))
+        </div>
+   </div>
+   
+   
+   
+  
+<div class="container apply-docs-terms">
+        <div class="col-md-7 col-sm-12" style="margin-top:15%;">
+             @applyDocs.Value("cardDescriptionLongText")
+        </div>
+       <div class="col-md-5 col-sm-12">
+           <img  class="terms-img" style="" src="@cardUrl"/>  
+       </div>
+                           
+</div>
+
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            var imageBgCss = "url('" + "@headerImage_large" + "')";
+            var imageMdCss = "url('" + "@headerImage_medium" + "')";
+            var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_medium : headerImage_small)" + "')";
+            var CheckScreenSize;
+            (CheckScreenSize = function () {
+                var _width = $(window).outerWidth();
+                var _height = $(window).outerHeight();
+                if (_width <= 511) {
+                    $("#heroHeader").css("background-image", imageSmCss);
+                }
+                else {
+                    $("#heroHeader").css("background-image", imageBgCss);
+                }
+            })();
+            $(window).resize(CheckScreenSize);
+        });
+
+            $(".btnFeaturesTable").click(function () {
+            $("#table-toggle").toggleClass('fa-chevron-up fa-chevron-down');
+            $(".accordion-content ").fadeToggle();
+        });
+    </script>
+    
+  @*  <script type="application/ld+json">
+        {
+        "@@context": "https://schema.org",
+        "@@type": "Table",
+        "about": "list of MyWORLD Banking Features"
+        }
+    </script>*@
+}
+

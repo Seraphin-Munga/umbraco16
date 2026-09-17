@@ -1,5 +1,464 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCampaign>
+
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models;
+@using Web.Helpers
+@using Umbraco.Web.Models
+@using System.Text.RegularExpressions
+
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
+	
+	var children = Model.Children;
+	
+
+    // Get specific Children
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+
+    var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
+
+     var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+     var bodyCards = heroBody.Children.Where(c => c.ContentType.Alias.ToLower() == "card").FirstOrDefault();
+     var heroKnees = children?.Where(c => c.ContentType.Alias.ToLower() == "heroknees").FirstOrDefault();
+     
+     
+        var insuranceitem = heroBody.Children.Where(c => c.Name == "content").FirstOrDefault();
+        var noinsuranceitem = insuranceitem.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+        var noinsuranceitemcmp = noinsuranceitem.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+        var noinsu = 1; 
+     
+      var faq = heroBody.Children.Where(c => c.Name == "FAQ").FirstOrDefault();
+      var faqcontent = faq.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var faqcontentqa = faqcontent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+      
+      var credit = heroBody.Children.Where(c => c.Name == "Credit Card").FirstOrDefault();
+      var creditCard = credit.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var creditCards = creditCard.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+      
+      var priceStructure = children?.Where(c => c.ContentType.Alias == "priceStructure").FirstOrDefault();
+      
+      var blackCard = heroBody.Children.Where(c => c.Name == "Black Credit").FirstOrDefault();
+      var blackCardCredit = blackCard.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var blackCardsCredit = blackCardCredit.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+      
+      var noCampx1 = 1;
+        var empcount=0;
+        
+
+    
+    
+     var image = Model.Value<IPublishedContent>("image");
+     var appImage = bodyCards.Value<IPublishedContent>("cardIcon");
+     var accordionImage =  heroHeader.Value<IPublishedContent>("imageMedium");
+     
+         var kneesTabHeaders = heroKnees?.Children?.Select(c => c.Value("title")?.ToString()).ToList();
+    var findOutMoreTab = heroKnees?.Children?
+        .Where(c => c.ContentType.Alias.ToLower() == "findoutmore").FirstOrDefault();
+    var creditLifeInsuranceTab = heroKnees?.Children?
+        .Where(c => c.ContentType.Alias.ToLower() == "creditlifeinsurance").FirstOrDefault();
+    var creditLifeInsuranceTab_Credit = heroKnees?.Children?
+    .Where(c => c.ContentType.Alias.ToLower() == "creditlifeinsurancecredit").FirstOrDefault();
 }
+
+@* the fun starts here *@
+
+
+
+<style>
+    .text-center h3{
+      color:#112768 ; 
+    }
+
+.pricing-table{
+    
+    margin: auto !important;
+}
+    
+ 
+</style>
+
+
+<div>
+  <section class="section-800">
+    <div class="container">
+     
+        <div class="row align-items-center d-flex row-change md-text-center">
+          <div class="col-md-6">
+            <h2 class="color-brand-1 mb-20">@Model.Value("title_tag")</h2>
+            <p class="font-md color-brand-1">
+              @Model.Value("description_tag")
+            </p>
+           
+              
+              <div class="combo-btn">
+<div class="mt-50 text-start column1">
+<p class="combo-btn-text primary">
+               
+                 <p class="combo-btn-text primary">
+                         <a class="btn  btn-brand-1 hover-up " href="#">TELL ME MORE</a>
+                 </p>
+              
+</p>
+</div>
+</div>
+              
+          </div>
+          <div class="col-md-6">
+         <img src="@image.Url" alt="Image" />
+          </div>
+        </div>
+      </section>
+
+
+    
+
+  
+  
+   <section class="section-800 bg-grey-60">
+    <div class="container">
+        <div class="row mt-50 align-items-center">
+            <div class="col-lg-6 mb-30">
+                <h2 class="color-brand-1">@credit.Value("partialViewName")</h2>
+            </div>
+               @foreach (var item in creditCards)
+
+          {
+                    var cardTitle = item.Value<string>("nCcardTitle");
+                    var cardIcon = item.Value<IPublishedContent>("nCcardIcon")?.Url;
+           
+                    
+                    <div class="col-lg-6">
+                        <div class="card-offer-small card-we-do hover-up">
+                            <div class="card-image">
+                                <img
+                                class="d-block"
+                                src="@cardIcon"
+                                alt="iori"
+                                
+                              /> 
+                            </div>
+                            <div class="card-info">
+                                <h4 class="color-brand-1 mb-10">
+                                    <a class="color-brand-1" href="#">@cardTitle</a>
+                                </h4>
+                                <p class="font-md color-brand-1 color-grey-500 mb-5">@Html.Raw(item.Value<string>("mediumDescription"))</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+               
+            }
+        </div>
+        
+   
+    </div>
+</section>
+  
+  
+
+
+
+
+@foreach (var item in blackCardsCredit.Select((value, index) => new { Value = value, Index = index }))
+{
+    var cardIcon = item.Value.Value<IPublishedContent>("nCcardIcon")?.Url;
+    var title = item.Value.Value<string>("nCcardTitle");
+    var description = item.Value.Value<string>("mediumDescription");
+    var descriptionLong = item.Value.Value<string>("nClongDescription");
+
+    <section class="@((item.Index % 2 == 0) ? "section-800" : "section-800 bg-grey-60")">
+        <div class="container">
+            <div class="row align-items-center d-flex row-change md-text-center">
+                @if (item.Index % 2 == 0)
+                {
+                    <div class="col-md-6">
+                        <img src="@cardIcon" />
+                    </div>
+                   
+                }
+                <div class="col-md-6">
+                    <h2 class="color-brand-1 mb-20">
+                        @title
+                    </h2>
+                    @Html.Raw(description)
+                    
+                    
+                </div>
+                @if (item.Index % 2 != 0)
+                {
+                    <div class="col-md-6">
+                        <img src="@cardIcon" />
+                    </div>
+                    
+                  
+                }
+                
+            </div>
+             <div>
+                             @Html.Raw(descriptionLong)
+                   </div>
+        </div>
+    </section>
+}
+
+
+  <section class="section-800">
+      @if (priceStructure != null)
+{
+   @Html.Partial("_priceStructure", priceStructure as ContentModels.PriceStructure)
+}
+
+  
+  </section>
+
+
+      
+     
+@{
+         int insu = 0;
+           foreach (var item in noinsuranceitemcmp){
+                var cardTitle = item.Value<string>("nCcardTitle");
+                var cardTitleId = cardTitle.Trim().ToString().Replace(" ", "").ToString() + insu.ToString();
+                var cardDesc = item.Value<string>("nClongDescription");
+                var cardDescmedium = item.Value<string>("mediumDescription");
+                var icon = item.Value<IPublishedContent>("nCcardIcon");
+                
+                <section class="section-800 bg-grey-60">
+                <div class="container">
+                  <div class="row align-items-center d-flex row-change md-text-center">
+                    <div class="col-xl-7 col-lg-7 col-md-7">
+                      <h1 class="color-brand-1 mt-15 mb-20">
+                       @cardTitle 
+                      </h1>
+                      @Html.Raw(item.Value<string>("mediumDescription"))
+                      <div class="mt-50 text-start">
+                         @Html.Raw(item.Value<string>("nClongDescription"))
+                      </div>
+                    </div>
+                    <div class="col-xl-5 col-lg-5 col-md-5">
+                       <img
+                        class="d-block"
+                        src="@icon.Url"
+                        
+                        alt="@icon.Value("altTag")"
+                      /> 
+                    </div>
+                  </div>
+                </div>
+              </section>
+                }
+}
+      
+      
+
+
+  
+  
+
+  
+  
+  
+  
+
+  <section class="section-800">
+      
+      <div class="container " >
+    <div class="row align-items-center d-flex row-change">
+        <div class="col-xl-12 col-lg-12 col-md-12">
+              <h1 class="color-brand-1 mt-15 mb-20 text-center faqHeader">FAQS</h1>
+               <div class="accordion accordionStyle2" id="accordionFAQ">
+                    <div class="row">
+                   @foreach (var item in faqcontentqa)
+
+                    {
+                        var cardTitle = item.Value<string>("nCcardTitle");
+                        <div class="col-lg-12">
+                            <div class="accordion-item">
+                                <h5 class="accordion-header">
+                                    <button class="accordion-button text-heading-5">@cardTitle</button>
+                                </h5><div id="accordion-body" class="accordion-collapse collapse">
+                                    <div class="accordion-body">@Html.Raw(item.Value<string>("mediumDescription"))</div>
+                                </div>
+                            </div>
+                        </div>
+                                                    
+                        noCampx1 += 1;
+
+                    }
+                    </div>
+                </div>
+        </div>
+        
+    </div>
+</section>
+
+
+<section class="section-800 bg-grey-60">
+    
+      <div class="container">
+        <div class="row align-items-center row-change d-flex flex-row-reverse md-text-center">
+        <div class="col-xl-6 col-lg-6 col-md-6">
+          
+             
+                       <h1 class="color-brand-1 mb-20">@bodyCards.Value("cardTitle")</h1>
+            <p class="font-md color-brand-1">
+               
+                @Html.Raw(bodyCards.Value<string>("cardDescriptionLongText"))
+            </p>
+            
+                 <p class="combo-btn">
+                     <a class="btn btn-brand-1 mt-50 text-start hover-up" href="https://downloadabapp.onrender.com">DOWNLOAD NOW
+
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="right-icon" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M320 336h76c55 0 100-21.21 100-75.6s-53-73.47-96-75.6C391.11 99.74 329 48 256 48c-69 0-113.44 45.79-128 91.2-60 5.7-112 35.88-112 98.4S70 336 136 336h56m0 64.1 64 63.9 64-63.9M256 224v224.03">
+                 
+</a>
+    
+                     
+                 </p>
+            
+            
+        </div>
+        <div class="col-xl-6 col-lg-6 col-md-6">
+   <img src="@appImage.Url" alt="Image" />
+      
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+    
+</section>
+
+
+
+@if (findOutMoreTab != null)
+            {
+               var tabTitle = findOutMoreTab.Value("title")?.ToString();
+              
+                
+                var downloadItems = findOutMoreTab.Value<IEnumerable<DownloadItem>>("downloadItems");
+                
+                    
+ <section class="section-800">
+     
+                <div class="container">
+                  <div class="col d-flex align-items-center row-change">
+                    <div class="row-xl-6 row-lg-6 col-md-6">
+                       <h1 class="color-brand-1 mt-15 mb-20">
+                        @tabTitle
+                      </h1>
+                    </div>
+                    <div class="-xl-6 col-lg-6 col-md-6">
+                    
+                       
+                    </div>
+                    
+                  </div>
+                   <div class="">
+                    <div class="campaign-list">
+                       
+                        <ul>
+                             @if (downloadItems != null && downloadItems.Any())
+                {
+                             foreach (var link in downloadItems)
+                    {
+                                    <li>
+                                        <div class="row no-gutter download-item first">
+                                            <div class="col-sm-9">
+                                                <div class="download-descr">@link.DownloadTextDescription</div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <a class="download-btn" href="@link.DownloadButtonRedirectLink2.Url" target="_blank" class="download-btn">
+                                                    @(string.IsNullOrEmpty(link.DownloadButtonText) ? "Download" : link.DownloadButtonText)
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                   
+                                }   
+                                }
+                        </ul>
+                        
+                    </div>
+                </div>
+                </div>
+</section>
+}
+
+
+
+
+
+<link rel="stylesheet" href="/css/projectmagic.css" /> 
+    
+  <script>
+      $(document).ready(function () {
+        $(".scroll-left").click(function () {
+          $(".scroll-container").animate({ scrollLeft: "-=100px" }, "slow");
+        });
+
+        $(".scroll-right").click(function () {
+          $(".scroll-container").animate({ scrollLeft: "+=100px" }, "slow");
+        });
+        
+       $('ul li').click(function() {
+        var selectedItem = $(this).text();
+        $('.menu-card-credit').empty();
+        $('.menu-card-credit').append('<div><h3 class="sub-title-month monthly-fees">ACCOUNT FEES</h3></div><hr class="primary-color"/><div><div><span class="fees">' + selectedItem + '</span><span class="price">Updated Price</span></div><hr/></div>');
+      });
+      
+      
+              $(".accordion-button").click(function(){
+            
+         
+    var isCollapsed = $(this).hasClass('collapsed');
+    
+           $(".accordion-button").removeClass('collapsed');
+           
+           if(isCollapsed == false) {
+            $(this).toggleClass("collapsed");
+           }
+
+           
+ var isCollapsedContent = $(this).parent().next(".accordion-collapse").hasClass('collapse');
+            $(".accordion-collapse").addClass('collapse');
+            if(isCollapsedContent == true) {
+                $(this).parent().next(".accordion-collapse").toggleClass('collapse');
+           }
+
+           
+
+        });
+      
+      
+        $(".accordion").click(function() {
+        // Toggle the current accordion
+        $(this).toggleClass("active");
+        
+        // Get the panel related to this accordion
+        var panel = $(this).next(".panel");
+
+        // Check if the panel was already open
+        var wasOpen = panel.css("display") === "block";
+        
+        // Close all panels
+        $(".panel").css("display", "none");
+        $(".accordion").removeClass("active"); // Optionally remove the 'active' class from all accordions
+        
+        // If the clicked panel was not already open, open it
+        if (!wasOpen) {
+            panel.css("display", "block");
+            $(this).addClass("active"); // Optionally add 'active' class back to the clicked accordion
+        }
+    });
+      });
+    </script>
+
+
+
+
+

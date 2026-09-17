@@ -1,5 +1,1209 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
 	Layout = null;
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+
 }
+
+@* the fun starts here *@
+
+<style>
+  .body {
+    font-family: Montserrat !important;
+    background-color: #fff;
+    margin: 0;
+    padding: 0;
+    color: #002B60;
+  }
+
+/**/
+
+.footer {
+   position: fixed !important;
+   left: 0 !important;
+   bottom: 0 !important;
+   width:100%;
+}
+
+.success{
+  display:none;  
+}
+
+.unsuccessful{
+  display:none;
+}
+
+.navbar {
+    height: 100px;
+    padding: 16px 24px;
+}
+
+.navbar-brand {
+  
+    position: relative;
+    padding: 0px 70px 0px 0px !important;
+}
+
+.mt-25 {
+    margin-top: 25px;
+}
+
+.font-bg-white{
+    color:white !important;
+    font-weight:400;
+    font-size:12px;
+    padding-left: 5%;
+}
+
+.bg-ab-blue{
+    background: var(--surface-primary, #002B60);
+}
+
+label{
+    text-transform: none;
+}
+
+.marketing-msg{
+    left: 10px;
+    bottom: 8px;
+    position: relative;
+}
+
+.consent-text{
+    color: var(--Brand-AB-Blue, #012B60);
+
+    /* Body/Medium/Regular */
+    font-family: Montserrat !important;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 150% */
+}
+
+.consent-section strong {
+    color: #012B60 !important;
+}
+
+.radio-question{
+    color: var(--text-primary-blue, #002B60);
+
+    /* Body/Medium/Semibold */
+    font-family: Montserrat !important;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 24px; /* 150% */
+}
+
+input[type="radio"], input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    margin: -4px 0 0;
+    margin-top: 1px \9;
+    line-height: normal;
+}
+
+
+.radio-label-text{
+    color: var(--text-primary-blue, #002B60);
+    margin-left: 10px;
+    /* Body/Medium/Regular */
+    font-family: Montserrat !important;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 150% */
+}
+
+  /* Invalid input styling */
+  .invalid-input {
+    border: 2px solid red !important;
+  }
+
+  /* Radio buttons default appearance */
+.options-group {
+  gap: 24px;
+  align-items: center;
+}
+
+/* Hide native radio */
+.radio-input {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #7ed321;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  margin-right: 8px;
+  vertical-align: middle;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Inner green dot when checked */
+.radio-input:checked::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  background-color: #7ed321;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Hover effect (optional) */
+.radio-input:hover {
+  box-shadow: 0 0 0 3px rgba(126, 211, 33, 0.2);
+}
+
+/* Label styling */
+.options-group label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: var(--text-primary-blue, #002B60);
+  font-family: Montserrat !important;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+
+  /* Checked radio appearance */
+
+input[type="file"]:focus, input[type="radio"]:focus, input[type="checkbox"]:focus {
+    outline: none !important; 
+    outline-offset: none !important; 
+}
+  /* Invalid radio outline (red border only) */
+  .question-item.invalid .radio-input:not(:checked) {
+    border-color: red !important;
+  }
+
+  /* Red “select an option” text */
+  .error-message {
+
+    margin-top: 5px;
+    display: none;
+    color: var(--text-error, #D92020);
+
+    /* Body/Medium/Regular */
+
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 150% */
+  }
+
+  .question-item.invalid .error-message {
+    display: block;
+  }
+  
+  
+  /**/
+.action-bar {
+  height: 112px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+  padding: 0 0px;
+  box-sizing: border-box;
+}
+
+.arrow{
+    margin-top: -2px;
+}
+
+.back-link {
+
+  color: #002e6d; /* African Bank blue */
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-primary-blue, #002B60);
+
+font-size: 14px;
+font-style: normal;
+font-weight: 600;
+line-height: 20px; /* 142.857% */
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.contact-btn {
+  display: inline-flex; /* ✅ enables centering */
+  justify-content: center;
+  align-items: center;
+
+  width: 220px;
+  height: 48px;
+  padding: 0 16px;
+  gap: 8px;
+  flex-shrink: 0;
+
+  font-size: 16px;
+  font-weight: 600;
+  color: #002e6d;
+  text-decoration: none;
+
+  border-radius: var(--border-radius-md, 2px);
+  border: 1px solid var(--border-green, #5DC400);
+  background: var(--surface-white, #FFF);
+
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+}
+
+/* Optional hover/focus state */
+.contact-btn:hover,
+.contact-btn:focus {
+  background-color: #5DC400;
+  color: #fff;
+  text-decoration: none;
+}
+
+  
+    /* Input invalid state */
+  .invalid-input {
+      border-color: red !important;
+  }
+
+  .card-container {
+
+    margin: 50px auto;
+    background-color: #fff;
+    padding: 48px;
+    border-radius: 0px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    position: relative;
+  }
+
+  .alert-banner {
+    background-color: #e8f3ff;
+    padding: 20px 8px;
+    margin-bottom: 30px;
+    margin-top: 10px;
+    color: #003366;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .alert-banner strong {
+    color: #002a61;
+  }
+
+  .section-header {
+   
+    margin-bottom: 48px;
+    color: var(--Brand-AB-Blue, #012B60);
+
+    /* Heading/H4/Semibold */
+    font-family: Montserrat !important;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 32px; /* 133.333% */
+  }
+
+  .section-description {
+
+    margin-bottom: 48px;
+    color: var(--text-primary-blue, #002B60);
+
+    /* Body/Large/Regular */
+    font-family: Montserrat !important;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 28px; /* 155.556% */
+  }
+
+  .info-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .input-group {
+    flex: 1 1 45%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  label {
+    font-weight: 600;
+    margin-bottom: 2px;
+    font-size: 14px;
+    color: #002a61;
+  }
+
+  .text-input,
+  .email-input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border 0.2s;
+  }
+
+  .text-input:focus,
+  .email-input:focus {
+    border-color: #0072ce;
+  }
+
+  .divider {
+    margin: 30px 0;
+    border: none;
+    border-top: 1px solid #d9e4dd;
+    background: var(--border-green, #5DC400);
+  }
+
+  .questions-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .question-item {
+    flex: 1 1 45%;
+    font-weight: 500;
+    color: #003366;
+    font-size: 15px;
+  }
+
+  .options-group {
+    margin-top: 10px;
+  }
+
+  .options-group label {
+    font-weight: normal;
+    display: block;
+    color: #222;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .radio-input {
+    margin-right: 6px;
+    accent-color: #0072ce;
+  }
+
+  .checkbox-input {
+    accent-color: #0072ce;
+    transform: scale(1.1);
+    margin-right: 8px;
+  }
+
+  .contact-button {
+position: fixed;
+    top: 40%;
+    right: -54px;
+    transform: translateY(-50%) rotate(-90deg);
+    z-index: 999;
+    width: 148px;
+    height: 38px;
+    display: flex
+;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 12px 16px;
+    color: var(--text-primary-blue, #002B60);
+    font-family: Montserrat !important;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 20px;
+    border-radius: var(--border-radius-md, 2px) var(--border-radius-md, 2px) var(--border-radius-none, 0px) var(--border-radius-none, 0px);
+    border-top: 1px solid var(--border-primary, #002B60);
+    border-right: 1px solid var(--border-primary, #002B60);
+    border-left: 1px solid var(--border-primary, #002B60);
+    background: var(--surface-primary, #FFF);
+    box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.11);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+  .contact-button:hover {
+    background-color: #0072ce;
+    color: #fff;
+  }
+
+  .consent-section {
+    font-size: 14px;
+    margin-top: 20px;
+    color: #002a61;
+  }
+
+  .consent-section strong {
+    color: #0072ce;
+  }
+
+  .submit-wrapper {
+    text-align: right;
+    margin-top: 25px;
+  }
+
+  .submit-button {
+    background-color: #39b54a;
+    color: #fff;
+    width: 200px;
+    height: 48px;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background 0.3s;
+    border-radius: var(--border-radius-md, 2px);
+    background: var(--surface-green, #5DC400);
+    
+    /* Elevation/SM */
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.08);
+  }
+
+  .submit-button:hover {
+    background-color: #2e993c;
+  }
+
+  @@media (max-width: 768px) {
+    .input-group, .question-item {
+      flex: 1 1 100%;
+    }
+    
+    .marketing-msg {
+        left: 10px;
+    }
+
+    .card-container {
+      padding: 20px;
+    }
+
+    .contact-button {
+      position: static;
+      margin-top: 15px;
+    }
+  }
+</style>
+<style>
+.screen {
+  font-family: Montserrat !important;
+  border-radius: 8px;
+  background: var(--surface-white, #FFF);
+    /* Elevation/MD */
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.10);
+ 
+  width: 74.75rem;
+height: 39.4375rem;
+
+  flex-shrink: 0;
+  padding: 40px 30px;
+  text-align: center;
+  position: absolute; /* keep both screens stacked */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
+  opacity: 0;             /* invisible by default */
+  pointer-events: none;    /* prevent clicks when hidden */
+  transition: opacity 0.5s ease-in-out;
+}
+
+.screen.active {
+  opacity: 1;             /* visible */
+  pointer-events: all;    /* enable clicks */
+}
+
+.screen-body{
+    padding: 5.25rem 15.25rem;
+}
+
+.icon-area {
+  width: 78.333px;
+  height: 73.333px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 20px;
+  overflow: hidden;
+}
+
+.icon-area img {
+  width: 100%;
+  height: 100%;
+}
+
+
+    .heading {
+
+      margin-bottom: 10px;
+      font-weight: 600;  color: var(--Brand-AB-Blue, #012B60);
+        text-align: center;
+        
+        /* Heading/H4/Medium */
+        font-family: Montserrat !important;
+        font-size: 1.5rem;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 2rem; /* 133.333% */
+    }
+
+    .text {
+        color: var(--Brand-AB-Blue, #012B60);
+        text-align: center;
+        
+        /* Body/Medium/Regular */
+        font-family: Montserrat !important;
+        font-size: 1rem;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 1.5rem; /* 150% */
+    }
+
+    .text span {
+      font-weight: 600;
+    }
+
+    .line {
+      height: 1px;
+      background-color: #e5e5e5;
+      margin-bottom: 25px;
+    }
+
+    .subheading {
+     
+        margin-bottom: 8px;
+     
+        color: var(--Brand-AB-Blue, #012B60);
+        text-align: center;
+        
+        /* Body/Large/Semibold */
+        font-family: Montserrat !important;
+        font-size: 1.125rem;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 1.75rem; /* 155.556% */
+    }
+
+    .note {
+        color: var(--Brand-AB-Blue, #012B60);
+        text-align: center;
+        
+        /* Body/Medium/Regular */
+        font-family: Montserrat !important;
+        font-size: 1rem;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 1.5rem; /* 150% */
+    }
+
+    .note span {
+      font-weight: 600;
+      color: #002a5c;
+    }
+
+    .btn-area {
+        top: 70px;
+        position: relative;
+        display: flex;
+        justify-content: end;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .btn-area-2btn {
+        top: 45px;
+        position: relative;
+        display: flex;
+        justify-content: end;
+        gap: 10px;
+        flex-wrap: wrap; 
+    }
+
+    .btn-custom {
+        color: var(--text-primary-blue, #002B60);
+
+/* Body/Small/Semibold */
+font-family: Montserrat !important;
+font-size: 0.875rem;
+font-style: normal;
+font-weight: 600;
+line-height: 1.25rem; /* 142.857% */
+
+border-radius: var(--border-radius-md, 0.125rem);
+border: 1px solid var(--border-primary, #002B60);
+background: var(--surface-white, #FFF);
+
+/* Elevation/SM */
+box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.08);
+        
+
+      display: flex;
+width: 12.5rem;
+height: 3rem;
+padding: 0 1rem;
+justify-content: center;
+align-items: center;
+gap: 0.5rem;
+flex-shrink: 0;
+     
+
+   
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-custom:hover {
+      background-color: #002a5c;
+      color: #ffffff;
+    }
+
+    .btn-green {
+        color: var(--text-primary, #FFF);
+        border:none;
+        /* Body/Small/Semibold */
+        font-family: Montserrat !important;
+        font-size: 0.875rem;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 1.25rem; /* 142.857% */
+        display: flex;
+        width: 12.5rem;
+        height: 3rem;
+        padding: 0.75rem 1rem;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        flex-shrink: 0;
+        border-radius: var(--border-radius-md, 0.125rem);
+        background: var(--surface-green, #5DC400);
+        
+        /* Elevation/SM */
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-green:hover {
+      background-color: #008f46;
+    }
+
+    .top-contact {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    .contact-btn {
+      border: 1px solid #00a550;
+      color: #002a5c;
+      background: #ffffff;
+      border-radius: 4px;
+      padding: 8px 18px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .contact-btn:hover {
+      background-color: #00a550;
+      color: #ffffff;
+    }
+
+    .toggle-wrapper {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+    }
+
+    .toggle-btn {
+      background: #002a5c;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .toggle-btn:hover {
+      background: #00407a;
+    }
+  </style>
+
+
+<nav class="navbar navbar-light bg-ab-blue">
+  <div class="container d-flex justify-content-between align-items-center">
+    <!-- Left: Home -->
+    <a class="navbar-brand" href="#" style="color:white">
+        <span class="arrow">
+            <img src="/media/5uibc0c3/arrow_back-1.svg">
+        </span> Back
+    </a>
+
+    <!-- Right: Logo -->
+
+    
+    <img class="navbar-brand" src="/media/cuojgb4e/logo.svg" width="160" alt="African Bank">
+  </div>
+</nav>
+
+<section class="body" id="formSection">
+
+<section class="container">
+    <div class="action-bar">
+      <a href="#" class="back-link">
+        <span class="arrow">
+            <img src="/media/cejji4o3/arrow_back.svg">
+        </span> Back
+      </a>
+      <a href="#" class="contact-btn">Contact us</a>
+    </div>
+</section>
+
+
+<button class="contact-button">Contact us</button>
+
+<div class="container">
+  <div class="alert-banner">
+    Please <strong>proceed only if your business is actively registered with Companies and Intellectual Property Commission (CIPC).</strong>
+    Businesses that are not registered or in the process of deregistration will not be considered.
+  </div>
+</div>
+
+<div class="card-container container">
+    
+  <div class="section-header">Pre-qualification check</div>
+  <div class="section-description">
+    Please complete the questionnaire below to see if your business may pre-qualify for the small enterprise loan.
+    Select the option that best applies to each question and <strong>ensure that all sections are completed.</strong>
+  </div>
+
+  <!-- Personal and Business Info -->
+  <form class="info-form">
+    <div class="input-group">
+      <label for="name">Name</label>
+      <input type="text" id="name" class="text-input" value="">
+    </div>
+
+    <div class="input-group">
+      <label for="surname">Surname</label>
+      <input type="text" id="surname" class="text-input" value="">
+    </div>
+
+    <div class="input-group">
+      <label for="email">Email address</label>
+      <input type="email" id="email" class="email-input" value="">
+    </div>
+
+    <div class="input-group">
+      <label for="contact">Contact number</label>
+      <input type="text" id="contact" class="text-input" value="">
+    </div>
+
+    <div class="input-group" style="flex: 1 1 100%;">
+      <label for="business">Registered business name</label>
+      <input type="text" id="business" class="text-input" value="">
+    </div>
+  </form>
+
+  <hr class="divider">
+
+  <!-- Questionnaire Section -->
+  <div class="questions-wrapper">
+
+    <div class="question-item">
+      <label class="radio-question">Is your business at least 51% black-owned?</label>
+      <div class="options-group">
+        <label><input type="radio" name="blackOwned" class="radio-input" /> <span class="radio-label-text" >Yes</span></label>
+        <label><input type="radio" name="blackOwned" class="radio-input" /> <span class="radio-label-text" >No</span></label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label class="radio-question">Is your business 100% owned by South African citizens?</label>
+      <div class="options-group">
+        <label><input type="radio" name="citizenOwned" class="radio-input" /> <span class="radio-label-text" >Yes</span></label>
+        <label><input type="radio" name="citizenOwned" class="radio-input" /> <span class="radio-label-text" >No</span></label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label class="radio-question">Are your employees at least 70% South African citizens?</label>
+      <div class="options-group">
+        <label><input type="radio" name="employeesSA" class="radio-input" /> <span class="radio-label-text" >Yes</span></label>
+        <label><input type="radio" name="employeesSA" class="radio-input" /> <span class="radio-label-text" >No</span></label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label class="radio-question">Do all non-South African employees have valid work permits?</label>
+      <div class="options-group">
+        <label><input type="radio" name="permits" class="radio-input" /> <span class="radio-label-text" >Yes</span></label>
+        <label><input type="radio" name="permits" class="radio-input" /> <span class="radio-label-text" >No</span></label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label class="radio-question">Where is your business located?</label>
+      <div class="options-group">
+        <label><input type="radio" name="location" class="radio-input" /> <span class="radio-label-text" >Township</span></label>
+        <label><input type="radio" name="location" class="radio-input" /> <span class="radio-label-text" >Rural</span></label>
+        <label><input type="radio" name="location" class="radio-input" /> <span class="radio-label-text" >Other</span></label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label class="radio-question">Does your business have a valid municipal licence?</label>
+      <div class="options-group">
+        <label><input type="radio" name="municipalLicence" class="radio-input" /> <span class="radio-label-text" >Yes</span></label>
+        <label><input type="radio" name="municipalLicence" class="radio-input" /> <span class="radio-label-text" >No</span></label>
+        <label><input type="radio" name="municipalLicence" class="radio-input" /> <span class="radio-label-text" >Willing to apply</span></label>
+        <label><input type="radio" name="municipalLicence" class="radio-input" /> <span class="radio-label-text" >Not willing to apply</span></label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label class="radio-question">What is your business type?</label>
+      <div class="options-group">
+        <label><input type="radio" name="businessType" class="radio-input" /> <span class="radio-label-text" >Cooperative</span></label>
+        <label><input type="radio" name="businessType" class="radio-input" /> <span class="radio-label-text" >Sole proprietor</span></label>
+        <label><input type="radio" name="businessType" class="radio-input" /> <span class="radio-label-text" >Private company (Pty) Ltd</span></label>
+        <label><input type="radio" name="businessType" class="radio-input" /> <span class="radio-label-text" >Partnership</span></label>
+        <label><input type="radio" name="businessType" class="radio-input" /> <span class="radio-label-text" >Other</span></label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label class="radio-question">Is your business registered with the CIPC?</label>
+      <div class="options-group">
+        <label><input type="radio" name="cipc" class="radio-input" /> <span class="radio-label-text" >Yes</span></label>
+        <label><input type="radio" name="cipc" class="radio-input" /> <span class="radio-label-text" >No</span></label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label class="radio-question">Is your business registered with UIF?</label>
+      <div class="options-group">
+        <label><input type="radio" name="uif" class="radio-input" /> <span class="radio-label-text" >Yes</span></label>
+        <label><input type="radio" name="uif" class="radio-input" /> <span class="radio-label-text" >No</span></label>
+        <label><input type="radio" name="uif" class="radio-input" /> <span class="radio-label-text" >Willing to register</span></label>
+        <label><input type="radio" name="uif" class="radio-input" /> <span class="radio-label-text" >Not willing to register</span></label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label class="radio-question">Is your business registered with SARS?</label>
+      <div class="options-group">
+        <label><input type="radio" name="sars" class="radio-input" /> <span class="radio-label-text" >Yes</span></label>
+        <label><input type="radio" name="sars" class="radio-input" /> <span class="radio-label-text" >No</span></label>
+        <label><input type="radio" name="sars" class="radio-input" /> <span class="radio-label-text" >Willing to register</span></label>
+        <label><input type="radio" name="sars" class="radio-input" /> <span class="radio-label-text" >Not willing to register</span></label>
+      </div>
+    </div>
+
+    <div class="question-item" style="flex: 1 1 100%;">
+      <label class="radio-question">Does your business have a valid business bank account?</label>
+      <div class="options-group">
+        <label><input type="radio" name="bankAccount" class="radio-input" /> <span class="radio-label-text" >Yes</span></label>
+        <label><input type="radio" name="bankAccount" class="radio-input" /> <span class="radio-label-text" >No</span></label>
+        <label><input type="radio" name="bankAccount" class="radio-input" /> <span class="radio-label-text" >Willing to open one</span></label>
+        <label><input type="radio" name="bankAccount" class="radio-input" /> <span class="radio-label-text" >Not willing to open one</span></label>
+      </div>
+    </div>
+
+  </div>
+
+  <hr class="divider">
+
+  <div class="consent-section">
+    <label>
+      <input type="checkbox" name="marketing" class="checkbox-input"/>
+     <span class="marketing-msg">I would like to receive marketing updates from African Bank.</span>
+    </label>
+    <p style="margin-top: 10px;" class="consent-text">
+      By clicking <strong>submit</strong>, I hereby declare that the information provided above is <strong>true and correct.</strong>
+    </p>
+  </div>
+
+  <div class="submit-wrapper">
+    <button class="submit-button">Submit</button>
+  </div>
+
+</div>
+
+</section>
+
+
+<section name="loan-responds">
+
+<section class="container" id="contact-us-screen">
+    <div class="action-bar">
+      <a href="#" class="back-link">
+        <span class="arrow">
+            
+        </span> 
+      </a>
+      <a href="#" class="contact-btn">Contact us</a>
+    </div>
+</section>
+
+ <!-- ✅ SUCCESS SCREEN -->
+  <div class="screen success active" id="successScreen">
+      <div class="screen-body">
+          <div class="icon-area">
+            <img src="/media/tegp4z2k/check-square-svgrepo-com-2.svg" alt="Unsuccessful Icon" />
+          </div>
+        <div class="heading">Great news!</div>
+        <div class="text">
+          You have passed the pre-qualification check and your business 
+          <span>could qualify</span> for the small enterprise loan.
+        </div>
+    
+        <div class="line"></div>
+    
+        <div class="subheading">Next steps:</div>
+        <div class="note">
+          A Banker will contact you within <span>48 business hours</span> regarding the application process.
+        </div>
+    
+
+      </div>
+        <div class="btn-area">
+          <div class="btn-custom btn-green">Back to Home</div>
+        </div>
+  </div>
+
+
+
+  <!-- ❌ UNSUCCESSFUL SCREEN -->
+<div class="screen unsuccessful" id="unsuccessfulScreen">
+ <div class="screen-body">
+    <div class="icon-area">
+        <img src="/media/1x3p3he2/check-square-svgrepo-com-1.svg" alt="Unsuccessful Icon" />
+    </div>
+    <div class="heading">Unsuccessful.</div>
+    <div class="text">
+      Based on the information provided, you have not 
+      <span>passed the pre-qualification check</span> 
+      for the small enterprise loan at this time.
+    </div>
+
+    <div class="line"></div>
+
+    <div class="subheading">This isn’t the end of the road.</div>
+    <div class="note">
+      If your business circumstances change, you’re welcome to try again in the future. 
+      In the meantime, you may explore our 
+      <span>other loan products</span>, use the 
+      <span>MyBusiness Toolkit</span>, or 
+      <span>contact us</span> for support.
+    </div>
+
+
+ </div>
+ 
+     <div class="btn-area-2btn">
+      <div class="btn-custom">MyBusiness Toolkit</div>
+      <div class="btn-custom btn-green">Back to Borrow</div>
+    </div>
+ 
+</div>
+
+
+
+
+</section>
+
+<footer class="footer navbar navbar-light bg-ab-blue mt-auto ">
+  <div class="container d-flex justify-content-between align-items-center">
+    <!-- Left: Home -->
+    <a class="navbar-brand font-bg-white" href="#" style="color:white">
+         © Copyright 2025 African Bank. An authorized financial services and credit provider Reg No. 2014/176899/06 (NCRCP7638)
+    </a>
+
+    <!-- Right: Logo -->
+
+    
+    <img class="navbar-brand" src="/media/cuojgb4e/logo.svg" width="160" alt="African Bank">
+  </div>
+</footer>  
+
+
+
+@Html.Raw(@"<script src=""https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"" integrity=""sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"" crossorigin=""anonymous""></script>")
+@Html.Raw(@"<script src=""https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"" integrity=""sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y"" crossorigin=""anonymous""></script>")
+
+@*
+<script>
+    const success = document.getElementById("successScreen");
+    const fail = document.getElementById("unsuccessfulScreen");
+
+    function toggleScreen() {
+      success.classList.toggle("active");
+      fail.classList.toggle("active");
+    }
+
+    // 🔁 Automatically switch screens every 3 seconds
+    setInterval(toggleScreen, 10000);
+  </script>
+ *@ 
+ 
+ <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script>
+  const successScreen = document.getElementById("successScreen");
+  const failScreen = document.getElementById("unsuccessfulScreen");
+  const formSection = document.getElementById("formSection");
+
+  const submitBtn = document.querySelector(".submit-button");
+
+  submitBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+
+      let qualifies = true;
+
+      function check(name, allowedYes = true) {
+          const selected = document.querySelector(`input[name="${name}"]:checked`);
+          if (!selected) return false;
+          return allowedYes ? selected.nextElementSibling.innerText === "Yes" : true;
+      }
+
+      if (!check("blackOwned")) qualifies = false;
+      if (!check("citizenOwned")) qualifies = false;
+      if (!check("employeesSA")) qualifies = false;
+      if (!check("permits")) qualifies = false;
+      if (!check("municipalLicence")) qualifies = false;
+      if (!check("cipc")) qualifies = false;
+      if (!check("bankAccount")) qualifies = false;
+
+      const uif = document.querySelector(`input[name="uif"]:checked`);
+      if (!uif || uif.nextElementSibling.innerText === "Not willing to register")
+          qualifies = false;
+
+      const sars = document.querySelector(`input[name="sars"]:checked`);
+      if (!sars || sars.nextElementSibling.innerText === "Not willing to register")
+          qualifies = false;
+
+      // Hide form
+      formSection.style.display = "none";
+
+      if (qualifies) {
+          failScreen.classList.remove("active");
+          successScreen.classList.add("active");
+          $('.success').fadeIn(300);
+      } else {
+          successScreen.classList.remove("active");
+          failScreen.classList.add("active");
+          $('.unsuccessful').fadeIn(300);
+      }
+  });
+</script>
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function() {
+    const form = document.querySelector(".info-form");
+    const inputs = form.querySelectorAll("input[type='text'], input[type='email']");
+    const questionItems = document.querySelectorAll(".question-item");
+    const contactInput = document.getElementById("contact");
+
+    // Add error messages dynamically under each question
+    questionItems.forEach(q => {
+        if (!q.querySelector(".error-message")) {
+            const errorMsg = document.createElement("div");
+            errorMsg.classList.add("error-message");
+            errorMsg.textContent = "Select an option";
+            q.appendChild(errorMsg);
+        }
+    });
+
+    // South African phone validation
+    const saPhoneRegex = /^(0[6-8]\d{8}|\+27[6-8]\d{8})$/;
+
+    // Validate radio group
+    function validateRadioGroup(question) {
+        const radios = question.querySelectorAll("input[type='radio']");
+        const anyChecked = Array.from(radios).some(r => r.checked);
+        if (!anyChecked) {
+            question.classList.add("invalid");
+        } else {
+            question.classList.remove("invalid");
+        }
+        return anyChecked;
+    }
+
+    // Live validation for text/email inputs
+    inputs.forEach(input => {
+        input.addEventListener("input", () => {
+            let isValid = input.checkValidity() && input.value.trim() !== "";
+
+            if (input === contactInput) {
+                const value = input.value.trim().replace(/\s+/g, "");
+                isValid = saPhoneRegex.test(value);
+            }
+
+            input.classList.toggle("invalid-input", !isValid);
+        });
+    });
+
+    // Live validation for radio buttons
+    questionItems.forEach(q => {
+        const radios = q.querySelectorAll("input[type='radio']");
+        radios.forEach(r => {
+            r.addEventListener("change", () => {
+                validateRadioGroup(q);
+            });
+        });
+    });
+
+    // On submit validation
+    const submitButton = document.querySelector(".submit-button");
+    submitButton.addEventListener("click", e => {
+        e.preventDefault();
+        let valid = true;
+
+        // Validate inputs
+        inputs.forEach(input => {
+            let isValid = input.checkValidity() && input.value.trim() !== "";
+            if (input === contactInput) {
+                const value = input.value.trim().replace(/\s+/g, "");
+                isValid = saPhoneRegex.test(value);
+            }
+
+            input.classList.toggle("invalid-input", !isValid);
+            if (!isValid) valid = false;
+        });
+
+        // Validate radios
+        questionItems.forEach(q => {
+            if (!validateRadioGroup(q)) valid = false;
+        });
+
+        if (valid) {
+            alert("Form submitted successfully!");
+            form.reset();
+            inputs.forEach(i => i.classList.remove("invalid-input"));
+            questionItems.forEach(q => q.classList.remove("invalid"));
+        } else {
+            alert("Please complete all required fields correctly.");
+        }
+    });
+});
+</script>

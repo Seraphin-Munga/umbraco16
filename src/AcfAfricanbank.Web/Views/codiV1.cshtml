@@ -1,5 +1,234 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCampaign>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models;
+@using Web.Helpers
+@using Umbraco.Web.Models
+@using System.Text.RegularExpressions
+
 @{
-	Layout = null;
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var children = Model.Children;
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+     
+    var faq = heroBody.Children.Where(c => c.Name == "Faq").FirstOrDefault();
+    var faqcodi = faq.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+    var allfaq = faqcodi.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+    
+    ContentModels.TabBody createOwnWorldOfBanking = null;
+    var partialName = faq.Value("PartialViewName");
+    createOwnWorldOfBanking = (TabBody)faq;
+    
+    var section = heroBody.Children.Where(c => c.Name == "Section").FirstOrDefault();
+    var sectioncodi = section.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+    var allsection = sectioncodi.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+   
+    var heroKnees = children?.Where(c => c.ContentType.Alias.ToLower() == "heroknees").FirstOrDefault();
+    var kneesTabHeaders = heroKnees?.Children?.Select(c => c.Value("title")?.ToString()).ToList();
+    var findOutMoreTab = heroKnees?.Children?.Where(c => c.ContentType.Alias.ToLower() == "findoutmore").FirstOrDefault();
+    
+    var bodyCards = heroBody?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+      
+    var applyDocs = bodyCards?.Select(c => c as Card).FirstOrDefault();
+    var cardImage = applyDocs.Value("cardIcon");
+    String cardUrl = ((IPublishedContent)cardImage).Url.ToString();
+    var navigate = applyDocs.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").FirstOrDefault();
+    
+    var applyDocs1 = bodyCards?.Select(c => c as Card).Last();
+    var cardImage1 = applyDocs1.Value("cardIcon");
+    String cardUrl1 = ((IPublishedContent)cardImage1).Url.ToString();
+    var navigate1 = applyDocs1.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").FirstOrDefault();
 }
+<link rel="stylesheet" href="/css/projectmagic.css" />
+
+   <section class="section pb-40 pt-40 bg-grey-60">
+        <div class="container">
+            <div class="row d-flex align-items-center row-change md-text-center">
+               <div class="col-xl-6 col-lg-6 col-md-6">
+                    <h1 class="color-brand-1 mb-20">@applyDocs.Value("cardTitle")</h1>
+                    <p class="font-md color-grey-500">
+                       @applyDocs.Value("cardDescriptionLongText")
+                    </p>
+                    <div class="combo-btn">
+                        <div class="mt-50 text-start column1">
+                          <p class="combo-btn-text primary"><a href="@navigate.Url" class="btn  btn-brand-1 hover-up">@navigate.Name</a></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-6 col-md-6">
+                   <img class="d-block" src="@cardUrl" alt=""/>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="section pb-40 pt-40">
+        <div class="container">
+            <div class="row align-items-center  d-flex flex-row-reverse row-change md-text-center">
+                <div class="col-xl-6 col-lg-6 col-md-6">
+                    <h1 class="color-brand-1 mb-20">@applyDocs1.Value("cardTitle")</h1>
+                    <p class="font-md color-grey-500">
+                      @applyDocs1.Value("cardDescriptionLongText")
+                    </p>
+                    <div class="mt-50 text-start">
+                        <a class="btn btn-brand-1 hover-up" href="@navigate1.Url">@navigate1.Name
+                            <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="right-icon"
+                                height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                                <path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" 
+                                   d="M320 336h76c55 0 100-21.21 100-75.6s-53-73.47-96-75.6C391.11 99.74 329 48 256 48c-69 0-113.44 45.79-128 91.2-60 5.7-112 35.88-112 98.4S70 336 136 336h56m0 64.1 64 63.9 64-63.9M256 224v224.03">
+                                </path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-6 col-md-6">
+                    <img class="d-block" src="@cardUrl1" alt=""/>
+                </div>
+            </div>
+        </div>
+    </section>
+   
+   @{
+        int idIterator = 0;
+        foreach (var item in allsection){
+           
+           var title = item.Value<string>("tabSubItemTitle");
+           var description = item.Value<string>("genericCardContent");
+           var tabSubItemImage = item.Value<IPublishedContent>("tabSubItemImage")?.Url;
+            if (idIterator%2 ==  0)
+            {
+                <section class="section pb-40 pt-40 bg-grey-60">
+                    <div class="container">
+                        <div class="row d-flex align-items-center row-change md-text-center">
+                            <div class="col-xl-6 col-lg-6 col-md-6">
+                                <h1 class="color-brand-1 mt-15 mb-20">
+                                    @title
+                                </h1>
+                                <p class="font-md color-brand-1 mt-20">
+                                    @item.Value("tabSubItemTextContent")
+                                </p>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-6">
+                                <img class="d-block" src="@tabSubItemImage" alt="iori" />
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            }
+            else{
+               <section class="section pb-40 pt-40">
+                    <div class="container">
+                        <div class="row align-items-center  d-flex flex-row-reverse row-change md-text-center">
+                            <div class="col-xl-6 col-lg-6 col-md-6">
+                                <h1 class="color-brand-1 mt-15 mb-20">
+                                    @title
+                                </h1>
+                                <p class="font-md color-brand-1 mt-20">
+                                    @item.Value("tabSubItemTextContent")
+                                </p>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-6">
+                                <img class="d-block" src="@tabSubItemImage" alt="iori" />
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            }
+          idIterator += 1;
+        }
+    }
+    
+    <section class="section-800">
+        <div class="container " >
+            <div class="row align-items-center d-flex row-change md-text-center">
+                <div class="col-xl-12 col-lg-12 col-md-12">
+                    <h1 class="color-brand-1 mt-15 mb-20 text-center faqHeader">@createOwnWorldOfBanking.Value("partialViewClassName")</h1>
+                    <div class="accordion accordionStyle2" id="accordionFAQ">
+                        <div class="row">
+                           @foreach (var item in allfaq)
+                            {
+                                var cardTitle = item.Value<string>("nCcardTitle");
+                                <div class="col-lg-12">
+                                    <div class="accordion-item">
+                                        <h5 class="accordion-header">
+                                            <button class="accordion-button text-heading-5">@cardTitle</button>
+                                        </h5><div id="accordion-body" class="accordion-collapse collapse">
+                                            <div class="accordion-body">@Html.Raw(item.Value<string>("mediumDescription"))</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+   </section>   
+
+ @if (findOutMoreTab != null)
+    {
+        var tabTitle = findOutMoreTab.Value("title")?.ToString();
+        var downloadItems = findOutMoreTab.Value<IEnumerable<DownloadItem>>("downloadItems");
+        <section class="section pt-40 pb-40 bg-grey-60">
+            <div class="container">
+                <div class="col d-flex align-items-center row-change">
+                    <div class="row-xl-6 row-lg-6 col-md-6">
+                       <h1 class="color-brand-1 mt-15 mb-20">
+                        @tabTitle
+                      </h1>
+                    </div>
+                    <div class="-xl-6 col-lg-6 col-md-6"></div>
+               </div>
+                <div class="">
+                    <div class="campaign-list">
+                        <ul>
+                             @if (downloadItems != null && downloadItems.Any())
+                            {
+                               foreach (var link in downloadItems)
+                               {
+                                    <li>
+                                        <div class="row no-gutter download-item first">
+                                            <div class="col-sm-9">
+                                                <div class="download-descr">@link.DownloadTextDescription</div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <a href="@link.DownloadButtonRedirectLink2.Url" target="_blank" class="download-btn">
+                                                    @(string.IsNullOrEmpty(link.DownloadButtonText) ? "Download" : link.DownloadButtonText)
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                }   
+                            }
+                        </ul>
+                        
+                    </div>
+                </div>
+            </div>
+        </section>
+   }
+   
+   @section scripts
+   {
+       <script>
+           $(document).ready(function(){
+                $(".accordion-button").click(function(){
+                    
+                    var isCollapsed = $(this).hasClass('collapsed');
+                    $(".accordion-button").removeClass('collapsed');
+                   
+                   if(isCollapsed == false) {
+                    $(this).toggleClass("collapsed");
+                   }
+                
+                   var isCollapsedContent = $(this).parent().next(".accordion-collapse").hasClass('collapse');
+                    $(".accordion-collapse").addClass('collapse');
+                    if(isCollapsedContent == true) {
+                        $(this).parent().next(".accordion-collapse").toggleClass('collapse');
+                    }
+                });
+            });
+        </script>
+   }

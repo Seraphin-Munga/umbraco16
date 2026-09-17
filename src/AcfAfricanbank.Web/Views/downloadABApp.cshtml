@@ -1,5 +1,51 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
 }
+
+@* the fun starts here *@
+
+<script>
+function detectOS() {
+    const userAgent = window.navigator.userAgent;
+
+    if (userAgent.includes("HUAWEI") || userAgent.includes("huawei") || userAgent.includes("Huawei")) {
+        return "Huawei";
+    }
+    if (userAgent.indexOf("Windows") !== -1) {
+        return "Windows";
+    } else if (userAgent.indexOf("Mac") !== -1) {
+        return "MacOS";
+    } else if (userAgent.indexOf("Linux") !== -1) {
+        return "Linux";
+    } else if (userAgent.indexOf("Android") !== -1) {
+        return "Android";
+    } else if (userAgent.match(/iPhone|iPad|iPod/i)) {
+        return "iOS";
+    } else {
+        return "Unknown OS";
+    }
+}
+
+function getAppStoreLink(os) {
+    switch (os) {
+        case "Huawei":
+            return "https://appgallery.huawei.com/app/C103438901";
+        case "Android":
+        case "Windows":
+        case "Linux":
+            return "https://play.google.com/store/apps/details?id=za.co.android.africanbank";
+        case "MacOS":
+        case "iOS":
+            return "https://apps.apple.com/us/app/african-bank/id1357204405";
+        default:
+            return "#";
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const os = detectOS();
+    const appStoreLink = getAppStoreLink(os);
+    window.location.href = appStoreLink; // Redirect the user to the app store link
+});
+</script>

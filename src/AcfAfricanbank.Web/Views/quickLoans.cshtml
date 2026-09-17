@@ -4,13 +4,548 @@
 @using Web.Helpers
 @*@inherits Umbraco.Web.Mvc.UmbracoTemplatePage*@
 
-
 <link href="~/css/quick_loans.css" rel="stylesheet" />
+
+@{
+    Layout = "MasterHeaderOnly.cshtml";
+
+    var Children = Model.Children;
+
+    // Get specific Children
+    var HeroHeader = Children?.Where(c => c is HeroHeader).FirstOrDefault();
+    var dropOff = Children?.Where(c => c is PagePopup).FirstOrDefault();
+    var heroBody = Children?.Where(c => c is HeroBody).FirstOrDefault();
+    var login = heroBody.Children.Where(c => c.Name == "Login").FirstOrDefault() as Link;
+    var register = heroBody.Children.Where(c => c.Name == "Register").FirstOrDefault() as Link;
+
+    var consolidationLoan = heroBody.Children.Where(c => c.Name == "Consolidation Loan").FirstOrDefault() as Link;
+    var fifteenPercentLoan = heroBody.Children.Where(c => c.Name == "15% Loan").FirstOrDefault() as Link;
+
+
+    var quickTitle = heroBody.Value("bodyTitle");
+    var quickBody = heroBody.Value("richTextBox");
+    
+    var termsAndConditions = heroBody.Value("bodyFooterTitle");
+
+    var salaryFrequencyDropdownId = 5389;
+    var bankDropdownId = 5390;
+    var bankStatementsDropdownId = 5391;
+    var employmentSectorDropdownId = 5382;
+    var childMaintenanceDropdownId = 5395;
+
+    var terminateProcess = dropOff.Children.Where(c => c.Name == "Terminate process").FirstOrDefault() as DocumentTypeTitleAndDescription;
+
+    var heroHeaderImage = HeroHeader?.Value<IPublishedContent>("image")?.Url;
+
+    var campaignCode = Request.Params["campaignCode"];
+
+    var utm_source = Request.Params["utm_source"];
+    var utm_medium = Request.Params["utm_medium"];
+    var utm_campaign = Request.Params["utm_campaign"];
+
+    // Get the utm tagging
+    string strPageUrl = Request.RawUrl;
+    var shoulderButtonLink = "";
+    if (strPageUrl.Contains("?"))
+    {
+        var strendUrl = strPageUrl.Split('?').Last();
+        shoulderButtonLink = String.Format("{1}{2}", shoulderButtonLink, "?", strendUrl);
+    }
+}
+<!-- BODY -->
 <style type="text/css">
+
+
+    div.datainer::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+        border-radius: 10px;
+        background-color: #F5F5F5;
+    }
+
+    datainer::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    datainer::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+        background-color: #00377A;
+    }
+    .offerWelcome {
+        font-size: 18px;
+        font-weight: 800;
+    } 
+    .combo-card .mobi-font p:first-of-type:before {
+        content: "";
+        position: absolute;
+        height: 5px;
+        background: #88bc47;
+        width: 35px;
+        top: -0.75rem;
+        border-radius: 3px;
+    }
+    .datainer {
+        width: 70%;
+        height: 250px;
+        overflow-y: scroll;
+    } 
+    
+    .cmb2{
+        display: none;
+    }
+    .triangle-nav.collapsed:before {
+        content: '▶';
+        display: block;
+        width: 15px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        transition: all linear 0.25s;
+    }
+
+    .triangle-nav:before {
+        content: '▼';
+        display: block;
+        width: 15px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        transition: all linear 0.25s;
+    }
+
+    .sublink-collapsables {
+        color: #002b60;
+        font-weight: 600;
+        font-size: larger;
+        display: flex;
+        cursor: pointer;
+    }
+    #GetYourOffer tbody .comboTitle {
+        padding-left: 40px;
+    }    
+    /*
+    .ia-send-off {
+        display: none;
+    } 
+    */
+    
+    .form-control-feedback {
+        z-index:0;
+    }
+    
+    .terms_and_conditions{
+        display: block !important; 
+    }
+
+    .no-thank-you{
+      background-color: #002b60 !important;
+      color: #fff;
+       text-decoration: underline  !important; 
+           cursor: pointer;
+               box-shadow: none !important;
+    }
+  
+    
+    .index_ImproveOffers:hover {
+  background-color: #002B60 !important;
+    }
+    .table-condensed tbody {
+        left: 0px;
+        position: relative;
+    }
+    .table-reponsive {
+          overflow-x: auto;
+    }
+    
+    .sw-btn-prev{
+        display:none !important;
+    }
+    
+    .table-striped>tbody>tr:nth-of-type(even) {
+        background-color: #f9f9f9 !important;
+    }
+       
+   .table-striped>tbody>tr:nth-of-type(odd) {
+        background-color: #fff !important;
+    }
+    
+    .icon-button {
+        float: right;
+        margin-top: -5px;
+    }
+  
+    .expense-box{
+      height: 90%;
+
+    }
+    .btn-toolbar {
+        bottom: 0;
+    }
+    
+   .table-th {
+     width: 50px !important;
+    }
+
+    tbody {
+        display: block;
+        height: 200px;
+        overflow: auto;
+    }
+
+    thead, tbody tr {
+        display: table;
+        width: 100%;
+        table-layout: fixed; /* even columns width , fix width of table too*/
+    }
+        
+    tbody::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+        border-radius: 10px;
+        background-color: #F5F5F5;
+    }
+
+    tbody::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    tbody::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+        background-color: #00377A;
+    }
+    
+    
+            
+    .sw-container.tab-content::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+        border-radius: 10px;
+        background-color: #F5F5F5;
+    }
+
+    .sw-container.tab-content::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .sw-container.tab-content::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+        background-color: #00377A;
+    }
+
+
+    .second {
+        width: 20px;
+        position: relative;
+        top: -8px;
+    }
+
+    #terminate-quick-loan span {
+        /* width: 0px; 
+        height: unset; 
+         margin-left: unset; 
+         display: unset; 
+        background: unset; */
+    }
+    .mobi-offers {
+    
+        padding-left: 50px;
+        padding-right: 20px;
+    }
+    
+    /*#region Large devices (desktops, 992px and up)*/
+    @@media (min-width: 992px) and (max-width: 1440px) {
+      .mobile-view-blue{
+         display:none !important;
+      }
+      
+ 
+    }
+    @@media (min-width: 992px) and (max-width: 2560px) {
+      .mobile-view-blue{
+         display:none !important;
+      }
+    }
+    @@media (max-width: 768px) {
+       .mobile-view-blue{
+         display:none !important;
+      }
+      
+
+       
+        .sw-btn-cancel:focus{
+        color: #fff;
+        
+            text-decoration: underline;
+
+       }
+    }
+    @@media (min-width: 1024px) and (max-width: 1440px) {
+       .sw-toolbar-bottom {
+             bottom: -55% !important;
+       }
+       
+   
+    }
+    
+    @@media (min-width: 360px) and (max-width: 375px) {
+        .mobi-offers {
+            padding-left: 30px;
+            padding-right: 20px;
+        }
+        
+       .index_ImproveOffers {
+             margin-top: 2vh !important;
+        }
+        
+    }
+    
+    @@media (min-width: 280px) and (max-width: 320px) {
+       .container.mobi-offers-view{
+          padding-left:inherit;
+          margin-left: -54px;
+          margin-right: inherit;
+        }
+        .col-xs-6 {
+           width: 40%;
+        }
+        .amount p{
+		   font-size:18px !important;
+		}
+		.improve-offer-btn{
+           margin-bottom: 69px;
+           margin-top: -17px;
+        }
+        .improver-copy{
+           margin-top: 20px;
+           text-align: center !important;
+           font-size:14px !important;
+           margin-left:-25px;
+           margin-right:-38px;
+        }
+        .pyramid
+        {
+            display:block !important;
+            border-top: 15px solid #002b60;
+            border-left: 100px solid transparent;
+            border-right: 96px solid transparent;
+            margin-top:-1.5px;
+        }
+        .table-responsive{
+           display:none;
+        }  
+        .index_ImproveOffers {
+             margin-top: 2vh !important;
+        }
+        
+        .sw-btn-cancel{
+          color: #fff;
+          text-decoration: underline;
+              position: absolute;
+    left: 20px;
+         }
+  
+        .wizard{
+           width:94% !important;
+        }
+        .offers-blue-grid{
+           margin-top: 21px;
+        }
+        .desk-view-blue{
+          display:none !important;
+        }
+        .mobile-view-blue{
+            display:block !important;
+        }
+    }
+    @@media (min-width: 330px) and (max-width: 360px){
+       .container.mobi-offers-view{
+          padding-left:inherit;
+          margin-left: -17px;
+          margin-right: inherit;
+        }
+        .improve-offer-btn{
+           margin-bottom: 69px;
+           margin-top: -17px;
+        }
+        .improver-copy{
+           margin-top: 20px;
+           text-align: center !important;
+           font-size:14px !important;
+           margin-left:-25px;
+           margin-right:-38px;
+        }
+        .pyramid
+        {
+            display:block !important;
+            border-top: 15px solid #002b60;
+            border-left: 140px solid transparent;
+            border-right: 143px solid transparent;
+            margin-top:-1.5px;
+        }
+     
+        .table-responsive{
+           display:none;
+        } 
+        
+    
+        .wizard{
+           width:95% !important;
+        }
+        .offers-blue-grid{
+           margin-top: 21px;
+        }
+        .desk-view-blue{
+          display:none !important;
+        }
+        .mobile-view-blue{
+            display:block !important;
+        }
+    }
+    @@media (min-width: 375px) and (max-width: 428px){
+        .container.mobi-offers-view{
+           padding-left:inherit;
+           margin-left: -34px;
+           margin-right: inherit;
+        }
+        .improve-offer-btn{
+           margin-bottom: 69px;
+           margin-top: -17px;
+        }
+        .improver-copy{
+           margin-top: 20px;
+           text-align: center !important;
+           font-size:14px !important;
+           margin-left:-9px;
+           margin-right:-23px;
+        }
+        
+     
+        .pyramid
+        {
+            display:block !important;
+            border-top: 15px solid #002b60;
+            border-left: 176px solid transparent;
+            border-right: 177px solid transparent;
+            margin-top:-1.5px;
+        }
+        .table-responsive{
+           display:none;
+        }  
+        .index_ImproveOffers {
+             margin-top: 2vh !important;
+        }
+        
+        .sw-btn-cancel{
+           color: #fff !important;
+           text-decoration: underline;
+         }
+         
+         
+         #call_me_back {
+
+ border: 1px solid #fff !important;
+    background: transparent !important;
+    color: #fff !important;
+}
+   
+        .wizard{
+           width:95% !important;
+        }
+        .offers-blue-grid{
+           margin-top: 21px;
+        }
+        .desk-view-blue{
+          display:none !important;
+        }
+        .mobile-view-blue{
+            display:block !important;
+        }
+    }
+    
+    #GetYourOffer {
+        height: 280px;
+    }
+    html {
+      scrollbar-color: #6969dd #e0e0e0;
+      scrollbar-width: thin;
+    }
+    .section::-webkit-scrollbar {
+      width: 10px;
+    }
+    .section::-webkit-scrollbar-button {
+       height: 15px; //for vertical scrollbar
+    }
+    .section::-webkit-scrollbar-track {
+      background-color: #EFE6E6;  /*transparent; darkgrey; */
+    }
+    
+    .section::-webkit-scrollbar-thumb {
+          background-image: linear-gradient(180deg, #002b60 0%, #002b60 99%);
+          box-shadow: inset 2px 2px 5px 0 rgba(#fff, 0.5);
+          border-radius: 100px;
+          height: 20px;
+    }
+
+  .box {
+	  opacity: 1;
+	  transition: opacity 1s;
+	}
+	.box--hidden {
+	  opacity: 0;
+	}
+  
+    .box_cc {
+	  opacity: 1;
+	  transition: opacity 1s;
+	}
+	.box_cc--hidden {
+	  opacity: 0;
+	}
+	
+    .box_lns {
+	  opacity: 1;
+	  transition: opacity 1s;
+	}
+	.box_lns--hidden {
+	  opacity: 0;
+	}
+
+   /*.box{
+        height: 300px;
+        border: 2px solid #ddd;
+        margin: 10px;
+        padding: 10px;
+        
+    }
+   table {
+        display: flex;
+        flex-flow: column;
+        height: 100%;
+        width: 100%;
+    }
+    table thead {
+        flex: 0 0 auto;
+        width: calc(100% - 0.2em);
+    }
+*/
+ /*   .table-container {
+        padding: 0.3em;
+    }
+    table {
+      
+    }
+    table td, table th {
+        padding: 0.3em;
+       
+    }
+    table th {
+        
+    }
+
+*/
+
     /*
     .ia-close {
         display: none;
-        float: right;
+        float:right;
         margin-right: 12px;
         margin-top: -15px;
         float: right;
@@ -19,39 +554,31 @@
         opacity: 1;
         padding: 20px;
         font-weight: 100;
-        position: absolute;
-        right: 0px;
     }
-
     #ds-terminate-IA #terminate-IA {
         margin-top: 90px;
     }
     */
     .text-to-speech-icon-container .margin-tb-5 {
-        margin-top: 18px !important;
+         margin-top: 18px !important;
     }
-
     .white-color-link {
-        cursor: pointer;
+        cursor:  pointer;
         color: white;
         font-size: 11px;
         text-decoration: underline;
     }
-
     .for-ia {
         padding: 11px 35px;
     }
-
     .survey-ds-text2 p {
         font-size: 12px;
         font-weight: bold;
     }
-
     .icon-space {
         text-align: center;
         padding: 8px;
     }
-
     /*
     .IA-begin-ds {
         background: #6E9739 0% 0% no-repeat padding-box;
@@ -59,113 +586,111 @@
         border: 1px solid #FFFFFF;
         border-radius: 3px;
         opacity: 1;
-    } */
-
+    }
+    */
     .rejection-ds-message {
         font-size: 16px;
         font-weight: bold;
         opacity: 1;
     }
-
     #survey-tab-ds #survey-tab {
         padding-top: 8%;
     }
-
     .survey-ds-title {
-        text-align: center;
+        text-align:center;
     }
-
     .index_ImproveOffers:after {
-        font-family: Font-awesome;
+        font-family: Font-awesome; 
         url('/media/53353/improve-ico.svg');
         float: right;
     }
-
+    
     .padder {
         padding: 0 0 25px 0;
     }
-
-    .ui-helper-hidden-accessible {
-        display: none;
+    .ui-helper-hidden-accessible{
+        display:none;
     }
+.has-success .form-control-feedback {
+  color: #3c763d;
+}
+.ui-widget-content {
+    border: 1px solid #dddddd !important;
+	color: #333333 !important;
+}
+.ui-menu {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0;
+    display: block;
+    outline: none;
+}
+.ui-menu .ui-menu-item {
+    position: relative;
+    margin: 0;
+    padding: 3px 1em 3px .4em;
+    cursor: pointer;
+    min-height: 0;
+    list-style-image: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7);
+}
 
-    .has-success .form-control-feedback {
-        color: #3c763d;
-    }
+.ui-autocomplete {
+    width: 250px !important;
+    background: #fafafa;
+    z-index:500;
+    height: 150px;
+    overflow-y: auto;
+}
 
-    .ui-widget-content {
-        border: 1px solid #dddddd !important;
-        color: #333333 !important;
-    }
+.ui-autocomplete li {
+  display: block;
+  color: #808b97;
+  width:100%;
+  padding:10px 0;
+  cursor:pointer;
+  border-bottom:1px solid #adb1b6;
+}
 
-    .ui-menu {
-        list-style: none !important;
-        padding: 0 !important;
-        margin: 0;
-        display: block;
-        outline: none;
-    }
+ul, ol {
+    line-height: 1.4;
+}
 
-        .ui-menu .ui-menu-item {
-            position: relative;
-            margin: 0;
-            padding: 3px 1em 3px .4em;
-            cursor: pointer;
-            min-height: 0;
-            list-style-image: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7);
-        }
+.ui-autocomplete li:hover {
+  background:#e4e6e3;
+  color:white;
+}
 
-    .ui-autocomplete {
-        width: 250px !important;
-        background: #fafafa;
-        z-index: 500;
-        height: 150px;
-        overflow-y: auto;
-    }
+.ui-autocomplete li a {
+    text-decoration:none;
+}
 
-        .ui-autocomplete li {
-            display: block;
-            color: #808b97;
-            width: 100%;
-            padding: 10px 0;
-            cursor: pointer;
-            border-bottom: 1px solid #adb1b6;
-        }
+.ui-helper-hidden-accessible {
+    display: none;
+}
+.btn:focus{
+    outline:none !important;
+}
 
-    ul, ol {
-        line-height: 1.4;
-    }
-
-    .ui-autocomplete li:hover {
-        background: #e4e6e3;
-        color: white;
-    }
-
-    .ui-autocomplete li a {
-        text-decoration: none;
-    }
-
-    .ui-helper-hidden-accessible {
-        display: none;
-    }
-
-    .btn:focus {
-        outline: none !important;
-    }
-
-    .sw-btn-next, .sw-btn-prev {
-        background-color: #4C6A8F !important;
-        color: #FFFFFF;
-    }
+.sw-btn-next, .sw-btn-prev{
+	background-color:#4C6A8F !important;
+	color:#FFFFFF;
+	padding:16px;
+}
 
     #GetYourOffer tbody td {
         text-align: left;
         font-size: 16px;
         color: #002b60;
     }
-
+    .thead-dark {
+        width: 100%;
+    }
     #GetYourOffer .thead-dark {
+        top: 0;
         background-color: #002b60;
+        position: sticky;
+        width: 100%;
+        z-index:1;
     }
 
         #GetYourOffer .thead-dark th {
@@ -175,11 +700,11 @@
     #GetYourOffer tbody .amount {
         color: #002b60;
         font-size: 16px;
+        padding-left: 40px;
     }
-
-    .side-info-txt {
-        font-size: 11px;
-        padding-top: 24px;
+     .side-info-txt {
+        font-size:11px;
+        padding-top:24px;
     }
 
     #form-loader {
@@ -191,23 +716,23 @@
         left: 0%;
     }
 
-    .bank-not-found {
+    .bank-not-found{
         display: none;
         color: red;
     }
-
-    .employer-not-found {
+      .employer-not-found {
         display: none;
-        font-size: 11px;
-        color: black !important;
+        font-size:11px;
+        color: black!important;
         padding: 0px 7px 15px 9px !important;
-    }
 
+    }
     .employerCheck {
         display: none;
-        font-size: 11px;
-        color: #a94442 !important;
+        font-size:11px;
+        color: #a94442!important;
         padding: 0px 7px 15px 9px !important;
+
     }
 
     #button1, #button2 {
@@ -229,6 +754,7 @@
         padding-left: 15%;
         padding-right: 15%;
         text-align: center;
+        cursor: pointer;
     }
 
     #reasonDesc {
@@ -259,8 +785,6 @@
         padding: 20px;
         font-weight: 100;
         margin-top: -25px;
-        position: absolute;
-        right: 0px;
     }
 
     .center-icon-text .image img {
@@ -387,7 +911,7 @@
     .sw-toolbar-bottom {
         width: auto;
         position: absolute;
-        bottom: -27%;
+        bottom: -19%;
         text-align: center;
         z-index: 1;
         left: 0;
@@ -413,7 +937,7 @@
         }
 
     .sw-container.tab-content {
-        height: 57vh;
+        height: 63vh;
         overflow-y: auto;
         overflow-x: hidden;
         min-height: unset !important;
@@ -447,7 +971,7 @@
     .form-field label {
         color: black;
         font-weight: 300;
-        margin: 8px 0px 3px 0px;
+       margin: 8px 0px 3px 0px;
         display: inline-block;
     }
 
@@ -532,10 +1056,16 @@
             }
 
     #call_me_back {
-        border-radius: 3px;
+     
         float: left;
         display: inline-block;
         width: 90%;
+        
+        border: 1px solid #6987AC;
+        border-radius: 3px;
+        color: #002B60;
+        box-shadow: none;
+        background: #fff ;
     }
 
     .sw-btn-next, .sw-btn-prev {
@@ -558,10 +1088,14 @@
     }
 
     .sw-btn-next {
-        border-radius: 3px;
+   
         text-align: left;
         padding-left: 15px;
         padding-right: 5px;
+        
+        background: #6E9739 0% 0% no-repeat padding-box !important;
+        box-shadow: 0px 3px 20px #00000029;
+        border-radius: 2px;
     }
 
     .sw-btn-prev {
@@ -575,9 +1109,8 @@
         content: "\f054";
         float: right;
     }
-
     .sw-btn-next:focus {
-        color: #ffffff;
+        color:#ffffff;
     }
 
     #terminate-quick-loan span {
@@ -598,6 +1131,7 @@
         height: 111px;
         transform: skew(20deg);
         left: -98px;
+        display:none !important;
         border-top: solid 10px #88bc47;
         background-color: #002b60;
     }
@@ -642,15 +1176,18 @@
     #quick-drop-off {
         position: absolute;
         z-index: 10;
-        background-color: #002B60; /* background-color: rgb(0, 43, 96, 0.85); */
+        background-color:#002B60; /* background-color: rgb(0, 43, 96, 0.85); */
         width: 97.7%;
         height: auto;
         padding-top: 2%;
-        padding-bottom: 2%;
+        padding-bottom:2%;
         margin-top: 1%;
         display: none;
         left: 1%;
+        
         box-shadow: 0px 3px 6px #00000029;
+        
+    
     }
 
         #quick-drop-off, #quick-drop-off h4,
@@ -854,8 +1391,8 @@
     .pause-form {
         top: 0px;
         left: 3%;
-        padding-top: 10%;
-        margin-top: 3%;
+        padding-top:10%;
+        margin-top:3%;
         background: #002b60;
         opacity: 0.8;
         width: 90%;
@@ -877,7 +1414,7 @@
         right: 10px !important;
     }
 
-    .sw-btn-next:hover, .sw-btn-prev:hover, #call_me_back:hover {
+    .sw-btn-next:hover, .sw-btn-prev:hover {
         background: #858585;
         color: white;
     }
@@ -914,26 +1451,98 @@
         color: #a94442 !important;
         padding: 0px 7px 15px 9px !important;
     }
-
+    
     #para {
         background: none !important;
-        color: #a94442 !important;
-        ] display: none;
+        color: #a94442 !important;]
+        display: none;
         margin-top: 125px;
         width: 400px;
         margin-left: -200px;
     }
-
-    .custom-top {
-        top: -15px;
+    .custom-top{
+        top:-15px;
     }
-
+    @@media (min-width:320px) and (max-width:425px) {
+        #terminate-quick-loan {
+            width: 220px !important;
+            float: left !important;
+        }
+    }
     @@media(max-width: 576px) {
 
-        .custom-top {
-            top: -30px;
+        .quick-offer-content {
+            height: 112vh;
         }
 
+        .btn-toolbar {
+            bottom: 0;
+        }
+
+        .index_ImproveOffers {
+            margin-top: 0px;
+        }
+
+    
+        #myTable th {
+            /* font-size: 14px; */
+        }
+        
+        .section td {
+           /* font-size: 12px; */
+        }
+        
+
+    .scoper {
+        width: 12px !important;
+    }
+    .arrow-right {
+        width: 0px;
+        height: 0px;
+        border-top: 36px solid transparent;
+        border-bottom: 37px solid transparent;
+        border-left: 33px solid #002b60;
+        position: relative;
+        top: 42%;
+        text-align: center;
+        position: absolute;
+        width: 0;
+        height: 0;
+        border-top: 80px solid transparent;
+        border-left: 9px solid #002b60;
+        border-bottom: 80px solid transparent;
+        margin: 200px 0px 0 202px;
+        transform: rotate(90deg);
+    }
+    /*
+    .iaMobiStatus {
+        background: #002b60;
+        color: white;
+        vertical-align: middle;
+        font-size: 16px;
+        font-weight: 500;
+        text-align: left;
+        padding: 14px;
+        position: relative;
+        text-indent: 30px;
+        height: 153px;
+        display: inline-block;
+        zoom: 1;
+        display: inline;
+        margin-left: 30px;
+        color: white;
+        text-align: center;
+        margin-top: 31px;
+    }
+    */
+    .index_ImproveOffers {
+	   margin-top: 17px;
+	}
+    
+    
+    .custom-top{
+        top:-30px;
+    }
         .sw-theme-arrows > ul.step-anchor > li.active p {
             font-size: 11px !important;
             padding-left: 0px;
@@ -947,8 +1556,26 @@
 
         .sw-container.tab-content {
             padding-top: 5% !important;
-            padding-bottom: 5% !important;
+            padding-bottom:5%!important;
         }
+    }
+
+    @@media (max-width: 1023px) and (min-width:991px) {
+    	.smart-wizard {
+    	    height: 100%;
+            }
+    	.improver-copy {
+    	   font-size: 11.6px;
+    	}
+        .improver-ico {
+	     padding: 7.2px;
+        }
+    	.arrow-right {
+    
+    	}
+    	.quick-offer-content {
+    	    margin:0px;
+    	}
     }
 
     @@media only screen and (max-width: 1366px),screen and (max-height: 736px) {
@@ -958,7 +1585,7 @@
         }
 
         .sw-container.tab-content {
-            height: 54vh;
+            height: 450px;
         }
 
         .btn-toolbar.mr-2 {
@@ -1001,38 +1628,89 @@
             height: 46vh;
         }
 
-        .quick-offer-content {
-            width: 66%;
-        }
         /*#endregion*/
     }
     /*#endregion*/
 
+    @@media (min-width: 424px) and (max-width:576px) {
+        .terminate-quick-loan {
+            left: 5%;
+        }
+    }
+    
+    @@media (max-width:576px) {
+        #terminate-quick-loan {
+            display: block;
+            margin-left: 14px;
+            width: 130px !important;
+           
+        }
+    }
+
+    @@media (min-width: 769px) and (max-width:992px) {
+       .sw-toolbar-bottom {
+    bottom: 0;
+    position: fixed !important;
+    right: 50px;
+}
+
+#call_me_back {
+    border: 1px solid #fff !important;
+    background: transparent !important;
+    color: #fff !important;
+    position: relative;
+
+}
+    }
+
     /*#region Medium devices (tablets, 768px and up)*/
     @@media (max-width: 768px) {
         /*#region --quick loans page*/
-
-        #para {
-            margin-top: 0px !important;
+        .improver-copy {
+            font-size: 15px;
+            padding: 15px;
+        }
+        .improver-ico {
+            padding: 5px;
+        }
+        
+        table {
+            display: revert !important;
+            flex-flow: column;
+            height: 100%;
             width: 100% !important;
-            margin-left: 0px !important;
         }
-
-        .quick-offer-content .button {
-            box-shadow: 0 3px 10px 0 rgba(0,0,0,.2);
-        }
-
-        .quick-offer-smile {
-            margin-left: 0px;
-        }
-
-        .quick-offer-option {
-            display: inline-block;
-            width: 100%;
-            height: 1px;
-            margin-top: 35px;
-            margin-bottom: 30px;
-        }
+            
+            td {
+            padding: 0;
+            text-align: left !important;
+            width: 90px;
+            position: relative;
+            left: -20px;
+          }
+            
+            #para {
+            
+                margin-top: 0px !important;
+                width: 100% !important;
+                margin-left: 0px !important;
+            }
+        
+            .quick-offer-content .button {
+                box-shadow: 0 3px 10px 0 rgba(0,0,0,.2);
+            }
+    
+            .quick-offer-smile {
+                margin-left: 0px;
+            }
+    
+            .quick-offer-option {
+                display: inline-block;
+                width: 100%;
+                height: 1px;
+                margin-top: 35px;
+                margin-bottom: 30px;
+            }
 
             .quick-offer-option span {
                 display: inline-block;
@@ -1055,6 +1733,10 @@
         .sw-toolbar-bottom {
             margin-left: 0%;
             bottom: -18%;
+            
+            position: fixed;
+    bottom: -10px;
+    right: 20px;
         }
 
         .quick-content h1 {
@@ -1095,41 +1777,75 @@
         }
 
         #terminate-quick-loan {
-            width: 150px;
-            position: absolute;
-            left: 10px;
+            width: 150px !important;
+               margin-top: -40px;
         }
+        
+        
+                 #call_me_back {
+
+ border: 1px solid #fff !important;
+    background: transparent !important;
+    color: #fff !important;
+        position: relative;
+    top: 36px;
+}
 
         #call_me_back {
             width: 90%;
             padding-left: 0px;
             padding-right: 0px;
+          ;
         }
+        
+        #terminate-quick-loan span {
+ 
+    margin-left: 353px !important;
+
+}
+        
         /*#endregion*/
     }
     /*#endregion*/
-
+    @@media (min-width:577px) and (max-width:990px) {
+        #quick-flat-bottom {
+            left: 0px;
+            width: 100%;
+            background: #002b60;
+            border-top: none;
+            background-color: #002b60;
+            height: 75px;
+        }
+        .quick-parallelogram {
+            display:none;
+        }
+    .sw-btn-cancel{
+      position: relative;
+    
+    color: #fff;
+    text-decoration: underline;
+    }
+    }
     /*#regionSmall devices (landscape phones, 576px and up)*/
     @@media(max-width: 576px) {
         .radio-wrap .checkmark:after {
-            transition: 0.35s;
-            top: 4px;
-            left: 4px;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #259CD8;
-            box-shadow: 0px 2px 4px #00000010;
-        }
-
-        .checkmark.radio {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 20px;
-            width: 20px;
-            border-radius: 50%;
-        }
+        transition: 0.35s;
+        top: 4px;
+        left: 4px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #259CD8;
+        box-shadow: 0px 2px 4px #00000010;
+    }
+    .checkmark.radio {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 20px;
+        width: 20px;
+        border-radius: 50%;
+    }
         /*#region --quick loans page*/
         .wizad-container {
             padding: 0px;
@@ -1144,17 +1860,17 @@
         .quick-offer {
             width: 270px;
         }
-
-        #quick-drop-off {
+        
+        #quick-drop-off{
             padding-top: 2%;
             padding-bottom: 2%;
             margin-top: 20px;
+            height: 100% !important;
         }
-
         .wizard {
             margin-top: 0px;
             box-shadow: none;
-            width: 96%;
+            width:100%;
         }
 
         .quick-offer-item .item {
@@ -1234,17 +1950,35 @@
         }
 
         #terminate-quick-loan {
-            width: 138px;
+            width: 220px !important;
         }
 
-            #terminate-quick-loan span {
-                display: none;
-            }
+        #terminate-quick-loan span {
+            display: none;
+        }
 
         #call_me_back {
-            width: 84%;
+            width: 130px;
         }
+        
+           .sw-btn-cancel{
+           color: #fff !important;
+           text-decoration: underline;
 
+         }
+         
+         
+         #call_me_back {
+
+ border: 1px solid #fff !important;
+    background: transparent !important;
+    color: #fff !important;
+}
+
+        .side-info-txt {
+            padding-top: 0px;
+            margin-top: -15px;
+        }
         .option-register {
             margin-left: 0px;
         }
@@ -1271,7 +2005,6 @@
             background: #259CD8;
             box-shadow: 0px 2px 4px #00000010;
         }
-
         .checkmark.radio {
             position: absolute;
             top: 0;
@@ -1291,10 +2024,13 @@
 
         #terminate-quick-loan {
             width: 130px;
+         float: right !important;
+         margin-right: -80px;
         }
         /*#endregion*/
+        
         .quick-offer-content {
-            width: 82%;
+            width: 100%; /* 82px */
         }
 
         .chest-images {
@@ -1304,7 +2040,7 @@
     }
     /*#endregion*/
 
-    /*radio button*/
+ /*radio button*/
     @@media (min-width: 1025px) and (max-width: 1441px) {
         .radio-wrap {
             display: flex;
@@ -1319,13 +2055,16 @@
             user-select: none;
         }
     }
-
     @@media (min-width: 820px) and (max-width: 1368px) {
         .survey-qsn {
-            height: 540px;
+            height:540px;
         }
     }
-
+    @*@@media (min-width: 280px) and (max-width: 420px) {
+        .button.secondary.IA-begin {
+           background-color: #4C6A8F;
+        }
+    }*@
     @@media (min-width: 1200px) {
 
         .radio-wrap {
@@ -1438,18 +2177,16 @@
 
     .radio-wrap input:checked ~ .checkmark {
     }
-
-    .checkmark {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 25px;
-        width: 25px;
-        border: solid 1px #003B61;
-        border-radius: 7px;
-        transition: 0.35s;
-    }
-
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 25px;
+            width: 25px;
+            border: solid 1px #003B61;
+            border-radius: 7px;
+            transition: 0.35s;
+        }
     @@media (min-width: 1025px) and (max-width: 1441px) {
         .checkmark {
             position: absolute;
@@ -1475,57 +2212,47 @@
             transition: 0.35s;
         }
     }
-</style>
-@{
-    Layout = "MasterHeaderOnly.cshtml";
-
-    var Children = Model.Children;
-
-    // Get specific Children
-    var HeroHeader = Children?.Where(c => c is HeroHeader).FirstOrDefault();
-    var dropOff = Children?.Where(c => c is PagePopup).FirstOrDefault();
-    var heroBody = Children?.Where(c => c is HeroBody).FirstOrDefault();
-    var login = heroBody.Children.Where(c => c.Name == "Login").FirstOrDefault() as Link;
-    var register = heroBody.Children.Where(c => c.Name == "Register").FirstOrDefault() as Link;
-
-    var consolidationLoan = heroBody.Children.Where(c => c.Name == "Consolidation Loan").FirstOrDefault() as Link;
-    var fifteenPercentLoan = heroBody.Children.Where(c => c.Name == "15% Loan").FirstOrDefault() as Link;
-
-
-    var quickTitle = heroBody.Value("bodyTitle");
-    var quickBody = heroBody.Value("richTextBox");
-
-    var salaryFrequencyDropdownId = 5389;
-    var bankDropdownId = 5390;
-    var bankStatementsDropdownId = 5391;
-    var employmentSectorDropdownId = 5382;
-    var childMaintenanceDropdownId = 5395;
-
-    var terminateProcess = dropOff.Children.Where(c => c.Name == "Terminate process").FirstOrDefault() as DocumentTypeTitleAndDescription;
-
-    var heroHeaderImage = HeroHeader?.Value<IPublishedContent>("image")?.Url;
-
-    var campaignCode = Request.Params["campaignCode"];
-
-    var utm_source = Request.Params["utm_source"];
-    var utm_medium = Request.Params["utm_medium"];
-    var utm_campaign = Request.Params["utm_campaign"];
-
-    // Get the utm tagging
-    string strPageUrl = Request.RawUrl;
-    var shoulderButtonLink = "";
-    if (strPageUrl.Contains("?"))
-    {
-        var strendUrl = strPageUrl.Split('?').Last();
-        shoulderButtonLink = String.Format("{1}{2}", shoulderButtonLink, "?", strendUrl);
+    .term-head{
+      font-size:19px;
+      /*margin-left: -15px;*/
     }
-}
-<!-- BODY -->
-
+     @@media (min-width: 260px) and (max-width: 512px){
+          .copy-right-mobile{
+            padding-top: 260%;
+            padding-bottom: 100px;
+            text-align: center !important;
+            }
+         .survey-mobile-view{
+                 height: 600px;
+            }
+     }
+     @@media (min-width: 280px) and (max-width: 653px){
+    .copy-right-mobile{
+    padding-top: 160%;
+    padding-bottom: 100px;
+    text-align: center !important;
+    }
+    }
+    @@media (min-width: 320px) and (max-width: 1080px) {
+        .copy-right-mobile
+        {
+            padding-top: 90%;
+            padding-bottom: 70px;
+            text-align: center !important;
+        }
+        
+       .survey-mobile-view{
+             height: 600px;
+        }
+    }
+</style>
 <style type="text/css">
 
     .index_accept {
         border-radius: 3px;
+        float: right !important;
+        background: #DDDDDD 0% 0% no-repeat padding-box !important;
+        box-shadow: 0px 3px 20px #00000029 !important;
     }
 
     #st-panel-submit1 {
@@ -1543,6 +2270,15 @@
         height: 80%;
     }
 
+    .sw-btn-cancel{
+        float: right !important;
+        margin-right: 30px !important;
+        margin-top: 16px !important;
+         text-decoration: underline;
+        cursor:pointer;
+        
+    }
+      
     .survey-text1 .survey-ds-title {
         text-align: center;
         font-weight: 700;
@@ -1554,24 +2290,89 @@
         font-weight: 600;
     }
 
-    /*.IA-begin {
-         Commenting these out so we can center align
-        margin-left: 460px;
-        margin-top: 45px;
-        
-        background: #6E9739 0% 0% no-repeat padding-box;
+    /*
+    .IA-begin {
+         background: #6E9739 0% 0% no-repeat padding-box;
         box-shadow: 0px 3px 20px #0000001a;
         border: 1px solid #FFFFFF;
         border-radius: 3px;
         opacity: 1;
-    }*/
+    }
+    */
+    
+    @*
+    @@media (min-width: 280px) and (max-width: 320px) {
+       .container.mobi-offers-view{
+          padding-left:inherit;
+          margin-left: -54px;
+          margin-right: inherit;
+        }
+        .col-xs-6 {
+           width: 40%;
+        }
+        .amount p{
+		   font-size:18px !important;
+		}
+		.pyramid {
+             border-top: 50px solid #002b60;
+            border-left: 115px solid transparent;
+            border-right: 131px solid transparent;
+            margin-top: -1px;
+        }
+    }*@
+    @@media (min-width: 360px) and (max-width: 375px) {
+        .even-odd-mobi {
+            padding-left: 10%;
+            padding-right: 0%;
+        }
+    }
+    @*
+    @@media (min-width: 360px) {
+       .container.mobi-offers-view{
+          padding-left:inherit;
+          margin-left: -17px;
+          margin-right: inherit;
+        }
+    }
+    @@media (min-width: 375px) and (max-width: 428px){
+        .container.mobi-offers-view{
+           padding-left:inherit;
+           margin-left: -34px;
+           margin-right: inherit;
+        }
+        }
+    @@media (min-width: 540px) and (max-width: 600px){
+        .pyramid {
+           border-top: 40px solid #002b60;
+           border-left: 237px solid transparent;
+           border-right: 237px solid transparent;
+           margin-top: -1.5px;
+        }
+    }
+    @@media (min-width: 412px) and (max-width: 530px){
+        .pyramid {
+           border-top: 40px solid #002b60;
+           border-left: 180px solid transparent;
+           border-right: 180px solid transparent;
+           margin-top: -1.5px;
+        }
+        
+    }
+    @@media (min-width: 320px)and (max-width: 325px){
+        .pyramid {
+            border-top: 50px solid #002b60;
+            border-left: 137px solid transparent;
+            border-right: 137px solid transparent;
+            margin-top: -1px;
+       }
+    }*@
 </style>
 
 <div class="wizad-container container">
     <!--Start-------------drop off popup------------------->
     <div id="quick-drop-off">
         <a class="close" href="">X</a>
-        @*<a class="ia-close" href="">X</a>*@
+        @* <a class="ia-close" href="">X</a> *@
         <div id="terminate-process">
             <h4>@terminateProcess.BodyTitle</h4>
             <p>@terminateProcess.BodyDescription</p>
@@ -1591,6 +2392,7 @@
                     <input id="sessionId" type="hidden" value="@(Guid.NewGuid().ToString())" />
                     <input id="processID" type="hidden" value="" />
                     <div id="form_fields">
+                       
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -1642,7 +2444,7 @@
                         <div class="row">
                             <div class="col-xs-12">
                                 @*<button type="button" id="st-panel-submit" onclick="open_call_me()" class="call-me btn-hover-blue">Call Me</button>*@
-                                <button type="button" id="st-panel-submit1" onclick="open_call_me()" class="call-me btn-hover-blue">Call Me</button>
+                                <button type="button" id="st-panel-submit1" onclick="open_call_me_for_qq()" class="call-me btn-hover-blue">Call Me</button>
                             </div>
                         </div>
                     </div>
@@ -1671,24 +2473,47 @@
         </div>
 
         <div class="terminate-reason" style="display:none"></div>
-
         @*
-        <div id="terminate-IA" style="margin-top: 90px;">
+        <div id="terminate-IA">
+            
+            <section id="form-preloader" class="pause-form">
+                <div class="loader" id="form-preloader-loader">
+                    <div class="loader-img"></div>
+                </div>
+                <div class="loading-message text-white align-center"></div>
+                <h4 class="form-preloader-title align-center">Please wait...</h4>
+            </section>
+            
             <div id="survey-tab">
-                <div class="icon-space"><img src="/media/fzbhsseo/being-reviewed-icon.svg" /></div>
-                <p class="survey-text2" style="font-size: 18px;text-align: center;font-weight: 800;">(<span style="color: red">IA</span>) Survey</p>
+                <div class="icon-space"><img src="/media/zjxbsrfo/being-reviewed-icon.svg" /></div>
+                <p class="survey-text2" style="font-size: 18px;text-align: center;font-weight: 800;"></p>
                 <p class="survey-text2">Please give us more information, so we can <br>improve our qualifying offers<br> today! </p>
                 <div class="center-align margin-top-40">
                     <a class="button for-ia secondary IA-begin" href="#">
                         Begin
-                        <embed style="vertical-align: middle;margin-left:15px" src="/media/50hngh2h/improve-ico.svg">
+                        <embed style="vertical-align: middle;margin-left:15px" src="/media/hbfcqnr5/improve-ico.svg">
+                    </a>
+                </div>
+                
+                      <div class="center-align margin-top-40">
+                    <a class="button no-thank-you" href="/en/home/get-a-quote/">
+                        No Thank You
                     </a>
                 </div>
             </div>
-            <div id="iframeHolder"><iframe class="survey-questionnaire survey-qsn" id="iframe" src="https://i-a.co/q/afrbnkc/xxx" width="100%" height="500" frameBorder="0" style="margin-top: -20px;"></iframe></div>
+            <div id="iframeHolder"><iframe class="survey-questionnaire survey-qsn survey-mobile-view" id="iframe" src="" width="100%" height="500" frameBorder="0" style="margin-top: -20px;"></iframe></div>
         </div>
-
-        <div id="ds-terminate-IA" style="margin-top: 90px;display:none">
+        
+        <div id="ds-terminate-IA" style="display:none">
+            
+            <section id="form-preloader" class="pause-form">
+                <div class="loader" id="form-preloader-loader">
+                    <div class="loader-img"></div>
+                </div>
+                <div class="loading-message text-white align-center"></div>
+                <h4 class="form-preloader-title align-center">Please wait...</h4>
+            </section>
+            
             <div id="survey-tab-ds">
                 <div class="icon-space"><img src="/media/fzbhsseo/being-reviewed-icon.svg" /></div>
                 <div class="survey-ds-title"></div>
@@ -1696,11 +2521,11 @@
                 <div class="center-align margin-top-40">
                     <a class="button for-ia secondary IA-begin-ds" href="#">
                         Take our survey
-                        <embed style="vertical-align: middle;margin-left:15px" src="/media/50hngh2h/improve-ico.svg">
+                        <embed style="vertical-align: middle;margin-left:15px" src="/media/hbfcqnr5/improve-ico.svg">
                     </a>
                 </div>
                 <div class="center-align" style="margin-top: 10px;">
-                    <a class="white-color-link ok-with-decline">No, thank you</a>
+                    <a class="white-color-link ok-with-decline"  href="/en/home/get-a-quote/">No, thank you</a>
                 </div>
             </div>
             <div id="iframeHolder-ds"><iframe class="survey-questionnaire-ds ia-frame-trigg" id="iframe" src="" width="100%" height="500" frameBorder="0" style="margin-top: -20px;"></iframe></div>
@@ -1738,8 +2563,6 @@
             </ul>
 
             <div>
-
-
                 <div id="step-1">
                     @*<small class="border-bottom border-gray pb-2">@Model.Value("step1Heading")</small>*@
                     <div class="row">
@@ -1748,6 +2571,15 @@
                                 <form id="frmStep1">
                                     @Html.AntiForgeryToken()
                                     <div class="form-field row">
+                                        <div class="col-md-5">
+                                            <div class="form-group">
+                                                <label class="label">@ResourceHelper.GetResource(Model.Value("quickLoansLookingFor").@ToString())</label>
+                                                <input type="number" maxlength="6" class="form-control" id="howMuchYoureLookingFor" name="howMuchYoureLookingFor" required placeholder="@ResourceHelper.GetResource(Model.Value("quickLoansLookingFor").ToString())">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-field row">
+                                         
                                         <div class="col-md-5">
                                             <div class="form-group">
                                                 <label class="label">@ResourceHelper.GetResource(Model.Value("quickLoansIDNumber").@ToString())</label>
@@ -1800,7 +2632,7 @@
                                         </div>
                                         <div class="col-md-5">
                                             <div class="form-group">
-                                                <label class="label">@ResourceHelper.GetResource(Model.Value("quickLoansEmail").ToString())</label>
+                                                <label class="label">Email Address</label>
                                                 <input type="email" id="email" name="email" class="form-control" placeholder="@ResourceHelper.GetResource(Model.Value("quickLoansEmail").ToString())">
                                             </div>
                                         </div>
@@ -1812,23 +2644,18 @@
                                             </div>
                                         </div>
                                         <div class="col-md-3 custom-margin custom-top">
-                                            @*<div class="col-md-2 col-xs-3">*@
                                             <div class="form-group">
                                                 <label class="radio-wrap">
                                                     <span class="radio-text">Yes</span>
                                                     <input type="radio" id="rdbYes" name="option" value="1" class="myRadio" checked="checked">
                                                     <span class="checkmark radio"></span>
                                                 </label>
-                                                @*</div>
-                                                    <div class="col-md-2 col-xs-3">*@
+
                                                 <label class="radio-wrap">
                                                     <span class="radio-text">No</span>
                                                     <input type="radio" id="rdbNo" name="option" value="0" class="myRadio">
                                                     <span class="checkmark radio"></span>
                                                 </label>
-                                                @*</div>*@
-                                                @*<div class="col-md-8">
-                                                    </div>*@
                                             </div>
 
                                         </div>
@@ -1853,6 +2680,7 @@
                                             amount payable R 2036
                                         </small>
                                     </p>
+                                 
                                 </div>
                             </div>
                         </div>
@@ -2036,48 +2864,99 @@
                             <div class="quick-offer-content">
                                 <div class="quick-success">
                                     <p id="congratulationMessage">
-                                        Your estimated credit offer is shown below.<br /> The final offer
+                                        <span class="offerWelcome">Here are your offers.</span><br /> The final offer
                                         might change depending on a full credit evaluation process.
                                     </p>
                                     <!--Start-->
-                                    <div class="container" style="width:90%">
+                                    <div class="container">
 
                                         <div id="offer-div" class="row eq-height margin-top-10"></div>
                                         <div id="GetYourOffer">
+                                             
                                             <div class="body_qq"></div>
+
+                                            @* <table id="myTable" class="table table-striped hidden-xs"></table> *@
+
+                                            <div class="hidden-lg hidden-md hidden-sm visible-xs row" 
+                                                    style="background: #002b60;color: white;font-size: 22px;padding-top: 45px;padding-bottom:6px;text-align: center;/*margin-left: -30px;margin-right: -30px;margin-top: -13px;*/">
+                                                <div class="col-xs-7">Amount</div>
+                                                <div class="col-xs-5 term-head" style="font-size: 18px;top: 6px;">Term</div>
+                                            </div>
+                                            @* iterate *@
+                                            <div class="mobi-offers margin-top-20 section hidden-lg hidden-md hidden-sm visible-xs row" style="overflow-x: hidden; overflow-y: hidden;/* margin-top: 16px;*/"></div>
+                                            @* iterate *@
                                             @*
-                                            <div class="container ia-controls" style="margin-top: -21px;">
+                                            <div class="container ia-controls mobile-view-blue" style="margin-top: -10px; /*margin-bottom:33px !important;*/">
                                                 <div class="row" style="display: none;">
                                                     <div class="col-sm-12" style="background: #002B60 0% 0% no-repeat padding-box;opacity: 1;width: 55%;">You have been provided with the above offers. Take our survey to see if these offers can be improved.</div>
                                                 </div>
-                                                <div class="row" style="display: block;">
-                                                    <div class="col-sm-1" style="background: #002b60;color: white;vertical-align: middle;padding:5.5px">
-                                                        <embed src="/media/u0ajlnwd/improve-smybol.svg" />
+                                                <div class="container row" style="display: block;margin-bottom: 10px !important; /*padding-top:24px;*/">
+                                                    <div class="hidden-lg hidden-md hidden-sm hidden-xs improver-ico" style="background: #002b60;color: white;vertical-align: middle;padding:5.5px">
+                                                        <embed src="/media/ypxcjy0n/improve-smybol.svg" />
                                                     </div>
-                                                    <div class="col-sm-8" style="background: #002b60;color: white;vertical-align: middle;font-size: 16px;font-weight: 500;text-align: left;padding: 14px;">
+                                                    <div class="col-md-7 col-sm-7 improver-copy" style="background: #002b60;color: white;vertical-align: middle;font-size: 16px;font-weight: 500;text-align: center;padding: 14px;">
                                                         You have been provided with the above offers. Take our survey to see if these offers can be improved.
                                                     </div>
-                                                    <div class="arrow-right" style="width: 0px;height: 0px;border-top: 36px solid transparent;border-bottom: 37px solid transparent;border-left: 33px solid #002b60;position: relative;top: 42%;float: left;"></div>
+                                                    <div class="pyramid"></div>
+                                                    <div class="arrow-right hidden-sm hidden-xs" style="width: 0px;height: 0px;border-top: 36px solid transparent;border-bottom: 37px solid transparent;border-left: 33px solid #002b60;position: relative;top: 42%;float: left; margin-left:-1px"></div>
+                                                    <div class="col-md-3 col-sm-2 improve-offer-btn" style="padding: 10px;color: white;margin-left: -20px;">
+                                                        <button class="index_ImproveOffers " type="button" style="background: #4C6A8F 0% 0% no-repeat padding-box;box-shadow: 0px 3px 20px #00000052;
+                                                                                                border: 1px solid #FFFFFF;
+                                                                                                border-radius: 3px;
+                                                                                                opacity: 0.87;
+                                                                                                width: 144px;
+                                                                                                height: 50px; margin-left:12px;">
+                                                           Improve offers <embed style="vertical-align: middle;margin-left: 4px;" src="/media/hbfcqnr5/improve-ico.svg" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="container ia-controls" style="margin-top: 14px; margin-bottom:33px !important;">
+                                                <div class="row" style="display: none;">
+                                                    <div class="col-sm-12" style="background: #002B60 0% 0% no-repeat padding-box;opacity: 1;width: 55%;">You have been provided with the above offers. Take our survey to see if these offers can be improved.</div>
+                                                </div>
+                                                <div class="row hidden-xs hidden-sm hidden-md hidden-lg" style="display: block; padding-top:24px;">
+                                                    <div class="col-sm-1 hidden-xs" style="background: #002b60;color: white;vertical-align: middle;padding:5.5px">
+                                                        <embed src="/media/ypxcjy0n/improve-smybol.svg" />
+                                                    </div>
+                                                    <div class="col-sm-8 offers-blue-grid" style="background: #002b60;color: white;vertical-align: middle;font-size: 16px;font-weight: 500;text-align: center;padding: 14px;">
+                                                        You have been provided with the above offers. Take our survey to see if these offers can be improved.
+                                                    </div>
+                                                    <div class="pyramid  hidden-lg hidden-md hidden-sm visible-xs">
+                                                        
+                                                    </div>
+                                                    <div class="arrow-right" style="width: 0px;height: 0px;border-top: 36px solid transparent;border-bottom: 37px solid transparent;border-left: 33px solid #002b60;position: relative;top: 42%;float: left; margin-left:-1px"></div>
                                                     <div class="col-sm-2" style="padding: 10px;color: white;margin-left: -20px;">
-                                                        <button class="index_ImproveOffers" type="button" style="background: #4C6A8F 0% 0% no-repeat padding-box;box-shadow: 0px 3px 20px #00000052;
+                                                        <button class="index_ImproveOffers " type="button" style="background: #4C6A8F 0% 0% no-repeat padding-box;box-shadow: 0px 3px 20px #00000052;
+                                                                                                border: 1px solid #FFFFFF;
+                                                                                                border-radius: 3px;
+                                                                                                opacity: 0.87;
+                                                                                                width: 144px;
+                                                                                                height: 50px; margin-left:12px;">
+                                                           
+                                                            Improve offers
+                                                             <embed style="vertical-align: middle;margin-left: 4px;" src="/media/hbfcqnr5/improve-ico.svg" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>*@
+                                            
+                                            
+                                        </div>
+                                        @*
+                                        <div class="row margin-top-10 button-footer">
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <!--<a id="index_offer" class="button primary">Accept offer</a>-->
+                                                        <button class="index_ImproveOffers visible-xs hidden-sm hidden-md hidden-lg" type="button" style="background: #4C6A8F 0% 0% no-repeat padding-box;box-shadow: 0px 3px 20px #00000052;
                                                                                                 border: 1px solid #FFFFFF;
                                                                                                 border-radius: 3px;
                                                                                                 opacity: 0.87;
                                                                                                 width: 144px;
                                                                                                 height: 50px;">
-                                                            <embed style="vertical-align: middle;margin-left: 4px;" src="/media/50hngh2h/improve-ico.svg" />
+                                                            <embed style="vertical-align: middle;margin-left: 4px;" src="/media/hbfcqnr5/improve-ico.svg" />
                                                             Improve offers
                                                         </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            *@
-                                        </div>
-
-                                        <div class="row margin-top-10 button-footer">
-                                            <div class="col-sm-3">
-                                                <div class="form-group">
-                                                    <!--<a id="index_offer" class="button primary">Accept offer</a>-->
                                                 </div>
                                             </div>
                                             <div class="col-sm-3">
@@ -2097,6 +2976,7 @@
                                             </div>
 
                                         </div>
+                                        *@
                                     </div>
                                     <!--End-->
                                 </div>
@@ -2110,6 +2990,9 @@
                             </div>
                         </form>
                     </div>
+                    @* <div class="spacer hidden-xs">
+                        @Html.Raw(termsAndConditions)
+                    </div> TEMP: taken out *@
                 </div>
                 <div id="step-5">
                     <div class="quick-offer-content">
@@ -2137,21 +3020,87 @@
                         </div>
                     </div>
                 </div>
+                @*
+                <div id="desk-view-blue" class="container ia-controls desk-view-blue">
+                    <div class="row" style="display: none;">
+                        <div class="col-sm-12" style="background: #002B60 0% 0% no-repeat padding-box;opacity: 1;width: 55%;">You have been provided with the above offers. Take our survey to see if these offers can be improved.</div>
+                    </div>
+                    <div class="row ia-copy" style="display: block;position: absolute;">
+                        <div class="col-sm-1   hidden-xs" style="background: #002b60;color: white;vertical-align: middle;padding:5.5px">
+                            <embed src="/media/ypxcjy0n/improve-smybol.svg" />
+                        </div>
+                        <div class="col-sm-8" style="background: #002b60;color: white;vertical-align: middle;font-size: 16px;font-weight: 500;text-align: left;padding: 14px;">
+                            You have been provided with the above offers. Take our survey to see if these offers can be improved.
+                        </div>
+                        
+                        <div class="arrow-right hidden-sm hidden-xs" style="width: 0px;height: 0px;border-top: 36px solid transparent;border-bottom: 37px solid transparent;border-left: 33px solid #002b60;position: relative;top: 42%;float: left;"></div>
+                        <div class="col-sm-2" style="padding: 10px;color: white;text-align:right">
+                            <button class="index_ImproveOffers hidden-xs" type="button" style="background: #4C6A8F 0% 0% no-repeat padding-box;box-shadow: 0px 3px 20px #00000052;
+                                                                    border: 1px solid #FFFFFF;
+                                                                    border-radius: 3px;
+                                                                    opacity: 0.87;
+                                                                    width: 144px;
+                                                                    height: 50px; ">
+                                Improve offers <embed style="vertical-align: middle;margin-left: 4px;" src="/media/hbfcqnr5/improve-ico.svg" />
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row visible-xs hidden-lg hidden-md hidden-sm" style="position: absolute;bottom: -86px;color: white;left: 0%;z-index: 5;float: left;">
+                        <div class="col-xs-12">
+                                <button class="index_ImproveOffers" type="button" style="background: #4C6A8F 0% 0% no-repeat padding-box;box-shadow: 0px 3px 20px #00000052;
+                                                                        border: 1px solid #FFFFFF;
+                                                                        border-radius: 3px;
+                                                                        opacity: 0.87;
+                                                                        width: 144px;
+                                                                        height: 50px;">
+                                    Improve offers <embed style="vertical-align: middle;margin-left: 4px;" src="/media/hbfcqnr5/improve-ico.svg">
+                                </button>
+                            </div>
+                    </div>
+                </div>
+                *@
+                <div class="container">
+                    <div class="row margin-top-10 button-footer">
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <!--<a id="index_offer" class="button primary">Accept offer</a>-->
+                                @*<button class="index_ImproveOffers visible-xs hidden-sm hidden-md hidden-lg" type="button" style="background: #4C6A8F 0% 0% no-repeat padding-box;box-shadow: 0px 3px 20px #00000052;
+                                                                        border: 1px solid #FFFFFF;
+                                                                        border-radius: 3px;
+                                                                        opacity: 0.87;
+                                                                        width: 144px;
+                                                                        height: 50px;">
+                                    <embed style="vertical-align: middle;margin-left: 4px;" src="/media/hbfcqnr5/improve-ico.svg" />
+                                    Improve offers
+                                </button>*@
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <a id="credit_card_offer" class="button primary">Accept offer</a>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <a id="button1" class="">Accept offer</a>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <a id="button2" class="">Accept offer</a>
+                        </div>
+                    </div>
+    
+                </div>
+                </div>
             </div>
         </div>
-
+        <div class="row terms_and_conditions margin-top-10 hidden-xs copy-right-mobile"  style="padding-left: 22px; padding-right: 24px;text-align:left">
+            @Html.Raw(termsAndConditions)
+        </div> 
     </div>
 
-    <div class="row" style="padding-left: 24px; padding-right: 24px;">
-        <div class="col-md-5">
 
-        </div>
-        <div class="col-md-7 side-info-txt">
-            <p>
-                © Copyright 2021 African Bank. An authorized financial services and credit provider  Reg No. 2014/176899/06 (NCRCP7638)
-            </p>
-        </div>
-    </div>
     <div id="quick-flat-bottom">
         <div class="row">
             <div class="col-md-5">
@@ -2165,7 +3114,7 @@
 
         </div>
     </div>
-
+    
 
     @Html.Partial("_renderPopUpContent", new ContainerViewModel()
     {
@@ -2175,7 +3124,6 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                @*@ResourceHelper.GetResource("RentAccommodation")*@
                                 <label class="label">Accomodation</label>
                                 <input type="text" id="rentAccomodation" name="rentAccomodation" class="form-control expense-add " placeholder="0.00" required>
                             </div>
@@ -2388,7 +3336,17 @@
 
 <script>
 
+
+    $(function () {
+        $(".cmb1").click(function(){
+            //$("#heading1").toggleClass('cmb2');
+            $("#heading1").show();
+        });
+    });
     $(document).ready(function () {
+        
+        $('.mobile-view-blue').hide();
+        
         addFormValidation();
 
         $(".expense-add").keyup(function () {
@@ -2424,7 +3382,7 @@
                             callback: {
                                 callback: function (value, validator, $field) {
                                     var idNumber = value;
-
+                                    debugger;
                                     if (null === idNumber || 0 === idNumber.length) return !1;
                                     var correct = !0;
                                     if (13 !== idNumber.length || isNaN(parseFloat(idNumber)) && isFinite(idNumber)) return !1;
@@ -2456,12 +3414,18 @@
             });
         }
         $(".wizard").show();
+        
     });
-
+    /*$(function () {
+        $(".cmb1").click(function(){
+            $("#1").toggleClass('cmb2');
+            $("#2").toggleClass('cmb2');
+            
+        });
+    });    
     $(function () {
         $("#iframeHolder").hide();
         $("#iframeHolder-ds").hide();
-        /*
         $('.IA-begin').click(function () {
             $("#survey-tab").hide();
             $(".btn-toolbar").hide();
@@ -2476,6 +3440,7 @@
             $("#quick-drop-off").css("background-color", "rgb(0, 43, 96)");
             $(".frontpage").css("background-color", "rgb(152 147 147)");
         });
-        */
-    });
+    });*/
+    
+    
 </script>

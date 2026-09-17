@@ -1,5 +1,1075 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+
+
 @{
 	Layout = null;
+	
+	    var baseUrl = "https://api.stg.africanbank.net";
+ 
 }
+<link rel="stylesheet" href="/css/projectmagic.css" />
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+ <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">   
+    <style>
+        body-section {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            
+        }
+        
+        .btn:hover {
+            background-color: #5dc300 !important;
+        }
+        
+        .navbar>.container, .navbar>.container-fluid, .navbar>.container-lg, .navbar>.container-md, .navbar>.container-sm, .navbar>.container-xl, .navbar>.container-xxl {
+    margin-top: 20px;
+    margin-bottom: 40px;
+}
+
+        /*.container {*/
+        /*    max-width: 900px;*/
+        /*    margin: 0 auto;*/
+        /*}*/
+
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 50px;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            
+        }
+
+        .form-content {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .form-section {
+            flex: 1;
+            min-width: 350px;
+        }
+
+        .documents-section {
+            flex: 1;
+            min-width: 350px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            color: #555;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+            color: #333;
+        }
+
+        input[type="text"]::placeholder,
+        input[type="email"]::placeholder {
+            color: #aaa;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            margin-top: 10px;
+            cursor: pointer;
+            user-select: none;
+            color: #555;
+        }
+        
+        .radio-group input[type="radio"] {
+            width: auto;
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        .mandatory-docs h4 {
+            font-size: 16px;
+            color: #007bff;
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .mandatory-docs ul {
+            padding-left: 20px;
+            margin: 0;
+            list-style-type: disc;
+        }
+
+        .mandatory-docs li {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .file-upload-box {
+            border: 2px dashed #ccc;
+            background-color: #f9f9f9;
+            padding: 40px 20px;
+            text-align: center;
+            color: #999;
+            margin-top: 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+
+        .file-upload-box:hover, .file-upload-box.drag-over {
+            border-color: #007bff;
+            background-color: #f0f7ff;
+        }
+
+        .file-upload-box .icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .file-upload-text {
+            font-size: 16px;
+        }
+
+        .file-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .file-input-label {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .browse-btn {
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        
+        .browse-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .error-text {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .input.error {
+            border-color: red !important;
+        }
+
+        .file-upload-text-container {
+            position: relative;
+        }
+
+        .file-upload-text-container .close-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 20px;
+            color: #999;
+            cursor: pointer;
+        }
+        
+        .footer-spacer {
+            display:none;
+        }
+        
+        @@media (max-width: 560px) {
+            .radio-group input[type="radio"] {
+                height: 30px;
+                width: 30px;
+                margin-right: 10px;
+                transform: scale(1.2);
+            }
+            .mY-footer {
+                position: fixed;
+                bottom: 0;
+                width: 100%;
+                z-index: 1000;
+            }
+            
+            .footer-spacer {
+                display:block;
+                height: 150px; /* Adjust this value to match your footer height */
+            }
+        }
+    </style>
+    <style>
+
+      /* Add this to your existing CSS */
+      .mY-footer {
+        background-color: #00285a;
+        color: white;
+        padding: 1rem 0;
+
+        width: 100%;
+      }
+
+      .mY-footer .container {
+        display: grid;
+        grid-template-columns: 20% 60% 20%;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .mY-footer .navbar-brand {
+        display: flex;
+        
+      }
+      
+      .navbar>.container, 
+      .navbar>.container-fluid, 
+      .navbar>.container-lg, 
+      .navbar>.container-md, 
+      .navbar>.container-sm, 
+      .navbar>.container-xl, 
+      .navbar>.container-xxl {
+          
+        margin-bottom: 40px;
+          
+      }
+
+      .mY-footer .navbar-brand img {
+        height: 40px;
+        width: auto;
+      }
+
+      .mY-footer .footer-text {
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .mY-footer .footer-text a {
+        color: white;
+        text-decoration: none;
+      }
+
+      .mY-footer .footer-text a:hover {
+        text-decoration: underline;
+      }
+
+      .mY-footer .flex-container {
+        display: flex;
+        flex-direction: row; /* Ensure elements are inline */
+        align-items: center; /* Center items vertically */
+        justify-content: center; /* Center items horizontally */
+      }
+
+
+
+      /* Responsive styles */
+      @@media (max-width:500px){
+        .form-section {
+            flex: 0 0 auto;
+            min-width: 350px;
+        }
+        
+        .navbar>.container, .navbar>.container-fluid, .navbar>.container-lg, .navbar>.container-md, .navbar>.container-sm, .navbar>.container-xl, .navbar>.container-xxl {
+            margin: 40px 5px;
+        }
+        
+        h2 ,
+        .mandatory-docs h4 ,
+        .mandatory-docs li ,
+        
+        {
+            font-size: 50px;
+        }
+        
+        
+        h2 ,
+        .subtitle ,
+        label ,
+        .mandatory-docs h4 ,
+        .mandatory-docs li ,
+        .file-upload-text ,
+        .file-input-label
+        {
+            font-size: 30px;
+        }
+        
+        
+        .radio-group label , 
+        input[type="text"], input[type="email"], select {
+
+            font-size: 40px;
+            
+        }
+   
+      
+      
+      }
+      
+      @@media (max-width: 992px) {
+        .mY-footer .container {
+          line-height: 1.5;
+          grid-template-columns: 100%;
+        }
+
+        .mY-footer {
+          position: fixed;
+          bottom: 0;
+        }
+
+       
+      }
+
+
+    </style>
+
+<nav class="navbar navbar-default">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="~/en/home/">
+            <svg
+              id="Layer"
+              class="svg"
+              height="40px"
+              data-name="Layer"
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              viewBox="0 0 396.81 127.43"
+            >
+              <defs>
+                <style>
+                  .cls-1 {
+                    fill: url(#linear-gradient);
+                  }
+
+                  .cls-1,
+                  .cls-2,
+                  .cls-3,
+                  .cls-4 {
+                    stroke-width: 0px;
+                  }
+
+                  .cls-2 {
+                    fill: #00285a;
+                  }
+
+                  .cls-3 {
+                    fill: url(#linear-gradient-2);
+                  }
+
+                  .cls-4 {
+                    fill: url(#linear-gradient-3);
+                  }
+                </style>
+                <linearGradient
+                  id="linear-gradient"
+                  x1="-3003.03"
+                  y1="2372.22"
+                  x2="-2944.19"
+                  y2="2286.57"
+                  gradientTransform="translate(554.55 -3686.67) rotate(-45)"
+                  gradientUnits="userSpaceOnUse"
+                >
+                  <stop offset="0" stop-color="#84d3ec" />
+                  <stop offset=".75" stop-color="#00a6d5" />
+                  <stop offset=".8" stop-color="#019fd0" />
+                  <stop offset=".88" stop-color="#038bc5" />
+                  <stop offset=".96" stop-color="#086cb2" />
+                  <stop offset="1" stop-color="#0b5ca9" />
+                </linearGradient>
+                <linearGradient
+                  id="linear-gradient-2"
+                  x1="-3063.26"
+                  y1="2262.81"
+                  x2="-2935.17"
+                  y2="2262.81"
+                  gradientTransform="translate(554.55 -3686.67) rotate(-45)"
+                  gradientUnits="userSpaceOnUse"
+                >
+                  <stop offset=".1" stop-color="#1e582c" />
+                  <stop offset=".18" stop-color="#357934" />
+                  <stop offset=".26" stop-color="#48963c" />
+                  <stop offset=".34" stop-color="#56ab41" />
+                  <stop offset=".42" stop-color="#5fb744" />
+                  <stop offset=".5" stop-color="#62bc46" />
+                  <stop offset=".75" stop-color="#c4d92f" />
+                  <stop offset=".83" stop-color="#a8d035" />
+                  <stop offset="1" stop-color="#63bc45" />
+                  <stop offset="1" stop-color="#62bc46" />
+                </linearGradient>
+                <linearGradient
+                  id="linear-gradient-3"
+                  x1="-3019.54"
+                  y1="2354.65"
+                  x2="-3054.6"
+                  y2="2287.56"
+                  gradientTransform="translate(554.55 -3686.67) rotate(-45)"
+                  gradientUnits="userSpaceOnUse"
+                >
+                  <stop offset="0" stop-color="#1d2f5e" />
+                  <stop offset=".36" stop-color="#0b5ca9" />
+                  <stop offset=".5" stop-color="#1864af" />
+                  <stop offset=".68" stop-color="#2069b3" />
+                  <stop offset="1" stop-color="#236bb5" />
+                  <stop offset="1" stop-color="#fff" />
+                </linearGradient>
+              </defs>
+              <g id="Layer" data-name="Layer">
+                <g>
+                  <g>
+                    <path
+                      class="cls-1"
+                      d="m88.65,88.65c0,.84-.03,1.67-.05,2.5-.23,9.21-3.86,18.35-10.89,25.37l38.82-38.82c14.54-14.54,14.54-38.11,0-52.65-5.03-5.03-11.13-8.31-17.57-9.87-8.62-2.08-17.84-1.04-25.86,3.11l-2.91,1.59c12.57,21.1,18.73,44.95,18.46,68.75Z"
+                    />
+                    <path
+                      class="cls-3"
+                      d="m15.19,98.96c-2.08-8.62-1.04-17.84,3.12-25.86,0,0,1.05-1.95,1.59-2.91,5.76-10.24,12.99-19.87,21.71-28.58,8.71-8.71,18.35-15.95,28.58-21.71.97-.54,2.91-1.59,2.91-1.59,8.02-4.15,17.24-5.19,25.86-3.11L47.83,1.53c-12.66-3.75-26.93-.62-36.92,9.37C1.03,20.78-2.14,34.83,1.4,47.38l13.78,51.58Z"
+                    />
+                    <path
+                      class="cls-4"
+                      d="m15.19,98.96c-2.08-8.62-1.04-17.84,3.12-25.86,0,0,1.05-1.95,1.59-2.91,21.1,12.57,44.95,18.73,68.75,18.46,0,0-.03,1.67-.05,2.5-.23,9.21-3.86,18.35-10.89,25.37-14.54,14.54-38.11,14.54-52.65,0-5.03-5.03-8.31-11.13-9.87-17.57Z"
+                    />
+                  </g>
+                  <path
+                    class="cls-2"
+                    d="m236.91,75.77v-19.09c0-4.97-4.04-9-9-9s-9,4.04-9,9v19.09h-7.69v-19.09c0-9.21,7.49-16.7,16.7-16.7s16.7,7.49,16.7,16.7v19.09h-7.69Zm-163.5-26.93c-1.57-2.7-3.71-4.87-6.38-6.44-1.59-.93-3.31-1.59-5.15-1.97h0s0,0,0,0c-7.87-1.59-13.12,3-13.59,7.89,2.97-1.29,11.22-2.64,15.46.6h0s0,0,0,0c1.27.9,2.3,2.07,3.07,3.49.88,1.63,1.33,3.52,1.33,5.61s-.45,3.92-1.33,5.55c-.88,1.63-2.1,2.93-3.63,3.86-1.52.93-3.28,1.4-5.24,1.4s-3.67-.47-5.21-1.41c-1.27-.77-2.34-1.79-3.17-3.03h0s0,0,0,0c-3.69-5.39-2.57-12.29-1.28-16.09-6.9,1.26-9.29,8.82-7.53,15.03h0c.36,1.34.85,2.62,1.49,3.81,1.44,2.69,3.44,4.85,5.94,6.42,2.51,1.58,5.38,2.38,8.52,2.38s6.02-.8,8.52-2.38c.96-.61,1.85-1.3,2.66-2.08v4.27h7.86v-18.25h0c-.08-3.19-.87-6.1-2.36-8.68Zm23.53-23.04c-2.67.08-5.07.72-7.15,1.92-2.22,1.29-3.98,3.11-5.22,5.41-1.23,2.29-1.86,5.02-1.86,8.11v.28h-5.58v6.87h5.58v27.38h7.86v-27.38h9.23v-6.87h-9.23v-.9c0-1.56.29-2.92.87-4.05.57-1.1,1.38-1.98,2.41-2.61,1.03-.62,2.25-.94,3.63-.94,0,0,0,0,.01,0h3.92v-7.24h-4.48v.02Zm107.02,23.04c1.57,2.71,2.37,5.8,2.37,9.18v17.74h-7.86v-4.27c-.81.78-1.7,1.47-2.66,2.08-2.51,1.58-5.38,2.38-8.52,2.38s-6.02-.8-8.52-2.38c-2.5-1.57-4.5-3.73-5.94-6.42-1.44-2.68-2.17-5.75-2.17-9.13s.8-6.48,2.36-9.18c1.57-2.7,3.72-4.87,6.41-6.44,2.69-1.57,5.75-2.37,9.09-2.37s6.39.8,9.06,2.37c2.66,1.57,4.81,3.74,6.38,6.44Zm-5.24,9.18c0-2.09-.45-3.98-1.33-5.61-.88-1.63-2.1-2.92-3.63-3.86-1.52-.93-3.28-1.4-5.24-1.4s-3.66.47-5.21,1.41c-1.55.94-2.79,2.24-3.69,3.86-.9,1.63-1.36,3.52-1.36,5.61s.46,3.91,1.36,5.54c.9,1.63,2.14,2.93,3.69,3.86,1.54.93,3.3,1.41,5.21,1.41s3.71-.47,5.24-1.4c1.53-.94,2.75-2.23,3.63-3.86.88-1.63,1.33-3.5,1.33-5.55Zm175.13,2.45l13.12,15.3h9.84l-16.66-19.43,16.05-16.05h-10.55l-11.79,11.79v-23.73h-7.86v47.42h7.86v-15.3ZM116.78,40.3c-2.67.08-5.07.72-7.15,1.92-2.22,1.29-3.98,3.11-5.22,5.41-1.23,2.29-1.86,5.02-1.86,8.11v20.03h7.86v-20.65c0-1.56.29-2.92.87-4.05.57-1.1,1.38-1.98,2.41-2.61,1.03-.62,2.25-.94,3.63-.94,0,0,0,0,.01,0h3.92v-7.24h-4.48v.02Zm46.63,25.32c-.65.72-1.4,1.34-2.23,1.84-1.52.91-3.31,1.38-5.3,1.38s-3.78-.46-5.3-1.38c-1.53-.92-2.75-2.19-3.62-3.8-.88-1.61-1.33-3.51-1.33-5.64s.45-4.04,1.33-5.67c.88-1.62,2.1-2.91,3.62-3.83,1.52-.91,3.31-1.38,5.3-1.38s3.78.46,5.3,1.38c.83.5,1.58,1.12,2.22,1.85l.54.61,5.3-5.3-.54-.54c-1.07-1.09-2.3-2.03-3.65-2.81-2.67-1.53-5.76-2.3-9.18-2.3s-6.57.77-9.24,2.3c-2.67,1.53-4.8,3.67-6.33,6.36-1.53,2.69-2.3,5.83-2.3,9.33s.77,6.58,2.3,9.27c1.53,2.69,3.66,4.83,6.33,6.36,2.67,1.53,5.77,2.3,9.24,2.3s6.57-.77,9.24-2.3c1.34-.77,2.56-1.7,3.62-2.78l.54-.54-5.32-5.32-.54.61Zm-33.7-39.83c-1.32,0-2.47.48-3.42,1.43-.95.95-1.43,2.1-1.43,3.42s.48,2.47,1.43,3.42c.95.95,2.1,1.43,3.42,1.43s2.47-.48,3.42-1.43c.95-.95,1.43-2.1,1.43-3.42s-.48-2.47-1.43-3.42c-.95-.95-2.1-1.43-3.42-1.43Zm-3.93,18.42s0,0,0,0v27.57s0,0,0,0v3.99h7.86v-7.86h0v-19.77h0v-7.86h-7.86v3.92Zm210,12.47c0-4.97,4.04-9,9-9s9,4.04,9,9v19.09h7.69v-19.09c0-9.21-7.49-16.7-16.7-16.7s-16.7,7.49-16.7,16.7v19.09h7.69v-19.09Zm-59.12,11.06c-2.97,1.29-11.22,2.64-15.46-.6h0c-1.27-.9-2.3-2.07-3.07-3.49-.88-1.63-1.33-3.52-1.33-5.61s.45-3.92,1.33-5.55c.88-1.63,2.1-2.93,3.63-3.86,1.52-.93,3.28-1.4,5.24-1.4s3.67.47,5.21,1.41c1.27.77,2.34,1.79,3.17,3.03h0s0,0,0,0c3.69,5.39,2.57,12.29,1.28,16.09,6.9-1.26,9.29-8.82,7.53-15.03h0c-.36-1.34-.85-2.62-1.49-3.81-1.44-2.69-3.44-4.85-5.94-6.42-2.51-1.58-5.38-2.38-8.52-2.38s-6.02.8-8.52,2.38c-.96.61-1.85,1.3-2.66,2.08v-16.21h-7.86v30.19h0c.08,3.19.87,6.1,2.36,8.68,1.57,2.7,3.71,4.87,6.38,6.44,1.59.93,3.31,1.59,5.14,1.97h0c7.87,1.6,13.12-2.99,13.59-7.88Zm44.55-18.9c1.57,2.71,2.37,5.8,2.37,9.18v17.74h-7.86v-4.27c-.81.78-1.7,1.47-2.66,2.08-2.51,1.58-5.38,2.38-8.52,2.38s-6.02-.8-8.52-2.38c-2.5-1.57-4.5-3.73-5.94-6.42-1.44-2.68-2.17-5.75-2.17-9.13s.8-6.48,2.36-9.18c1.57-2.7,3.72-4.87,6.41-6.44,2.69-1.57,5.75-2.37,9.09-2.37s6.39.8,9.06,2.37c2.66,1.57,4.81,3.74,6.38,6.44Zm-5.24,9.18c0-2.09-.45-3.98-1.33-5.61-.88-1.63-2.1-2.92-3.63-3.86-1.52-.93-3.28-1.4-5.24-1.4s-3.66.47-5.21,1.41c-1.55.94-2.79,2.24-3.69,3.86-.9,1.63-1.36,3.52-1.36,5.61s.46,3.91,1.36,5.54c.9,1.63,2.14,2.93,3.69,3.86,1.54.93,3.3,1.41,5.21,1.41s3.71-.47,5.24-1.4c1.53-.94,2.75-2.23,3.63-3.86.88-1.63,1.33-3.5,1.33-5.55Z"
+                  />
+                </g>
+              </g>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </nav>
+
+
+
+<body-section>
+  <div class="container">
+    <div class="card">
+      <h2>Document Upload</h2>
+      <div class="subtitle">
+        Please fill in the below and upload required documents
+      </div>
+
+      <div class="form-content row">
+        <div class="form-section col-12 col-lg-6">
+          <label for="idNumber">ID Number</label>
+          <input type="text" id="idNumber" placeholder="e.g 8511335041094" />
+          <span id="idNumber-error" class="error-text"
+            >Please enter a valid ID number (13 digits).</span
+          >
+
+          <label for="mobileNumber">Mobile Number</label>
+          <input type="text" id="mobileNumber" placeholder="e.g 082 123 4567" />
+          <span id="mobileNumber-error" class="error-text"
+            >Please enter a valid mobile number (10 digits).</span
+          >
+
+          <label for="passportNumber">Passport Number</label>
+          <input type="text" id="passportNumber" placeholder="e.g AB012345" />
+
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="e.g john@email.com" />
+          <span id="email-error" class="error-text"
+            >Please enter a valid email address.</span
+          >
+
+          <div class="form-group creditLifeDropDownList">
+            <label for="CreditLifeClaimId">Credit Life Claim Conditions</label>
+            <select
+              class="form-control"
+              id="CreditLifeClaimId"
+              name="CreditLifeClaimId"
+            >
+              <option selected="selected" value="0">
+                -- SELECT VALUE --
+              </option>
+              <option value="1">Retrenchment Instalment Claim</option>
+              <option value="10">Retrenchment Re-employment Claim</option>
+              <option value="2">Death</option>
+              <option value="3">Compulsory Unpaid Leave</option>
+              <option value="4">Lay Off</option>
+              <option value="5">Short Time</option>
+              <option value="6">Loss of Income</option>
+              <option value="7">Retrenchment Balance Claim</option>
+              <option value="8">Temporary Disability</option>
+              <option value="9">Permanent Disablity</option>
+            </select>
+          </div>
+
+          <div
+            class="form-group funeralClaimsDropDownList"
+            style="display: none"
+          >
+            <label for="FuneralClaimId">Funeral Claims</label>
+            <select
+              class="form-control"
+              id="FuneralClaimId"
+              name="FuneralClaimId"
+            >
+              <option selected="selected" value="0">
+                -- SELECT VALUE --
+              </option>
+              <option value="1">Main Member Claim</option>
+              <option value="2">Adult Member Claim</option>
+              <option value="3">Child Member Claim</option>
+            </select>
+          </div>
+
+          <div
+            class="form-group deceasedEstateDropDownList"
+            style="display: none"
+          >
+            <label for="DeceasedEstateId">Deceased Estate</label>
+            <select
+              class="form-control"
+              id="DeceasedEstateId"
+              name="DeceasedEstateId"
+            >
+              <option selected="selected" value="0">
+                -- SELECT VALUE --
+              </option>
+              <option value="3">Deceased Estates Claims</option>
+            </select>
+          </div>
+
+          <div
+            class="form-group thirdPartyRequestDropDownList"
+            style="display: none"
+          >
+            <label for="ThirdPartyRequestId">Third Party Request</label>
+            <select
+              class="form-control"
+              id="ThirdPartyRequestId"
+              name="ThirdPartyRequestId"
+            >
+              <option selected="selected" value="0">
+                -- SELECT VALUE --
+              </option>
+              <option value="3">Third Party Request Claims</option>
+            </select>
+          </div>
+
+          <div style="margin-top: 25px">
+            <label>Application Type</label>
+            <div class="radio-group">
+              <label
+                ><input
+                  type="radio"
+                  name="appType"
+                  value="creditLife"
+                  checked
+                />
+                Credit Life Claims</label
+              >
+              <label
+                ><input type="radio" name="appType" value="funeral" /> Funeral
+                Claims</label
+              >
+              <label
+                ><input type="radio" name="appType" value="estate" /> Deceased
+                Estate</label
+              >
+              <label
+                ><input type="radio" name="appType" value="thirdParty" /> Third
+                Party Request</label
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="documents-section col-12 col-lg-6">
+          <div class="mandatory-docs">
+            <h4>Mandatory Documents Required</h4>
+            <ul id="documentList">
+              <li>
+                Please select a claim condition to see the required documents.
+              </li>
+            </ul>
+          </div>
+
+          <div class="file-upload-box">
+            <div class="file-upload-text-container">
+              <span class="close-btn">&times;</span>
+              <div class="file-upload-text">Drag & drop files here …</div>
+            </div>
+          </div>
+
+          <div class="file-actions">
+            <div class="file-input-label">Please upload your files</div>
+            <label for="fileUpload" class="browse-btn">Browse ...</label>
+            <input type="file" id="fileUpload" multiple style="display: none" />
+          </div>
+        </div>
+      </div>
+      
+      <div class="combo-btn">
+        <div class="mt-50 text-start column1">
+            <p class="combo-btn-text primary file-button"><a href="https://www.africanbank.co.za/en/home/get-a-quote?utm_source=Website&amp;utm_medium=Productpage&amp;utm_campaign=WebLead" class="btn  btn-brand-1 hover-up" id="submitBtn">Submit</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="container">
+    <div class="col-12 mt-4">
+      <div class="card shadow-sm">
+        <div class="card-body text-center text-lg-start">
+          <h4 class="card-title mb-3">Need Help?</h4>
+          <hr class="mt-0 mb-3" />
+          <h5 class="mb-2">Call Us</h5>
+          <a
+            href="tel:+27861123456"
+            class="fw-bold text-decoration-none d-block fs-5 mb-3"
+          >
+            0861 123 456
+          </a>
+          <p class="text-muted small mb-0">
+            Monday to Friday: 8am – 5pm <br />
+            Saturday: 9am – 1pm
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</body-section>
+
+<footer class="mY-footer mt-auto py-3">
+  <div class="container">
+    <div>
+      <a class="navbar-brand" href="~/en/home/">
+        <img
+          src="https://publishing.v5.stg.africanbankdmz.net/media/h50duhhg/asset-5.svg"
+          height="40px"
+          alt="Brand Logo"
+        />
+      </a>
+    </div>
+    <div class="footer-text">
+      Copyright 2024 African Bank. An authorised financial services and
+      registered credit provider Reg No. 2014/176899/06 (NCRCP7638)
+    </div>
+    <div class="footer-text" style="margin-top: -5px">
+      <a
+        href="/doc/TermsAndConditions.PDF"
+        class="text-white"
+        target="_blank"
+      >
+        <div class="flex-container">
+          <p class="text-white">Terms</p>
+          <p class="text-white">&amp; Conditions</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</footer>
+<div class="footer-spacer"></div>
+
+
+<script>
+  $(document).ready(function () {
+    const mandatoryDocuments = {
+      creditLife: {
+        "Retrenchment Instalment Claim": [
+          "Completed Claim Form Section A",
+          "Completed Claim Form Section C",
+          "Letter from Employer confirming retrenchment",
+        ],
+        "Retrenchment Re-employment Claim": [
+          "Completed Claim Form Section A",
+          "Completed Claim Form Section C",
+          "Letter from new Employer confirming re-employment",
+        ],
+        Death: [
+          "Completed Claim Form Section A",
+          "Certified copy of Death Certificate",
+          "Certified copy of deceased's ID document",
+          "Letter of Executorship",
+        ],
+        "Compulsory Unpaid Leave": [
+          "Completed Claim Form Section A",
+          "Completed Claim Form Section C",
+          "Letter from Employer confirming unpaid leave",
+        ],
+        "Lay Off": [
+          "Completed Claim Form Section A",
+          "Completed Claim Form Section C",
+          "Letter from Employer confirming lay off",
+        ],
+        "Short Time": [
+          "Completed Claim Form Section A",
+          "Completed Claim Form Section C",
+          "Letter from Employer confirming short time",
+        ],
+        "Loss of Income": [
+          "Completed Claim Form Section A",
+          "Completed Claim Form Section C",
+          "Letter from Employer",
+          "Pay Slip Prior to Event",
+          "Pay Slip/s During Event",
+          "Latest Bank Statements Reflecting the Latest Salary Deposit",
+        ],
+        "Retrenchment Balance Claim": [
+          "Completed Claim Form Section A",
+          "Completed Claim Form Section C",
+          "Letter from Employer confirming retrenchment and final balance",
+        ],
+        "Temporary Disability": [
+          "Completed Claim Form Section A",
+          "Completed Claim Form Section B (Medical)",
+          "Detailed Medical Report from Doctor/Specialist",
+          "Latest Bank Statements Reflecting the Latest Salary Deposit",
+          "Copy of ID document",
+        ],
+        "Permanent Disablity": [
+          "Completed Claim Form Section A",
+          "Completed Claim Form Section B (Medical)",
+          "Detailed Medical Report from Doctor/Specialist",
+          "Latest Bank Statements Reflecting the Latest Salary Deposit",
+          "Copy of ID document",
+        ],
+      },
+      funeral: {
+        "Main Member Claim": [
+          "Completed Claim Form",
+          "Certified copy of Death Certificate",
+          "Certified copy of the Deceased's ID document",
+          "Certified copy of the Claimant's ID document",
+          "Proof of residence of claimant",
+        ],
+        "Adult Member Claim": [
+          "Completed Claim Form",
+          "Certified copy of Death Certificate",
+          "Certified copy of the Deceased's ID document",
+          "Certified copy of the Claimant's ID document",
+          "Proof of relationship to the Deceased (e.g., marriage or birth certificate)",
+        ],
+        "Child Member Claim": [
+          "Completed Claim Form",
+          "Certified copy of Death Certificate",
+          "Certified copy of the Deceased's ID document",
+          "Certified copy of the Claimant's ID document",
+          "Certified copy of the child's birth certificate",
+        ],
+      },
+      estate: {
+        "Deceased Estates Claims": [
+          "Completed Deceased Estate Form",
+          "Certified copy of Death Certificate",
+          "Certified copy of Letter of Executorship",
+          "Certified copy of ID document of the Deceased",
+          "Certified copy of Executor's ID document",
+          "Copy of the last will and testament (if applicable)",
+        ],
+      },
+      thirdParty: {
+        "Third Party Request Claims": [
+          "Completed Third Party Request Form",
+          "Certified copy of ID document of the person making the request",
+          "Certified copy of ID document of the policyholder",
+          "Letter of Authorization from the policyholder",
+          "Proof of residence of the person making the request",
+        ],
+      },
+    };
+
+    const dropdowns = {
+      creditLife: $(".creditLifeDropDownList"),
+      funeral: $(".funeralClaimsDropDownList"),
+      estate: $(".deceasedEstateDropDownList"),
+      thirdParty: $(".thirdPartyRequestDropDownList"),
+    };
+
+    function updateDocumentList(appType, claimName) {
+      const listItems = mandatoryDocuments[appType][claimName];
+      $("#documentList").empty();
+      if (listItems) {
+        listItems.forEach((item) => {
+          $("#documentList").append(`<li>${item}</li>`);
+        });
+      } else {
+        $("#documentList").append(
+          "<li>Please select a claim condition to see the required documents.</li>"
+        );
+      }
+      $(".mandatory-docs h4").text(`Mandatory Documents Required For ${claimName}`);
+    }
+
+    function handleApplicationChange() {
+      const selectedAppType = $("input[name='appType']:checked").val();
+      $(".form-group").hide();
+      if (dropdowns[selectedAppType]) {
+        dropdowns[selectedAppType].show();
+        const selectedClaimName = dropdowns[selectedAppType]
+          .find("select option:selected")
+          .text()
+          .trim();
+        const selectedValue = dropdowns[selectedAppType]
+          .find("select option:selected")
+          .val();
+        if (selectedValue !== "0") {
+          updateDocumentList(selectedAppType, selectedClaimName);
+        } else {
+          $("#documentList").empty();
+          $("#documentList").append(
+            "<li>Please select a claim condition to see the required documents.</li>"
+          );
+          $(".mandatory-docs h4").text("Mandatory Documents Required");
+        }
+      }
+    }
+
+    $("input[name='appType']").on("change", handleApplicationChange);
+
+    $("#CreditLifeClaimId, #FuneralClaimId, #DeceasedEstateId, #ThirdPartyRequestId").on(
+      "change",
+      function () {
+        const selectedAppType = $("input[name='appType']:checked").val();
+        const selectedClaimName = $(this).find("option:selected").text().trim();
+        const selectedValue = $(this).val();
+        if (selectedValue !== "0") {
+          updateDocumentList(selectedAppType, selectedClaimName);
+        } else {
+          $("#documentList").empty();
+          $("#documentList").append(
+            "<li>Please select a claim condition to see the required documents.</li>"
+          );
+          $(".mandatory-docs h4").text("Mandatory Documents Required");
+        }
+      }
+    );
+
+    handleApplicationChange();
+
+    // ✅ Email regex
+    const emailRegex = /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i;
+function validateInput(input, regex, errorId, errorMessage) {
+  const value = input.val().trim();
+  const errorSpan = $(`#${errorId}`);
+
+  // Check for empty input first
+  if (value === '') {
+    input.addClass('error');
+    errorSpan.text('This field is required.').show();
+    return false;
+  }
+
+  // Check regex pattern
+  if (regex.test(value)) {
+    input.removeClass('error');
+    errorSpan.hide();
+    return true;
+  } else {
+    input.addClass('error');
+    errorSpan.text(errorMessage).show();
+    return false;
+  }
+}
+
+
+    $("#idNumber").on("input", function () {
+      validateInput(
+        $(this),
+        /^\d{13}$/,
+        "idNumber-error",
+        "Please enter a valid ID number (13 digits)."
+      );
+    });
+
+    $("#mobileNumber").on("input", function () {
+      validateInput(
+        $(this),
+        /^\d{10}$/,
+        "mobileNumber-error",
+        "Please enter a valid mobile number (10 digits)."
+      );
+    });
+
+    $("#email").on("input", function () {
+      validateInput($(this), emailRegex, "email-error", "Please enter a valid email address.");
+    });
+
+    const fileUploadArea = $(".file-upload-box");
+    const fileInput = $("#fileUpload");
+    let attachments = [];
+
+    function readFileAsBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64Content = reader.result.split(",")[1];
+          resolve({ filename: file.name, content: base64Content });
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    fileUploadArea.on("dragover", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      $(this).addClass("drag-over");
+    });
+
+    fileUploadArea.on("dragleave", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      $(this).removeClass("drag-over");
+    });
+
+    fileUploadArea.on("drop", async function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      $(this).removeClass("drag-over");
+      const files = e.originalEvent.dataTransfer.files;
+      if (files.length > 0) {
+        attachments = [];
+        for (const file of files) {
+          const att = await readFileAsBase64(file);
+          attachments.push(att);
+        }
+        fileUploadArea.find(".file-upload-text").text(`${files.length} file(s) selected.`);
+        fileUploadArea.addClass("has-files");
+        fileUploadArea.find(".close-btn").show();
+      }
+    });
+
+    fileUploadArea.on("click", function (e) {
+      if (!$(e.target).hasClass("close-btn")) {
+        fileInput.click();
+      }
+    });
+
+    fileInput.on("change", async function () {
+      const files = $(this)[0].files;
+      if (files.length > 0) {
+        attachments = [];
+        for (const file of files) {
+          const att = await readFileAsBase64(file);
+          attachments.push(att);
+        }
+        fileUploadArea.find(".file-upload-text").text(`${files.length} file(s) selected.`);
+        fileUploadArea.addClass("has-files");
+        fileUploadArea.find(".close-btn").show();
+      }
+    });
+
+    $(".close-btn").on("click", function (e) {
+      e.stopPropagation();
+      fileInput.val("");
+      attachments = [];
+      fileUploadArea.find(".file-upload-text").text("Drag & drop files here …");
+      fileUploadArea.removeClass("has-files");
+      $(this).hide();
+    });
+
+    $(".close-btn").hide();
+
+    $("#submitBtn").on("click", async function (e) {
+      e.preventDefault();
+
+      const idNumber = $("#idNumber").val().trim();
+      const mobileNumber = $("#mobileNumber").val().trim();
+      const email = $("#email").val().trim();
+      const passportNumber = $("#passportNumber").val().trim();
+
+     if (
+  !validateInput($("#idNumber"), /^\d{13}$/, "idNumber-error", "Please enter a valid ID number (13 digits).")
+) return;
+if (
+  !validateInput($("#mobileNumber"), /^\d{10}$/, "mobileNumber-error", "Please enter a valid mobile number (10 digits).")
+) return;
+      if (!validateInput($("#email"), emailRegex, "email-error", "Please enter a valid email address.")) return;
+      if (attachments.length === 0) {
+        alert("Please upload at least one document.");
+        return;
+      }
+
+      const selectedAppType = $("input[name='appType']:checked").val();
+      let applicationType = "";
+      if (selectedAppType === "creditLife") applicationType = "CreditLifeClaims";
+      if (selectedAppType === "funeral") applicationType = "FuneralClaims";
+      if (selectedAppType === "estate") applicationType = "DeceasedEstateClaims";
+      if (selectedAppType === "thirdParty") applicationType = "ThirdPartyRequestClaims";
+
+      const currentDate = new Date().toISOString().split("T")[0];
+
+
+      const requestData = {
+          applicationType: "FuneralClaims",
+          referenceNumber: "REF12345",
+          idNumber: "123456789",
+          name: "Sipho",
+          surname: "Nkosi",
+          mobileNumber: "+27123456789",
+          email: "smoeng@AfricanBank.co.za",
+          currentDate: "2025-10-08",
+          attachments: [
+            {
+              filename: "id_document.pdf",
+              content: "dGVzdF9iYXNlNjRfY29udGVudF9pZF9kb2N1bWVudA=="
+            },
+            {
+              filename: "proof_of_address.jpg",
+              content: "dGVzdF9iYXNlNjRfY29udGVudF9wcm9vZl9vZl9hZGRyZXNz"
+            }
+          ]
+        };
+
+      try {
+        const response = await $.ajax({
+          url: "https://cxappuat.stg.africanbankdmz.net/businessBanking/personal-banking",
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": "QWRtaW5pc3RyYXRvcjptYW5hZ2U=",
+          },
+          data: JSON.stringify(requestData),
+        });
+        alert("Form submitted successfully!");
+        console.log("API Response:", response);
+      } catch (error) {
+        alert("Error submitting form. Please try again.");
+        console.error(error);
+      }
+    });
+  });
+</script>
+

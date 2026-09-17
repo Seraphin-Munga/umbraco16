@@ -2,36 +2,1002 @@
 @using CustomModels = Web.Models;
 @using ContentModels = Umbraco.Web.PublishedModels;
 @using Web.Helpers
-
 @inherits Umbraco.Web.Mvc.UmbracoViewPage
 @using AcfAfricanbank.Core.Models.Forms
-
-
-
 
 @{
     Layout = "Master.cshtml";
 
-    // All Current Page Children
+   // All Current Page Children
     var Children = Model.Children;
 
     // Get specific Children
-    var heroHeader = Children?.Where(c => c is HeroHeader).FirstOrDefault();
+   var heroHeader = Children?.Where(c => c is HeroHeader).FirstOrDefault();
+    var footer = Children?.Where(c => c is RichTextEditor).FirstOrDefault();
+   
+   var section2 = Children?.Where(c => c is HeroBody).First();
+   
+   var sectionSub = Children?.Where(c => c is HeroBody).Last(); 
+   
+   var section3 = Children?.Where(c => c is HeroChest).FirstOrDefault();
+   
+   var bodyDescription = section2.Value("bodyDescription").ToString();
+   @* var bodyTitle = section2.Value("bodyTitle").ToString();*@
+    var bodyFooter = section2.Value("bodyFooterTitle").ToString();
+   var bodyRichText = section2.Value("richTextBox").ToString();
+   var bodyCards = section2.Children.Where(c => c.ContentType.Alias.ToLower() == "card");
+   var chestCards = section3.Children.Where(c => c.ContentType.Alias.ToLower() == "card");
+    var bodyCardsSub = sectionSub.Children.Where(c => c.ContentType.Alias.ToLower() == "card");
+    var applyDocs = chestCards?.Select(c => c as Card).FirstOrDefault();
+    var navigate = applyDocs.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").FirstOrDefault();
+    
+    
+    var heroBodyTabGroup = section2.Children?.Where(c => c.ContentType.Alias.ToLower() == "tabgroup").FirstOrDefault();
+ 
+    var videoItem = section2.Children.Where(c => c.ContentType.Alias.ToLower() == "tabbody").FirstOrDefault();
+    
+    
 
-    // var section1 = Children?.Where(c => c is HeroBody).FirstOrDefault();
-
-    // var headerGroup = heroHeader.Children(x => x.ContentType.Alias.ToLower() == "heroHeader").FirstOrDefault();
-    //(HeroHeader)Children?.Where(c => c.ContentType.Alias.ToLower() == "modernHeader").FirstOrDefault();
-    // var heroTitle = headerGroup?.Value("headerTitle").ToString();
-    //  var heroHeaderTitle = headerGroup?.Value("subHeaderTitle");
-
-
+  @*  var content = videoItem.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+    var tabs = content.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");*@
+    
+     var noCampcontent = videoItem.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+        var noCampvideos = noCampcontent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+        var noCampx = 1;
+        
+      var tabs = section2?.Children.Where(c => c.ContentType.Alias.ToLower() == "tabbody").FirstOrDefault();
+      ContentModels.TabBody createOwnWorldOfBanking = null;
+      var partialName = tabs.Value("PartialViewName");
+      createOwnWorldOfBanking = (TabBody)tabs;
+  		
+    var benefitsModel = new CustomModels.Benefits
+    {
+      @*  Header = bodyTitle,
+        Description = bodyDescription, *@
+        BenefitCards = bodyCards.Select(c => c as Card).ToList()
+    };
+    
+    var benefitsModel1 = new CustomModels.Benefits
+    {
+      @*  Header = bodyTitle,
+        Description = bodyDescription, *@
+        BenefitCards = chestCards.Select(c => c as Card).ToList()
+    };
+    var benefitsModel2 = new CustomModels.Benefits
+    {
+      @*  Header = bodyTitle,
+        Description = bodyDescription,*@
+        BenefitCards = bodyCardsSub.Select(c => c as Card).ToList() 
+    };
+     
 }
 <style>
+
+:root {
+    --color-dark: #000000;
+    --color-primary: #5DC300;
+    --font-color: #DDDDDD;
+    --font-light: #EEEEEE;
+    --font-paragraph-dark:#707070;
+    --card-bg: #222222;
+}
+
+/*==================
+SECTION TWO 
+==================== */
+body{
+    overflow-x: hidden;
+}
+
+.header-button {
+    border-radius: 60px !important;
+}
+
+.section-benefits {
+    background: var(--color-dark);
+    background-position: right center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.business-growth {
+    height: 600px;
+    display: flex;
+    flex-direction: column;
+   justify-content: center;
+}
+
+.info-title h1 {
+    font-weight: bold;
+    font-size: 30px;
+    color: var(--font-light);
+}
+
+.info-title h1 span {
+    font-weight: 100;
+}
+
+.info-sub p{
+    font-weight: bold;
+    color: var(--font-light);
+    line-height: 1.8;
+}
+
+.card-benefits {
+    display: flex;
+    flex-wrap: wrap;
+    width: 550px;
+    justify-content: space-between;
+}
+
+.benefits {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+}
+
+.image-wrapper {
+    width: 50px;
+    height: 50px;
+    border: 3px solid var(--color-primary);
+    border-radius: 50%;
+}
+
+.image-title {
+    margin-left: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--font-light);
+}
+
+.info-deck {
+    width: 560px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+    
+    footer {
+        background-color: #000
+    }
+    
+    footer .footer-social {
+    background-color: transparent;
+    border: 2px solid #3D3D3D;
+    color: #f9f9f9;
+   }
+   
+    .pattern{
+        display:none;
+    }
+    
+    footer .footer-copyright {
+        border-top: transparent;
+    }
+    
+    section{
+       background-color: #1A1A1A; 
+       width:100%;
+    }
+   
+    .sub-footer{
+       background: #111111;
+       padding-bottom: 2%;
+       padding-top: 2%;
+       font-size: 15px;
+       font-weight: bold;
+       color: #DDDDDD;
+    }
+    
+/*==================
+SECTION THREE 
+==================== */
+.business-banking {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 500px;
+}
+
+.info-deck-1 {
+    width: 550px;
+    margin: 0px auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.info-banking {
+    color: var(--font-paragraph-dark)!important;
+    width: 70%;
+    margin: 0px auto;
+}
+
+.banking-card {
+    height: 750px;
+    transform: translateY(-13%);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.banking-info {
+    display: flex;
+    height: 550px;
+}
+
+.audacity-btn {
+    margin-top: -100px;
+}
+
+
+.audacity-apply-btn{
+    background:#3BBCE2!important;
+    font-weight: bold;
+    padding: 18px 70px;
+}
+
+/*
+Accordion style start here
+*/
+.accordion {
+  font-weight: bold; /* Explicitly setting font-weight */
+  font-family: Montserrat, sans-serif; /* Specifying the font family */
+  background-color: #222222;
+  color: #9b9b9b;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  text-align: left;
+  font-size: 15px;
+  transition: 0.4s;
+  border-radius: 50px;
+  border: none;
+  margin-bottom: 10px; /* Space between inactive accordion buttons */
+  position: relative; /* Needed for absolute positioning of the arrow */
+}
+
+.accordion::after {
+  content: '\276F'; /* Heavy Chevron Unicode character */
+  font-size: 15px; /* Adjust as needed */
+  color: #F9F9F9;
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.4s;
+}
+
+.active, .accordion:hover {
+  background-color: #222222;
+}
+
+.active {
+  color: #F9F9F9;
+  border-radius: 30px 30px 0 0; /* Rounded corners on the top when active */
+  margin-bottom: 0; /* Remove space between button and panel for active accordion */
+}
+
+.active::after {
+  transform: translateY(-50%) rotate(90deg);
+}
+
+.panel {
+  font-family: Montserrat, sans-serif; /* Specifying the font family */
+  padding:  18px 18px 25px 18px;
+  background-color: #222222;
+  color : #F9F9F9;
+  display: none;
+  overflow: hidden;
+  border-radius: 0 0 30px 30px;; /* Round the bottom corners */
+  border-top: none; /* Remove the border top to make it seamless with the button */
+  margin-top: -1px; /* This ensures that the panel sits flush with the button */
+  box-shadow: inset 0 3px 6px #222222; /* Optional: inner shadow to mimic the button's inset */
+}
+
+  .faqHeader {
+    font: normal normal bold 42px/52px Montserrat;
+    letter-spacing: 0px;
+    color: #F9F9F9;
+    opacity: 1;
+    text-align: center; /* This centers the text within the h4 */
+    margin: 0 auto; /* This ensures that the margin is auto on both sides for block-level centering */
+    padding: 20px 0; /* Adds some padding above and below the text */
+  }
+/*
+Accordion style end here
+*/
+
+/*==================
+MEDIA QUARRIES
+==================== */
+@@media(min-width: 1024px){
+
+.section-benefits {
+    background: var(--color-dark);
+    background-position: right center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 70vh;
+    }
+.business-growth {
+    height: 550px;
+}
+
+.banking-info {
+    height: 550px;
+    }
+    
+.info-title h1 {
+    font-size: 25px;
+    }
+
+.business-banking {
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.info-sub p {
+    font-size: 13px;
+    }
+
+.banking-card {
+    transform: translateY(-13%);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    }
+
+}
+
+
+@@media(max-width: 912px) and (min-width: 890px){
+.deck {
+    margin-top: 30% ;
+}
+
+.section-benefits {
+    background-size: cover;
+    }
+    
+.banking-card {
+    height: 450px;
+    transform: translateY(0%);
+    }
+
+.business-banking {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    }
+    
+.banking-info {
+    height: 150px;
+    }
+    
+.audacity-btn {
+    margin-top: 100px;
+    }
+}
+
+@@media(max-width: 991px) and (min-width: 551px)  {
+
+.deck {
+    margin-top: 30% ;
+}
+
+    .business-growth {
+    height: 360px;
+    }
+    
+    .banking-card {
+    height: 450px;
+    margin-bottom: -20px;
+    transform: translateY(0);
+    }
+    
+    .section-benefits {
+    background: var(--color-dark);
+    background-position: right bottom;
+    background-repeat: no-repeat;
+    object-fit: contain;
+    background-size: cover;
+    }
+    
+    .banking-info {
+    display: flex;
+    height: 100%;
+    margin-top: -20px;
+    }   
+    
+    .audacity-btn {
+    margin-top: 10%;
+    }
+    
+    .footer-audacity {
+    font-size: 20px!important;
+    }
+}
+
+@@media(max-width: 550px) and (min-width: 376px){
+
+.deck {
+    margin-top: 30% ;
+}
+.business-growth {
+    height: 100%;
+    text-size:12px !important;
+}
+
+.section-benefits {
+    background: var(--color-dark);
+    background-position: right bottom;
+    background-repeat: no-repeat;
+    object-fit: contain;
+    background-size: cover;
+    height: 65vh;
+    }
+
+
+  .info-deck {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    }
+    
+    .info-title h1 {
+    font-size: 18px;
+    }
+    
+    .info-banking {
+    font-size: 12px;
+    width: 80%;
+    text-align: center;
+    }
+
+	.info-deck {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    }
+    
+    .info-deck-1 {
+    width:100%;
+    }
+    
+    .benefits {
+    justify-content: space-between;
+    margin-bottom: 20px;
+    }
+
+    .card-benefits {
+    width:350px;
+    padding: 10px;
+    justify-content: space-between;
+    }
+    
+    .banking-card {
+    height: 300px;
+    margin-top: 20px;
+    /* transform: translateY(-13%) */;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    }
+    
+    .banking-info {
+    display: flex;
+    height: 100%;
+    margin-top: -40px;
+    }
+    
+    .audacity-btn {
+        margin: 30px 0px;
+        
+    }
+    
+    .footer-audacity {
+    padding-top: 10%!important;
+    font-size: 13px!important;
+    }
+    
+    .footer-spacing {
+        margin-top: 150px;
+    }
+}
+
+
+@@media(max-width: 375px) and (min-width: 361px){
+
+.deck {
+    margin-top: 20% !important;
+}
+
+.business-growth {
+    height: 100%;
+    text-size:12px !important;
+}
+
+.section-benefits {
+    background: var(--color-dark);
+    background-position: right bottom;
+    background-repeat: no-repeat;
+    object-fit: contain;
+    background-size: cover;
+    height: 65vh;
+    }
+
+
+  .info-deck {
+    font-size: 11.5px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    }
+    
+.info-title h1 {
+    margin-top: 13%;
+    font-size: 18px;
+}
+    
+    .info-banking {
+    font-size: 12px;
+    width: 80%;
+    text-align: center;
+    }
+
+	.info-deck {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    }
+    
+    .info-deck-1 {
+    width:100%;
+    }
+    
+    .benefits {
+    justify-content: space-between;
+    margin-bottom: 20px;
+    }
+
+    .card-benefits {
+    width:350px;
+    padding: 10px;
+    justify-content: space-between;
+    }
+    
+    .banking-card {
+    height: 300px;
+    margin-top: 20px;
+    /* transform: translateY(-13%) */;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    }
+    
+    .banking-info {
+    display: flex;
+    height: 100%;
+    margin-top: -40px;
+    }
+    
+    .audacity-btn {
+        margin: 30px 0px;
+        
+    }
+    
+    .footer-audacity {
+    padding-top: 10%!important;
+    font-size: 13px!important;
+    }
+    
+    .footer-spacing {
+        margin-top: 150px;
+    }
+}
+
+
+
+@@media(max-width: 360px){
+
+.deck {
+    margin-top: 15% !important;
+}
+
+.business-growth {
+    height: 100%;
+    text-size:12px !important;
+}
+
+.section-benefits {
+    background: var(--color-dark);
+    background-position: right bottom;
+    background-repeat: no-repeat;
+    object-fit: contain;
+    background-size: cover;
+    height: 65vh;
+    }
+
+
+  .info-deck {
+    font-size: 5px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    }
+    
+.info-title h1 {
+    margin-top: 13%;
+    font-size: 18px;
+   
+}
+    
+    .info-banking {
+    font-size: 12px;
+    width: 80%;
+    text-align: center;
+    }
+
+	.info-deck {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    }
+    
+    .info-deck-1 {
+    width:100%;
+    }
+    
+    .benefits {
+    justify-content: space-between;
+    margin-bottom: 20px;
+    }
+
+    .card-benefits {
+    width:350px;
+    padding: 10px;
+    justify-content: space-between;
+    }
+    
+    .banking-card {
+    height: 300px;
+    margin-top: 20px;
+    /* transform: translateY(-13%) */;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    }
+    
+    .banking-info {
+    display: flex;
+    height: 100%;
+    margin-top: -40px;
+    }
+    
+    .audacity-btn {
+        margin: 30px 0px;
+        
+    }
+    
+    .footer-audacity {
+    padding-top: 10%!important;
+    font-size: 13px!important;
+    }
+    
+    .footer-spacing {
+        margin-top: 150px;
+    }
+}
+
+
+@@media(min-width: 360px) and (max-width: 414px){
+
+.deck {
+    margin-top: 15% !important;
+}
+
+.business-growth {
+    height: 100%;
+    text-size:11px !important;
+}
+
+.section-benefits {
+    background: var(--color-dark);
+    background-position: right bottom;
+    background-repeat: no-repeat;
+    object-fit: contain;
+    background-size: cover;
+    height: 65vh;
+    }
+
+
+  .info-deck {
+    font-size: 10px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    }
+    
+    .info-title h1 {
+        margin-top: 13%;
+        font-size: 18px;
+       
+    }
+        .info-title {
+       
+        margin-left: -7%;
+    }
+    
+    .info-banking {
+    font-size: 12px;
+    width: 80%;
+    text-align: center;
+    }
+
+	.info-deck {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    }
+    
+    .info-deck-1 {
+    width:100%;
+    }
+    
+    .benefits {
+    justify-content: space-between;
+    margin-bottom: 20px;
+    }
+
+    .card-benefits {
+    width:350px;
+    padding: 10px;
+    justify-content: space-between;
+    }
+    
+    .banking-card {
+    height: 300px;
+    margin-top: 20px;
+    /* transform: translateY(-13%) */;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    }
+    
+    .banking-info {
+    display: flex;
+    height: 100%;
+    margin-top: -40px;
+    }
+    
+    .audacity-btn {
+        margin: 30px 0px;
+        
+    }
+    
+    .footer-audacity {
+    padding-top: 10%!important;
+    font-size: 13px!important;
+    }
+    
+    .footer-spacing {
+        margin-top: 150px;
+    }
+}
+
+
+
+
+
 </style>
 @* the fun starts here *@
-@Html.Partial("_pageModernHeader", heroHeader as ContentModels.HeroHeader)
 
-<div class="container">
-    @* <div>   @Html.Raw(heroTitle)</div>*@
+ @Html.Partial("_pageModernHeader", heroHeader as ContentModels.HeroHeader)
+ 
+ <!-- BUSINESS BANKING BENEFITS SECTION -->
+
+ @{
+       var bgimgUrl = benefitsModel2.BenefitCards.FirstOrDefault();
+       
+  <section class="section-benefits" style="background-image: url('@bgimgUrl.CardIcon.Url');">
+      <div class="container">
+            <div class="row business-growth" >
+                   
+                    @if (benefitsModel2.BenefitCards != null && benefitsModel2.BenefitCards.Any())
+                    {
+                        int iterator = 0;
+                        
+                       
+                            foreach (Card benefit in benefitsModel2.BenefitCards)
+                            {
+                                String cardIdTag = "card" + iterator.ToString();
+                             
+                                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 info-deck">
+                                       @benefit.CardDescriptionLongText
+                                   </div>
+
+                                   
+            
+                                ++iterator;
+                            }
+                    }
+                    
+                    <!--BENEFIT CARD SECTION-->
+                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 card-benefits">
+                        @if (benefitsModel.BenefitCards != null && benefitsModel.BenefitCards.Any())
+                        {
+                        int iterator = 0;
+            
+                           foreach (Card benefit in benefitsModel.BenefitCards)
+                            {
+                                String cardIdTag = "card" + iterator.ToString();
+                             
+                            
+                                    <div class="benefits">
+                                            <div class="image-wrapper">
+                                                @if (benefit.CardIcon != null)
+                                                {
+                                                    <img src="@benefit.CardIcon.Url" alt="@benefit.CardIcon.Value("altTag")" />
+                                                }
+                                            </div>
+                                            <div class="image-title">@benefit.Name</div>
+                                    </div>
+                                  
+            
+                                ++iterator;
+                            }
+                        }
+                    
+                    </div>
+        </div>
+    </section> 
+}
+
+
+ <!-- BUSINESS BANKING SECTION -->
+<section class="business-banking">
+    <div class="container">
+         @{
+             var  bgimg2Url = benefitsModel1.BenefitCards.FirstOrDefault();
+              
+            
+                <div class="row">
+                    
+                    @if (benefitsModel1.BenefitCards != null && benefitsModel1.BenefitCards.Any())
+                    {
+                   
+                        int iterator = 0;
+            
+                            foreach (Card benefit in benefitsModel1.BenefitCards)
+                            {
+                                String cardIdTag = "card" + iterator.ToString();
+                                   
+                                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 banking-card" style="background-image: url('@bgimg2Url.CardIcon.Url');"></div>
+                                           
+                                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 banking-info">
+                                                <div class="info-deck-1">
+                                                    <div class="info-title text-center">
+                                                    <h1>@benefit.Name</h1>
+                                                    </div>
+                                                     <div class="info-sub text-center">
+                                                        @benefit.CardDescriptionLongText
+                                                 </div>
+                                                </div>
+                                            </div>
+                                           
+            
+                                ++iterator;
+                            }
+                    }
+               </div>
+               
+            }
+            
+            <!--call to action section-->
+            <div class="row">
+                <div class=>
+                    
+                </div>
+                
+            </div>
+    </div>
+</section>
+@*
+*@
+@*
+<section>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 audacity-btn text-center">
+                <a href= "@navigate.Url" class="button primary audacity-apply-btn"> @navigate.Name</a> 
+                <h3 class="col-lg-12 col-md-12 col-sm-12 col-xs-12 audacity-text">@Html.Raw(footer.Value("textEditor"))</h3>
+            </div>
+        </div>
+        
+    </div>
+</section>   
+<section class="">
+<div class="container " >
+      <h5 class="faqHeader">@createOwnWorldOfBanking.Value("partialViewClassName")</h5>
+      
+      
+ @foreach (var item in noCampvideos)
+
+                    {
+
+                        var cardTitle = item.Value<string>("nCcardTitle");
+                      
+                            <button class="accordion">
+                                @cardTitle
+                            </button>
+                            <div class="panel">
+                              <p>  @Html.Raw(item.Value<string>("mediumDescription"))</p>
+                            </div>
+                                                    
+                        noCampx += 1;
+
+                    }
+
 </div>
+</section>   
+<section class="sub-footer">
+    <div class="container footer-spacing" >
+        <div class="row text-center">
+            @Html.Raw(bodyFooter)
+        </div> 
+    </div>
+</section>   
+*@
+<script>
+$(document).ready(function() {
+    $(".accordion").click(function() {
+        // Toggle the current accordion
+        $(this).toggleClass("active");
+        
+        // Get the panel related to this accordion
+        var panel = $(this).next(".panel");
+
+        // Check if the panel was already open
+        var wasOpen = panel.css("display") === "block";
+        
+        // Close all panels
+        $(".panel").css("display", "none");
+        $(".accordion").removeClass("active"); // Optionally remove the 'active' class from all accordions
+        
+        // If the clicked panel was not already open, open it
+        if (!wasOpen) {
+            panel.css("display", "block");
+            $(this).addClass("active"); // Optionally add 'active' class back to the clicked accordion
+        }
+    });
+});
+</script>
+

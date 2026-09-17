@@ -30,7 +30,7 @@
 
     var sectionContent = (ICollection<IPublishedElement>)tabBody.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
 
-    var questionGroups = sectionContent.Where(c => c is NCheroBodyFaq).FirstOrDefault().Value("nCquestionGroups"); // sectionContent.Where(c => c.ContentType.Alias == "frequentlyAskedQuestionsSection").FirstOrDefault().Value("nCquestionGroups");
+    var questionGroups = sectionContent.Where(c => c.ContentType.Alias == "nCHeroBodyFaq").FirstOrDefault().Value("nCquestionGroups");
     var dts = Services.DataTypeService;
 
     var searchString = Request["searchstring"];
@@ -252,3 +252,5 @@
         })
     </script>
 }
+
+

@@ -1,5 +1,984 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
 }
+
+@* the fun starts here *@
+
+
+<style>
+
+.btn-primary:hover {
+    color: #fff;
+    background-color: #5DC400;
+    border-color: none;
+}
+    /*Section 1 style start here*/
+#section-1{
+    height: 376px;
+}
+#section-3{
+    height: 680px;
+}
+.customer-container{
+  height:200px;  
+}
+.mtb-40 {
+    margin: 40px 0px !important;
+}
+.mtb-24{
+    margin: 24px 0px !important;
+}
+.mtb-60 {
+    margin: 60px 0px !important;
+}
+.mtb-64 {
+    margin: 64px 0px !important;
+}
+.mt-40 {
+    margin-top: 40px; !important;
+}
+.mt-24 {
+    margin-top: 24px; !important;
+}
+.mb-24 {
+    margin-bottom: 24px; !important;
+}
+.content-center{
+    display: flex;
+    height: 320px;
+    align-content: center;
+    align-items: center;
+ 
+}
+.content-sub-start{
+    display: grid;
+    align-content: start;
+    align-items: start;
+}
+
+
+    /*section 1 styles end here*/
+    
+    /*section 2 start here*/
+        .tab-content {
+            padding: 20px 20px;
+            margin-top:40px;
+            border-top: none;
+            background: #fff;
+        }
+
+      .btn-font-color{
+          color : #012B60 !important;
+      }
+          .header-section {
+            line-height: 2;
+            text-align: start;
+            margin-bottom: 40px;
+            margin-top: 50px;
+
+        }
+        .cards-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        
+        .card-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          
+          }
+        .card-text {
+            font-size: 16px;
+        }
+        .card-title {
+            font-weight:500;
+            font-size: 18px;
+            color:#012B60;
+        }
+        
+        .card {
+            display: grid;
+            height: 242px;
+            border: 1px solid #B4BBD2;
+            border-radius: 8px;
+            width: 242px;
+            padding: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+         .card-body {
+            /*margin-top: 50px;*/
+            line-height: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            align-content: flex-end;
+            flex-direction: column;
+            flex-wrap: nowrap;
+          }
+  
+    /*section 2 end here*/
+    /*section 3 start here*/
+    .account-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    min-height: 170px;
+}
+    .account-card h4 {
+       color: var(--Brand-AB-Blue, #012B60);
+
+/* Heading/H3/Semibold */
+font-family: Montserrat;
+font-size: 30px;
+font-style: normal;
+font-weight: 600;
+line-height: 38px; /* 126.667% */
+    }
+    .bg-grey {
+        background: #F5F5F5 !important;
+    }
+    
+      .custom-bullets {
+    list-style-type: none;
+    padding-left: 0px;
+  }
+  
+.custom-bullets li {
+    text-wrap-mode: nowrap;
+    display: flex;
+    align-items: flex-start;
+    margin: 8px 0;
+    justify-content: flex-start;
+    align-content: center;
+}
+      .custom-img {
+    max-width: 100%;
+    height: auto;
+    width: 80%; /* Adjust size as needed */
+    margin: 0 auto;
+  }  
+  .font-weight-600{
+        font-weight : 600;
+    }
+    .highlight-text {
+      flex: 1;
+    }
+    .bottom-section {
+      background-color: #5dc300 !important;
+      width: 560px;
+      height: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .bottom-section-1.0 {
+      background-color: #5dc300 !important;
+      width: 100%;
+      height: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+      .contact-us{
+          background-color: white;
+  }
+  .section-large-card{
+    position: relative;
+    top: 52px;
+    margin: 10px 0px !important;
+    padding: 20px;
+    border-radius: 10px;  
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Soft shadow */
+  }
+  
+  
+    /*section 3 end here*/
+    /*section 0 start here*/
+    .bg-nothing-white{
+        height:100px;
+        background-color:white;
+        color:#012B60;
+    }
+ 
+    /*section 0 end here*/
+    
+    /*Section 5 start here*/
+    .app-btn{
+        border: none;
+        background: none;
+    }
+    
+    /*section 5 end here*/
+    /*section-6 Accordion start here*/
+.section-600 {
+
+    height: 600px;
+    display: flex;
+    align-items: center;
+
+}
+  .section-327 {
+    min-height: 327px;
+    display: flex;
+    align-items: center;
+    }
+    .accordion {
+                 font-weight: bold; /* Explicitly setting font-weight */
+                 font-family: Montserrat, sans-serif; /* Specifying the font family */
+                 background-color: #fff;
+                 color: #012B60;
+                 cursor: pointer;
+                 padding: 18px;
+                 width: 100%;
+                 text-align: left;
+                 font-size: 15px;
+                 transition: 0.4s;
+                 border-radius: 0px;
+                 border: solid 1px #efefef;
+              /*    margin-bottom: 10px; Space between inactive accordion buttons */
+                 position: relative; /* Needed for absolute positioning of the arrow */
+               }
+               
+               .accordion::after {
+                 content: '\276F'; /* Heavy Chevron Unicode character */
+                 font-size: 15px; /* Adjust as needed */
+                 color: #012B60;
+                 position: absolute;
+                 right: 20px;
+                 top: 50%;
+                 transform: translateY(-50%);
+                 transition: transform 0.4s;
+               }
+               
+              button.accordion.active{
+                 color: #012B60 !important; 
+              }
+
+               .active::after {
+                 transform: translateY(-50%) rotate(90deg);
+               }
+               
+               .myPanel {
+                    border: solid 1px #efefef;
+                    font-family: Montserrat, sans-serif;
+                    padding: 37px 50px 25px 22px;
+                    background-color: #fff;
+                    color: #012B60;
+                    display: none;
+                    overflow: hidden;
+                    border-top: none;
+                    margin-top: -20px !important;
+               }
+               
+               .myPanel p {
+                       font-weight: 400;
+               }
+               
+                 .faqHeader {
+                   font: normal normal bold 30px/52px Montserrat;
+                   letter-spacing: 0px;
+                   color: #F9F9F9;
+                   opacity: 1;
+                   margin: 0 auto; /* This ensures that the margin is auto on both sides for block-level centering */
+                   padding: 20px 0; /* Adds some padding above and below the text */
+                 }
+    /*section-6 Accordion End here*/
+
+.customer-container{
+  height:200px;  
+}
+
+
+.image-section{
+    margin-bottom: -200px;
+}
+.image-position {
+    left: 193px;
+    position: relative;
+    top: -66px;
+    height: 376px;
+    width: auto;
+    max-width: 100%;
+    object-fit: cover;
+    image-rendering: auto;
+  
+}
+
+
+/*Back button start here*/
+.back-section{
+    display: flex;
+    background: white;
+    min-height: 112px;
+    align-items: center;
+}
+
+.back-section button{
+    background:none !important;
+    border:none !important;
+}
+
+/*Back button end here*/
+
+.custom-card {
+    overflow: none;
+    border-radius: 10px;
+    background-color:white;
+}
+.custom-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.custom-row {
+    flex-grow: 1;
+}
+.bg-blue{
+    background-color:#002b60;
+    color:white;
+}
+.bg-white{
+    background-color:white;
+    color:#012B60;
+}
+.bg-grey{
+    background-color:#F5F5F5;
+    color:#012B60;
+}
+.bg-nothing-white{
+    height:100px;
+    background-color:white;
+    color:#012B60;
+}
+.content-center{
+    display: flex;
+    height: 320px;
+    align-content: center;
+    align-items: center;
+ 
+}
+.content-center-2{
+    display: flex;
+    height: 200px;
+    align-content: center;
+    align-items: center;
+ 
+}
+
+.content-sub-start{
+    display: grid;
+    align-content: start;
+    align-items: start;
+}
+
+.content-sub-start-2{
+    display: grid;
+    align-content: start;
+    align-items: start;
+}
+
+.content-sub-start-3{
+    display: grid;
+    align-content: start;
+    align-items: start;
+    font-size:15px;
+}
+
+
+/*Cards Css start here*/
+        .business-section {
+            padding: 50px 0;
+            text-align: center;
+        }
+        .business-section h2 {
+            color: #002F6C;
+            font-weight: bold;
+        }
+        .business-section p {
+            color: #4F5B66;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .account-card {
+          
+    
+            padding: 20px;
+         
+            text-align: left;
+            height: 320px;
+            border-radius: 8px;
+            background: var(--Base-White, #FDFDFD);
+            
+            /* Shadows Light Mode/MD */
+            box-shadow: 0px 9px 18px 0px rgba(0, 0, 0, 0.15);
+        }
+        .card-divider {
+            width: 100%;
+            height: 2px;
+            background-color: #6FCF97;
+            margin: 10px 0;
+        }
+        .btn-learn {
+            border: 1px solid #002F6C;
+            color: #002F6C;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+        .btn-learn:hover {
+            background-color: #002F6C;
+            color: #fff;
+        }
+        .btn-apply, .btn-download {
+            background-color: #6FCF97;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+        }
+        .btn-apply:hover, .btn-download:hover {
+            background-color: #57B881;
+        }
+        .card-image {
+            position: absolute;
+            top: -15px;
+            right: 10px;
+            width: 80px;
+        }
+        .get-in-touch {
+            position: fixed;
+            right: 0;
+            top: 50%;
+            background: #002F6C;
+            color: white;
+            padding: 10px;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            border-radius: 8px 0 0 8px;
+            cursor: pointer;
+        }
+        .cards-position{
+            top: 50px;
+            position: relative;
+            margin: 55px 0px;  
+        }
+        .font-size-24-weight-600 {
+            font-size: 24px !important;
+            font-weight: 600 !important ;
+        }
+        .mtb-40 {
+            margin: 40px 0px !important;
+        }
+/*Cards Css end here*/
+
+
+.section-1-heading{
+    color: var(--Base-White, #FDFDFD);
+    /* Heading/H1/Semibold */
+    font-family: Montserrat;
+    font-size: 48px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 60px; /* 125% */
+    margin-bottom:16px !important;
+}
+.mb-64 {
+    margin: 64px 0px 0px 0px !important;
+}
+.section-1-p {
+    color: var(--Base-White, #FDFDFD);
+    /* Body/xlarge/Regular */
+    font-family: Montserrat;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 30px; /* 150% */
+}
+
+.download-btn{
+    display: flex;
+width: 200px;
+height: 48px;
+padding: 12px 16px;
+justify-content: center;
+align-items: center;
+gap: 8px;
+flex-shrink: 0;
+border-radius: var(--border-radius-md, 2px);
+background: var(--surface-action, #5DC400);
+
+/* Shadows Light Mode/SM */
+box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.11);
+}
+
+.why-choose-us{
+    color: var(--Brand-AB-Blue, #012B60);
+    margin-bottom: 24px;
+    /* Heading/H3/Semibold */
+    font-family: Montserrat;
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 38px; /* 126.667% */
+}
+.sub-class-p{
+    color: var(--Brand-AB-Blue, #012B60);
+
+    /* Body/xlarge/Regular */
+    font-family: Montserrat;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 30px; /* 150% */
+}
+.card-sub-p{
+    color: var(--Brand-AB-Blue, #012B60);
+
+    /* Body/xlarge/Regular */
+    font-family: Montserrat;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 30px; /* 150% */
+}
+.benefit{
+    color: var(--Brand-AB-Blue, #012B60);
+
+/* Heading/H3/Semibold */
+font-family: Montserrat;
+font-size: 30px;
+font-style: normal;
+font-weight: 600;
+line-height: 38px; /* 126.667% */
+}
+
+.btn-primary{
+margin-top: 108px;
+display: flex;
+width: 200px;
+height: 48px;
+padding: 12px 16px;
+justify-content: center;
+align-items: center;
+gap: 8px;
+border:none;
+flex-shrink: 0;
+border-radius: var(--border-radius-md, 2px);
+background: var(--surface-action, #5DC400);
+
+/* Shadows Light Mode/SM */
+box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.11);
+}
+
+
+#section-0{
+    height: 112px;
+}
+#section-10{
+    display:none;
+}
+
+.btn-primary-1{
+
+display: flex;
+width: 200px;
+height: 48px;
+padding: 12px 16px;
+justify-content: center;
+align-items: center;
+gap: 8px;
+border:none;
+flex-shrink: 0;
+border-radius: var(--border-radius-md, 2px);
+background: var(--surface-action, #5DC400);
+
+/* Shadows Light Mode/SM */
+box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.11);
+}
+
+.padding-right-svg{
+  padding-right:10px;  
+}
+.padding-left-svg{
+  padding-left:10px;  
+}
+
+.allowWrap{
+   text-wrap: auto; 
+}
+
+@@media (max-width: 768px) {
+  /* General mobile adjustments */
+  #section-1, #section-3 {
+    height: auto !important;
+    padding: 40px 0 !important;
+  }
+
+  .image-position {
+    height: auto !important;
+    width: 100% !important;
+    margin-bottom: 30px !important;
+  }
+
+  /* Text adjustments */
+  .section-1-heading {
+    font-size: 36px !important;
+    line-height: 45px !important;
+  }
+
+  .section-1-p {
+    font-size: 16px !important;
+    line-height: 24px !important;
+  }
+
+  .why-choose-us, .benefit {
+    font-size: 24px !important;
+    line-height: 32px !important;
+  }
+
+  /* Card container adjustments */
+  .account-card {
+    width: 100% !important;
+    margin-bottom: 30px;
+    height: auto !important;
+    min-height: auto !important;
+  }
+
+  /* Card content adjustments */
+  .card-body {
+    padding: 15px !important;
+  }
+
+  .font-size-24-weight-600 {
+    font-size: 20px !important;
+    line-height: 28px !important;
+  }
+
+  /* Button adjustments */
+  .btn-learn, .btn-apply, .btn-download, .download-btn {
+    width: 100% !important;
+    margin: 10px 0 !important;
+  }
+
+  /* Card grid adjustments */
+  .row > [class^="col-"] {
+    width: 100%;
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  /* Accordion adjustments */
+  .section-600, .section-327 {
+    height: auto !important;
+    padding: 40px 0;
+  }
+
+  /* Image section adjustments */
+  .image-section {
+    margin-bottom: 0 !important;
+    text-align: center;
+  }
+
+  /* Form elements */
+  .custom-img {
+    width: 100% !important;
+  }
+
+  /* Spacing adjustments */
+  .mtb-40, .mtb-60, .mt-40 {
+    margin: 20px 0 !important;
+  }
+
+  /* Header adjustments */
+  .header-section {
+    margin: 30px 0 !important;
+    text-align: center;
+  }
+
+  /* Card list adjustments */
+  .custom-bullets li {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+</style>
+
+
+<section class="back-section" id="learn-more-btn-back">
+    <div class="container">
+        <button>
+            <svg width="68" height="24" viewBox="0 0 68 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M4.25 12.2744L19.25 12.2744" stroke="#012B60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M10.2998 18.299L4.2498 12.275L10.2998 6.25" stroke="#012B60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M33.47 17V7.2H37.866C38.9953 7.2 39.8633 7.42867 40.47 7.886C41.0767 8.334 41.38 8.95 41.38 9.734C41.38 10.266 41.2587 10.714 41.016 11.078C40.7827 11.442 40.4653 11.722 40.064 11.918C39.6627 12.114 39.2287 12.212 38.762 12.212L39.014 11.792C39.574 11.792 40.0687 11.89 40.498 12.086C40.9273 12.282 41.268 12.5713 41.52 12.954C41.772 13.3273 41.898 13.794 41.898 14.354C41.898 15.194 41.5807 15.8473 40.946 16.314C40.3207 16.7713 39.3873 17 38.146 17H33.47ZM34.87 15.866H38.09C38.8647 15.866 39.4573 15.7353 39.868 15.474C40.2787 15.2127 40.484 14.802 40.484 14.242C40.484 13.6727 40.2787 13.2573 39.868 12.996C39.4573 12.7347 38.8647 12.604 38.09 12.604H34.744V11.47H37.74C38.4493 11.47 39 11.3393 39.392 11.078C39.784 10.8167 39.98 10.4247 39.98 9.902C39.98 9.37933 39.784 8.98733 39.392 8.726C39 8.46467 38.4493 8.334 37.74 8.334H34.87V15.866ZM48.4757 17V15.432L48.4057 15.138V12.464C48.4057 11.8947 48.2377 11.456 47.9017 11.148C47.575 10.8307 47.0804 10.672 46.4177 10.672C45.979 10.672 45.5497 10.7467 45.1297 10.896C44.7097 11.036 44.355 11.2273 44.0657 11.47L43.5057 10.462C43.8884 10.154 44.3457 9.92067 44.8777 9.762C45.419 9.594 45.9837 9.51 46.5717 9.51C47.589 9.51 48.373 9.75733 48.9237 10.252C49.4744 10.7467 49.7497 11.5027 49.7497 12.52V17H48.4757ZM46.0397 17.084C45.489 17.084 45.0037 16.9907 44.5837 16.804C44.173 16.6173 43.8557 16.3607 43.6317 16.034C43.4077 15.698 43.2957 15.32 43.2957 14.9C43.2957 14.4987 43.389 14.1347 43.5757 13.808C43.7717 13.4813 44.0844 13.22 44.5137 13.024C44.9524 12.828 45.5404 12.73 46.2777 12.73H48.6297V13.696H46.3337C45.6617 13.696 45.209 13.808 44.9757 14.032C44.7424 14.256 44.6257 14.5267 44.6257 14.844C44.6257 15.208 44.7704 15.502 45.0597 15.726C45.349 15.9407 45.7504 16.048 46.2637 16.048C46.7677 16.048 47.2064 15.936 47.5797 15.712C47.9624 15.488 48.2377 15.1613 48.4057 14.732L48.6717 15.656C48.4944 16.0947 48.1817 16.4447 47.7337 16.706C47.2857 16.958 46.721 17.084 46.0397 17.084ZM55.4709 17.084C54.7149 17.084 54.0382 16.9207 53.4409 16.594C52.8529 16.2673 52.3909 15.8193 52.0549 15.25C51.7189 14.6807 51.5509 14.0273 51.5509 13.29C51.5509 12.5527 51.7189 11.8993 52.0549 11.33C52.3909 10.7607 52.8529 10.3173 53.4409 10C54.0382 9.67333 54.7149 9.51 55.4709 9.51C56.1429 9.51 56.7402 9.64533 57.2629 9.916C57.7949 10.1773 58.2056 10.5693 58.4949 11.092L57.4729 11.75C57.2302 11.386 56.9316 11.12 56.5769 10.952C56.2316 10.7747 55.8582 10.686 55.4569 10.686C54.9716 10.686 54.5376 10.7933 54.1549 11.008C53.7722 11.2227 53.4689 11.526 53.2449 11.918C53.0209 12.3007 52.9089 12.758 52.9089 13.29C52.9089 13.822 53.0209 14.284 53.2449 14.676C53.4689 15.068 53.7722 15.3713 54.1549 15.586C54.5376 15.8007 54.9716 15.908 55.4569 15.908C55.8582 15.908 56.2316 15.824 56.5769 15.656C56.9316 15.4787 57.2302 15.208 57.4729 14.844L58.4949 15.488C58.2056 16.0013 57.7949 16.398 57.2629 16.678C56.7402 16.9487 56.1429 17.084 55.4709 17.084ZM61.2312 15.208L61.2592 13.486L65.5292 9.58H67.1532L63.8772 12.8L63.1492 13.416L61.2312 15.208ZM60.1392 17V6.612H61.4832V17H60.1392ZM65.8092 17L62.8972 13.388L63.7652 12.31L67.4612 17H65.8092Z" fill="#012B60"/>
+</svg>
+
+        </button>
+    </div>
+</section>
+
+<section class="bg-blue" id="section-1">
+    <div class="container customer-container">
+  <div class="row mtb-40 justify-content-center">
+ 
+        <div class="col-xs-6 col-sm-9 col-lg-9 content-center" >
+          <div class="content-sub-start">
+              
+            <div>
+                <h1 class="section-1-heading">Tap2Glass</h1>
+                <p class="section-1-p">Tap2Glass turns your NFC enables Android device (phone or tablet) into a card machine for easy customer payments.It’s a quick, cost-effective, convenient, and more importantly, a secure way to transact.</p>
+            </div>
+           @* <div class="mtb-64">
+                <button class="btn btn-primary-1 download-btn">Download</button>
+            </div>*@
+           
+          </div>
+        </div>
+    
+
+        <div class="col-xs-6 col-sm-3 col-lg-3 image-section">
+          <img class="image-position" src="/media/jxskcqfw/cx-survey-strategy-1-1.png" alt="img" >
+        </div>
+  </div>
+</div>
+</section>
+<div class="bottom-section-1.0" id="section-1.0"></div>
+<section class="bg-white" id="section-2">
+    <div class="">
+            <div class="container">
+               
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabmyPanel" class="tab-pane active" id="CallDeposits"> 
+                <!-- Header Section -->
+                
+                <div class="header-section btn-font-color">
+                    <h1 class="why-choose-us">Why choose Tap2Glass?</h1>
+                    <p class="sub-class-p">A smarter way to manage your business and get paid—anytime, anywhere. Just load Tap2Glass on your mobile device and your customers can pay you instantly through the Tap2Glass App.</p>
+                    <p class="sub-class-p"><b>A Business Transactional Account is required to use the App.</b></p>
+                </div>
+
+            </div>
+                </div>
+            </div>
+    </div>
+</section>
+<section class="bg-grey" id="section-3">
+    <div class="container ">
+        
+       <div class="row mt-40 justify-content-center">
+        <div class="col-md-4">
+            <div class="account-card position-relative">
+                <h4>2.5% fixed rate</h4>
+                
+               
+                <p class="mtb-24 card-sub-p"><b>Only 2.5%*</b> per transaction – a super–low fixed rate.</p>
+               
+            
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="account-card position-relative">
+
+                <h4>R8.00 cash out</h4>
+                
+               
+                <p class="mtb-24 card-sub-p">Pay <b>only R8.00*</b> to transfer money from Tap2Glass to your Bank account.</p>
+            
+           
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="account-card position-relative">
+
+                <h4>Value for you</h4>
+             
+              
+                <p class="mtb-24 card-sub-p">
+          <!--          <ul class="btn-font-color">-->
+          <!--            <li class="card-sub-p">-->
+                       
+          <!--              Download fees.-->
+          <!--</li>-->
+          <!--            <li class="card-sub-p">-->
+                       
+          <!--              Subscription fees.-->
+          <!--</li>-->
+          <!--            <li class="card-sub-p">-->
+                       
+          <!--              Data-usage fees.-->
+          <!--</li>-->
+                   
+          <!--          </ul>-->
+          
+          <b>No hidden fees</b> – free to download with no monthly subscriptions. Data charges may apply from your mobile network provider.
+                </p>
+                
+                </p class="mtb-24 card-sub-p">
+                * Fees and rates shown are exclusive of VAT. VAT will be added where applicable.
+                </p>
+                
+             
+            </div>
+        </div>
+    </div>
+
+  <!-- Highlight Section Full Width -->
+        <div class="row bg-white section-large-card">
+    <div class="col-md-12">
+        <div class="col-md-4 col-sm-4 visible-xs" >
+                  <img  src="/media/h4ejhign/image_business-banking49.png" 
+                        alt="Finance Image" 
+                        class="custom-img"
+                  >
+        </div>
+      <div class="highlight-section">
+          
+          <div class="col-md-8 col-sm-8">
+              <div class="highlight-text">
+          <h4 class="benefit mb-24">Benefits</h4>
+          <div class="bottom-section"></div>
+          
+        <ul class="custom-bullets btn-font-color mt-24">
+              <li class="card-sub-p">
+                  <span class="padding-right-svg">
+                                      <svg  width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
+                  </span>
+
+                <b>Easy payments</b>: Payments made easy for you and your customers.
+  </li>
+              <li class="card-sub-p">
+                  <span class="padding-right-svg">
+                                      <svg  width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
+                  </span>
+
+               <span class="allowWrap"> <b>Real-time tracking and reporting</b>: See transactions instantly for better business and financial control.</span>
+  </li>
+              <li class="card-sub-p">
+                  <span class="padding-right-svg">
+                                      <svg  width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
+                  </span>
+
+                <b>Mobile-friendly</b>: Set up in minutes, receive payments on the go.
+  </li>
+        </ul>
+
+          
+        
+        </div>
+          </div>
+          <div class="col-md-4 hidden-xs col-sm-4">
+                  <img  src="/media/h4ejhign/image_business-banking49.png" 
+                        alt="Finance Image" 
+                        class="img-responsive custom-img"
+                  >
+                </div>
+      </div>
+    </div>
+    
+  </div>
+    </div>
+</section>
+<section class="bg-nothing-white-3" id="section-0">
+    <div class="container">
+        <div class="mtb-60" id="section-10">
+            <button class="btn btn-primary">Download</button>
+        </div>
+    </div>
+</section>
+
+<section class="bg-grey" id="accordion">
+    <section class="section-6 section-327 section4-img-bg-image" id="faq" aria-labelledby="faq-tab" role="tabmyPanel">
+    <div class="container">
+        <h5 class="faqHeader btn-font-color">FAQs</h5>
+        
+            <button class="accordion" aria-expanded="false" aria-controls="Which businesses qualify for funding?">
+                What types of payments can be accepted through the Tap2Glass App?
+            </button>
+            <div class="myPanel" id="Which businesses qualify for funding?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">The Tap2Glass App supports credit and debit card payments. Additional payment methods may be added in the future.</h5>
+                  
+    
+                </div>
+            </div>
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                What cards can be used on Tap2Glass?
+            </button>
+            <div class="myPanel" id="Do you offer funding to startups?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">What cards can be used on Tap2Glass?</h5>
+                  
+                </div>
+            </div>
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding outside of South Africa?">
+               Does Tap2Glass accept payments from Samsung Pay or Apple Pay?
+            </button>
+            <div class="myPanel" id="Do you offer funding outside of South Africa?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">Business funding qualifying criteria include:</h5>
+                  
+                  <ul class="custom-bullets btn-font-color">
+                      <li class="btn-font-color">South African registered CC or PTY.</li>
+                      <li class="btn-font-color">Annual turnover greater than R500, 000 per annum.</li>
+                      <li class="btn-font-color">Trading history of more that 6 months.</li>
+                      <li class="btn-font-color">The business does not have to be VAT registered.</li>
+                  </ul>
+                </div>
+            </div>  
+    </div>
+</section>
+</section>
+
+
+
+<script >
+
+
+$(document).ready(function() {
+    $("#learn-more-btn-back").click(function() {
+        window.location.href = 'http://cmsdev.africanbank.net/en/home/bank'; // Change '/' to your actual home page URL if needed
+    });
+});
+
+        // Accordion Script (if applicable)
+    $(".accordion").click(function() {
+        $(this).toggleClass("active");
+        var myPanel = $(this).next(".myPanel");
+        var wasOpen = myPanel.css("display") === "block";
+
+        $(".myPanel").css("display", "none");
+        $(".accordion").removeClass("active");
+
+        if (!wasOpen) {
+            myPanel.css("display", "block");
+            $(this).addClass("active");
+        }
+    });
+    
+</script>
+
+
+
+
+

@@ -1,5 +1,242 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.BaseModernUI>
+@using CustomModels = Web.Models;
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using AcfAfricanbank.Core.Models.Forms
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
+	 var Children = Model.Children;
+	 
+	  var herobody = Children?.Where(c => c is HeroBody).FirstOrDefault();
+	   var heroheader = Children?.Where(c => c is HeroHeader).FirstOrDefault();
+	 
+	 var headerImage_large = heroheader?.Value<IPublishedContent>("image")?.Url;
+	 var headerImage_Medium = heroheader?.Value<IPublishedContent>("imageMedium")?.Url;
+	 var headerImage_Small = heroheader?.Value<IPublishedContent>("imageSmall")?.Url;
+	  var headerImage_Last = heroheader?.Value<IPublishedContent>("video")?.Url;
+
+	  
+	  var sectioncard = herobody.Children.Where(c => c.Name == "Business Cards").FirstOrDefault();
+      var sectioncardAfricanBank = sectioncard.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var sectioncards = sectioncardAfricanBank.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+      
+      var homecard = sectioncard?.Children?.Where(c => c.Name == "Home Card");
+      var homecards = homecard.Select(c => c as Card).ToList();
+      
+       var thirdsection = sectioncard?.Children?.Where(c => c.Name == "Third Section");
+       var thirdcards = thirdsection.Select(c => c as Card).ToList();
+      
+       @*var applyDocs = thirdcards?.Select(c => c as Card).FirstOrDefault();
+       var navigate1 = applyDocs.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").First();
+       var navigate2 = applyDocs.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").Last();*@
+       
+       
+        var secondsection = sectioncard?.Children?.Where(c => c.Name == "Second Card");
+       var secondcards = secondsection.Select(c => c as Card).ToList();
+      
+       var applyDocs = secondcards?.Select(c => c as Card).FirstOrDefault();
+       var navigate1 = applyDocs.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").First();
+      
+	 
+   
 }
+
+@* the fun starts here *@
+
+<link rel="stylesheet" href="/css/projectmagic-business-banking.css"/>
+<style>
+
+.section1-img-bg-image {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    @*overflow: hidden;*@ /* To ensure the pseudo-element is contained within the parent */
+}
+
+
+.section1-img-bg-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('@headerImage_large');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.15; /* Adjust opacity as needed */
+  
+}
+
+
+</style>
+
+<!--banner section-->
+@*
+@Html.Partial("_pageModernHeaderv2", heroheader as ContentModels.HeroHeader)
+*@
+<section class="section-800 section-bg-black section1-img-bg-image">
+    <div class="container">
+            <div class="row align-items-center d-flex flex-row-reverse row-change md-text-center">
+                @if (homecards!= null && homecards.Any())
+            {
+
+                foreach (Card benefit in homecards)
+                {
+               
+              <div class="col-xl-7 col-lg-7 col-md-7 ">
+                <h1 class="font-white">@benefit.CardTitle</h1>
+                <h1 class="font-blue1">@benefit.CardDescription</h1>
+              </div>
+               <div class="col-xl-5 col-lg-5 col-md-5 ">
+                <img
+                  class="d-block"
+                  src="@benefit.CardIcon.Url"
+                  alt="iori"
+                />
+              </div>
+              }
+              }
+            </div>
+            <div class="container">
+            <div class="row d-flex align-items-center md-text-center" style="margin-top: 65px; margin-bottom: 65px !important;">
+              <div class="col-xl-12 col-lg-12 col-md-12">
+                <div class="deck">
+                  @foreach (var item in sectioncards)
+
+                    {
+                        var cardTitle = item.Value<string>("nCcardTitle");
+                        var Icon = item.Value<IPublishedContent>("nCcardIcon")?.Url;
+                       var url = item.Value<string>("abstractButton");
+                    <div class="card-deck">
+                
+                        <div class="card-title">
+                
+                            <h2 class="font-white">@cardTitle</h2>
+                           
+                    @Html.Raw(item.Value<string>("mediumDescription"))
+                            
+                
+                
+                        </div>
+
+                        <div class="card-link">
+                            <div class="icon">
+                                <a href="@url">
+                                    <img loading="lazy" src="@Icon">
+                                </a>  
+                            </div>
+                        </div>
+
+                    </div>
+                   
+}
+
+                </div>
+              </div>
+            </div>
+          </div>
+    </div>
+</section>
+
+ <section class="section-800 bg-grey-60 section3-img-bg-image">
+       @if (thirdcards!= null && thirdcards.Any())
+            {
+             foreach (Card benefit in thirdcards)
+                {
+    <div class="container">
+            <div class="row align-items-center flex-row-revesre d-flex row-change md-text-center">
+               
+              <div class="col-xl-6 col-lg-6 col-md-6">
+               
+               @benefit.CardDescriptionLongText
+              </div>
+               <div class="col-xl-6 col-lg-6 col-md-6">
+                <img
+                  class="d-block"
+                  src="@benefit.CardIcon.Url"
+                  alt="iori"
+                />
+              </div>
+            </div>
+    </div>
+    @*<div class="container">
+            <div class="row d-flex align-items-center row-change md-text-center">
+              <div class="col-xl-6 col-lg-6 col-md-6">
+                
+                <p class="font-md font-black">
+                  @Html.Raw(@herobody.Value("bodyFooterTitle"))
+               
+                 <div class="combo-btn">
+                    <div class="mt-50 text-start column1">
+                    <p class="combo-btn-text primary">
+                        <a href="@navigate1.Url" class="btn  btn-brand-1 hover-up">@navigate1.Name</a></p>
+                    </div>
+                    <div class="mt-50 text-start column2">
+                    <p class="combo-btn-text secondary"><a href="@navigate2.Url" class="btn btn-brand-secondary hover-up">@navigate2.Name</a></p>
+                    </div>
+                </div>
+              </div>
+              <div class="col-xl-6 col-lg-6 col-md-6">
+                <img
+                  class="d-block"
+                  src="@benefit.CardIcon.Url"
+                  alt="iori"
+                />
+              </div>
+            </div>
+          </div>*@
+          }
+          }
+</section>
+
+ <section class="section-800 pt-45 pb-45 section3-img-bg-image" style="background:white">
+       @if (secondcards!= null && secondcards.Any())
+            {
+             foreach (Card benefit in secondcards)
+                {
+    <div class="container">
+            <div class="row d-flex align-items-center  md-text-center  flex-row-reverse row-change">
+               
+              <div class="col-xl-6 col-lg-6 col-md-6 font-black">
+               
+               @benefit.CardDescriptionLongText
+               <div class="combo-btn">
+                    <div class="mt-50 text-start column1">
+                    <p class="combo-btn-text primary">
+                        <a href="@navigate1.Url" class="btn  btn-brand-1 hover-up">@navigate1.Name</a></p>
+                    </div>
+                    @*<div class="mt-50 text-start column2">
+                    <p class="combo-btn-text secondary"><a href="@navigate2.Url" class="btn btn-brand-secondary hover-up">@navigate2.Name</a></p>
+                    </div>*@
+                </div>
+              </div>
+               <div class="col-xl-6 col-lg-6 col-md-6">
+                <img
+                  class="d-block"
+                  src="@benefit.CardIcon.Url"
+                  alt="iori"
+                />
+              </div>
+            </div>
+    </div>
+
+          }
+          }
+</section>
+
+<section class="section-500 ptb-70 section-bg-black section4-img-bg-image">
+    <div class="container">
+        <div class="row align-items-center md-text-center">
+            <div class="col-md-12"><div class="col-md-6">
+    <h3 class="font-blue1">@Html.Raw(@herobody.Value("bodyTitle"))</h3> 
+</div></div>
+          
+        
+             @Html.Raw(@herobody.Value("richTextBox"))
+          </div>
+          </div>
+</section>

@@ -1,5 +1,600 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
 }
+
+@* the fun starts here *@
+
+
+<!--css styling-->
+<link rel="stylesheet" href="/css/projectmagic.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+
+
+<style>
+/*hero section*/
+#videoContainer {
+    position: relative;
+    width: 100%;
+    height: 95vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    }
+
+#placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(0, 52, 119, 0.60), rgba(0, 52, 119, 0.60)), url('/media/dk3lqa32/logo-min-vid-banner-2x.png') no-repeat center center;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s;
+    }
+
+#placeholderText {
+    color: white;
+    padding: 10px;
+    align-items: center;
+    justify-content: flex-start;
+    }
+
+#placeholder.hidden {
+    transform: translateX(-100%);
+    }
+
+#myVideo {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: none;
+    }
+
+#myButton {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    text-transform: uppercase;
+    top: 70%;
+    left: 20%;
+    padding: 10px 24px;
+    background-color: #5dc300;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: width 0.3s;
+    z-index: 10;
+    }
+
+.button-icon {
+        height: 28px;
+        width: 28px;
+        border: 1.5px solid #fff;
+        border-radius: 50%;
+        margin-left: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+#myButton.expanded {
+    min-width: 140px;
+    padding: 13px 24px;
+}
+
+
+/*end of hero section*/
+
+.video-container {
+    position: relative;
+    width: 535px;
+    height: 535px;
+}
+
+video {
+    width: 100%;
+    height: 100%;
+    mix-blend-mode: screen; /* Try different modes like screen, overlay, darken, lighten, etc. */
+}
+
+#placeholderText h1 {
+    font-weight: 200;
+    color: #fff;
+    font-size: 68px;
+    margin-bottom: 20px;
+    line-height: 1.2;
+    font-family: "Montserrat", sans-serif !important;
+}
+
+.section-500{
+    display: flex;
+    min-height: 700px;
+   align-items: center; 
+}
+
+.bg-gradient {
+ background: transparent linear-gradient(247deg, #031F4E 0%, #02214D 21%, #053975 44%, #074D92 60%, #2EAEDC 100%) 0% 0% no-repeat padding-box;
+}
+
+.heading-text {
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  text-align: center;
+}
+
+.heading-text span {
+  font-weight: 100;
+}
+
+ul {
+  list-style: none;
+}
+
+.color-brand-white {
+        color:#FFFFFF !important;
+    }
+    
+.color-brand-green{
+        color: #C4D82E !important;
+    }
+    
+h3{
+    color:#FFFFFF !important;
+}
+
+.cta-text {
+    font-size: 11px !important;
+    line-height: 1.5;
+    color:#FFFFFF !important;
+}
+
+/* Responsive image gallery rules begin*/
+
+.image-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.image-gallery > li {
+  flex-basis: 350px; /*width: 350px;*/
+  position: relative;
+}
+
+.image-gallery::after {
+  content: "";
+  flex-basis: 350px;
+}
+
+.image-gallery li img {
+  object-fit: cover;
+  max-width: 100%;
+  height: auto;
+  vertical-align: middle;
+  border-radius: 5px;
+}
+
+.overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(57, 57, 57, 0.502);
+  top: 0;
+  left: 0;
+  transform: scale(0);
+  transition: all 0.2s 0.1s ease-in-out;
+  color: #fff;
+  border-radius: 5px;
+  /* center overlay text */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* hover */
+.image-gallery li:hover .overlay {
+  transform: scale(1);
+}
+
+/*carousel styling*/
+.swiper {
+      width: 60%;
+      height: 100%;
+    }
+
+    .swiper-slide {
+      text-align: center;
+      font-size: 18px;
+      background: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    width: 250px !important;
+    height: 700px;
+    margin-left: 15px;
+    border-radius: 5px;
+    }
+    
+    .swiper-slide img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .swiper-button-next, .swiper-button-prev{
+    width: 60px;
+    height: 60px;
+    padding: 14px;
+    border-radius: 50%;
+    background: #1aa7ec !important;
+    color: #fff !important;
+    }
+    
+    .swiper-button-next:after {
+        font-size: 10px !important;
+    }
+    
+    .swiper-button-prev:after {
+        font-size: 10px !important;
+    }
+    
+    /*cta styling*/
+        .section-cta {
+        display: flex;
+        align-items: center;
+        padding-top: 40px;
+        padding-bottom: 40px;
+        width: 100%;
+        min-height: 250px;
+        background:#222222;
+    }
+    
+    .image-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #fff !important;
+    }
+
+
+    @@media (max-width: 896px) {
+    
+    .video-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    }
+    
+    #myButton {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    text-transform: uppercase;
+    top: 70%;
+    padding: 10px 24px;
+    background-color: #B6D133;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: width 0.3s;
+    z-index: 10;
+    }
+    
+    .swiper {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .swiper-button-next {
+        right: 20px;
+      }
+
+     .swiper-button-prev {
+        left: 20px;
+     }
+    
+    .section-800 img {
+         max-width: 100% !important;
+        }
+    }
+    
+
+</style>
+
+<!--end of styling-->
+
+@* the fun starts here *@
+
+<!--hero section-->
+<div id="videoContainer" class="md-text-center">
+    <div id="placeholder">
+        <div id="placeholderText" class="container">
+            <div class="row d-flex align-items-center md-text-center">
+                <div class="col-md-9">
+                    <h1>WE HAVE THE AUDACITY TO BACK YOU.</h1>
+                    <p class="lead color-brand-white">Without audacity, there would be no Africanbank. Because it takes audacity to defy the odds. It takes audacity to overcome your challenges. It takes audacity to believe you can make a difference. That’s why we back you to close the gap between where you are and where you want to be.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  <iframe id="myVideo" src="https://www.youtube.com/embed/grCFsKGklJ8?si=Ed8Q2u_mZj2ho7Up&autoplay=1" allow="accelerometer; autoplay; clipboard-write;" allowfullscreen></iframe>
+    <button id="myButton">click for more <span class="button-icon">▶</span></button>
+</div>
+<!--section one with image-->
+<section class="section-500 bg-gradient">
+          <div class="container">
+            <div class="row d-flex align-items-center row-change md-text-center">
+              <div class="col-xl-6 col-lg-6 col-md-6 mb-50">
+                <h1 class="color-brand-white mb-20">SEE THE DIFFERENCE. FEEL THE DIFFERENCE.</h1>
+                <p class="font-md color-brand-white">
+                 We’ve gone for a bold new look to reflect a bright new future. Africanbank has grown into a financial partner that can support you when it matters most. We’re more than just a bank. We’re a movement manifesting itself as a bank, a movement created to bring out the best in you. 
+                 </p>
+              </div>
+              <div class="col-xl-6 col-lg-6 col-md-6">
+                    <div class="video-container">
+                        <video autoplay muted loop>
+                            <source src="/media/f0ebpbm0/vid-20240517-wa0001.mp4" type="video/mp4">
+                         </video>
+                    </div>  
+              </div>
+            </div>
+          </div>
+        </section>
+
+<!--section CI guide with image-->
+<section class="section-500">
+          <div class="container">
+            <div class="row d-flex align-items-center row-change md-text-center">
+              <div class="col-md-6">
+                <h1 class="color-brand-1 mb-20 mt-20">AWAKEN YOUR AUDACITY TO BELIEVE.</h1>
+                <p class="font-md color-grey-500">
+                  We are passionate about creating real value for you. Our exciting range of products was designed with you in mind. Our fees stay low because we won’t hold you back from living your best life. And, your audacity is instantly rewarded. It’s time to awaken your audacity to believe…
+                </p>
+                
+                <div class="mt-20 text-start"><a href="" class="btn btn-brand-1 arrow-right"> view brand CI </a></div>
+              </div>
+              <div class="col-xl-6 col-lg-6 col-md-6">
+                    <img
+                    class="d-block"
+                    src="/media/sxybakin/images_535x535_cards-2.jpg"
+                    alt="iori"
+                    />  
+                  
+              </div>
+            </div>
+          </div>
+        </section>        
+<!--slider section-->
+<section class="section-800">
+           <!-- Swiper -->
+  <div class="swiper mySwiper">
+    <div class="swiper-wrapper">
+      <div class="swiper-slide">
+        <img src="/media/05cbmohh/images-250x700-1.jpg" class="">
+      </div>
+      <div class="swiper-slide">
+        <img src="/media/mespl2xl/images-250x700-2.jpg" class="">
+      </div>
+      <div class="swiper-slide">
+        <img src="/media/z4dnb4wt/images-250x700-3.jpg" class="">
+      </div>
+      <div class="swiper-slide">
+        <img src="/media/3habyxev/images-250x700-4.jpg" class="">
+      </div>
+      <div class="swiper-slide">
+        <img src="/media/rrsn0ttm/images-250x700-5.jpg" class="">
+      </div>
+    </div>
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+  </div> 
+    </div>
+</section>
+
+<!--section two with image-->
+<section class="section-500">
+          <div class="container">
+            <div class="row d-flex align-items-center row-change md-text-center">
+              <div class="col-md-6">
+                <h1 class="color-brand-1 mb-20">WE ARE BECAUSE YOU ARE.</h1>
+                <p class="font-md color-grey-500">
+                  Our heritage is an inspiring story in which a courageous group of people changed the course of history. From their audacity to believe in you, the vision of Africanbank was born: A bank for the people, by the people, serving the people. 
+                </p>
+              </div>
+              <div class="col-xl-6 col-lg-6 col-md-6">
+                    <img
+                    class="d-block"
+                    src="/media/txqlgvdp/images_535x535-2.jpg"
+                    alt="image of Dr.Sam"
+                    />  
+                  
+              </div>
+            </div>
+          </div>
+        </section>
+
+<!--gallery section-->
+<section class="section-800">
+          <div class="container-fluid">
+            <div class="row d-flex align-items-center text-center row-change md-text-center mb-20">
+            <div class="col-md-3"></div>
+              <div class="col-md-6">
+                <h1 class="color-brand-1 mb-20">YOUR TRUSTED PARTNER ON THE PATH TO PROSPERITY.</h1>
+                <p class="font-md color-grey-500">
+                  Whatever your road to success looks like, we’ll be with you every step of the way.
+                </p>
+              </div>
+              <div class="col-md-3"></div>
+            </div>
+            
+            <!--gallery part-->
+            <div class="row">
+                <ul class="image-gallery">
+        <li>
+          <img src="/media/fk2fkpeq/images_384x384-10.jpg" alt="" />
+          <div class="overlay"><span class="image-title">Audacious Moves</span></div>
+        </li>
+        <li>
+          <img src="/media/qfmfse1n/images_384x384-9.jpg" alt="" />
+          <div class="overlay"><span class="image-title">myWorld Banking</span></div>
+        </li>
+        <li>
+          <img src="/media/itvb11u5/images_384x384-6.jpg" alt="" />
+          <div class="overlay"><span class="image-title">Audacity To Believe</span></div>
+        </li>
+        <li>
+          <img src="/media/aucdglat/images_384x384-7.jpg" alt="" />
+          <div class="overlay"><span class="image-title">Mobile Banking</span></div>
+        </li>
+        <li>
+          <img src="/media/ulrhm3u3/images_384x384-8.jpg" alt="" />
+          <div class="overlay"><span class="image-title">Audacity To Invest</span></div>
+        </li>
+        <li>
+          <img src="/media/rhcf20ri/images_384x384-1.jpg" alt="" />
+          <div class="overlay"><span class="image-title">Audacious Rewards</span></div>
+        </li>
+        <li>
+          <img src="/media/dtvl1b5s/images_384x384-2.jpg" alt="" />
+          <div class="overlay"><span class="image-title">Bank On The Go</span></div>
+        </li>
+        <li>
+          <img src="/media/m2nhdg0x/images_384x384-3.jpg" alt="" />
+          <div class="overlay"><span class="image-title">Tax Free Investment</span></div>
+        </li>
+
+        <li>
+          <img src="/media/avzbammz/images_384x384-4.jpg" alt="" />
+          <div class="overlay"><span class="image-title">Salary Switch</span></div>
+        </li>
+        <li>
+          <img src="/media/wi4hmmtz/images_384x384-5.jpg" alt="" />
+          <div class="overlay"><span class="image-title">Audacity To Dream</span></div>
+        </li>
+      </ul>
+            </div>
+            
+          </div>
+        </section>
+        
+<!--section three with image-->
+<section class="section-500">
+          <div class="container">
+            <div class="row d-flex align-items-center row-change md-text-center">
+              <div class="col-md-6">
+                <h1 class="color-brand-1 mb-20">AWAKEN YOUR AUDACITY TO BELIEVE.</h1>
+                <p class="font-md color-grey-500">
+                  We are passionate about creating real value for you. Our exciting range of products was designed with you in mind. Our fees stay low because we won’t hold you back from living your best life. And, your audacity is instantly rewarded. It’s time to awaken your audacity to believe…
+                </p>
+                <div class="mt-20 text-start"><a href="" class="btn btn-brand-1 arrow-right"> Bank with us </a></div>
+              </div>
+              <div class="col-xl-6 col-lg-6 col-md-6">
+                    <img
+                    class="d-block"
+                    src="/media/sxybakin/images_535x535_cards-2.jpg"
+                    alt="iori"
+                    />  
+                  
+              </div>
+            </div>
+          </div>
+        </section>
+        
+<!--cta section-->
+<section class="section-cta">
+    <div class="container">
+        <div class="row d-flex align-items-center row-change md-text-center">
+            <div class="col-lg-12 col-md-12 cta-footer">
+                  <span class="font-lg color-brand-green">
+                    1 Number to call
+                  </span>
+                  <h3 class="color-brand-white mb-15 mt-5">0861 123 456</h3>
+                  <p class="font-xs cta-text">
+                    MyWorld Terms and Conditions | Website Terms and Conditions
+                    | Registration Terms and Conditions
+                  </p>
+                  <p class="font-xs cta-text">
+                    *Banking fees are based on Solidarity&apos;s methodology of
+                    comparing defined baskets of transactions(12,17,25 and 30
+                    transactions) across 6 biggest entry level bank accounts. In
+                    this way, an average industry price was obtained.
+                  </p>
+                </div>
+        </div>
+    </div>
+</section>
+
+
+<!--Script Section-->
+  <!-- Swiper JS -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+  <!-- Initialize Swiper -->
+  <script>
+    var swiper = new Swiper(".mySwiper", {
+      slidesPerView: 1,
+      spaceBetween: 10,
+      navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+      },
+      breakpoints: {
+        "@@0.00": {
+          slidesPerView: 1,
+          spaceBetween: 5,
+        },
+        "@@0.75": {
+          slidesPerView: 2,
+          spaceBetween: 10,
+        },
+        "@@1.00": {
+          slidesPerView: 3,
+          spaceBetween: 20,
+        },
+        "@@1.50": {
+          slidesPerView: 4,
+          spaceBetween: 25,
+        },
+      },
+    });
+  </script>
+  
+ <!--banner video control-->
+ 
+ <!--banner video control-->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+       var video = $('#myVideo');
+    $('#myButton').click(function() {
+     
+        console.log("Button clicked");
+     
+        
+        if (video.is(':visible')) {
+            $(this).removeClass('expanded').html(`click for more <span class="button-icon">▶</span>`);
+            $('#placeholder').removeClass('hidden');
+            video.attr("src", "");
+            video.hide();
+        } else {
+            video.attr("src", "https://www.youtube.com/embed/grCFsKGklJ8?si=Ed8Q2u_mZj2ho7Up&autoplay=1");
+            $(this).addClass('expanded').html(`close <span class="button-icon">x</span>`);
+            $('#placeholder').addClass('hidden');
+            video.show();
+        }
+    });
+});
+</script>
+</script>
+

@@ -90,7 +90,7 @@
     var seo_title = Umbraco.Field("title_tag");
     var seo_description = Umbraco.Field("descrition_tag");
     var seo_keywords = Umbraco.Field("keywords_tag");
-    String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
+    String twitter_default_image = "/media/u1yax2c5/ab-logo_icon_blue_30x30-2.png";
 
     if (Model.Content.GetPropertyValue<IPublishedContent>("image") != null)
     {
@@ -287,6 +287,8 @@
     @*<link href="~/css/main.css" rel="stylesheet" />*@
     @*<link href="~/css/custom_main.css" rel="stylesheet" />*@
     @*<link href="~/Content/font-awesome.min.css" rel="stylesheet" />*@
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/brands.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
     @* <link href="~/Umbraco/lib/datetimepicker/bootstrap-datetimepicker.min.css" rel="stylesheet" /> *@
     <link href="~/javascripts/datetime/bootstrap-datetimepicker.min.css" rel="stylesheet" />
@@ -360,6 +362,7 @@
     <script type="text/javascript" src="~/scripts/search.min.js"></script>
     <script type="text/javascript" src="~/scripts/autoNumeric.min.js"></script>
     <script type="text/javascript" src="~/scripts/ab-branch-locator.min.js"></script>
+    <script type="text/javascript" src="~/scripts/utmtracker.js"></script>
 
 
     <script async type="text/javascript" src="https://maps.google.com/maps/api/js?key=AIzaSyDBmQ2ZZjFw2l6IkoObraDVK-vD6tMW5pI"></script>

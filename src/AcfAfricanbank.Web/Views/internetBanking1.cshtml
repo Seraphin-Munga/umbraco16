@@ -1,5 +1,365 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using AcfAfricanbank.Core.Models.Forms
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers;
+@using CustomModels = Web.Models;
+@using System.Collections.Generic;
 @{
-	Layout = null;
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var children = Model.Children;
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
+    var heroBody = (HeroBody)children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    // Get Properties from children
+    var tableItems = heroBody.Children(x => x is TableChecklist).FirstOrDefault();
+    var chestTitle = heroChest?.Value("chestTitle").ToString();
+    var chestDescription = heroChest?.Value("chestDescription").ToString();
+    var chestCards = heroChest?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+
+    var internetBankingItemsModel = new CustomModels.Benefits
+    {
+        Header = chestTitle,
+        Description = chestDescription,
+        BenefitCards = chestCards.Select(c => c as Card).ToList()
+    };
+
+    var tabGroup = heroBody.Children(x => x.ContentType.Alias.ToLower() == "tabgroup").FirstOrDefault();
+    var tabHeader = tabGroup.Children(xx => xx.ContentType.Alias.ToLower() == "tabheader").FirstOrDefault();
+    var tabBody = (TabBody)tabHeader.Children(cc => cc.ContentType.Alias.ToLower() == "tabbody").FirstOrDefault();
+
+    var mobileBlurpData = heroBody.Children(x => x.ContentType.Alias.ToLower() == "richtexteditor").FirstOrDefault();
+    var mobileBlurp = mobileBlurpData.Value("TextEditor");
+}
+
+<style type="text/css">
+    .onenumbercall {
+        text-align: center;
+        margin-top: 0;
+        margin-bottom: 10px;
+        line-height: 1.1;
+        display: block;
+    }
+
+    .modal .modal-dialog .modal-content .modal-header {
+        background-color: transparent;
+        border-bottom: 1px solid #eee;
+    }
+</style>
+
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+<!-- HERO CONTINUED-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+<div class="container">
+    <div class="internet-banking-container full">
+        @Html.Partial("_benefitsSection", internetBankingItemsModel)
+    </div>
+</div>
+
+<div class="campaign-more-container">
+    <div class="hover-block"></div>
+    <div class="container">
+        <div class="mega-tabs">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs eq-height" role="tablist">
+                <li role="presentation" class="online-banking-li">
+                    @tabHeader.Value("ebankITIconTitle")
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("_pageRenderOnlineBankingCard", tabBody as ContentModels.TabBody)
+
+<div class="number-to-call">@Html.Raw(@heroBody.Value("richTextBox"))</div>
+
+<div class="online-banking-container">
+    <div class="container">
+        <div style="text-align:center">
+            <div style="margin-top:20px">
+                <h2>Features available online</h2>
+            </div>
+        </div>
+
+        @{
+
+            int mobiIterator = 1;
+            string mobiAccordionName = null;
+
+            foreach (var mobiItem in (IEnumerable<NCtabularInfo>)tableItems.Value("Data"))
+            {
+                mobiAccordionName = "accordion" + mobiIterator.ToString();
+                <div class="mobi-table" style="width:  100%;padding: 0px;left:  0;">
+                    <div data-toggle="collapse" data-target=".@mobiAccordionName" class="clickable tr-category">
+                        <div class="arrow-container">
+                            @{ var mobiIconName = "mobiIcon" + @mobiIterator.ToString(); }
+                            <i id="@mobiIconName" style="float: right;"><span class="fa fa-arrow-down"></span></i>
+                        </div>
+                        <b>@mobiItem.Value("category")</b>
+                    </div>
+                    @foreach (var mobiData in (IEnumerable<NCtabularData>)mobiItem.Value("tabularData"))
+                    {
+                        <div class="row @mobiAccordionName collapse" aria-expanded="false" style="text-align: left; width: 100%; margin-top: 0px; padding: 25px; height: 50px;">
+                            <h3 style="color: #fff;text-align:  left;font-size: 24px;margin-bottom:  18px;">
+                                @mobiData.Value("action")
+                            </h3>
+
+                            @{
+
+                                if (mobiItem.Value("category").ToString() == "All")
+                                {
+                                    <div class="col-xs-4"><img src="/media/cznhvbf1/yes-internet-banking-icon.svg" alt="yes-internet-banking-icon" width="80%"></div>
+                                    <div class="col-xs-4"><img src="/media/keig23yt/icon_yes_app.svg" alt="icon-yes-app" width="80%"></div>
+                                    <div class="col-xs-4"><img src="/media/0twjqhgz/icon_yes_cell.svg" alt="icon-yes-cell" width="80%"></div>
+                                }
+                                else
+                                {
+                                    var mobiOption = (IEnumerable<BankingOptions>)mobiData.Value("bankingOptions");
+
+                                    BankingOptions internetBanking, africanBankApp, cellPhoneBanking = null;
+
+                                    internetBanking = (BankingOptions)mobiOption.ToList()[0];
+                                    africanBankApp = (BankingOptions)mobiOption.ToList()[1];
+                                    cellPhoneBanking = (BankingOptions)mobiOption.ToList()[2];
+
+                                    if (internetBanking.OptionForBanking == "Internet Banking" && (bool)internetBanking.IsSelected)
+                                    {
+                                        <div class="col-xs-4"><img src="/media/cznhvbf1/yes-internet-banking-icon.svg" alt="yes-internet-banking-icon" width="80%" /></div>
+                                    }
+                                    else
+                                    {
+                                        <div class="col-xs-4"><img src="/media/lxwdcgq3/no-internet-banking-icon.svg" alt="no-internet-banking-icon" width="80%" /></div>
+                                    }
+
+                                    if (africanBankApp.OptionForBanking == "African Bank App" && (bool)africanBankApp.IsSelected)
+                                    {
+                                        <div class="col-xs-4"><img src="/media/keig23yt/icon_yes_app.svg" alt="icon-yes-app" width="80%" /></div>
+                                    }
+                                    else
+                                    {
+                                        <div class="col-xs-4"><img src="/media/jd2hm45r/icon_no_app.svg" alt="icon-no-app" width="80%" /></div>
+                                    }
+
+                                    if (cellPhoneBanking.OptionForBanking == "CellPhone Banking" && (bool)cellPhoneBanking.IsSelected)
+                                    {
+                                        <div class="col-xs-4"><img src="/media/0twjqhgz/icon_yes_cell.svg" alt="icon-yes-cell" width="80%" /></div>
+                                    }
+                                    else
+                                    {
+                                        <div class="col-xs-4"><img src="/media/w01dqi1p/icon_no_cell.svg" alt="icon-no-cell" width="80%" /></div>
+                                    }
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+                ++mobiIterator;
+            }
+
+            <div class="row desk-table">
+                <div class="col-md-12">
+                    <div class="margin-top-50">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <table class="checklist-table" table width="100%" border="1" cellpadding="10" bordercolor="#00132a">
+                                    <tr class="checklist-headers">
+                                        <th class="empty-table-header"></th>
+                                        <th>Internet Banking</th>
+                                        <th>African Bank App</th>
+                                        <th>CellPhone Banking</th>
+                                        <th>Whatsapp Banking</th>
+                                    </tr>
+                                    @{
+                                        int iterator = 1;
+                                        string accordionName = null;
+
+                                        foreach (var item in (IEnumerable<NCtabularInfo>)tableItems.Value("Data"))
+                                        {
+                                            accordionName = "accordion" + iterator.ToString();
+                                            <tr data-toggle="collapse" data-target=".@accordionName" class="clickable tr-category">
+
+                                                <td colspan="5">
+
+                                                    <div class="arrow-container">
+                                                        <b>@item.Value("category")</b>
+                                                        @{ var iconName = "icon" + iterator.ToString(); }
+                                                        <i id="@iconName" style="float: right;"><span class="fa fa-arrow-down"></span></i>
+                                                    </div>
+                                                </td>
+
+                                            </tr>
+                                            foreach (var data in (IEnumerable<NCtabularData>)item.Value("tabularData"))
+                                            {
+
+                                                if (data.Value("action").ToString() == "Apply online")
+                                                {
+                                                    if (item.Value("category").ToString() == "LOAN")
+                                                    {
+                                                        int actionIterator = 0;
+                                                        <tr class="@accordionName collapse">
+                                                            <td>
+                                                                @data.Value("action")
+                                                            </td>
+                                                            @foreach (var options in (IEnumerable<BankingOptions>)data.Value("bankingOptions"))
+                                                            {
+                                                                if (actionIterator == 1)
+                                                                {
+                                                                    <td style="text-align:center">Call back</td>
+                                                                    break;
+                                                                }
+                                                                bool isSelected = (bool)options.Value("isSelected");
+                                                                <td style="text-align:center">
+                                                                    <i class="@(isSelected ? "fa fas fa-check-circle fa-2x" : "")" style="color:green;"></i>
+                                                                </td>
+                                                                actionIterator += 1;
+                                                            }
+                                                            <td style="text-align:center">Call back</td>
+                                                        </tr>
+                                                    }
+                                                    else if (item.Value("category").ToString() == "CREDIT CARD")
+                                                    {
+                                                        int actionIterator = 0;
+                                                        <tr class="@accordionName collapse">
+                                                            <td>
+                                                                @data.Value("action")
+                                                            </td>
+                                                            @foreach (var options in (IEnumerable<BankingOptions>)data.Value("bankingOptions"))
+                                                            {
+                                                                if (actionIterator == 1)
+                                                                {
+                                                                    <td style="text-align:center"></td>
+                                                                    break;
+                                                                }
+                                                                bool isSelected = (bool)options.Value("isSelected");
+                                                                <td style="text-align:center">
+                                                                    <i class="@(isSelected ? "fa fas fa-check-circle fa-2x" : "")" style="color:green;"></i>
+                                                                </td>
+                                                                actionIterator += 1;
+                                                            }
+                                                            <td style="text-align:center">Call back</td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <tr class="@accordionName collapse">
+                                                        <td>
+                                                            @data.Value("action")
+                                                        </td>
+                                                        @foreach (var options in (IEnumerable<BankingOptions>)data.Value("bankingOptions"))
+                                                        {
+                                                            bool isSelected = (bool)@options.Value("isSelected");
+                                                            <td style="text-align:center">
+                                                                <i class="@(isSelected ? "fa fas fa-check-circle fa-2x" : "")" style="color:green;"></i>
+                                                            </td>
+                                                        }
+                                                    </tr>
+                                                }
+
+
+                                            }
+                                            ++iterator;
+                                        }
+                                    }
+                                </table>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        }
+    </div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-21394042-6"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-21394042-6', { 'optimize_id': 'GTM-T7N9LBL' });
+</script>
+@section scripts
+{
+
+    <script type="text/javascript">
+
+    function getMobileOperatingSystem()
+    {
+        var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+        if (/windows phone/i.test(userAgent)) {
+            return "Windows Phone";
+        }
+
+        if (/android/i.test(userAgent)) {
+            return "Android";
+        }
+
+        if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+            return "iOS";
+        }
+
+        return "unknown";
+    }
+    $(document).ready(function(){
+        var downloadPath = window.location.href;
+        var hastagDownload = downloadPath.substring(downloadPath.length-9, downloadPath.length);
+
+        var emoji = String.fromCodePoint(0x1F60A);
+        var platform = "";
+        var appendHTML = "<div class='hidden-sm hidden-md hidden-lg'><div class='row'><div class='col-xs-12'> " +
+                        "<span class='copy'>For easier navigation and to get familiar with our products - we reckon you should use our app</span>" +
+                        "</div></div>" +
+                        "<div class='row'><div class='col-xs-12'><a class='app-platform button primary clearfix' style='background-color: #88bc47 !important;' " +
+                        "href=''>Get it!</a></div></div></div>" +
+                        "<div class='hidden-xs row'><div class='col-xs-12 col-sm-1 col-md-1 col-lg-1' style='padding-left:10%;'>" +
+                        "<i class='fa fa-mobile' aria-hidden='true' style='font-size:58px;'></i></div>" +
+                        "<div class='col-xs-12 col-sm-7 col-md-7 col-lg-7' style='text-align: left;padding-left: 50px;'>" +
+                        "<span class='copy'>For easier navigation and to get familiar with our products - we reckon you should use our app</span></div>" +
+                        "<div class='hidden-xs col-sm-3 col-md-3 col-lg-3' style='margin: 9px;padding-right: 2px;'>" +
+                        "<a class='app-platform button primary clearfix' style='background-color: #88bc47 !important;' href='' >Get it!</a>" +
+                        "</div></div>";
+
+        switch(getMobileOperatingSystem())
+        {
+            case "Android":
+                platform = $("#AndroidUrl").attr('href');
+
+                $('.modal-title').text('Hi, Android User ' + emoji);
+                $('.modal-body').text("");
+
+                $('.modal-body').append(appendHTML);
+                $('.app-platform').attr('href', platform);
+                $('.copy').html('@mobileBlurp');
+          
+                break;
+
+            case "iOS":
+                platform = $("#iOSUrl").attr('href');
+                $('.modal-title').text('Hi, iOS User ' + emoji);
+                $('.modal-body').text("");
+                $('.modal-body').append(appendHTML);
+                $('.copy').html('@mobileBlurp');
+
+                $('.app-platform').attr('href', platform);
+               
+                break;
+            default:
+             console.log("click");
+
+        }
+    });
+
+    $(".btn_ok_modal").click(function () {
+        $('#generic').modal('hide');
+    });
+
+    </script>
 }

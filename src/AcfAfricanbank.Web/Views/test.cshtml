@@ -1,5 +1,466 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
-	Layout = null;
+    Layout = "Master.cshtml";
 }
+
+<style>
+    select{
+     appearance:auto !important;   
+    }
+    
+    .glyphicon-search{
+       color:#557194 !important; 
+    }
+    
+    .ShowAdvanceSearchDetails{
+            padding-left: 10px;
+    }
+    .ab-navigate-branch-link{
+        margin-top: 10px;
+        background-color: #fcfcfc !important;
+        border-color: #002b60 !important;
+        color: #002b60;
+        font-weight: 600;
+        border-radius: 20px;
+        width: 80%;
+    }
+    .ab-navigate-branch-link:hover{
+        color: #002b60 !important;
+    }
+
+    .ab-navigate-branch-link:active{
+        color: #002b60 !important;
+        background-color: #fcfcfc !important;
+    }
+
+    .ab-navigate-branch-link:focus{
+        color: #002b60 !important;
+        background-color: #fcfcfc !important;
+    }
+
+    .glyphicon-triangle-bottom{
+       width:0%; 
+       position: absolute !important;
+       margin-left: 2px; !important
+    }
+    
+    #LB_BODY_SEARCH_6ef8638f-af8c-409d-ad24-cf3422269370 {
+        font-size: 16px;
+    }
+    
+    .bootstrap-iso .input-group {
+        width: 90%;
+        margin-left: 10px;
+    }
+    
+    .ab-filters{
+        margin-left:-10px;
+    }
+    
+    .filter-icon{
+        display: flex;
+        margin-top: 12px;
+        position: absolute;
+        padding-left: 8px;
+        cursor: pointer;
+    }
+    
+    #LB_BODY_SEARCH_BUTTON {
+        background-color: #f9f9f9 !important;
+    }
+    
+    .img-responsive{
+        display:none !important;
+    }
+    .LB_BODY-iso .ml0{
+        width:100% !important;
+    }
+
+    .LB_BODY-iso .pl0{
+        display:none !important;
+    }
+
+     .LB_BODY-iso{
+        margin-left: 0px !important;
+    }
+
+    .btn-info{
+        background-color: #88bc47;
+        border-color: #88bc47;
+        border-radius:20px;
+        width:80%;
+    }
+    .btn-info:hover{
+        background-color: #88bc47;
+        border-color: #88bc47;
+    }
+    
+    .btn-info:active{
+        background-color: #88bc47 !important;
+        border-color: #88bc47 !important;
+    }
+    
+    .glyphicon-earphone {
+        color:#88bc47;
+    }
+    
+    .glyphicon-time{
+         color:#88bc47;
+    }
+    
+    .locationHeading {
+         color: #002b60 !important;
+        font-size: 14px !important;
+        font-weight: bold !important;
+    }
+    .analytic-phone a{
+        font-weight: bold !important;
+    }
+    .text-success{
+        color: #002b60 !important;
+        font-weight: bold !important;
+    }
+    .bootstrap-iso .col-sm-12{
+        background: #ECECEC 0% 0% no-repeat padding-box;
+        margin-bottom: 20px;
+        margin-left:25px;
+        width:87% !important;
+        border-radius:20px;
+        box-shadow: 0 10px 14px 0 rgba(69,73,91,.08);
+    }
+
+
+    .glyphicon-chevron-down{
+      width:0% !important;  
+    }
+
+    #LB_SIDEBAR {
+       height: 60vh;
+        overflow-x: hidden;
+        overflow-y: scroll;
+      @*  width:130% !important;*@
+    }
+    
+    #LB_BODY_SEARCH_BUTTON{
+      background-color: #2B5F94;
+      color: white;
+    }
+    
+   #LB_BODY_SEARCH_NEARME6ef8638f-af8c-409d-ad24-cf3422269370{
+        
+      padding-bottom: 10px;
+      padding-top: 10px
+      
+    }
+    
+    #LB_BODY_SEARCH_6ef8638f-af8c-409d-ad24-cf3422269370{
+        font-size:16px;
+        border-radius: 20px
+    }
+    
+   .row NoPadMargin{
+        right:10px;
+    }
+  
+    .locationHeading h4{
+        text-align:initial;
+        color: rgb(51 51 51);
+    }
+    
+    .mt {
+        display:grid !important;
+    }
+    
+    .text-info{
+        font-size:16px !important;
+    }
+    
+    .AdvanceSearchHeader{
+        padding-top: 10px;
+        margin-left: 10px
+    }
+  
+    .ab-view-store-details:hover{
+        background-color: #88bc47 !important;
+        border-color: #88bc47 !important
+    }
+    
+    .ab-view-store-details:visited{
+        background-color: #88bc47 !important;
+        border-color: #88bc47 !important
+    }
+    
+   .ab-store-locator-test > a {
+      pointer-events: none;
+   }
+
+    .ab-store-locator-test > div {
+        pointer-events: none;
+    }
+    
+    .LB_BODY-iso .LB_MAP {
+        height: calc(90vh / 1 - 5px) !important;
+    }
+    
+    .LB_BODY-iso .h100 {
+        height: calc(90vh / 1) !important;
+    }
+    
+    .text-success{
+        margin-right: -20px !important;
+    }
+    
+    #openHoursList > .row{
+        margin-bottom:10px !important;
+    }
+    
+     .text-success div:nth-child(2) {
+         margin-left:-2px !important;
+     }
+    
+    @@media (min-width: 768px){
+        .NoPadMargin .col-md-4 {
+            position: absolute !important;
+            max-width: 400px;
+          
+            height: 565px;
+            z-index: 1;
+            overflow: hidden;
+           margin: 70px 200px;
+            padding: 15px;
+        
+        }
+        
+       .NoPadMargin .col-md-4 .p0{
+          border-bottom-right-radius: 10px;
+          border-bottom-left-radius: 10px;
+          background-color: #fff;
+          border: 10px solid #fff;
+        }
+         
+        .NoPadMargin .col-md-4 .form 
+        {
+            border-top-right-radius: 10px;
+            border-top-left-radius: 10px;
+            background-color: #fff;
+            border: 10px solid #fff;
+        }
+             
+        .LB_StoreLocator  {
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+            width:100% !important;
+            padding-left:0 !important;
+            padding-right:0 !important;
+        }
+        
+        #LB_BODY_SEARCH_6ef8638f-af8c-409d-ad24-cf3422269370 {
+            
+            border-radius: 0px !important; 
+            background-color: #f0f0f0 !important;
+            border-top-left-radius: 20px !important;
+            border-bottom-left-radius: 20px !important;
+        }
+        
+        #LB_BODY_SEARCH_BUTTON {
+            background-color: #f9f9f9 !important;
+            border-top-right-radius: 20px !important;
+            border-bottom-right-radius: 20px !important;
+        }
+        
+        .bootstrap-iso .col-sm-6 {
+            width: 100% !important;
+        }
+    }
+    
+    @@media (min-width: 992px)
+    {
+        .bootstrap-iso .col-md-8 {
+            width: 100% !important;
+        }
+    }
+    
+    @@media(max-width: 767px) and (min-width: 256px)
+    {
+
+     ::-webkit-scrollbar-button:single-button:vertical:decrement {
+          border-width: 0 8px 8px 8px;
+          border-color: transparent transparent #555555 transparent;
+        }
+    
+        ::-webkit-scrollbar-button:single-button:vertical:decrement:hover {
+          border-color: transparent transparent #777777 transparent;
+        }
+        
+       .LB_BODY-iso #LB_SIDEBAR{
+          @*  max-width:400px;*@
+            max-height:350px;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            margin-bottom: 2px;
+        }
+        
+        .LB_BODY-iso #LB_SIDEBAR::-webkit-scrollbar {
+            width: 0.5em;
+        }
+        
+        .LB_BODY-iso #LB_SIDEBAR::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 2px rgba(1,1,1,0.4);
+        }
+        
+        .LB_BODY-iso #LB_SIDEBAR::-webkit-scrollbar-thumb {
+            background-color: #D5F5E3;
+            outline: 1px solid #FBFCFC;
+        }
+        
+        .text-success{
+        font-size:10px;
+        }
+        
+        #LB_BODY_SEARCH_BUTTON{
+        border-top-right-radius: 20px !important;
+        border-bottom-right-radius: 20px !important;
+        }
+        
+        #LB_BODY_SEARCH_6ef8638f-af8c-409d-ad24-cf3422269370 {
+   
+        border-top-right-radius: 0px !important;
+        border-bottom-right-radius: 0px !important;
+        }
+        
+        #LB_BODY_from_6ef8638f-af8c-409d-ad24-cf3422269370{
+           margin-bottom: 12px;
+        }
+    }
+    
+   @@media(max-width: 320px) and (min-width: 300px){
+   
+       .text-success{
+         font-size:8px;
+        }
+    }
+    
+   
+</style>
+
+   <div id="6ef8638f-af8c-409d-ad24-cf3422269370" class=" LB_StoreLocator container " style="hieght:800px;" ></div>
+   
+  @* <div class="store-details" style="display:none;">
+       <div><button class="bt store-detail-back-link" >Back</button></div>
+         <div><span style="font-size: 18px;margin-left: 13%;color: currentColor;font-weight: bolder;">Branch Details</span></div>
+      <div id="295c65c2-affb-44f8-b365-3f19f53a2581" class="LB_LocationDetails"></div>
+        <div class="locator-bank-main" ></div>
+   </div>*@
+   
+    <div class="container-fluid bg-blue">
+        <div class="row">
+            <div class="col-sm-5">
+              <p> </p>
+              <p> </p>
+              <p> </p>
+              <p> </p>
+           </div>
+      </div>
+    </div>
+@*<img src="/media/w4el0mjw/african-bank.jpg" class="w3-image w3-greyscale-min" style="width:100%">*@
+<!-- Include jQuery library -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ 
+ 
+@section scripts {
+<script type="text/javascript" src="~/scripts/location-bank.js"></script>
+
+<script type="text/javascript">
+var isOpenFilter = false;
+
+  $(".filter-icon").click(function()
+  {
+      isOpenFilter = !isOpenFilter;
+      $("#ShowAdvanceSearch").click();
+      if(isOpenFilter){
+      $("#LB_SIDEBAR").css("height","42vh");
+      }
+      else
+      {
+          $("#LB_SIDEBAR").css("height","60vh");
+      }
+  }
+  );
+      
+  
+      
+   
+    
+</script>
+@*<script type="text/javascript" src="~/scripts/store-locator.js"></script>*@
+ 
+ 
+ @* $(document).ready(function() {
+ $(".ab-view-store-details").click(function(event) {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    urlParams.append('loc=African%20Bank%20Diepsloot&id=6d24311d-adb1-4143-a13c-f992051003a6&layout=standard&clientid=6ef8638f-af8c-409d-ad24-cf3422269370');
+
+    window.location.search = urlParams;
+    $(".store-details").css("display", "block");
+    $(".LB_StoreLocator").css("display", "none");
+    
+ });
+ 
+ });
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var divId = "6ef8638f-af8c-409d-ad24-cf3422269370";
+            var scriptUrl = "https://locationbank.net/Public/StoreLocator?id=" + divId + "&layout=standard&detailslayout=standard";
+            var script = document.createElement("script");
+            script.type = "text/javascript";
+            script.src = scriptUrl;
+            document.getElementById(divId).appendChild(script);
+            const myTimeout = setTimeout(myGreeting, 3000);
+
+          function myGreeting() {
+               _LB_Map_ObjInfo_1.getDetailURL = function(loc_id,locationNameUrl,storeLocatorDetailsShortURL,loc_clientId){
+                return "/en/home/location-store?locationid="+ loc_id;
+            }
+               $(".btn-accent").each(function(index, element) {
+                   
+                  if($(element).attr('href')) {
+                        var href = $(element).attr('href');
+                        var arr = href.split('&');
+                        if(arr && arr.length > 0) {
+                          var value = arr[1].split('=');
+                          $(element).attr("store-id", (value && value.length > 0) ? value[1] : "");
+                        }
+                    }
+                    $(element).attr("href", "#");
+                    $(element).parent().parent().attr('store-locator', " ");
+                    $(element).parent().addClass('ab-store-locator-test');
+                    $(element).parent().parent().find(".locationHeading").addClass('storeheader');
+                  // var directionUrl = $(element).parent().parent().find(".icon-directions-lb").attr("href");
+                  // console.log(directionUrl);
+                     
+                  //  $(element).parent().append.('<span><a class="btn btn-info btn-solid " href="'+directionUrl+'" >Navigate to Branch</a></span>');
+                   
+                });
+             
+               $(".ab-store-locator-test").click(function(event) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  localStorage.setItem("store-id", $($(this).find('a')[0]).attr("store-id"));
+                  window.location.href = "/en/home/location-store/";
+              });
+             $(".storeheader").click(function(event) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  localStorage.setItem("store-id", $($(this).parent().parent().parent().find('a')[3]).attr("store-id"));
+                  window.location.href = "/en/home/location-store/";
+               }); 
+               $('#ShowAdvanceSearch').remove();
+                $("#LB_BODY_from_6ef8638f-af8c-409d-ad24-cf3422269370").prepend('<div class="col-md-4"></div><div class="col-md-8"><a id="LB_BODY_SEARCH_NEARME6ef8638f-af8c-409d-ad24-cf3422269370" href="#" style="text-align: end; text-decoration:underline; display:block; color: #002b60 !important; font-weight:bold; font-size:14px;"><span>View Branch near me</span></a></div>');
+                $(".AdvanceSearchHeader").prepend('<div id="ShowAdvanceSearch" style="display:block; color: #002b60 !important;"><i class="fas fa-sliders-h"></i> advachsearch </div>');
+               
+               
+            }
+        });
+    </script>*@
+  }

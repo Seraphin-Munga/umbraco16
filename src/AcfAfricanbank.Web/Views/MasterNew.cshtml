@@ -1,29 +1,31 @@
-﻿@inherits UmbracoViewPage
-@inject Umbraco.Cms.Core.Models.PublishedContent.IPublishedValueFallback PublishedValueFallback
-@inject Umbraco.Cms.Core.Models.PublishedContent.IVariationContextAccessor VariationContextAccessor
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using ContentModels = Umbraco.Web.PublishedModels
+@using Umbraco.Core
+@using System.Web.Optimization
 @{
     Layout = null;
+    ContentModels.PageHome home = Model.Root() as ContentModels.PageHome;
     HomePageElements homePageElements = null;
-    if (Model.Children(VariationContextAccessor).Where(o => o is HomePageElements).FirstOrDefault() != null)
+    if (Model.Children.Where(o => o is HomePageElements).FirstOrDefault() != null)
     {
-        homePageElements = (HomePageElements)Model.Children(VariationContextAccessor).Where(o => o is HomePageElements).FirstOrDefault();
+        homePageElements = (HomePageElements)Model.Children.Where(o => o is HomePageElements).FirstOrDefault();
     }
-    else if (Model.Parent.Parent.Children(VariationContextAccessor).Where(o => o is HomePageElements).FirstOrDefault() != null)
+    else if (Model.Parent.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault() != null)
     {
-        homePageElements = (HomePageElements)Model.Parent.Parent.Children(VariationContextAccessor).Where(o => o is HomePageElements).FirstOrDefault();
+        homePageElements = (HomePageElements)Model.Parent.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
     }
     else
     {
-        homePageElements = (HomePageElements)Model.Parent.Children(VariationContextAccessor).Where(o => o is HomePageElements).FirstOrDefault();
+        homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
     }
-    var disclaimersData = homePageElements?.Children(VariationContextAccessor).Where(o => o.ContentType.Alias == "ebankITListSectionText").ToList();
-    var disclaimers = disclaimersData?.FirstOrDefault()?.Children(VariationContextAccessor) ?? Enumerable.Empty<IPublishedContent>();
+    var disclaimersData = homePageElements.Children.Where(o => o.ContentType.Alias == "ebankITListSectionText").ToList();
+    var disclaimers = disclaimersData.FirstOrDefault().Children;
     IPublishedContent disclaimerValue = null;
     foreach (var content in disclaimers)
     {
-        if (Context.Request.Path.ToString().Contains("/banking"))
+        if (HttpContext.Current.Request.Path.ToString().Contains("/banking"))
         {
-            if ((content.Value(PublishedValueFallback, "ebankITTitle")?.ToString() ?? "").Contains("Banking"))
+            if (content.Value("ebankITTitle").ToString().Contains("Banking"))
             {
                 disclaimerValue = content;
             }
@@ -34,7 +36,7 @@
             break;
         }
     }
-    var bottomNavigation = (BottomNavigation)homePageElements?.Children(VariationContextAccessor).Where(c => c is BottomNavigation).FirstOrDefault();
+    var bottomNavigation = (BottomNavigation)homePageElements.Children.Where(c => c is BottomNavigation).FirstOrDefault();
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -50,6 +52,9 @@
     <link href="~/css/style.css" rel="stylesheet">
     <link href="~/css/media-query.css" rel="stylesheet">
     <link href="~/css/aos-2-3-1.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/brands.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="~/scripts/jquery-3-5-1.min.js"></script>
     <script src="~/scripts/popper-1-16-0.min.js"></script>
@@ -78,7 +83,7 @@
                     <div class="col-sm-7 col-sm-pull-5">
                         <img src="~/images/africanbank-logo-white.svg" width="170" alt="African Bank">
                         <div class="copyright-text">
-                            @Html.Raw(disclaimerValue?.Value(PublishedValueFallback, "ebankITContent"))
+                            @Html.Raw(disclaimerValue.Value("ebankITContent"))
                         </div>
                     </div>
                     <div class="col-sm-5 col-sm-push-7">
@@ -86,7 +91,9 @@
                         <div class="pull-right">
                             <a href="#" target="_blank"><i class="footer-social fa" aria-hidden="true"><span style="font-family:Montserrat">B</i></a>
                             <a href="https://www.facebook.com/africanbank/" target="_blank"><i class="footer-social fa fa-facebook" aria-hidden="true"></i></a>
-                            <a href="https://twitter.com/AfricanBank" target="_blank"><i class="footer-social fa fa-twitter" aria-hidden="true"></i></a>
+                            <a href="https://twitter.com/AfricanBank" target="_blank"><i class="footer-social bi bi-twitter-x"></i><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-twitter-x" viewBox="0 0 16 16">
+  <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z"/>
+</svg></a>
                             <a href="https://www.instagram.com/african_bank/" target="_blank"><i class="footer-social fa fa-instagram" aria-hidden="true"></i></a>
                             <a href="https://za.linkedin.com/company/african-bank" target="_blank"><i class="footer-social fa fa-linkedin" aria-hidden="true"></i></a>
                         </div>

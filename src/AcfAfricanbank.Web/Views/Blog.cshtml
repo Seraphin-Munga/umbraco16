@@ -74,7 +74,7 @@ var searchResults = searchQuery;
 var blogName = Model.Name;
 var selectedContent = Model.Children.Where(c => c is BlogDetailsElements).FirstOrDefault();
 selectedCat = ((BlogDetailsElements)selectedContent).BlogCategory;
-foreach (var item in contents.Skip(50).Take(20))
+foreach (var item in contents)
 {
     if (item.Id == 41927)
     {
@@ -86,13 +86,24 @@ foreach (var item in contents.Skip(50).Take(20))
     // ((Umbraco.Web.PublishedModels.BlogDetailsElements)item.Children.FirstOrDefault()).BlogCategory; //blogObj.Children.FirstOrDefault().Value("blogCategory");
     // ((Umbraco.Web.PublishedContentModels.BlogDetailsElements)((System.Collections.Generic.List<Umbraco.Core.Models.IPublishedContent>)blogObj.Children)._items[0]).BlogCategory; // ((Umbraco.Web.PublishedContentModels.BlogDetailsElements)selectedContent).BlogCategory;
 
-    var catName = item.Children.Where(c => c is BlogDetailsElements).FirstOrDefault();
+  //  var catName = item.Children.Where(c => c is BlogDetailsElements).FirstOrDefault();
 
-    var blogCat = catName.Value("blogCategory");
+   // var blogCat = catName.Value("blogCategory");
+    
+    @*7142025*@
+     var catName = item.Children.FirstOrDefault(c => c is BlogDetailsElements);
+string blogCat = null;
+
+if (catName != null)
+{
+    blogCat = (string)catName.Value("blogCategory");
+}
+
+    @*end*@
 
     var blogHeader = item.Children.FirstOrDefault().Children.Where(c => c is HeroHeaderBlogDetail).FirstOrDefault();
     var blogBody = item.Children.FirstOrDefault().Children.Where(c => c is HeroBodyBlogDetail).FirstOrDefault();
-    var image = blogHeader.Value("image");
+    //var image = blogHeader.Value("image");
 
     var ID = item.Id;
     var ImageUrl = ((IPublishedContent)blogHeader.Value("image")).Url?.ToString() ?? "";
@@ -171,15 +182,6 @@ foreach (var item in contents.Skip(50).Take(20))
                     blogDetail.Id,
                     blogDetail.Value("Keywords_tag").ToString(),
                     blogDetail.Value("blogBlurp")?.ToString() ?? ""));
-        //var IDs = item.Id;
-        //var ImageUrls = ((IPublishedContent)blogHeader.Value("image")).Url?.ToString() ?? "";
-        //var Titles = (blogBody.Value("title"))?.ToString() ?? "";
-        //var Descriptions = (blogBody.Value("introductionDescription"))?.ToString() ?? "";
-        //var BlogItemUrls = ((IPublishedContent)item).Url;
-        //var PublishDates = Convert.ToDateTime(blogBody.Value("blogDate"));
-        //var Contents = (blogBody.Value("blogBody"))?.ToString() ?? "";
-        //var blogKeywords = item.Value("Keywords_tag")?.ToString() ?? "";
-        //blogReadTime = blogBody.Value("blogBlurp") ?? "";
     }
     if (searchResults != null)
     {
@@ -311,7 +313,7 @@ catch
 {
 }
 
-var jsonBlogUrl = "https://www.africanbank.co.za" + TupleCurrentBlog.Item2;
+var jsonBlogUrl = "http://cmsdev1.africanbank.net/" + TupleCurrentBlog.Item2;
 var jsonBlogDate = TupleCurrentBlog.Item6.ToShortDateString();
 var jsonBlogKeywords = TupleCurrentBlog.Rest.Item2;
 string[] keywordsArray = jsonBlogKeywords.Split(',');
@@ -455,7 +457,7 @@ var viewPath = Request.Url.ToString();
 
     .content-margin {
         padding: unset;
-        margin-top: 125px;
+        margin-top: -10px;
     }
 
     .date-output {
@@ -513,9 +515,9 @@ var viewPath = Request.Url.ToString();
         font-size: 12px;
     }
 
-    #divMainDetail > .blog-content {
+  @*  #divMainDetail > .blog-content {
         padding-left: 0px;
-    }
+    }*@
 
     .dropdown {
         z-index: 4;
@@ -531,6 +533,10 @@ var viewPath = Request.Url.ToString();
         padding: 9px 20px;
         padding-right: 10px;
     }
+    
+   @* .hidden-sm, .hidden-md {
+        display: none;
+    }*@
 
     @@media (min-width: 320px) and (max-width: 426px) {
         .fixed-sub-menu-bar {
@@ -605,7 +611,7 @@ var viewPath = Request.Url.ToString();
 
     @@media (min-width: 426px) and (max-width: 1024px) {
         .shaded-background {
-            padding-top: 70px;
+            padding-top: 40px;
         }
 
         .fixed-sub-menu-bar {
@@ -810,7 +816,7 @@ var viewPath = Request.Url.ToString();
     <div class="shaded-background">
         <div class="container margin-top-20 margin-bottom-20">
             <div class="row">
-                <div class="col-xs-12 hidden-sm hidden-md hidden-lg" style="top:20px">
+                <div class="col-xs-12 hidden-sm hidden-md hidden-lg" @*style="top:20px"*@>
                     <form id="lg-md-show-search" class="navbar-form  content-padding-10 ng-pristine ng-valid" style="display: flex;" action="?">
                         <input type="text" class="searchTerm" placeholder="Search for blog..." id="searchstring" name="searchstring">
                         <button type="submit" id="btnSubmit" class="searchButton">
@@ -847,9 +853,9 @@ var viewPath = Request.Url.ToString();
             </div>
             <div class="row">
                 <div class="col-xs-12 col-md-12 col-sm-12 content-margin">
-                    <h4 class="hidden-xs blue-highlight margin-bottom-10 text-left" style="font-weight: 600;">
+                    <h1 class="hidden-xs blue-highlight margin-bottom-10 text-left" style="font-weight: 600;font-size:24px;padding-left: 20px;">
                         @TupleCurrentBlog.Item3
-                    </h4>
+                    </h1>
                     <div id="divMainBlog" class="hidden-xs col-sm-12 col-md-12 col-lg-8">
                         <div class="article-card">
                             <div style="display:flex;">
@@ -1256,7 +1262,7 @@ var viewPath = Request.Url.ToString();
         "name": "African Bank Social Media Team",
         "logo": {
         "@@type": "ImageObject",
-        "url": "https://africanbank.co.za/media/51588/ab-logo_icon_blue_30x30-2.png",
+        "url": "http://cmsdev1.africanbank.net/media/u1yax2c5/ab-logo_icon_blue_30x30-2.png",
         "width": "227",
         "height": "37"
         }

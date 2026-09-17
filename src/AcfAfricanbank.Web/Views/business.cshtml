@@ -1,5 +1,792 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.BaseModernUI>
+@using CustomModels = Web.Models;
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using AcfAfricanbank.Core.Models.Forms
+
+
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
+	var Children = Model.Children;
+
+    // Get specific Children
+   var heroHeader = Children?.Where(c => c is HeroHeader).FirstOrDefault();
+   var heroBody = Children?.Where(c => c is HeroBody).FirstOrDefault();
+   var footer = Children?.Where(c => c is RichTextEditor).FirstOrDefault();
+   var bodyCards = heroBody.Children.Where(c => c.ContentType.Alias.ToLower() == "card");
+    var applyDocs = bodyCards?.Select(c => c as Card).FirstOrDefault();
+    var navigate = applyDocs.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").FirstOrDefault();
+     var navigate1 = applyDocs.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").Last();
+     
+  var heroChest = Children?.Where(c => c is HeroChest).FirstOrDefault();
+  var chestCards = heroChest.Children.Where(c => c.ContentType.Alias.ToLower() == "card");
+   var apply = chestCards?.Select(c => c as Card).FirstOrDefault();
+   var chestnavigate = apply.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").FirstOrDefault();
+    
+    var heroChest1 = Children?.Where(c => c is HeroChest).Last();
+   var chestCards1 = heroChest1.Children.Where(c => c.ContentType.Alias.ToLower() == "card");
+   
+   // var applyNowButton = chestCards1.Children.ToList(); // .Where(c => c.ContentType.Alias.ToLower() == "buttonLink"); // .FirstOrDefault();
+   
+    var apply1 = chestCards1?.Select(c => c as Card).FirstOrDefault();
+    var chestnavigate1 = apply1.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").FirstOrDefault();
+    
+    var benefitsModel = new CustomModels.Benefits
+    {
+      @*  Header = bodyTitle,
+        Description = bodyDescription, *@
+        BenefitCards = bodyCards.Select(c => c as Card).ToList()
+    };
+     var benefitsModel1 = new CustomModels.Benefits
+    {
+      @*  Header = bodyTitle,
+        Description = bodyDescription, *@ 
+        BenefitCards = chestCards.Select(c => c as Card).ToList()
+    };
+     var benefitsModel2 = new CustomModels.Benefits
+    {
+      @*  Header = bodyTitle,
+        Description = bodyDescription, *@
+        BenefitCards = chestCards1.Select(c => c as Card).ToList()
+    };
+     TabBody tabData = null;
+    TabBody tabWaysToBank = null;
+    TabBody myWorldPDFData = null;
+
+    foreach (var tab in heroBody.Children)
+    {
+        if (tab.ContentType.Alias.ToLower() == "tabbody")
+        {
+            if (tab.Value("partialViewName").ToString() == "partialHeader")
+            {
+                tabWaysToBank = (TabBody)tab;
+            }
+            else if (tab.Value("partialViewName").ToString() == "_renderPDFData")
+            {
+                myWorldPDFData = (TabBody)tab;
+            }
+            else
+            {
+                tabData = (TabBody)tab;
+            }
+        }
+    }
+    var sectionCardsContent = (ICollection<IPublishedElement>)tabWaysToBank.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+
+ ICollection<IPublishedElement> videos = new List<IPublishedElement>();
+  // var videoCollection = (ICollection<Object>)sectionCardsContent.Select(x => x.Value("genericCardContent")).ToList();
+  //  { foreach (
+      //  foreach (var _videoData in (ICollection<NChelpGuide>)videoCollection)
+     //   {
+    //        videos.Add(_videoData);
+    //    }
+   // }
+//var example=sectionCardsContent.Value(ICollection<IPublishedElement>)("genericCardContent").ToList();
 }
+
+<style>
+ html, body{
+        overflow-x: hidden;
+        width: 100%;
+        height: auto;
+    }
+    body{
+        overflow-x: hidden;
+       
+    }
+     footer {
+        background-color: #000
+    }
+    footer .footer-social {
+    background-color: transparent;
+    border: 2px solid #3D3D3D;
+    color: #f9f9f9;
+   }
+    .pattern{
+        display:none;
+    }
+    footer .footer-copyright {
+        border-top: transparent;
+    }
+    .black-section{
+       background-color: #000; 
+       width:100%;
+    }
+    .section2{
+      background-color:#111111 !important;  
+      padding-left:13%; 
+      @*padding-right:14%;*@
+     padding-bottom: 3%;
+      padding-top: 3%;
+      margin-left: -20px;
+      margin-right: -20px;
+    }
+    
+    .section3{
+      background-color:#000 !important;  
+      padding-left:13%; 
+      padding-right:14%;
+     
+      padding-top: 10%;
+      margin-left: -20px;
+      margin-right: -20px;
+    }
+    .section4{
+      background-color:#111111 !important;  
+      padding-left:17%; 
+      padding-right:14%;
+     
+     
+      margin-left: -20px;
+      margin-right: -20px;
+    }
+    .ab-business-cards{
+      min-height:180; @*250px;*@
+      color: #002963;
+      margin-bottom: 10px;
+      width: 300px;
+      padding: 8px;
+      left: 3%;
+      background: #222222;
+      border-radius: 25px;
+      padding: 25px;
+      color: #fff;
+      cursor:pointer;
+      text-align:center;
+    }
+    
+    .ab-business-cards:hover{
+      transform: translateY(-10px);
+    }
+     
+    .card-title{
+      padding-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      height:35%;
+    }
+    .card-description{
+       
+    margin-top: 20px;
+
+    }
+     .span-buttons{
+       margin-left: 30%;
+       margin-top: 20px !important;
+       width:140px;
+    }
+    .button.primary {
+       background-color: #00A7D6; @*#3BBCE2;*@
+       font-weight: bold;
+       margin-top: 8%;
+       width:140px;
+     }
+   .button {
+       padding: 8px 20px;
+   }
+   .button.primary:hover {
+       background-color: #3BBCE2;
+   }
+   .learn-more{
+      color: #787878; 
+   }
+   .learn{
+      margin-top: 10%;  
+   }
+   .khula-btn{
+     background: border-box;
+     font-size: 30px;
+    /* margin-left: 15%;*/
+     border-style: groove;
+     border-right: 50%;
+     width: 280px; 
+     color:#DDDDDD;
+    @* padding:4px;*@
+     margin-top: -158px;
+    margin-left: 9%;
+     
+   @* background: linear-gradient(to right, #00A7D695,#5DC300);*@
+    border: none;
+
+      }
+   
+   .section3-btn{
+     margin-right: 100%;
+     margin-top:8%;
+     
+   }
+   .section5-btn{
+     margin-bottom: 5%;
+     margin-top: 2% !important;
+   } 
+   .section4-btn{
+      margin-top: 5% !important; 
+   }
+   .section5{
+       padding-top: 4%;
+       background: transparent linear-gradient(116deg, #00A7D695 0%, #5DC300 180%) 0% 0% no-repeat padding-box !important;
+       text-align:center;
+   }
+   .section3-image{
+      width: 500px;
+      height: 500px;
+      margin-left: 17%;
+      margin-top: -20%;
+   }
+    .section3-business {
+        padding-left: 10%;
+    }
+    .section3-business-title{
+        margin-top:5%;
+    }
+    .section4-image{
+      width: 500px;
+     @* height: 600px; *@ 
+      margin-left: -47%;
+    }
+    .section4-text{
+      padding-top: 15%;  
+    }
+    .benfit-icon{
+       width:45px; 
+    }
+   @*.img-back{
+        width:50%;
+        float:left;
+        
+    }*@
+    .benfit-text{
+        margin-left:20px;
+        font-weight:bold;
+    }
+    .benfits{
+      display:flex; 
+      align-items:center; 
+      width: 30%;
+     }
+     
+    .benfit-section{
+      padding-top:5%;  
+    }
+    .ab-cards{
+      margin-top: 4%; 
+      width:30%; 
+    }
+    .khula-text{
+      @* background: #000;*@
+       padding: 10px;
+       text-align: center; 
+    }
+    .section3-business-mbl{
+        margin-top:50px;
+        margin-bottom: 20px;
+    }
+    .section-6{
+        
+        text-align: center;
+        
+    }
+    .terms {
+       background-color: #111; 
+    }
+   
+    @@media (min-width: 256px) and (max-width: 767px){
+     .scroll-cards{
+       display:flex;
+       overflow:scroll;
+       margin-right:10px;
+     }
+     .ab-business-cards:hover{
+       transform: none;
+     }
+     
+     .card-description{
+         height:30%;
+         padding-left: 2px;
+         padding-right: 2px
+         }
+         
+     .ab-cards {
+       width: auto;
+    }
+    .ab-business-cards {
+    min-height: 170px;
+    
+    width: 210px;
+    
+    
+    padding: 1px;
+    }
+    .khula-btn {
+    font-size:25px;
+    width: 240px;
+    margin-top: -55px;
+    margin-left: 0%;
+    }
+    .khula-text{
+    padding:5px;
+    }
+    .benfits {
+    margin-bottom: 20px;
+    width: 100%;
+    }
+    .section2 {
+    
+    padding-left: 8%;
+    }
+     .section3{
+      
+      padding-left:0%; 
+      padding-right:0%;
+     
+     margin-top: 20%;
+      margin-left: 0px;
+      margin-right: 0px;
+    }
+    .section3-image{
+    margin-left: 10%;
+    width:350px;
+    
+    }
+    .section4{
+      margin-bottom: 0%;
+      padding-left:0%; 
+      padding-right:0%;
+      padding-bottom: 13%;
+    }
+    .section4-image {
+       margin-left: -35%;
+       
+    }
+    .section4-text {
+    padding-top: 2px;
+    margin-left: 12px;
+    }
+    .section5{
+    background: transparent linear-gradient(158deg, #00A7D695 0%, #5DC300 250%) 0% 0% no-repeat padding-box !important;
+    }
+    .button.primary{
+        margin-top: 3%;
+        margin-bottom:5%;
+    }
+}
+ @@media (min-width: 300px) and (max-width: 320px){
+       .section3-image {
+        
+        width: 300px;
+        }
+       .section4-image {
+       margin-left: -52%;
+       }
+    }
+   
+@@media (min-width: 530px) and (max-width: 550px){
+   .section4-image {
+    margin-left: -20%;
+    }
+}
+ @@media (min-width: 600px) and (max-width: 640px){
+ 
+  .card-description{
+         height:30%;
+         }
+         
+   .khula-btn {
+    margin-top: -55px;
+    
+
+    }
+    .section3-image {
+    width: 600px;
+    height: 600px;
+    }
+    .section4-image {
+       margin-left: -10%;
+    }
+    .section4-text {
+    
+    margin-left: 16px
+    }
+    .ab-business-cards {
+       min-height: 170px;
+    }
+ }
+ @@media (min-width: 768px) and (max-width: 991px){
+  .section4-text {
+            margin-left: -12%;
+        }
+ }
+     @@media (min-width: 768px) and (max-width: 1024px){
+           .section2 {
+             padding-left: 5%;
+         }
+         .ab-business-cards{
+           width: 220px;
+           min-height: 200px;
+         }
+         
+         .card-description{
+         height:30%;
+         }
+         
+         .ab-cards {
+   
+            width: 31%;
+        }
+         .section3-image {
+          width: 800px;
+          height: 800px;
+          margin-left: 5%;
+        }
+    .section3 {
+    
+        padding-left: 0%;
+        
+        padding-top: 10%;
+        margin-top: 80px;
+        margin-right: 0px;
+    }
+        
+         .card-title {
+         font-size:16px;
+         }
+         .facility{
+         font-size:12px !important;
+         }
+         .benfit-section{
+         display:flex;
+         }
+         .benfits {
+    
+        width: 35%;
+        }
+         .section3-business-mbl {
+            margin-top: 80px
+        }
+        .section4-text {
+         padding-top: 15%;
+         margin-bottom: 50px;
+         }
+        
+        .cross-selling{
+        width:60%;
+        }
+        .section4-image {
+   
+            margin-left: -20%;
+        }
+        .button.primary {
+    
+         margin-top: 7%;
+         }
+         .khula-btn{
+           margin-top: -90px;
+           margin-left: 0%;
+         }
+   }
+    
+   
+   @* @@media (min-width: 1024px) and (max-width: 1030px){
+        .section3-image {
+          margin-left: 0%
+        }
+        .section3-business {
+            padding-left: 0;
+        }
+    
+    }*@
+    
+    @@media (min-width: 1250px) and (max-width: 1300px){
+       .section2 {
+        
+        padding-left: 6%;
+      }
+      .section3 {
+        padding-left: 0%;
+      }
+      .section4-text {
+    
+            margin-left: -15%;
+        }
+    }
+    
+    @@media (min-width: 992px) and (max-width: 1199px)
+    {
+        .section2 {
+        
+        padding-left: 5%;
+        }
+        .benfits {
+             font-size: 13px;
+           width: 33.33333%;
+        }
+        .section3 {
+        margin-left: 0%;
+        padding-left: 0%;
+        }
+        .section3-image {
+            width: 500px;
+            height: 500px;
+            margin-left: -10%;
+        }
+      .section4 {
+    
+        padding-left: 0%;
+        }
+        .section4-image {
+            margin-left: -15%;
+        }
+    }
+    @@media (min-width: 1114px) and (max-width: 1270px){
+    .section2 {
+    
+    padding-left: 8%;
+    }
+    .ab-cards {
+    
+    width: 32%;
+    }
+    .section3 {
+    
+    padding-left: 0%;
+    }
+    .benfit-section {
+    
+    width: 130%;
+    }
+    .section3-business {
+        padding-left: 10%;
+    }
+    .section3-image {
+    
+    margin-left: 10%;
+    }
+    .benfits {
+       
+        width: 33.3%;
+    }
+    }
+</style>
+@* the fun starts here *@
+@Html.Partial("_pageModernHeaderNew", heroHeader as ContentModels.HeroHeader)
+<div class="container black-section">
+    
+   <div class="section2">
+        
+        @Html.Raw(@heroBody.Value("richTextBox"))
+        <div class="row scroll-cards">
+        @if (benefitsModel.BenefitCards != null && benefitsModel.BenefitCards.Any())
+        {
+            int iterator = 0;
+            foreach (Card benefit in benefitsModel.BenefitCards)
+            {
+                String cardIdTag = "card" + iterator.ToString();
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 ab-cards">
+                    <div class="ab-business-cards">
+                       <div class="card-title title">@benefit.CardTitle</div>
+                       <div class="card-description descr">@benefit.CardDescriptionLongText</div>
+                        @*    <div class="image">
+                                @if (benefit.CardIcon != null)
+                                {
+                                    <img src="@benefit.CardIcon.Url" alt="@benefit.CardIcon.Value("altTag")" />
+                                }
+                            </div>
+                            
+                            <div class="title text-uppercase">@benefit.Name</div>*@
+                            @if(navigate.Name.ToString() == "Business-Loans")
+                            {
+                            }
+                            else{
+                            <a href= "@navigate.Url" class="button primary"> @navigate.Name</a>
+                            }
+                        
+                       @* <div class="learn"><a href= "@navigate1.Url" class="learn-more"> @navigate1.Name</a></div>*@
+                     
+                    </div>
+                </div>
+                ++iterator;
+            }
+        }
+        </div>
+    </div>
+    <div class="section3">
+        
+         @{
+                int cardIterator = 0;
+                bool increaseCardHeight = false;
+                foreach (var item in sectionCardsContent)
+                {
+                    if (cardIterator == (int)sectionCardsContent.Count() - 1)
+                    {
+                        increaseCardHeight = true;
+                    }
+                       Umbraco.Web.Models.Link itemLink = null;
+                        foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)item.Value("tabSubItemLinks"))
+                        {
+                            itemLink = link;
+                            break;
+                        }  
+                        var image = item.Value("tabSubItemImage");
+                        String url = ((IPublishedContent)image).Url.ToString();
+                        String altTag = ((IPublishedContent)image).Value("altTag").ToString();
+                        var image1 = item.Value("tabSubItemIcon");
+                        String url1 = ((IPublishedContent)image1).Url.ToString();
+                        String altTag1 = ((IPublishedContent)image1).Value("altTag").ToString();
+                        
+                    // var cardTitle = (ICollection<Object>)item.Value("genericCardContent");
+                    <div class="row">
+                           <div class="khula-btn visible-md hidden-sm hidden-xs visible-lg">
+                              @*  <div class="khula-text">@Html.Raw(item.Value("tabSubItemTitle"))
+                               </div>*@
+                               <img class="khula-text" style="height:100px;" src="@url1" alt="@altTag1" />
+                           </div>
+                       <div class="section3-business col-lg-8 col-md-8 col-sm-12 visible-md hidden-sm hidden-xs visible-lg">
+                        @*  <div class="khula-btn">
+                              <div class="khula-text">@Html.Raw(item.Value("tabSubItemTitle"))
+                               </div>
+                               <img class="khula-text" style="height:100px;" src="@url1" alt="@altTag1" />
+                           </div>*@
+                          <div class="section3-business-title">@Html.Raw(item.Value("tabSubItemTextContent"))</div>  
+                            <div class="row benfit-section">
+                              @foreach (var link in (IEnumerable<ContentModels.NCcard>)item.Value("genericCardContent"))
+                                {
+                                  var cardTitle = link.Value<string>("nCcardTitle");
+                                  var icon = link.Value<IPublishedContent>("nCcardIcon");
+                                  
+                                      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 benfits">
+                                          <div class="img-back">  
+                                            <img class="benfit-icon" loading="lazy" src="@icon.Url" />
+                                          </div>
+                                          <div class="benfit-text"> @cardTitle</div>
+                                     </div>
+                                  
+                                }  
+                            </div>
+                              @if (itemLink != null)
+                              {
+                              <div class="section3-btn">
+                              <a class="button primary span-buttons" href="@itemLink.Url" target="_blank">@itemLink.Name</a>
+                              </div>
+                                 
+                               }
+                            @* <p class="card-title" style="padding-top: 20px; font-size: 21px;font-weight: bold;">@cardTitle</p>
+                              <p class="card-description"> @Html.Raw(@item.Value("mediumDescription"))</p>*@
+                          
+                       </div>
+                       
+                      
+                        <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                         <img class="section3-image" src="@url" alt="@altTag" />
+                        </div>
+                            
+                            @*text  mobile  and tablet devices*@
+                            
+                            <div class="section3-business section3-business-mbl col-md-8 col-sm-12 col-xs-12 hidden-md visible-sm visible-xs hidden-lg">
+                          <div class="khula-btn">
+                             @* <div class="khula-text">@Html.Raw(item.Value("tabSubItemTitle"))</div>*@
+                              <img class="khula-text" style="height:100px;" src="@url1" alt="@altTag1" />
+                          </div>
+                          <div class="section3-business-title">@Html.Raw(item.Value("tabSubItemTextContent"))</div>  
+                            <div class="row benfit-section">
+                              @foreach (var link in (IEnumerable<ContentModels.NCcard>)item.Value("genericCardContent"))
+                                {
+                                  var cardTitle = link.Value<string>("nCcardTitle");
+                                  var icon = link.Value<IPublishedContent>("nCcardIcon");
+                                  
+                                      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 benfits">
+                                          <div class="img-back">  
+                                            <img class="benfit-icon" loading="lazy" src="@icon.Url" />
+                                          </div>
+                                          <div class="benfit-text"> @cardTitle</div>
+                                     </div>
+                                  
+                                }  
+                            </div>
+                              @if (itemLink != null)
+                              {
+                              <div class="section3-btn">
+                              <a class="button primary span-buttons" href="@itemLink.Url" target="_blank">@itemLink.Name</a>
+                              </div>
+                                 
+                               }
+                            @* <p class="card-title" style="padding-top: 20px; font-size: 21px;font-weight: bold;">@cardTitle</p>
+                              <p class="card-description"> @Html.Raw(@item.Value("mediumDescription"))</p>*@
+                          
+                       </div>
+                    </div>
+                }
+            }
+       
+    </div>
+    
+    <div class="section4">
+        <div class="container">
+            <div class="row">
+                 @if (benefitsModel1.BenefitCards != null && benefitsModel1.BenefitCards.Any())
+            {
+                int iterator = 0;
+                foreach (Card benefit in benefitsModel1.BenefitCards)
+                {
+                    String cardIdTag = "card" + iterator.ToString();
+                       <div class="image col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                    @if (benefit.CardIcon != null)
+                                    {
+                                        <img class="section4-image" src="@benefit.CardIcon.Url" alt="@benefit.CardIcon.Value("altTag")" />
+                                    }
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 section4-text">
+                                     <div class="title text-uppercase">@benefit.CardTitle</div>
+                                  <div class="descr">@benefit.CardDescriptionLongText</div>
+                               
+                             
+                               <a href= "@chestnavigate.Url" class="button primary section4-btn"> @chestnavigate.Name</a>
+                        </div>
+                       
+                    ++iterator;
+                }
+            }   
+            </div>
+        </div>
+    </div>
+   
+    <div class="section5 row">
+       
+      @if (benefitsModel2.BenefitCards != null && benefitsModel2.BenefitCards.Any())
+        {
+            int iterator = 0;
+                foreach (Card benefit in benefitsModel2.BenefitCards)
+                {
+                    String cardIdTag = "card" + iterator.ToString();
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" >
+                       
+                        <div class="descr">@benefit.CardDescriptionLongText</div>
+                                <div class="image">
+                                    @if (benefit.CardIcon != null)
+                                    {
+                                        <img src="@benefit.CardIcon.Url" alt="@benefit.CardIcon.Value("altTag")" />
+                                    }
+                                </div>
+                               
+                          <a href= "@chestnavigate1.Url" class="button primary section5-btn"> @chestnavigate.Name</a>
+                   </div>
+                    ++iterator;
+            }
+                 
+       }
+                
+    </div>
+    <div class="section-6">
+         
+        <div class="row">
+            <div class=" terms col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                
+                <h1>@Html.Raw(footer.Value("textEditor"))</h1>
+            </div>
+        </div>
+        
+
+    </div>
+   
+    
+</div>

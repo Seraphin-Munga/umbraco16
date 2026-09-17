@@ -1,5 +1,1928 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
 }
+
+@* the fun starts here *@
+
+@* css styles starts here *@
+<style>
+
+
+
+.section-326 {
+    min-height: 0px;
+    display: flex;
+    align-items: center;
+    margin-top: 00px;
+    margin-bottom: 40px;
+}
+h5, .h5 {
+    margin-top: 5px;
+    margin-bottom: 7px;
+}
+#faq-height{
+    min-height: 415px;
+}
+
+
+#iframe-karaboChat-speechBubble {
+    display:none;
+}
+#chatIconImg{
+    display:none;
+}
+
+
+.highlight-text h5 {
+    color: var(--Brand-AB-Blue, #012B60);
+    font-family: Montserrat;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 600; /* Changed from 500 to 600 for semi-bold */
+    line-height: 16px;
+}
+.who-can-apply{
+    color: var(--Brand-AB-Blue, #012B60);
+
+    /* Heading/H3/Semibold */
+    font-family: Montserrat;
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 38px; /* 126.667% */
+}
+
+.who-can-apply-p {
+color: var(--Brand-AB-Blue, #012B60);
+
+/* Body/Medium/Regular */
+font-family: Montserrat;
+font-size: 16px;
+font-style: normal;
+font-weight: 400;
+line-height: 24px; /* 150% */
+}
+      /* Optional custom styles */
+      .tab-pane {
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-top: none;
+      }
+      
+.mbt-32-48 {
+    margin-bottom: 32px;
+    margin-top: 48px;
+}
+.nav-tabs > li {
+    text-align: -webkit-center;
+    width:50%;
+    position: relative;
+    margin-right: 0;
+}
+      
+   .nav-tabs{
+             display: flex;
+            width: 1312px;
+            padding: 48px 24px;
+            justify-content: center;
+            align-items: center;
+            gap: 64px;
+   }   
+
+.nav-tabs
+{
+    display: flex;
+    width: 100%;
+    padding: 48px 24px;
+    justify-content: center;
+    align-items: center;
+    gap: 64px;
+    border-radius: 8px;
+    border: 2px solid var(--Brand-AB-Nuetral-Blue-Tint, #B4BBD2);
+    background: #FFF;
+    
+}
+.tab-toggle-1 ,
+.tab-toggle-2 ,
+.tab-toggle-3  {
+    display: flex;
+    width: 267px;
+    height: 32px;
+    flex-direction: column;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--Brand-AB-Blue, #012B60);
+    text-align: center;
+    
+    /* Body/Medium/Semibold */
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 24px; /* 150% */
+}
+
+
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:hover, .nav-tabs>li.active>a:focus {
+    border: none;
+    color: var(--Brand-AB-Green, #5DC303);
+    text-align: center;
+    
+    /* Body/Medium/Semibold */
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 24px; /* 150% */
+}
+
+.nav-tabs>li>a:hover {
+    border: none !important;
+    background: none !important;
+}
+
+.nav-tabs > li.active > a {
+    color:var(--Brand-AB-Green, #5DC303);
+    border: transparent !important;
+    background: none !important;
+    z-index: 3;
+    text-align: center !important;
+    display: flex; /* For better centering of text with icons */
+    align-items: center;
+    justify-content: center;
+}
+.nav-tabs > li > a {
+    font-size:16px;
+    padding: 12px 24px;
+    margin-right: 15px;
+    border: none !important;
+    border-radius: 4px 4px 0 0 !important;
+    background: none !important;
+    position: relative;
+    text-align: center !important;
+    display: flex; /* For better centering of text with icons */
+    align-items: center;
+    justify-content: center;
+    
+}
+
+.nav-tabs > li:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: -1px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.997px;
+    height: 48px;
+    background: var(--Gray-300, #D5D7DA);
+    z-index: 2;
+}
+
+/*section-6 Accordion start here*/
+.section-600 {
+
+    height: 600px;
+    display: flex;
+    align-items: center;
+
+}
+
+
+.section-327 {
+    min-height: 0px;
+    display: flex;
+    align-items: center;
+}
+
+
+    
+    
+    .accordion {
+                 font-weight: bold; /* Explicitly setting font-weight */
+                 font-family: Montserrat, sans-serif; /* Specifying the font family */
+                 background-color: #fff;
+                 color: #012B60;
+                 cursor: pointer;
+                 padding: 18px;
+                 width: 100%;
+                 text-align: left;
+                 font-size: 15px;
+                 transition: 0.4s;
+                 border-radius: 0px;
+                 border: solid 1px #efefef;
+              /*    margin-bottom: 10px; Space between inactive accordion buttons */
+                 position: relative; /* Needed for absolute positioning of the arrow */
+               }
+               
+    .accordion::after {
+        content: '\276F'; /* Heavy Chevron Unicode character */
+                 font-size: 15px; /* Adjust as needed */
+                 color: #012B60;
+                 position: absolute;
+                 right: 20px;
+                 top: 50%;
+                 transform: translateY(-50%);
+                 transition: transform 0.4s;
+               }
+               
+    button.accordion.active{
+                 color: #012B60 !important; 
+              }
+
+    .active::after {
+                 transform: translateY(-50%) rotate(90deg);
+               }
+               
+    .myPanel {
+                    border: solid 1px #efefef;
+                    font-family: Montserrat, sans-serif;
+                    padding: 37px 50px 25px 22px;
+                    background-color: #fff;
+                    color: #012B60;
+                    display: none;
+                    overflow: hidden;
+                    border-top: none;
+                    margin-top: -20px !important;
+               }
+               
+    .myPanel p {
+                       font-weight: 400;
+               }
+               
+    .myPanel-inside {
+                    margin-bottom: 30px;
+                    border: solid 1px #efefef;
+                    font-family: Montserrat, sans-serif;
+                    padding: 37px 50px 25px 22px;
+                    background-color: #fff;
+                    color: #012B60;
+                    display: none;
+                    overflow: hidden;
+                    border-top: none;
+                    margin-top: -140px !important;           
+                    border: solid 1px #efefef;
+                    font-family: Montserrat, sans-serif;
+                    padding: 0px;
+                    background-color: #fff;
+                    color: #012B60;
+                    display: none;
+                    overflow: hidden;
+                    border-top: none;
+                    margin-top: 30px !important;
+               }
+               
+    .myPanel-inside  p {
+                       font-weight: 400;
+               }
+               
+    .faqHeader {
+                   font: normal normal bold 30px/52px Montserrat;
+                   letter-spacing: 0px;
+                   color: #F9F9F9;
+                   opacity: 1;
+                   margin: 0 auto; /* This ensures that the margin is auto on both sides for block-level centering */
+                   padding: 20px 0; /* Adds some padding above and below the text */
+                 }
+    /*section-6 Accordion End here*/
+
+/*section-7 Accordion 2 start here*/
+
+
+    
+    .accordion-2 {
+                 font-weight: bold; /* Explicitly setting font-weight */
+                 font-family: Montserrat, sans-serif; /* Specifying the font family */
+                 background-color: #fff;
+                 color: #012B60;
+                 cursor: pointer;
+                 padding: 18px;
+                 width: 100%;
+                 text-align: left;
+                 font-size: 15px;
+                 transition: 0.4s;
+                 border-radius: 0px;
+                 border: solid 1px #efefef;
+              /*    margin-bottom: 10px; Space between inactive accordion buttons */
+                 position: relative; /* Needed for absolute positioning of the arrow */
+               }
+               
+    .accordion-2::after {
+        content: '\276F'; /* Heavy Chevron Unicode character */
+                 font-size: 15px; /* Adjust as needed */
+                 color: #012B60;
+                 position: absolute;
+                 right: 20px;
+                 top: 50%;
+                 transform: translateY(-50%);
+                 transition: transform 0.4s;
+               }
+               
+    button.accordion-2.active{
+                 color: #012B60 !important; 
+              }
+
+    .active::after {
+                 transform: translateY(-50%) rotate(90deg);
+               }
+               
+    .myPanel-2 {
+                    border: solid 1px #efefef;
+                    font-family: Montserrat, sans-serif;
+                    padding: 37px 50px 25px 22px;
+                    background-color: #fff;
+                    color: #012B60;
+                    display: none;
+                    overflow: hidden;
+                    border-top: none;
+                    margin-top: -20px !important;
+               }
+               
+    .myPanel-2 p {
+                       font-weight: 400;
+               }
+               
+    .faqHeader-2 {
+                   font: normal normal bold 30px/52px Montserrat;
+                   letter-spacing: 0px;
+                   color: #F9F9F9;
+                   opacity: 1;
+                   margin: 0 auto; /* This ensures that the margin is auto on both sides for block-level centering */
+                   padding: 20px 0; /* Adds some padding above and below the text */
+                 }
+    /*section-6 Accordion End here*/
+
+.section-bg-grey {
+    background: #F5F5F5 !important;
+}
+
+
+
+.btn-font-color {
+    color: #012B60 !important;
+}
+
+.bg-blue{
+    height: 420px;
+    background:  #012B60;
+    
+}
+
+.bottom-section {
+    background-color: #5dc300 !important;
+    height: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.carousel-content {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    text-align: center;
+}
+
+.list-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    max-width: 500px;
+    width: 100%;
+}
+.tap-pane{
+    border: none !important;
+}
+
+.tab-pane {
+    padding: none !important;
+    border: none;
+}
+.faqs-header{
+    color: var(--Base-White, #FDFDFD);
+    
+    /* Display/Medium/Semibold */
+    font-family: Montserrat;
+    font-size: 72px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 90px; /* 125% */
+    letter-spacing: -1.44px;
+    margin-top:54px;
+}
+.faqs-header-p{
+    color: var(--Base-White, #FDFDFD);
+
+    /* Heading/H4/Regular */
+    font-family: Montserrat;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 32px; /* 133.333% */
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    text-align: left;
+}
+
+.back-section {
+    display: flex;
+    background: white;
+    min-height: 112px;
+    align-items: center;
+}
+
+
+
+.custom-bullets {
+    list-style-type: none;
+    padding-left: 0px;
+}
+
+.custom-bullets li {
+    display: flex;
+    color: var(--Brand-AB-Blue, #012B60);
+    font-family: Montserrat;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: 10px;
+    align-items: baseline;
+}
+  
+.custom-bullets li svg {
+    flex-shrink: 0;
+    position: relative;
+    margin-top: 0px;
+    margin-right: 10px;
+    height: 16px;
+    top: 4px;
+}
+
+.custom-bullets li p {
+    position: relative;
+    top: 5px;
+}
+
+
+.mb-16{
+    margin-bottom:16px;
+}
+
+
+.back-section button {
+    background: none !important;
+    border: none !important;
+}
+</style>
+<style>
+    @@media (max-width: 768px) {
+    
+    .section-327 {
+        display: block;
+    }
+    
+    .back-section {
+        min-height: 50px;
+    }
+
+    .nav-tabs > li::after {
+        content: none;
+    }
+
+    .tab-toggle-1, .tab-toggle-2, .tab-toggle-3 {
+        width: 100%;
+        height: auto;
+        padding: 12px;
+        font-size: 16px;
+    }
+
+    .faqs-header {
+        font-size: 36px;
+        line-height: 48px;
+        margin-top: 32px;
+    }
+
+    .faqs-header-p {
+        font-size: 16px;
+        line-height: 24px;
+    }
+
+    .bg-blue {
+        height: auto;
+        padding-bottom: 40px;
+    }
+
+.section-6 .container{
+    margin-right: 0;
+    margin-left: 0;
+    padding-left: 0px; 
+    padding-right: 0px;
+}
+
+    .accordion, .accordion-2 {
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    .myPanel, .myPanel-2 {
+        padding: 20px 16px;
+    }
+
+    .custom-bullets li {
+        font-size: 12px;
+        line-height: 16px;
+    }
+
+    .back-section {
+        padding: 16px 0;
+    }
+
+    #btnRefresh svg {
+        width: 48px;
+        height: auto;
+    }
+
+    .mbt-32-48 {
+        margin-top: 24px;
+        margin-bottom: 24px;
+    }
+
+    .who-can-apply {
+        font-size: 24px;
+        line-height: 32px;
+    }
+
+    .who-can-apply-p {
+        font-size: 14px;
+        line-height: 20px;
+    }
+
+    .carousel-content {
+        padding: 0 16px;
+    }
+}
+
+@@media (max-width: 480px) {
+    .faqs-header {
+        font-size: 28px;
+        line-height: 36px;
+    }
+
+    .nav-tabs {
+        gap: 16px;
+        padding: 16px 8px;
+    }
+
+    .tab-toggle-1, .tab-toggle-2, .tab-toggle-3 {
+        font-size: 12px;
+    }
+
+    .accordion::after, .accordion-2::after {
+        right: 12px;
+        font-size: 12px;
+    }
+
+    .myPanel, .myPanel-2 {
+        padding: 16px;
+    }
+
+    .custom-bullets li svg {
+        width: 14px;
+        height: 14px;
+        margin-right: 8px;
+    }
+
+    .highlight-text h5 {
+        font-size: 12px;
+    }
+}
+
+/* Add this to make columns stack on mobile */
+@@media (max-width: 767px) {
+    .carousel-content .col-md-8,
+    .carousel-content .col-md-4 {
+        width: 100%;
+        max-width: 100%;
+        flex: 0 0 100%;
+    }
+    
+    .carousel-image {
+        display: none;
+    }
+    
+
+}
+
+
+</style>
+
+<section class="back-section" id="btn-back" >
+        <div class="container">
+            <button id="btnRefresh">
+                <svg width="68" height="24" viewBox="0 0 68 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4.25 12.2744L19.25 12.2744" stroke="#012B60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M10.2998 18.299L4.2498 12.275L10.2998 6.25" stroke="#012B60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M33.47 17V7.2H37.866C38.9953 7.2 39.8633 7.42867 40.47 7.886C41.0767 8.334 41.38 8.95 41.38 9.734C41.38 10.266 41.2587 10.714 41.016 11.078C40.7827 11.442 40.4653 11.722 40.064 11.918C39.6627 12.114 39.2287 12.212 38.762 12.212L39.014 11.792C39.574 11.792 40.0687 11.89 40.498 12.086C40.9273 12.282 41.268 12.5713 41.52 12.954C41.772 13.3273 41.898 13.794 41.898 14.354C41.898 15.194 41.5807 15.8473 40.946 16.314C40.3207 16.7713 39.3873 17 38.146 17H33.47ZM34.87 15.866H38.09C38.8647 15.866 39.4573 15.7353 39.868 15.474C40.2787 15.2127 40.484 14.802 40.484 14.242C40.484 13.6727 40.2787 13.2573 39.868 12.996C39.4573 12.7347 38.8647 12.604 38.09 12.604H34.744V11.47H37.74C38.4493 11.47 39 11.3393 39.392 11.078C39.784 10.8167 39.98 10.4247 39.98 9.902C39.98 9.37933 39.784 8.98733 39.392 8.726C39 8.46467 38.4493 8.334 37.74 8.334H34.87V15.866ZM48.4757 17V15.432L48.4057 15.138V12.464C48.4057 11.8947 48.2377 11.456 47.9017 11.148C47.575 10.8307 47.0804 10.672 46.4177 10.672C45.979 10.672 45.5497 10.7467 45.1297 10.896C44.7097 11.036 44.355 11.2273 44.0657 11.47L43.5057 10.462C43.8884 10.154 44.3457 9.92067 44.8777 9.762C45.419 9.594 45.9837 9.51 46.5717 9.51C47.589 9.51 48.373 9.75733 48.9237 10.252C49.4744 10.7467 49.7497 11.5027 49.7497 12.52V17H48.4757ZM46.0397 17.084C45.489 17.084 45.0037 16.9907 44.5837 16.804C44.173 16.6173 43.8557 16.3607 43.6317 16.034C43.4077 15.698 43.2957 15.32 43.2957 14.9C43.2957 14.4987 43.389 14.1347 43.5757 13.808C43.7717 13.4813 44.0844 13.22 44.5137 13.024C44.9524 12.828 45.5404 12.73 46.2777 12.73H48.6297V13.696H46.3337C45.6617 13.696 45.209 13.808 44.9757 14.032C44.7424 14.256 44.6257 14.5267 44.6257 14.844C44.6257 15.208 44.7704 15.502 45.0597 15.726C45.349 15.9407 45.7504 16.048 46.2637 16.048C46.7677 16.048 47.2064 15.936 47.5797 15.712C47.9624 15.488 48.2377 15.1613 48.4057 14.732L48.6717 15.656C48.4944 16.0947 48.1817 16.4447 47.7337 16.706C47.2857 16.958 46.721 17.084 46.0397 17.084ZM55.4709 17.084C54.7149 17.084 54.0382 16.9207 53.4409 16.594C52.8529 16.2673 52.3909 15.8193 52.0549 15.25C51.7189 14.6807 51.5509 14.0273 51.5509 13.29C51.5509 12.5527 51.7189 11.8993 52.0549 11.33C52.3909 10.7607 52.8529 10.3173 53.4409 10C54.0382 9.67333 54.7149 9.51 55.4709 9.51C56.1429 9.51 56.7402 9.64533 57.2629 9.916C57.7949 10.1773 58.2056 10.5693 58.4949 11.092L57.4729 11.75C57.2302 11.386 56.9316 11.12 56.5769 10.952C56.2316 10.7747 55.8582 10.686 55.4569 10.686C54.9716 10.686 54.5376 10.7933 54.1549 11.008C53.7722 11.2227 53.4689 11.526 53.2449 11.918C53.0209 12.3007 52.9089 12.758 52.9089 13.29C52.9089 13.822 53.0209 14.284 53.2449 14.676C53.4689 15.068 53.7722 15.3713 54.1549 15.586C54.5376 15.8007 54.9716 15.908 55.4569 15.908C55.8582 15.908 56.2316 15.824 56.5769 15.656C56.9316 15.4787 57.2302 15.208 57.4729 14.844L58.4949 15.488C58.2056 16.0013 57.7949 16.398 57.2629 16.678C56.7402 16.9487 56.1429 17.084 55.4709 17.084ZM61.2312 15.208L61.2592 13.486L65.5292 9.58H67.1532L63.8772 12.8L63.1492 13.416L61.2312 15.208ZM60.1392 17V6.612H61.4832V17H60.1392ZM65.8092 17L62.8972 13.388L63.7652 12.31L67.4612 17H65.8092Z" fill="#012B60"/>
+                </svg>
+    
+            </button>
+    
+        </div>
+</section>
+
+
+
+<section class="bg-blue">
+    <div class="container">
+        <!-- Tab panes -->
+
+           <div class="row">
+            
+                <div class="col-md-8 carousel-content">
+                    <h1 class="faqs-header">FAQs</h1>
+                    <p class="faqs-header-p">Find quick answers to common questions about our services, products, and how to get the most out of your banking experience. If you don’t see what you’re looking for, we’re just a message away!</p>
+                </div>
+                <div class="col-md-4 col-xs-0 hidden-xs carousel-image">
+                    
+                </div>
+            </div>
+       
+    </div>
+</section>
+<section class="bottom-section"></section>
+<section class="mbt-32-48">
+    <div class="container">
+      <!-- Nav tabs -->
+      <ul class="nav nav-tabs" role="tablist">
+        <li class="btn-font-color">
+          <a href="#tab1" class="tab-toggle-2" role="tab" data-toggle="tab" name="BANK">BANK</a>
+        </li>
+        <li class="btn-font-color active">
+          <a href="#tab2" class="tab-toggle-1" role="tab" data-toggle="tab" name="BORROW">BORROW</a>
+        </li>
+        <li>
+          <a href="#tab3" class="tab-toggle-3" role="tab" data-toggle="tab" name="INVEST">INVEST</a>
+        </li>
+      </ul>
+    </div>
+</section>
+<section class="section-bg-grey"  id="faq-height">   
+    <!-- Tab panes -->
+      <div class="tab-content">
+        <div class="tab-pane fade" id="tab1">
+         
+            <section class="section-6 section-327 section4-img-bg-image" id="faq" aria-labelledby="faq-tab" role="tabmyPanel">
+    <div class="container">
+        <h5 class="faqHeader btn-font-color">Tap2Glass</h5>
+        
+            <button class="accordion" aria-expanded="false" aria-controls="Which businesses qualify for funding?">
+                What types of payments can be accepted through the Tap2Glass App?
+            </button>
+            <div class="myPanel" id="Which businesses qualify for funding?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">The Tap2Glass App supports credit and debit card payments. Additional payment methods may be added in the future.</h5>
+                  
+    
+                </div>
+            </div>
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                What cards can be used on Tap2Glass?
+            </button>
+            <div class="myPanel" id="Do you offer funding to startups?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">Tap2Glass is certified for Mastercard and Visa cards.</h5>
+                  
+                </div>
+            </div>
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding outside of South Africa?">
+               Does Tap2Glass accept payments from Samsung Pay or Apple Pay?
+            </button>
+            <div class="myPanel" id="Do you offer funding outside of South Africa?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">Yes, Tap2Glass accepts payments from phone/gadget payment Apps. Samsung Pay, Apple Pay and all the other OEM Pay solutions are essentially digital versions of your contactless card. Paying with a phone/gadget is faster as both devices are powering the NFC communication.</h5>
+                  
+                </div>
+            </div>  
+    </div>
+</section>
+          
+        </div>
+        <div class="tab-pane fade in active" id="tab2">
+         
+            <section >
+              <section class="section-6 section-326 section4-img-bg-image" id="faq" aria-labelledby="faq-tab" role="tabmyPanel">
+        <div class="container">
+            <h5 class="faqHeader btn-font-color">Business Loans</h5>
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                Application Criteria
+            </button>
+            <div class="myPanel myPanel-inside section-bg-grey" id="Do you offer funding to startups?" style="display: none;">
+            <section >
+              <section class="section-6 section-327 section4-img-bg-image" id="faq" aria-labelledby="faq-tab" role="tabmyPanel">
+                    <div class="container">
+                        
+                        
+                        <button class="accordion-2" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                            What are the application requirements?
+                        </button>
+                        <div class="myPanel-2" id="" style="display: none;">
+                           <div class="highlight-text">
+                              <h5>Our minimum requirements are simple. You need to be:</h5>
+                              
+                              <ul class="custom-bullets btn-font-color">
+                                  <li class="btn-font-color">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                  <h5>A registered company or close corporation in South Africa.</h5>
+                                  </li>
+                                  <li class="btn-font-color">
+                                      
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                      
+                                     <h5> Doing annual turnover of more than R1 000 000.</h5></li>
+                                  <li class="btn-font-color">
+                                      
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                      
+                                      <h5>Trading history of 6 months or more.</h5></li>
+                                      <li class="btn-font-color">
+                                      
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                                  
+                                      <h5>Annual financial statements or management accounts will be required for funding above R2 000 000.</h5></li>
+                              </ul>
+                              
+                             <h5 class="" style="font-size: small;">Additionally, we do <b>not</b> require a business plan, a budget or a financial forecast. You also don't have to be VAT registered.</h5>
+                              
+                            </div>
+                        </div>
+                        
+                        <button class="accordion-2" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                            What documents do I need to apply?
+                        </button>
+                        <div class="myPanel-2" id="" style="display: none;">
+                           <div class="highlight-text">
+                              <h5>For regulatory and Know Your Customer purposes, we will ask for the following.</h5>
+                              
+                              <ul class="custom-bullets btn-font-color">
+                                  <li class="btn-font-color">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                      <h5>Company registration documents.</h5>
+                                  </li>
+                                  <li class="btn-font-color">
+                                      
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                      
+                                      <h5>Proof of ID and address for the directors and related parties.</h5></li>
+                              </ul>
+                              
+                             <h5 class="mb-16" style="font-size: small;">Our application process is digital first. What we require to process your application is for you to give access to your accounting or banking data. This removes the need for you to submit any documents and it enables us to approve your application and send funds to you much faster.</h5>
+                             <h5 class="" style="font-size: small;">Bank statements: Where we cant link your bank account or you do not use an online accounting package, you will be required to upload your bank statements.</h5>
+                              
+                            </div>
+                        </div>
+                        
+                        <button class="accordion-2" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                            Do I need to submit a business plan?
+                        </button>
+                        <div class="myPanel-2" id="" style="display: none;">
+                           <div class="highlight-text">
+                              <h5>We do not require a business plan, a budget or a financial forecast. You also don't have to be VAT registered.</h5>
+
+                            </div>
+                        </div>
+                        
+                        
+                        
+                        <button class="accordion-2" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                            What if I'm not eligible yet?
+                        </button>
+                        <div class="myPanel-2" id="" style="display: none;">
+                           <div class="highlight-text">
+                              <h5>Do not worry. You'll get there soon! Feel free to apply or reapply if you want us to take another look at your business after 6 months.</h5>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+            </section>
+            </div>
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                Application Process
+            </button>
+            <div class="myPanel myPanel-inside section-bg-grey" id="Do you offer funding to startups?" style="display: none;">
+               <section >
+              <section class="section-6 section-327 section4-img-bg-image" id="faq" aria-labelledby="faq-tab" role="tabmyPanel">
+                    <div class="container">
+                        
+                        
+                        <button class="accordion-2" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                            How do I apply?
+                        </button>
+                        <div class="myPanel-2" id="" style="display: none;">
+                           <div class="highlight-text">
+                              <h5>The application process is completely online and it only involves 3 quick steps:</h5>
+                              
+                              <ul class="custom-bullets btn-font-color">
+                                  <li class="btn-font-color">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                      <h5>Create your free account.</h5>
+                                  </li>
+                                  <li class="btn-font-color">
+                                      
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                      
+                                      <h5>Give access to your accounting/banking data (or upload bank statements).</h5></li>
+                                  <li class="btn-font-color">
+                                      
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                      
+                                      <h5>Complete your company details.</h5>
+                                    </li>
+                                      
+                              </ul>
+                              
+                             <h5 class="" style="font-size: small;">For more details on each step listed above, read on further below in the respective sections.</h5>
+                              
+                            </div>
+                        </div>
+                        
+                        <button class="accordion-2" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                            How do I apply if I don't have accounting software?
+                        </button>
+                        <div class="myPanel-2" id="" style="display: none;">
+                           <div class="highlight-text">
+                              <h5>We cater for all businesses, even if you don't use one of the accounting packages seen on our application process. Just follow the simple steps below:</h5>
+                              
+                              <ul class="custom-bullets btn-font-color">
+                                  <li class="btn-font-color">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                      <h5>Select ‘Other/None’ when asked to select your accounting package.</h5>
+                                  </li>
+                                  <li class="btn-font-color">
+                                      
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                      
+                                     <h5>Enter your business details.</h5>
+                                </li>
+                                  <li class="btn-font-color">
+                                      
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                      
+                                     <h5> Upload your bank statements and any supporting documentation.</h5>
+                                     </li>
+                                  <li class="btn-font-color">
+                                      
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                      
+                                      <h5>Click ‘complete application’.</h5></li>
+                              </ul>
+                              
+
+                            </div>
+                        </div>
+                        
+                        <button class="accordion-2" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                           How do I connect my bank feed?
+                        </button>
+                        <div class="myPanel-2" id="" style="display: none;">
+                           <div class="highlight-text">
+                              <h5>To connect your bank feed, simply follow the steps below:</h5>
+                              
+                              <ul class="custom-bullets btn-font-color">
+                                  <li class="btn-font-color">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                      <h5>Log into your African Bank dashboard.</h5>
+                                  </li>
+                                  <li class="btn-font-color">
+                                      
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                      
+                                     <h5>Click on the <link>"Connect & Upload"</link> tab on the left of your African Bank dashboard.</h5></li>
+                                  <li class="btn-font-color">
+                                      
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                      
+                                      <h5>Click "Connect Internet Banking.</h5></li>
+                                  
+                              </ul>
+                              
+
+                            </div>
+                        </div>
+                        
+                        
+                        <button class="accordion-2" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                            Is it safe to connect my accounting solution or bank account feeds?
+                        </button>
+                        <div class="myPanel-2" id="" style="display: none;">
+                           <div class="highlight-text">
+                             
+                              <ul class="custom-bullets btn-font-color">
+                                  <li class="btn-font-color">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                    <h5>Data Access</h5>
+                                  </li>
+                                  <h5>We have worked closely with your accounting software providers to ensure it complies with all of the policies and rules for connected applications and plugins. Some accounting software providers have even specifically assessed our platform, approving which data it can and can't access and the duration for which it has access.</h5>
+                                  <li class="btn-font-color">
+                                      
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                      
+                                    <h5>Data Privacy</h5>
+                                    
+                                    </li>
+                                    <h5>We take the sensitivity and safety of our customers data very seriously. We also take digital security very seriously and have implemented several best-practice measures including encrypted communications, encryption at rest, and a firewall protecting the web application. There are also several monitoring tools in place to detect hacking attempts, new system vulnerabilities, and suspicious and fraudulent user activity.</h5>
+                                  <li class="btn-font-color">
+                                      
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                      
+                                     <h5> Data Privacy</h5>
+                                    </li>
+                                    <h5>We comply with the POPI act.</h5>
+                                  
+                              </ul>
+                              
+
+                            </div>
+                        </div>
+
+
+                        <button class="accordion-2" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                            Will data on the Xero account be modified when applying for finance?
+                        </button>
+                        <div class="myPanel-2" id="" style="display: none;">
+                           <div class="highlight-text">
+                             
+                              <ul class="custom-bullets btn-font-color">
+                                  <li class="btn-font-color">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                    <h5>By default, we will not make changes on your Xero account.</h5>
+                                  </li>
+                                  <h5>The system only ever reads information from the Xero account you connect during the application process and will not create or make any changes on your Xero account. Rest assured, your Xero account and data is safe.</h5>
+                                  <li class="btn-font-color">
+                                      
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                      
+                                    <h5>Enabling "2-way sync" for simple reconciliation.</h5>
+                                    
+                                    </li>
+                                    <h5 class="mb-16">As a client approved for finance, you have the option of going to the Settings page on your dashboard and switching on "2-way sync". Only if you choose to enable this setting, will the system then post the relevant spend and receive money transactions to your Xero account. These will be posted whenever you withdraw funds from your facility.</h5>
+                                  
+                                    <h5>The benefit of enabling this feature is that you won't have to think about how to record your loan finance in your books. Simply let us do the heavy lifting. All you need to do is then reconcile the accounting records with the bank transactions for the deposit of the funds into your account, and payment of each instalment.</h5>
+                                  
+                              </ul>
+                              
+
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+            </section>
+            </div>
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                Pricing
+            </button>
+            <div class="myPanel myPanel-inside section-bg-grey" id="Do you offer funding to startups?" style="display: none;">
+               <section >
+              <section class="section-6 section-327 section4-img-bg-image" id="faq" aria-labelledby="faq-tab" role="tabmyPanel">
+                    <div class="container">
+                        
+                        
+                        <button class="accordion-2" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                            How is the interest charged to me calculated?
+                        </button>
+                        <div class="myPanel-2" id="" style="display: none;">
+                           <div class="highlight-text">
+                              <h5 class="mb-16">We use complex algorithms to assess thousands of data points which include credit data, government data, legal records, other public data, trade history, quality of invoices and debtors, etc. All the data collected is used to assess each client holistically, so it is difficult to point to any single data point in isolation that results in a particular interest rate being set for a credit facility.</h5>
+                              
+                              
+                             <h5 class="" style="font-size: small;">To review preliminary indications, see our pricing calculator.</h5>
+                              
+                            </div>
+                        </div>
+                        
+                        <button class="accordion-2" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                           How to improve your rate?
+                        </button>
+                        <div class="myPanel-2" id="" style="display: none;">
+                           <div class="highlight-text">
+                              <h5 class="mb-16">Customer behaviour and performance over time is also an important contributor to the rates charged. Clients that use their facility and consistently make repayments on time, are rewarded with larger facilities and improved rates over time.</h5>
+                              
+                              
+                              
+                            </div>
+                        </div>
+                        
+                        
+                        <button class="accordion-2" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                           Do you charge termination or cancellation fees?
+                        </button>
+                        <div class="myPanel-2" id="" style="display: none;">
+                           <div class="highlight-text">
+                        
+                             <h5 class="" style="font-size: small;">We feel you should be rewarded for early settlement, not penalised. So we don’t charge an early settlement penalty fee, in fact we actually give you a prorated discount on the fee outstanding.</h5>
+                              
+                            </div>
+                        </div>
+                        
+                        
+                        <button class="accordion-2" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                            Do you charge initiation or admin fees?
+                        </button>
+                        <div class="myPanel-2" id="" style="display: none;">
+                           <div class="highlight-text">
+                        
+                             <h5 class="" style="font-size: small;">There are zero hidden fees, account fees or application charges on your facility. You will always know the total cost of finance upfront, before you withdraw.</h5>
+                              
+                            </div>
+                        </div>
+
+
+                      
+                    </div>
+                </section>
+            </section>
+            </div>
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                Support
+            </button>
+            <div class="myPanel myPanel-inside section-bg-grey" id="Do you offer funding to startups?" style="display: none;">
+               <section >
+              <section class="section-6 section-327 section4-img-bg-image" id="faq" aria-labelledby="faq-tab" role="tabmyPanel">
+                    <div class="container">
+                        
+                        
+                        <button class="accordion-2" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                            How to make a formal complaint?
+                        </button>
+                        <div class="myPanel-2" id="" style="display: none;">
+                           <div class="highlight-text">
+                            <h5 class="mb-16">Each and every applicant and customer is important to us and we strongly believe you have the right to a fair and respectful service at all times.</h5>
+                              
+                              
+                            <h5 class="mb-16" style="font-size: small;">This guide explains how to make a formal complaint, as well as the typical timelines you can expect, and how to escalate a complaint if necessary.</h5>
+                             
+                            <h5 class="mb-16"><b>Making a complaint</b></h5>
+                            <h5 class="" style="font-size: small;">We welcome complaints from our customers or any other third party who may wish to express dissatisfaction with our service. You can submit a complaint at any time by contacting us at any of the following:</h5>
+                             
+                            <ul class="custom-bullets btn-font-color">
+                                  <li class="btn-font-color">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                     <h5> Complaints@businessloan.africanbank.co.za</h5>
+                                  </li>
+                        
+                                      
+                              </ul>
+                            
+                            
+                            <h5 class="mb-16"><b>Complaint timelines</b></h5>
+                
+                            <ul class="custom-bullets btn-font-color">
+                                  <li class="btn-font-color">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                      <h5>Once a complaint is received, we will endeavour to acknowledge it swiftly and will do our best to resolve it within 5 business days. If resolution of your complaint is expected to take longer, we will inform you of how your complaint is being dealt with and, if possible, what the revised timeline is.</h5>
+                                  </li>
+                                  <li class="btn-font-color">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                      <h5>If we are not in a position to resolve a complaint, we will send you a final communication which may include an explanation of why we are not in a position to resolve your complaint. We will do our best to send such final communications within six weeks of receiving your complaint.</h5>
+                                  </li>
+                        
+                                      
+                              </ul>
+                           <h5 class="mb-16"><b>Complaint escalation</b></h5>
+      
+                            <ul class="custom-bullets btn-font-color">
+                                  <li class="btn-font-color">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                     <h5> After receiving a final communication from us, we trust there will not be a need to advance your complaint. If you feel the need to escalate a complaint, you may ask the team member that handled your complaint to escalate it to management.</h5>
+                                  </li>
+
+                                  <li class="btn-font-color">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                          <path d="M16.75 7.72607L1.75 7.72607" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                          <path d="M10.6992 1.70149L16.7492 7.72549L10.6992 13.7505" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>
+                                    <h5> In the event of an escalation, a member of management will review the escalation. They will confirm that it was handled and the appropriate responses were given in accordance with our internal policy. In the event of deviation from our internal policy, the member of management will take the necessary action to resolve your complaint.</h5>
+                                  </li>                        
+                                      
+                              </ul>
+                            </div>
+                            
+                            
+                        </div>
+                        
+
+                    </div>
+                </section>
+            </section>
+            </div>
+            
+            
+        </div>
+    </section>
+            </section>
+       
+        </div>
+        <div class="tab-pane fade" id="tab3">
+          
+            <section >
+              <section class="section-6 section-327 section4-img-bg-image" id="faq" aria-labelledby="faq-tab" role="tabmyPanel">
+        <div class="container">
+            <h5 class="faqHeader btn-font-color">Savings & Investments</h5>
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                What are the application requirements?
+            </button>
+            <div class="myPanel" id="Do you offer funding to startups?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">Our minimum requirements are simple. You need to be:</h5>
+                  
+                  <ul class="custom-bullets btn-font-color">
+                      <li class="btn-font-color">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                         <h5> A registered company or close corporation in South Africa.</h5>
+                      </li>
+                      <li class="btn-font-color">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                         
+                          <h5>Finance to start or to buy a business.</h5>
+                          
+                      </li>
+                      <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Doing annual turnover of more than R1 000 000.</h5>
+                          
+                          </li>
+                      <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                         <h5> Trading history of 6 months or more.</h5>
+                         
+                         </li>
+                      <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                      
+                          <h5>Annual financial statements or management accounts will be required for funding above R2 000 000.</h5>
+                          
+                      </li>
+                  </ul>
+                  
+                 <h5 class="font-weight-600 btn-font-color" style="font-size: small;">Additionally, we do <b>not</b> require a business plan, a budget or a financial forecast. You also don't have to be VAT registered.</h5>
+                  
+                </div>
+            </div>
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                What documents do I need to apply?
+            </button>
+            <div class="myPanel" id="Do you offer funding to startups?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">For regulatory and Know Your Customer purposes, we will ask for the following:</h5>
+                  
+                  <ul class="custom-bullets btn-font-color">
+                      <li class="btn-font-color">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                         <h5> Startup grants or funding.</h5>
+                      </li>
+                      <li class="btn-font-color">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Finance to start or to buy a business.</h5></li>
+                      <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Finance to a new business with a tender or purchase order.</h5></li>
+                      <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Non-profit Organisations or Public Benefit Organisations.</h5>
+                          </li>
+                          <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Trusts.</h5>
+                          
+                    </li>
+                  </ul>
+                </div>
+            </div>
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding outside of South Africa?">
+               Do you offer funding outside of South Africa?
+            </button>
+            <div class="myPanel" id="Do you offer funding outside of South Africa?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">Currently, we only provide funding to South African registered businesses. Your clients can be based locally in South Africa or internationally.</h5>
+                  
+               
+                </div>
+            </div> 
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding outside of South Africa?">
+               What industries does African Bank offer funding to?
+            </button>
+            <div class="myPanel" id="Do you offer funding outside of South Africa?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">We offer funding to registered businesses from many industry sectors excluding credit providers and lenders, debt collection, debt counselling, firearm dealers, FOREX services, gambling and pawnbrokers. Illicit industries are also categorically excluded.</h5>
+                  
+               
+                </div>
+            </div> 
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding outside of South Africa?">
+               Are there any application fees?
+            </button>
+            <div class="myPanel" id="Do you offer funding outside of South Africa?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">There are no fees to apply and you can decide whether to use your approved facility and whether you use it in full or in part.</h5>
+                  
+               
+                </div>
+            </div> 
+            
+        </div>
+    </section>
+            </section>
+            <section >
+              <section class="section-6 section-327 section4-img-bg-image" id="faq" aria-labelledby="faq-tab" role="tabmyPanel">
+        <div class="container">
+            <h5 class="faqHeader btn-font-color">Call Deposits</h5>
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                What are the application requirements?
+            </button>
+            <div class="myPanel" id="Do you offer funding to startups?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">Our minimum requirements are simple. You need to be:</h5>
+                  
+                  <ul class="custom-bullets btn-font-color">
+                      <li class="btn-font-color">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                         <h5> A registered company or close corporation in South Africa.</h5>
+                      </li>
+                      <li class="btn-font-color">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Finance to start or to buy a business.</h5>
+                          
+                      </li>
+                      <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Doing annual turnover of more than R1 000 000.</h5>
+                          
+                        </li>
+                      <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Trading history of 6 months or more.</h5>
+                          
+                      </li>
+                      <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                         <h5> Annual financial statements or management accounts will be required for funding above R2 000 000.</h5></li>
+                  </ul>
+                  
+                 <h5 class="font-weight-600 btn-font-color" style="font-size: small;">Additionally, we do <b>not</b> require a business plan, a budget or a financial forecast. You also don't have to be VAT registered.</h5>
+                  
+                </div>
+            </div>
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                What documents do I need to apply?
+            </button>
+            <div class="myPanel" id="Do you offer funding to startups?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">For regulatory and Know Your Customer purposes, we will ask for the following:</h5>
+                  
+                  <ul class="custom-bullets btn-font-color">
+                      <li class="btn-font-color">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                         <h5> Startup grants or funding.</h5>
+                      </li>
+                      <li class="btn-font-color">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Finance to start or to buy a business.</h5>
+                          
+                        </li>
+                      <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                         <h5> Finance to a new business with a tender or purchase order.</h5>
+                         
+                         </li>
+                      <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Non-profit Organisations or Public Benefit Organisations.</h5>
+                          
+                          </li>
+                          <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Trusts.</h5>
+                          
+                          </li>
+                  </ul>
+                </div>
+            </div>
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding outside of South Africa?">
+               Do you offer funding outside of South Africa?
+            </button>
+            <div class="myPanel" id="Do you offer funding outside of South Africa?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">Currently, we only provide funding to South African registered businesses. Your clients can be based locally in South Africa or internationally.</h5>
+                  
+               
+                </div>
+            </div> 
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding outside of South Africa?">
+               What industries does African Bank offer funding to?
+            </button>
+            <div class="myPanel" id="Do you offer funding outside of South Africa?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">We offer funding to registered businesses from many industry sectors excluding credit providers and lenders, debt collection, debt counselling, firearm dealers, FOREX services, gambling and pawnbrokers. Illicit industries are also categorically excluded.</h5>
+                  
+               
+                </div>
+            </div> 
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding outside of South Africa?">
+               Are there any application fees?
+            </button>
+            <div class="myPanel" id="Do you offer funding outside of South Africa?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">There are no fees to apply and you can decide whether to use your approved facility and whether you use it in full or in part.</h5>
+                  
+               
+                </div>
+            </div> 
+            
+        </div>
+    </section>
+            </section>
+            <section >
+              <section class="section-6 section-327 section4-img-bg-image" id="faq" aria-labelledby="faq-tab" role="tabmyPanel">
+        <div class="container">
+            <h5 class="faqHeader btn-font-color">Notice Deposits</h5>
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                What are the application requirements?
+            </button>
+            <div class="myPanel" id="Do you offer funding to startups?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">Our minimum requirements are simple. You need to be:</h5>
+                  
+                  <ul class="custom-bullets btn-font-color">
+                      <li class="btn-font-color">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                         <h5> A registered company or close corporation in South Africa.</h5>
+                      </li>
+                      <li class="btn-font-color">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                         <h5>Finance to start or to buy a business.</h5>
+                         
+                      </li>
+                      <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Doing annual turnover of more than R1 000 000.</h5>
+                          
+                        </li>
+                      <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Trading history of 6 months or more.</h5>
+                          
+                        </li>
+                      <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Annual financial statements or management accounts will be required for funding above R2 000 000.</h5></li>
+                  </ul>
+                  
+                 <h5 class="font-weight-600 btn-font-color" style="font-size: small;">Additionally, we do <b>not</b> require a business plan, a budget or a financial forecast. You also don't have to be VAT registered.</h5>
+                  
+                </div>
+            </div>
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                What documents do I need to apply?
+            </button>
+            <div class="myPanel" id="Do you offer funding to startups?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">For regulatory and Know Your Customer purposes, we will ask for the following:</h5>
+                  
+                  <ul class="custom-bullets btn-font-color">
+                      <li class="btn-font-color">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          <h5>Startup grants or funding.</h5>
+                      </li>
+                      <li class="btn-font-color">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Finance to start or to buy a business.</h5>
+                          
+                          </li>
+                      <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Finance to a new business with a tender or purchase order.</h5>
+                          
+                          </li>
+                      <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Non-profit Organisations or Public Benefit Organisations.</h5>
+                          
+                          </li>
+                      <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Trusts.</h5>
+                          
+                      </li>
+                  </ul>
+                </div>
+            </div>
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding outside of South Africa?">
+               Do you offer funding outside of South Africa?
+            </button>
+            <div class="myPanel" id="Do you offer funding outside of South Africa?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">Currently, we only provide funding to South African registered businesses. Your clients can be based locally in South Africa or internationally.</h5>
+                  
+               
+                </div>
+            </div> 
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding outside of South Africa?">
+               What industries does African Bank offer funding to?
+            </button>
+            <div class="myPanel" id="Do you offer funding outside of South Africa?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">We offer funding to registered businesses from many industry sectors excluding credit providers and lenders, debt collection, debt counselling, firearm dealers, FOREX services, gambling and pawnbrokers. Illicit industries are also categorically excluded.</h5>
+                  
+               
+                </div>
+            </div> 
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding outside of South Africa?">
+               Are there any application fees?
+            </button>
+            <div class="myPanel" id="Do you offer funding outside of South Africa?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">There are no fees to apply and you can decide whether to use your approved facility and whether you use it in full or in part.</h5>
+                  
+               
+                </div>
+            </div> 
+            
+        </div>
+    </section>
+            </section>
+            <section >
+              <section class="section-6 section-327 section4-img-bg-image" id="faq" aria-labelledby="faq-tab" role="tabmyPanel">
+        <div class="container">
+            <h5 class="faqHeader btn-font-color">Notice Deposits</h5>
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                What are the application requirements?
+            </button>
+            <div class="myPanel" id="Do you offer funding to startups?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">Our minimum requirements are simple. You need to be:</h5>
+                  
+                  <ul class="custom-bullets btn-font-color">
+                      <li class="btn-font-color">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          <h5>A registered company or close corporation in South Africa.</h5>
+                      </li>
+                      <li class="btn-font-color">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Finance to start or to buy a business.</h5>
+                          
+                        </li>
+                      <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                         <h5> Doing annual turnover of more than R1 000 000.</h5>
+                          
+                          </li>
+                      <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Trading history of 6 months or more.</h5>
+                          
+                          </li>
+                          <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Annual financial statements or management accounts will be required for funding above R2 000 000.</h5>
+                          
+                          </li>
+                  </ul>
+                  
+                 <h5 class="font-weight-600 btn-font-color" style="font-size: small;">Additionally, we do <b>not</b> require a business plan, a budget or a financial forecast. You also don't have to be VAT registered</h5>
+                  
+                </div>
+            </div>
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding to startups?">
+                What documents do I need to apply?
+            </button>
+            <div class="myPanel" id="Do you offer funding to startups?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">For regulatory and Know Your Customer purposes, we will ask for the following:</h5>
+                  
+                  <ul class="custom-bullets btn-font-color">
+                      <li class="btn-font-color">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          <h5>Startup grants or funding.</h5>
+                      </li>
+                      <li class="btn-font-color">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Finance to start or to buy a business.</h5>
+                          
+                          </h5></li>
+                      <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Finance to a new business with a tender or purchase order.</h5></li>
+                      <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Non-profit Organisations or Public Benefit Organisations.</h5></li>
+                          <li class="btn-font-color">
+                          
+                          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" fill="none" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path d="M2 12h18" stroke="#5dc300" stroke-width="2"></path>
+                            <path d="M14 6l6 6-6 6" fill="#5dc300"></path>
+                          </svg>
+                          
+                          <h5>Trusts.</h5>
+                          
+                        </li>
+                  </ul>
+                </div>
+            </div>
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding outside of South Africa?">
+               Do you offer funding outside of South Africa?
+            </button>
+            <div class="myPanel" id="Do you offer funding outside of South Africa?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">Currently, we only provide funding to South African registered businesses. Your clients can be based locally in South Africa or internationally.</h5>
+                  
+               
+                </div>
+            </div> 
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding outside of South Africa?">
+               What industries does African Bank offer funding to?
+            </button>
+            <div class="myPanel" id="Do you offer funding outside of South Africa?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">We offer funding to registered businesses from many industry sectors excluding credit providers and lenders, debt collection, debt counselling, firearm dealers, FOREX services, gambling and pawnbrokers. Illicit industries are also categorically excluded.</h5>
+                  
+               
+                </div>
+            </div> 
+            
+            <button class="accordion" aria-expanded="false" aria-controls="Do you offer funding outside of South Africa?">
+               Are there any application fees?
+            </button>
+            <div class="myPanel" id="Do you offer funding outside of South Africa?" style="display: none;">
+               <div class="highlight-text">
+                  <h5 class="font-weight-600 btn-font-color" style="font-size: small;">There are no fees to apply and you can decide whether to use your approved facility and whether you use it in full or in part</h5>
+                  
+               
+                </div>
+            </div> 
+            
+        </div>
+    </section>
+            </section>
+      
+        </div>
+      </div>
+</section>
+
+
+
+
+<script >
+
+
+$(document).ready(function() {
+    $("#learn-more-btn-back").click(function() {
+        window.location.href = 'http://cmsdev.africanbank.net/en/home/bank'; // Change '/' to your actual home page URL if needed
+    });
+});
+
+        // Accordion Script (if applicable)
+    $(".accordion").click(function() {
+        $(this).toggleClass("active");
+        var myPanel = $(this).next(".myPanel");
+        var wasOpen = myPanel.css("display") === "block";
+
+        $(".myPanel").css("display", "none");
+        $(".accordion").removeClass("active");
+
+        if (!wasOpen) {
+            myPanel.css("display", "block");
+            $(this).addClass("active");
+        }
+    });
+    
+        // Accordion Script (if applicable)
+    $(".accordion-2").click(function() {
+        $(this).toggleClass("active");
+        var myPanel_2 = $(this).next(".myPanel-2");
+        var wasOpen_2 = myPanel_2.css("display") === "block";
+        
+          $('.myPanel-inside').each(function(){
+            // Use the native setProperty API to pass a priority of "important"
+            this.style.setProperty('margin-top',    '30px', 'important');
+            this.style.setProperty('margin-bottom', '30px', 'important');
+          });
+
+        $(".myPanel-2").css("display", "none");
+        $(".accordion-2").removeClass("active");
+
+        if (!wasOpen_2) {
+            myPanel_2.css("display", "block");
+            $(this).addClass("active");
+            
+        }
+        
+        if(wasOpen_2){
+          $('.myPanel-inside').each(function(){
+            // Use the native setProperty API to pass a priority of "important"
+            this.style.setProperty('margin-top',    '30px', 'important');
+            this.style.setProperty('margin-bottom', '30px', 'important');
+          });  
+        }
+        
+    });
+    
+    
+    $(document).ready(function() {
+      $('#btnRefresh').on('click', function() {
+        // Get the previous URL (if available)
+        const previousUrl = document.referrer;
+        console.log('Previous URL:', previousUrl);
+        
+        // Navigate back in history
+        window.history.back();
+      });
+    });
+    
+    
+function handleContainerClass() {
+  if ($(window).width() <= 768) {
+    $('.back-section .container').removeClass('container');
+  } else {
+    // Optionally re-add the class on larger screens
+    if (!$('.back-section div').hasClass('container')) {
+      $('.back-section div').addClass('container');
+    }
+  }
+}
+
+$(document).ready(handleContainerClass);
+$(window).resize(handleContainerClass);
+
+</script>

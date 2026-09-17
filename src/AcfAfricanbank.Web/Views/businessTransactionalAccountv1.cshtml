@@ -1,5 +1,367 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.BaseModernUI>
+@using CustomModels = Web.Models;
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using AcfAfricanbank.Core.Models.Forms
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
+	var Children = Model.Children;
+	 
+	  var herobody = Children?.Where(c => c is HeroBody).FirstOrDefault();
+	   var heroheader = Children?.Where(c => c is HeroHeader).FirstOrDefault();
+	 
+	 var headerImage_large = heroheader?.Value<IPublishedContent>("image")?.Url;
+	 var headerImage_Medium = heroheader?.Value<IPublishedContent>("imageMedium")?.Url;
+	 var headerImage_Small = heroheader?.Value<IPublishedContent>("imageSmall")?.Url;
+	  var headerImage_Last = heroheader?.Value<IPublishedContent>("video")?.Url;
+
+	  
+	  var sectioncard = herobody.Children.Where(c => c.Name == "Business Cards").FirstOrDefault();
+      var sectioncardAfricanBank = sectioncard.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var sectioncards = sectioncardAfricanBank.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+      
+      var firstcard = sectioncard?.Children?.Where(c => c.Name == "First Card");
+      var firstcards = firstcard.Select(c => c as Card).ToList();
+      
+      var FirstDocs = firstcards?.Select(c => c as Card).FirstOrDefault();
+       var Firstcardlink = FirstDocs.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").First();
+      
+      var secondcard = sectioncard?.Children?.Where(c => c.Name == "Second Card");
+      var secondcards = secondcard.Select(c => c as Card).ToList();
+      
+       var secondDocs = secondcards?.Select(c => c as Card).FirstOrDefault();
+       var secondcardlink = secondDocs.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").First();
+       var secondcardlink2 = secondDocs.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").Last();
+       
+       var thirdsection = sectioncard?.Children?.Where(c => c.Name == "Third Card");
+       var thirdcards = thirdsection.Select(c => c as Card).ToList();
+      
+       var thirdDocs = thirdcards?.Select(c => c as Card).FirstOrDefault();
+       var thirdcardlink = thirdDocs.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").FirstOrDefault();
+       
+       var faqcard = herobody.Children.Where(c => c.Name == "FAQ").FirstOrDefault();
+      var faqcardAfricanBank = faqcard.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var faqcards = faqcardAfricanBank.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+      
+      ContentModels.TabBody createOwnWorldOfBanking = null;
+    
+      var partialName = faqcard.Value("PartialViewName");
+      createOwnWorldOfBanking = (TabBody)faqcard;
+      
+      
+     ContentModels.TabBody business = null;
+      var partialName1 = sectioncard.Value("PartialViewName");
+      business = (TabBody)sectioncard; 
+     
+      
 }
+
+    <link rel="stylesheet" href="/css/projectmagic-business-banking.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        .section1-img-bg-image{
+            height: none !important;
+        }
+    </style>
+
+@* the fun starts here 
+ @Html.Partial("_pageModernHeaderv2", heroheader as ContentModels.HeroHeader)
+*@
+        <!--banner section-->
+        
+<section class="section-600 section-bg-black section1-img-bg-image">
+    <div class="container">
+        <div class="row align-items-center  d-flex flex-row-reverse row-change md-text-center">
+             @if (firstcards!= null && firstcards.Any())
+            {
+
+                foreach (Card benefit in firstcards)
+                {
+                
+                <div class="col-xl-6 col-lg-6 col-md-6">
+                    
+                    
+                    
+                    
+                    <h1 class="color-brand-1 mt-15 font-white">@benefit.CardTitle</h1>
+                    <p class="font-md2 font-white">@benefit.CardDescriptionLongText
+                    </p>
+                                        
+                    <div class="combo-btn">
+                    <div class="mt-50 text-start column1">
+                    <p class="combo-btn-text primary"><a href="@Firstcardlink.Url" class="btn  btn-brand-1 hover-up">@Firstcardlink.Name</a></p>
+                    </div>
+                    </div>
+                                        
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                    <img class="d-block" src="@benefit.CardIcon.Url" alt="">
+                  </div>
+                                    }
+                                    }
+            </div>
+        </div>
+</section>
+
+<section class="section-500 pt-45 pb-100 section-bg-black section2-img-bg-image">
+    <div class="container">
+        <div class="">
+            <div class="">
+                
+                <div class="2section  md-text-center">
+                
+                    @Html.Raw(@herobody.Value("bodyFooterTitle"))
+                    <br>
+                    <p style="font-size: 15px; color: #fff;" class="facility">
+                       @business.Value("partialViewClassName")
+                    </p>
+                </div>
+        
+        
+        <div class="row scroll-cards">
+            @foreach (var item in sectioncards)
+
+                    {
+                        var cardTitle = item.Value<string>("nCcardTitle");
+                       var button = item.Value<string>("abstractIt");
+                       var url = item.Value<string>("abstractButton");
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 ab-cards">
+                    <div class="ab-business-cards">
+                       <div class="card-title title">@cardTitle</div>
+                       @Html.Raw(item.Value<string>("mediumDescription"))
+                        
+                           <div class="combo-btn">
+                            <div class="mt-50 text-start column1">
+                            <p class="combo-btn-text primary"><a href="@url" class="btn  btn-brand-1 hover-up">@button</a></p>
+                            </div>
+                            </div>
+                       
+                     
+                    </div>
+                </div>
+              
+                }
+        </div>
+    </div>   
+        </div>
+    </div>
+</section>
+<section class="section-800 pt-45 pb-100 section-bg-white">
+    <div class="container">
+        <div class="row align-items-center  d-flex flex-row-reverse row-change md-text-center">
+            
+              @if (secondcards!= null && secondcards.Any())
+            {
+
+                foreach (Card benefit in secondcards)
+                {
+               
+                <div class="col-xl-6 col-lg-6 col-md-6">
+                    <h1 class="color-brand-1 mt-15 mb-20 color-brand-2 font-black">@benefit.CardTitle</h1>
+                    <p class="font-md color-brand-1">
+                        
+                    </p>
+                    @benefit.CardDescriptionLongText
+                                        
+                    <div class="combo-btn">
+                    <div class="mt-50 text-start column1">
+                    <p class="combo-btn-text primary"><a href="@secondcardlink.Url" class="btn  btn-brand-1 hover-up">@secondcardlink.Name</a></p>
+                    </div>
+                    <div class="mt-50 text-start column2">
+                    <p class="combo-btn-text secondary"><a href="@secondcardlink2.Url" class="btn btn-brand-secondary hover-up">@secondcardlink2.Name</a></p>
+                    </div>
+                    </div>
+                                        
+                </div>
+                 <div class="col-xl-6 col-lg-6 col-md-6">
+                    <img class="d-block" src="@benefit.CardIcon.Url" alt="">
+                  </div>
+                }
+                }
+            </div>
+        </div>
+</section>
+<section>
+    <div class="section5 row">
+
+                    <div class="subsection5 col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                         @if (thirdcards!= null && thirdcards.Any())
+            {
+
+                foreach (Card benefit in thirdcards)
+                {
+                       @benefit.CardDescriptionLongText
+                                <div class="image">
+                                </div>
+                          
+                          
+                    <div class="combo-btn">
+                    
+                        <div class="mt-50 text-start column2">
+                            <p class="combo-btn-text secondary"><a href="@thirdcardlink.Url" class="btn btn-brand-secondary hover-up">@thirdcardlink.Name</a></p>
+                        </div>
+                    </div>
+                          <!--<a href="https://onboarding.grindrodbank.co.za/onboardingui/#/onboardingui/sign-in?redirectURL=%2Fclient%2Fportfolio" class="button primary section5-btn"> Open Now</a>-->
+                  }
+                  }
+                   </div>
+                
+    </div>
+</section>
+@*
+<section class="section-6 section-bg-black section4-img-bg-image">
+        
+            <div class="container ">
+                <h5 class="faqHeader">@createOwnWorldOfBanking.Value("partialViewClassName")</h5>
+                 
+           @foreach (var item in faqcards)
+
+                    {
+                        var cardTitle = item.Value<string>("nCcardTitle");
+                       
+           
+                                 <button class="accordion">
+                                   @cardTitle
+                                 </button>
+                                 <div class="panel" style="display: none;">
+                                  @Html.Raw(item.Value<string>("mediumDescription"))
+                                   </div>
+                               
+                    }
+             </div>
+    </section>*@
+<section class="section-7 section-bg-black">
+        <div class="section6">
+                 
+            @Html.Raw(@herobody.Value("richTextBox"))
+            
+    
+        </div>
+    </section>
+
+    
+    
+    
+<script>
+// tapscards
+$(document).ready(function() {
+            $('.tabcard').on('click', function() {
+                var target = $(this).data('target');
+                
+                if ($(target).hasClass('active')) {
+                    $(target).removeClass('active').slideUp();
+                } else {
+                    $('.tabcontent').removeClass('active').slideUp();
+                    $(target).addClass('active').slideDown();
+                }
+            });
+        });
+
+    // Accordion Script start here
+    $(document).ready(function() {
+        $(".accordion").click(function() {
+            // Toggle the current accordion
+            $(this).toggleClass("active");
+            
+            // Get the panel related to this accordion
+            var panel = $(this).next(".panel");
+    
+            // Check if the panel was already open
+            var wasOpen = panel.css("display") === "block";
+            
+            // Close all panels
+            $(".panel").css("display", "none");
+            $(".accordion").removeClass("active"); // Optionally remove the 'active' class from all accordions
+            
+            // If the clicked panel was not already open, open it
+            if (!wasOpen) {
+                panel.css("display", "block");
+                $(this).addClass("active"); // Optionally add 'active' class back to the clicked accordion
+            }
+        });
+    });
+    
+                $(document).ready(function () {
+                 
+                  var imageBgCss = "url('" + "/media/vnolspcn/pl_email_bb_op.png" + "')";
+                  var imageMdCss = "url('" + "/media/vnolspcn/pl_email_bb_op_med.gen.png" + "')";
+                  var imageSmCss = "url('" + "/media/vnolspcn/pl_email_bb_op.png" + "')";
+                  var CheckScreenSize;
+                  (CheckScreenSize = function () {
+                      
+                      var _width = $(window).outerWidth();
+                      var _height = $(window).outerHeight();
+                      if (_width <= 414) {
+                          $("#heroHeader").css("background-image", imageSmCss);
+                      }
+                      else {
+                          $("#heroHeader").css("background-image", imageBgCss);
+                      }
+                  })();
+                  $(window).resize(CheckScreenSize);
+              });
+
+            //   Accordion End here
+
+            document.addEventListener('DOMContentLoaded', () => {
+    const cards = document.querySelectorAll('.card');
+    const cardsContainer = document.querySelector('.cards-container');
+    const prevButton = document.getElementById('prev');
+    const nextButton = document.getElementById('next');
+    const pageNumbersContainer = document.getElementById('page-numbers');
+    const cardsPerPage = 3;
+    let currentPage = 0;
+    const totalPages = Math.ceil(cards.length / cardsPerPage);
+
+    function showPage(page) {
+        const start = page * cardsPerPage;
+        const end = start + cardsPerPage;
+        cards.forEach((card, index) => {
+            if (index >= start && index < end) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        prevButton.disabled = page === 0;
+        nextButton.disabled = page >= totalPages - 1;
+        updatePageNumbers();
+    }
+
+    function updatePageNumbers() {
+        pageNumbersContainer.innerHTML = '';
+        for (let i = 0; i < totalPages; i++) {
+            const pageNumber = document.createElement('button');
+            pageNumber.textContent = i + 1;
+            pageNumber.className = 'page-number';
+            if (i === currentPage) {
+                pageNumber.classList.add('active');
+            }
+            pageNumber.addEventListener('click', () => {
+                currentPage = i;
+                showPage(currentPage);
+            });
+            pageNumbersContainer.appendChild(pageNumber);
+        }
+    }
+
+    prevButton.addEventListener('click', () => {
+        if (currentPage > 0) {
+            currentPage--;
+            showPage(currentPage);
+        }
+    });
+
+    nextButton.addEventListener('click', () => {
+        if (currentPage < totalPages - 1) {
+            currentPage++;
+            showPage(currentPage);
+        }
+    });
+
+    showPage(currentPage);
+});
+</script>
+
+

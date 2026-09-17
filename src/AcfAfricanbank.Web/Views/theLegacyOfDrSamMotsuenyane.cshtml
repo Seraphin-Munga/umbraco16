@@ -1,5 +1,3282 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using AcfAfricanbank.Core.Models.Forms
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers;
+@using System.Configuration;
+@using CustomModels = Web.Models;
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
+	
+	 var children = Model.Children;
+	 
+	 var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+	 var footerDescription = heroBody.Value("richTextBox").ToString();
 }
+
+<link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="/css/projectmagic.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
+    
+@* the fun starts here *@
+    <style>
+      body {
+       @* margin-top: 20px;*@
+        background: #f2f2f2;
+        font-family: "Montserrat", sans-serif;
+      }
+
+      .bootdey {
+        margin-top: 250px;
+      }
+
+      .desktop {
+        background: #fff;
+        padding: 60px 0px 60px 0px;
+      }
+
+      .audio-playlist {
+        background: #fff;
+        min-width: 800px;
+        padding: 80px 0px 100px 0px;
+      }
+
+      img {
+        width: 100%;
+        height: 100%;
+      }
+
+      .header_title {
+        font-weight: 900;
+        font-family: "Montserrat", sans-serif;
+        font-size: 24px;
+      }
+
+      .card {
+        background-color: #f2f2f2 !important;
+        border: none;
+      }
+
+      .timeline-year {
+        background: #002b60;
+        height: 100%;
+        width: 20px;
+        border-radius: 0 15px 15px 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+      }
+
+      .timeline-row:nth-child(even) .timeline-content .timeline-year {
+        right: auto;
+        left: 0;
+        border-radius: 15px 0 0 15px;
+      }
+
+      .timeline-content p {
+        font-family: "Montserrat", sans-serif;
+        color: #6b6f82;
+        font-size: 14px;
+        line-height: 1rem;
+      }
+
+      .timeline-content h1 {
+        font-size: 18px;
+        line-height: 0.85rem;
+        font-weight: 800;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-family: "Montserrat", sans-serif;
+        color: #464855;
+      }
+
+      .mt-5 {
+        margin-top: 20px;
+      }
+
+      .light-title {
+        color: #95d03a;
+        font-size: 24px;
+        font-weight: 900;
+        font-family: "Montserrat", sans-serif;
+      }
+
+      .light-text {
+        font-size: 24px;
+        color: #464855;
+        text-transform: uppercase;
+      }
+
+      .timeline {
+        position: relative;
+        padding: 10px;
+        margin: 0 auto;
+        overflow: hidden;
+        color: #ffffff;
+      }
+
+      .timeline:after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 50%;
+        margin-left: -1px;
+        border-right: 2px dashed #c4d2e2;
+        height: 100%;
+        display: block;
+      }
+
+      .timeline-row {
+        padding-left: 50%;
+        position: relative;
+        margin-bottom: 30px;
+      }
+
+      .timeline-row .timeline-time {
+        position: absolute;
+        right: 53%;
+        top: 100px;
+        text-align: right;
+        margin-right: 20px;
+        color: #000000;
+        font-size: 1.5rem;
+      }
+
+      .timeline-row .timeline-content {
+        position: relative;
+        padding: 20px 30px;
+        -webkit-border-radius: 10px;
+        -moz-border-radius: 10px;
+        border-radius: 10px;
+        width: 462px;
+        min-height: 296px;
+      }
+
+      .timeline-row .timeline-content:after {
+        content: "";
+        position: absolute;
+        top: 155px;
+        height: 3px;
+        width: 40px;
+      }
+
+      .timeline-row .timeline-content:before {
+        content: "";
+        position: absolute;
+        top: 150px;
+        right: -55px;
+        width: 30px;
+        height: 30px;
+        -webkit-border-radius: 100px;
+        -moz-border-radius: 100px;
+        border-radius: 100px;
+        z-index: 100;
+        background: #002b60;
+        border: 7px solid #dbdbdb;
+      }
+
+      .timeline-row .timeline-content h4 {
+        margin: 0 0 20px 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        line-height: 150%;
+      }
+
+      .timeline-row .timeline-content p {
+        margin-bottom: 30px;
+        line-height: 150%;
+      }
+
+      .timeline-row .timeline-content i {
+        font-size: 2rem;
+        color: #ffffff;
+        line-height: 100%;
+        padding: 10px;
+        border: 2px solid #ffffff;
+        -webkit-border-radius: 100px;
+        -moz-border-radius: 100px;
+        border-radius: 100px;
+        margin-bottom: 10px;
+        display: inline-block;
+      }
+
+      .timeline-row .timeline-content .thumbs {
+        margin-bottom: 20px;
+      }
+
+      .timeline-row .timeline-content .thumbs img {
+        margin-bottom: 10px;
+      }
+
+      .timeline-row:nth-child(even) .timeline-content {
+        background: #ffffff 0% 0% no-repeat padding-box;
+        box-shadow: 0px 10px 15px #0000001a;
+        border-radius: 20px;
+        opacity: 1;
+        margin-left: 40px;
+        text-align: left;
+      }
+
+      .timeline-row:nth-child(even) .timeline-content:after {
+        left: -40px;
+        border-right: 18px solid #002b60;
+        border-top: 10px solid transparent;
+        border-bottom: 10px solid transparent;
+      }
+
+      .timeline-row:nth-child(even) .timeline-content:before {
+        left: -50px;
+        right: initial;
+      }
+
+      .timeline-row:nth-child(odd) {
+        padding-left: 0;
+        padding-right: 50%;
+      }
+
+      .timeline-row:nth-child(odd) .timeline-time {
+        right: auto;
+        left: 53%;
+        text-align: left;
+        margin-right: 0;
+        margin-left: 20px;
+      }
+
+      .timeline-row:nth-child(odd) .timeline-content {
+        background: #ffffff 0% 0% no-repeat padding-box;
+        box-shadow: 0px 10px 15px #0000001a;
+        border-radius: 20px;
+        opacity: 1;
+        margin-right: 40px;
+        margin-left: 0;
+        text-align: right;
+        left: 4.5%;
+      }
+
+      .timeline-row:nth-child(odd) .timeline-content:after {
+        right: -39px;
+        border-left: 18px solid #002b60;
+        border-top: 10px solid transparent;
+        border-bottom: 10px solid transparent;
+      }
+      
+      .date {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+ .scrollable-x {
+  width:1000px;
+  height:200px;
+  border:0px;
+  overflow-x: scroll;
+  white-space: nowrap;
+        }
+        
+        .vertical-timeline-line {
+            position: reletive;
+            background: #002B60;
+            width: 4px;
+            border-radius: 12px;
+            position: relative;
+            justify-self: end;
+            top:72px;
+        }
+        
+        .vertical-timeline-line::-webkit-scrollbar {
+            display: none;
+        }
+        
+
+        .vertical-timeline-innerline {
+            position: absolute;
+            background: #002B60;
+            width: 4px;
+            height: 0%;
+            top: 0%;
+            left: 0%;
+            transition: 1s linear;
+        }
+
+        .vertical-timeline ul {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            list-style: none;
+            padding: 0;
+        }
+
+        .vertical-timeline-item {
+            margin-top: 30px;
+            position: relative;
+            padding: 25px;
+        }
+
+        .vertical-timeline-item p {
+            padding: 0 20px;
+            transition: 1.5s;
+        }
+
+        .vertical-timeline-item .date {
+            position: absolute;
+            top: 30px;
+            left: -50px;
+            opacity: 0;
+            transition: 1.5s;
+            font-size: 12px;
+        }
+
+        .vertical-timeline-point {
+            border: none;
+            position: absolute;
+            border-radius: 50%;
+            background: #002B60;
+            width: 8px;
+            height: 8px;
+            top: 30px;
+            left: -6px;
+            transition: 1.5s ease;
+            cursor: pointer;
+        }
+
+
+      @@media (max-width: 767px) {
+        .timeline {
+          padding: 15px 10px;
+        }
+        .timeline:after {
+          left: 28px;
+        }
+        .timeline .timeline-row {
+          padding-left: 0;
+          margin-bottom: 16px;
+        }
+        .timeline .timeline-row .timeline-time {
+          position: relative;
+          right: auto;
+          top: 0;
+          text-align: left;
+          margin: 60px 0px 60px 52px;
+        }
+
+        .timeline-year {
+          background: #002b60;
+          height: 100%;
+          width: 20px;
+          border-radius: 15px 0px 0px 15px;
+          position: absolute;
+          left: 0;
+          top: 0;
+        }
+
+        .timeline-content h1 {
+          font-size: 18px;
+          line-height: 1.6;
+          font-weight: 800;
+          margin-left: 20px;
+        }
+
+        .timeline-row .timeline-content p {
+          margin-bottom: 30px;
+          line-height: 150%;
+          margin-left: 20px;
+        }
+
+        .timeline .timeline-row .timeline-content {
+          padding: 15px;
+          margin-left: 56px;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+          position: relative;
+          width: 250px;
+          height: 100%;
+        }
+        .timeline .timeline-row .timeline-content:after {
+          right: auto;
+          left: -39px;
+          top: 154px;
+        }
+        .timeline .timeline-row:nth-child(odd) {
+          padding-right: 0;
+        }
+        .timeline .timeline-row:nth-child(odd) .timeline-time {
+          position: relative;
+          right: auto;
+          left: auto;
+          top: 0;
+          text-align: left;
+          margin: 60px 0px 60px 52px;
+        }
+        .timeline .timeline-row:nth-child(odd) .timeline-content {
+          margin-right: 0;
+          margin-left: 30px;
+        }
+        .timeline .timeline-row:nth-child(odd) .timeline-content:after {
+          right: auto;
+          left: -39px;
+          top: 154px;
+          border-right: 18px solid #002b60;
+          border-left: inherit;
+        }
+
+        .timeline-row .timeline-content:before {
+          content: "";
+          position: absolute;
+          top: 150px;
+          left: -40px;
+          width: 30px;
+          height: 30px;
+          -webkit-border-radius: 100px;
+          -moz-border-radius: 100px;
+          border-radius: 100px;
+          z-index: 100;
+          background: #002b60;
+          border: 7px solid #dbdbdb;
+        }
+
+        .timeline.animated .timeline-row:nth-child(odd) .timeline-content {
+          left: 20px;
+        }
+        .timeline.animated
+          .timeline-row.active:nth-child(odd)
+          .timeline-content {
+          left: 0;
+        }
+
+        .timeline-row:nth-child(odd) .timeline-content {
+          background: #ffffff 0% 0% no-repeat padding-box;
+          box-shadow: 0px 10px 15px #0000001a;
+          border-radius: 20px;
+          opacity: 1;
+          margin-left: 40px;
+          margin-left: 0;
+          text-align: left;
+          left: 4.5%;
+        }
+      }
+
+      /* Maanda's style code */
+      .background {
+        position: relative;
+        height: 70vh;
+        width: 100%;
+        background: url("/media/pfddtlxk/dr-sam-2-2x.png") center center no-repeat;
+        background-size: cover;
+        opacity: 0.06;
+        right: 140px;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .overlay-content {
+        position: relative;
+        height: 100%;
+        color: #002b60;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 5; /* higher z-index to ensure it's on top */
+        bottom: 750px;
+      }
+      .banner-bar {
+        background-color: #002b60;
+        color: white;
+        padding: 20px 0;
+        text-align: center;
+      }
+      .myStoryBtn {
+        background: #95d03a;
+        border: none;
+        border-radius: 50px;
+        color: white;
+        padding: 6px 25px;
+        font-size: 21px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        bottom: 115px;
+      }
+      .myStoryBtn svg {
+        margin-left: 20px;
+        width: 34px;
+        position: relative;
+        left: 15px;
+      }
+      .title-1 {
+        text-align: center;
+        font-weight: bold;
+        font: normal normal 800 32px/35px;
+        letter-spacing: 0px;
+        color: #002b60;
+        text-transform: uppercase;
+      }
+      .title-2 {
+        text-align: center;
+        font-weight: bold;
+        font: normal normal 800 32px / 35px;
+        letter-spacing: 0px;
+        color: #95d03a;
+        text-transform: uppercase;
+      }
+      .lead {
+        font-size: 5rem !important;
+      }
+
+      .accordion-header {
+        padding: 10px;
+        font-size: 16px;
+        background: #f9f9f9;
+        color: #464855;
+        cursor: pointer;
+        border: none;
+        width: 100%;
+        text-align: left;
+        transition: background-color 0.3s;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .accordion-header:hover {
+        background-color: #f2f2f2;
+      }
+
+      .accordion-header.active {
+        font-size: 23px !important;
+        text-align: left;
+        font: normal normal 800 18px / 20px Montserrat;
+        letter-spacing: 0px;
+        color: #95d03a;
+        opacity: 1;
+      }
+
+      .accordion-content {
+        padding: 0 18px;
+        background-color: white;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.2s ease-out;
+        border: 1px solid #ccc;
+        border-top: none;
+      }
+
+      .accordion-content p {
+        margin: 10px 0;
+      }
+
+      .music-container {
+        width: 80%;
+        margin: auto;
+        background-color: #fff;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .title {
+        font-size: 24px;
+        color: #333;
+        text-align: center;
+        margin: 23px 294px;
+      }
+
+      .audio-item {
+        margin: 19px -24px;
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        background: transparent linear-gradient(90deg, #ffffff 0%, #fcfcfc 100%)
+          0% 0% no-repeat padding-box;
+        box-shadow: 0px 7px 8px #00000012;
+        border-radius: 30px;
+        opacity: 1;
+      }
+
+      .play-button {
+           width: 50px;
+            height: 50px;
+            background-color: #FFF;
+            border: none;
+            border-radius: 50%;
+            margin-right: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+      }
+
+      .play-button img {
+        width: 20px;
+        height: 20px;
+      }
+
+      .audio-info h2 {
+        margin: 0;
+        font-size: 18px;
+        color: #333;
+      }
+
+      .audio-info p {
+        margin: 5px 0 0;
+        font-size: 14px;
+        color: #666;
+      }
+
+        .audio-item {
+            margin: 19px -24px;
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: transparent linear-gradient(90deg, #FFFFFF 0%, #FCFCFC 100%) 0% 0% no-repeat padding-box;
+            box-shadow: 0px 7px 8px #00000012;
+            border-radius: 30px;
+            opacity: 1;
+        }
+      .media-player {
+        width: 300px;
+        padding: 20px;
+        background-color: #f2f2f2;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .progress-container {
+        width: 95%; /* Full width to make it responsive */
+        height: 2px;
+        background-color: #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .progress-bar {
+        height: 100%;
+        background-color: rgb(
+          173,
+          216,
+          79
+        ); /* Updated the color for better visibility */
+        width: 2%; /* Start with 0% width */
+        border-radius: 5px;
+      }
+
+      .bg-grey-60 {
+        background-color: #f2f2f2 !important;
+      }
+
+      .gallery {
+        -webkit-column-count: 4;
+        -moz-column-count: 4;
+        column-count: 4;
+        -webkit-column-gap: 10px;
+        -moz-column-gap: 10px;
+        column-gap: 10px;
+        margin-top: 10px;
+        overflow: hidden;
+      }
+
+      .gallery img,
+      .gallery video {
+        width: 100%; /* Ensures width is responsive and fills the column */
+        height: 200px; /* Fixed height for both images and videos */
+        object-fit: cover; /* Ensures the content covers the area without distorting aspect ratio */
+        transition: 500ms;
+        margin-bottom: 10px;
+        opacity: 0.8;
+      }
+
+      .media-item {
+        width: 100%; /* Ensures width is responsive and fills the column */
+        height: 200px; /* Fixed height for both images and videos */
+        object-fit: cover; /* Ensures the content covers the area without distorting aspect ratio */
+        transition: 500ms;
+        margin-bottom: 10px;
+        opacity: 0.8;
+      }
+      .gallery img:hover,
+      .gallery video:hover {
+        opacity: 1;
+      }
+
+      .modal-img,
+      .modal-vid {
+        width: 100%; /* Ensure full width within modal */
+        height: auto; /* Adjust height as needed */
+      }
+
+      .modal-body {
+        padding: 0px;
+      }
+
+      .modal-dialog {
+        max-width: 90%;
+        margin: 30px auto;
+      }
+
+      .modal-content {
+        border: none;
+      }
+
+      .gallery-container {
+        background: white;
+        padding: 40px;
+        border-radius: 19px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .subheader {
+        text-align: center;
+        font-weight: 300;
+        margin: 14px 163px;
+      }
+
+      .mainheader {
+        text-align: center;
+        font-weight: 700;
+      }
+
+      .tab-container {
+        display: flex;
+        align-items: flex-start;
+        position: relative;
+        font-family: Arial, sans-serif;
+      }
+
+      .tab-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        width: 200px;
+      }
+
+      .tab {
+        padding: 10px;
+        cursor: pointer;
+        position: relative;
+        transition: background-color 0.3s;
+        text-align: left;
+        font: normal normal normal 14px/20px Montserrat;
+        letter-spacing: 0px;
+        color: #464855;
+        opacity: 1;
+      }
+
+      li.tab.active {
+        font-size: 23px !important;
+        text-align: left;
+        font: normal normal 800 18px/20px Montserrat;
+        letter-spacing: 0px;
+        color: #95d03a;
+        opacity: 1;
+      }
+
+      .tab.active {
+        font-weight: 500;
+        color: #f2f2f2;
+      }
+
+      .tab.active::after {
+        content: "";
+        position: absolute;
+        left: 134%;
+        top: 50%;
+        width: 0;
+        height: 0;
+        border-top: 10px solid transparent;
+        border-bottom: 10px solid transparent;
+        border-right: 10px solid #95d03a;
+        transform: translate(0, -50%);
+        opacity: 1;
+      }
+
+      .tab-content {
+        border-left: 2px solid #ccc;
+        padding: 20px;
+        width: calc(100% - 260px);
+        background-color: white;
+        margin-left: 10px;
+        position: relative;
+        left: 65px;
+        text-align: left;
+        font: normal normal normal 14px/24px Montserrat;
+        letter-spacing: 0px;
+        color: #6b6f82;
+      }
+
+      .content {
+        display: none;
+      }
+
+      .content.active {
+        display: block;
+      }
+
+      .tab-content-header {
+        text-align: left;
+        font: normal normal 300 42px/24px Montserrat;
+        letter-spacing: 0px;
+        color: #464855;
+      }
+
+      *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+        }
+
+ .vertical-timeline-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: row;
+        }
+      
+
+        .vertical-timeline {
+         
+            
+                margin-top: 35px;
+            display: grid;
+            grid-template-columns: 40% auto;
+            justify-content: center;
+            position: relative;
+            bottom: 10px;
+        }
+
+        .vertical-timeline-line {
+            background: #002B60;
+            width: 4px;
+            border-radius: 12px;
+            position: relative;
+            justify-self: end;
+            top:72;
+        }
+
+.vertical-timeline-items{
+    list-style: none;
+    padding: 0;
+}
+
+        .vertical-timeline-innerline {
+            position: absolute;
+            background: #002B60;
+            width: 4px;
+            height: 0%;
+            top: 0%;
+            left: 0%;
+            transition: 1s linear;
+        }
+
+        .vertical-timeline ul {
+            width: fit-content;
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            list-style: none;
+            padding: 0;
+        }
+
+        .vertical-timeline-item {
+                position: relative;
+    padding-left: 50px;
+    margin-bottom: 20px;
+        }
+
+        .vertical-timeline-item p {
+            padding: 0 20px;
+            transition: 1.5s;
+        }
+
+        .vertical-timeline-item .date {
+            position: absolute;
+            top: 30px;
+            left: -50px;
+            opacity: 0;
+            transition: 1.5s;
+            font-size: 12px;
+        }
+
+        .vertical-timeline-point {
+border: none;
+            position: absolute;
+            border-radius: 50%;
+            background: #002B60;
+            width: 8px;
+            height: 8px;
+            top: 30px;
+            left: -6px;
+            transition: 1.5s ease;
+            cursor: pointer;
+
+        }
+
+        @@media screen and (min-width: 728px) {
+            .vertical-timeline {
+                display: block;
+            }
+
+            .vertical-timeline ul {
+                flex-direction: row;
+                width: fit-content;
+            }
+
+            .vertical-timeline-item {
+                margin-top: 0px;
+                position: relative;
+                width: 100%;
+                padding: 0px;
+            }
+
+            .vertical-timeline-item p {
+                transform: translateY(-10px);
+                opacity: 0;
+                transition: 1.5s;
+            }
+
+            .vertical-timeline-item .date {
+                opacity: 0;
+                transition: 1.5s;
+                font-size: 12px;
+                position: absolute;
+                top: -60px;
+                left: 38%;
+            }
+
+            .vertical-timeline-point {
+                width: 15px;
+                height: 15px;
+                top: -40px;
+                left: 40%;
+                transition: 1.5s ease;
+            }
+
+            .vertical-timeline-line {
+                width: 100%;
+                height: 4px;
+            }
+
+            .vertical-timeline-innerline {
+                position: absolute;
+                background: #002B60;
+                width: 0%;
+                height: 4px;
+                top: 0%;
+                left: 0%;
+                transition: 1s linear;
+                border-radius: 999px;
+            }
+        }
+
+      @@media (min-width: 1000px) {
+        .desktop {
+          display: block;
+        }
+        .mobile {
+          display: none;
+        }
+
+        .title {
+          font-size: 18px;
+          margin: 10px 10px;
+        }
+
+        .audio-item {
+          flex-direction: row;
+          padding: 10px;
+          margin: 24px 1px;
+        }
+
+        .play-button {
+          margin-bottom: 0px;
+        }
+
+        .audio-info h2 {
+          font-size: 16px;
+        }
+
+        .audio-info p {
+          font-size: 12px;
+        }
+
+        .progress-container {
+          width: 90%;
+          margin-top: 0px;
+        }
+      }
+
+      @@media (max-width: 1500px) {
+        .lead {
+          font-size: 2rem !important;
+        }
+        .title-2,
+        .title-3 {
+          font-size: 24px;
+        }
+        .myStoryBtn {
+          font-size: 14px;
+        }
+        .banner-bar p {
+          padding: 0 15px; /* Ensures padding within the viewport */
+        }
+
+        .overlay-content {
+          bottom: 723px !important;
+        }
+      }
+     
+      @@media (max-width: 768px) {
+        .myStoryBtn {
+          bottom: 115px;
+        }
+        .lead {
+          font-size: 2rem !important;
+        }
+        .title-2,
+        .title-3 {
+          font-size: 24px;
+        }
+        .myStoryBtn {
+          font-size: 14px;
+        }
+        .banner-bar p {
+          padding: 0 15px; /* Ensures padding within the viewport */
+        }
+      }
+
+      @@media (max-width: 999px) {
+        .desktop {
+          display: block;
+        }
+        .mobile {
+          display: none;
+        }
+        .title {
+          font-size: 18px;
+          margin: 10px 10px;
+        }
+
+        .audio-item {
+          flex-direction: row;
+          padding: 10px;
+          margin: 24px 1px;
+        }
+
+        .play-button {
+          margin-bottom: 0px;
+        }
+
+        .audio-info h2 {
+          font-size: 16px;
+        }
+
+        .audio-info p {
+          font-size: 12px;
+        }
+
+        .progress-container {
+          width: 90%;
+          margin-top: 0px;
+        }
+      }
+
+      @@media (max-width: 765px) {
+        .desktop {
+          display: block;
+        }
+        .mobile {
+          display: none;
+        }
+        .title {
+          font-size: 18px;
+          margin: 10px 10px;
+        }
+
+        .audio-item {
+          flex-direction: row;
+          padding: 10px;
+          margin: 24px 1px;
+        }
+
+        .play-button {
+          margin-bottom: 0px;
+        }
+
+        .audio-info h2 {
+          font-size: 16px;
+        }
+
+        .audio-info p {
+          font-size: 12px;
+        }
+
+        .progress-container {
+          width: 80%;
+          margin-top: 0px;
+        }
+
+        .gallery {
+          -webkit-column-count: 2;
+          -moz-column-count: 2;
+          column-count: 2;
+        }
+        .subheader {
+          margin: 0px 0px;
+        }
+      }
+      /*  */
+      @@media (max-width: 768px) {
+        .desktop {
+          display: none;
+        }
+        .mobile {
+          display: block;
+        }
+        .tab-container {
+          flex-direction: column;
+        }
+        .tab-list,
+        .tab-content {
+          width: 100%;
+        }
+        .tab {
+          width: 100%;
+          border-bottom: 1px solid #ddd;
+          margin: 0; /* Remove any default margin. */
+          padding: 10px; /* Uniform padding */
+          font-size: 16px; /* Larger font size for better readability */
+          background: #f9f9f9; /* Light background for the tab */
+          cursor: pointer;
+        }
+        .tab:hover {
+          background-color: #ececec; /* Slight background color on hover for visual feedback */
+        }
+        .tab.active {
+          background-color: #ddd; /* Different background for active tab */
+        }
+        .tab-content {
+          width: 100%;
+          padding: 10px;
+          border-top: none;
+          display: none; /* Start with content hidden */
+          background-color: white;
+          border: 1px solid #ccc; /* Give content a slight border */
+          border-top: none; /* Seamless top border with the tab */
+        }
+
+        .content.active {
+          display: block; /* Display the content when active */
+        }
+        .tab.active::after {
+          display: none; /* Optionally remove the arrow indicator for a cleaner look */
+        }
+      }
+
+      @@media (max-width: 480px) {
+        .title {
+          font-size: 16px;
+        }
+
+        .audio-info h2 {
+          font-size: 14px;
+        }
+        .desktop {
+          display: none;
+        }
+        .mobile {
+          display: block;
+        }
+      }
+
+      @@media screen and (max-width: 479px) {
+        .gallery {
+          -webkit-column-count: 1;
+          -moz-column-count: 1;
+          column-count: 1;
+        }
+        .desktop {
+          display: none;
+        }
+        .mobile {
+          display: block;
+        }
+      }
+    </style>
+
+  <body>
+    <!-- banner section -->
+    <div class="background"></div>
+    <div class="banner-bar">
+      <div class="container">
+             @Html.Raw(footerDescription)
+      </div>
+    </div>
+    <div class="container overlay-content">
+            <h1  class="title-1 display-4">Life of</h1>
+            <h1 class="lead">Dr SAM MOTSUENYANE</h1>
+            <h1  class="title-2">THE DOYEN OF BLACK BUSINESS</h1>
+            <img src="/media/lyujqf0o/dr-sam-2.png" alt="Dr Sam" class="img-fluid my-3">
+            <button class="myStoryBtn">
+                MY STORY
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                  <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                  <g id="SVGRepo_iconCarrier">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M11.0748 7.50835C9.74622 6.72395 8.25 7.79065 8.25 9.21316V14.7868C8.25 16.2093 9.74622 17.276 11.0748 16.4916L15.795 13.7048C17.0683 12.953 17.0683 11.047 15.795 10.2952L11.0748 7.50835ZM9.75 9.21316C9.75 9.01468 9.84615 8.87585 9.95947 8.80498C10.0691 8.73641 10.1919 8.72898 10.3122 8.80003L15.0324 11.5869C15.165 11.6652 15.25 11.8148 15.25 12C15.25 12.1852 15.165 12.3348 15.0324 12.4131L10.3122 15.2C10.1919 15.271 10.0691 15.2636 9.95947 15.195C9.84615 15.1242 9.75 14.9853 9.75 14.7868V9.21316Z" fill="#fff"></path>
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.25C6.06294 1.25 1.25 6.06294 1.25 12C1.25 17.9371 6.06294 22.75 12 22.75C17.9371 22.75 22.75 17.9371 22.75 12C22.75 6.06294 17.9371 1.25 12 1.25ZM2.75 12C2.75 6.89137 6.89137 2.75 12 2.75C17.1086 2.75 21.25 6.89137 21.25 12C21.25 17.1086 17.1086 21.25 12 21.25C6.89137 21.25 2.75 17.1086 2.75 12Z" fill="#fff"></path> </g></svg>
+            </button>
+    </div>
+    <!-- horizontal timeline -->
+ 
+ 
+ <div class="vertical-timeline-container">
+    <section class="vertical-timeline">
+        <div class="vertical-timeline-line">
+            <span class="vertical-timeline-innerline"></span>
+        </div>
+
+
+        <div class="scrollable-x">
+            <br>
+            <br>
+            <br>
+            <br>
+            
+            <ul>
+                <li class="vertical-timeline-item" data-year="2000">
+                    <span class="vertical-timeline-point" onclick="showEventByYear(2000)"></span>
+                    <span class="date">2000</span>
+                    <p style=" max-width: 250px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;" >
+                        Lorem, ipsum dolor sit ametametLorem, ipsum dolor sit ame</p>
+                </li>
+                <li class="vertical-timeline-item" data-year="2005">
+                    <span class="vertical-timeline-point" onclick="showEventByYear(2005)"></span>
+                    <span class="date">2005</span>
+                    <p style=" max-width: 250px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;" >Lorem, ipsum dolor sit ametametLorem, ipsum dolor sit ame</p>
+                    </li>
+                    <li class="vertical-timeline-item" data-year="2010">
+                    <span class="vertical-timeline-point" onclick="showEventByYear(2010)"></span>
+                    <span class="date">2010</span>
+                    <p style=" max-width: 250px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;">Lorem, ipsum dolor sit ametametLorem, ipsum dolor sit ame</p>
+                    </li>
+                    <li class="vertical-timeline-item" data-year="2015">
+                    <span class="vertical-timeline-point" onclick="showEventByYear(2015)"></span>
+                    <span class="date">2015</span>
+                    <p style=" max-width: 250px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;">Lorem, ipsum dolor sit ametLorem, ipsum dolor sit ame</p>
+                    </li>
+                    <li class="vertical-timeline-item" data-year="2020">
+                    <span class="vertical-timeline-point" onclick="showEventByYear(2020)"></span>
+                    <span class="date">2020</span>
+                    <p style=" max-width: 250px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;">Lorem, ipsum dolor sit ametametLorem, ipsum dolor sit ame</p>
+                    </li>
+                    </ul>
+        </div>
+
+                </section>
+                
+</div>
+ 
+ 
+ 
+    <!-- vertical timeline -->
+    <div class="container bootdey">
+      <div class="row justify-content-center my-5">
+        <div class="col-md-8 text-center">
+          <h1 class="header_title">The story of</h1>
+          <span class="light-text"
+            >AN ENTREPRENEUR, FARMER, BUSINESS LEADER, VISIONARY, AND OUR
+            INSPIRATION</span
+          >
+        </div>
+      </div>
+      <div class="row gutters">
+        <div class="col-lg-12 col-md-12 col-sm-12 mx-auto">
+          <div class="card">
+            <div class="card-body">
+              <!-- Timeline start -->
+              <div class="timeline">
+                <div class="timeline-row">
+                  <div class="timeline-time">
+                    <h1 class="light-title">1964</h1>
+                    <span class="light-text"
+                      >THE NATIONAL AFRICAN FEDERATED CHAMBER OF COMMERCE</span
+                    >
+                  </div>
+                  <div class="timeline-content">
+                    <span class="timeline-year"></span>
+                    <h1 class="mt-5">NAFCOC</h1>
+                    <p class="mt-5">
+                      Dr. Sam Motsuenyane played a significant role in the
+                      development of Black business in the country. He was in
+                      the leadership of NAFCOC which conceived the birth of the
+                      African Bank (“the Bank”). Dr. Sam Motsuenyane lead the
+                      initiative by NAFCOC to establish African Bank.
+                    </p>
+                  </div>
+                </div>
+                <div class="timeline-row">
+                  <div class="timeline-time">
+                    <h1 class="light-title">1975</h1>
+                    <span class="light-text"
+                      >THE FOUNDING STORY OF AFRICAN BANK</span
+                    >
+                  </div>
+
+                  <div class="timeline-content">
+                    <span class="timeline-year"></span>
+                    <h1 class="mt-5">What could you do with R70?</h1>
+                    <p class="mt-5">
+                      In 1975, Dr Sam Motsuenyane, together with a group of
+                      courageous men and women, managed to turn that paltry sum
+                      into a bank! Not just any bank, mind you. An African Bank
+                      for the people, by the people, serving the people.
+                    </p>
+                  </div>
+                </div>
+                <div class="timeline-row">
+                  <div class="timeline-time">
+                    <h1 class="light-title">1964</h1>
+                    <span class="light-text"
+                      >THE NATIONAL AFRICAN FEDERATED CHAMBER OF COMMERCE</span
+                    >
+                  </div>
+
+                  <div class="timeline-content">
+                    <span class="timeline-year"></span>
+                    <h1 class="mt-5">NAFCOC</h1>
+                    <p class="mt-5">
+                      Dr. Sam Motsuenyane played a significant role in the
+                      development of Black business in the country. He was in
+                      the leadership of NAFCOC which conceived the birth of the
+                      African Bank (“the Bank”). Dr. Sam Motsuenyane lead the
+                      initiative by NAFCOC to establish African Bank.
+                    </p>
+                  </div>
+                </div>
+                <div class="timeline-row">
+                  <div class="timeline-time">
+                    <h1 class="light-title">1975</h1>
+                    <span class="light-text"
+                      >THE FOUNDING STORY OF AFRICAN BANK</span
+                    >
+                  </div>
+
+                  <div class="timeline-content">
+                    <span class="timeline-year"></span>
+                    <h1 class="mt-5">What could you do with R70?</h1>
+                    <p class="mt-5">
+                      In 1975, Dr Sam Motsuenyane, together with a group of
+                      courageous men and women, managed to turn that paltry sum
+                      into a bank! Not just any bank, mind you. An African Bank
+                      for the people, by the people, serving the people.
+                    </p>
+                  </div>
+                </div>
+                <div class="timeline-row">
+                  <div class="timeline-time">
+                    <h1 class="light-title">1964</h1>
+                    <span class="light-text"
+                      >THE NATIONAL AFRICAN FEDERATED CHAMBER OF COMMERCE</span
+                    >
+                  </div>
+
+                  <div class="timeline-content">
+                    <span class="timeline-year"></span>
+                    <h1 class="mt-5">NAFCOC</h1>
+                    <p class="mt-5">
+                      Dr. Sam Motsuenyane played a significant role in the
+                      development of Black business in the country. He was in
+                      the leadership of NAFCOC which conceived the birth of the
+                      African Bank (“the Bank”). Dr. Sam Motsuenyane lead the
+                      initiative by NAFCOC to establish African Bank.
+                    </p>
+                  </div>
+                </div>
+                <div class="timeline-row">
+                  <div class="timeline-time">
+                    <h1 class="light-title">1975</h1>
+                    <span class="light-text"
+                      >THE FOUNDING STORY OF AFRICAN BANK</span
+                    >
+                  </div>
+                  <div class="timeline-content">
+                    <span class="timeline-year"></span>
+                    <h1 class="mt-5">What could you do with R70?</h1>
+                    <p class="mt-5">
+                      In 1975, Dr Sam Motsuenyane, together with a group of
+                      courageous men and women, managed to turn that paltry sum
+                      into a bank! Not just any bank, mind you. An African Bank
+                      for the people, by the people, serving the people.
+                    </p>
+                  </div>
+                </div>
+                <div class="timeline-row">
+                  <div class="timeline-time">
+                    <h1 class="light-title">1964</h1>
+                    <span class="light-text"
+                      >THE NATIONAL AFRICAN FEDERATED CHAMBER OF COMMERCE</span
+                    >
+                  </div>
+                  <div class="timeline-content">
+                    <span class="timeline-year"></span>
+                    <h1 class="mt-1">NAFCOC</h1>
+                    <p class="mt-2">
+                      Dr. Sam Motsuenyane played a significant role in the
+                      development of Black business in the country. He was in
+                      the leadership of NAFCOC which conceived the birth of the
+                      African Bank (“the Bank”). Dr. Sam Motsuenyane lead the
+                      initiative by NAFCOC to establish African Bank.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <!-- Timeline end -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- tab section -->
+    <section class="desktop">
+      <div class="container">
+        <div class="row justify-content-center my-5">
+          <div class="col-md-8 text-center">
+            <h1 class="header_title">The story of</h1>
+            <span class="light-text"
+              >AN ENTREPRENEUR, FARMER, BUSINESS LEADER, VISIONARY, AND OUR
+              INSPIRATION</span
+            >
+          </div>
+        </div>
+        <div class="tab-container">
+          <ul class="tab-list">
+            <li class="tab active" data-tab="content1">
+              The doting family man
+            </li>
+            <li class="tab" data-tab="content2">life as an agriculturalist</li>
+            <li class="tab" data-tab="content3">the human rights champion</li>
+            <li class="tab" data-tab="content4">the activist for peace</li>
+            <li class="tab" data-tab="content5">A story of resilience</li>
+            <li class="tab" data-tab="content6">life as a diplomat</li>
+            <li class="tab" data-tab="content7">
+              Interactions with the ANC in exile
+            </li>
+            <li class="tab" data-tab="content8">
+              The Parliamentarian in a new democratic South Africa
+            </li>
+            <li class="tab" data-tab="content9">
+              Dr Motsuenyane’s first love – African Bank
+            </li>
+            <li class="tab" data-tab="content10">The Principal has fallen</li>
+          </ul>
+          <div class="tab-content">
+            <div id="content1" class="content active">
+              <h2 class="tab-content-header">The donating family man</h2>
+              <br />
+
+              <p>
+                The doting family man There is a Setswana idiom, “Fa thlako ya
+                pele e gatileng teng le ya morago e tla gata” – “where the front
+                hoof of a cow has trodden so must the hindleg tread”, or
+                roughly, “children must take after their parents”.
+              </p>
+
+              <p>
+                Dr Sam Motsuenyane acknowledged how his own mother and father
+                had a profound impact on the way he lived his life and conducted
+                himself.
+              </p>
+
+              <p>
+                While neither of his parents had much formal education, they
+                were both devoutly Christian.
+              </p>
+
+              <p>
+                They were also diligent workers with a strong work ethic. His
+                mother, particularly, resisted being dominated and was highly
+                principled and insisted young Samuel and his brothers had to do
+                their share of the chores inside the home.
+              </p>
+
+              <p>
+                Religion would always play an important part in Dr Motsuenyane’s
+                life. He met his wife Jocelyn Nomgqibelo Mashinini in August
+                1953 while they were both Sunday school teachers at the
+                Methodist church in Alexandra.
+              </p>
+
+              <p>
+                “At first sight she looked like somebody special, someone I
+                could befriend and possibly take to the altar some time later. I
+                did not delay in sending the right signals to Jocelyn,” he
+                recalled.
+              </p>
+              <br />
+              <p>
+                They were married eight months later in April 1954 and settled
+                down in Dube Village. Together they helped build a Methodist
+                church and community there, with Dr Motsuenyane serving as a lay
+                preacher.
+              </p>
+              <br />
+              <p>
+                Both were members of the church choir. At the time, Dr
+                Motsuenyane was working for the African National Soil
+                Conservation Association. This led him to travel widely and
+                frequently, which caused a fair bit of tension between the
+                newlyweds.
+              </p>
+              <br />
+              <p>
+                But cool heads always prevailed. Later though, Mrs Motsuenyane
+                was able to accompany her husband on some of his longer trips.
+              </p>
+              <br />
+              <p>
+                She was with him in 1959 when he first visited the United
+                States, but returned home to their children when he was awarded
+                a bursary to study there.
+              </p>
+              <br />
+              <p>
+                She also accompanied him to Saudi Arabia when he was posted
+                there as ambassador in 1996 to 2000, helping him to entertain
+                visiting dignitaries and travelling with him around the region.
+              </p>
+              <br />
+              <p>
+                They had six children, all boys, whom they made sure got a
+                decent education. As a Black family living in South Africa of
+                the 1960s and 1970s, at the height of apartheid, they were not
+                immune from the discriminatory practices of the racist National
+                Party government.
+              </p>
+              <br />
+              <p>
+                Their eldest son, who was at university in the 1970s at the time
+                of student uprisings against the nationalist government,
+                eventually dropped out and did not finish his degree. Three of
+                his sons got degrees in arts and law; another becoming a
+                teacher. Two of his sons passed away early in life; one was a
+                carpenter and the other, who had a tertiary qualification in
+                business management, managed the family’s garage business in
+                Soshanguve for 15 years.
+              </p>
+              <br />
+              <p>
+                While Dr Motsuenyane was lucky in that his children listened to
+                him when he tried to guide them, he admitted, “sometimes they
+                say I preach a lot. I always say that as long as there are no
+                converts among them, I’ll continue to preach, and if you
+                convert, I’ll stop preaching.”
+              </p>
+            </div>
+            <div id="content2" class="content">
+              <h2 class="tab-content-header">The donating family man</h2>
+              <br />
+
+              <p>
+                The doting family man There is a Setswana idiom, “Fa thlako ya
+                pele e gatileng teng le ya morago e tla gata” – “where the front
+                hoof of a cow has trodden so must the hindleg tread”, or
+                roughly, “children must take after their parents”.
+              </p>
+
+              <p>
+                Dr Sam Motsuenyane acknowledged how his own mother and father
+                had a profound impact on the way he lived his life and conducted
+                himself.
+              </p>
+
+              <p>
+                While neither of his parents had much formal education, they
+                were both devoutly Christian.
+              </p>
+
+              <p>
+                They were also diligent workers with a strong work ethic. His
+                mother, particularly, resisted being dominated and was highly
+                principled and insisted young Samuel and his brothers had to do
+                their share of the chores inside the home.
+              </p>
+
+              <p>
+                Religion would always play an important part in Dr Motsuenyane’s
+                life. He met his wife Jocelyn Nomgqibelo Mashinini in August
+                1953 while they were both Sunday school teachers at the
+                Methodist church in Alexandra.
+              </p>
+
+              <p>
+                “At first sight she looked like somebody special, someone I
+                could befriend and possibly take to the altar some time later. I
+                did not delay in sending the right signals to Jocelyn,” he
+                recalled.
+              </p>
+              <br />
+              <p>
+                They were married eight months later in April 1954 and settled
+                down in Dube Village. Together they helped build a Methodist
+                church and community there, with Dr Motsuenyane serving as a lay
+                preacher.
+              </p>
+              <br />
+              <p>
+                Both were members of the church choir. At the time, Dr
+                Motsuenyane was working for the African National Soil
+                Conservation Association. This led him to travel widely and
+                frequently, which caused a fair bit of tension between the
+                newlyweds.
+              </p>
+              <br />
+              <p>
+                But cool heads always prevailed. Later though, Mrs Motsuenyane
+                was able to accompany her husband on some of his longer trips.
+              </p>
+              <br />
+              <p>
+                She was with him in 1959 when he first visited the United
+                States, but returned home to their children when he was awarded
+                a bursary to study there.
+              </p>
+              <br />
+              <p>
+                She also accompanied him to Saudi Arabia when he was posted
+                there as ambassador in 1996 to 2000, helping him to entertain
+                visiting dignitaries and travelling with him around the region.
+              </p>
+              <br />
+              <p>
+                They had six children, all boys, whom they made sure got a
+                decent education. As a Black family living in South Africa of
+                the 1960s and 1970s, at the height of apartheid, they were not
+                immune from the discriminatory practices of the racist National
+                Party government.
+              </p>
+              <br />
+              <p>
+                Their eldest son, who was at university in the 1970s at the time
+                of student uprisings against the nationalist government,
+                eventually dropped out and did not finish his degree. Three of
+                his sons got degrees in arts and law; another becoming a
+                teacher. Two of his sons passed away early in life; one was a
+                carpenter and the other, who had a tertiary qualification in
+                business management, managed the family’s garage business in
+                Soshanguve for 15 years.
+              </p>
+              <br />
+              <p>
+                While Dr Motsuenyane was lucky in that his children listened to
+                him when he tried to guide them, he admitted, “sometimes they
+                say I preach a lot. I always say that as long as there are no
+                converts among them, I’ll continue to preach, and if you
+                convert, I’ll stop preaching.”
+              </p>
+            </div>
+            <div id="content3" class="content">
+              <h2 class="tab-content-header">The donating family man</h2>
+
+              <br />
+
+              <p>
+                The doting family man There is a Setswana idiom, “Fa thlako ya
+                pele e gatileng teng le ya morago e tla gata” – “where the front
+                hoof of a cow has trodden so must the hindleg tread”, or
+                roughly, “children must take after their parents”.
+              </p>
+
+              <p>
+                Dr Sam Motsuenyane acknowledged how his own mother and father
+                had a profound impact on the way he lived his life and conducted
+                himself.
+              </p>
+
+              <p>
+                While neither of his parents had much formal education, they
+                were both devoutly Christian.
+              </p>
+
+              <p>
+                They were also diligent workers with a strong work ethic. His
+                mother, particularly, resisted being dominated and was highly
+                principled and insisted young Samuel and his brothers had to do
+                their share of the chores inside the home.
+              </p>
+
+              <p>
+                Religion would always play an important part in Dr Motsuenyane’s
+                life. He met his wife Jocelyn Nomgqibelo Mashinini in August
+                1953 while they were both Sunday school teachers at the
+                Methodist church in Alexandra.
+              </p>
+
+              <p>
+                “At first sight she looked like somebody special, someone I
+                could befriend and possibly take to the altar some time later. I
+                did not delay in sending the right signals to Jocelyn,” he
+                recalled.
+              </p>
+              <br />
+              <p>
+                They were married eight months later in April 1954 and settled
+                down in Dube Village. Together they helped build a Methodist
+                church and community there, with Dr Motsuenyane serving as a lay
+                preacher.
+              </p>
+              <br />
+              <p>
+                Both were members of the church choir. At the time, Dr
+                Motsuenyane was working for the African National Soil
+                Conservation Association. This led him to travel widely and
+                frequently, which caused a fair bit of tension between the
+                newlyweds.
+              </p>
+              <br />
+              <p>
+                But cool heads always prevailed. Later though, Mrs Motsuenyane
+                was able to accompany her husband on some of his longer trips.
+              </p>
+              <br />
+              <p>
+                She was with him in 1959 when he first visited the United
+                States, but returned home to their children when he was awarded
+                a bursary to study there.
+              </p>
+              <br />
+              <p>
+                She also accompanied him to Saudi Arabia when he was posted
+                there as ambassador in 1996 to 2000, helping him to entertain
+                visiting dignitaries and travelling with him around the region.
+              </p>
+              <br />
+              <p>
+                They had six children, all boys, whom they made sure got a
+                decent education. As a Black family living in South Africa of
+                the 1960s and 1970s, at the height of apartheid, they were not
+                immune from the discriminatory practices of the racist National
+                Party government.
+              </p>
+              <br />
+              <p>
+                Their eldest son, who was at university in the 1970s at the time
+                of student uprisings against the nationalist government,
+                eventually dropped out and did not finish his degree. Three of
+                his sons got degrees in arts and law; another becoming a
+                teacher. Two of his sons passed away early in life; one was a
+                carpenter and the other, who had a tertiary qualification in
+                business management, managed the family’s garage business in
+                Soshanguve for 15 years.
+              </p>
+              <br />
+              <p>
+                While Dr Motsuenyane was lucky in that his children listened to
+                him when he tried to guide them, he admitted, “sometimes they
+                say I preach a lot. I always say that as long as there are no
+                converts among them, I’ll continue to preach, and if you
+                convert, I’ll stop preaching.”
+              </p>
+            </div>
+            <div id="content4" class="content">
+              <h2 class="tab-content-header">The donating family man</h2>
+              <p>
+                The doting family man There is a Setswana idiom, “Fa thlako ya
+                pele e gatileng teng le ya morago e tla gata” – “where the front
+                hoof of a cow has trodden so must the hindleg tread”, or
+                roughly, “children must take after their parents”. Dr Sam
+                Motsuenyane acknowledged how his own mother and father had a
+                profound impact on the way he lived his life and conducted
+                himself. While neither of his parents had much formal education,
+                they were both devoutly Christian. They were also diligent
+                workers with a strong work ethic. His mother, particularly,
+                resisted being dominated and was highly principled and insisted
+                young Samuel and his brothers had to do their share of the
+                chores inside the home. Religion would always play an important
+                part in Dr Motsuenyane’s life. He met his wife Jocelyn
+                Nomgqibelo Mashinini in August 1953 while they were both Sunday
+                school teachers at the Methodist church in Alexandra. “At first
+                sight she looked like somebody special, someone I could befriend
+                and possibly take to the altar some time later. I did not delay
+                in sending the right signals to Jocelyn,” he recalled. They were
+                married eight months later in April 1954 and settled down in
+                Dube Village. Together they helped build a Methodist church and
+                community there, with Dr Motsuenyane serving as a lay preacher.
+                Both were members of the church choir. At the time, Dr
+                Motsuenyane was working for the African National Soil
+                Conservation Association. This led him to travel widely and
+                frequently, which caused a fair bit of tension between the
+                newlyweds. But cool heads always prevailed. Later though, Mrs
+                Motsuenyane was able to accompany her husband on some of his
+                longer trips. She was with him in 1959 when he first visited the
+                United States, but returned home to their children when he was
+                awarded a bursary to study there. She also accompanied him to
+                Saudi Arabia when he was posted there as ambassador in 1996 to
+                2000, helping him to entertain visiting dignitaries and
+                travelling with him around the region. They had six children,
+                all boys, whom they made sure got a decent education. As a Black
+                family living in South Africa of the 1960s and 1970s, at the
+                height of apartheid, they were not immune from the
+                discriminatory practices of the racist National Party
+                government. Their eldest son, who was at university in the 1970s
+                at the time of student uprisings against the nationalist
+                government, eventually dropped out and did not finish his
+                degree. Three of his sons got degrees in arts and law; another
+                becoming a teacher. Two of his sons passed away early in life;
+                one was a carpenter and the other, who had a tertiary
+                qualification in business management, managed the family’s
+                garage business in Soshanguve for 15 years. While Dr Motsuenyane
+                was lucky in that his children listened to him when he tried to
+                guide them, he admitted, “sometimes they say I preach a lot. I
+                always say that as long as there are no converts among them,
+                I’ll continue to preach, and if you convert, I’ll stop
+                preaching.”
+              </p>
+            </div>
+            <div id="content5" class="content">
+              <h2 class="tab-content-header">The donating family man</h2>
+              <p>
+                The doting family man There is a Setswana idiom, “Fa thlako ya
+                pele e gatileng teng le ya morago e tla gata” – “where the front
+                hoof of a cow has trodden so must the hindleg tread”, or
+                roughly, “children must take after their parents”. Dr Sam
+                Motsuenyane acknowledged how his own mother and father had a
+                profound impact on the way he lived his life and conducted
+                himself. While neither of his parents had much formal education,
+                they were both devoutly Christian. They were also diligent
+                workers with a strong work ethic. His mother, particularly,
+                resisted being dominated and was highly principled and insisted
+                young Samuel and his brothers had to do their share of the
+                chores inside the home. Religion would always play an important
+                part in Dr Motsuenyane’s life. He met his wife Jocelyn
+                Nomgqibelo Mashinini in August 1953 while they were both Sunday
+                school teachers at the Methodist church in Alexandra. “At first
+                sight she looked like somebody special, someone I could befriend
+                and possibly take to the altar some time later. I did not delay
+                in sending the right signals to Jocelyn,” he recalled. They were
+                married eight months later in April 1954 and settled down in
+                Dube Village. Together they helped build a Methodist church and
+                community there, with Dr Motsuenyane serving as a lay preacher.
+                Both were members of the church choir. At the time, Dr
+                Motsuenyane was working for the African National Soil
+                Conservation Association. This led him to travel widely and
+                frequently, which caused a fair bit of tension between the
+                newlyweds. But cool heads always prevailed. Later though, Mrs
+                Motsuenyane was able to accompany her husband on some of his
+                longer trips. She was with him in 1959 when he first visited the
+                United States, but returned home to their children when he was
+                awarded a bursary to study there. She also accompanied him to
+                Saudi Arabia when he was posted there as ambassador in 1996 to
+                2000, helping him to entertain visiting dignitaries and
+                travelling with him around the region. They had six children,
+                all boys, whom they made sure got a decent education. As a Black
+                family living in South Africa of the 1960s and 1970s, at the
+                height of apartheid, they were not immune from the
+                discriminatory practices of the racist National Party
+                government. Their eldest son, who was at university in the 1970s
+                at the time of student uprisings against the nationalist
+                government, eventually dropped out and did not finish his
+                degree. Three of his sons got degrees in arts and law; another
+                becoming a teacher. Two of his sons passed away early in life;
+                one was a carpenter and the other, who had a tertiary
+                qualification in business management, managed the family’s
+                garage business in Soshanguve for 15 years. While Dr Motsuenyane
+                was lucky in that his children listened to him when he tried to
+                guide them, he admitted, “sometimes they say I preach a lot. I
+                always say that as long as there are no converts among them,
+                I’ll continue to preach, and if you convert, I’ll stop
+                preaching.”
+              </p>
+            </div>
+            <div id="content6" class="content">
+              <h2 class="tab-content-header">The donating family man</h2>
+              <p>
+                The doting family man There is a Setswana idiom, “Fa thlako ya
+                pele e gatileng teng le ya morago e tla gata” – “where the front
+                hoof of a cow has trodden so must the hindleg tread”, or
+                roughly, “children must take after their parents”. Dr Sam
+                Motsuenyane acknowledged how his own mother and father had a
+                profound impact on the way he lived his life and conducted
+                himself. While neither of his parents had much formal education,
+                they were both devoutly Christian. They were also diligent
+                workers with a strong work ethic. His mother, particularly,
+                resisted being dominated and was highly principled and insisted
+                young Samuel and his brothers had to do their share of the
+                chores inside the home. Religion would always play an important
+                part in Dr Motsuenyane’s life. He met his wife Jocelyn
+                Nomgqibelo Mashinini in August 1953 while they were both Sunday
+                school teachers at the Methodist church in Alexandra. “At first
+                sight she looked like somebody special, someone I could befriend
+                and possibly take to the altar some time later. I did not delay
+                in sending the right signals to Jocelyn,” he recalled. They were
+                married eight months later in April 1954 and settled down in
+                Dube Village. Together they helped build a Methodist church and
+                community there, with Dr Motsuenyane serving as a lay preacher.
+                Both were members of the church choir. At the time, Dr
+                Motsuenyane was working for the African National Soil
+                Conservation Association. This led him to travel widely and
+                frequently, which caused a fair bit of tension between the
+                newlyweds. But cool heads always prevailed. Later though, Mrs
+                Motsuenyane was able to accompany her husband on some of his
+                longer trips. She was with him in 1959 when he first visited the
+                United States, but returned home to their children when he was
+                awarded a bursary to study there. She also accompanied him to
+                Saudi Arabia when he was posted there as ambassador in 1996 to
+                2000, helping him to entertain visiting dignitaries and
+                travelling with him around the region. They had six children,
+                all boys, whom they made sure got a decent education. As a Black
+                family living in South Africa of the 1960s and 1970s, at the
+                height of apartheid, they were not immune from the
+                discriminatory practices of the racist National Party
+                government. Their eldest son, who was at university in the 1970s
+                at the time of student uprisings against the nationalist
+                government, eventually dropped out and did not finish his
+                degree. Three of his sons got degrees in arts and law; another
+                becoming a teacher. Two of his sons passed away early in life;
+                one was a carpenter and the other, who had a tertiary
+                qualification in business management, managed the family’s
+                garage business in Soshanguve for 15 years. While Dr Motsuenyane
+                was lucky in that his children listened to him when he tried to
+                guide them, he admitted, “sometimes they say I preach a lot. I
+                always say that as long as there are no converts among them,
+                I’ll continue to preach, and if you convert, I’ll stop
+                preaching.”
+              </p>
+            </div>
+            <div id="content7" class="content">
+              <h2 class="tab-content-header">The donating family man</h2>
+              <p>
+                The doting family man There is a Setswana idiom, “Fa thlako ya
+                pele e gatileng teng le ya morago e tla gata” – “where the front
+                hoof of a cow has trodden so must the hindleg tread”, or
+                roughly, “children must take after their parents”. Dr Sam
+                Motsuenyane acknowledged how his own mother and father had a
+                profound impact on the way he lived his life and conducted
+                himself. While neither of his parents had much formal education,
+                they were both devoutly Christian. They were also diligent
+                workers with a strong work ethic. His mother, particularly,
+                resisted being dominated and was highly principled and insisted
+                young Samuel and his brothers had to do their share of the
+                chores inside the home. Religion would always play an important
+                part in Dr Motsuenyane’s life. He met his wife Jocelyn
+                Nomgqibelo Mashinini in August 1953 while they were both Sunday
+                school teachers at the Methodist church in Alexandra. “At first
+                sight she looked like somebody special, someone I could befriend
+                and possibly take to the altar some time later. I did not delay
+                in sending the right signals to Jocelyn,” he recalled. They were
+                married eight months later in April 1954 and settled down in
+                Dube Village. Together they helped build a Methodist church and
+                community there, with Dr Motsuenyane serving as a lay preacher.
+                Both were members of the church choir. At the time, Dr
+                Motsuenyane was working for the African National Soil
+                Conservation Association. This led him to travel widely and
+                frequently, which caused a fair bit of tension between the
+                newlyweds. But cool heads always prevailed. Later though, Mrs
+                Motsuenyane was able to accompany her husband on some of his
+                longer trips. She was with him in 1959 when he first visited the
+                United States, but returned home to their children when he was
+                awarded a bursary to study there. She also accompanied him to
+                Saudi Arabia when he was posted there as ambassador in 1996 to
+                2000, helping him to entertain visiting dignitaries and
+                travelling with him around the region. They had six children,
+                all boys, whom they made sure got a decent education. As a Black
+                family living in South Africa of the 1960s and 1970s, at the
+                height of apartheid, they were not immune from the
+                discriminatory practices of the racist National Party
+                government. Their eldest son, who was at university in the 1970s
+                at the time of student uprisings against the nationalist
+                government, eventually dropped out and did not finish his
+                degree. Three of his sons got degrees in arts and law; another
+                becoming a teacher. Two of his sons passed away early in life;
+                one was a carpenter and the other, who had a tertiary
+                qualification in business management, managed the family’s
+                garage business in Soshanguve for 15 years. While Dr Motsuenyane
+                was lucky in that his children listened to him when he tried to
+                guide them, he admitted, “sometimes they say I preach a lot. I
+                always say that as long as there are no converts among them,
+                I’ll continue to preach, and if you convert, I’ll stop
+                preaching.”
+              </p>
+            </div>
+            <div id="content8" class="content">
+              <h2 class="tab-content-header">The donating family man</h2>
+              <p>
+                The doting family man There is a Setswana idiom, “Fa thlako ya
+                pele e gatileng teng le ya morago e tla gata” – “where the front
+                hoof of a cow has trodden so must the hindleg tread”, or
+                roughly, “children must take after their parents”. Dr Sam
+                Motsuenyane acknowledged how his own mother and father had a
+                profound impact on the way he lived his life and conducted
+                himself. While neither of his parents had much formal education,
+                they were both devoutly Christian. They were also diligent
+                workers with a strong work ethic. His mother, particularly,
+                resisted being dominated and was highly principled and insisted
+                young Samuel and his brothers had to do their share of the
+                chores inside the home. Religion would always play an important
+                part in Dr Motsuenyane’s life. He met his wife Jocelyn
+                Nomgqibelo Mashinini in August 1953 while they were both Sunday
+                school teachers at the Methodist church in Alexandra. “At first
+                sight she looked like somebody special, someone I could befriend
+                and possibly take to the altar some time later. I did not delay
+                in sending the right signals to Jocelyn,” he recalled. They were
+                married eight months later in April 1954 and settled down in
+                Dube Village. Together they helped build a Methodist church and
+                community there, with Dr Motsuenyane serving as a lay preacher.
+                Both were members of the church choir. At the time, Dr
+                Motsuenyane was working for the African National Soil
+                Conservation Association. This led him to travel widely and
+                frequently, which caused a fair bit of tension between the
+                newlyweds. But cool heads always prevailed. Later though, Mrs
+                Motsuenyane was able to accompany her husband on some of his
+                longer trips. She was with him in 1959 when he first visited the
+                United States, but returned home to their children when he was
+                awarded a bursary to study there. She also accompanied him to
+                Saudi Arabia when he was posted there as ambassador in 1996 to
+                2000, helping him to entertain visiting dignitaries and
+                travelling with him around the region. They had six children,
+                all boys, whom they made sure got a decent education. As a Black
+                family living in South Africa of the 1960s and 1970s, at the
+                height of apartheid, they were not immune from the
+                discriminatory practices of the racist National Party
+                government. Their eldest son, who was at university in the 1970s
+                at the time of student uprisings against the nationalist
+                government, eventually dropped out and did not finish his
+                degree. Three of his sons got degrees in arts and law; another
+                becoming a teacher. Two of his sons passed away early in life;
+                one was a carpenter and the other, who had a tertiary
+                qualification in business management, managed the family’s
+                garage business in Soshanguve for 15 years. While Dr Motsuenyane
+                was lucky in that his children listened to him when he tried to
+                guide them, he admitted, “sometimes they say I preach a lot. I
+                always say that as long as there are no converts among them,
+                I’ll continue to preach, and if you convert, I’ll stop
+                preaching.”
+              </p>
+            </div>
+            <div id="content9" class="content">
+              <h2 class="tab-content-header">The donating family man</h2>
+              <p>
+                The doting family man There is a Setswana idiom, “Fa thlako ya
+                pele e gatileng teng le ya morago e tla gata” – “where the front
+                hoof of a cow has trodden so must the hindleg tread”, or
+                roughly, “children must take after their parents”. Dr Sam
+                Motsuenyane acknowledged how his own mother and father had a
+                profound impact on the way he lived his life and conducted
+                himself. While neither of his parents had much formal education,
+                they were both devoutly Christian. They were also diligent
+                workers with a strong work ethic. His mother, particularly,
+                resisted being dominated and was highly principled and insisted
+                young Samuel and his brothers had to do their share of the
+                chores inside the home. Religion would always play an important
+                part in Dr Motsuenyane’s life. He met his wife Jocelyn
+                Nomgqibelo Mashinini in August 1953 while they were both Sunday
+                school teachers at the Methodist church in Alexandra. “At first
+                sight she looked like somebody special, someone I could befriend
+                and possibly take to the altar some time later. I did not delay
+                in sending the right signals to Jocelyn,” he recalled. They were
+                married eight months later in April 1954 and settled down in
+                Dube Village. Together they helped build a Methodist church and
+                community there, with Dr Motsuenyane serving as a lay preacher.
+                Both were members of the church choir. At the time, Dr
+                Motsuenyane was working for the African National Soil
+                Conservation Association. This led him to travel widely and
+                frequently, which caused a fair bit of tension between the
+                newlyweds. But cool heads always prevailed. Later though, Mrs
+                Motsuenyane was able to accompany her husband on some of his
+                longer trips. She was with him in 1959 when he first visited the
+                United States, but returned home to their children when he was
+                awarded a bursary to study there. She also accompanied him to
+                Saudi Arabia when he was posted there as ambassador in 1996 to
+                2000, helping him to entertain visiting dignitaries and
+                travelling with him around the region. They had six children,
+                all boys, whom they made sure got a decent education. As a Black
+                family living in South Africa of the 1960s and 1970s, at the
+                height of apartheid, they were not immune from the
+                discriminatory practices of the racist National Party
+                government. Their eldest son, who was at university in the 1970s
+                at the time of student uprisings against the nationalist
+                government, eventually dropped out and did not finish his
+                degree. Three of his sons got degrees in arts and law; another
+                becoming a teacher. Two of his sons passed away early in life;
+                one was a carpenter and the other, who had a tertiary
+                qualification in business management, managed the family’s
+                garage business in Soshanguve for 15 years. While Dr Motsuenyane
+                was lucky in that his children listened to him when he tried to
+                guide them, he admitted, “sometimes they say I preach a lot. I
+                always say that as long as there are no converts among them,
+                I’ll continue to preach, and if you convert, I’ll stop
+                preaching.”
+              </p>
+            </div>
+            <div id="content10" class="content">
+              <h2 class="tab-content-header">The donating family man</h2>
+              <p>
+                The doting family man There is a Setswana idiom, “Fa thlako ya
+                pele e gatileng teng le ya morago e tla gata” – “where the front
+                hoof of a cow has trodden so must the hindleg tread”, or
+                roughly, “children must take after their parents”. Dr Sam
+                Motsuenyane acknowledged how his own mother and father had a
+                profound impact on the way he lived his life and conducted
+                himself. While neither of his parents had much formal education,
+                they were both devoutly Christian. They were also diligent
+                workers with a strong work ethic. His mother, particularly,
+                resisted being dominated and was highly principled and insisted
+                young Samuel and his brothers had to do their share of the
+                chores inside the home. Religion would always play an important
+                part in Dr Motsuenyane’s life. He met his wife Jocelyn
+                Nomgqibelo Mashinini in August 1953 while they were both Sunday
+                school teachers at the Methodist church in Alexandra. “At first
+                sight she looked like somebody special, someone I could befriend
+                and possibly take to the altar some time later. I did not delay
+                in sending the right signals to Jocelyn,” he recalled. They were
+                married eight months later in April 1954 and settled down in
+                Dube Village. Together they helped build a Methodist church and
+                community there, with Dr Motsuenyane serving as a lay preacher.
+                Both were members of the church choir. At the time, Dr
+                Motsuenyane was working for the African National Soil
+                Conservation Association. This led him to travel widely and
+                frequently, which caused a fair bit of tension between the
+                newlyweds. But cool heads always prevailed. Later though, Mrs
+                Motsuenyane was able to accompany her husband on some of his
+                longer trips. She was with him in 1959 when he first visited the
+                United States, but returned home to their children when he was
+                awarded a bursary to study there. She also accompanied him to
+                Saudi Arabia when he was posted there as ambassador in 1996 to
+                2000, helping him to entertain visiting dignitaries and
+                travelling with him around the region. They had six children,
+                all boys, whom they made sure got a decent education. As a Black
+                family living in South Africa of the 1960s and 1970s, at the
+                height of apartheid, they were not immune from the
+                discriminatory practices of the racist National Party
+                government. Their eldest son, who was at university in the 1970s
+                at the time of student uprisings against the nationalist
+                government, eventually dropped out and did not finish his
+                degree. Three of his sons got degrees in arts and law; another
+                becoming a teacher. Two of his sons passed away early in life;
+                one was a carpenter and the other, who had a tertiary
+                qualification in business management, managed the family’s
+                garage business in Soshanguve for 15 years. While Dr Motsuenyane
+                was lucky in that his children listened to him when he tried to
+                guide them, he admitted, “sometimes they say I preach a lot. I
+                always say that as long as there are no converts among them,
+                I’ll continue to preach, and if you convert, I’ll stop
+                preaching.”
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- gallery section -->
+    <section>
+      <div class="container pt-5 pb-5">
+        <div class="row justify-content-center my-5">
+          <div class="col-md-8 text-center">
+            <h1 class="header_title">The story of</h1>
+            <span class="light-text"
+              >AN ENTREPRENEUR, FARMER, BUSINESS LEADER, VISIONARY, AND OUR
+              INSPIRATION</span
+            >
+          </div>
+        </div>
+        <div class="gallery-container">
+          <div class="gallery">
+            <div class="media-item">
+              <img
+                src="/media/nj2ntgim/whatsapp-image-2024-05-02-at-12-47-36.jpeg"
+                alt="Image 1"
+                class="gallery-img"
+              />
+            </div>
+
+            <div class="media-item">
+            @*  <video controls class="gallery-img">
+                <source
+                  src="https://www.example.com/path_to_video1.mp4"
+                  type="video/mp4"
+                />
+                Your browser does not support the video tag.
+              </video>*@
+              <img
+                src="/media/se0jckkh/whatsapp-image-2024-05-02-at-12-47-36-1.jpeg"
+                alt="Image 2"
+                class="gallery-img"
+              />
+            </div>
+
+            <div class="media-item">
+              <img
+                src="/media/se0jckkh/whatsapp-image-2024-05-02-at-12-47-36-1.jpeg"
+                alt="Image 2"
+                class="gallery-img"
+              />
+            </div>
+
+            <div class="media-item">
+              <img
+                src="/media/bsgjig13/whatsapp-image-2024-05-02-at-12-47-35-4.jpeg"
+                alt="Image 1"
+                class="gallery-img"
+              />
+            </div>
+
+            <div class="media-item">
+             @* <video controls class="gallery-img">
+                <source
+                  src="https://www.example.com/path_to_video1.mp4"
+                  type="video/mp4"
+                />
+                Your browser does not support the video tag.
+              </video>*@
+               <img
+                src="/media/bsgjig13/whatsapp-image-2024-05-02-at-12-47-35-4.jpeg"
+                alt="Image 2"
+                class="gallery-img"
+              />
+            </div>
+
+            <div class="media-item">
+              <img
+                src="/media/bsgjig13/whatsapp-image-2024-05-02-at-12-47-35-4.jpeg"
+                alt="Image 2"
+                class="gallery-img"
+              />
+            </div>
+
+            <div class="media-item">
+             @* <video controls class="gallery-img">
+                <source
+                  src="https://www.example.com/path_to_video1.mp4"
+                  type="video/mp4"
+                />
+                Your browser does not support the video tag.
+              </video>*@
+               <img
+                src="/media/bsgjig13/whatsapp-image-2024-05-02-at-12-47-35-4.jpeg"
+                alt="Image 2"
+                class="gallery-img"
+              />
+            </div>
+
+            <div class="media-item">
+              <img
+                src="/media/bsgjig13/whatsapp-image-2024-05-02-at-12-47-35-4.jpeg"
+                alt="Image 2"
+                class="gallery-img"
+              />
+            </div>
+
+            <!-- Additional images and videos -->
+          </div>
+        </div>
+      </div>
+      <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="audio-playlist">
+      <div class="container">
+        <div class="row justify-content-center my-5">
+          <div class="col-md-8 text-center">
+            <span class="light-text"
+              >HIS LEGACY IS ONE OF STEWARD LEADERSHIP AND SELFLESS DEDICATION
+              TO THE SERVICE OF OTHERS.</span
+            >
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 col-sm-12">
+ 
+                  <div class="audio-list">
+          <div class="audio-item">
+              <button class="play-button">
+                <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--emojione" preserveAspectRatio="xMidYMid meet" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><circle cx="32" cy="32" r="30" fill="#add84f"></circle><path fill="#ffffff" d="M25 12l20 20l-20 20z"></path></g></svg>
+              </button>
+              <div class="audio-info"style="width: -webkit-fill-available; ">
+                  <h2><b>Visionary leadership and development</b></h2>
+                  <p id="audioTime">00:00 / 00:00</p>
+                  <br>
+                  <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <audio id="audioPlayer1" src="/media/daodvapu/whatsapp-audio-2024-05-02-at-12-48-01.ogg"></audio>
+              </div>
+          </div>
+          <div class="audio-item">
+            <button class="play-button">
+              <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--emojione" preserveAspectRatio="xMidYMid meet" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><circle cx="32" cy="32" r="30" fill="#add84f"></circle><path fill="#ffffff" d="M25 12l20 20l-20 20z"></path></g></svg>
+            </button>
+            <div class="audio-info"style="width: -webkit-fill-available; ">
+                <h2><b>Visionary leadership and development</b></h2>
+                <p id="audioTime2">00:00 / 00:00</p>
+                <br>
+                <div class="progress-container">
+                  <div class="progress-bar" id="progressBar"></div>
+              </div>
+            </div>
+            <audio id="audioPlayer2" src="/media/daodvapu/whatsapp-audio-2024-05-02-at-12-48-01.ogg"></audio>
+          </div>
+          <div class="audio-item">
+          <button class="play-button">
+            <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--emojione" preserveAspectRatio="xMidYMid meet" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><circle cx="32" cy="32" r="30" fill="#add84f"></circle><path fill="#ffffff" d="M25 12l20 20l-20 20z"></path></g></svg>
+          </button>
+          <div class="audio-info"style="width: -webkit-fill-available; ">
+              <h2><b>Visionary leadership and development</b></h2>
+              <p id="audioTime3">00:00 / 00:00</p>
+              <br>
+              <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+          </div>
+          </div>
+          <audio id="audioPlayer3" src="/media/daodvapu/whatsapp-audio-2024-05-02-at-12-48-01.ogg"></audio>
+      </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mobile">
+      <div class="container">
+        <div class="accordion">
+          <button class="accordion-header">The doting family man</button>
+          <div class="accordion-content">
+            <p>
+              The doting family man There is a Setswana idiom, “Fa thlako ya
+              pele e gatileng teng le ya morago e tla gata” – “where the front
+              hoof of a cow has trodden so must the hindleg tread”, or roughly,
+              “children must take after their parents”.
+            </p>
+
+            <p>
+              Dr Sam Motsuenyane acknowledged how his own mother and father had
+              a profound impact on the way he lived his life and conducted
+              himself.
+            </p>
+
+            <p>
+              While neither of his parents had much formal education, they were
+              both devoutly Christian.
+            </p>
+
+            <p>
+              They were also diligent workers with a strong work ethic. His
+              mother, particularly, resisted being dominated and was highly
+              principled and insisted young Samuel and his brothers had to do
+              their share of the chores inside the home.
+            </p>
+
+            <p>
+              Religion would always play an important part in Dr Motsuenyane’s
+              life. He met his wife Jocelyn Nomgqibelo Mashinini in August 1953
+              while they were both Sunday school teachers at the Methodist
+              church in Alexandra.
+            </p>
+
+            <p>
+              “At first sight she looked like somebody special, someone I could
+              befriend and possibly take to the altar some time later. I did not
+              delay in sending the right signals to Jocelyn,” he recalled.
+            </p>
+            <br />
+            <p>
+              They were married eight months later in April 1954 and settled
+              down in Dube Village. Together they helped build a Methodist
+              church and community there, with Dr Motsuenyane serving as a lay
+              preacher.
+            </p>
+            <br />
+            <p>
+              Both were members of the church choir. At the time, Dr Motsuenyane
+              was working for the African National Soil Conservation
+              Association. This led him to travel widely and frequently, which
+              caused a fair bit of tension between the newlyweds.
+            </p>
+            <br />
+            <p>
+              But cool heads always prevailed. Later though, Mrs Motsuenyane was
+              able to accompany her husband on some of his longer trips.
+            </p>
+            <br />
+            <p>
+              She was with him in 1959 when he first visited the United States,
+              but returned home to their children when he was awarded a bursary
+              to study there.
+            </p>
+            <br />
+            <p>
+              She also accompanied him to Saudi Arabia when he was posted there
+              as ambassador in 1996 to 2000, helping him to entertain visiting
+              dignitaries and travelling with him around the region.
+            </p>
+            <br />
+            <p>
+              They had six children, all boys, whom they made sure got a decent
+              education. As a Black family living in South Africa of the 1960s
+              and 1970s, at the height of apartheid, they were not immune from
+              the discriminatory practices of the racist National Party
+              government.
+            </p>
+            <br />
+            <p>
+              Their eldest son, who was at university in the 1970s at the time
+              of student uprisings against the nationalist government,
+              eventually dropped out and did not finish his degree. Three of his
+              sons got degrees in arts and law; another becoming a teacher. Two
+              of his sons passed away early in life; one was a carpenter and the
+              other, who had a tertiary qualification in business management,
+              managed the family’s garage business in Soshanguve for 15 years.
+            </p>
+            <br />
+            <p>
+              While Dr Motsuenyane was lucky in that his children listened to
+              him when he tried to guide them, he admitted, “sometimes they say
+              I preach a lot. I always say that as long as there are no converts
+              among them, I’ll continue to preach, and if you convert, I’ll stop
+              preaching.”
+            </p>
+          </div>
+          <button class="accordion-header">life as an agriculturalist</button>
+          <div class="accordion-content">
+            <p>
+              The doting family man There is a Setswana idiom, “Fa thlako ya
+              pele e gatileng teng le ya morago e tla gata” – “where the front
+              hoof of a cow has trodden so must the hindleg tread”, or roughly,
+              “children must take after their parents”. Dr Sam Motsuenyane
+              acknowledged how his own mother and father had a profound impact
+              on the way he lived his life and conducted himself. While neither
+              of his parents had much formal education, they were both devoutly
+              Christian. They were also diligent workers with a strong work
+              ethic. His mother, particularly, resisted being dominated and was
+              highly principled and insisted young Samuel and his brothers had
+              to do their share of the chores inside the home. Religion would
+              always play an important part in Dr Motsuenyane’s life. He met his
+              wife Jocelyn Nomgqibelo Mashinini in August 1953 while they were
+              both Sunday school teachers at the Methodist church in Alexandra.
+              “At first sight she looked like somebody special, someone I could
+              befriend and possibly take to the altar some time later. I did not
+              delay in sending the right signals to Jocelyn,” he recalled. They
+              were married eight months later in April 1954 and settled down in
+              Dube Village. Together they helped build a Methodist church and
+              community there, with Dr Motsuenyane serving as a lay preacher.
+              Both were members of the church choir. At the time, Dr Motsuenyane
+              was working for the African National Soil Conservation
+              Association. This led him to travel widely and frequently, which
+              caused a fair bit of tension between the newlyweds. But cool heads
+              always prevailed. Later though, Mrs Motsuenyane was able to
+              accompany her husband on some of his longer trips. She was with
+              him in 1959 when he first visited the United States, but returned
+              home to their children when he was awarded a bursary to study
+              there. She also accompanied him to Saudi Arabia when he was posted
+              there as ambassador in 1996 to 2000, helping him to entertain
+              visiting dignitaries and travelling with him around the region.
+              They had six children, all boys, whom they made sure got a decent
+              education. As a Black family living in South Africa of the 1960s
+              and 1970s, at the height of apartheid, they were not immune from
+              the discriminatory practices of the racist National Party
+              government. Their eldest son, who was at university in the 1970s
+              at the time of student uprisings against the nationalist
+              government, eventually dropped out and did not finish his degree.
+              Three of his sons got degrees in arts and law; another becoming a
+              teacher. Two of his sons passed away early in life; one was a
+              carpenter and the other, who had a tertiary qualification in
+              business management, managed the family’s garage business in
+              Soshanguve for 15 years. While Dr Motsuenyane was lucky in that
+              his children listened to him when he tried to guide them, he
+              admitted, “sometimes they say I preach a lot. I always say that as
+              long as there are no converts among them, I’ll continue to preach,
+              and if you convert, I’ll stop preaching.”
+            </p>
+          </div>
+          <button class="accordion-header">the activist for peace</button>
+          <div class="accordion-content">
+            <p>
+              The doting family man There is a Setswana idiom, “Fa thlako ya
+              pele e gatileng teng le ya morago e tla gata” – “where the front
+              hoof of a cow has trodden so must the hindleg tread”, or roughly,
+              “children must take after their parents”. Dr Sam Motsuenyane
+              acknowledged how his own mother and father had a profound impact
+              on the way he lived his life and conducted himself. While neither
+              of his parents had much formal education, they were both devoutly
+              Christian. They were also diligent workers with a strong work
+              ethic. His mother, particularly, resisted being dominated and was
+              highly principled and insisted young Samuel and his brothers had
+              to do their share of the chores inside the home. Religion would
+              always play an important part in Dr Motsuenyane’s life. He met his
+              wife Jocelyn Nomgqibelo Mashinini in August 1953 while they were
+              both Sunday school teachers at the Methodist church in Alexandra.
+              “At first sight she looked like somebody special, someone I could
+              befriend and possibly take to the altar some time later. I did not
+              delay in sending the right signals to Jocelyn,” he recalled. They
+              were married eight months later in April 1954 and settled down in
+              Dube Village. Together they helped build a Methodist church and
+              community there, with Dr Motsuenyane serving as a lay preacher.
+              Both were members of the church choir. At the time, Dr Motsuenyane
+              was working for the African National Soil Conservation
+              Association. This led him to travel widely and frequently, which
+              caused a fair bit of tension between the newlyweds. But cool heads
+              always prevailed. Later though, Mrs Motsuenyane was able to
+              accompany her husband on some of his longer trips. She was with
+              him in 1959 when he first visited the United States, but returned
+              home to their children when he was awarded a bursary to study
+              there. She also accompanied him to Saudi Arabia when he was posted
+              there as ambassador in 1996 to 2000, helping him to entertain
+              visiting dignitaries and travelling with him around the region.
+              They had six children, all boys, whom they made sure got a decent
+              education. As a Black family living in South Africa of the 1960s
+              and 1970s, at the height of apartheid, they were not immune from
+              the discriminatory practices of the racist National Party
+              government. Their eldest son, who was at university in the 1970s
+              at the time of student uprisings against the nationalist
+              government, eventually dropped out and did not finish his degree.
+              Three of his sons got degrees in arts and law; another becoming a
+              teacher. Two of his sons passed away early in life; one was a
+              carpenter and the other, who had a tertiary qualification in
+              business management, managed the family’s garage business in
+              Soshanguve for 15 years. While Dr Motsuenyane was lucky in that
+              his children listened to him when he tried to guide them, he
+              admitted, “sometimes they say I preach a lot. I always say that as
+              long as there are no converts among them, I’ll continue to preach,
+              and if you convert, I’ll stop preaching.”
+            </p>
+          </div>
+          <button class="accordion-header">A story of resilience</button>
+          <div class="accordion-content">
+            <p>
+              The doting family man There is a Setswana idiom, “Fa thlako ya
+              pele e gatileng teng le ya morago e tla gata” – “where the front
+              hoof of a cow has trodden so must the hindleg tread”, or roughly,
+              “children must take after their parents”. Dr Sam Motsuenyane
+              acknowledged how his own mother and father had a profound impact
+              on the way he lived his life and conducted himself. While neither
+              of his parents had much formal education, they were both devoutly
+              Christian. They were also diligent workers with a strong work
+              ethic. His mother, particularly, resisted being dominated and was
+              highly principled and insisted young Samuel and his brothers had
+              to do their share of the chores inside the home. Religion would
+              always play an important part in Dr Motsuenyane’s life. He met his
+              wife Jocelyn Nomgqibelo Mashinini in August 1953 while they were
+              both Sunday school teachers at the Methodist church in Alexandra.
+              “At first sight she looked like somebody special, someone I could
+              befriend and possibly take to the altar some time later. I did not
+              delay in sending the right signals to Jocelyn,” he recalled. They
+              were married eight months later in April 1954 and settled down in
+              Dube Village. Together they helped build a Methodist church and
+              community there, with Dr Motsuenyane serving as a lay preacher.
+              Both were members of the church choir. At the time, Dr Motsuenyane
+              was working for the African National Soil Conservation
+              Association. This led him to travel widely and frequently, which
+              caused a fair bit of tension between the newlyweds. But cool heads
+              always prevailed. Later though, Mrs Motsuenyane was able to
+              accompany her husband on some of his longer trips. She was with
+              him in 1959 when he first visited the United States, but returned
+              home to their children when he was awarded a bursary to study
+              there. She also accompanied him to Saudi Arabia when he was posted
+              there as ambassador in 1996 to 2000, helping him to entertain
+              visiting dignitaries and travelling with him around the region.
+              They had six children, all boys, whom they made sure got a decent
+              education. As a Black family living in South Africa of the 1960s
+              and 1970s, at the height of apartheid, they were not immune from
+              the discriminatory practices of the racist National Party
+              government. Their eldest son, who was at university in the 1970s
+              at the time of student uprisings against the nationalist
+              government, eventually dropped out and did not finish his degree.
+              Three of his sons got degrees in arts and law; another becoming a
+              teacher. Two of his sons passed away early in life; one was a
+              carpenter and the other, who had a tertiary qualification in
+              business management, managed the family’s garage business in
+              Soshanguve for 15 years. While Dr Motsuenyane was lucky in that
+              his children listened to him when he tried to guide them, he
+              admitted, “sometimes they say I preach a lot. I always say that as
+              long as there are no converts among them, I’ll continue to preach,
+              and if you convert, I’ll stop preaching.”
+            </p>
+          </div>
+          <button class="accordion-header">life as a diplomat</button>
+          <div class="accordion-content">
+            <p>
+              The doting family man There is a Setswana idiom, “Fa thlako ya
+              pele e gatileng teng le ya morago e tla gata” – “where the front
+              hoof of a cow has trodden so must the hindleg tread”, or roughly,
+              “children must take after their parents”. Dr Sam Motsuenyane
+              acknowledged how his own mother and father had a profound impact
+              on the way he lived his life and conducted himself. While neither
+              of his parents had much formal education, they were both devoutly
+              Christian. They were also diligent workers with a strong work
+              ethic. His mother, particularly, resisted being dominated and was
+              highly principled and insisted young Samuel and his brothers had
+              to do their share of the chores inside the home. Religion would
+              always play an important part in Dr Motsuenyane’s life. He met his
+              wife Jocelyn Nomgqibelo Mashinini in August 1953 while they were
+              both Sunday school teachers at the Methodist church in Alexandra.
+              “At first sight she looked like somebody special, someone I could
+              befriend and possibly take to the altar some time later. I did not
+              delay in sending the right signals to Jocelyn,” he recalled. They
+              were married eight months later in April 1954 and settled down in
+              Dube Village. Together they helped build a Methodist church and
+              community there, with Dr Motsuenyane serving as a lay preacher.
+              Both were members of the church choir. At the time, Dr Motsuenyane
+              was working for the African National Soil Conservation
+              Association. This led him to travel widely and frequently, which
+              caused a fair bit of tension between the newlyweds. But cool heads
+              always prevailed. Later though, Mrs Motsuenyane was able to
+              accompany her husband on some of his longer trips. She was with
+              him in 1959 when he first visited the United States, but returned
+              home to their children when he was awarded a bursary to study
+              there. She also accompanied him to Saudi Arabia when he was posted
+              there as ambassador in 1996 to 2000, helping him to entertain
+              visiting dignitaries and travelling with him around the region.
+              They had six children, all boys, whom they made sure got a decent
+              education. As a Black family living in South Africa of the 1960s
+              and 1970s, at the height of apartheid, they were not immune from
+              the discriminatory practices of the racist National Party
+              government. Their eldest son, who was at university in the 1970s
+              at the time of student uprisings against the nationalist
+              government, eventually dropped out and did not finish his degree.
+              Three of his sons got degrees in arts and law; another becoming a
+              teacher. Two of his sons passed away early in life; one was a
+              carpenter and the other, who had a tertiary qualification in
+              business management, managed the family’s garage business in
+              Soshanguve for 15 years. While Dr Motsuenyane was lucky in that
+              his children listened to him when he tried to guide them, he
+              admitted, “sometimes they say I preach a lot. I always say that as
+              long as there are no converts among them, I’ll continue to preach,
+              and if you convert, I’ll stop preaching.”
+            </p>
+          </div>
+          <button class="accordion-header">
+            Interactions with the ANC in exile
+          </button>
+          <div class="accordion-content">
+            <p>
+              The doting family man There is a Setswana idiom, “Fa thlako ya
+              pele e gatileng teng le ya morago e tla gata” – “where the front
+              hoof of a cow has trodden so must the hindleg tread”, or roughly,
+              “children must take after their parents”. Dr Sam Motsuenyane
+              acknowledged how his own mother and father had a profound impact
+              on the way he lived his life and conducted himself. While neither
+              of his parents had much formal education, they were both devoutly
+              Christian. They were also diligent workers with a strong work
+              ethic. His mother, particularly, resisted being dominated and was
+              highly principled and insisted young Samuel and his brothers had
+              to do their share of the chores inside the home. Religion would
+              always play an important part in Dr Motsuenyane’s life. He met his
+              wife Jocelyn Nomgqibelo Mashinini in August 1953 while they were
+              both Sunday school teachers at the Methodist church in Alexandra.
+              “At first sight she looked like somebody special, someone I could
+              befriend and possibly take to the altar some time later. I did not
+              delay in sending the right signals to Jocelyn,” he recalled. They
+              were married eight months later in April 1954 and settled down in
+              Dube Village. Together they helped build a Methodist church and
+              community there, with Dr Motsuenyane serving as a lay preacher.
+              Both were members of the church choir. At the time, Dr Motsuenyane
+              was working for the African National Soil Conservation
+              Association. This led him to travel widely and frequently, which
+              caused a fair bit of tension between the newlyweds. But cool heads
+              always prevailed. Later though, Mrs Motsuenyane was able to
+              accompany her husband on some of his longer trips. She was with
+              him in 1959 when he first visited the United States, but returned
+              home to their children when he was awarded a bursary to study
+              there. She also accompanied him to Saudi Arabia when he was posted
+              there as ambassador in 1996 to 2000, helping him to entertain
+              visiting dignitaries and travelling with him around the region.
+              They had six children, all boys, whom they made sure got a decent
+              education. As a Black family living in South Africa of the 1960s
+              and 1970s, at the height of apartheid, they were not immune from
+              the discriminatory practices of the racist National Party
+              government. Their eldest son, who was at university in the 1970s
+              at the time of student uprisings against the nationalist
+              government, eventually dropped out and did not finish his degree.
+              Three of his sons got degrees in arts and law; another becoming a
+              teacher. Two of his sons passed away early in life; one was a
+              carpenter and the other, who had a tertiary qualification in
+              business management, managed the family’s garage business in
+              Soshanguve for 15 years. While Dr Motsuenyane was lucky in that
+              his children listened to him when he tried to guide them, he
+              admitted, “sometimes they say I preach a lot. I always say that as
+              long as there are no converts among them, I’ll continue to preach,
+              and if you convert, I’ll stop preaching.”
+            </p>
+          </div>
+          <button class="accordion-header">
+            The Parliamentarian in a new democratic South Africa
+          </button>
+          <div class="accordion-content">
+            <p>
+              The doting family man There is a Setswana idiom, “Fa thlako ya
+              pele e gatileng teng le ya morago e tla gata” – “where the front
+              hoof of a cow has trodden so must the hindleg tread”, or roughly,
+              “children must take after their parents”. Dr Sam Motsuenyane
+              acknowledged how his own mother and father had a profound impact
+              on the way he lived his life and conducted himself. While neither
+              of his parents had much formal education, they were both devoutly
+              Christian. They were also diligent workers with a strong work
+              ethic. His mother, particularly, resisted being dominated and was
+              highly principled and insisted young Samuel and his brothers had
+              to do their share of the chores inside the home. Religion would
+              always play an important part in Dr Motsuenyane’s life. He met his
+              wife Jocelyn Nomgqibelo Mashinini in August 1953 while they were
+              both Sunday school teachers at the Methodist church in Alexandra.
+              “At first sight she looked like somebody special, someone I could
+              befriend and possibly take to the altar some time later. I did not
+              delay in sending the right signals to Jocelyn,” he recalled. They
+              were married eight months later in April 1954 and settled down in
+              Dube Village. Together they helped build a Methodist church and
+              community there, with Dr Motsuenyane serving as a lay preacher.
+              Both were members of the church choir. At the time, Dr Motsuenyane
+              was working for the African National Soil Conservation
+              Association. This led him to travel widely and frequently, which
+              caused a fair bit of tension between the newlyweds. But cool heads
+              always prevailed. Later though, Mrs Motsuenyane was able to
+              accompany her husband on some of his longer trips. She was with
+              him in 1959 when he first visited the United States, but returned
+              home to their children when he was awarded a bursary to study
+              there. She also accompanied him to Saudi Arabia when he was posted
+              there as ambassador in 1996 to 2000, helping him to entertain
+              visiting dignitaries and travelling with him around the region.
+              They had six children, all boys, whom they made sure got a decent
+              education. As a Black family living in South Africa of the 1960s
+              and 1970s, at the height of apartheid, they were not immune from
+              the discriminatory practices of the racist National Party
+              government. Their eldest son, who was at university in the 1970s
+              at the time of student uprisings against the nationalist
+              government, eventually dropped out and did not finish his degree.
+              Three of his sons got degrees in arts and law; another becoming a
+              teacher. Two of his sons passed away early in life; one was a
+              carpenter and the other, who had a tertiary qualification in
+              business management, managed the family’s garage business in
+              Soshanguve for 15 years. While Dr Motsuenyane was lucky in that
+              his children listened to him when he tried to guide them, he
+              admitted, “sometimes they say I preach a lot. I always say that as
+              long as there are no converts among them, I’ll continue to preach,
+              and if you convert, I’ll stop preaching.”
+            </p>
+          </div>
+
+          <button class="accordion-header">
+            Dr Motsuenyane’s first love – African Bank
+          </button>
+          <div class="accordion-content">
+            <p>
+              The doting family man There is a Setswana idiom, “Fa thlako ya
+              pele e gatileng teng le ya morago e tla gata” – “where the front
+              hoof of a cow has trodden so must the hindleg tread”, or roughly,
+              “children must take after their parents”. Dr Sam Motsuenyane
+              acknowledged how his own mother and father had a profound impact
+              on the way he lived his life and conducted himself. While neither
+              of his parents had much formal education, they were both devoutly
+              Christian. They were also diligent workers with a strong work
+              ethic. His mother, particularly, resisted being dominated and was
+              highly principled and insisted young Samuel and his brothers had
+              to do their share of the chores inside the home. Religion would
+              always play an important part in Dr Motsuenyane’s life. He met his
+              wife Jocelyn Nomgqibelo Mashinini in August 1953 while they were
+              both Sunday school teachers at the Methodist church in Alexandra.
+              “At first sight she looked like somebody special, someone I could
+              befriend and possibly take to the altar some time later. I did not
+              delay in sending the right signals to Jocelyn,” he recalled. They
+              were married eight months later in April 1954 and settled down in
+              Dube Village. Together they helped build a Methodist church and
+              community there, with Dr Motsuenyane serving as a lay preacher.
+              Both were members of the church choir. At the time, Dr Motsuenyane
+              was working for the African National Soil Conservation
+              Association. This led him to travel widely and frequently, which
+              caused a fair bit of tension between the newlyweds. But cool heads
+              always prevailed. Later though, Mrs Motsuenyane was able to
+              accompany her husband on some of his longer trips. She was with
+              him in 1959 when he first visited the United States, but returned
+              home to their children when he was awarded a bursary to study
+              there. She also accompanied him to Saudi Arabia when he was posted
+              there as ambassador in 1996 to 2000, helping him to entertain
+              visiting dignitaries and travelling with him around the region.
+              They had six children, all boys, whom they made sure got a decent
+              education. As a Black family living in South Africa of the 1960s
+              and 1970s, at the height of apartheid, they were not immune from
+              the discriminatory practices of the racist National Party
+              government. Their eldest son, who was at university in the 1970s
+              at the time of student uprisings against the nationalist
+              government, eventually dropped out and did not finish his degree.
+              Three of his sons got degrees in arts and law; another becoming a
+              teacher. Two of his sons passed away early in life; one was a
+              carpenter and the other, who had a tertiary qualification in
+              business management, managed the family’s garage business in
+              Soshanguve for 15 years. While Dr Motsuenyane was lucky in that
+              his children listened to him when he tried to guide them, he
+              admitted, “sometimes they say I preach a lot. I always say that as
+              long as there are no converts among them, I’ll continue to preach,
+              and if you convert, I’ll stop preaching.”
+            </p>
+          </div>
+          <button class="accordion-header">The Principal has fallen</button>
+          <div class="accordion-content">
+            <p>
+              The doting family man There is a Setswana idiom, “Fa thlako ya
+              pele e gatileng teng le ya morago e tla gata” – “where the front
+              hoof of a cow has trodden so must the hindleg tread”, or roughly,
+              “children must take after their parents”. Dr Sam Motsuenyane
+              acknowledged how his own mother and father had a profound impact
+              on the way he lived his life and conducted himself. While neither
+              of his parents had much formal education, they were both devoutly
+              Christian. They were also diligent workers with a strong work
+              ethic. His mother, particularly, resisted being dominated and was
+              highly principled and insisted young Samuel and his brothers had
+              to do their share of the chores inside the home. Religion would
+              always play an important part in Dr Motsuenyane’s life. He met his
+              wife Jocelyn Nomgqibelo Mashinini in August 1953 while they were
+              both Sunday school teachers at the Methodist church in Alexandra.
+              “At first sight she looked like somebody special, someone I could
+              befriend and possibly take to the altar some time later. I did not
+              delay in sending the right signals to Jocelyn,” he recalled. They
+              were married eight months later in April 1954 and settled down in
+              Dube Village. Together they helped build a Methodist church and
+              community there, with Dr Motsuenyane serving as a lay preacher.
+              Both were members of the church choir. At the time, Dr Motsuenyane
+              was working for the African National Soil Conservation
+              Association. This led him to travel widely and frequently, which
+              caused a fair bit of tension between the newlyweds. But cool heads
+              always prevailed. Later though, Mrs Motsuenyane was able to
+              accompany her husband on some of his longer trips. She was with
+              him in 1959 when he first visited the United States, but returned
+              home to their children when he was awarded a bursary to study
+              there. She also accompanied him to Saudi Arabia when he was posted
+              there as ambassador in 1996 to 2000, helping him to entertain
+              visiting dignitaries and travelling with him around the region.
+              They had six children, all boys, whom they made sure got a decent
+              education. As a Black family living in South Africa of the 1960s
+              and 1970s, at the height of apartheid, they were not immune from
+              the discriminatory practices of the racist National Party
+              government. Their eldest son, who was at university in the 1970s
+              at the time of student uprisings against the nationalist
+              government, eventually dropped out and did not finish his degree.
+              Three of his sons got degrees in arts and law; another becoming a
+              teacher. Two of his sons passed away early in life; one was a
+              carpenter and the other, who had a tertiary qualification in
+              business management, managed the family’s garage business in
+              Soshanguve for 15 years. While Dr Motsuenyane was lucky in that
+              his children listened to him when he tried to guide them, he
+              admitted, “sometimes they say I preach a lot. I always say that as
+              long as there are no converts among them, I’ll continue to preach,
+              and if you convert, I’ll stop preaching.”
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- tribute feature -->
+    <section class="" style="background-color: #002b60">
+      <div class="container">
+        <div class="row" style="padding: 30px 0px 30px 0px">
+          <div class="col-md-12">
+            <h1
+              class="color-brand-1 mt-2 mb-2"
+              style="color: #fff !important; font-size: 32px; font-weight: 100"
+            >
+              His legacy is one of steward leadership and selfless dedication to
+              the service of others.
+            </h1>
+          </div>
+        </div>
+        <div class="row gutters d-flex">
+          <div class="col-md-4">
+            <img
+              class="d-block"
+              src="https://www.africanbank.co.za/media/higfoeim/sm2401_0021_blog-header-image-create-your-financial-vision-board_desktop.png"
+              alt="iori"
+            />
+          </div>
+          <div class="col-md-8">
+            <p
+              class="font-md color-brand-1 my-3"
+              style="color: #ffff !important; font-size: 14px !important"
+            >
+              Dr Sam Motsuenyane’s involvement in African Bank started in 1964,
+              when the seeds of the idea for a bank for the people by the people
+              were first sown at the very first conference of the National
+              African Federated Chamber of Commerce (Nafcoc), then known as the
+              National African Chamber of Commerce (Nacoc).
+            </p>
+            <p
+              class="font-md color-brand-1 my-3"
+              style="color: #ffff !important; font-size: 14px !important"
+            >
+              It would take another 10 years for that seed to take root, and it
+              was largely thanks to the perseverance and steady guiding hand of
+              Dr Motsuenyane that it eventually bore fruit.
+            </p>
+            <p
+              class="font-md color-brand-1 my-3"
+              style="color: #ffff !important; font-size: 14px !important"
+            >
+              The idea was born out of the realisation that a Black bank was
+              needed to promote and finance Black economic development. It was
+              an audacious idea at that time – the apartheid regime was at its
+              most oppressive and the rights of Black people were summarily
+              being stripped away. In fact, Nacoc’s first conference was held
+              only one month before the Rivonia Trial, which found Nelson
+              Mandela and seven ANC comrades guilty of treason and sentenced
+              them to life in prison.
+            </p>
+          </div>
+
+          <div class="col-xl-12 col-lg-12 col-md-12">
+            <p
+              class="font-md color-brand-1"
+              style="color: #ffff !important; font-size: 14px !important"
+            >
+              Virtually all black anti-apartheid organisations were banned. Many
+              of their leaders were either in jail or fled into exile to escape
+              prosecution. The grim menace of death in detention became a new
+              ominous feature in the suppression of resistance against
+              apartheid. In addition to the draconian pass laws restricting
+              their movement, Black people were not allowed to own property in
+              urban areas, and it was illegal for them to run businesses in
+              townships, unless they provided essential goods and services.
+              Those who ran shops could only sell a pre-approved list of 26
+              items.
+            </p>
+            <p
+              class="font-md color-brand-1 my-3"
+              style="color: #ffff !important; font-size: 14px !important"
+            >
+              While Black people could bank their money in traditional banks, it
+              was impossible to access loans. Loans required collateral, which
+              Black people simply did not have. “Interestingly though, financial
+              institutions were always happy to take our money whenever we
+              brought it in for banking. They just did not bother recycling the
+              money back into our communities,” Dr Motsuenyane recalled. Having
+              attended university in the US, Dr Motsuenyane had witnessed
+              firsthand how Black communities there had set up their own banks
+              to solve the same problem of access to capital. He used his
+              experiences in the American South to help convince Nacoc that a
+              Black bank was a necessity for the economic development of Black
+              people in South Africa.
+            </p>
+            <p
+              class="font-md color-brand-1 my-3"
+              style="color: #ffff !important; font-size: 14px !important"
+            >
+              He also played a major role in raising capital for the venture. It
+              proved to be slow going. In 1964, a call had gone out to Nacoc
+              members to donate R100 a year. At that first meeting the princely
+              sum of R70 was raised. The chief obstacle to fundraising was the
+              belief that any Black venture on this scale was doomed to failure.
+              “People need to have a history of successes to believe things can
+              be done. Where people or communities have a history of failures,
+              or of restricted progress and development, they come to believe
+              that everything is impossible. This is quite sad and true about
+              many African communities who have not seen themselves achieve
+              anything and succeed. They wrongly believe that nothing can be
+              done,” Dr Motsuenyane would write later.
+            </p>
+            <p
+              class="font-md color-brand-1 my-3"
+              style="color: #ffff !important; font-size: 14px !important"
+            >
+              There was nothing for it, but to roll up his sleeves. Following
+              his election in 1968 as Nafcoc’s third president, it was up to Dr
+              Motsuenyane to cultivate support for the idea of an African Bank.
+              An account was opened at the Church Square branch of Barclays Bank
+              in Pretoria, where those who wanted to buy shares in the new bank
+              could deposit their contribution of at least R100. Dr Motsuenyane
+              traversed the globe to drum up support for the bank – his journey
+              taking him from the US to Europe and the UK, to the Ivory Coast
+              and Kenya.
+            </p>
+            <p
+              class="font-md color-brand-1 my-3"
+              style="color: #ffff !important; font-size: 14px !important"
+            >
+              Despite setbacks he persevered. He engineered a meeting with the
+              South African finance minister, Nico Diederichs, on the sidelines
+              of a World Bank gathering in Kenya and managed to convince him
+              that by registering the African Bank, the government would be able
+              to soften increasingly hostile attitudes towards the country. Back
+              home, the government agreed to allow the registration of African
+              Bank – with several provisos, including that the first branch of
+              the bank be in a homeland and that at least six of the homelands
+              had to support the idea of the African Bank.
+            </p>
+            <p
+              class="font-md color-brand-1 my-3"
+              style="color: #ffff !important; font-size: 14px !important"
+            >
+              That meant Dr Motsuenyane had to pack his bags again. In a
+              marathon trip, he and his Nafcoc colleagues travelled the length
+              and breadth of South Africa to get support. In the end, they
+              managed to secure the backing of six homeland governments, bar
+              Bophuthatswana. The next hurdle was to get buy-in from
+              Bophuthatswana to locate the first branch in Ga-Rankuwa near
+              Pretoria. There was such massive support from the people of the
+              homeland that the South African government could no longer hold
+              back its approval. When African Bank was finally registered in
+              1975, Dr Motsuenyane was elected as its first chairman, a post he
+              held for almost 20 years. “On that day when we inaugurated the
+              first branch of the African Bank, there was a tremendous downpour
+              of rain. Just after we said ‘Amen’, the rain came down in
+              torrents. We sang ‘Glory hallelujah” when our long-cherished dream
+              was transformed into reality,” Dr Motsuenyane recalled.
+            </p>
+            <p
+              class="font-md color-brand-1 my-3"
+              style="color: #ffff !important; font-size: 14px !important"
+            >
+              Dr Motsuenyane resigned from the board in 1995 when he was posted
+              as South Africa’s ambassador to Saudi Arabia. In the intervening
+              years, Dr Motsuenyane remained a true friend to African Bank,
+              through all its ups and downs – championing its cause to remain a
+              bank for the people by the people, just as he had envisioned it.
+              An audacious feat, indeed.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+  <!-- handling vertical timeline -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+   const line = $(".vertical-timeline-innerline");
+                    const verticalTimelineEvents = $(".vertical-timeline-item");
+                
+                    function showContent(e) {
+                        e.attr("done", "true");
+                        e.find(".vertical-timeline-point").css("background", "#002B60");
+                        e.find(".date").css("opacity", "100%");
+                        e.find("p").css({ opacity: "100%", transform: "translateY(0px)" });
+                    }
+                
+                    function hideContent(e) {
+                        e.removeAttr("done");
+                        e.find(".vertical-timeline-point").css("background", "rgb(228, 228, 228)");
+                        e.find("p").css({ opacity: "0%", transform: "translateY(-10px)" });
+                    }
+                
+                    function showEventByYear(year) {
+                        verticalTimelineEvents.each((idx, ev) => {
+                            if ($(ev).data("year") === year) {
+                                showContent($(ev));
+                            } else {
+                                hideContent($(ev));
+                            }
+                        });
+                    }
+                
+                    function verticalTimelineProgress(value) {
+                        let progress = `${(value / verticalTimelineEvents.length) * 100}%`;
+                        if (window.matchMedia("(min-width: 728px)").matches) {
+                            line.css({ width: progress, height: "4px" });
+                        } else {
+                            line.css({ height: progress, width: "4px" });
+                        }
+                    }
+                
+                    $(document).ready(() => {
+                        // Show the first event initially
+                        showEventByYear(2000);
+                    });
+                
+  </script>
+
+  <!--end of vertical timeline script-->
+  <script
+    src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"
+  ></script>
+
+  <script>
+    $(document).ready(function () {
+      $(".gallery img, .gallery video").click(function () {
+        var content;
+        if ($(this).is("img")) {
+          content =
+            "<img src='" +
+            $(this).attr("src") +
+            "' class='img-fluid modal-img'>";
+        } else {
+          var videoSrc = $(this).find("source").attr("src");
+          content =
+            '<video class="modal-vid" controls autoplay><source src="' +
+            videoSrc +
+            '" type="video/mp4"></video>';
+        }
+        $(".modal-body").html(content);
+        $("#myModal").modal("show");
+      });
+
+      $("#myModal").on("hidden.bs.modal", function () {
+        var video = $(".modal-body video").get(0);
+        if (video) {
+          video.pause();
+        }
+      });
+    });
+
+  
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const tabs = document.querySelectorAll(".tab");
+      const contents = document.querySelectorAll(".content");
+
+      tabs.forEach((tab, index) => {
+        tab.addEventListener("click", function () {
+          // Toggle the active class on the tab
+          this.classList.toggle("active");
+
+          // Get the content element related to this tab
+          const content = contents[index];
+
+          // Check if the clicked tab is active and set the display accordingly
+          if (this.classList.contains("active")) {
+            content.style.display = "block";
+          } else {
+            content.style.display = "none";
+          }
+
+          // Close all other contents
+          contents.forEach((otherContent, otherIndex) => {
+            if (otherIndex !== index) {
+              otherContent.style.display = "none";
+              tabs[otherIndex].classList.remove("active");
+            }
+          });
+        });
+      });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const headers = document.querySelectorAll(".accordion-header");
+
+      headers.forEach((header) => {
+        header.addEventListener("click", function () {
+          // Toggle the "active" class on the header
+          this.classList.toggle("active");
+
+          // Select the next element (should be the .accordion-content)
+          var content = this.nextElementSibling;
+
+          if (content.style.maxHeight) {
+            content.style.maxHeight = null; // This will hide the content
+          } else {
+            content.style.maxHeight = content.scrollHeight + "px"; // This will expand the content
+          }
+        });
+      });
+    });
+    
+    
+    document.addEventListener('DOMContentLoaded', function() {
+    var playButtons = document.querySelectorAll('.play-button');
+
+    function formatTime(time) {
+        var minutes = Math.floor(time / 60);
+        var seconds = Math.floor(time % 60);
+        return minutes + ':' + (seconds < 10 ? '0' + seconds : seconds);
+    }
+
+    playButtons.forEach(function(button) {
+        var audioPlayer = button.nextElementSibling.querySelector('audio');
+        var progressBar = button.nextElementSibling.querySelector('.progress-bar');
+        var audioTime = button.nextElementSibling.querySelector('p');
+
+        button.addEventListener('click', function() {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+                button.innerHTML = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22ZM8.07612 8.61732C8 8.80109 8 9.03406 8 9.5V14.5C8 14.9659 8 15.1989 8.07612 15.3827C8.17761 15.6277 8.37229 15.8224 8.61732 15.9239C8.80109 16 9.03406 16 9.5 16C9.96594 16 10.1989 16 10.3827 15.9239C10.6277 15.8224 10.8224 15.6277 10.9239 15.3827C11 15.1989 11 14.9659 11 14.5V9.5C11 9.03406 11 8.80109 10.9239 8.61732C10.8224 8.37229 10.6277 8.17761 10.3827 8.07612C10.1989 8 9.96594 8 9.5 8C9.03406 8 8.80109 8 8.61732 8.07612C8.37229 8.17761 8.17761 8.37229 8.07612 8.61732ZM13.0761 8.61732C13 8.80109 13 9.03406 13 9.5V14.5C13 14.9659 13 15.1989 13.0761 15.3827C13.1776 15.6277 13.3723 15.8224 13.6173 15.9239C13.8011 16 14.0341 16 14.5 16C14.9659 16 15.1989 16 15.3827 15.9239C15.6277 15.8224 15.8224 15.6277 15.9239 15.3827C16 15.1989 16 14.9659 16 14.5V9.5C16 9.03406 16 8.80109 15.9239 8.61732C15.8224 8.37229 15.6277 8.17761 15.3827 8.07612C15.1989 8 14.9659 8 14.5 8C14.0341 8 13.8011 8 13.6173 8.07612C13.3723 8.17761 13.1776 8.37229 13.0761 8.61732Z" fill="#add84c"></path> </g></svg>'; // Pause icon
+            } else {
+                audioPlayer.pause();
+                button.innerHTML = '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--emojione" preserveAspectRatio="xMidYMid meet" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><circle cx="32" cy="32" r="30" fill="#add84f"></circle><path fill="#ffffff" d="M25 12l20 20l-20 20z"></path></g></svg>'; // Play icon
+            }
+        });
+
+        audioPlayer.addEventListener('timeupdate', function() {
+            var currentTime = formatTime(audioPlayer.currentTime);
+            var duration = formatTime(audioPlayer.duration);
+            audioTime.textContent = currentTime + ' / ' + duration;
+
+            var percentage = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+            progressBar.style.width = percentage + '%';
+        });
+
+        var progressContainer = button.nextElementSibling.querySelector('.progress-container');
+        progressContainer.addEventListener('click', function(e) {
+            var totalWidth = this.clientWidth;
+            var clickX = e.offsetX; // Changed to offsetX for better compatibility
+            audioPlayer.currentTime = (clickX / totalWidth) * audioPlayer.duration;
+        });
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+      var audioPlayer = document.getElementById('audioPlayer');
+      var progressBars = document.querySelectorAll('.progress-bar');
+
+      if (audioPlayer) {
+          audioPlayer.addEventListener('timeupdate', function() {
+              var percentage = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+              progressBars.forEach(function(progressBar) {
+                  progressBar.style.width = percentage + '%';
+              });
+          });
+      }
+
+      document.querySelectorAll('.progress-container').forEach(function(container) {
+          container.addEventListener('click', function(e) {
+              var totalWidth = this.clientWidth;
+              var clickX = e.offsetX; // Changed to offsetX for better compatibility
+              var duration = audioPlayer.duration;
+              audioPlayer.currentTime = (clickX / totalWidth) * duration;
+          });
+      });
+  });
+
+  </script>

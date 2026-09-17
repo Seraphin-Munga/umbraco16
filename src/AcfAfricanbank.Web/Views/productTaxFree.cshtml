@@ -1,4 +1,5 @@
 ﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageInvestments>
+@using AcfAfricanbank.Core.Models.Forms
 @using ContentModels = Umbraco.Web.PublishedModels;
 @using Web.Helpers;
 @using CustomModels = Web.Models;
@@ -49,7 +50,10 @@
 }
 
 <style>
-
+    .mega-tabs .nav-tabs>li.active:after {
+        top: unset !important;
+        bottom: -18px;
+    }
     .control-label {
         text-align: left !important;
         width: 100%;
@@ -190,12 +194,13 @@
 @Html.Partial("_testimonials", testimonialTab as Testimonials)
 
 <!-- CALL BACK FORM -->
-@{
+<!-- CALL BACK FORM 20240215-->
+@*@{
    //  var _floatingFormViewModel = callMeBack.Children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
 
-    @Html.Partial("_callMeBackForm", callMeBack as ContentModels.CallMeBack)
+    @Html.Partial("_callMeBackInvest", callMeBack as ContentModels.CallMeBack)
 
-}
+}*@
 <!-- POPUP DIALOG -->
 @Html.Partial("_ebankITModal")
 
@@ -240,6 +245,7 @@
             headers: [
                    ['ITSAPP-DEVICE', '@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.ITSAPP-DEVICE"]'],
                    ['ITSAPP-LANG', 'en-GB'],
+                   ['ITSAPP-DEVICEID', ''],
                    ['Content-type', 'application/json']
             ],
             translations: {

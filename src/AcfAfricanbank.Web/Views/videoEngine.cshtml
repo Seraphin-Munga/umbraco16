@@ -101,8 +101,8 @@ var faqImageAltTagData = ((ContentModels.Image)frequentlyAQ);
 
 //var sectionContent = (IEnumerable<IPublishedElement>)tabBodyFAQ.TabBodyContent.Where(c => c is NCtabGenericContent).FirstOrDefault().SectionContent;
 
-var sectionContent = ((Umbraco.Web.PublishedModels.HeroBodyFaq)tabBodyFAQ.Children.Where(x => x.Name == "Questions and Answers").FirstOrDefault()).QuestionGroups;
-
+//var sectionContent = (Umbraco.Web.PublishedModels.HeroBodyFaq)tabBodyFAQ.Children.Where(x => x.Name == "Questions and Answers").FirstOrDefault()).QuestionGroups;
+var sectionContent = (ICollection<QuestionGroup>)tabBodyFAQ.Children.Where(c => c.ContentType.Alias == "heroBodyFaq1").FirstOrDefault().Value("questionGroups");
 ContentModels.TabBody _availablePlatforms = null;
 ContentModels.TabBody _videoButtonControls = null;
 

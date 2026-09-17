@@ -1,131 +1,91 @@
 ﻿<!DOCTYPE html>
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
-@inject AcfAfricanbank.Core.Utilities.ResourceHelper ResourceHelper
-@inject Umbraco.Cms.Core.Models.PublishedContent.IVariationContextAccessor VariationContextAccessor
-@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+
+@using AcfAfricanbank.Core.Utilities
+@using ContentModels = Umbraco.Web.PublishedModels
+@using Umbraco.Core
+@using Web.Helpers;
+@using System.Web.Optimization
 
 @{
 
     string CacheVersion = "V1.1";
     Layout = null;
-    // Get basic design settings from the homepage.
-    //
-    // This view deliberately uses the untyped IPublishedContent API
-    // (IsDocumentType("alias"), Value<T>("alias")) instead of ModelsBuilder's
-    // generated content model classes (PageHome, CallMeBack, ...). Those
-    // classes only exist once the matching document types are migrated and
-    // Umbraco has regenerated them, which made this view uncompilable at
-    // various points during the migration. IsDocumentType/Value<T> work
-    // directly off the alias strings already in the migrated database, so
-    // this view compiles and runs regardless of ModelsBuilder state.
-    var home = Model.Root();
+    // Get basic design settings from the homepage
+    ContentModels.PageHome home = Model.Root() as ContentModels.PageHome;
     var colorTheme = "#002b60";
     var font = "arial";
-    var allKids = Model.Children(VariationContextAccessor).ToList();
-    IPublishedContent floatingForm = null;
+    var allKids = Model.Children.ToList();
+    ContentModels.CallMeBack floatingForm = null;
     var currentPage = Umbraco.AssignedContentItem;
-
-    if (allKids.Where(c => c.IsDocumentType("callMeBack")).Any())
+    if (allKids.Where(c => c is ContentModels.CallMeBack).Any())
     {
         @*All pages except home*@
-        floatingForm = allKids.Where(c => c.IsDocumentType("callMeBack")).FirstOrDefault();
+        floatingForm = (ContentModels.CallMeBack)allKids.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
     }
     else
     {
-        @*
-            var _home = Model.Parent;
-            var homePageElementItems = _home.Children.Where(c => c.IsDocumentType("homePageElements")).FirstOrDefault();
-            if (homePageElementItems != null)
-            {
-                floatingForm = homePageElementItems.Children.Where(c => c.IsDocumentType("callMeBack")).FirstOrDefault();
-            }
-        *@
+        @*var _home = Model.Parent;
+        var homePageElementItems = _home.Children.Where(c => c is ContentModels.HomePageElements).FirstOrDefault();
+        if (homePageElementItems != null)
+        {
+            floatingForm = (ContentModels.CallMeBack)homePageElementItems.Children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+        }*@
+        
+
+
+        
+        
         foreach (var t in allKids)
         {
-
-            if (t.Children(VariationContextAccessor).Where(c => c.IsDocumentType("callMeBack")).Any())
+            if (t.Children.Where(c => c is ContentModels.CallMeBack).Any() && currentPage.Id == 2808)
             {
-                floatingForm = t.Children(VariationContextAccessor).Where(c => c.IsDocumentType("callMeBack")).FirstOrDefault();
+                floatingForm = (ContentModels.CallMeBack)t.Children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
                 break;
             }
+    
         }
+        
     }
-
-    @*<!--if (allKids.Where(c => c.IsDocumentType("callMeBack")).Any())
-        {-->
-        All pages except home
-            <!--floatingForm = allKids.Where(c => c.IsDocumentType("callMeBack")).FirstOrDefault();
-            }
-            else
-            {
-                foreach (var t in allKids)
-                {
-                    if (t.Children.Where(c => c.IsDocumentType("callMeBack")).Any() && currentPage.Id == 2808)
-                    {
-                        floatingForm = t.Children.Where(c => c.IsDocumentType("callMeBack")).FirstOrDefault();
-                        break;
-                    }
-
-                }
-            }-->*@
 
 var call_me_subject = floatingForm?.Value("ProductSubject") ?? "";
 var call_me_contact_type = floatingForm?.Value("contactType") ?? "";
 var prodID = floatingForm?.Value("productID") ?? "";
 var check_open = floatingForm?.Value<bool>("callMeBackDifferentLocation");
 
-IPublishedContent homePageElements = null;
-if (Model.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault() != null)
+HomePageElements homePageElements = null;
+if (Model.Children.Where(o => o is HomePageElements).FirstOrDefault() != null)
 {
-    homePageElements = Model.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault();
+    homePageElements = (HomePageElements)Model.Children.Where(o => o is HomePageElements).FirstOrDefault();
 }
-else if (Model.Parent.Parent.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault() != null)
+else if (Model.Parent.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault() != null)
 {
-    homePageElements = Model.Parent.Parent.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault();
+    homePageElements = (HomePageElements)Model.Parent.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
 }
 else
 {
-    homePageElements = Model.Parent.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault();
+    homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
 }
 
-// var disclaimersData = homePageElements.Children.Where(o => o.ContentType.Alias == "ebankITListSectionText").ToList();
-//var disclaimers = disclaimersData.FirstOrDefault().Children;
-//IPublishedContent disclaimerValue = null;
-//foreach (var content in disclaimers)
-//{
-//    if (HttpContext.Current.Request.Path.ToString().Contains("/banking"))
-//    {
-//        if (content.Value("ebankITTitle").ToString().Contains("Banking"))
-//        {
-//            disclaimerValue = content;
-//        }
-//    }
-//    else
-//    {
-//        disclaimerValue = content;
-//        break;
-//    }
+
+
+
+var heroBodyBlog = (HeroBody)homePageElements?.Children?.Where(x => x is HeroBody)?.FirstOrDefault();
+
+
+//Umbraco.Web.Models.Link itemLink = null;
+//foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)((Link)heroBodyBlogLink).UrlLink)
+//{var heroBodyBlogLink = heroBodyBlog?.Children?.Where(x => x?.ContentType?.ToLower() == "link")?.FirstOrDefault();
+//   itemLink = link;
+ //   break;
 //}
 
 
-var heroBodyBlog = homePageElements?.Children(VariationContextAccessor).Where(x => x.IsDocumentType("heroBody")).FirstOrDefault();
-var heroBodyBlogLink = heroBodyBlog?.Children(VariationContextAccessor).Where(x => x.ContentType.Alias.ToLower() == "link").FirstOrDefault();
 
-Umbraco.Cms.Core.Models.Link itemLink = null;
-var urlLinks = heroBodyBlogLink?.Value<IEnumerable<Umbraco.Cms.Core.Models.Link>>("urlLink");
-if (urlLinks != null)
-{
-    foreach (var link in urlLinks)
-    {
-        itemLink = link;
-        break;
-    }
-}
-
-var bottomNavigation = homePageElements?.Children(VariationContextAccessor).Where(c => c.IsDocumentType("bottomNavigation")).FirstOrDefault();
+var bottomNavigation = Umbraco.Content("18207"); // (BottomNavigation)homePageElements.Children.Where(c => c is BottomNavigation).FirstOrDefault();
 //var CacheVersion = "ver=" + AfricanBank.Cms.Portal.Helpers.CacheFactory.CacheVersion();
 var seo_title = Model.Value("title_tag"); //Umbraco.Field("title_tag");
-var seo_description = Model.Value("descrition_tag");
+var seo_description = Model.Value("description_tag");
 var seo_keywords = Model.Value("keywords_tag");
 var seo_robots = Model.Value("robots_tag");
 var seo_googlebot = Model.Value("googlebot_tag");
@@ -133,49 +93,37 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
     @*media/52775/abw1808_002_heritage_logo.png*@
     @*media/51288/ab-logo_icon_blue_30x30-2.png*@
 
-    if (Model.Value<IPublishedContent>
-        ("image") != null)
+if (Model.Value<IPublishedContent>
+    ("image") != null)
+{
+    twitter_default_image = Model.Value("image").ToString();
+}
+//check if blog image exist
+if (Model.Children.Where(c => c is BlogDetailsElements).FirstOrDefault() != null)
+{
+    var headerItem = Model.Children.Where(c => c is BlogDetailsElements).FirstOrDefault().Children.Where(x => x is HeroHeaderBlogDetail).FirstOrDefault();
+
+    ContentModels.Image imageData = (ContentModels.Image)headerItem.Value("Image");
+    if (imageData != null)
     {
-        twitter_default_image = Model.Value("image").ToString();
+        twitter_default_image = ((ContentModels.Image)headerItem.Value("Image")).Url;
     }
-    //check if blog image exist
-    if (Model.Children(VariationContextAccessor).Where(c => c.IsDocumentType("blogDetailsElements")).FirstOrDefault() != null)
-    {
-        var headerItem = Model.Children(VariationContextAccessor).Where(c => c.IsDocumentType("blogDetailsElements")).FirstOrDefault().Children(VariationContextAccessor).Where(x => x.IsDocumentType("heroHeaderBlogDetail")).FirstOrDefault();
+}
 
-        var imageData = headerItem?.Value<IPublishedContent>("Image");
-        if (imageData != null)
-        {
-            twitter_default_image = imageData.Url();
-        }
-    }
+var url = Request.Url.OriginalString.Trim();
+var uri = new Uri(url);
 
-    // Classic HttpCookie multi-value ("Value=x&Other=y") had no direct
-    // equivalent in ASP.NET Core's flat string cookies - parse it manually.
-    var userSettings = "";
-    var africanBankCookie = Context.Request.Cookies["AfricanBank"];
-    if (!string.IsNullOrEmpty(africanBankCookie))
-    {
-        var valuePair = africanBankCookie
-            .Split('&', StringSplitOptions.RemoveEmptyEntries)
-            .Select(p => p.Split('=', 2))
-            .FirstOrDefault(p => p.Length == 2 && p[0] == "Value");
+var query = HttpUtility.ParseQueryString(uri.Query);
 
-        if (valuePair != null)
-        {
-            userSettings = valuePair[1];
-        }
-    }
+var userSettings = "";
+if (Request.Cookies["AfricanBank"] != null)
+{
+    userSettings = Request.Cookies["AfricanBank"]["Value"];
+}
 
-    var utm_source = Context.Request.Query["utm_source"].ToString();
-    var utm_medium = Context.Request.Query["utm_medium"].ToString();
-    var utm_campaign = Context.Request.Query["utm_campaign"].ToString();
-
-    // Any querystring (tracking params, etc.) marks the page noindex below
-    // so tracked-link variants of a URL don't get indexed as duplicates.
-    var query = Context.Request.QueryString.Value ?? string.Empty;
-
-    var url = Model.Url(mode: UrlMode.Absolute);
+var utm_source = Request.Params["utm_source"];
+var utm_medium = Request.Params["utm_medium"];
+var utm_campaign = Request.Params["utm_campaign"];
 }
 
 
@@ -185,44 +133,67 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#002b60">
-    @if (!string.IsNullOrEmpty(query.ToString()))
+    @if (!string.IsNullOrEmpty(query.ToString()) )
     {
         <title>African Bank</title>
+        <link rel="icon" src="https://www.africanbank.co.za/media/xz1fhfj5/ab-logo_icon_blue_30x30-2.png" type="image/png" href="favicon.png">
         <meta name="robots" content="noindex,follow">
         <meta name="googlebot" content="noindex">
     }
     else
     {
         <title>@seo_title</title>
+         <link rel="icon" src="https://www.africanbank.co.za/media/xz1fhfj5/ab-logo_icon_blue_30x30-2.png" type="image/png" href="favicon.png">
         <meta name="description" content="@seo_description">
         <meta name="keywords" content="@seo_keywords">
         <meta name="robots" content="@seo_robots">
         <meta name="author" content="African Bank">
     }
+    
+   
+         <link rel="icon" src="https://www.africanbank.co.za/media/xz1fhfj5/ab-logo_icon_blue_30x30-2.png" type="image/png" href="favicon.png">
 
-  
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@Html.Raw("@")AfricanBank" />
+    <meta name="twitter:creator" content="@Html.Raw("@")AfricanBank" />
+    <meta name="twitter:title" content="African Bank | @seo_title.ToString()" />
+    <meta name="twitter:description" content="@seo_description" />
+    <meta name="twitter:image" content="@System.Configuration.ConfigurationManager.AppSettings["site_domain"]@twitter_default_image" />
+
+    <meta property="og:title" content="African Bank | @seo_title.ToString()" />
+    <meta property="og:type" content="article" />
 
 
-    <!-- Google Tag Manager -->
-    <script>
-        (function (w, d, s, l, i) {
-            w[l] = w[l] || []; w[l].push({
-                'gtm.start':
-                    new Date().getTime(), event: 'gtm.js'
-            }); var f = d.getElementsByTagName(s)[0],
-                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-        })(window, document, 'script', 'dataLayer', 'GTM-WPMR64S');
-    </script>
-    <!-- End Google Tag Manager -->
+    <meta property="og:url" content="@Model.Url(mode: UrlMode.Absolute)" />
+    <meta property="og:description" content="@seo_description" />
+    <meta property="og:image" content="@System.Configuration.ConfigurationManager.AppSettings["site_domain"]@twitter_default_image" />
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WPMR64S');</script>
+<!-- End Google Tag Manager -->
+
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-21394042-1"></script>
+    
+    @*<script>
+            var script = document.createElement('script');
+            script.id = "_cls_detector";
+            script.src = "https://cdn.gbqofs.com/africanbank/Web_UAT/detector-dom.min.js";
+            script.setAttribute("data-clsconfig","reportURI=https://report.africanbank.glassboxdigital.io/reporting/7d4af0e7-bf94-4e99-99e4-dfb375674500;");
+            document.head.appendChild(script);
+    </script>*@
+    
+    
+    @* <script async src="https://www.googletagmanager.com/gtag/js?id=UA-21394042-1"></script> *@
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
 
-        gtag('config', 'UA-21394042-1', { 'optimize_id': 'GTM-T7N9LBL' });
+        gtag('config', 'UA-21394042-1', { 'optimize_id': 'GTM-WPMR64S' });
     </script>
 
     @* @RenderSection("Header", required: false) *@
@@ -236,14 +207,32 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
         <link rel="canonical" href="@url/" />
     }
 
-    <link rel="shortcut icon" type="image/png" href="/favicon.png?@CacheVersion" />
-    <link rel="stylesheet" href="/css/bootstrap.min.css?@CacheVersion" />
-    <link rel="stylesheet" href="/stylesheets/main.css?@CacheVersion" />
-    <link rel="stylesheet" href="/css/style_unlimited.css">
+    <link rel="shortcut icon" type="image/png" href="/media/51288/ab-logo_icon_blue_30x30-2.png?@CacheVersion" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+   @* <script src="~/scripts/ab-downloadApp"></script> *@
 
     <style>
-        .cookieimg {
+    
+    
+ 
+    
+        @* .m    margin-top: -30px;ains{
+            width: 100% !important;
+            height: 100%  !important;
+            }*@
+            
+            .footer-socials {
+                display: flex;
+            }
+     .cookieimg
+        {
             height: 50px;
+        }
+        
+        
+        .grayfooter{
+            background: #00000029 !important;
         }
 
         .cookie-btn {
@@ -281,6 +270,7 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
         }
 
 
+
         .decline {
             background-color: #fff;
             border: 1px solid #fff;
@@ -297,18 +287,16 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
             top: 15px;
             font-weight: bold;
         }
-
-        .settings-cookie {
+         .settings-cookie {
             position: absolute;
             background: no-repeat;
             border: none;
             color: #002b60 !important;
             font-weight: bold;
-            width: 100%;
-            font-size: 80%;
+            width:100%;
+            font-size:80%;
             margin-top: 8px;
         }
-
         .settings-cookie1 {
             position: absolute;
             background: no-repeat;
@@ -318,10 +306,8 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
             width: 100%;
             font-size: 80%;
             margin-top: 7px;
-            margin-left: -20px;
+            margin-left:-20px;
         }
-
-
 
         .cookie-consent > img {
             height: 35px;
@@ -330,6 +316,7 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
             margin-top: 11px;
             margin-right: 10px;
         }
+
 
         .cookie-consent {
             position: fixed;
@@ -346,7 +333,7 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
             border-radius: 0px;
             display: inline-block;
             box-shadow: 0px 5px 5px #00000035;
-            padding-top: 12px;
+              padding-top:12px;
         }
 
 
@@ -361,10 +348,34 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
 
         .policy {
             position: absolute;
-            right: 90px;
+            right: 290px;
             top: 23px;
         }
+   
+   
+        
+        
+   #iframe-karaboChat-speechBubble {
+    position: fixed;
+    bottom: 168px;
+    right: 118px !important;
+    background-color: rgb(0, 43, 96);
+    color: rgb(255, 255, 255);
+    padding: 10px 14px;
+    border-radius: 16px 16px 0px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 5px;
+    z-index: 200;
+    font-size: 12px;
+}
 
+
+@@media only screen and (max-width: 768px) {
+                
+    .navbar-brand {
+        position: relative;
+        padding: 0px 0px 0px 0px !important;
+    }
+}
 
         @@media (min-width: 768px) {
             #lb-content {
@@ -375,6 +386,14 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
                 height: 300px;
             }
         }
+        .mega-tabs .nav-tabs>li.active:after {
+        top: unset !important;
+        bottom: -18px !important;
+    }
+    
+    .social-content{
+        justify-content: center !important;
+    }
     </style>
 
 
@@ -383,21 +402,11 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
 
         <style>
          @@media (min-width: 280px) and (max-width: 653px) {
-            .cookie-consent {
-                height: 155px !important;
-                font-size: 80%;
-            }
+                .cookie-consent {
+                    height: 155px !important;
+                    font-size:80%;
+                }
 
-            .dropdown-container .navbar-header {
-                margin-top: 140px;
-            }
-
-            .decline {
-                top: 78px;
-            }
-            .policy {
-                top: 83px;
-            }
                 .padding-top-15 {
                     padding-top: 20px;
                 }
@@ -409,20 +418,67 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
                 .cookie-btn {
                     font-size: 60%;
                 }
-
                 .settings-cookie {
                     font-size: 60%;
                 }
             }
-
-            @@media (min-width: 360px) and (max-width: 640px) {
-                .cookieimg {
-                    height: 30px;
+         @@media (min-width: 0px) and (max-width: 767px) {
+                .cookie-consent {
+                display:none !important;
+                    
                 }
+            }
+            
+            
 
-              @*  .cookie-consent > img {
+            @@media (min-width: 300px) and (max-width: 766px) {
+            
+#chatIconImg {
+    height: 160px !important;
+    /* max-height: 100px; */
+}
+
+
+
+#iframe-karaboChat-speechBubble {
+    position: fixed;
+    bottom: 127px !important;
+    right: 68px !important;
+    background-color: rgb(0, 43, 96);
+    color: rgb(255, 255, 255);
+    padding: 10px 14px;
+    border-radius: 16px 16px 0px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 5px;
+    z-index: 200;
+    font-size: 12px;
+}
+
+#openChatButton {
+    background-color: transparent;
+    border-radius: 60px;
+    position: fixed;
+    bottom: 3px !important;
+    right: -26px !important;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    z-index: 200;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+            
+            .padding-top-15 {
+                        padding-top: 15px;
+                    }
+
+                    .cookieimg {
+                        height: 30px;
+                    }
+
+                .cookie-consent > img {
                     display: none;
-                }*@
+                }
 
                 .decline {
                     top: 95px;
@@ -436,14 +492,17 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
                 }
 
                 .cookie-consent {
-                    height: 140px !important;
-                   @* padding-left: 20px;
+                    height: 140px !important; 
+                  @*padding-left: 20px; 
                     padding-right: 20px;
-                    text-align: center; *@
+                    text-align: center;*@
+                }
+                .#cookies-banner {
+                    top: 45px;
                 }
 
                 .dropdown-container .navbar-header {
-                    margin-top: 140px;
+                        margin-top: 0px !important;
                 }
 
                 .dropdown-container.navbar-default .navbar-collapse {
@@ -451,14 +510,55 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
                 }
             }
 
-            @@media (min-width: 411px) and (max-width: 731px) {
-                .cookieimg {
-                    height: 30px;
+
+          @@media (min-width: 420px) and (max-width: 760px) {
+            
+            .padding-top-15 {
+                        padding-top: 15px;
+                    }
+
+                    .cookieimg {
+                        height: 30px;
+                    }
+
+                .cookie-consent > img {
+                    display: none;
                 }
 
-               @* .cookie-consent > img {
+                .decline {
+                    top: 95px;
+                    right: 90px;
+                }
+
+                .policy {
+                    position: absolute;
+                    right: 170px;
+                    top: 102px;
+                }
+
+                .cookie-consent {
+                    height: 140px !important; 
+                  @*padding-left: 20px; 
+                    padding-right: 20px;
+                    text-align: center;*@
+                }
+                .#cookies-banner {
+                    top: 45px;
+                }
+
+                .dropdown-container .navbar-header {
+                        margin-top: 0px;
+                }
+
+                .dropdown-container.navbar-default .navbar-collapse {
+                    margin-top: 140px;
+                }
+            }
+            @@media (min-width: 411px) and (max-width: 731px) {
+
+                .cookie-consent > img {
                     display: none;
-                }*@
+                }
 
 
                 .decline {
@@ -471,14 +571,12 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
                     right: 190px;
                     top: 95px;
                 }
+                
             }
 
 
 
             @@media (min-width: 768px) and (max-width: 1024px) {
-                .cookieimg {
-                    height: 30px;
-                }
 
 
 
@@ -516,13 +614,8 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
             }
 
             @@media (min-width: 1024px) and (max-width: 1366px) {
-                .cookieimg {
-                    height: 30px;
-                }
-                .policy {
-                    top: 25px;
-                }
-                    .message {
+
+                .message {
                     width: 80%;
                     text-align: center;
                 }
@@ -551,13 +644,15 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
             }
         </style>
 
-    }
+    } 
     @{
         if (currentPage.Id == 2808)
         {
             <style>
                 /*Ipad  potrait*/
                 @@media only screen and (max-width: 768px) {
+                
+                
                     .right-bottom {
                         bottom: 13em;
                     }
@@ -640,97 +735,16 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
         }
     }
 
-    <link rel="stylesheet" href="/css/font-awesome-5.15.3.min.css" />
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:200,300,400,600,700&font-display=swap" rel="stylesheet">
+    @* <link rel="stylesheet" href="/css/font-awesome-5.15.3.min.css" /> *@
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
+    @* <link defer href="https://fonts.googleapis.com/css?family=Montserrat:200,300,400,600,700&font-display=swap" rel="stylesheet"> *@
 
-    <link href="/css/cookieconsent.css" rel="stylesheet" />
-    <style amp-boilerplate>
-        body {
-            -webkit-animation: -amp-start 8s steps(1,end) 0s 1 normal both;
-            -moz-animation: -amp-start 8s steps(1,end) 0s 1 normal both;
-            -ms-animation: -amp-start 8s steps(1,end) 0s 1 normal both;
-            animation: -amp-start 8s steps(1,end) 0s 1 normal both
-        }
-
-        @@-webkit-keyframes -amp-start {
-            from {
-                visibility: hidden
-            }
-
-            to {
-                visibility: visible
-            }
-        }
-
-        @@-moz-keyframes -amp-start {
-            from {
-                visibility: hidden
-            }
-
-            to {
-                visibility: visible
-            }
-        }
-
-        @@-ms-keyframes -amp-start {
-            from {
-                visibility: hidden
-            }
-
-            to {
-                visibility: visible
-            }
-        }
-
-        @@-o-keyframes -amp-start {
-            from {
-                visibility: hidden
-            }
-
-            to {
-                visibility: visible
-            }
-        }
-
-        @@keyframes -amp-start {
-            from {
-                visibility: hidden
-            }
-
-            to {
-                visibility: visible
-            }
-        }
-    </style>
-    <noscript>
-        <style amp-boilerplate>
-            body {
-                -webkit-animation: none;
-                -moz-animation: none;
-                -ms-animation: none;
-                animation: none
-            }
-        </style>
-    </noscript>
-    <script async src="https://cdn.ampproject.org/v0.js"></script>
-
-    <script>
-        // This code is only used to remember theme selection between page loads
-        //const themeSwitch = document.querySelector('.theme-switch');
-        //themeSwitch.checked = localStorage.getItem('switchedTheme') === 'true';
-
-        //themeSwitch.addEventListener('change', function (e) {
-        //    if (e.currentTarget.checked === true) {
-        //        // Add item to localstorage
-        //        localStorage.setItem('switchedTheme', 'true');
-        //    } else {
-        //        // Remove item if theme is switched back to normal
-        //        localStorage.removeItem('switchedTheme');
-        //    }
-        //});
-    </script>
+    @Styles.Render("~/bundles/styles")
+	
+	
     <link href="~/stylesheets/smartWizard/smart_wizard.css" rel="stylesheet" />
     <link href="~/stylesheets/smartWizard/smart_wizard_theme_arrows.css" rel="stylesheet" />
+    <link href="~/css/cookieconsent.css" rel="stylesheet" />
 
     @*<script src="~/scripts/*.min.js" type="text/javascript"></script>
         <script src="~/javascripts/*.min.js" type="text/javascript"></script>
@@ -738,16 +752,15 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
 
 </head>
 <body class="frontpage theme-font-@font theme-color-@colorTheme">
-    <!-- Google Tag Manager (noscript) -->
-    <noscript>
-        <iframe loading="lazy" src="https://www.googletagmanager.com/ns.html?id=GTM-WPMR64S"
-                height="0" width="0" style="display:none;visibility:hidden"></iframe>
-    </noscript>
-    <!-- End Google Tag Manager (noscript) -->
+   <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WPMR64S"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
 
     <header class="header">
         <nav class="nav-bar top-nav">
-            @Html.Partial("~/Views/Partials/Navigation/Navigation.cshtml")
+             @Html.Partial("~/Views/Partials/Navigation/Navigation.cshtml")
         </nav>
         <div class="mobile-nav-handler">
             <div class="hamburger lines" id="toggle-nav">
@@ -755,38 +768,315 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
             </div>
         </div>
     </header>
+    
+    
+    <script>
+     function openModal() {
+            $('#nav-modal-overlay').css('display', 'flex');
+            $("body").css("overflow", "hidden");
+            $('#nav-modal').css('display', 'flex');
+        }
+
+        $(document).ready(function () {
+
+            // Show the banner
+            // $('#banner').show();
+
+            // Close banner function
+            $('#close-btn').click(function () {
+                $('#banner').hide();
+            });
+            $('#cookies-close-btn').click(function () {
+                $('#cookies-banner').hide();
+            });
+        
+        });
+
+              // Function to detect the operating system
+function detectOS() {
+            const userAgent = window.navigator.userAgent;
+
+            if (userAgent.includes("HUAWEI") || userAgent.includes("huawei") || userAgent.includes("Huawei")) {
+                return "Huawei"
+            }
+            if (userAgent.indexOf("Windows") !== -1) {
+                return "Windows";
+            } else if (userAgent.indexOf("Mac") !== -1) {
+                return "MacOS";
+            } else if (userAgent.indexOf("Linux") !== -1) {
+                return "Linux";
+            } else if (userAgent.indexOf("Android") !== -1) {
+                return "Android";
+            } else if (userAgent.match(/iPhone|iPad|iPod/i)) {
+                return "iOS";
+            } else {
+                return "Unknown OS";
+            }
+    }
+
+        // Function to get the app store link based on the OS
+        function getAppStoreLink(os) {
+            switch (os) {
+                case "Huawei":
+                    return "https://appgallery.huawei.com/app/C103438901"
+                case "Android":
+                    return "https://play.google.com/store/apps/details?id=za.co.android.africanbank";  // App Store link
+                case "Windows":
+                    return "https://play.google.com/store/apps/details?id=za.co.android.africanbank";  // App Store link
+                case "Linux":
+                return "https://play.google.com/store/apps/details?id=za.co.android.africanbank";  // App Store link
+                case "MacOS":
+                case "iOS":
+                    return "https://apps.apple.com/us/app/african-bank/id1357204405"; // App Store link
+                default:
+                    return "#"; // Placeholder for other operating systems
+            }
+        }
+        
+
+        // Update the HTML content and link using jQuery
+        $(document).ready(function() {
+            const osName = detectOS();
+            const appStoreLink = getAppStoreLink(osName);
+            $('#osName').text('You are using ' + osName);
+
+            // Update the button link
+            $('#appStoreLink').attr('onclick', 'window.location.href="' + appStoreLink + '"');
+        });
+    </script>
+    
+    <style>
+            /*banner css start here*/
+            
+            
+        #banner {
+            display: none;
+        }
+        
+        #banner1{
+            display:none ;
+        }
+
+        #cookies-banner {
+            display: none;
+        }
+        
+        .footer-new{
+           padding:0 !important;
+         }
+        
+        
+        @@media only screen and (max-width: 766px) {
+         #banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #edeef4; /* Adjust background color as needed */
+           
+        }
+
+        #cookies-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #b2bfcf; /* Adjust background color as needed */
+           
+        }
+
+        #banner-icon,
+        #cookies-banner-icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+        }
+
+        #banner-content,
+        #cookies-banner-content {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+
+        #banner-text{margin-bottom: 5px;}
+        #cookies-banner-text {
+            margin-bottom: 5px;
+            font-size: 9px;
+        }
+
+        #appStoreLink,
+        .tell-me-more {
+            text-decoration: none;
+            color: ##214922; /* Adjust the color as needed */
+            padding-right: 40px;
+        }
+
+        #close-btn,
+        #cookies-close-btn {
+            cursor: pointer;
+        }
+        
+        
+         #banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #edeef4; /* Adjust background color as needed */
+           
+        }
+        
+        #banner1{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #edeef4; /* Adjust background color as needed */
+           
+        }
+        
+        #banner-business banking {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #edeef4; /* Adjust background color as needed */
+           
+        }
+
+        #cookies-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #b2bfcf; /* Adjust background color as needed */
+           
+        }
+
+        #banner-icon,
+        #cookies-banner-icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+        }
+
+        #banner-content,
+        #cookies-banner-content {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+
+        #banner-text,
+        #cookies-banner-text {
+            margin-bottom: 5px;
+        }
+
+        #appStoreLink,
+        .tell-me-more {
+            text-decoration: none;
+            color: #002b60; /* Adjust the color as needed */
+            padding-right: 40px;
+        }
+
+        #close-btn,
+        #cookies-close-btn {
+            cursor: pointer;
+        }
+        
+        
+        }
+
+
+
+      
+
+        /*banner css end here*/
+    </style>
+    
+
+   
+        <div id="banner">
+            <img src="https://african-bank-ui.vercel.app/_next/image?url=%2Fassets%2Fimgs%2Fnew-site%2Flogo-two.png&w=640&q=75" id="banner-icon" />
+            <div id="banner-content">
+                <div id="long-banner-text" style="color:black;"><b>AB Banking App</b></div>
+                <div id="short-banner-text">African Bank</div>
+            </div>
+            <div id="banner-content-download-btn">
+                <div id="appStoreLink2"><a id="appStoreLink" onclick="goToAppStore()"><u>Download</u></a></div>
+            </div>
+            <div id="close-btn">
+                <i class="fas fa-times"></i>
+            </div>
+        </div>
+        
+        <div id="banner1">
+            <img src="https://african-bank-ui.vercel.app/_next/image?url=%2Fassets%2Fimgs%2Fnew-site%2Flogo-two.png&w=640&q=75" id="banner-icon" />
+            <div id="banner-content">
+                <div id="long-banner-text" style="color:black;"><b>B Banking App</b></div>
+                <div id="short-banner-text">African Bank</div>
+            </div>
+            <div id="banner-content-download-btn">
+                <div id="appStoreLink2"><a id="appStoreLink" onclick="goToAppStore()"><u>Download</u></a></div>
+            </div>
+            <div id="close-btn">
+                <i class="fas fa-times"></i>
+            </div>
+        </div>
+
+  
+
+      <div id="cookies-banner">
+
+            <img src="/Media/dqxpfbcm/cookies.svg" id="cookies-banner-icon" />
+            <div id="banner-content">
+                <div id="cookies-banner-text" style="color:#fff;">We use cookies to improve</div>
+                <div id="cookies-banner-text" style="color:#fff;">your experience.</div>
+            </div>
+            <div id="">
+                <div id="cookies-banner-tex"><a href="https://www.africanbank.co.za/en/home/cookie-policy/" class="tell-me-more" style="font-size: 80%; white-space: nowrap;"><u>Tell me more</u></a></div>
+            </div>
+            <div id="cookies-close-btn">
+                <i class="fas fa-times"></i>
+            </div>
+
+        </div>
+        
+        
+        <div class="cookies-23">
+    
+        @Html.Partial("~/Views/Partials/_cookiesSection.cshtml")
+         </div>
+
+  
+
+    
+
 
     @if (userSettings == "")
     {
-
+        Uri myuri = new Uri(System.Web.HttpContext.Current.Request.Url.AbsoluteUri);
+        string pathQuery = myuri.PathAndQuery;
+        string urlPath = myuri.ToString().Replace(pathQuery , "");
+        urlPath = urlPath + "/en/home/cookie-policy/";
+        
         <div class="headers" id="headers">
             <div class="cookie-consent">
-                @*  <img class="cookie" src="/Media/dqxpfbcm/cookies.svg" style="height: 50px; float: left; opacity: 0.45;">
-                    <div class="message">
-                        <p>This site uses cookies to provide you with a great user experience. By using our site, you agree to our use of cookies. </p>
-                    </div>
-
-                    <div class="accept-btn">
-                        <a href="https://africanbank.co.za/en/home/cookie-policy/" class="policy ml-1">Tell Me More!</a>
-                        <button onclick="AcceptCookie()" class="decline">Accept</button>
-                    </div> *@
                 <div class="container">
                     <div class="row">
                         <div class="col-md-2 col-sm-2 col-xs-2 padding-top-15">
-                            <img class="cookieimg" src="/Media/dqxpfbcm/cookies.svg" style=" float: left; opacity: 0.45;">
+                            <img class="cookieimg" src="~/media/dqxpfbcm/cookies.svg" style=" float: left; opacity: 0.45;">
                         </div>
-                        <div class="col-md-6 col-sm-10 col-xs-10">
+                        <div class="col-md-5 col-sm-10 col-xs-10">
                             <p>This site uses cookies to provide you with a great user experience. By using our site, you agree to our use of cookies.</p>
                         </div>
-                        <div class="col-md-4 col-sm-12 col-xs-12">
+                        <div class="col-md-5 col-sm-12 col-xs-12">
                             <div class="row">
                                 <div class="col-md-3 col-sm-3 col-xs-3">
-                                    <a class="settings-cookie" href="http://localhost:50053//en/home/cookie-policy">Tell Me More!</a>
+                                    <a class="settings-cookie" href="@urlPath">Tell Me More!</a>
                                 </div>
                                 <div class="col-md-3 col-sm-3 col-xs-3">
-                                    <a class="settings-cookie" data-cc="c-settings" href="#">Settings</a>
-
-                                    @* <button type="button" class="settings-cookie1" data-cc="c-settings">Settings</button> *@
+                                    <a class="settings-cookie" data-cc="c-settings"  href="#">Settings</a>
+                                  @*  <button type="button" class="settings-cookie1" data-cc="c-settings">Settings</button>*@
                                 </div>
                                 <div class="col-md-3 col-sm-3 col-xs-3">
                                     <button class="cookie-btn" onclick="AcceptCookie()">Accept All</button>
@@ -796,18 +1086,17 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
                                 </div>
                             </div>
                         </div>
-
+        
                     </div>
-
-
                 </div>
             </div>
         </div>
 
 
 
-        <style>
 
+
+        <style>
             @@media (min-width: 1200px) and (max-width: 2000px) {
                 .dropdown-container .navbar-header {
                     margin-top: 35px;
@@ -817,12 +1106,7 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
                     margin-top: 35px;
                 }
             }
-        </style>
-
-    }
-
-    <style>
-        /*arrow mark styles for mobile view */
+              /*arrow mark styles for mobile view */
         @@media (min-width: 376px) and (max-width: 414px) {
             .mega-tabs .nav-tabs > li.active:after {
                 top: auto;
@@ -840,51 +1124,75 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
                 top: auto;
             }
         }
-    </style>
+            
+       
+        </style>
+
+    }
 
     @{
-        <main>
+        <div class="mains" >
             @RenderBody()
-        </main>
-        <!-- FOOTER -->
-<footer>
-     <div class="container">
-                <div class="row">
-                  @*   @Html.Partial("_pageBottomNavigation", bottomNavigation as BottomNavigation)*@
-            </div>
-            <div class="footer-copyright">
-                <div class="row">
-                    <div class="col-sm-5 col-sm-push-7">
-                        <img class="pattern hidden-xs" src="~/images/footer-pattern.svg" alt="footer-pattern">
-                        <div class="pull-right">
-                            <a href="" target="_blank"><i class="footer-social fa" aria-hidden="true"><span style="font-family:Montserrat">B</i></a>
-                            <a href="https://www.facebook.com/africanbank/" target="_blank"><i class="footer-social fab fa-facebook-f" aria-hidden="true"></i></a>
-                            <a href="https://twitter.com/AfricanBank" target="_blank"><i class="footer-social fab fa-twitter" aria-hidden="true"></i></a>
-                            <a href="https://www.instagram.com/african_bank/" target="_blank"><i class="footer-social fab fa-instagram" aria-hidden="true"></i></a>
-                            <a href="https://za.linkedin.com/company/african-bank" target="_blank"><i class="footer-social fab fa-linkedin-in" aria-hidden="true"></i></a>
-                        </div>
-                    </div>
-                    <div class="col-sm-7 col-sm-pull-5">
-                        <img src="~/images/africanbank-logo-white.svg" width="170" alt="African Bank">
-                        @*@Html.Raw(disclaimerValue.Value("ebankITContent"))*@
+            
 
+
+      
+        <!-- FOOTER -->
+        
+        
+        
+  <footer>
+            <div class="container">
+                <div class="row">
+                  @Html.Partial("_pageBottomNavigation", bottomNavigation as BottomNavigation) 
+                </div>
+                <div class="footer-copyright">
+                    <div class="row">
+                        <div class="col-sm-5 col-sm-push-7">
+                         
+                            <div class="pull-right footer-socials">
+                                <a href="/en/home/blog-landing/" target="_blank"><i class="footer-social fa" aria-hidden="true"><span style="font-family:Montserrat">B</i></a>
+                                <a href="https://www.facebook.com/africanbank/" target="_blank"><i class="footer-social fab fa-facebook-f" aria-hidden="true"></i></a>
+                                <a href="https://twitter.com/AfricanBank" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="footer-social bi bi-twitter-x" viewBox="0 0 16 16">
+  <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z"/>
+</svg></a>
+                                <a href="https://www.instagram.com/african_bank/" target="_blank"><i class="footer-social fab fa-instagram" aria-hidden="true"></i></a>
+                                <a href="https://za.linkedin.com/company/african-bank" target="_blank"><i class="footer-social fab fa-linkedin-in" aria-hidden="true"></i></a>
+                                
+                            </div>
+                        </div>
+                        <div class="col-sm-7 col-sm-pull-5">
+                        
+                        
+       
+                            <img src="https://african-bank-ui.vercel.app/_next/image?url=%2Fassets%2Fimgs%2Fnew-site%2FLogo.png&w=1920&q=75" width="170" alt="African Bank">
+                        
+       
+
+                            
+                            
+                     
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-</footer>
+        </footer>
+        
+          </div>
 
     }
 
     <!--Bottom JS start -->
-    @*<script type="text/javascript" src="~/scripts/ab-branch-locator.min.js?@CacheVersion"></script>
+    @*<script   type="text/javascript" src="~/scripts/ab-branch-locator.min.js?@CacheVersion"></script>
         <script type="text/javascript" src="https://maps.google.com/maps/api/js?key=AIzaSyACY1CTwQQrIAWJUgLMscxZioI-_6tDluE"></script>*@
 
     <!--START Ebankit-change -->
     <!--END Ebankit-change -->
     <!--Bottom JS End-->
     @*<script  type="text/javascript" src="~/scripts/jquery-1.10.2.min.js?ver=@CacheVersion"></script>*@
-    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script type="text/javascript" src="~/scripts/Latest JS Libraries/jquery-2.2.4.min.js?ver=@CacheVersion"></script>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 
     @*<script  type="text/javascript" src="~/scripts/angular-1-6-7.min.js?ver=@CacheVersion"></script>*@
     <script type="text/javascript" src="~/scripts/Latest JS Libraries/angular-1.7.0.min.js?ver=@CacheVersion"></script>
@@ -897,20 +1205,19 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
 
     @*<script  type="text/javascript" src="~/scripts/bootstrapValidator.min.js?ver=@CacheVersion"></script>*@
     <script type="text/javascript" src="~/scripts/bootstrapValidator-0-5-3.min.js?ver=@CacheVersion"></script>
-    <script type="text/javascript" src="~/scripts/jquery.mobile.custom.min.js?ver=@CacheVersion"></script>
+    <script type="text/javascript" src="~/javascripts/jquery.mobile.custom.min.js?ver=@CacheVersion"></script>
 
     @*<script  type="text/javascript"src="@Url.Content("~/javascripts/slick.js?@CacheVersion")"></script>*@
     <script type="text/javascript" src="~/scripts/Latest JS Libraries/slick-1.9.0.min.js?ver=@CacheVersion"></script>
 
-    <script type="text/javascript" src="~/scripts/search.min.js?ver=@CacheVersion"></script>
+    <script type="text/javascript" src="~/scripts/search.js?ver=@CacheVersion"></script>
     <script type="text/javascript" src="~/javascripts/africanBankApp.js?ver=@CacheVersion"></script>
 
     <script defer type="text/javascript" src="~/scripts/mobile.min.js?ver=@CacheVersion"></script>
     <script defer type="text/javascript">
-        $.rootPath = '@Configuration["ebankit.Portal.Services.Mobile.URL"]';
-        $.headers = { "ITSAPP-DEVICE": "@Configuration["ebankit.Portal.Services.ITSAPP-DEVICE"]", "ITSAPP-LANG": '', "ITSAPP-DEVICEID": '*' };
+        $.rootPath = '@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.Mobile.URL"]';
+        $.headers = { "ITSAPP-DEVICE": "@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.ITSAPP-DEVICE"]", "ITSAPP-DEVICEID": "*", "ITSAPP-LANG": '' };
     </script>
-    <script type="text/javascript" src="/scripts/web3.js"></script>
 
 
     <script defer type="text/javascript" src="~/scripts/underscore-min.min.js?ver=@CacheVersion"></script>
@@ -918,7 +1225,8 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
     <script defer type="text/javascript" src="~/scripts/common.min.js?ver=@CacheVersion"></script>
     <script defer type="text/javascript" src="~/scripts/placeholders.min.js?ver=@CacheVersion"></script>
     <script defer type="text/javascript" src="~/scripts/autoNumeric.min.js?ver=@CacheVersion"></script>
-    <script type="text/javascript" src="/scripts/cookieconsent.js"></script>
+    <script defer type="text/javascript" src="~/scripts/cookieconsent.js"></script>
+    <script type="text/javascript" src="~/scripts/utmtracker.js"></script>
 
 
     <script defer type="text/javascript" src="~/scripts/formNewsletter.min.js?ver=@CacheVersion"></script>
@@ -926,31 +1234,89 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
     <script defer type="text/javascript" src="~/Common.JS.Library.Ab/Newsletter/unsubscribe.min.js?ver=@CacheVersion"></script>
 
 
-    <script defer type='text/javascript' src='//platform-api.sharethis.com/js/sharethis.js#property=5ca6063b9b272f00119abd21&product=inline-share-buttons' async='async'></script>
+    @* <script defer type='text/javascript' src='//platform-api.sharethis.com/js/sharethis.js#property=5ca6063b9b272f00119abd21&product=inline-share-buttons' async='async'></script> *@
     <script defer type="application/javascript" src="~/javascripts/st.action-panel.js?ver=@CacheVersion"></script>
-    <script defer type="text/javascript" src="/scripts/custom.js?ver=@CacheVersion"></script>
+    <script defer type="text/javascript" src="/javascripts/custom.js?ver=@CacheVersion"></script>
     <script defer type="text/javascript" src="/scripts/custom_javascript.js?ver=@CacheVersion"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
 
     @RenderSection("scripts", false)
+    
+ <script>
+ 
+ $(document).ready(function() {
+    var $element1 = $('#banner');   // main banner (default visible)
+    var $element2 = $('#banner1');  // alternate banner
+
+    if ($element1.length === 0 || $element2.length === 0) return;
+
+    // URLs where #banner should be hidden and #banner1 should be shown
+    var bannerHidePatterns = [
+        '/en/home/business-banking',
+        '/en/home/tap2glass',
+        '/en/home/business-transactional-account',
+        '/en/home/business-and-commercial-banking',
+        '/en/home/business-and-commercial-banking/#tab-CommercialPropertyFinance',
+        '/en/home/business-and-commercial-banking/#tab-BusinessLoans',
+        '/en/home/invest/call-deposits',
+        '/en/home/invest/notice-deposits',
+        '/en/home/invest/fixed-deposits',
+        '/en/home/invest/online-money-manager'
+    ];
+
+    var currentUrl = window.location.href;
+
+    // Check if current URL matches any hide pattern
+    var shouldHideBanner = bannerHidePatterns.some(function(pattern) {
+        return currentUrl.indexOf(pattern) !== -1;
+    });
+
+    if (shouldHideBanner && window.innerWidth <= 768) {
+        $element1.hide();
+        $element2.css("display", "flex");
+        
+    } else if(window.innerWidth <= 768) {
+        $element1.show();
+        $element2.hide();
+    }
+});
+   
+     
+ </script>   
+ 
+    
+
 
     @if (floatingForm != null)
     {
 
-        <script>
- @* defer type="text/javascript" *@
+        <script defer type="text/javascript">
+        
+        // Get the current year
+const currentYear = new Date().getFullYear();
+
+// Update the HTML content with the current year
+document.getElementById("currentYear").textContent = currentYear;
+
             if ("@check_open" == "True") {
                 setTimeout(function () {
                      $(".st-button-main.campaing-call").click();
-                 }, 3000);
+                 }, 2000);
               }
+              
         </script>
 
         <script defer type="text/javascript">
+        
+        
+
+        
+        
+        
+        
         function clear_validation() {
             $("form#frmCallMeBack").bootstrapValidator("destroy");
         }
-
         function init_loan_tracker_fields() {
             $('#frmLoanTracker').bootstrapValidator({
                 feedbackIcons: {
@@ -995,7 +1361,7 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
                                                 valid: false,
                                                 message: '@ResourceHelper.GetResource("GenericContactForm_SAID_InvalidAge")'
                                             }
-                                        }
+                                        } 
                                     (tempDate.getYear() != idNumber.substring(0, 2) || id_month != idNumber.substring(2, 4) - 1 || id_date != idNumber.substring(4, 6)) && (correct = !1);
                                     for (var tempTotal = 0, checkSum = 0, multiplier = 1, i = 0; 13 > i; ++i) tempTotal = parseInt(idNumber.charAt(i)) * multiplier, tempTotal > 9 && (tempTotal = parseInt(tempTotal.toString().charAt(0)) + parseInt(tempTotal.toString().charAt(1))), checkSum += tempTotal, multiplier = multiplier % 2 === 0 ? 1 : 2;
                                     return checkSum % 10 !== 0 && (correct = !1), correct
@@ -1211,52 +1577,66 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
                     }
             requestInProgress = true;
             $("#form-loader").show();
+                    //AJAX.request('/public/contacform/submit', {
             AJAX.request('/leads/apply', {
-                    data: data,
-                    success: function (e) {
-                        call_me_success_close();
-                        call_me_success();
-                        $("#form-loader").hide();
-                    },
-                    error: function (req, txt, err) {
-                        $("#form-loader").hide();
-
-                        call_me_failed();
-                    }
-                });
-            }
+                        data: data,
+                        success: function (e) {
+                            call_me_success_close(5000);
+                            call_me_success();
+                            $("#form-loader").hide();
+                        },
+                        error: function (req, txt, err) {
+                            $("#form-loader").hide();
+                            call_me_failed(7000);
+                        }
+                    });
+        }
         $("#loan-tracker").click(function () {
             loan_tracker($("#ltSAIDInput").val());
         });
         function loan_tracker(_value) {
-            if (_value === "frmLoanTracker" || _value === "" ) { return; }
+            if (_value === "frmLoanTracker" || _value === "") { return; }
             var csrfToken = $("input[name='__RequestVerificationToken']").val();
-            var _data = JSON.stringify({ "idNumber": _value });
+            var data = JSON.stringify({ "idNumber": _value });
 
-            $("#form-loader").show();
-            $.ajax({
-                headers: { '__RequestVerificationToken': csrfToken },
-                url: '/umbraco/surface/Custom/ClientSearch',
-                type: "POST",
-                contentType: 'application/json; charset=utf-8',
-                data: _data,
-                success: function (data, x, y) {
-
-                    $("#form-loader").hide();
-                    var result = JSON.parse(data.data);
-
-                    if ((result.resultCode == '204') || (result.resultCode == '200')) {
-                        var header = "Thank you";
-                        var body = "The status of your loan application will be sent to you via sms shortly."
-                        var duration = 3000;
-                        notifyCustomer(header, body, duration,
-                            '@ResourceHelper.GetResource("GenericContactForm_SAID_Required")',
-                            '@ResourceHelper.GetResource("GenericContactForm_SAID_ValMessage")',
-                            '@ResourceHelper.GetResource("GenericContactForm_SAID_LenghtValMessage")',
-                            '@ResourceHelper.GetResource("GenericContactForm_SAID_InvalidAge")'
-                        );
-                        $("#form-loader").css("margin-top", "50%");
-                    } else {
+                $("#form-loader").show();
+                $.ajax({
+                    headers: { '__RequestVerificationToken': csrfToken },
+                    url: '/umbraco/surface/Custom/ClientSearch',
+                    type: "POST",
+                    contentType: 'application/json; charset=utf-8',
+                    data: data,
+                    success: function (data, x, y) {
+                        
+                        $("#form-loader").hide();
+                        var results = JSON.stringify(data);
+                        debugger;
+                        //-->check if validation was succesful
+                        if (y.status === 200) {
+                            var header = "Thank you";
+                            var body = "The status of your loan application will be sent to you via sms shortly."
+                            var duration = 3000;
+                            notifyCustomer(header, body, duration,
+                                '@ResourceHelper.GetResource("GenericContactForm_SAID_Required")',
+                                '@ResourceHelper.GetResource("GenericContactForm_SAID_ValMessage")',
+                                '@ResourceHelper.GetResource("GenericContactForm_SAID_LenghtValMessage")',
+                                '@ResourceHelper.GetResource("GenericContactForm_SAID_InvalidAge")'
+                            );
+                            $("#form-loader").css("margin-top", "50%");
+                        } else {
+                            var header = "";
+                            var body = "Unfortunately we are experiencing technical issues. Please try again later or log into our banking App to view the status of your loan application."
+                            var duration = 3000;
+                            notifyCustomer(header, body, duration,
+                                '@ResourceHelper.GetResource("GenericContactForm_SAID_Required")',
+                                '@ResourceHelper.GetResource("GenericContactForm_SAID_ValMessage")',
+                                '@ResourceHelper.GetResource("GenericContactForm_SAID_LenghtValMessage")',
+                                '@ResourceHelper.GetResource("GenericContactForm_SAID_InvalidAge")'
+                            );
+                            $("#form-loader").css("margin-top", "50%");
+                        }
+                    },
+                    error: function (error) {
                         var header = "";
                         var body = "Unfortunately we are experiencing technical issues. Please try again later or log into our banking App to view the status of your loan application."
                         var duration = 3000;
@@ -1267,29 +1647,16 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
                             '@ResourceHelper.GetResource("GenericContactForm_SAID_InvalidAge")'
                         );
                         $("#form-loader").css("margin-top", "50%");
-                    }
-                },
-                error: function (error) {
-                    var header = "";
-                    var body = "Unfortunately we are experiencing technical issues. Please try again later or log into our banking App to view the status of your loan application."
-                    var duration = 3000;
-                    notifyCustomer(header, body, duration,
-                        '@ResourceHelper.GetResource("GenericContactForm_SAID_Required")',
-                        '@ResourceHelper.GetResource("GenericContactForm_SAID_ValMessage")',
-                        '@ResourceHelper.GetResource("GenericContactForm_SAID_LenghtValMessage")',
-                        '@ResourceHelper.GetResource("GenericContactForm_SAID_InvalidAge")'
-                    );
-                    $("#form-loader").css("margin-top", "50%");
-                },
-            });
-        }
+                    },
+                });
+            }
         function call_me(form_name, prodId, call_me_subject, call_me_contact_type) {
             var data = {};
             var inputs = document.forms[form_name].getElementsByTagName("input");
-
             for (var x = 0; x < inputs.length; x++) {
                 data[inputs[x].id] = inputs[x].value;
             }
+
             var utmSource = '@utm_source';
             	var utmMedium = '@utm_medium';
             	var utmCampaign = '@utm_campaign';
@@ -1305,35 +1672,36 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
 
             var csrfToken = $("input[name='__RequestVerificationToken']").val();
             $.ajax({
+            
                 headers: { '__RequestVerificationToken': csrfToken },
                 url: '/umbraco/surface/Custom/call_me_request',
                 type: "POST",
                 dataType: 'json',
                 contentType: 'application/json; charset=utf-8',
                 data: JSON.stringify({ form: data, prodId: prodId, call_me_subject: call_me_subject, call_me_contact_type: call_me_contact_type}),
-                success: function (data, x, y) {
-                    $("#form-loader").hide();
-                    if (!data.error) {
-                        callMeSuccess(data.data.split(";")[0]);
-                        call_me_success_close(9000, data.data.split(";")[0]);
-                    } else {
-                        if (data.error) {
-                            callMeSuccess(JSON.parse(data.data.split(";")[1]));
-                            call_me_success_close(9000, JSON.parse(data.data.split(";")[1]));
+                    success: function (data, x, y) {
+                        $("#form-loader").hide();
+                        if (!data.error) {
+                            callMeSuccess(data.data.split(";")[0]);
+                            call_me_success_close(9000, data.data.split(";")[0]);
                         } else {
-                            if ($("#st-panel-submit")[0].type == "button") {
-                                open_call_me();
-                                $("#st-panel-submit").submit();
-                            } else if ($("#st-panel-submit")[0].type == "submit") {
-                                $("#st-panel-submit").submit();
+                            if (data.error) {
+                                callMeSuccess(JSON.parse(data.data.split(";")[1]));
+                                call_me_success_close(9000, JSON.parse(data.data.split(";")[1]));
+                            } else {
+                                if ($("#st-panel-submit")[0].type == "button") {
+                                    open_call_me();
+                                    $("#st-panel-submit").submit();
+                                } else if ($("#st-panel-submit")[0].type == "submit") {
+                                    $("#st-panel-submit").submit();
+                                }
                             }
                         }
+                    },
+                    error: function (data, x, y) {
+                        $("#form-loader").hide();
+                        call_me_failed(data, 7000);
                     }
-                },
-                error: function (data, x, y) {
-                    $("#form-loader").hide();
-                    call_me_failed(data, 7000);
-                }
             });
         }
         function screenWidth() {
@@ -1350,33 +1718,33 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
                 return (0);
             }
         }
-        function returnHumanReadables(message) {
-            var _message = "";
-            if (typeof (message.code) === "undefined") {
-                _message = message;
-            } else {
-                switch (message.code) {
-                    case "400":
-                        _message = "Unfortunately, you do not qualify for a credit product right now. Let African Bank help you to improve your credit score and your financial fitness. Click <a href ='https://ib.africanbank.co.za'>here</a> to apply now for a MyWORLD bank account with zero monthly bank fees";
-                        break;
-                    case "422":
+            function returnHumanReadables(message) {
+                var _message = "";
+                if (typeof (message.code) === "undefined") {
+                    _message = message;
+                } else {
+                    switch (message.code) {
+                    	case "400":
                         _message = "Unfortunately, we are experiencing technical issues. Please try again in a few minutes.";
                         break;
-                    case "500":
-                        _message = "Unfortunately, we are experiencing technical issues. Please try again in a few minutes.";
+                    	case "422":
+                        _message = "Unfortunately, you do not qualify for a credit product right now. Let African Bank help you to improve your credit score and your financial fitness. Click <a href ='https://ib.africanbank.co.za'><b>here</b></a> to apply now for a MyWORLD bank account with zero monthly bank fees";
                         break;
-                    case "502":
-                        _message = "Unfortunately, we are experiencing technical issues. Please try again in a few minutes.";
-                        break;
-                    case "504":
-                        _message = "Unfortunately, we are experiencing technical issues. Please try again in a few minutes.";
-                        break;
-                    default:
-                    // code block
+                        case "500":
+                            _message = "Unfortunately, we are experiencing technical issues. Please try again in a few minutes.";
+                            break;
+                        case "502":
+                            _message = "Unfortunately, we are experiencing technical issues. Please try again in a few minutes.";
+                            break;
+                        case "504":
+                            _message = "Unfortunately, we are experiencing technical issues. Please try again in a few minutes.";
+                            break;
+                        default:
+                        // code block
+                    }
                 }
+                return _message;
             }
-            return _message;
-        }
             function callMeSuccess(message) {
                 //Display the correct message if request was successful
                 $('#call_me_form').hide();
@@ -1426,190 +1794,139 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
 
                     $('#call_me_success_body').css("color,#6b6f82");
                 },
-                    message_duration);
+                message_duration);
             }
-
-            window.addEventListener('DOMContentLoaded', async () => {
-                // Wait for MetaMask to be loaded
-                await window.ethereum.enable();
-
-                debugger;
-                // Initialize web3.js
-                if (typeof web3 !== 'undefined') {
-                    web3 = new Web3(web3.currentProvider);
-                } else {
-                    // Handle cases where MetaMask is not available
-                    console.error('Please install MetaMask.');
-                    return;
-                }
-
-                // Get the selected Ethereum address
-                const accounts = await web3.eth.getAccounts();
-                const selectedAddress = accounts[0];
-
-                // You can use the selected address to retrieve the NFTs
-                // and display them in the widget
-
-                // Example: Display the selected address
-                document.getElementById('address').innerText = selectedAddress;
-            });
-
 
             $(document).ready(function () {
                 init_fields();
-                init_loan_tracker_fields();
+    	        init_loan_tracker_fields();
                 $('.st-button-main.campaing-call').click();
-
-                $('body').on('click', '#s-rall-bn', function () {
-                    CloseCookie();
-                });
-                $('body').on('click', '#s-sv-bn', function () {
-                    AcceptCookie();
-                });
             });
         </script>
-
-        <script type="text/javascript">
-
-            window.addEventListener('load', function () {
-
-                // obtain plugin
-                var cc = initCookieConsent();
-
-                // run plugin with your configuration
-                cc.run({
-                    current_lang: 'en',
-                    autoclear_cookies: true,                   // default: false
-                    page_scripts: true,                        // default: false
-
-                    // mode: 'opt-in'                          // default: 'opt-in'; value: 'opt-in' or 'opt-out'
-                    // delay: 0,                               // default: 0
-                    // auto_language: '',                      // default: null; could also be 'browser' or 'document'
-                    autorun: false,                          // default: true
-                    // force_consent: false,                   // default: false
-                    // hide_from_bots: false,                  // default: false
-                    // remove_cookie_tables: false             // default: false
-                    // cookie_name: 'cc_cookie',               // default: 'cc_cookie'
-                    // cookie_expiration: 182,                 // default: 182 (days)
-                    // cookie_necessary_only_expiration: 182   // default: disabled
-                    // cookie_domain: location.hostname,       // default: current domain
-                    // cookie_path: '/',                       // default: root
-                    // cookie_same_site: 'Lax',                // default: 'Lax'
-                    // use_rfc_cookie: false,                  // default: false
-                    // revision: 0,                            // default: 0
-
-                    onFirstAction: function (user_preferences, cookie) {
-                        console.log("onFirstAction called");
-                        // callback triggered only once on the first accept/reject action
-                       if (user_preferences.accept_type == "all") {
-                           AcceptCookie();
-                       } else {
-                           CloseCookie();
-                     }
-                    },
-
-                    onAccept: function (cookie) {
-                        console.log("onAccept called");
-                        // callback triggered on the first accept/reject action, and after each page load
-
-                    },
-
-                    onChange: function (cookie, changed_categories) {
-                        console.log("onChange called");
-                        if (cookie.level.length > 1 ) {
-                            AcceptCookie();
-                        }
-
-                       @* if (cookie.level.length == 1) {
-                            CloseCookie();
-                        } *@
-                        // callback triggered when user changes preferences after consent has already been given
-                    },
-
-                    languages: {
-                        'en': {
-                            consent_modal: {
-                                title: 'We use cookies!',
-                                description: 'This site uses cookies to provide you with a great user experience. By using our site, you agree to our use of cookies.  <a href="http://localhost:50053/en/home/privacy-policy/">Tell Me More!</a> <br/>  <button type="button" data-cc="c-settings" class="cc-link">Settings</button>',
-                                primary_btn: {
-                                    text: 'Accept all',
-                                    role: 'accept_selected'              // 'accept_selected' or 'accept_all'
-                                },
-                                secondary_btn: {
-                                    text: 'Reject all',
-                                    role: 'accept_necessary'        // 'settings' or 'accept_necessary'
-                                }
-                            },
-                            settings_modal: {
-                                title: 'Cookie preferences',
-                                save_settings_btn: 'Save settings',
-                                accept_all_btn: 'Accept all',
-                                reject_all_btn: 'Reject all',
-                                close_btn_label: 'Close',
-                                cookie_table_headers: [
-                                    { col1: 'Name' },
-                                    { col2: 'Domain' },
-                                    { col3: 'Expiration' },
-                                    { col4: 'Description' }
-                                ],
-                                blocks: [
-                                    {
-                                        title: 'Cookie usage 📢',
-                                        description: 'I use cookies to ensure the basic functionalities of the website and to enhance your online experience. You can choose for each category to opt-in/out whenever you want. For more details relative to cookies and other sensitive data, please read the full <a href="http://localhost:50053/en/home/privacy-policy/" class="cc-link">privacy policy</a>.'
-                                    }, {
-                                        title: 'Strictly necessary cookies',
-                                        description: 'These cookies are essential for the proper functioning of my website. Without these cookies, the website would not work properly',
-                                        toggle: {
-                                            value: 'necessary',
-                                            enabled: true,
-                                            readonly: true          // cookie categories with readonly=true are all treated as "necessary cookies"
-                                        }
-                                    }, {
-                                        title: 'Performance and Analytics cookies',
-                                        description: 'These cookies allow the website to remember the choices you have made in the past',
-                                        toggle: {
-                                            value: 'analytics',     // your cookie category
-                                            enabled: false,
-                                            readonly: false
-                                        },
-                                        cookie_table: [             // list of all expected cookies
-                                            {
-                                                col1: '^_ga',       // match all cookies starting with "_ga"
-                                                col2: 'google.com',
-                                                col3: '2 years',
-                                                col4: 'description ...',
-                                                is_regex: true
-                                            },
-                                            {
-                                                col1: '_gid',
-                                                col2: 'google.com',
-                                                col3: '1 day',
-                                                col4: 'description ...',
-                                            }
-                                        ]
-                                    }, {
-                                        title: 'Advertisement and Targeting cookies',
-                                        description: 'These cookies collect information about how you use the website, which pages you visited and which links you clicked on. All of the data is anonymized and cannot be used to identify you',
-                                        toggle: {
-                                            value: 'targeting',
-                                            enabled: false,
-                                            readonly: false
-                                        }
-                                    }, {
-                                        title: 'More information',
-                                        description: 'For any queries in relation to our policy on cookies and your choices, please <a class="cc-link" href="hhttp://localhost:50053/en/home/about-us-contact-us/">contact us</a>.',
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                });
-            });
-        </script>
-
     }
 
     <script type="text/javascript">
+     
+
+        window.addEventListener('load', function () {
+
+            // obtain plugin
+            var cc = initCookieConsent();
+
+            // run plugin with your configuration
+            cc.run({
+                current_lang: 'en',
+                autoclear_cookies: true,                   // default: false
+                page_scripts: true,                        // default: false
+
+                // mode: 'opt-in'                          // default: 'opt-in'; value: 'opt-in' or 'opt-out'
+                // delay: 0,                               // default: 0
+                // auto_language: '',                      // default: null; could also be 'browser' or 'document'
+                 autorun: false,                          // default: true
+                // force_consent: false,                   // default: false
+                // hide_from_bots: false,                  // default: false
+                // remove_cookie_tables: false             // default: false
+                // cookie_name: 'cc_cookie',               // default: 'cc_cookie'
+                // cookie_expiration: 182,                 // default: 182 (days)
+                // cookie_necessary_only_expiration: 182   // default: disabled
+                // cookie_domain: location.hostname,       // default: current domain
+                // cookie_path: '/',                       // default: root
+                // cookie_same_site: 'Lax',                // default: 'Lax'
+                // use_rfc_cookie: false,                  // default: false
+                // revision: 0,                            // default: 0
+
+                onFirstAction: function (user_preferences, cookie) {
+                    // callback triggered only once on the first accept/reject action
+                },
+
+                onAccept: function (cookie) {
+                    // callback triggered on the first accept/reject action, and after each page load
+                    AcceptCookie();
+                },
+
+                onChange: function (cookie, changed_categories) {
+                    // callback triggered when user changes preferences after consent has already been given
+                },
+
+                languages: {
+                    'en': {
+                        consent_modal: {
+                            title: 'We use cookies!',
+                            description: 'This site uses cookies to provide you with a great user experience. By using our site, you agree to our use of cookies.  <a href="http://localhost:50053/en/home/cookie-policy/">Tell Me More!</a> <br/>  <button type="button" data-cc="c-settings" class="cc-link">Settings</button>',
+                            primary_btn: {
+                                text: 'Accept all',
+                                role: 'accept_all'              // 'accept_selected' or 'accept_all'
+                            },
+                            secondary_btn: {
+                                text: 'Reject all',
+                                role: 'accept_necessary'        // 'settings' or 'accept_necessary'
+                            }
+                        },
+                        settings_modal: {
+                            title: 'Cookie preferences',
+                            save_settings_btn: 'Save settings',
+                            accept_all_btn: 'Accept all',
+                            reject_all_btn: 'Reject all',
+                            close_btn_label: 'Close',
+                            cookie_table_headers: [
+                                { col1: 'Name' },
+                                { col2: 'Domain' },
+                                { col3: 'Expiration' },
+                                { col4: 'Description' }
+                            ],
+                            blocks: [
+                                {
+                                    title: 'Cookie usage 📢',
+                                    description: 'I use cookies to ensure the basic functionalities of the website and to enhance your online experience. You can choose for each category to opt-in/out whenever you want. For more details relative to cookies and other sensitive data, please read the full <a href="../../en/home/cookie-policy/" class="cc-link">Cookie policy</a>.'
+                                }, {
+                                    title: 'Strictly necessary cookies',
+                                    description: 'These cookies are essential for the proper functioning of my website. Without these cookies, the website would not work properly',
+                                    toggle: {
+                                        value: 'necessary',
+                                        enabled: true,
+                                        readonly: true          // cookie categories with readonly=true are all treated as "necessary cookies"
+                                    }
+                                }, {
+                                    title: 'Performance and Analytics cookies',
+                                    description: 'These cookies allow the website to remember the choices you have made in the past',
+                                    toggle: {
+                                        value: 'analytics',     // your cookie category
+                                        enabled: false,
+                                        readonly: false
+                                    },
+                                    cookie_table: [             // list of all expected cookies
+                                        {
+                                            col1: '^_ga',       // match all cookies starting with "_ga"
+                                            col2: 'google.com',
+                                            col3: '2 years',
+                                            col4: 'description ...',
+                                            is_regex: true
+                                        },
+                                        {
+                                            col1: '_gid',
+                                            col2: 'google.com',
+                                            col3: '1 day',
+                                            col4: 'description ...',
+                                        }
+                                    ]
+                                }, {
+                                    title: 'Advertisement and Targeting cookies',
+                                    description: 'These cookies collect information about how you use the website, which pages you visited and which links you clicked on. All of the data is anonymized and cannot be used to identify you',
+                                    toggle: {
+                                        value: 'targeting',
+                                        enabled: false,
+                                        readonly: false
+                                    }
+                                }, {
+                                    title: 'More information',
+                                    description: 'For any queries in relation to our policy on cookies and your choices, please <a class="cc-link" href="../../en/home/about-us-contact-us/">contact us</a>.',
+                                }
+                            ]
+                        }
+                    }
+                }
+            });
+        });
         function CloseCookie(){
               var x = document.getElementById("headers");
               if (x.style.display === "inline") {
@@ -1617,6 +1934,9 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
               } else {
                 x.style.display = "none";
             }
+            $('.dropdown-container .navbar-header').css({ marginTop: '0px' });
+            $('.dropdown-container.navbar-default .navbar-collapse').css({ marginTop: '0px' });
+            $('.dropdown-container .navbar-right').css({ marginTop: '0px' });
         }
 
         function AcceptCookie(){
@@ -1711,7 +2031,15 @@ String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
         }
     </script>
 
-    <script defer id="customcare-webchat" src="https://africanbank-webchat.gotbot.co.za/js/customcare-webchat.js"></script>
+    <link rel="stylesheet" href="/css/font-awesome-5.15.3.min.css" /> 
+ 
+  
+    <link defer href="https://fonts.googleapis.com/css?family=Montserrat:200,300,400,600,700&font-display=swap" rel="stylesheet">
+
+    <script type='text/javascript' src='//platform-api.sharethis.com/js/sharethis.js#property=5ca6063b9b272f00119abd21&product=inline-share-buttons' async='async'></script> 
+
+    @*<script defer id="customcare-webchat" src="https://africanbank-webchat.gotbot.co.za/js/customcare-webchat.js"></script>*@
+     <script defer src="https://karabo-chatbot.s3.eu-west-1.amazonaws.com/script/mvskarabo.js"></script>
     @*<script defer id="customcare-webchat" src="https://africanbank.webchat.gotbot.co.za/js/customcare-webchat.js"></script>*@
     @*<script defer id="customcare-webchat" src="https://africanbankstaging.webchat.gotbot.co.za/js/customcare-webchat.js"></script>*@
 </body>

@@ -1,5 +1,716 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
 	Layout = null;
 }
+
+@* the fun starts here *@
+
+<style>
+  .body {
+    font-family: Montserrat;
+    background-color: #fff;
+    margin: 0;
+    padding: 0;
+    color: #002B60;
+  }
+
+/**/
+
+label{
+    text-transform: none;
+}
+
+.marketing-msg{
+    left: 10px;
+    bottom: 8px;
+    position: relative;
+}
+
+.consent-text{
+    color: var(--Brand-AB-Blue, #012B60);
+
+    /* Body/Medium/Regular */
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 150% */
+}
+
+.consent-section strong {
+    color: #012B60 !important;
+}
+
+.radio-question{
+    color: var(--text-primary-blue, #002B60);
+
+    /* Body/Medium/Semibold */
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 24px; /* 150% */
+}
+
+input[type="radio"], input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    margin: -4px 0 0;
+    margin-top: 1px \9;
+    line-height: normal;
+}
+
+
+.radio-label-text{
+    color: var(--text-primary-blue, #002B60);
+    margin-left: 10px;
+    /* Body/Medium/Regular */
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 150% */
+}
+
+  /* Invalid input styling */
+  .invalid-input {
+    border: 2px solid red !important;
+  }
+
+  /* Radio buttons default appearance */
+.options-group {
+  gap: 24px;
+  align-items: center;
+}
+
+/* Hide native radio */
+.radio-input {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #7ed321;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  margin-right: 8px;
+  vertical-align: middle;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Inner green dot when checked */
+.radio-input:checked::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  background-color: #7ed321;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Hover effect (optional) */
+.radio-input:hover {
+  box-shadow: 0 0 0 3px rgba(126, 211, 33, 0.2);
+}
+
+/* Label styling */
+.options-group label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: var(--text-primary-blue, #002B60);
+  font-family: Montserrat;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+
+  /* Checked radio appearance */
+
+input[type="file"]:focus, input[type="radio"]:focus, input[type="checkbox"]:focus {
+    outline: none !important; 
+    outline-offset: none !important; 
+}
+  /* Invalid radio outline (red border only) */
+  .question-item.invalid .radio-input:not(:checked) {
+    border-color: red !important;
+  }
+
+  /* Red “select an option” text */
+  .error-message {
+
+    margin-top: 5px;
+    display: none;
+    color: var(--text-error, #D92020);
+
+    /* Body/Medium/Regular */
+
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 150% */
+  }
+
+  .question-item.invalid .error-message {
+    display: block;
+  }
+  
+  
+  /**/
+.action-bar {
+  height: 112px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+  padding: 0 0px;
+  box-sizing: border-box;
+}
+
+.arrow{
+    margin-top: -2px;
+}
+
+.back-link {
+
+  color: #002e6d; /* African Bank blue */
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-primary-blue, #002B60);
+
+font-size: 14px;
+font-style: normal;
+font-weight: 600;
+line-height: 20px; /* 142.857% */
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.contact-btn {
+  display: inline-flex; /* ✅ enables centering */
+  justify-content: center;
+  align-items: center;
+
+  width: 220px;
+  height: 48px;
+  padding: 0 16px;
+  gap: 8px;
+  flex-shrink: 0;
+
+  font-size: 16px;
+  font-weight: 600;
+  color: #002e6d;
+  text-decoration: none;
+
+  border-radius: var(--border-radius-md, 2px);
+  border: 1px solid var(--border-green, #5DC400);
+  background: var(--surface-white, #FFF);
+
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+}
+
+/* Optional hover/focus state */
+.contact-btn:hover,
+.contact-btn:focus {
+  background-color: #5DC400;
+  color: #fff;
+  text-decoration: none;
+}
+
+  
+    /* Input invalid state */
+  .invalid-input {
+      border-color: red !important;
+  }
+
+  .card-container {
+
+    margin: 50px auto;
+    background-color: #fff;
+    padding: 48px;
+    border-radius: 0px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    position: relative;
+  }
+
+  .alert-banner {
+    background-color: #e8f3ff;
+    padding: 20px 8px;
+    margin-bottom: 30px;
+    margin-top: 10px;
+    color: #003366;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .alert-banner strong {
+    color: #002a61;
+  }
+
+  .section-header {
+   
+    margin-bottom: 48px;
+    color: var(--Brand-AB-Blue, #012B60);
+
+    /* Heading/H4/Semibold */
+    font-family: Montserrat;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 32px; /* 133.333% */
+  }
+
+  .section-description {
+
+    margin-bottom: 48px;
+    color: var(--text-primary-blue, #002B60);
+
+    /* Body/Large/Regular */
+    font-family: Montserrat;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 28px; /* 155.556% */
+  }
+
+  .info-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .input-group {
+    flex: 1 1 45%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  label {
+    font-weight: 600;
+    margin-bottom: 2px;
+    font-size: 14px;
+    color: #002a61;
+  }
+
+  .text-input,
+  .email-input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border 0.2s;
+  }
+
+  .text-input:focus,
+  .email-input:focus {
+    border-color: #0072ce;
+  }
+
+  .divider {
+    margin: 30px 0;
+    border: none;
+    border-top: 1px solid #d9e4dd;
+    background: var(--border-green, #5DC400);
+  }
+
+  .questions-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .question-item {
+    flex: 1 1 45%;
+    font-weight: 500;
+    color: #003366;
+    font-size: 15px;
+  }
+
+  .options-group {
+    margin-top: 10px;
+  }
+
+  .options-group label {
+    font-weight: normal;
+    display: block;
+    color: #222;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .radio-input {
+    margin-right: 6px;
+    accent-color: #0072ce;
+  }
+
+  .checkbox-input {
+    accent-color: #0072ce;
+    transform: scale(1.1);
+    margin-right: 8px;
+  }
+
+  .contact-button {
+    position: absolute;
+    top: 20px;
+    right: 40px;
+    background-color: transparent;
+    border: 1.5px solid #0072ce;
+    color: #0072ce;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .contact-button:hover {
+    background-color: #0072ce;
+    color: #fff;
+  }
+
+  .consent-section {
+    font-size: 14px;
+    margin-top: 20px;
+    color: #002a61;
+  }
+
+  .consent-section strong {
+    color: #0072ce;
+  }
+
+  .submit-wrapper {
+    text-align: right;
+    margin-top: 25px;
+  }
+
+  .submit-button {
+    background-color: #39b54a;
+    color: #fff;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background 0.3s;
+  }
+
+  .submit-button:hover {
+    background-color: #2e993c;
+  }
+
+  @@media (max-width: 768px) {
+    .input-group, .question-item {
+      flex: 1 1 100%;
+    }
+    
+    .marketing-msg {
+        left: 10px;
+    }
+
+    .card-container {
+      padding: 20px;
+    }
+
+    .contact-button {
+      position: static;
+      margin-top: 15px;
+    }
+  }
+</style>
+
+<section class="body">
+
+<section class="container">
+    <div class="action-bar">
+  <a href="#" class="back-link">
+    <span class="arrow">
+        <img src="/media/cejji4o3/arrow_back.svg">
+    </span> Back
+  </a>
+  <a href="#" class="contact-btn">Contact us</a>
+</div>
+
+</section>
+
+
+<button class="contact-button">Contact us</button>
+
+<div class="container">
+  <div class="alert-banner">
+    Please <strong>proceed only if your business is actively registered with Companies and Intellectual Property Commission (CIPC).</strong>
+    Businesses that are not registered or in the process of deregistration will not be considered.
+  </div>
+</div>
+
+<div class="card-container container">
+    
+  <div class="section-header">Pre-qualification check</div>
+  <div class="section-description">
+    Please complete the questionnaire below to see if your business may pre-qualify for the small enterprise loan.
+    Select the option that best applies to each question and <strong>ensure that all sections are completed.</strong>
+  </div>
+
+  <!-- Personal and Business Info -->
+  <form class="info-form">
+    <div class="input-group">
+      <label for="name">Name</label>
+      <input type="text" id="name" class="text-input" value="">
+    </div>
+
+    <div class="input-group">
+      <label for="surname">Surname</label>
+      <input type="text" id="surname" class="text-input" value="">
+    </div>
+
+    <div class="input-group">
+      <label for="email">Email address</label>
+      <input type="email" id="email" class="email-input" value="">
+    </div>
+
+    <div class="input-group">
+      <label for="contact">Contact number</label>
+      <input type="text" id="contact" class="text-input" value="">
+    </div>
+
+    <div class="input-group" style="flex: 1 1 100%;">
+      <label for="business">Registered business name</label>
+      <input type="text" id="business" class="text-input" value="">
+    </div>
+  </form>
+
+  <hr class="divider">
+
+  <!-- Questionnaire Section -->
+  <div class="questions-wrapper">
+
+    <div class="question-item">
+      <label class="radio-question">Is your business at least 51% black-owned?</label>
+      <div class="options-group">
+        <label><input type="radio" name="blackOwned" class="radio-input" /> <span class="radio-label-text" >Yes</span></label>
+        <label><input type="radio" name="blackOwned" class="radio-input" /> <span class="radio-label-text" >No</span></label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label class="radio-question">Is your business 100% owned by South African citizens?</label>
+      <div class="options-group">
+        <label><input type="radio" name="citizenOwned" class="radio-input" /> <span class="radio-label-text" >Yes</span></label>
+        <label><input type="radio" name="citizenOwned" class="radio-input" /> <span class="radio-label-text" >No</span></label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label class="radio-question">Are your employees at least 70% South African citizens?</label>
+      <div class="options-group">
+        <label><input type="radio" name="employeesSA" class="radio-input" /> <span class="radio-label-text" >Yes</span></label>
+        <label><input type="radio" name="employeesSA" class="radio-input" /> <span class="radio-label-text" >No</span></label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label class="radio-question">Do all non-South African employees have valid work permits?</label>
+      <div class="options-group">
+        <label><input type="radio" name="permits" class="radio-input" /> <span class="radio-label-text" >Yes</span></label>
+        <label><input type="radio" name="permits" class="radio-input" /> <span class="radio-label-text" >No</span></label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label class="radio-question">Where is your business located?</label>
+      <div class="options-group">
+        <label><input type="radio" name="location" class="radio-input" /> <span class="radio-label-text" >Township</span></label>
+        <label><input type="radio" name="location" class="radio-input" /> <span class="radio-label-text" >Rural</span></label>
+        <label><input type="radio" name="location" class="radio-input" /> <span class="radio-label-text" >Other</span></label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label class="radio-question">Does your business have a valid municipal licence?</label>
+      <div class="options-group">
+        <label><input type="radio" name="municipalLicence" class="radio-input" /> <span class="radio-label-text" >Yes</span></label>
+        <label><input type="radio" name="municipalLicence" class="radio-input" /> <span class="radio-label-text" >No</span></label>
+        <label><input type="radio" name="municipalLicence" class="radio-input" /> <span class="radio-label-text" >Willing to apply</span></label>
+        <label><input type="radio" name="municipalLicence" class="radio-input" /> <span class="radio-label-text" >Not willing to apply</span></label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label class="radio-question">What is your business type?</label>
+      <div class="options-group">
+        <label><input type="radio" name="businessType" class="radio-input" /> <span class="radio-label-text" >Cooperative</span></label>
+        <label><input type="radio" name="businessType" class="radio-input" /> <span class="radio-label-text" >Sole proprietor</span></label>
+        <label><input type="radio" name="businessType" class="radio-input" /> <span class="radio-label-text" >Private company (Pty) Ltd</span></label>
+        <label><input type="radio" name="businessType" class="radio-input" /> <span class="radio-label-text" >Partnership</span></label>
+        <label><input type="radio" name="businessType" class="radio-input" /> <span class="radio-label-text" >Other</span></label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label class="radio-question">Is your business registered with the CIPC?</label>
+      <div class="options-group">
+        <label><input type="radio" name="cipc" class="radio-input" /> <span class="radio-label-text" >Yes</span></label>
+        <label><input type="radio" name="cipc" class="radio-input" /> <span class="radio-label-text" >No</span></label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label class="radio-question">Is your business registered with UIF?</label>
+      <div class="options-group">
+        <label><input type="radio" name="uif" class="radio-input" /> <span class="radio-label-text" >Yes</span></label>
+        <label><input type="radio" name="uif" class="radio-input" /> <span class="radio-label-text" >No</span></label>
+        <label><input type="radio" name="uif" class="radio-input" /> <span class="radio-label-text" >Willing to register</span></label>
+        <label><input type="radio" name="uif" class="radio-input" /> <span class="radio-label-text" >Not willing to register</span></label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label class="radio-question">Is your business registered with SARS?</label>
+      <div class="options-group">
+        <label><input type="radio" name="sars" class="radio-input" /> <span class="radio-label-text" >Yes</span></label>
+        <label><input type="radio" name="sars" class="radio-input" /> <span class="radio-label-text" >No</span></label>
+        <label><input type="radio" name="sars" class="radio-input" /> <span class="radio-label-text" >Willing to register</span></label>
+        <label><input type="radio" name="sars" class="radio-input" /> <span class="radio-label-text" >Not willing to register</span></label>
+      </div>
+    </div>
+
+    <div class="question-item" style="flex: 1 1 100%;">
+      <label class="radio-question">Does your business have a valid business bank account?</label>
+      <div class="options-group">
+        <label><input type="radio" name="bankAccount" class="radio-input" /> <span class="radio-label-text" >Yes</span></label>
+        <label><input type="radio" name="bankAccount" class="radio-input" /> <span class="radio-label-text" >No</span></label>
+        <label><input type="radio" name="bankAccount" class="radio-input" /> <span class="radio-label-text" >Willing to open one</span></label>
+        <label><input type="radio" name="bankAccount" class="radio-input" /> <span class="radio-label-text" >Not willing to open one</span></label>
+      </div>
+    </div>
+
+  </div>
+
+  <hr class="divider">
+
+  <div class="consent-section">
+    <label>
+      <input type="checkbox" name="marketing" class="checkbox-input"/>
+     <span class="marketing-msg">I would like to receive marketing updates from African Bank.</span>
+    </label>
+    <p style="margin-top: 10px;" class="consent-text">
+      By clicking <strong>submit</strong>, I hereby declare that the information provided above is <strong>true and correct.</strong>
+    </p>
+  </div>
+
+  <div class="submit-wrapper">
+    <button class="submit-button">Submit</button>
+  </div>
+
+</div>
+
+</section>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const form = document.querySelector(".info-form");
+    const inputs = form.querySelectorAll("input[type='text'], input[type='email']");
+    const questionItems = document.querySelectorAll(".question-item");
+    const contactInput = document.getElementById("contact");
+
+    // Add error messages dynamically under each question
+    questionItems.forEach(q => {
+        if (!q.querySelector(".error-message")) {
+            const errorMsg = document.createElement("div");
+            errorMsg.classList.add("error-message");
+            errorMsg.textContent = "Select an option";
+            q.appendChild(errorMsg);
+        }
+    });
+
+    // South African phone validation
+    const saPhoneRegex = /^(0[6-8]\d{8}|\+27[6-8]\d{8})$/;
+
+    // Validate radio group
+    function validateRadioGroup(question) {
+        const radios = question.querySelectorAll("input[type='radio']");
+        const anyChecked = Array.from(radios).some(r => r.checked);
+        if (!anyChecked) {
+            question.classList.add("invalid");
+        } else {
+            question.classList.remove("invalid");
+        }
+        return anyChecked;
+    }
+
+    // Live validation for text/email inputs
+    inputs.forEach(input => {
+        input.addEventListener("input", () => {
+            let isValid = input.checkValidity() && input.value.trim() !== "";
+
+            if (input === contactInput) {
+                const value = input.value.trim().replace(/\s+/g, "");
+                isValid = saPhoneRegex.test(value);
+            }
+
+            input.classList.toggle("invalid-input", !isValid);
+        });
+    });
+
+    // Live validation for radio buttons
+    questionItems.forEach(q => {
+        const radios = q.querySelectorAll("input[type='radio']");
+        radios.forEach(r => {
+            r.addEventListener("change", () => {
+                validateRadioGroup(q);
+            });
+        });
+    });
+
+    // On submit validation
+    const submitButton = document.querySelector(".submit-button");
+    submitButton.addEventListener("click", e => {
+        e.preventDefault();
+        let valid = true;
+
+        // Validate inputs
+        inputs.forEach(input => {
+            let isValid = input.checkValidity() && input.value.trim() !== "";
+            if (input === contactInput) {
+                const value = input.value.trim().replace(/\s+/g, "");
+                isValid = saPhoneRegex.test(value);
+            }
+
+            input.classList.toggle("invalid-input", !isValid);
+            if (!isValid) valid = false;
+        });
+
+        // Validate radios
+        questionItems.forEach(q => {
+            if (!validateRadioGroup(q)) valid = false;
+        });
+
+        if (valid) {
+            alert("Form submitted successfully!");
+            form.reset();
+            inputs.forEach(i => i.classList.remove("invalid-input"));
+            questionItems.forEach(q => q.classList.remove("invalid"));
+        } else {
+            alert("Please complete all required fields correctly.");
+        }
+    });
+});
+</script>
+
+
+

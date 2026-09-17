@@ -1,4 +1,6 @@
-﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+﻿
+
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @using CustomModels = Web.Models;
 @using ContentModels = Umbraco.Web.PublishedModels;
 @using Web.Helpers
@@ -33,13 +35,13 @@
         indexString = Request.QueryString["searchstring"];
         indexStringAlt = "searchstring";
 
-  
-    }
-    else if (!string.IsNullOrEmpty(Request.QueryString["category"]))
-    {
-        indexString = Request.QueryString["category"];
 
-    
+    }
+    else if (string.IsNullOrEmpty(Request.QueryString["category"]))
+    {
+        indexString = "Fraud Awareness";
+
+
     }
     else if (!string.IsNullOrEmpty(Request.QueryString["blogstartdate"]) && !string.IsNullOrEmpty(Request.QueryString["blogenddate"]))
     {
@@ -51,7 +53,7 @@
     Examine.ISearchResults searchQuery = null;
     if (indexString != "")
     {
-      
+
     }
 
     // searchQuery = searchQuery.OrderBy(x => x.Values).ToList();
@@ -59,85 +61,24 @@
     var searchResults = searchQuery; //  searcher.Search(searchQuery.Compile());
                                      // var searchResults = searcher.Search(searchQuery.Compile());
 
+ 
+
     foreach (var item in currentNoode.Children)
     {
-        if (item.Id == 41927)
+        if (item.Id == 41927) 
         {
             break;
         }
 
         var blogHeader = item.Children.FirstOrDefault().Children.Where(c => c is HeroHeaderBlogDetail).FirstOrDefault();
         var blogBody = item.Children.FirstOrDefault().Children.Where(c => c is HeroBodyBlogDetail).FirstOrDefault();
+        var catName = item.Children.Where(c => c is BlogDetailsElements).FirstOrDefault();
+
+        var blogCat = catName.Value("blogCategory");
         // var image = blogHeader.GetPropertyValue("image");
         if (searchResults != null)
         {
-            if (searchResults.Count() != 0 && indexString != "")
-            {
-                foreach (var result in searchResults)
-                {
-                    try
-                    {
-                        var node = Umbraco.Content(result.Id);
 
-                        if (node == null)
-                        {
-                            continue;
-                        }
-
-                        var nodeParentId = node.Parent.Id;
-                        if (indexStringAlt == "searchstring")
-                        {
-                            nodeParentId = node.Id;
-                        }
-
-                        if (item.Id == nodeParentId)
-                        {
-                            TupleBlogs.Add(new Tuple<int, string, string, string, string, DateTime, string>(
-                                item.Id,
-                                ((IPublishedContent)blogHeader.Value("image")).Url?.ToString() ?? "",
-                                (blogBody.Value("title"))?.ToString() ?? "",
-                                (blogBody.Value("introductionDescription"))?.ToString() ?? "",
-                                ((IPublishedContent)item).Url,
-                                Convert.ToDateTime(blogBody.Value("blogDate")),
-                                (blogBody.Value("blogBody"))?.ToString() ?? ""
-                                ));
-                        }
-                    }
-                    catch
-                    {
-                        Console.WriteLine("Error: ");
-                    }
-                }
-
-            }
-            else
-            {
-                if (indexStringAlt != "searchstring" && indexString != "" && indexStringAlt != "")
-                {
-                    DateTime testdate = Convert.ToDateTime(blogBody.Value("publishedAt"));
-                    if (testdate == null || testdate == Convert.ToDateTime("01/01/0001 00:00:00"))
-                    {
-                        testdate = Convert.ToDateTime(blogBody.Value("blogDate"));
-                    }
-                    DateTime startdate = Convert.ToDateTime(indexString);
-                    DateTime enddate = Convert.ToDateTime(indexStringAlt);
-
-                    if (testdate <= startdate || testdate >= enddate)
-                    {
-                        continue;
-                    }
-                }
-
-                TupleBlogs.Add(new Tuple<int, string, string, string, string, DateTime, string>(
-                    item.Id,
-                    ((IPublishedContent)blogHeader.Value("image")).Url?.ToString() ?? "",
-                    (blogBody.Value("title"))?.ToString() ?? "",
-                    (blogBody.Value("introductionDescription"))?.ToString() ?? "",
-                    ((IPublishedContent)item).Url,
-                    Convert.ToDateTime(blogBody.Value("blogDate")),
-                    (blogBody.Value("blogBody"))?.ToString() ?? ""
-                    ));
-            }
         }
         else
         {
@@ -160,15 +101,20 @@
                     }
                 }
 
-                TupleBlogs.Add(new Tuple<int, string, string, string, string, DateTime, string>(
-                    item.Id,
-                    ((IPublishedContent)blogHeader.Value("image")).Url?.ToString() ?? "",
-                    (((Umbraco.Web.PublishedModels.HeroBodyBlogDetail)blogBody).Title)?.ToString() ?? "",
-                    (blogBody.Value("introductionDescription"))?.ToString() ?? "",
-                    ((IPublishedContent)item).Url,
-                    Convert.ToDateTime(blogBody.Value("blogDate")),
-                    (blogBody.Value("blogBody"))?.ToString() ?? ""
-                    ));
+                if (blogCat?.ToString()  == "Fraud")
+                {
+
+                    TupleBlogs.Add(new Tuple<int, string, string, string, string, DateTime, string>(
+                        item.Id,
+                        ((IPublishedContent)blogHeader.Value("image")).Url?.ToString() ?? "",
+                        (((Umbraco.Web.PublishedModels.HeroBodyBlogDetail)blogBody).Title)?.ToString() ?? "",
+                        (blogBody.Value("introductionDescription"))?.ToString() ?? "",
+                        ((IPublishedContent)item).Url,
+                        Convert.ToDateTime(blogBody.Value("blogDate")),
+                        (blogBody.Value("blogBody"))?.ToString() ?? ""
+                        ));
+                }
+
             }
 
         }
@@ -238,9 +184,85 @@
         color: #000000;
     }
 
+    .nav-tabs::-webkit-scrollbar {
+        width: 0.1em !important;
+    }
+    
+    @@media screen and (min-width: 600px) and (max-width: 900px) {
+    .hero-static-banner {
+            height: 218px !important;
+            background-size: contain !important;
+        
+        }
+     
+  }
+    
 
-    .container{
-        margin-top: 40px;
+    @@media screen and (min-width: 768px) and (max-width: 1024px) {
+        .hero-static-banner {
+           
+            height: 218px !important;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+    }
+
+
+    .campaign-product-container {
+        position: unset !important;
+        margin-top: 40px !important;
+        margin-bottom: 50px !important;
+    }
+
+    .faq-section .main-title {
+        font-size: 24px !important;
+    }
+
+    @@media (max-width: 767px) {
+        .hero-static-caption .hero-static-title, .hero-static-caption h1 {
+            font-size: 30px;
+        }
+
+        .hero-static-caption .hero-static-description, .hero-static-caption p {
+            font-size: 14px;
+            font-weight: 200;
+            line-height: 1.5;
+        }
+
+        .campaign-product-container.full {
+            margin: 0 -15px;
+            padding: 10px;
+        }
+
+        .campaign-product-container {
+            padding: 0;
+            margin: 8px -7px 0 -7px;
+            top: 0;
+            overflow: hidden;
+        }
+
+        .nav-tabs {
+            width: 100% !important;
+            display: inline-flex !important;
+            overflow: auto !important;
+        }
+    }
+
+    @@media screen and (max-width: 850px) {
+        .faq-section .main-title {
+            font-size: 47px;
+            margin-left: 15px;
+        }
+    }
+
+    .blogHeaderLink {
+        text-decoration: none !important;
+    }
+
+    .fraud-container {
+        margin-top: 20px;
     }
 
     .title-report {
@@ -258,10 +280,7 @@
         opacity: 1;
     }
 
-    .image-icon {
-        width: 40%;
-        margin-bottom: 10px;
-    }
+
 
     .nCcardTitle {
         text-align: left;
@@ -300,17 +319,20 @@
     }
 
     .btn-tab {
-        background: #FFFFFF 0% 0% no-repeat padding-box;
-        border: 1px solid #707070 !important;
+        width: 155px;
+        height: 40px;
+        background: #EEEEEE 0% 0% no-repeat padding-box;
         border-radius: 33px !important;
         opacity: 1;
-        width: 160px;
         color: #000 !important;
     }
 
     .btn-primary.active {
         background: #88BC47 0% 0% no-repeat padding-box !important;
+        opacity: 1;
         color: #fff !important;
+        -webkit-box-shadow: none !important;
+        border: none !important;
     }
 
     .my-card {
@@ -320,16 +342,20 @@
         opacity: 1;
     }
 
+
+
     .card-contain {
         margin-top: 30px;
-   
     }
 
     .nav-tabs {
         border: none !important;
-        display: flex;
-        gap: 10px;
+        margin-top: 40px;
     }
+
+        .nav-tabs li:not(:first-child) {
+            margin-left: 15px;
+        }
 
     .ab-big-video-title {
         background: #002b60 !important;
@@ -356,12 +382,15 @@
             margin-top: 25px;
         }
 
+
+
         .ab-big-video-thumbnail {
             background-repeat: no-repeat;
             background-size: cover;
             background-position-x: center;
         }
     }
+
     .article-card {
         background-color: unset;
         box-shadow: none !important;
@@ -395,7 +424,7 @@
         left: -144px !important;
     }
 
-    .mobi-items{
+    .mobi-items {
         display: none !important;
     }
 
@@ -417,6 +446,7 @@
 
     #divRemainingblogs {
         margin-top: 9px;
+        padding: 0;
     }
 
     #divAbStories {
@@ -425,13 +455,6 @@
 
     .press-release-container > .container {
         padding-left: 0px;
-    }
-
-    .header {
-        position: fixed;
-        top: 0;
-        width: 100%;
-        z-index: 16 !important;
     }
 
     .fixed-sub-menu-bar {
@@ -603,9 +626,14 @@
 
     @@media (min-width: 320px) and (max-width: 568px) {
 
-        .sharethis-inline-share-buttons {
-            margin-left: 9px;
+  
+        .nav-tabs {
+            width: 100% !important;
+            display: inline-flex !important;
+            overflow: auto !important;
         }
+
+
 
         #divMainBlog .sharethis-inline-share-buttons {
             margin-left: -31px;
@@ -618,23 +646,31 @@
 
     @@media (min-width: 360px) and (max-width: 640px) {
 
-        .sharethis-inline-share-buttons {
-            margin-left: -2px;
-        }
+   
 
         #divMainBlog .sharethis-inline-share-buttons {
             margin-left: -29px;
+        }
+
+        .nav-tabs {
+            width: 100% !important;
+            display: inline-flex !important;
+            overflow: auto !important;
         }
     }
 
     @@media (min-width: 375px) and (max-width: 667px) {
 
-        .sharethis-inline-share-buttons {
-            margin-left: -6px;
-        }
+   
 
         #divMainBlog .sharethis-inline-share-buttons {
             margin-left: -26px;
+        }
+
+        .nav-tabs {
+            width: 100% !important;
+            display: inline-flex !important;
+            overflow: auto !important;
         }
     }
 
@@ -651,29 +687,44 @@
         #divMainBlog {
             margin-top: 30px;
         }
+
+        .nav-tabs {
+            width: 100% !important;
+            display: inline-flex !important;
+            overflow: auto !important;
+        }
     }
 
     @@media (min-width: 411px) and (max-width: 823px) {
-
-        .sharethis-inline-share-buttons {
-            margin-left: -15px;
-        }
-
         #divMainBlog .sharethis-inline-share-buttons {
             margin-left: -24px;
+        }
+
+        .nav-tabs {
+            width: 100% !important;
+            display: inline-flex !important;
+            overflow: auto !important;
         }
     }
 
     @@media (min-width: 414px) and (max-width: 731px) {
 
         .sharethis-inline-share-buttons {
-            margin-left: -283px;
+         
             left: 91.5%;
         }
 
         #divMainBlog .sharethis-inline-share-buttons {
-            margin-left: -24px;
+   
             margin-top: 0px;
+        }
+
+
+
+        .nav-tabs {
+            width: 100% !important;
+            display: inline-flex !important;
+            overflow: auto !important;
         }
     }
 
@@ -712,6 +763,12 @@
 
         #divAbStories {
             padding-left: 15px;
+        }
+
+        .nav-tabs {
+            width: 100% !important;
+            display: inline-flex !important;
+            overflow: auto !important;
         }
     }
 
@@ -887,6 +944,8 @@
             margin-top: 29px;
         }
 
+
+
         .fixed-sub-menu-bar {
             top: 36px;
         }
@@ -915,11 +974,15 @@
 @Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
 
 
-<div class="container">
+<div class="container fraud-container">
     <div class="row">
         <div class="col-sm-12 col-md-7">
             <h2 class="title">@card.Value("cardTitle")</h2>
             <p class="description">@card.Value("cardDescription")</p>
+
+
+            @card.Value("cardDescriptionLongText")
+
         </div>
         <div class="col-sm-12 col-md-5">
             <h2 class="title-report flex-container">@heroBody.Value("bodyTitle")</h2>
@@ -934,7 +997,7 @@
                             <span class="nCcardTitle">@item.Value("nCcardTitle")</span>
                         </div>
                         <div class="circle">
-                            <!-- <img class="image-icon" src="@image" /> -->
+                            <img class="image-icon" src="@image" />
                         </div>
                     </div>
                 }
@@ -966,7 +1029,7 @@
                 <div id="@tabCounter" class="tab-pane fade @(tabCounter == 1 ? "in active" : "")">
                     @if (item.Value("TabSubItemTitle").ToString() == "Blogs")
                     {
-                      
+
                         <div id="divRemainingblogs" class="col-sm-12 responsiveMove" style="margin-top:9px">
                             <div class="row">
                                 @if (TupleBlogs.Count() != 0)
@@ -982,7 +1045,7 @@
                                     {
                                         page = 1;
                                     }
-                                    foreach (var blog in TupleBlogs.Skip(((page - 1) * pageSize) + 4).Take(6))
+                                    foreach (var blog in TupleBlogs)
                                     {
                                         <div class="col-xs-12 col-sm-6 col-md-4 desktop-items margin-bottom-10">
                                             @if (indexString == "")
@@ -1099,12 +1162,80 @@
                                     }
                                     if (totalPages > 1)
                                     {
-                                       
+
                                     }
                                 }
                             </div>
                         </div>
                     }
+                    else if (item.Value("TabSubItemTitle").ToString() == "Trending Scams")
+                    {
+
+
+                        <div class="margin-bottom-minus-60" ng-controller="ReportsAndArchievesController">
+                            <div class="campaign-product-container faq-section full">
+                                <div class="margin-top-20 visible-xs"></div>
+
+                                @{
+
+                                    var cards = item.Value<IEnumerable<NCcard>>("genericCardContent");
+                                    var counter = 0;
+
+                                    foreach (var mycard in cards)
+                                    {
+                                        counter++;
+
+
+                                        var image = mycard.Value<IPublishedContent>("NCcardIcon").Url;
+                                        <div id="@mycard.Value("NCcardTitle").ToString().Replace(" ", string.Empty).ToLower()" class="row sectionHeading">
+                                            <h3 id="@counter" class="main-title @mycard.Value("NCcardTitle").ToString().Replace(" ", string.Empty).ToLower() searchItemHeader">
+                                                @mycard.Value("NCcardTitle")
+                                            </h3>
+
+
+                                            <div class="faq-item searchItemList" ng-show="stringContains('@mycard.Value("NCcardTitle")', searchTerm)">
+                                                <div class="item-content">
+                                                    <h4 class="title text-uppercase">
+                                                        @mycard.Value("MediumDescription")
+
+                                                    </h4>
+                                                    <div class="faq content row">
+
+                                                        <div class="col-sm-6">
+                                                            @mycard.Value("NCcardDescription")
+
+                                                        </div>
+
+                                                        <div class="col-sm-6">
+                                                            <img style="width: 100%;  " src="@image" />
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                @*<div class="download-icon faq-button" onclick="toggleFAQ(this)"><i class="fa fa-long-arrow-down" aria-hidden="true"></i></div>*@
+
+                                                <div class="download-icon faq-button"><i class="fas fa-long-arrow-alt-down" aria-hidden="true"></i></div>
+                                            </div>
+
+                                        </div>
+                                    }
+
+
+
+
+
+                                }
+
+
+
+                            </div>
+                        </div>
+
+                    }
+
+
+
                     else
                     {
                         var cards = item.Value<IEnumerable<NCcard>>("genericCardContent");
@@ -1145,15 +1276,19 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <video class="videoPlatformPlayer" controls>
-                        <!-- Video source will be dynamically set via JavaScript -->
-                    </video>
+                    <iframe style="
+    position: unset;
+    width: 100%;
+" id="video" class="videoPlatformPlayer" width="100%" height="400" height=frameborder ="0"
+                            allowfullscreen></iframe>
                 </div>
             </div>
         </div>
     </div>
 
 </div>
+
+<link rel="stylesheet" href="http://cmsdev.africanbank.net/css/projectmagic.css" />
 
 
 <script>
@@ -1173,33 +1308,90 @@
         });
 
         $(".fa-play").on("click", function (clickEvent) {
+
             var e = clickEvent; // Capture the click event
+
+
 
             var videoPath = $(e.currentTarget).closest('.ab-video').data('video');
 
             if (videoPath) {
                 var video = $('.videoPlatformPlayer')[0];
-                var path = 'https://africanbank.co.za' + videoPath.trim() + '?autoplay=1';
+                var path = videoPath.trim() + '?autoplay=1';
 
                 video.src = path;
-                video.load();
-                video.play();
+
 
                 $('#generic').modal('show');
             }
         });
 
         $('#generic').on('hide.bs.modal', function (modalEvent) {
+            debugger
             var e = modalEvent; // Capture the modal hide event
             var video = $('.videoPlatformPlayer')[0];
             var videoPath = $(e.currentTarget).closest('.ab-video').data('video');
-
+            video.src = '';
             if (videoPath) {
-                var path = 'https://africanbank.co.za' + videoPath.trim();
+                var path = videoPath.trim();
 
-                video.src = path;
-                video.pause();
+                video.src = '';
+
             }
+        });
+    });
+</script>
+
+<script>
+
+
+    $(document).ready(function () {
+        $(".faq-item").click(function () {
+            var $faqItem = $(this);
+            var $siblings = $faqItem.siblings(".faq-item");
+
+            // Check if the clicked item is already active
+            var isActive = $faqItem.hasClass("active");
+
+            // Remove "active" class and hide content for all items
+            $(".faq-item").removeClass("active");
+            $(".content").hide(); // hide all content
+
+            // Toggle visibility and classes for siblings
+            $siblings.find(".item-content .content:visible")
+                .toggleClass("disable-content")
+                .toggle(200);
+            $siblings.find(".download-icon .fa-long-arrow-up")
+                .toggleClass("fa-long-arrow-up fa-long-arrow-down");
+
+            // Toggle visibility and classes for the clicked item
+            if (!isActive) {
+                $faqItem.addClass("active");
+                $faqItem.find(".item-content .content")
+                    .toggleClass("active-content")
+                    .toggle(200);
+                $faqItem.find(".download-icon .fa-long-arrow-up")
+                    .toggleClass("fa-long-arrow-up fa-long-arrow-down");
+            }
+        });
+
+
+
+
+
+        $("#cmbCategories").change(function () {
+            var selected = $("#cmbCategories option:selected").val();
+            $('.sectionHeading').each(function () {
+                if (selected == 'allcategories' || selected == '') { // show all categories
+                    $(this).show();
+                } else {
+                    if ($(this).context.id == selected) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                }
+            });
         });
     });
 </script>

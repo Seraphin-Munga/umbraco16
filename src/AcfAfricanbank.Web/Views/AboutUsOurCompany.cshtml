@@ -1,4 +1,6 @@
 ﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using AcfAfricanbank.Core.Models.CustomDataType
+@using AcfAfricanbank.Core.Utilities
 @using ContentModels = Umbraco.Web.PublishedModels
 @using Web.Helpers
 @{
@@ -35,6 +37,47 @@
 }
 
 <style type="text/css">
+ .thumbnail .caption p.title {
+
+    
+
+    font-weight: 600;
+
+    font-size: 16px;
+
+    
+
+}
+
+#TheExecutives .thumbnail, #TheBoard .thumbnail {
+
+    margin-bottom: 0px;
+
+}
+
+
+
+#TheExecutives .thumbnail .caption, #TheBoard .thumbnail .caption {
+
+    background-color: #f7f7f7;
+
+    height: 95px;
+
+}
+
+.margin-top-50 {
+
+    margin-top: 20px;
+
+}
+.modal .modal-dialog .modal-content .modal-header .close {
+    font-size: 40px;
+    color: #4a4a4a !important;
+    margin-top: 17px !important;
+    opacity: 1;
+    line-height: 0;
+    font-weight: lighter;
+}
     .our-mission p {
         width: 100% !important;
     }
@@ -113,8 +156,165 @@
 </div>
 
 
+@if (employeesB != null)
+{
+
+    var employeeList = (NCpeople)employeesB;
+    var itemGroups = employeeList.Items.GroupBy(4);
+    var isFirstRow = true;
+
+    <div id="TheBoard" class="padded-grey">
+        <div class="container">
+            <h3 class="text-center margin-top-20">@employeeList.Title</h3>
+            <p class="text-center descrition-board">@description</p>
+            @foreach (var itemGroup in itemGroups)
+            {
+
+                <div class="row margin-top-50 eq-height">
+                    @foreach (var item in itemGroup)
+                        {
+
+                            var b_title = "";
+                            var b_desc = "";
+                            var b_img = "";
+                            var b_name = "";
+                            var b_age = "";
+                            var b_certification = "";
+
+                            if (sectionSettings.Children.Where(x => x.Name == item.Value("title").ToString()).FirstOrDefault() != null)
+                            {
+                          
+
+                                var board_member = sectionSettings.Children.Where(x => x.Name.ToLower() == item.Value("title").ToString().ToLower()).FirstOrDefault();
+                              
+                                var info = board_member as Card;
+                                b_title = info.Value("cardTitle").ToString();
+                            
+                                b_desc = info.Value("cardDescription").ToString();
+                                if (info.Value<IPublishedContent>("cardIcon") != null)
+                                {
+                                    b_img = info.Value<IPublishedContent>("cardIcon").Url;
+                                    
+                                }
+                                else
+                                {
+                                    b_img = "/images/male-placeholder.jpg";
+                                }
+
+                                
+                                var temp_b_name = info.Children.Where(x => x.Name == "Name").FirstOrDefault() as EbankItitem1;
+                                
+                                var temp_b_age = info.Children.Where(x => x.Name == "Age").FirstOrDefault() as EbankItitem1;
+                                var temp_b_certification = info.Children.Where(x => x.Name == "Certification").FirstOrDefault() as EbankItitem1;
+
+                                b_name = temp_b_name.Value("ebankITContent").ToString();
+
+                                b_age = temp_b_age.Value("ebankITContent").ToString();
+                                b_certification = temp_b_certification.Value("ebankITContent").ToString();
+                            
+
+                            }
+
+                        <div class="col-sm-6 col-md-3">
+                             <div class="thumbnail shadow name- @item.Value("title")" onclick='executive_info("@b_title",@Html.Raw(Json.Encode(b_desc)), "@b_img","@b_name","@b_age","@b_certification");'>
+                                @if (item.Url != null)
+                                {
+                                    <img src="@item.Url" alt="@item.Value("title")">
+                                }
+                                else
+                                {
+                                    <img src="/images/male-placeholder.jpg" alt="">
+                                }
+                                <div class="caption">
+                                    <p class="title">@item.Value("title")</p>
+                                    <p>@item.Value("imageSummary")</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                isFirstRow = false;
+            }
+        </div>
+    </div>
+}
+@if (employeesA != null)
+{
+    var employeeList = (NCpeople)employeesA;
+    var itemGroups = employeeList.Items.GroupBy(4);
+    var isFirstRow = true;
+
+    <div id="TheExecutives" class="padded-white">
+        <div class="container">
+            <div class="padded-white">
+                <h3 class="text-center margin-top-20">@employeeList.Title</h3>
+                @foreach (var itemGroup in itemGroups)
+                {
+                    <div class="row margin-top-50 eq-height">
+                        @foreach (var item in itemGroup)
+                        {
+
+                            <div class="col-sm-3 col-md-3">
+                                <div class="thumbnail">
+                                    @if (item.Url != null)
+                                    {
+                                        <img src="@item.Url" alt="@item.Value("title")">
+                                    }
+                                    else
+                                    {
+                                        <img src="/images/male-placeholder.jpg" alt="">
+                                    }
+                                    <div class="caption">
+                                        <p class="title">@item.Value("title")</p>
+                                        <p>@item.Value("imageSummary")</p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    isFirstRow = false;
+                }
+            </div>
+        </div>
+    </div>
+}
 
 
+<!-- HERO FEET -->
+@{
+    var heroFeet = (HeroFeetAboutUs)Model.Children.Where(o => o is HeroFeetAboutUs).FirstOrDefault();
+    if (heroFeet != null)
+    {
+        var isFirstRow = true;
+        <div class="grey-bg">
+            <div class="container">
+                <div class="padded-grey">
+                    <h3 class="text-center margin-top-50">@heroFeet.Title</h3>
+                    @if (heroFeet.Items.Any())
+                    {
+                        var itemGroups = heroFeet.Items.GroupBy(2);
+                        foreach (var items in itemGroups)
+                        {
+                            <div class="row margin-top-@(isFirstRow ? "50" : "30")">
+                                @foreach (var item in items)
+                                {
+                                    <div class="col-sm-6 about-us-bottom-text__item">
+                                        <p>
+                                            @Html.Raw(item.Value("content"))
+                                        </p>
+                                    </div>
+                                    isFirstRow = false;
+                                }
+
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
 
 @Html.Partial("_renderPopUpContent", new ContainerViewModel()
 {
@@ -176,3 +376,7 @@
     </script>
 
 }
+
+
+
+

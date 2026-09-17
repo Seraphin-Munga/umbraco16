@@ -1,5 +1,490 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using CustomModels = Web.Models;
+@using ContentModels = Umbraco.Web.PublishedModels;
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
+	
+	
+    var children = Model.Children;
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    var documentList = heroBody.Children;
+    var keyBenefits = heroBody.Children(x => x.ContentType.Alias.ToLower() == "cardItemDetail").FirstOrDefault();
+    var cardItems = heroBody.Children(x => x is CardItem).FirstOrDefault();
+    var card = heroBody.Children(x => x is Card).FirstOrDefault();
+    var heroBodyTabGroup = heroBody.Children?.Where(c => c.ContentType.Alias.ToLower() == "tabgroup").FirstOrDefault();
+ 
+    var videoItem = heroBody.Children.Where(c => c.ContentType.Alias.ToLower() == "tabbody").FirstOrDefault();
+    
+    
+
+  @*  var content = videoItem.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+    var tabs = content.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");*@
+    
+     var noCampcontent = videoItem.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+        var noCampvideos = noCampcontent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+        var noCampx = 1;
+    
+ @*   var tabs = (IEnumerable<IPublishedContent>)heroBody?.Children.Where(c => c.ContentType.Alias.ToLower() == "tabbody").FirstOrDefault();
+     ContentModels.TabBody myWorldTermsAndConditions = null;
+     tabs.ToList().ForEach(x =>
+    {
+        var partialName = x.Value("PartialViewName");
+
+        if (partialName.ToString() == "_cardRenderDescribedCards")
+        {
+           myWorldTermsAndConditions = (TabBody)x;
+        }
+     
+        else
+        {
+          
+        }
+    });
+    
+    var newWaysItems = (IEnumerable<IPublishedElement>)myWorldTermsAndConditions.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");*@
 }
+
+@* the fun starts here *@
+<style>
+* ==========================================
+* CUSTOM UTIL CLASSES
+* ==========================================
+.accordion {
+  margin: 40px 0;
+}
+.accordion .item {
+    margin-bottom: 20px;
+    background: #F2F2F2 0% 0% no-repeat padding-box;
+    box-shadow: 0px 15px 20px #00000029;
+    border-radius: 20px;
+    border: 1px solid #FFFFFF;
+    opacity: 1;
+}
+.main-title {
+    font-size: 32px;
+    font-weight: 900;
+    color: #000000;
+    margin: 40px 0px;
+}
+.t-p{
+    font-size: 15px;
+  color: #6B6F82;
+  padding: 0px 50px 30px 10px;
+}
+
+
+
+.t-p li::marker {
+   content:"🡢    ";
+   color: #C3C3C3;
+}
+
+.accordion .item .item-header h2 button.btn.btn-link {
+    border: none;
+    outline: none;
+    font-size: 16px;
+    font-weight: 400;
+    text-decoration: none;
+}
+.accordion .item .item-header {
+    padding: 5px;
+    margin: 2px;
+}
+
+.accordion .item .item-header h2 button {
+    padding: 5px;
+    display: block;
+    width: 100%;
+}
+
+.hero-static-caption {
+    margin-bottom: -50px;
+}
+
+.btn-header {
+    display: flex;
+    align-items: center;
+    justify-content:space-between;
+}
+
+.btn-header__subtitles {
+    display: flex;
+    flex-direction:column;
+    align-items: start;
+}
+
+.btn-header h1 {
+    font-size:30px;
+    font-weight: 900;
+    color:#002B60;
+}
+
+.btn-header h2{
+   font-size:16px;
+    font-weight: 900;
+    color:#88BC47; 
+}
+
+.btn-header p{
+    font-size:14px;
+    font-weight: bold;
+    color:#000000;
+}
+
+.accordion .item .item-header h2 i {
+    font-size: 30px;
+    width: 60px;
+    height: 60px;
+    color: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+button.btn.btn-link.collapsed i {
+    transform: rotate(0deg);
+}
+
+.title_description {
+    margin: 30px 0px;
+    color: #000000;
+    font-size: 16px;
+    padding: 0px;
+}
+
+.list_title {
+    color: #000000;
+    font-weight: 900;
+    font-size: 25px;
+    padding: 15px 0px;
+}
+
+.document_list ul li::marker {
+   content:"✓    ";
+   color: #88BC47;
+   font-weight: bold;
+}
+
+button.btn.btn-link i {
+    transform: rotate(180deg);
+    transition: 0.5s;
+}
+
+.product-main_title {
+    color: #000000;
+    font-weight: 900;
+    font-size:28px;
+}
+
+.documentList-section {
+    background: #f2f2f2;
+}
+
+.impacted_product {
+        margin-top: 18px;
+        padding: 0px;
+        font-size: 16px;
+    }
+
+.impacted-desc {
+    font-size: 16px;
+}
+
+.impacted-title {
+    font-weight: 900;
+    font-size: 18px;
+    color: #002B60;
+}
+
+.impact-wrapper_title{
+    padding: 0px !important;
+}
+
+.footer-cta {
+    margin:30px 0px;
+}
+
+.footer-cta span {
+  font-size:18px;
+    font-weight: 900;
+    color:#88BC47;  
+}
+
+.footer-cta__title {
+    font-size: 20px;
+    line-height: 1.5;
+    font-weight: bold;
+    color:#000000;
+}
+
+.inforgraphic img{
+    width:100%;
+    height: 100%;
+}
+
+.footer-note{
+    background: #EEEEEE;
+    border-radius: 20px;
+}
+
+.footer_subnote{
+    padding: 60px 35px;
+}
+
+.subnote {
+    padding: 30px;
+    font-size: 16px;
+}
+
+.footer-note_section {
+    margin: 40px 0px;
+}
+
+.subnote h4 {
+    color: #000000;
+    font-weight: 900;
+    font-size: 17px;
+}
+
+.footer-cta__btn {
+  margin-top: 20px;
+  font-size: 18px;
+  font-weight: 200;
+  padding: 12px 25px!important;
+  background: #88BC47;  
+  border: none;
+  border-radius: 30px;
+}
+
+@@media (min-width: 770px) and (max-width: 5000px) {
+    
+    .mobile-view {
+        display: none;
+    }
+    
+    .desktop-view {
+            display:block !important;
+        }
+}
+
+ @@media (min-width: 319px) and (max-width: 768px) {
+        
+        .hero-static-caption {
+            margin-bottom: -20px;
+        }
+        
+        .impact-wrapper_title{
+            padding: 0px !important;
+        }
+        
+        .main-title {
+            font-size: 32px;
+            font-weight: 900;
+            color: #000000;
+            margin: 40px 0px;
+            padding-left: 20px;
+        }
+        
+        .btn-header p {
+            font-size: 14px;
+            font-weight: bold;
+            color: #000000;
+            margin-top: -20px;
+        }
+        
+        .btn-header h2 {
+            font-size: 10px;
+            font-weight: 900;
+            color: #88BC47;
+        }
+
+        .list_title {
+            color: #000000;
+            font-weight: 900;
+            font-size: 25px;
+            padding: 15px 15px;
+        }
+        
+        .title_description {
+            margin: 30px 0px;
+            color: #000000;
+            font-size: 14px;
+            padding: 0px;
+}       }
+        
+        .impacted_product {
+            margin-top: 18px;
+            padding: 0px;
+            font-size: 14px;
+        }
+        .subnote {
+            padding: 10px;
+            font-size: 14px;
+        }
+        
+        .footer-note_section {
+        margin: 40px 10px;
+        }
+        
+        .product-main_title {
+        color: #000000;
+        font-weight: 900;
+        font-size: 20px;
+        }
+        
+        .desktop-view {
+            display:none;
+        }
+}
+</style>
+
+
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+
+<div class="container">
+    <row>
+         <div class="col-md-12 title_description">
+           @heroBody.Value("richTextBox")  
+           
+          <script src="//my.visme.co/visme-embed.js"></script><div class="visme_d" data-title="Untitled" data-url="g7qend60-new-project" data-w="800" data-full-h="false" data-h="500" data-domain="my"></div><p style="width:220px !important;border-radius:3px !important;padding:3px !important;font-size:12px !important;font-family:Arial, sans-serif !important;color:#314152 !important;white-space:nowrap !important">Made with <a href="https://www.visme.co/make-infographics?utm_source=CTA&amp;utm_medium=Embed" target="_blank" rel="noreferrer" style="font-weight:600 !important;text-decoration:none !important;font-size:12px !important;font-family:Arial, sans-serif !important;color:#314152 !important;white-space:nowrap !important">Visme Infographic Maker</a></p>
+         </div>
+     </row>
+</div>
+
+<div class="container">
+    <div class="row documentList-section">
+        <div class="col-md-12 impact-wrapper">
+           @{
+           
+              foreach (var item in documentList) 
+            
+            {
+            
+            var nestedContent = item.Value<IEnumerable<IPublishedElement>>("SectionItem");
+            
+            if(nestedContent != null){
+                foreach (var data in nestedContent)
+                                    {
+         
+      <div class="col-md-12 impact-wrapper">
+      <h4 class="list_title">@data.Value("title")</h4>
+      </div>
+<row class="document_list">
+    <div>
+      @data.Value("description")
+    </div>
+</row>
+            
+            }
+        
+            }
+           
+           
+           }
+           
+           }
+         
+        </div>
+    </div>
+</div>
+
+ <div class="container">
+     <!--header title-->
+     
+    <div class="row py-5">
+      <div class="col-md-12 impact-wrapper">
+        <h1 class="display-4 main-title">@heroBody.Value("bodyTitle")</h1>
+                    <section class="container">
+            
+              <div class="accordion" id="accordionExample">
+            
+                @foreach (var item in noCampvideos)
+            
+                {
+            
+                var cardTitle = item.Value<string>("nCcardTitle");
+                  var cardDesc = item.Value<string>("nCcardDescription");
+                    var icon = item.Value<IPublishedContent>("nCcardIcon");
+                      var cardDescl = item.Value<string>("nClongDescription");
+                        var Desc = item.Value<string>("mediumDescription");
+                          var id = item.Value<string>("abstractButton");
+            
+                            <div class="item">
+            
+                              <div class="item-header" id="headingOne">
+            
+                                <h2 class="mb-0">
+            
+                                  <button class="btn btn-link" type="button" data-toggle="collapse"
+                                    data-target="#collapseOne_@noCampx" aria-expanded="true" aria-controls="collapseOne_@noCampx">
+                                    <div class="btn-header">
+                                      <div class="btn-header__subtitles">
+            
+                                        <h1>
+                                          <string>@cardTitle
+                                        </h1>
+            
+                                        <h2>
+                                          <string>@cardDesc
+                                        </h2>
+            
+                                        
+                                          @Html.Raw(item.Value<string>("mediumDescription"))
+            
+                                      </div>
+                                      <div>
+                                        <i class="fa fa-angle-down"></i>
+                                      </div>
+                                    </div>
+                                  </button>
+            
+                                </h2>
+            
+                              </div>
+            
+                              <div id="collapseOne_@noCampx" class="collapse" aria-labelledby="headingOne"
+                                data-parent="#accordionExample">
+            
+                                <div class="t-p">
+            
+                                  @Html.Raw(item.Value<string>("nClongDescription"))
+            
+                                </div>
+            
+                              </div>
+            
+                            </div>
+            
+                            noCampx += 1;
+            
+                            }
+            
+              </div>
+            
+            </section>
+      </div>
+    </div>
+  </div>
+
+  <section class="footer-cta">
+	<div class="container">
+		<div class="row text-center">
+		    
+			<div class="col-md-12">
+				<span class="text-sub">At African Bank</span>
+				<h1 class="footer-cta__title">We are dedicated to upholding the dignity and wishes of the deceased. We approach estate management with sensitivity and understanding, honouring the legacy of your loved one. </h1>
+				<a class="btn btn-primary footer-cta__btn" href="https://ab-docs-test.azurewebsites.net/">Submit Claim</a> 
+			</div>
+		</div>
+	</div>
+</section>
+
+  <section>
+      @heroBody.Value("bodyFooterTitle") 
+  </section>
+  
+  

@@ -1,5 +1,7 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.EbankItlistSectionText>
+@using ContentModels = Umbraco.Web.PublishedModels;
 @{
-	Layout = null;
+	// Layout = null;
+	var bankingDiscalimer = Umbraco.Content("16171"); // Model.Children.Where(x => x is ebankITItem1).First();
 }
+<div>In Disclaimers : @bankingDiscalimer.Value("ebankITTitle")</div>

@@ -1,5 +1,2831 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
 }
+
+@* the fun starts here *@
+
+<style>
+.category-value {
+  position: relative; 
+  
+}
+
+.item{
+    margin-bottom: 5px;
+    display:flex;
+}
+
+.descItem {
+  position: relative;
+ 
+  display: block; /* or inline-block if needed */
+  white-space: normal; /* allows wrapping */
+  word-break: break-word; /* breaks long words if needed */
+}
+
+
+/* Hide the native checkbox */
+.checkbox-declaration input[type="checkbox"] {
+  top:-4px;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #5DC400;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  vertical-align: middle;
+  margin-right: 8px;
+  background-color: white;
+  transition: background-color 0.3s ease;
+}
+
+/* When checked, change background color */
+.checkbox-declaration input[type="checkbox"]:checked {
+  background-color: #5DC400; /* green */
+  border-color: #5DC400;
+}
+
+/* Optional: add a checkmark */
+.checkbox-declaration input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 7px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+ .alert-content {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.alert-box {
+    width: 75%;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-radius: 6px;
+    margin: 1rem 0;
+    font-family: 'Arial', sans-serif;
+    font-size: 0.95rem;
+    border-bottom: 5px solid;
+    top: 27%;
+    position: absolute;
+    z-index: 2147483647;
+}
+
+.alert-box.success {
+  background-color: #d4f4d2;
+  border-color: #28a745;
+  color: #155724;
+  display:none;
+}
+
+.alert-box.error {
+  background-color: #fde8e8;
+  border-color: #dc3545;
+  color: #721c24;
+  display:none;
+}
+
+.alert-box .icon {
+  margin-right: 0.75rem;
+  font-weight: bold;
+}
+
+.alert-box .close-alert {
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: inherit;
+}
+
+.message {
+     position: relative;
+     right: 28%;
+     color: var(--text-primary-blue, #002B60);
+
+    /* Body/Medium/Semibold */
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 24px; /* 150% */
+     margin-top: 0px !important; 
+}
+
+
+button.prev {
+    position: relative;
+    z-index: 10; /* or higher than overlaying elements */
+}
+
+#successful,
+#bg-white-2{
+    display:none;
+}
+
+.message{
+    margin-top:10px;
+}
+#fileInput {
+    display: flex;
+    width: 24%;
+    padding: 0px;
+    height: 30px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    border-radius: 0px 8px 8px 0px;
+    border-top: 1px solid var(--border-default, #D5D7DA);
+    border-right: 1px solid var(--border-default, #D5D7DA);
+    border-bottom: 1px solid var(--border-default, #D5D7DA);
+    background: var(--surface-primary, #FFF);
+}
+
+input::file-selector-button {
+    background-color: #5DC400;
+    color: var(--text-primary, #FFF);
+    /* Body/Medium/Medium */
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px; /* 150% */
+}
+
+        #Product-or-Service ,
+        #Service-advice,
+        #Customer-service,
+        #Accessing-a-product-or-service{
+                                        display:none;
+                                    }
+                                    
+        .checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* space between checkbox and text */
+  font-size: 14px;
+}
+
+.checkbox-declaration-span {
+  display: inline;
+}
+
+.value {
+  display: inline;
+  font-weight: bold;
+}
+
+
+        .home-section {
+            display: flex;
+            background: white;
+            min-height: 50px;
+        }
+        
+        .home-section button {
+            background: none !important;
+            border: none !important;
+        }
+
+        .stepper {
+            display: flex;
+            justify-content: space-between;
+            margin: 40px auto;
+            max-width: 800px;
+        }
+        
+        .step {
+            text-align: center;
+            position: relative;
+            flex: 1;
+        }
+
+        .step-circle {
+            width: 33px;
+            height: 33px;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            background: #fff;
+            line-height: 30px;
+            margin: 0 auto 10px;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-circle {
+            font-weight:500;
+            border-radius: var(--border-radius-xxl, 48px);
+            border: var(--scale-50, 2px) solid var(--border-action, #5DC400);
+            background: #fff;
+            color: var(--text-primary-blue, #002B60);
+        }
+
+        .step.completed .step-circle {
+            border-color: #5cb85c;
+            background: #5cb85c;
+            color: #fff;
+        }
+
+        .step:not(:first-child)::before {
+            content: '';
+            width: 78%;
+            height: 2px;
+            background: #ddd;
+            position: absolute;
+            top: 15px;
+            left: -39%;
+            z-index: -1;
+        }
+        
+        /* Show 20% green only for the active step */
+        .step.active:not(:first-child)::before {
+          background: linear-gradient(to right, #5cb85c 0%, #5cb85c 100%, #ddd 20%, #ddd 100%);
+        }
+        
+
+
+        
+        .step.completed .step-circle::after {
+            content: "";
+            font-size: 16px;
+            display: block;
+            text-align: center;
+            line-height: 32px; /* same as width/height of the circle if it's 32px */
+            font-weight: bold;
+        }
+
+        .step.completed::before {
+            background: #5cb85c;
+        }
+
+        .step.active::before {
+            background: #5DC400;
+        }
+
+        .step-title {
+            color: var(--text-primary-blue, #002B60);
+            
+            /* Body/Medium/Medium */
+            font-family: Montserrat;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 24px; /* 150% */
+            text-align: end;
+        }
+        
+        #step-title1{
+            position: relative;
+            left: 5%;
+        }
+        
+        #step-title2{
+            position: relative;
+            left: 16%;
+        }
+        
+        #step-title3{
+            position: relative;
+            right: 28%;
+        }
+
+        .content {
+            margin: 40px auto;
+            
+        }
+
+        .buttons {
+            margin-top: 30px;
+        }
+        
+        .Submit-a-complaint{
+            color: var(--Brand-AB-Blue, #012B60);
+
+            /* Heading/H1/Regular */
+            font-family: Montserrat;
+            font-size: 36px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 60px; /* 125% */
+        }
+        
+        .stepper-body{
+            min-height: 640px;
+            background: var(--color-brand-AB-blue, #002B60);
+        }
+        .bg-white{
+            height: 112px;
+            background: #FFF;
+        }
+        .bg-white-2{
+            height: 200px;
+            background: #FFF;
+        }
+        .content{
+            display: flex;
+            min-width: 100%;
+            padding: 47px 46px;
+            flex-direction: column;
+            gap: 64px;
+            background: var(--primary-white, #FFF);
+            /* Shadows Light Mode/MD */
+            box-shadow: 0px 9px 18px 0px rgba(0, 0, 0, 0.15);
+        }
+        .p-47{
+            padding:47px;
+        }
+        .pb-48{
+            padding-bottom:48px;
+        }
+        .pb-32{
+            padding-bottom:32px;
+        }
+        .mb-48{
+            margin-bottom:48px;
+        }
+        .Your-details{
+            color: var(--Brand-AB-Blue, #012B60);
+
+            /* Heading/H4/Medium */
+            font-family: Montserrat;
+            font-size: 24px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 32px; /* 133.333% */
+            text-align: start;
+        }
+        .label-spacing{
+            display: block;
+            margin-bottom: 5px;
+        }
+        .label-default {
+            background-color: transparent;
+        }
+        .label {
+            display: inline;
+            padding: 0;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1;
+            color: var(--text-primary-blue, #002B60);
+            text-align: start;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: .25em;
+            font-style: normal;
+            line-height: 20px;
+            font-family: Montserrat;
+            font-style: normal;
+        }
+        .btn-primary{
+            color: var(--text-primary, #FFF);
+            /* Body/Small/Semibold */
+            font-family: Montserrat;
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 20px; /* 142.857% */
+            width: 200px;
+            height: 48px;
+            padding: 12px 16px;
+            justify-content: center;
+            gap: 8px;
+            border-radius: var(--border-radius-md, 2px);
+            background: var(--surface-action, #5DC400);
+            border: none;
+            /* Shadows Light Mode/SM */
+            box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.11);
+        }
+        .btn-default{
+            left: 315px;
+            position: relative;
+            width: 200px;
+            height: 48px;
+            padding: 12px 16px;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            border-radius: var(--border-radius-md, 2px);
+            border: 1px solid var(--border-primary, #002B60);
+            background: var(--surface-primary, #FFF);
+            color: var(--text-primary-blue, #002B60);
+
+            /* Body/Small/Semibold */
+            font-family: Montserrat;
+            font-size: 13px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 20px; /* 142.857% */
+            /* Shadows Light Mode/SM */
+            box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.11);
+        }
+    /**/
+    
+     .circle-radio {
+      margin-top: 20px;
+    }
+
+    .circle-radio input[type="radio"] {
+      display: none;
+    }
+
+    .circle-radio label {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #5DC400;
+        border-radius: 50%;
+        cursor: pointer;
+        position: relative;
+        vertical-align: middle;
+    }
+
+    .circle-radio input[type="radio"]:checked + label::after {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: 9px;
+      height: 9px;
+      background: #5DC400;
+      border-radius: 50%;
+    }
+
+    .circle-radio .radio-option {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .circle-radio .radio-option span {
+        margin-left: 6px;
+        vertical-align: middle;
+        color: var(--primary-default, #002B60);
+    
+        /* Body/Medium/Regular */
+        font-family: Montserrat;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 24px; /* 150% */
+    }
+
+    .id-type{
+        color: var(--primary-default, #002B60);
+
+        /* Body/Small/Regular */
+        font-family: Montserrat;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 20px; /* 142.857% */
+    }
+    
+    /**/
+    
+    
+    .select-categories-2 {
+    margin-top: 22px;
+    color: var(--primary-default, #002B60);
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+}
+    
+    .select-categories{
+        color: var(--primary-default, #002B60);
+
+        /* Body/Medium/Regular */
+        font-family: Montserrat;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 24px; /* 150% */
+    }
+    .review{
+        color: var(--Brand-AB-Blue, #012B60);
+
+        /* Heading/H4/Medium */
+        font-family: Montserrat;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 32px; /* 133.333% */
+    }
+    
+    /* step 3*/
+    
+    .details-container {
+      width: 100%;
+      font-family: Montserrat;
+      font-size: 14px;
+      line-height: 2;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dotted transparent; /* Optional spacing line */
+      padding: 4px 0;
+    }
+
+    .step3-label {
+        text-align: left;
+        color: var(--color-brand-AB-blue, #002B60);
+    
+        /* Body/Medium/Medium */
+        font-family: Montserrat;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px; /* 150% */
+    }
+
+    .value {
+        text-align: right;
+        color: var(--color-brand-AB-blue, #002B60);
+
+        /* Body/Medium/Regular */
+        font-family: Montserrat;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 24px; /* 150% */
+    }
+    
+    .green-hr{
+       width: 100%;
+       height: 1px;
+       background: #5DC303; 
+       margin-top:32px;
+       margin-bottom:24px;
+    }
+    
+    /**/
+    .complaint-section {
+      margin: auto;
+      /*border-top: 1px solid #5DC303;*/
+      border-bottom: 1px solid #5DC303;
+      padding: 20px 0;
+    }
+
+    .complaint-title {
+        color: var(--Brand-AB-Blue, #012B60);
+        
+        /* Heading/H4/Medium */
+        font-family: Montserrat;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 32px; /* 133.333% */
+        margin-bottom: 32px;
+        margin-top: 64px;
+    }
+
+    .complaint-table {
+      display: flex;
+      gap: 40px;
+      justify-content: flex-start;
+    }
+
+    .column {
+      flex: 1;
+    }
+
+    .column-title {
+        color: var(--color-brand-AB-blue, #002B60);
+
+        /* Body/Medium/Semibold */
+        font-family: Montserrat;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 24px; /* 150% */
+        margin-bottom:24px;
+    }
+
+    .complaint-item {
+        display: flex;
+        align-items: start;
+        color: var(--color-brand-AB-blue, #002B60);
+
+        /* Body/Medium/Regular */
+        font-family: Montserrat;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 24px; /* 150% */
+        margin-bottom:16px;
+    }
+
+    .check-icon {
+      color: #28a745;
+      margin-right: 8px;
+    }
+    
+    
+    /**/
+    .submit-section {
+      margin: auto;
+      padding-top: 10px;
+      border-top: 1px solid #5DC303;
+    }
+
+    .submit-title {
+      
+        margin-top: 64px;
+        margin-bottom: 24px;
+        color: var(--Brand-AB-Blue, #012B60);
+    
+        /* Heading/H4/Medium */
+        font-family: Montserrat;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 32px; /* 133.333% */
+    }
+
+    .policy-link {
+      
+      display: inline-flex;
+      align-items: center;
+      margin: 10px 0;
+      color: var(--surface-action, #5DC400);
+
+        /* Body/Medium/Semibold */
+        font-family: Montserrat;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 24px; /* 150% */
+        text-decoration-line: underline;
+        text-decoration-style: solid;
+        text-decoration-skip-ink: none;
+        text-decoration-thickness: auto;
+        text-underline-offset: auto;
+        text-underline-position: from-font;
+    }
+
+    .policy-link svg {
+      margin-right: 6px;
+    }
+
+    .checkbox-declaration {
+      margin-top: 20px;
+    }
+    
+    .checkbox-declaration-span {
+        text-transform: math-auto;
+        margin-top: 20px;
+        color: var(--Brand-AB-Blue, #012B60);
+        font-family: Montserrat;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 24px;
+    }
+
+
+
+    .text-muted {
+      color: var(--Brand-AB-Blue, #012B60);
+
+    /* Body/Medium/Regular */
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 150% */
+      margin: 5px 0;
+    }
+    /* step 3*/
+    
+    .successful{
+        background: var(--Brand-AB-Blue, #012B60);
+        height: 306px;
+    }
+    .successful-body{
+        display: flex;
+        width: 100%;
+        top: 50px;
+        position: relative;
+        padding: 47px 46px;
+        flex-direction: column;
+        align-items: flex-start;
+        box-shadow: 0px 9px 18px 0px rgba(0, 0, 0, 0.15);
+        overflow: visible;
+        background: #ffffff;
+        transition: all 0.3s ease;
+    }
+    
+    .successful-header{
+        color: var(--Brand-AB-Blue, #012B60);
+    
+        /* Heading/H4/Medium */
+        font-family: Montserrat;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 32px; /* 133.333% */
+    }
+    .successful-hr{
+        width: 100%;
+        height: 1px;
+        background: #5DC303;
+        margin-top:32px;
+        margin-bottom:32px;
+    }
+    .successful-p{
+        color: var(--Brand-AB-Blue, #012B60);
+
+        /* Body/Medium/Regular */
+        font-family: Montserrat;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 24px; /* 150% */
+        color: var(--Brand-AB-Blue, #012B60);
+
+        /* Body/Medium/Semibold */
+        font-family: Montserrat;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 24px;
+    }
+    
+    #chatIconImg {
+        display: none;
+    }
+    #iframe-karaboChat-speechBubble {
+        display: none;
+    }
+    
+    .current-step-title{
+        color: var(--text-primary-blue, #002B60);
+
+        /* Body/Medium/Semibold */
+        font-family: Montserrat;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 24px; /* 150% */
+    }
+    .next-text{
+        color: var(--text-secondary, #8095AF);
+
+        /* Body/xsmall/Regular */
+        font-family: Montserrat;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 18px; /* 150% */
+    }
+    
+
+
+   
+    @@media (max-width: 700px) {
+    .Submit-a-complaint {
+        font-weight: 600;
+    }
+    
+    .value {
+        text-align: right;
+        color: var(--color-brand-AB-blue, #002B60);
+        font-family: Montserrat;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px;
+    }
+    
+    .complaint-table {
+    display: flex;
+    gap: 0px;
+    justify-content: flex-start;
+    flex-direction: column;
+}
+    
+.detail-row {
+    justify-content: flex-start;
+}
+
+.complaint-title{
+    font-weight: 600;
+}
+    
+.step3-label {
+    padding-right: 5px;
+    font-weight: 600;
+}
+.Your-details {
+    font-weight: 600;
+}
+.review {
+    font-weight: 600;
+}
+.Your-details {
+    margin-top: -13px;
+    padding: 25px 0px;
+    color: var(--Brand-AB-Blue, #012B60);
+    font-family: Montserrat;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 0px;
+    text-align: start;
+}    
+    
+#myTextBox{
+    border: 2px solid;
+    margin-top: 13px;
+}
+    
+    .complaint-title {
+        font-size: 20px;
+        margin-bottom: 20px;
+        margin-top: 20px;
+    }
+    
+    .review {
+        font-size: 20px;
+    }
+    .submit-title {
+        font-weight:600;
+        margin-top: 28px;
+    }
+    
+    .successful-body {
+        padding: 16px 16px;
+    }
+    
+    .successful-header {
+        font-size: 20px;
+    }
+    
+    .successful-hr {
+        margin-top: 10px;
+        margin-bottom: 23px;
+    }
+    
+    .successful-p {
+        font-size: 14px;
+        line-height: 22px;
+    }
+    
+    .mb-48 {
+        margin-bottom: 12px;
+    }
+
+
+    
+    .step-text {
+        margin-top: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        height: 100%;
+        text-align: right;
+    }
+    
+    .checkbox-declaration-span {
+
+        font-size: 14px;
+    
+    }
+    
+      .buttons .row {
+        display: flex;
+        flex-wrap: nowrap;
+      }
+    
+      .buttons .row > div {
+        width: 50%;
+        padding: 0 5px; /* Optional: spacing between buttons */
+      }
+    
+      .buttons .btn {
+        width: 100%;
+      }
+      
+     .checkbox-label {
+        text-wrap-mode: wrap;
+    }
+      
+     #fileInput {
+
+        width: 100%;
+    }
+    .btn-primary ,
+    .btn-default {
+        left: 0px;
+        width: 140px;
+        height: 40px;
+    }
+    
+    .text-right {
+        text-align: start;
+    }
+    
+    .home-section button {
+        left: -14%;
+        position: absolute;
+    }
+    
+    .home-section {
+        min-height: 40px;
+    }
+    
+    .Submit-a-complaint {
+        font-size: 30px;
+    }
+    
+    .stepper {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        margin: 0 0 20px;
+    }
+
+    .step {
+        display: flex;
+        align-items: center;
+        position: relative;
+        text-align: left;
+        flex: none;
+    }
+
+    .step:not(:first-child)::before {
+        display: none;
+    }
+
+    
+.step-circle {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 8px solid #eee; /* light gray border as background */
+  font-weight: bold;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0px;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+/* This pseudo-element will act as the colored progress border */
+.step-circle::before {
+  content: '';
+  position: absolute;
+  top: -8px;  /* equal to border width */
+  left: -8px;
+  width: calc(100% + 16px);
+  height: calc(100% + 16px);
+  border-radius: 50%;
+  border: 8px solid green;
+  clip-path: polygon(50% 50%, 100% 0, 100% 100%, 0 100%, 0 0); /* initial clip to hide all */
+  transform: rotate(-90deg);
+  transform-origin: center;
+  transition: clip-path 0.3s ease;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+
+.progress-ring__circle {
+  transition: stroke-dashoffset 0.35s;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  stroke-linecap: round;
+}
+
+
+    .step.active .step-circle {
+        border-color: transparent;
+        background: conic-gradient(#5DC400 0% 33.3%, #eee 33.3% 100%);
+        color: #002B60;
+    }
+
+    .step.completed .step-circle {
+        background: #5cb85c;
+        color: white;
+        border: none;
+    }
+
+    .step-circle::after {
+        content: attr(data-step-label);
+        position: relative;
+        top: 17%;
+        left: 22%;
+        transform: translate(-50%, -50%);
+        font-weight: bold;
+    }
+
+    .step-title {
+        display: flex;
+        flex-direction: column;
+        font-size: 16px;
+        line-height: 1.4;
+        text-align: left;
+    }
+
+    .step-title .next {
+        font-size: 14px;
+        color: #8A99A3;
+    }
+    .text-right-xs {
+        text-align: right !important;
+    }
+}
+
+</style>
+<style>
+  .custom-checkbox {
+    margin: 10px;
+  }
+  
+  hr {
+    margin-top: -6px;
+    margin-bottom: 0px;
+    border: 0;
+    border-top: 1px solid #eee;
+}
+
+  .custom-checkbox input[type="checkbox"] {
+    display: none;
+  }
+
+  .custom-checkbox label {
+    text-wrap: nowrap;
+    position: relative;
+    padding-left: 30px;
+    cursor: pointer;
+    display: inline-block;
+    line-height: 22px;
+  }
+
+  .custom-checkbox label::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 2px;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #5DC400;
+    background: white;
+    border-radius: 2px; /* square */
+    transition: background 0.2s;
+  }
+
+  .custom-checkbox input[type="checkbox"]:checked + label::before {
+    background-color: #5DC400;
+  }
+
+  .custom-checkbox input[type="checkbox"]:checked + label::after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 4px;
+    width: 6px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  
+  .table-header{
+    display: flex;
+    height: 48px;
+    padding: 8px 40px;
+    align-items: center;
+    gap: 8px;
+    align-self: stretch;
+    border-bottom: 1px solid var(--border-default, #D5D7DA);
+    background: var(--surface-page, #F5F5F5);
+  }
+  .table-header p{
+  
+    color: var(--text-primary-blue, #002B60);
+    margin: 0 0 0px;
+     Body/Small/Semibold 
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 20px; /* 142.857% */
+}
+.checkbox-label{
+
+    color: var(--text-primary-blue, #002B60);
+    margin: 0 0 0px;
+    /* Body/Small/Medium */
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px; /* 142.857% */
+    text-transform: math-auto;
+}
+
+.p-0{
+    padding: 0;
+}
+
+.form-control1 {
+    height: 23px;
+    border-radius: 4px;
+    background-color: #fff;
+    box-shadow: 0 2px 1px 0 rgba(0, 0, 0, .03);
+    border: solid 1px #e4e5ec;
+    /* padding: 6px 20px; */
+}
+.form-group1{
+ margin-top:34px;   
+}
+.form-control1 {
+    display: block;
+    width: 23%;
+    height: 24px;
+    font-size: 14px;
+    line-height: 1.42857;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    -webkit-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+
+.upload-file{
+    color: var(--text-primary-blue, #002B60);
+
+/* Body/Medium/Medium */
+font-family: Montserrat !important;
+font-size: 16px;
+font-style: normal;
+font-weight:  500 !important;
+line-height: 24px; /* 150% */
+}
+
+
+.information{
+    
+color: var(--text-primary-blue, #002B60);
+
+/* Body/Medium/Medium */
+font-family: Montserrat;
+font-size: 16px;
+font-style: normal;
+font-weight: 500;
+line-height: 24px; /* 150% */
+position:relative;
+bottom: -20px;
+
+}
+
+textarea {
+    width: 100%;
+}
+
+input#file-upload-button{
+    border-radius: 8px 0px 0px 8px;
+    background: var(--surface-action, #5DC400);
+    display: flex;
+    width: 106px;
+    padding: 8px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-primary, #FFF);
+
+    /* Body/Medium/Medium */
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px; /* 150% */
+}
+
+    .alert-container {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .alert-box {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: left;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        max-width: 350px;
+        width: 100%;
+    }
+
+    .alert-content {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .alert-icon {
+        font-size: 2em;
+        margin-right: 15px;
+    }
+
+    .alert-title {
+        font-size: 1.5em;
+        margin-bottom: 5px;
+    }
+
+    .alert-message {
+        font-size: 1em;
+    }
+
+    .alert-btn {
+        width: 100%;
+        background-color: #3085d6;
+        color: #fff;
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        text-align: center;
+    }
+
+    .alert-btn:hover {
+        background-color: #0062cc;
+    }
+
+    .alert-success .alert-box {
+        border-left: 5px solid #28a745;
+    }
+
+    .alert-success .alert-icon {
+        color: #28a745;
+    }
+
+    .alert-warning .alert-box {
+        border-left: 5px solid #ffc107;
+    }
+
+    .alert-warning .alert-icon {
+        color: #ffc107;
+    }
+
+    .alert-danger .alert-box {
+        border-left: 5px solid #dc3545;
+    }
+
+    .alert-danger .alert-icon {
+        color: #dc3545;
+    }
+
+
+#loader-overlay {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#loader-overlay.active {
+  visibility: visible;
+  opacity: 1;
+}
+
+
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #5dc300;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+button:disabled {
+    
+    color: var(--text-disabled, #717680);
+
+    /* Body/Small/Semibold */
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+
+
+  cursor: not-allowed;
+  border-radius: var(--border-radius-md, 2px);
+    background: var(--surface-disabled, #E9EAEB);
+    
+    /* Shadows Light Mode/SM */
+    box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.11);
+  opacity: 1; /* Optional: override Bootstrap's opacity */
+}
+
+@@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@@media (max-width: 480px) {
+
+.category-value {
+    font-size: 14px;
+}
+
+    .descItem {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+
+    .message {
+        position: relative;
+        right: 0%;
+        color: var(--text-primary-blue, #002B60);
+        font-family: Montserrat;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 24px;
+        margin-top: 0px !important;
+    }
+
+    .alert-box {
+        width: 92%;
+    }
+}
+@@media only screen and (max-width: 600px) {
+    .content {
+        padding: 30px 15px;
+    }
+    .hidden-xs{
+        display:none !important;
+    }
+    
+}
+
+@@media only screen and (min-width: 601px) {
+
+    visible-xs{
+        display:block !important;
+    }
+}
+</style>
+
+<div id="loader-overlay">
+  <div class="loader"></div>
+</div>
+
+<section class="main-section" id="main-section">
+    <section class="home-section" id="gotohomebtn">
+        <div class="container">
+            <button>
+                <svg width="200" height="48" viewBox="0 0 200 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_5580_33944)">
+                    <path d="M79.3346 23.3332H71.2213L74.948 19.6065L74.0013 18.6665L68.668 23.9998L74.0013 29.3332L74.9413 28.3932L71.2213 24.6665H79.3346V23.3332Z" fill="#002B60"/>
+                    </g>
+                    <path d="M98.204 19.2H100.024V29H98.204V19.2ZM93.136 29H91.316V19.2H93.136V29ZM98.344 24.8H92.982V23.246H98.344V24.8ZM105.842 29.098C105.077 29.098 104.395 28.9347 103.798 28.608C103.201 28.272 102.729 27.8147 102.384 27.236C102.039 26.6573 101.866 25.9993 101.866 25.262C101.866 24.5153 102.039 23.8573 102.384 23.288C102.729 22.7093 103.201 22.2567 103.798 21.93C104.395 21.6033 105.077 21.44 105.842 21.44C106.617 21.44 107.303 21.6033 107.9 21.93C108.507 22.2567 108.978 22.7047 109.314 23.274C109.659 23.8433 109.832 24.506 109.832 25.262C109.832 25.9993 109.659 26.6573 109.314 27.236C108.978 27.8147 108.507 28.272 107.9 28.608C107.303 28.9347 106.617 29.098 105.842 29.098ZM105.842 27.6C106.271 27.6 106.654 27.5067 106.99 27.32C107.326 27.1333 107.587 26.8627 107.774 26.508C107.97 26.1533 108.068 25.738 108.068 25.262C108.068 24.7767 107.97 24.3613 107.774 24.016C107.587 23.6613 107.326 23.3907 106.99 23.204C106.654 23.0173 106.276 22.924 105.856 22.924C105.427 22.924 105.044 23.0173 104.708 23.204C104.381 23.3907 104.12 23.6613 103.924 24.016C103.728 24.3613 103.63 24.7767 103.63 25.262C103.63 25.738 103.728 26.1533 103.924 26.508C104.12 26.8627 104.381 27.1333 104.708 27.32C105.044 27.5067 105.422 27.6 105.842 27.6ZM120.941 21.44C121.539 21.44 122.066 21.5567 122.523 21.79C122.99 22.0233 123.354 22.3827 123.615 22.868C123.877 23.344 124.007 23.96 124.007 24.716V29H122.257V24.94C122.257 24.2773 122.113 23.7827 121.823 23.456C121.534 23.1293 121.119 22.966 120.577 22.966C120.195 22.966 119.854 23.05 119.555 23.218C119.266 23.386 119.037 23.6333 118.869 23.96C118.711 24.2867 118.631 24.702 118.631 25.206V29H116.881V24.94C116.881 24.2773 116.737 23.7827 116.447 23.456C116.158 23.1293 115.743 22.966 115.201 22.966C114.819 22.966 114.478 23.05 114.179 23.218C113.89 23.386 113.661 23.6333 113.493 23.96C113.335 24.2867 113.255 24.702 113.255 25.206V29H111.505V21.524H113.171V23.512L112.877 22.924C113.129 22.4387 113.493 22.07 113.969 21.818C114.455 21.566 115.005 21.44 115.621 21.44C116.321 21.44 116.928 21.6127 117.441 21.958C117.964 22.3033 118.309 22.826 118.477 23.526L117.791 23.288C118.034 22.728 118.435 22.28 118.995 21.944C119.555 21.608 120.204 21.44 120.941 21.44ZM129.771 29.098C128.941 29.098 128.213 28.9347 127.587 28.608C126.971 28.272 126.491 27.8147 126.145 27.236C125.809 26.6573 125.641 25.9993 125.641 25.262C125.641 24.5153 125.805 23.8573 126.131 23.288C126.467 22.7093 126.925 22.2567 127.503 21.93C128.091 21.6033 128.759 21.44 129.505 21.44C130.233 21.44 130.882 21.5987 131.451 21.916C132.021 22.2333 132.469 22.6813 132.795 23.26C133.122 23.8387 133.285 24.52 133.285 25.304C133.285 25.3787 133.281 25.4627 133.271 25.556C133.271 25.6493 133.267 25.738 133.257 25.822H127.027V24.66H132.333L131.647 25.024C131.657 24.5947 131.568 24.2167 131.381 23.89C131.195 23.5633 130.938 23.3067 130.611 23.12C130.294 22.9333 129.925 22.84 129.505 22.84C129.076 22.84 128.698 22.9333 128.371 23.12C128.054 23.3067 127.802 23.568 127.615 23.904C127.438 24.2307 127.349 24.618 127.349 25.066V25.346C127.349 25.794 127.452 26.1907 127.657 26.536C127.863 26.8813 128.152 27.1473 128.525 27.334C128.899 27.5207 129.328 27.614 129.813 27.614C130.233 27.614 130.611 27.5487 130.947 27.418C131.283 27.2873 131.582 27.082 131.843 26.802L132.781 27.88C132.445 28.272 132.021 28.5753 131.507 28.79C131.003 28.9953 130.425 29.098 129.771 29.098Z" fill="#002B60"/>
+                    <defs>
+                    <clipPath id="clip0_5580_33944">
+                    <rect width="16" height="16" fill="white" transform="translate(66 16)"/>
+                    </clipPath>
+                    </defs>
+                </svg>
+            </button>
+        </div>
+    </section>
+    <section class="stepper-indicators">
+
+        <div class="container">
+            <p class="Submit-a-complaint">Submit a complaint</p>
+            <div class="stepper hidden-xs small-tablet-hide">
+                <div class="step active" data-step="1">
+                    <div class="step-circle"><span>1</span></div>
+    
+                    <div class="step-title" id="step-title1">Personal details</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-circle">2</div>
+                    <div class="step-title" id="step-title2">Complaints details</div>
+                    
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-circle">3</div>
+                    <div class="step-title" id="step-title3">Review</div>
+                </div>
+                <div class="step" data-step="4">
+                    <div class="step-title"></div>
+                </div>
+            </div>
+            <div class="stepper visible-xs small-tablet-show">
+                
+                <div class="row step-1" style="align-items: center;">
+                  <div class="col-xs-4">
+                    <div class="" >
+                        <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M100 50C100 77.6142 77.6142 100 50 100C22.3858 100 0 77.6142 0 50C0 22.3858 22.3858 0 50 0C77.6142 0 100 22.3858 100 50ZM10 50C10 72.0914 27.9086 90 50 90C72.0914 90 90 72.0914 90 50C90 27.9086 72.0914 10 50 10C27.9086 10 10 27.9086 10 50Z" fill="#E9EAEB"/>
+                            <path d="M50 5C50 2.23858 52.2442 -0.0259493 54.9918 0.249653C66.4194 1.39589 77.1626 6.45188 85.3553 14.6447C93.5481 22.8374 98.6041 33.5806 99.7503 45.0081C100.026 47.7558 97.7614 50 95 50C92.2386 50 90.0323 47.7527 89.688 45.0128C88.5862 36.243 84.6005 28.0319 78.2843 21.7157C71.968 15.3995 63.757 11.4138 54.9872 10.312C52.2473 9.96773 50 7.76142 50 5Z" fill="#5DC400"/>
+                            <path d="M30.352 56V45.76L31.472 46.88H28.112V44.8H32.944V56H30.352ZM44.0449 56.128C43.1275 56.128 42.3115 55.936 41.5969 55.552C40.8929 55.168 40.3329 54.6453 39.9169 53.984C39.5115 53.312 39.3089 52.5493 39.3089 51.696C39.3089 50.832 39.5115 50.0693 39.9169 49.408C40.3329 48.736 40.8929 48.2133 41.5969 47.84C42.3115 47.456 43.1275 47.264 44.0449 47.264C44.9515 47.264 45.7622 47.456 46.4769 47.84C47.1915 48.2133 47.7515 48.7307 48.1569 49.392C48.5622 50.0533 48.7649 50.8213 48.7649 51.696C48.7649 52.5493 48.5622 53.312 48.1569 53.984C47.7515 54.6453 47.1915 55.168 46.4769 55.552C45.7622 55.936 44.9515 56.128 44.0449 56.128ZM44.0449 54.08C44.4609 54.08 44.8342 53.984 45.1649 53.792C45.4955 53.6 45.7569 53.328 45.9489 52.976C46.1409 52.6133 46.2369 52.1867 46.2369 51.696C46.2369 51.1947 46.1409 50.768 45.9489 50.416C45.7569 50.064 45.4955 49.792 45.1649 49.6C44.8342 49.408 44.4609 49.312 44.0449 49.312C43.6289 49.312 43.2555 49.408 42.9249 49.6C42.5942 49.792 42.3275 50.064 42.1249 50.416C41.9329 50.768 41.8369 51.1947 41.8369 51.696C41.8369 52.1867 41.9329 52.6133 42.1249 52.976C42.3275 53.328 42.5942 53.6 42.9249 53.792C43.2555 53.984 43.6289 54.08 44.0449 54.08ZM50.7373 56V47.2C50.7373 46.2293 51.0253 45.456 51.6013 44.88C52.1773 44.2933 52.9986 44 54.0653 44C54.4279 44 54.7746 44.0373 55.1053 44.112C55.4466 44.1867 55.7346 44.304 55.9693 44.464L55.3133 46.272C55.1746 46.176 55.0199 46.1013 54.8493 46.048C54.6786 45.9947 54.4973 45.968 54.3053 45.968C53.9426 45.968 53.6599 46.0747 53.4573 46.288C53.2653 46.4907 53.1693 46.8 53.1693 47.216V48.016L53.2333 49.088V56H50.7373ZM49.4093 49.504V47.584H55.3773V49.504H49.4093ZM64.256 56.192C63.4773 56.192 62.704 56.0907 61.936 55.888C61.168 55.6747 60.5173 55.376 59.984 54.992L60.992 53.008C61.4187 53.3173 61.9147 53.5627 62.48 53.744C63.0453 53.9253 63.616 54.016 64.192 54.016C64.8427 54.016 65.3547 53.888 65.728 53.632C66.1013 53.376 66.288 53.024 66.288 52.576C66.288 52.1493 66.1227 51.8133 65.792 51.568C65.4613 51.3227 64.928 51.2 64.192 51.2H63.008V49.488L66.128 45.952L66.416 46.88H60.544V44.8H68.384V46.48L65.28 50.016L63.968 49.264H64.72C66.096 49.264 67.136 49.5733 67.84 50.192C68.544 50.8107 68.896 51.6053 68.896 52.576C68.896 53.2053 68.7307 53.7973 68.4 54.352C68.0693 54.896 67.5627 55.3387 66.88 55.68C66.1973 56.0213 65.3227 56.192 64.256 56.192Z" fill="#002B60"/>
+                        </svg>
+                    </div>
+                  </div>
+                  <div class="col-xs-8">
+                    <div class="step-text">
+                      <div class="current-step-title">Personal details</div>
+                      <div class="next-text">Next: Complaint details</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="row step-2" style="display: none;align-items: center;">
+                  <div class="col-xs-4">
+                    <div class="">
+                        <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M100 50C100 77.6142 77.6142 100 50 100C22.3858 100 0 77.6142 0 50C0 22.3858 22.3858 0 50 0C77.6142 0 100 22.3858 100 50ZM10 50C10 72.0914 27.9086 90 50 90C72.0914 90 90 72.0914 90 50C90 27.9086 72.0914 10 50 10C27.9086 10 10 27.9086 10 50Z" fill="#E9EAEB"/>
+                            <path d="M50 5C50 2.23858 52.2441 -0.0258931 54.9917 0.249793C59.8454 0.736794 64.6109 1.93241 69.1342 3.80602C75.2005 6.31876 80.7124 10.0017 85.3553 14.6447C89.9983 19.2876 93.6812 24.7996 96.194 30.8658C98.7067 36.9321 100 43.4339 100 50C100 56.5661 98.7067 63.0679 96.194 69.1342C93.6812 75.2005 89.9983 80.7124 85.3553 85.3553C80.7124 89.9983 75.2004 93.6813 69.1342 96.194C64.6108 98.0676 59.8454 99.2632 54.9917 99.7502C52.2441 100.026 50 97.7614 50 95C50 92.2386 52.2471 90.0322 54.987 89.6879C58.5264 89.2432 61.9979 88.326 65.3073 86.9552C70.1604 84.945 74.5699 81.9986 78.2843 78.2843C81.9986 74.5699 84.945 70.1604 86.9552 65.3073C88.9654 60.4543 90 55.2529 90 50C90 44.7471 88.9654 39.5457 86.9552 34.6927C84.945 29.8396 81.9986 25.4301 78.2843 21.7157C74.5699 18.0014 70.1604 15.055 65.3073 13.0448C61.9979 11.674 58.5264 10.7568 54.987 10.3121C52.2472 9.96781 50 7.76142 50 5Z" fill="#5DC400"/>
+                            <path d="M27.528 56V54.32L31.848 50.24C32.1893 49.9307 32.44 49.6533 32.6 49.408C32.76 49.1627 32.8667 48.9387 32.92 48.736C32.984 48.5333 33.016 48.3467 33.016 48.176C33.016 47.728 32.8613 47.3867 32.552 47.152C32.2533 46.9067 31.8107 46.784 31.224 46.784C30.7547 46.784 30.3173 46.8747 29.912 47.056C29.5173 47.2373 29.1813 47.52 28.904 47.904L27.016 46.688C27.4427 46.048 28.04 45.5413 28.808 45.168C29.576 44.7947 30.4613 44.608 31.464 44.608C32.296 44.608 33.0213 44.7467 33.64 45.024C34.2693 45.2907 34.7547 45.6693 35.096 46.16C35.448 46.6507 35.624 47.2373 35.624 47.92C35.624 48.2827 35.576 48.6453 35.48 49.008C35.3947 49.36 35.2133 49.7333 34.936 50.128C34.6693 50.5227 34.2747 50.9653 33.752 51.456L30.168 54.832L29.672 53.888H35.992V56H27.528ZM46.2168 56.128C45.2994 56.128 44.4834 55.936 43.7688 55.552C43.0648 55.168 42.5048 54.6453 42.0888 53.984C41.6834 53.312 41.4808 52.5493 41.4808 51.696C41.4808 50.832 41.6834 50.0693 42.0888 49.408C42.5048 48.736 43.0648 48.2133 43.7688 47.84C44.4834 47.456 45.2994 47.264 46.2168 47.264C47.1234 47.264 47.9341 47.456 48.6488 47.84C49.3634 48.2133 49.9234 48.7307 50.3288 49.392C50.7341 50.0533 50.9368 50.8213 50.9368 51.696C50.9368 52.5493 50.7341 53.312 50.3288 53.984C49.9234 54.6453 49.3634 55.168 48.6488 55.552C47.9341 55.936 47.1234 56.128 46.2168 56.128ZM46.2168 54.08C46.6328 54.08 47.0061 53.984 47.3368 53.792C47.6674 53.6 47.9288 53.328 48.1208 52.976C48.3128 52.6133 48.4088 52.1867 48.4088 51.696C48.4088 51.1947 48.3128 50.768 48.1208 50.416C47.9288 50.064 47.6674 49.792 47.3368 49.6C47.0061 49.408 46.6328 49.312 46.2168 49.312C45.8008 49.312 45.4274 49.408 45.0968 49.6C44.7661 49.792 44.4994 50.064 44.2968 50.416C44.1048 50.768 44.0088 51.1947 44.0088 51.696C44.0088 52.1867 44.1048 52.6133 44.2968 52.976C44.4994 53.328 44.7661 53.6 45.0968 53.792C45.4274 53.984 45.8008 54.08 46.2168 54.08ZM52.9091 56V47.2C52.9091 46.2293 53.1971 45.456 53.7731 44.88C54.3491 44.2933 55.1705 44 56.2371 44C56.5998 44 56.9465 44.0373 57.2771 44.112C57.6185 44.1867 57.9065 44.304 58.1411 44.464L57.4851 46.272C57.3465 46.176 57.1918 46.1013 57.0211 46.048C56.8505 45.9947 56.6691 45.968 56.4771 45.968C56.1145 45.968 55.8318 46.0747 55.6291 46.288C55.4371 46.4907 55.3411 46.8 55.3411 47.216V48.016L55.4051 49.088V56H52.9091ZM51.5811 49.504V47.584H57.5491V49.504H51.5811ZM66.4279 56.192C65.6492 56.192 64.8759 56.0907 64.1079 55.888C63.3399 55.6747 62.6892 55.376 62.1559 54.992L63.1639 53.008C63.5905 53.3173 64.0865 53.5627 64.6519 53.744C65.2172 53.9253 65.7879 54.016 66.3639 54.016C67.0145 54.016 67.5265 53.888 67.8999 53.632C68.2732 53.376 68.4599 53.024 68.4599 52.576C68.4599 52.1493 68.2945 51.8133 67.9639 51.568C67.6332 51.3227 67.0999 51.2 66.3639 51.2H65.1799V49.488L68.2999 45.952L68.5879 46.88H62.7159V44.8H70.5559V46.48L67.4519 50.016L66.1399 49.264H66.8919C68.2679 49.264 69.3079 49.5733 70.0119 50.192C70.7159 50.8107 71.0679 51.6053 71.0679 52.576C71.0679 53.2053 70.9025 53.7973 70.5719 54.352C70.2412 54.896 69.7345 55.3387 69.0519 55.68C68.3692 56.0213 67.4945 56.192 66.4279 56.192Z" fill="#002B60"/>
+                        </svg>
+
+                    </div>
+                  </div>
+                  <div class="col-xs-8">
+                    <div class="step-text">
+                      <div class="current-step-title">Complaint details</div>
+                      <div class="next-text">Next: Review</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="row step-3" style="display: none;align-items: center;">
+                  <div class="col-xs-4">
+                    <div class="">
+                        <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M100 50C100 77.6142 77.6142 100 50 100C22.3858 100 0 77.6142 0 50C0 22.3858 22.3858 0 50 0C77.6142 0 100 22.3858 100 50ZM10 50C10 72.0914 27.9086 90 50 90C72.0914 90 90 72.0914 90 50C90 27.9086 72.0914 10 50 10C27.9086 10 10 27.9086 10 50Z" fill="#E9EAEB"/>
+                            <path d="M100 50C100 77.6142 77.6142 100 50 100C22.3858 100 0 77.6142 0 50C0 22.3858 22.3858 0 50 0C77.6142 0 100 22.3858 100 50ZM10 50C10 72.0914 27.9086 90 50 90C72.0914 90 90 72.0914 90 50C90 27.9086 72.0914 10 50 10C27.9086 10 10 27.9086 10 50Z" fill="#5DC400"/>
+                            <path d="M31.256 56.192C30.4773 56.192 29.704 56.0907 28.936 55.888C28.168 55.6747 27.5173 55.376 26.984 54.992L27.992 53.008C28.4187 53.3173 28.9147 53.5627 29.48 53.744C30.0453 53.9253 30.616 54.016 31.192 54.016C31.8427 54.016 32.3547 53.888 32.728 53.632C33.1013 53.376 33.288 53.024 33.288 52.576C33.288 52.1493 33.1227 51.8133 32.792 51.568C32.4613 51.3227 31.928 51.2 31.192 51.2H30.008V49.488L33.128 45.952L33.416 46.88H27.544V44.8H35.384V46.48L32.28 50.016L30.968 49.264H31.72C33.096 49.264 34.136 49.5733 34.84 50.192C35.544 50.8107 35.896 51.6053 35.896 52.576C35.896 53.2053 35.7307 53.7973 35.4 54.352C35.0693 54.896 34.5627 55.3387 33.88 55.68C33.1973 56.0213 32.3227 56.192 31.256 56.192ZM46.248 56.128C45.3307 56.128 44.5147 55.936 43.8 55.552C43.096 55.168 42.536 54.6453 42.12 53.984C41.7147 53.312 41.512 52.5493 41.512 51.696C41.512 50.832 41.7147 50.0693 42.12 49.408C42.536 48.736 43.096 48.2133 43.8 47.84C44.5147 47.456 45.3307 47.264 46.248 47.264C47.1547 47.264 47.9653 47.456 48.68 47.84C49.3947 48.2133 49.9547 48.7307 50.36 49.392C50.7653 50.0533 50.968 50.8213 50.968 51.696C50.968 52.5493 50.7653 53.312 50.36 53.984C49.9547 54.6453 49.3947 55.168 48.68 55.552C47.9653 55.936 47.1547 56.128 46.248 56.128ZM46.248 54.08C46.664 54.08 47.0373 53.984 47.368 53.792C47.6987 53.6 47.96 53.328 48.152 52.976C48.344 52.6133 48.44 52.1867 48.44 51.696C48.44 51.1947 48.344 50.768 48.152 50.416C47.96 50.064 47.6987 49.792 47.368 49.6C47.0373 49.408 46.664 49.312 46.248 49.312C45.832 49.312 45.4587 49.408 45.128 49.6C44.7973 49.792 44.5307 50.064 44.328 50.416C44.136 50.768 44.04 51.1947 44.04 51.696C44.04 52.1867 44.136 52.6133 44.328 52.976C44.5307 53.328 44.7973 53.6 45.128 53.792C45.4587 53.984 45.832 54.08 46.248 54.08ZM52.9404 56V47.2C52.9404 46.2293 53.2284 45.456 53.8044 44.88C54.3804 44.2933 55.2017 44 56.2684 44C56.631 44 56.9777 44.0373 57.3084 44.112C57.6497 44.1867 57.9377 44.304 58.1724 44.464L57.5164 46.272C57.3777 46.176 57.223 46.1013 57.0524 46.048C56.8817 45.9947 56.7004 45.968 56.5084 45.968C56.1457 45.968 55.863 46.0747 55.6604 46.288C55.4684 46.4907 55.3724 46.8 55.3724 47.216V48.016L55.4364 49.088V56H52.9404ZM51.6124 49.504V47.584H57.5804V49.504H51.6124ZM66.4591 56.192C65.6805 56.192 64.9071 56.0907 64.1391 55.888C63.3711 55.6747 62.7205 55.376 62.1871 54.992L63.1951 53.008C63.6218 53.3173 64.1178 53.5627 64.6831 53.744C65.2485 53.9253 65.8191 54.016 66.3951 54.016C67.0458 54.016 67.5578 53.888 67.9311 53.632C68.3045 53.376 68.4911 53.024 68.4911 52.576C68.4911 52.1493 68.3258 51.8133 67.9951 51.568C67.6645 51.3227 67.1311 51.2 66.3951 51.2H65.2111V49.488L68.3311 45.952L68.6191 46.88H62.7471V44.8H70.5871V46.48L67.4831 50.016L66.1711 49.264H66.9231C68.2991 49.264 69.3391 49.5733 70.0431 50.192C70.7471 50.8107 71.0991 51.6053 71.0991 52.576C71.0991 53.2053 70.9338 53.7973 70.6031 54.352C70.2725 54.896 69.7658 55.3387 69.0831 55.68C68.4005 56.0213 67.5258 56.192 66.4591 56.192Z" fill="#002B60"/>
+                        </svg>
+
+                    </div>
+                  </div>
+                  <div class="col-xs-8">
+                    <div class="step-text">
+                      <div class="current-step-title">Review</div>
+                    </div>
+                  </div>
+                </div>
+
+            </div>
+    </div>
+
+    </section>
+    <section class="stepper-body">
+        <div class="container">
+            <div class="content">
+                <div class="step-content step-1" >
+                    <div class="p-48">
+                        <form class="my-form" id="my-form-1" novalidation>
+                            <p class="Your-details pb-48">Your details</p>
+                            <div class="row ">
+                              <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 mb-48">
+                                
+                                    <span class="label label-default label-spacing">
+                                        <span style="color: red;">*</span>
+                                        Name
+                                    </span>
+                                    <input type="text" id="name" class="form-control input-class" required>
+                               
+                              </div>
+                              <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 mb-48">
+                                <span class="label label-default label-spacing">
+                                    <span style="color: red;">*</span>
+                                    Surname
+                                </span>
+                                <input type="text" id="surname" class="form-control input-class" required>
+                              </div>
+                              <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 mb-48">
+                                <span class="label label-default label-spacing">
+                                    <span style="color: red;">*</span>
+                                    Email address
+                                </span>
+                                <input type="email" id="email" class="form-control input-class">
+                              </div>
+                              <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 mb-48">
+                                <span class="label label-default label-spacing">
+                                <!--<span style="color: grey;">*</span>-->
+                                    Contact number (Optional)
+                                </span>
+                                <input type="number" id="number" class="form-control input-class">
+                              </div>
+                              <!--<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 mb-48">-->
+                              <!--  <span class="label label-default label-spacing">-->
+                              <!--      Client number (Optional)-->
+                              <!--      <span data-toggle="tooltip" data-placement="top" title="Optional">-->
+                              <!--          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none">-->
+                              <!--            <g clip-path="url(#clip0_5913_12206)">-->
+                              <!--              <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>-->
+                              <!--            </g>-->
+                              <!--            <defs>-->
+                              <!--              <clipPath id="clip0_5913_12206">-->
+                              <!--                <rect width="24" height="24" fill="white"/>-->
+                              <!--              </clipPath>-->
+                              <!--            </defs>-->
+                              <!--          </svg>-->
+                              <!--      </span>-->
+                              <!--  </span>-->
+                              <!--  <input type="text" id="Clientnumber" class="form-control input-class">-->
+                              <!--</div>-->
+                              <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 mb-48">
+                              <!--  <p class="id-type">Select ID type</p>-->
+                              <!--  <div class="circle-radio">-->
+                              <!--          <div class="radio-option">-->
+                              <!--            <input type="radio" id="option1" name="options" value="Id" active>-->
+                              <!--            <label for="option1"></label>-->
+                              <!--            <span>South African ID</span>-->
+                              <!--          </div>-->
+                              <!--          <div class="radio-option">-->
+                              <!--            <input type="radio" id="option2" name="options" value="Passport">-->
+                              <!--            <label for="option2"></label>-->
+                              <!--            <span>Passport </span>-->
+                              <!--          </div>-->
+                              <!--  <span class="label label-default label-spacing">-->
+                              <!--  <span style="color: red;">*</span>-->
+                              <!--      Enter number-->
+                              <!--  </span>-->
+                              <!--  <input type="number" id="identification"class="form-control input-class" required>-->
+                              <!--</div>-->
+                            </div>
+                            </div>
+                            
+                            <div class="text-right text-right-xs">
+                              <button class="btn btn-primary next" id="btn-step1">Next</button>
+                            </div>
+
+                          
+                        </form>
+                    </div>
+                </div>
+                <div class="step-content step-2" style="display: none;">
+                    <div class="p-48">
+                        <form class="my-form" id="my-form-2" novalidation>
+                            <p class="Your-details pb-32">Complaint details</p>
+                            <p class="select-categories">
+                                <span style="color: red;">*</span>
+                                Select 1 or more  categories:</p>
+                            <div class="row " style="padding: 0px 15px;">
+                               <section>
+                                    <div class="table-header">
+                                        
+                                        <p>Tell us what your complaint is about</p>
+                                    </div>    
+                                    <div class="custom-checkbox">
+                                      <input type="checkbox" id="squareCheck1">
+                                      <label for="squareCheck1"><p class="checkbox-label">Product or Service</p></label>
+                                    </div>
+                                    <hr style="width:100%">
+                                    <div class="custom-checkbox">
+                                      <input type="checkbox" id="squareCheck2">
+                                      <label for="squareCheck2"><p class="checkbox-label">Service advice</p></label>
+                                    </div>
+                                    <hr style="width:100%">
+                                    <div class="custom-checkbox">
+                                      <input type="checkbox" id="squareCheck3">
+                                      <label for="squareCheck3"><p class="checkbox-label">Customer service</p></label>
+                                    </div>
+                                    <hr style="width:100%">
+                                    <div class="custom-checkbox">
+                                      <input type="checkbox" id="squareCheck4">
+                                      <label for="squareCheck4"><p class="checkbox-label">Products or Services Access</p></label>
+                                    </div> 
+                                    <hr style="width:100%">
+                               </section>
+                               <section>
+                                   
+                                   
+                                   <p class="select-categories" style="margin-top: 30px;">
+                                       <span style="color: red;">*</span>
+                                       Select 1 or more descriptions for your complaint:</p>
+                                    <div class="table-header">
+                                        <p>Please select the relevant issues</p>
+                                    </div>
+                                    
+
+                                    <section id="Product-or-Service">
+                                    <div class="row">
+                                        <div class="col-xs-12 col-sm-6">
+                                            <div class="custom-checkbox p-0 col-xs-12 col-sm-6 col-lg-6">
+                                              <input type="checkbox" id="squareCheck5">
+                                              <label for="squareCheck5"><p class="checkbox-label">Unfair fees or charges</p></label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-xs-12 col-sm-6">
+                                            <hr style="width:100%" class="visible-xs">
+                                            
+                                            <div class="custom-checkbox p-0 col-xs-12 col-sm-6 col-lg-6">
+                                              <input type="checkbox" id="squareCheck6">
+                                              <label for="squareCheck6"><p class="checkbox-label">Unclear or confusing product prices</p></label>
+                                            </div>
+                                        </div>
+                                        
+                                     </div>
+                                    <hr style="width:100%">
+                                    <div class="row">
+                                        <div class="col-xs-12 col-sm-6">
+                                            <div class="custom-checkbox p-0 col-xs-12 col-sm-6 col-lg-6">
+                                              <input type="checkbox" id="squareCheck7">
+                                              <label for="squareCheck7"><p class="checkbox-label">Unfair service</p></label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-xs-12 col-sm-6">
+                                            <hr style="width:100%" class="visible-xs">
+                                            
+                                            <div class="custom-checkbox p-0 col-xs-12 col-sm-6 col-lg-6">
+                                              <input type="checkbox" id="squareCheck8">
+                                              <label for="squareCheck8"><p class="checkbox-label">Contract or account information not provided</p></label>
+                                            </div>
+                                        </div>
+                                        
+                                     </div>
+                                    <hr style="width:100%">
+                                    <div class="row">
+                                        <div class="col-xs-12 col-sm-6">
+                                            <div class="custom-checkbox p-0 col-xs-12 col-sm-6 col-lg-6">
+                                              <input type="checkbox" id="squareCheck9">
+                                              <label for="squareCheck9"><p class="checkbox-label">Poor interest rates</p></label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-xs-12 col-sm-6">
+                                            <hr style="width:100%" class="visible-xs">
+                                            
+                                            <div class="custom-checkbox p-0 col-xs-12 col-sm-6 col-lg-6">
+                                              <input type="checkbox" id="squareCheck10">
+                                              <label for="squareCheck10"><p class="checkbox-label">Confusing terms and conditions</p></label>
+                                            </div>
+                                        </div>
+                                        
+                                     </div>
+                                    <hr style="width:100%">
+                                    <div class="row">
+                                        <div class="col-xs-12 col-sm-6">
+                                            <div class="custom-checkbox p-0 col-xs-12 col-sm-6 col-lg-6">
+                                              <input type="checkbox" id="squareCheck11">
+                                              <label for="squareCheck11"><p class="checkbox-label">Confusing user systems/expectations not met</p></label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-xs-12 col-sm-6">
+                                            <hr style="width:100%" class="visible-xs">
+                                            
+                                            <div class="custom-checkbox p-0 col-xs-12 col-sm-6 col-lg-6">
+                                              <input type="checkbox" id="squareCheck12">
+                                              <label for="squareCheck12"><p class="checkbox-label">Too much fine print</p></label>
+                                            </div>
+                                        </div>
+                                        
+                                     </div>
+                                    <hr style="width:100%">
+                                    <div class="row">
+                                        <div class="col-xs-12 col-sm-6">
+                                            <div class="custom-checkbox p-0 col-xs-12 col-sm-6 col-lg-6">
+                                              <input type="checkbox" id="squareCheck13">
+                                              <label for="squareCheck13"><p class="checkbox-label">Misleading or incomplete information/disclosures</p></label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-xs-12 col-sm-6">
+                                            <hr style="width:100%" class="visible-xs">
+                                            
+                                            <div class="custom-checkbox p-0 col-xs-12 col-sm-6 col-lg-6">
+                                              <input type="checkbox" id="squareCheck14">
+                                              <label for="squareCheck14"><p class="checkbox-label">Inaccurate information provided </p></label>
+                                            </div>
+                                        </div>
+                                        
+                                     </div>
+                                    <hr style="width:100%">
+                                    <div class="row">
+                                        <div class="col-xs-12 col-sm-6">
+                                            <div class="custom-checkbox p-0 col-xs-12 col-sm-6 col-lg-6">
+                                              <input type="checkbox" id="squareCheck15">
+                                              <label for="squareCheck15"><p class="checkbox-label">Value-added services not delivered</p></label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-xs-12 col-sm-6">
+                                            <hr style="width:100%" class="visible-xs">
+                                            
+                                            <div class="custom-checkbox p-0 col-xs-12 col-sm-6 col-lg-6">
+                                              <input type="checkbox" id="squareCheck16">
+                                              <label for="squareCheck16"><p class="checkbox-label">Unfair product features</p></label>
+                                            </div>
+                                        </div>
+                                        
+                                     </div>
+                                    <hr style="width:100%">
+                                    </section>
+                                    <section id="Service-advice">
+                                        <div class="custom-checkbox">
+                                          <input type="checkbox" id="squareCheck17">
+                                          <label for="squareCheck17"><p class="checkbox-label">Misleading information</p></label>
+                                        </div>
+                                        <hr style="width:100%">
+                                        <div class="custom-checkbox">
+                                          <input type="checkbox" id="squareCheck18">
+                                          <label for="squareCheck18"><p class="checkbox-label">Benefits not explained correctly</p></label>
+                                        </div>
+                                        <hr style="width:100%">
+                                        <div class="custom-checkbox">
+                                          <input type="checkbox" id="squareCheck19">
+                                          <label for="squareCheck19"><p class="checkbox-label">Lack of knowledge, skill or integrity</p></label>
+                                        </div>
+                                       
+                                    </section>
+                                    <section id="Customer-service">
+                                        <hr style="width:100%">
+                                        <div class="custom-checkbox">
+                                          <input type="checkbox" id="squareCheck20">
+                                          <label for="squareCheck20"><p class="checkbox-label">Incompetence</p></label>
+                                        </div>
+                                        <hr style="width:100%">
+                                        <div class="custom-checkbox">
+                                          <input type="checkbox" id="squareCheck21">
+                                          <label for="squareCheck21"><p class="checkbox-label">Non-responsiveness</p></label>
+                                        </div>
+                                        <hr style="width:100%">
+                                        <div class="custom-checkbox">
+                                          <input type="checkbox" id="squareCheck22">
+                                          <label for="squareCheck22"><p class="checkbox-label">Rudeness</p></label>
+                                        </div>
+                                         <hr style="width:100%">
+                                        <div class="custom-checkbox">
+                                          <input type="checkbox" id="squareCheck23">
+                                          <label for="squareCheck23"><p class="checkbox-label">Administrative difficulty</p></label>
+                                        </div>
+                                        <hr style="width:100%">
+                                        <div class="custom-checkbox">
+                                          <input type="checkbox" id="squareCheck24">
+                                          <label for="squareCheck24"><p class="checkbox-label">Client service standards of service providers</p></label>
+                                        </div>
+                                         <hr style="width:100%">
+                                        <div class="custom-checkbox">
+                                          <input type="checkbox" id="squareCheck25">
+                                          <label for="squareCheck25"><p class="checkbox-label">Complaints handling - poor communication on process/decision</p></label>
+                                        </div>
+                                        
+                                       
+                                    </section>
+                                    <section id="Accessing-a-product-or-service">
+                                        <hr style="width:100%">
+                                        <div class="custom-checkbox">
+                                          <input type="checkbox" id="squareCheck26">
+                                          <label for="squareCheck26"><p class="checkbox-label">Product access/changes - access to funds</p></label>
+                                        </div>
+                                        <hr style="width:100%">
+                                        <div class="custom-checkbox">
+                                          <input type="checkbox" id="squareCheck27">
+                                          <label for="squareCheck27"><p class="checkbox-label">Product access/changes - unreasonable penalties to access product</p></label>
+                                        </div>
+                                        <hr style="width:100%">
+                                        <div class="custom-checkbox">
+                                          <input type="checkbox" id="squareCheck28">
+                                          <label for="squareCheck28"><p class="checkbox-label">Product changes, switches, redemptions</p></label>
+                                        </div>
+                                         <hr style="width:100%">
+                                        <div class="custom-checkbox">
+                                          <input type="checkbox" id="squareCheck29">
+                                          <label for="squareCheck29"><p class="checkbox-label">Product access/changes - early termination charges</p></label>
+                                        </div>
+                                        <hr style="width:100%">
+                                        <div class="custom-checkbox">
+                                          <input type="checkbox" id="squareCheck30">
+                                          <label for="squareCheck30"><p class="checkbox-label">Product access/changes/switches - ability to make changes</p></label>
+                                        </div>
+                                       <hr style="width:100%">
+                                    </section>
+                                    
+                                    
+
+                               </section>
+                            </div>
+                            
+                            <br>
+                            <br>
+                            <div class="form-group">
+                              <p class="Upload-file">
+                                <span class="Upload-file" style="color: #002B60;font-weight: 500;">Upload file (Optional)</span>
+                                   <span data-toggle="tooltip" data-placement="top" title="Optional">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none">
+                                          <g clip-path="url(#clip0_5913_12206)">
+                                            <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+                                          </g>
+                                          <defs>
+                                            <clipPath id="clip0_5913_12206">
+                                              <rect width="24" height="24" fill="white"/>
+                                            </clipPath>
+                                          </defs>
+                                        </svg>
+                                    </span>
+                            </p>
+                              <input type="file" id="fileInput" class="form-control1">
+                              <p style="color: #002B60;font-weight: 500;">Your file should be less than 5mb (.jpeg .png . pdf .docx .xlsx)</p>
+                            </div>
+                            
+                            <div class="form-group">
+                                <p class="information">
+                                    <span style="color: red;">*</span>
+                                    Complaint description 
+                                </p>
+                                
+                                </label><br>
+                                <textarea id="myTextBox" maxlength="300" rows="5" cols="50" required></textarea>
+                                <p id="charCount">0 / 300</p>
+                                <p id="error-message" style="color: red; display: none;"></p>
+                            </div>
+                            
+                            
+                            <div class="text-right">
+                                <div class="buttons">
+                                    <div class="row">
+                                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                                            <button class="btn btn-default prev">Back</button>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                                            <button class="btn btn-primary next" id="btn-step2" disabled>Submit</button>
+                                        </div>
+                                    </div>
+                                    
+                                    
+                                </div>
+                            </div>
+
+                          
+                        </form>
+                    </div>
+                </div>
+                <div class="step-content step-3" style="display: none;">
+                    <div class="p-48">
+                        
+                        <p class="review">Review</p>
+                        <hr class="green-hr">
+                        <div class="details-container">
+                            <div class="detail-row">
+                              <div class="step3-label">Name:</div>
+                              <div class="value" id="name1"></div>
+                            </div>
+                            <div class="detail-row">
+                              <div class="step3-label">Contact number:</div>
+                              <div class="value" id="contactNumber"></div>
+                            </div>
+                            <div class="detail-row">
+                              <div class="step3-label">Email:</div>
+                              <div class="value" id="email1"></div>
+                            </div>
+                            <!--<div class="detail-row">-->
+                            <!--  <div class="step3-label">Client number:</div>-->
+                            <!--  <div class="value" id="clientNumber"></div>-->
+                            <!--</div>-->
+                            <!--<div class="detail-row">-->
+                            <!--  <div class="step3-label">ID/Passport number:</div>-->
+                            <!--  <div class="value" id="idType"></div>-->
+                            <!--</div>-->
+                          </div>
+                        <hr class="green-hr">
+                        <div class="complaint-title">Complaint details</div>
+                        <hr class="green-hr">
+                        <div class="complaint-section">
+                            <div class="complaint-table">
+                              <div class="column">
+                                <div class="column-title">Category:</div>
+                                <div class="complaint-item">
+                                  <span class="check-icon"></span>
+                                  <div id="category-column"></div>
+                                </div>
+                             
+                              </div>
+                        
+                              <div class="column">
+                                <div class="column-title">Description</div>
+                                <div class="complaint-item">
+                                  <span class="check-icon"></span>
+                                  <div id="value-column"></div>
+                                </div>
+                              </div>
+                            </div>
+                         </div>
+                         
+                         <div class="complaint-section">
+                            <div class="complaint-table">
+                              <div class="column">
+                                <div class="column-title">Complaint description:</div>
+                                <div class="complaint-item">
+                                  <div id="idComplaintDescription"></div>
+                                </div>
+                             
+                              </div>
+                        
+                              
+                            </div>
+                         </div>
+                        
+                        <div class="submit-title">Submit</div>
+                        <div class="submit-section">
+                            
+                            <p class="text-muted">
+                              For more information on the every complaints process, please click the link below:
+                            </p>
+                        
+                            <a class="policy-link" href="http://cmsdev.africanbank.net/media/liejjzpm/african-bank-customer-complaints-policy-2.pdf" target="_blank" rel="noopener noreferrer" style="text-decoration: underline !important;">
+                              <svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 0 24 24" fill="#8cd211">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/>
+                              </svg>
+                              Complaints policy
+                            </a>
+
+                        
+                            <p class="text-muted">
+                              African Bank is committed to addressing every complaint in order to rectify any challenges or shortcomings that you as a client may face.
+                            </p>
+                            <p class="text-muted">
+                              Please contact us if you are aggrieved in any way as your feedback is important to us.
+                            </p>
+                        
+                            <div class="checkbox-declaration">
+                              <label>
+                                <input type="checkbox"  class="complaint-checkbox" id="declare"/>
+                                <span class="checkbox-declaration-span">I, <span><div class="value" id="name2"> </div></span> declare the above to be true and correct.</span>
+                              </label>
+                            </div>
+                          </div>
+
+                        <div class="text-right">
+                                <div class="buttons">
+                                    <div class="row">
+                                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                                            <button class="btn btn-default prev">Back</button>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                                            <button type="submit" class="btn btn-primary next" id="submit" disabled>Submit</button>
+                                        </div>
+                                    </div>
+                                    
+                                    
+                                </div>
+                            </div>
+                    </div>
+                </div>    
+            </div>
+        </div>
+    </section>
+    <section class="bg-white"></section>
+
+</section>
+
+
+<section class="successful" id="successful" >
+        <div class="container">
+            <div class="successful-body">
+                <p class="successful-header">Your complaint has been submitted successfully!</p>
+                <hr class="successful-hr">
+                <div class="successful-p">
+                    <p>Thank you for sharing your feedback. We truly appreciate your input and we will work to address your concerns appropriately.</p>
+                    <p><b>Your reference number is: <span id="idComplaintDescription1"></spam></b></p>
+                    <p>Please note that your every complaint will be acknowledged within <b>48 business hours</b> and, following a thorough investigation, resolved within <b>21 business days.</b></p>
+                </div>
+                <!--<hr class="successful-hr">-->
+                <!--<div class="successful-p">-->
+                <!--    <p>Did you know?</p>-->
+                <!--    <p><b>You can book your virtual meeting with a business banker</b> in just 4 easy steps? <b>Get personalised support</b> for all your business banking needs—whenever, wherever. Get started today!</p>-->
+                <!--</div>-->
+            </div>
+        </div>
+</section>
+<section class="bg-white-2" id="bg-white-2" ></section>
+
+
+<script>
+
+
+    $(document).ready(function () {
+    let currentStep = 1;
+
+    function updateStepper() {
+        // Hide all step contents
+        $('.step-content').hide();
+        // Show current step content
+        $('.step-' + currentStep).show();
+
+        // Update step circle state
+        $('.step').removeClass('active');
+        $('.step[data-step="' + currentStep + '"]').addClass('active');
+
+        // Update button states
+        $('.prev').prop('disabled', currentStep === 1);
+        $('.next').text(currentStep === 3 ? 'Submit' : 'Submit');
+    }
+    
+    function goToNextStep() {
+      if (currentStep < 4) {
+        $('.step[data-step="' + currentStep + '"]').removeClass('active').addClass('completed');
+        currentStep++;
+        updateStepper();
+      }
+    }
+
+    
+      function goToPreviousStep() {
+      if (currentStep > 1) {
+        $('.step[data-step="' + currentStep + '"]').removeClass('active');
+        currentStep--;
+        $('.step[data-step="' + currentStep + '"]').removeClass('completed').addClass('active');
+        updateStepper();
+      }
+    }
+
+
+
+    $('.next').click(function () {
+        if (currentStep < 4) {
+            $('.step[data-step="' + currentStep + '"]').removeClass('active').addClass('completed');
+            currentStep++;
+            updateStepper();
+        }
+    });
+
+    $('.prev').click(function () {
+        if (currentStep > 1) {
+            $('.step[data-step="' + currentStep + '"]').removeClass('active');
+            currentStep--;
+            $('.step[data-step="' + currentStep + '"]').removeClass('completed').addClass('active');
+            updateStepper();
+        }
+    });
+
+    updateStepper(); // Initial call
+});
+    
+ $(document).ready(function () {
+      $('.step.completed .step-circle').text('✓');
+    });   
+
+$(document).ready(function () {
+    
+
+    
+    $('#myTextBox').on('input', function () {
+    const currentLength = $(this).val().length;
+    $('#charCount').text(currentLength + ' / 300');
+  });
+
+    
+  $('#squareCheck1').on('change', function () {
+    if ($(this).is(':checked')) {
+      $('#Product-or-Service').show(); // display: block
+    } else {
+      $('#Product-or-Service').hide(); // display: none
+    }
+  });
+  
+  
+    $('#squareCheck2').on('change', function () {
+    if ($(this).is(':checked')) {
+      $('#Service-advice').show(); // display: block
+    } else {
+      $('#Service-advice').hide(); // display: none
+    }
+  });
+  
+    $('#squareCheck3').on('change', function () {
+    if ($(this).is(':checked')) {
+      $('#Customer-service').show(); // display: block
+    } else {
+      $('#Customer-service').hide(); // display: none
+    }
+  });
+  
+    $('#squareCheck4').on('change', function () {
+    if ($(this).is(':checked')) {
+      $('#Accessing-a-product-or-service').show(); // display: block
+    } else {
+      $('#Accessing-a-product-or-service').hide(); // display: none
+    }
+  });
+});
+
+
+
+
+
+
+$(document).ready(function () {
+    $('#btn-step1 , #btn-step2').on('click', function (e) {
+      e.preventDefault(); // prevent form submission
+
+      // Collect values using input IDs
+      const formData = {
+        name: $('#name').val(),
+        surname: $('#surname').val(),
+        email: $('#email').val(),
+        number: $('#number').val(),
+        clientNumber: $('#Clientnumber').val() || " ",
+        // idType: $('input[name="options"]:checked').val(), // Radio selection
+        // idNumber: $('#identification').val(),
+        complaintDescription: $('#myTextBox').val()
+      };
+
+      console.log("Collected Form Data:", formData);
+      
+        document.getElementById('name1').textContent = formData.name + " " + formData.surname || 'N/A';
+        document.getElementById('name2').textContent = formData.name + " " + formData.surname || 'N/A';
+        document.getElementById('contactNumber').textContent = formData.number || 'N/A';
+        document.getElementById('email1').textContent = formData.email || 'N/A';
+        // document.getElementById('clientNumber').textContent = formData.clientNumber || 'N/A';
+        // document.getElementById('idType').textContent = formData.idNumber || 'N/A';
+         document.getElementById('idComplaintDescription').textContent = formData.complaintDescription || 'N/A';
+      // You can now use `formData` as needed (e.g., send via AJAX, hold for next step, etc.)
+    });
+  });
+  
+  
+function getSelectedIdType() {
+  return $('input[name="options"]:checked').nextAll('span:first').text().trim();
+}
+
+function getAttachmentFileName() {
+  const file = $('#fileInput')[0].files[0];
+  return file ? file.name : "";
+}
+
+function getAttachmentBase64(callback) {
+  const file = $('#fileInput')[0].files[0];
+  
+  if (!file) {
+    callback(" ");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const base64String = e.target.result.split(',')[1]; // Remove data:*/*;base64,
+    callback(base64String);
+  };
+  reader.readAsDataURL(file);
+}
+
+
+
+
+ const selected = {};
+ 
+ let base64Attachment = "";
+
+function readAttachmentBase64() {
+  const file = $('#fileInput')[0].files[0];
+
+  if (!file) {
+    base64Attachment = "";
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    base64Attachment = e.target.result.split(',')[1];
+  };
+  reader.readAsDataURL(file);
+}
+
+
+function getAttachmentFileType() {
+  const file = $('#fileInput')[0].files[0];
+  return file ? file.type : "";
+}
+
+$('#fileInput').on('change', function () {
+  readAttachmentBase64(); // This sets the base64Attachment variable
+});
+
+
+
+
+
+$(document).ready(function () {
+  const sectionMap = {
+    squareCheck1: '#Product-or-Service',
+    squareCheck2: '#Service-advice',
+    squareCheck3: '#Customer-service',
+    squareCheck4: '#Accessing-a-product-or-service'
+  };
+
+  // Hide all sections initially
+  Object.values(sectionMap).forEach(selector => {
+    $(selector).hide();
+  });
+
+  // Function to collect all selected checkbox values in an object
+  
+  function logSelectedValues() {
+  
+
+  Object.values(sectionMap).forEach(selector => {
+    const values = $(`${selector} input[type="checkbox"]:checked`).map(function () {
+      const inputId = $(this).attr('id');
+      const labelText = $(`label[for="${inputId}"] .checkbox-label`).text().trim();
+      return labelText;
+    }).get();
+
+    if (values.length > 0) {
+      selected[selector.replace('#', '')] = values;
+    }
+  });
+
+  console.log(selected);
+  return selected; 
+}
+
+
+  // Handle top-level checkbox toggle
+  $.each(sectionMap, function (checkboxId, sectionSelector) {
+    $('#' + checkboxId).on('change', function () {
+      if ($(this).is(':checked')) {
+        $(sectionSelector).slideDown();
+      } else {
+        $(sectionSelector).slideUp();
+        $(sectionSelector).find('input[type="checkbox"]').prop('checked', false);
+      }
+      logSelectedValues();
+    });
+
+    // Handle inner checkbox change as well
+    $(sectionSelector).find('input[type="checkbox"]').on('change', logSelectedValues);
+  });
+}); 
+
+function routerToSuccess(){
+    
+        $('#successful, #bg-white-2').css('display', 'block');
+        $('#main-section').css('display', 'none');
+    
+}
+
+function startLoader() {
+  $('#loader-overlay').addClass('active');
+  $('#submit').prop('disabled', true);
+}
+
+function stopLoader() {
+  $('#loader-overlay').removeClass('active');
+  $('#submit').prop('disabled', false);
+}
+
+function hasFileSelected() {
+  const fileInput = document.getElementById('fileInput');
+  return fileInput.files.length > 0 ? true : false;
+}
+
+
+function submitFormData() {
+  return new Promise((resolve, reject) => { // Add reject parameter
+  
+   startLoader();
+  
+  
+    let data = {
+      fullName: $('#name').val() + " " + $('#surname').val(),
+      email: $('#email').val(),
+      clientAccountNumber: $('#Clientnumber').val(),
+      complaintDescription: $('#myTextBox').val(),
+      complaintType: " ",
+      disclaimer: "Yes",
+      productService: JSON.stringify(selected['Product-or-Service']) || '',
+      productServiceAdvice: JSON.stringify(selected['Service-advice']) || '',
+      productServiceAccess: JSON.stringify(selected['Accessing-a-product-or-service']) || '',
+      customerService: JSON.stringify(selected['Customer-service']) || '',
+      contactNumber: $('#number').val(),
+      identityType: " ",
+      identityNumber: " ",
+      complaintAttachment: base64Attachment,
+      hasAttachment: hasFileSelected(),
+      complaintAttachmentFileName: getAttachmentFileName()
+    };
+    
+    
+    console.log("payload:" , data)
+
+    startLoader();
+   
+    
+
+    $.ajax({
+      url: 'https://prod-49.westeurope.logic.azure.com:443/workflows/ef87a171855f4bddaebbd8708d43e51b/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Ue4vqqv6Ra_XOGFJSvmCir5ccu0w-UmOl9ZcQ_ynrUk',
+      type: 'POST',
+      data: JSON.stringify(data),
+      contentType: 'application/json',
+      processData: false,
+    //   async: false, // Temporary for debugging
+      success: function (response) {
+        stopLoader();
+        console.log("Success:", response.ReferenceNumber);
+        document.getElementById('idComplaintDescription1').textContent = response.ReferenceNumber;
+        $('html, body').animate({ scrollTop: 0 }, 'slow'); // 👈 Scroll to top1
+        routerToSuccess();
+
+          setTimeout(() => {
+            $('.alert-box.success').fadeOut();
+          }, 150000);
+        
+        resolve(true); // Pass full response
+      },
+      error: function (response) {
+        stopLoader();
+        
+        console.error("Error:", response.message);
+        
+        $('#successful, #bg-white-2').css('display', 'none');
+        $('#main-section').css('display', 'block');
+        
+        
+         let message = 'Oops! Something went wrong. Please try again later.';
+
+          if (error.responseJSON && error.responseJSON.message) {
+            message = error.responseJSON.message;
+          }
+        
+          $('.alert-box.error .alert-message').text(message);
+          $('.alert-box.error').fadeIn();
+        
+          setTimeout(() => {
+            $('.alert-box.error').fadeOut();
+          }, 150000);
+        
+        resolve(false); 
+        
+      }
+    });
+  });
+}
+
+$(document).ready(function () {
+  $('#submit').on('click', function (e) {
+    e.preventDefault();
+    submitFormData()
+      .then(response => {
+        console.log("Success:", response.ReferenceNumber);
+
+      })
+      .catch(error => {
+        console.error("Error:", error.message);
+      });
+  });
+});
+
+
+
+
+
+
+$(document).ready(function () {
+    
+$('#btn-step2').on('click', function (e) {
+    
+    const $categoryCol = $('#category-column').empty();
+    const $valueCol = $('#value-column').empty();
+
+    $.each(selected , function(category, descriptions) {
+      const cleanCategory = category.replace(/-/g, ' '); // remove or replace hyphens
+      // Add category with check
+      const $catDiv = $('<div>').addClass('item-group').append(
+        $('<div>').addClass('item').append(
+          $('<span>').addClass('check-icon').html(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M9.00016 16.1698L4.83016 11.9998L3.41016 13.4098L9.00016 18.9998L21.0002 6.99984L19.5902 5.58984L9.00016 16.1698Z" fill="#5DC400"/>
+        </svg>
+      `),
+          $('<span class="category-value">').text(cleanCategory)
+        ),
+      );
+      $categoryCol.append($catDiv);
+
+      // Add group of descriptions stacked vertically, each with check
+      const $descGroup = $('<div>').addClass('item-group');
+      descriptions.forEach(desc => {
+        const $descItem = $('<div>').addClass('item').append(
+          $('<span>').addClass('check-icon').html(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M9.00016 16.1698L4.83016 11.9998L3.41016 13.4098L9.00016 18.9998L21.0002 6.99984L19.5902 5.58984L9.00016 16.1698Z" fill="#5DC400"/>
+        </svg>
+      `),
+          $('<span class="descItem">').text(desc)
+        );
+        $descGroup.append($descItem);
+      });
+      $valueCol.append($descGroup);
+    });
+  });
+ });
+ 
+
+
+
+$('#number').on('input', function () {
+  const value = $(this).val();
+  const rsaPattern = /^(0)(6|7|8|1)[0-9]{8}$/;
+
+  if (!rsaPattern.test(value)) {
+    $(this).addClass('is-invalid');
+    
+            message1="Invade RSA phone number formart"
+          $('.alert-box.error .alert-message').text(message1);
+          $('.alert-box.error').fadeIn();
+        
+          setTimeout(() => {
+            $('.alert-box.error').fadeOut();
+          }, 150000);
+
+  } else {
+    $(this).removeClass('is-invalid');
+  }
+});
+
+
+ $(document).ready(function () {
+    $('#fileInput').on('change', function () {
+      const file = this.files[0];
+      const allowedExtensions = ['jpeg', 'png', 'pdf', 'docx', 'xlsx'];
+      const maxSize = 5 * 1024 * 1024; // 5MB
+
+      if (file) {
+        const fileSize = file.size;
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+
+        if (!allowedExtensions.includes(fileExtension)) {
+          
+          $(this).val(''); // Reset the input
+          message11="Invalid file type. Only .jpeg, .png, .pdf, .docx, .xlsx are allowed."
+          $('.alert-box.error .alert-message').text(message11);
+          $('.alert-box.error').fadeIn();
+        
+          setTimeout(() => {
+            $('.alert-box.error').fadeOut();
+          }, 150000);
+        } else if (fileSize > maxSize) {
+
+          message11="File size must be less than 5MB."
+          $('.alert-box.error .alert-message').text(message11);
+          $('.alert-box.error').fadeIn();
+        
+          setTimeout(() => {
+            $('.alert-box.error').fadeOut();
+          }, 150000);
+          $(this).val(''); // Reset the input
+        }
+      }
+    });
+  });
+  
+    $(document).ready(function () {
+    $('form').on('submit', function (e) {
+      const email = $('#email').val().trim();
+      const number = $('#number').val().trim();
+
+      if (email === '' && number === '') {
+        e.preventDefault(); // Stop form submission
+       
+        message12="Please enter at least Email address or Contact number.";
+          $('.alert-box.error .alert-message').text(message12);
+          $('.alert-box.error').fadeIn();
+        
+          setTimeout(() => {
+            $('.alert-box.error').fadeOut();
+          }, 150000);
+      }
+    });
+  });
+  
+
+
+//  $(document).ready(function () {
+//     // Function to check if all required inputs are filled
+//     function validateForm() {
+//       let isValid = true;
+
+//       // Loop through each required input in the form
+//       $('#my-form-1 [required]').each(function () {
+//         if ($(this).val().trim() === '') {
+//           isValid = false;
+//         message13="Not all valid fields are correctly filled or have correct formart ";
+//           $('.alert-box.error .alert-message').text(message13);
+//           $('.alert-box.error').fadeIn();
+        
+//           setTimeout(() => {
+//             $('.alert-box.error').fadeOut();
+//           }, 150000);
+//         }
+//       });
+
+//       // Enable or disable the Next button
+//       $('#btn-step1').prop('disabled', !isValid);
+//     }
+
+//     // Run validation on input and change events
+//     $('#my-form-1 [required]').on('input change', function () {
+//       validateForm();
+//     });
+
+//     // Run validation on page load in case fields are pre-filled
+//     validateForm();
+//   });
+
+$(document).ready(function () {
+    let currentStep = 1;
+    const totalSteps = 4;
+
+    function updateStepper() {
+        // Step circles and content
+        $('.step').each(function () {
+            const stepNum = parseInt($(this).attr('data-step'));
+            const $circle = $(this).find('.step-circle');
+
+            if (stepNum < currentStep) {
+                $(this).addClass('completed').removeClass('active');
+                $circle.text('✓');
+            } else if (stepNum === currentStep) {
+                $(this).addClass('active').removeClass('completed');
+                $circle.text(stepNum);
+            } else {
+                $(this).removeClass('active completed');
+                $circle.text(stepNum);
+            }
+        });
+
+        // Show current step content, hide others
+        $('.step-content').hide();
+        $('.step-' + currentStep).show();
+
+        // Button states
+        $('.prev').prop('disabled', currentStep === 1);
+        $('.next').text(currentStep === totalSteps - 1 ? 'Submit' : 'Next');
+    }
+
+    $('.next').click(function () {
+        if (currentStep < totalSteps) {
+            currentStep++;
+            updateStepper();
+        } else {
+            // Finish logic here
+            alert('Form completed!');
+        }
+    });
+
+    $('.prev').click(function () {
+        if (currentStep > 1) {
+            currentStep--;
+            updateStepper();
+        }
+    });
+
+    updateStepper(); // Initial render
+});
+
+
+
+$(document).ready(function () {
+  function validateForm() {
+    const email = $('#email').val().trim();
+    const number = $('#number').val().trim();
+    let isValid = email !== '' || number !== '';
+
+    if (!isValid) {
+      const message14 = "Please enter at least Email address or Contact number.";
+      $('.alert-box.error .alert-message').text(message14);
+      $('.alert-box.error').fadeIn();
+
+      setTimeout(() => {
+        $('.alert-box.error').fadeOut();
+      }, 5000); // 5 seconds is enough; 150000ms was likely a typo
+    }
+
+    $('#btn-step1').prop('disabled', !isValid);
+  }
+
+  $('#email, #number').on('input change', function () {
+    validateForm();
+  });
+
+  validateForm(); // run on load
+});
+
+
+
+
+// $(document).ready(function () {
+//   // Dynamically add class to all checkboxes you want to monitor
+//   $('input[type="checkbox"]').addClass('complaint-checkbox');
+
+//   function validateStep2() {
+//     const isChecked = $('.complaint-checkbox:checked').length > 0;
+//     const complaintText = $('#complaintDescription').val()?.trim() || '';
+//     const isValidText = complaintText.length >= 10;
+    
+    
+//     $('#myTextBox').on('input', function () {
+//       var textLength = $(this).val().length;
+//       console.log('Text length:', textLength);
+//         if(textLength >= 10){
+//             $('#btn-step2').prop('disabled', false);
+//         }else{
+//           message123 = "Please enter at least 10 letters in the complaint details.";
+
+//           $('.alert-box.error .alert-message').text(message123);
+//           $('.alert-box.error').fadeIn();
+        
+//           setTimeout(() => {
+//             $('.alert-box.error').fadeOut();
+//           }, 150000);
+//         }
+//     });
+
+   
+
+    
+
+//   }
+
+//   // Attach validation to checkbox and textarea events
+//   $(document).on('change', '.complaint-checkbox', validateStep2);
+//   $('#complaintDescription').on('input', validateStep2);
+
+//   // Run once on load (in case the form is pre-filled)
+//   validateStep2();
+// });
+
+
+$(document).ready(function () {
+    $('#btn-step1').on('click', function () {
+      // Show step-2 and hide step-1
+      $('.step-1').hide();
+      $('.step-2').show();
+    });
+    
+    $('#btn-step2').on('click', function () {
+      // Show step-3 and hide step-2
+      $('.step-2').hide();
+      $('.step-3').show();
+    });
+    
+  });
+
+
+$(document).ready(function () {
+  const sectionMap = {
+    squareCheck1: '#Product-or-Service',
+    squareCheck2: '#Service-advice',
+    squareCheck3: '#Customer-service',
+    squareCheck4: '#Accessing-a-product-or-service'
+  };
+
+  // Hide all sections initially
+  Object.values(sectionMap).forEach(selector => {
+    $(selector).hide();
+  });
+
+  // Get selected checkbox values
+  function logSelectedValues() {
+    const selected = {};
+    Object.values(sectionMap).forEach(selector => {
+      const values = $(`${selector} input[type="checkbox"]:checked`).map(function () {
+        const inputId = $(this).attr('id');
+        const labelText = $(`label[for="${inputId}"] .checkbox-label`).text().trim();
+        return labelText;
+      }).get();
+
+      if (values.length > 0) {
+        selected[selector.replace('#', '')] = values;
+      }
+    });
+    return selected;
+  }
+
+  // Check if at least one section has values
+  function hasAtLeastOneKeyWithValue(obj) {
+    if (!obj || typeof obj !== 'object') return false;
+    return Object.values(obj).some(value => Array.isArray(value) && value.length > 0);
+  }
+
+  // Check if text input has 10 or more characters
+  function hasMinimumTextLength() {
+    const length = $('#myTextBox').val().trim().length;
+    return length >= 10;
+  }
+
+  // Enable or disable the Next button
+  function updateNextButtonState() {
+  
+    const hasSelection = hasAtLeastOneKeyWithValue(logSelectedValues());
+    const hasEnoughText = hasMinimumTextLength();
+
+    const enable = hasSelection && hasEnoughText;
+
+    $('#btn-step2').prop('disabled', !enable);
+  }
+
+  // Live text length tracking
+  $('#myTextBox').on('input', function () {
+    const text = $(this).val().trim();
+    const length = text.length;
+    $('#charCount').text(length + ' / 300');
+
+    if (length < 10) {
+      const remaining = 10 - length;
+      $('#error-message')
+        .text('Please enter at least 10 characters. ' + remaining + ' more to go.')
+        .show();
+    } else {
+      $('#error-message').hide();
+    }
+
+    updateNextButtonState();
+  });
+
+  // Watch checkbox and declare
+  $('#declare, input[type="checkbox"]').on('change', function () {
+    updateNextButtonState();
+  });
+
+  // Initial state
+  updateNextButtonState();
+});
+
+$(document).ready(function () {
+  $('#declare').on('change', function () {
+    $('#submit').prop('disabled', !this.checked);
+  });
+
+  // Initialize button state on page load
+  $('#submit').prop('disabled', !$('#declare').is(':checked'));
+});
+
+
+$('.step.completed .step-circle').append(`
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M9.00016 16.1698L4.83016 11.9998L3.41016 13.4098L9.00016 18.9998L21.0002 6.99984L19.5902 5.58984L9.00016 16.1698Z" fill="#5DC400"/>
+</svg>
+`);
+
+
+
+</script>
+
+
+
+
+

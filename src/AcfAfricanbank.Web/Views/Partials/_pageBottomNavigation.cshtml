@@ -1,15 +1,10 @@
-@inherits UmbracoViewPage<ContentModels.BottomNavigation>
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.BottomNavigation>
 
-@using Umbraco.Cms.Core.Models;
-@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
+@using Umbraco.Web.Models;
+@using ContentModels = Umbraco.Web.PublishedModels;
 @using System.Linq;
-@inject Umbraco.Cms.Core.Models.PublishedContent.IPublishedValueFallback PublishedValueFallback
 @{
-    if (Model == null)
-    {
-        return;
-    }
-
+    BottomNavigation footer = null;
     var _model = Model;
 }
 
@@ -18,22 +13,22 @@
 
     foreach (var menuData in (IEnumerable<IPublishedElement>)_model.LinkItems)
     {
-        if (menuData.Value(PublishedValueFallback, "linkItems") != null)
+        if (menuData.Value("linkItems") != null)
         {
             <div class="col-sm-3 footer-category">
-                <div class="heading">@menuData.Value(PublishedValueFallback, "categoryName")</div>
+                <div class="heading">@menuData.Value("categoryName")</div>
                 <ul>
-                    @foreach (var relatedLink in (IEnumerable<IPublishedElement>)menuData.Value(PublishedValueFallback, "linkItems"))
+                    @foreach (var relatedLink in (IEnumerable<IPublishedElement>)menuData.Value("linkItems"))
                     {
-                        if (relatedLink.Value(PublishedValueFallback, "nCurlLink") != null)
+                        if (relatedLink.Value("nCurlLink") != null)
                         {
                             string pageSection = "";
-
-                            if (relatedLink.Value(PublishedValueFallback, "nCpageSection") != null)
+                            
+                            if (relatedLink.Value("nCpageSection") != null)
                             {
-                                pageSection = relatedLink.Value(PublishedValueFallback, "nCpageSection").ToString();
+                                pageSection = relatedLink.Value("nCpageSection").ToString();
                             }
-                            foreach (var link in (IEnumerable<Umbraco.Cms.Core.Models.Link>)relatedLink.Value(PublishedValueFallback, "nCurlLink"))
+                            foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)relatedLink.Value("nCurlLink"))
                             {
                                 if (link.Url != "#")
                                 {
@@ -48,39 +43,39 @@
                                     }
                                     <li><a href="@_linkString">@link.Name</a></li>
                                 }
-                                else
+                                else 
                                 {
-                                    var filePath = ((ContentModels.File)relatedLink.Value(PublishedValueFallback, "nCdocument"))?.UmbracoFile?.ToString() ?? "";
-                                    <li><a href="@filePath" target="_blank">@relatedLink.Value(PublishedValueFallback, "nCtext")</a></li>
-
+                                    var filePath = ((ContentModels.File)relatedLink.Value("nCdocument")).UmbracoFile.ToString();
+                                    <li><a href="@filePath" target="_blank">@relatedLink.Value("nCtext")</a></li>
+                                    
                                 }
                             }
                         }
-
+                        
                     }
                 </ul>
             </div>
         }
     }
     <div class="col-sm-3 footer-category">
-
+        
         @foreach (var menuData in (IEnumerable<IPublishedElement>)Model.LinkItems)
         {
-            if (menuData.Value(PublishedValueFallback, "listOfRichTextItems") != null)
+            if (menuData.Value("listOfRichTextItems") != null)
             {
 
-                <div class="heading">@menuData.Value(PublishedValueFallback, "categoryName")</div>
+                <div class="heading">@menuData.Value("categoryName")</div>
                 <ul>
                     <li></li>
-                    @foreach (var richTextEditor in (IEnumerable<IPublishedElement>)menuData.Value(PublishedValueFallback, "listOfRichTextItems"))
+                    @foreach (var richTextEditor in (IEnumerable<IPublishedElement>)menuData.Value("listOfRichTextItems"))
                     {
-                        @Html.Raw(richTextEditor.Value(PublishedValueFallback, "nCtextEditor"))
+                        @Html.Raw(richTextEditor.Value("nCtextEditor"))
                     }
                 </ul>
 
             }
         }
-
+        
     </div>
 
 }

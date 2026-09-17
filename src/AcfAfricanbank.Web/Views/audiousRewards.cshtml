@@ -1,36 +1,337 @@
-﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageInvestments>
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using AcfAfricanbank.Core.Models.Forms
 @using ContentModels = Umbraco.Web.PublishedModels;
 @using Web.Helpers;
 @using CustomModels = Web.Models;
 @using System.Collections.Generic;
 @{
     Layout = "Master.cshtml";
-   
+
     // All Current Page Children
     var children = Model.Children;
-    var heroHeader = children?.Where(c => c is HeroHeader).FirstOrDefault();
-    var heroShoulder1 = children?.Where(c => c is HeroShoulder).FirstOrDefault();
-    var heroBody = (HeroBody)children?.Where(c => c is HeroBody).FirstOrDefault();
-    var cardImageDescriptions = heroBody.Children(x => x is Card).ToList();
-    var bodyCards = heroBody?.Children?.Where(c => c is Card);
-    var applyDocs = bodyCards?.Select(c => c as Card).ToList();
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder1 = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
 
+    var heroBody = (HeroBody)children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+
+
+    var cardImageDescriptions = heroBody.Children(x => x is Card).ToList();
+    var bodyCards = heroBody?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+    var applyDocs = bodyCards?.Select(c => c as Card).FirstOrDefault();
+    
+    
+
+    var cardImage = applyDocs.Value("cardIcon");
+    String cardUrl = ((IPublishedContent)cardImage).Url.ToString();
+    
+
+   
     // Get Properties from children
-    var tableItems = heroBody.Children(x => x is TableChecklist).FirstOrDefault();
-    var tabGroup = heroBody.Children(x => x is TabGroup).FirstOrDefault();
-    var tabHeader = tabGroup.Children(xx => xx is TabHeader).FirstOrDefault();
-    var tabBody = (TabBody)tabHeader.Children(cc => cc is TabBody).FirstOrDefault();
-    var mobileBlurpData = heroBody.Children(x => x is RichTextEditor).FirstOrDefault();
+    var tableItems = heroBody.Children(x => x is TableChecklist).FirstOrDefault();ToString();
+
+    var tabGroup = heroBody.Children(x => x.ContentType.Alias.ToLower() == "tabgroup").FirstOrDefault();
+    var tabHeader = tabGroup.Children(xx => xx.ContentType.Alias.ToLower() == "tabheader").FirstOrDefault();
+    var tabBody = (TabBody)tabHeader.Children(cc => cc.ContentType.Alias.ToLower() == "tabbody").First();
+    var tabBodyFAQSections = (TabBody)tabHeader.Children(cc => cc.ContentType.Alias.ToLower() == "tabbody").Last();
+
+    var sectionContent = (ICollection<IPublishedElement>)tabBodyFAQSections.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+    var questionGroups = sectionContent.Where(c => c.ContentType.Alias == "nCHeroBodyFaq").FirstOrDefault().Value("nCquestionGroups");
+    
+    var mobileBlurpData = heroBody.Children(x => x.ContentType.Alias.ToLower() == "richtexteditor").FirstOrDefault();
     var mobileBlurp = mobileBlurpData.Value("TextEditor");
+    
+    //New Way Banking tab code start 
+    var heroBodyNew = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").Last();
+    ContentModels.TabBody surveyQuestionData = null;
+    ContentModels.TabBody bankingCardData = null;
+    ContentModels.TabBody tabWaysToBank = null;
+    ContentModels.TabBody myWorldTermsAndConditions = null;
+
+    var tabBodyItems = heroBodyNew.Children.OfType<TabBody>();
+    tabBodyItems.ToList().ForEach(x =>
+    {
+        if (x.Value("partialViewName").ToString() == "partialHeroChest")
+        {
+            tabWaysToBank = (TabBody)x;
+        }else
+        {
+            bankingCardData = (TabBody)x;
+        }
+    });
+
+    var sectionCardsContent = (IEnumerable<IPublishedElement>)tabWaysToBank.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+    //var sectionCardsContent = (ICollection<IPublishedContent>)tabWaysToBank.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+
+    //var myWorldTAndCs = (IEnumerable<IPublishedElement>)myWorldTermsAndConditions.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+
+    var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
+    var chestTitle = heroChest?.Value("chestTitle").ToString();
+    var chestDescription = heroChest?.Value("chestDescription").ToString();
+    var chestCards = heroChest?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+
+    var _bankingItemsModel = new CustomModels.Benefits
+    {
+        Header = chestTitle,
+        Description = chestDescription,
+        BenefitCards = sectionCardsContent.Select(c => c as Card).ToList()
+    };
+
+    IEnumerable<IPublishedContent>
+        bodyButtons = (IEnumerable<IPublishedContent>
+            )heroBodyNew.Children.Where(c => c is ContentModels.EbankItabstractButton);
+    ContentModels.EbankItabstractButton openNowButton = null;
+    ContentModels.EbankItabstractButton registerNowButton = null;
+    ContentModels.EbankItabstractButton androidDownloadNow = null;
+    ContentModels.EbankItabstractButton iosDownloadNow = null;
+    ContentModels.EbankItabstractButton downloadNow = null;
+    ContentModels.EbankItabstractButton huaweiDownloadNow = null;
+
+    foreach (var button in bodyButtons)
+    {
+        if (button.Value("EbankItbuttonText").ToString().Contains("Register / Login"))
+        {
+            openNowButton = (ContentModels.EbankItabstractButton)button;
+        }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("Register Now"))
+        {
+            registerNowButton = (ContentModels.EbankItabstractButton)button;
+
+        }
+
+        else if (button.Value("EbankItbuttonText").ToString().Contains("Android"))
+        {
+            androidDownloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("iOS"))
+        {
+            iosDownloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("Huawei"))
+        {
+            huaweiDownloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+        else
+        {
+            downloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+    }
+
+    var openNowButtonLink = "#";
+    openNowButtonLink = string.IsNullOrEmpty(openNowButton?.EbankItbuttonInternalLink?.Url) ?
+    openNowButton?.EbankItbuttonExternalLink :
+    openNowButton.EbankItbuttonInternalLink?.Url;
+    openNowButtonLink = (string.IsNullOrEmpty(openNowButtonLink)) ? "#" : openNowButtonLink;
+
+    var registerNowButtonLink = "#";
+    registerNowButtonLink = string.IsNullOrEmpty(registerNowButton?.EbankItbuttonInternalLink?.Url) ?
+    registerNowButton?.EbankItbuttonExternalLink :
+    registerNowButton.EbankItbuttonInternalLink?.Url;
+    registerNowButtonLink = (string.IsNullOrEmpty(registerNowButtonLink)) ? "#" : registerNowButtonLink;
+    var onlineButtonText = registerNowButton.Value("EbankItbuttonText");
+    
+    var androidButtonLink = "#";
+    androidButtonLink = string.IsNullOrEmpty(androidDownloadNow?.EbankItbuttonInternalLink?.Url) ?
+    androidDownloadNow?.EbankItbuttonExternalLink :
+    androidDownloadNow.EbankItbuttonInternalLink?.Url;
+    androidButtonLink = (string.IsNullOrEmpty(androidButtonLink)) ? "#" : androidButtonLink;
+    
+    var iosButtonLink = "#";
+    iosButtonLink = string.IsNullOrEmpty(iosDownloadNow?.EbankItbuttonInternalLink?.Url) ?
+    iosDownloadNow?.EbankItbuttonExternalLink :
+    iosDownloadNow.EbankItbuttonInternalLink?.Url;
+    iosButtonLink = (string.IsNullOrEmpty(iosButtonLink)) ? "#" : iosButtonLink;
+    
+    var huaweiButtonLink = "#";
+    huaweiButtonLink = string.IsNullOrEmpty(huaweiDownloadNow?.EbankItbuttonInternalLink?.Url) ?
+    huaweiDownloadNow?.EbankItbuttonExternalLink :
+    huaweiDownloadNow.EbankItbuttonInternalLink?.Url;
+    huaweiButtonLink = (string.IsNullOrEmpty(huaweiButtonLink)) ? "#" : huaweiButtonLink;
+    
+    // Mobile App Modal Data
+    var popupAppTitle = "Download the App using one of the following";
+    var popQRCode = "/media/ylalxyxb/image001.png";
+    var popAndroidApp = "/media/mtjfxi5f/googleplaystoredownloadimagelink.png";
+    var popIOsApp = "/media/5pdkgij3/appstoredownloadimagelink.png";
+    var popHuaweiApp = "/media/l2dls1tu/huaweiappgallery.png";
+    
+    //String androidLnk = "https://play.google.com/store/apps/details?id=za.co.android.africanbank";
+    //String huawaeiLnk = "https://appgallery.huawei.com/#/app/C103438901";
+    //String iOSLnk = "https://itunes.apple.com/us/app/apple-store/id1357204405?mt=8";
 }
 
 <style type="text/css">
+    
+    .new-way-bank-tab{ 
+        margin-top:-42px !important;
+        padding:25px;
+        text-transform:uppercase !important;
+        margin-left:1px !important;
+        margin-right:1px !important;
+        
+    }
+   .pop-up-container {
+        max-width: 500px;
+        margin: auto;
+        text-align: center;
+        margin-top: 7%;
+        background: #fff;
+        box-shadow: 1px 2px 20px rgba(0,0,0,0.3)
+    }
+
+    .pop-up-title {
+        color: #fff;
+        background: #002B60;
+        text-align: center;
+        padding: 10PX;
+        font-size: 18px;
+        font-weight: 100;
+    }
+    html, body{
+        overflow-x: hidden;
+        width: 100%;
+    }
     .green-pointer {
        display:none;
     }
-    .number-to-call {
-        background: #7F95AF 0% 0%;
+    
+    .text-uppercase{
+        text-transform: uppercase;
+        font: normal normal bold 21px/25px Montserrat;
+        letter-spacing: 0px;
+        color: #002B60;
+        opacity: 1;
     }
+    
+    .move-content-left {
+        margin-top: -170px !important;
+        margin-left: 17em !important;
+    }
+   
+    .number-to-call>p {
+        font-size: 18px !important;
+    }
+   
+    .number-to-call{
+        background: #F6F6F6 !important;
+    }
+   .download-button{
+        width: 221px !important;
+        opacity: 1;
+        font-size: 14px;
+        padding: -12px;
+        margin-top: 5px;
+        margin-bottom: 18px;
+        margin-left:446px;
+        height: 45px !important;
+        text-align:center;
+ 
+    }
+    .mega-tabs .nav-tabs > li.loan-summary > a {
+        color: #89BC47 !important;
+        font: normal normal 600 21px/25px Montserrat;
+        font-size: 15px;
+    }
+ 
+    .hero-fqs{
+        background: #F6F6F6;
+        padding: 30px;
+    }
+     
+    .fqs-container{
+        width: 90% !important;
+        margin: auto;
+        padding-top: 40px;
+    }
+ 
+    .desktop-video{
+        margin: auto;
+    }
+    
+    .span-buttons{
+        display: inherit !important;
+        margin: 0 auto;
+        padding-top: 11px;
+        padding: 14px;
+        margin-top: 19px;
+    }
+
+    .campaign-list{
+        margin-bottom: -100px !important;
+    }
+    
+    .circle-img-banner{
+        width:50%;
+    }
+
+    .ctabuttons-left{
+        display: none !important;
+    }
+
+    .internet-banking-row{
+        height: 24vw !important;
+    }
+    .audacious-reward-box{
+      
+        background: #1287C5 0% 0% no-repeat padding-box;
+        opacity: 1;
+        padding: 20px;
+        color: #fff;
+    }
+    .audacious-reward-btn{
+        color: #002b60 !important;
+        background: transparent  !important;
+        width: 100% !important;
+        border: 1px solid #002b60;
+    }
+    .img-heigt{
+        top: 53px;
+        margin-left: -3vw;
+    }
+    .online-background{
+        background: #002b60 !important;
+    }
+    .circle{
+       margin-left: -80px !important;
+       margin-top: -50px !important;
+    }
+    .audacious-container{
+        margin-bottom: -100px;
+    }
+    .infoGraphic-container {
+        width: 100%;
+        margin: auto;
+        margin-bottom: 0;
+        margin-top: 30px;
+    }
+    .inner-check {
+        width: 40%;
+        margin: auto;
+        width: 40%;
+        margin: auto;
+        position: relative;
+        top: 30px;
+    }
+   .circle{
+        width: 246px;
+        height: 246px;
+        background: #EEEEEE 0% 0% no-repeat padding-box;
+        border-radius: 240px;
+        margin-left: 50px;
+    }
+    .number-to-call {
+        background: #1287C5;
+        color: #fff;
+    }
+
+    .rewards-button{
+        width: 130px;
+        margin: auto;
+    }
+
+    .audacious-reward-bt{
+            margin-left: 90px;
+    }
+
     .onenumbercall {
         text-align: center;
         margin-top: 0;
@@ -38,6 +339,7 @@
         line-height: 1.1;
         display: block;
     }
+
     .modal .modal-dialog .modal-content .modal-header {
         background-color: transparent;
         border-bottom: 1px solid #eee;
@@ -46,6 +348,7 @@
         background-color:#ffff;
     }
     .button.primary {
+
         border-radius: 25px;
         top: 2172px;
         left: 499px;
@@ -55,15 +358,17 @@
         box-shadow: none;
         opacity: 1;
     }
-    .check-class-name {
-        background: rgb(246, 246, 246);
-        height:350px;
-    }
-    .check-class-name .campaign-more-container {
-         background: rgb(246, 246, 246);
-     }
-    .loan-summary-container {
 
+    .check-class-name {
+        background: #e8e8e8;
+        height:198px;
+        margin-top: -10px;
+    }
+
+    .check-class-name .campaign-more-container {
+        background: rgb(246, 246, 246);
+    }
+    .loan-summary-container {
         top: -140px;
     }
     .online-banking-container {
@@ -73,14 +378,242 @@
     .mega-tabs .nav-tabs > li {
         padding: 10px;
     }
+    @@media (min-width: 320px) and (max-width: 420px) {
+        .download-button{
+            width: 221px !important;
+            opacity: 1;
+            font-size: 14px;
+            padding: -12px;
+            margin-top: 5px;
+            margin-bottom: 18px;
+            margin-left:36px;
+            height: 45px !important;
+            text-align:center;
+        }
+    }
+    @@media(min-width:540px) and (max-width:540px)
+    {
+        .download-button{
+            width: 221px !important;
+            opacity: 1;
+            font-size: 14px;
+            padding: -12px;
+            margin-top: 5px;
+            margin-bottom: 18px;
+            margin-left:120px;
+            height: 45px !important;
+            text-align:center;
+        }
+    }
+    @@media (min-width: 280px) and (max-width: 320px) {
+        .download-button{
+            width: 197px !important;
+            opacity: 1;
+            font-size: 14px;
+            padding: -12px;
+            margin-top: 5px;
+            margin-bottom: 18px;
+            margin-left:2px;
+            height: 45px !important;
+            text-align:center;
+        }
+        .audacious-rewards {
+            font: normal normal bold 50px Montserrat !important;
+        }
+
+        .check-class-name {
+           height: 288px !important;
+        }
+        
+        .circle-img-banner{
+            width:80% !important;
+            /* margin: auto; */
+            margin-left: 30px;
+            margin-bottom: 30px;
+        }
+
+       @*.loan-summary-container {
+            margin-left: -29px;
+            margin-right: -30px;
+        }*@
+    }
+    @@media (min-width: 280px) and (max-width: 540px) {
+        .number-to-call {
+            padding: 65px;
+
+        }
+        .check-class-name {
+           height: 288px !important;
+        }
+        
+        .circle-img-banner{
+           width: 80%!important;
+           /* margin: auto; */
+           margin-left: 30px;
+           margin-bottom: 30px;
+        }
+
+        .move-content-left {
+            text-align: center;
+        }
+
+        .circle {
+            position: relative;
+            left: 30%;
+            top: 50px;
+        }
+    }
+   @@media(max-width:767px)
+   {
+        .hero-fqs {
+            padding: 20px !important;
+        }
+       .text-uppercase{
+            font-size:18px !important;
+        }
+        .test-class {
+            text-align: center !important;
+            font-size: 22px !important;
+        }
+        .mega-tabs .nav-tabs>li.loan-summary {
+            padding: 0px;
+        }
+        .loan-summary-container {
+            top: -140px;
+        }
+        .audacious-reward-btn {
+            margin-top: 20px;
+        }
+            
+        .circle-img-banner{
+             width: 80%!important;
+            /* margin: auto; */
+            margin-left: 30px;
+            margin-bottom: 30px;
+        }
+            
+        .inner-check {
+            width: 85% !important;
+            margin: auto;
+            position: relative;
+            top: 20px;
+        }
+
+        .move-content-left {
+            text-align: center;
+        }
+
+        .check-class-name {
+            height: 288px !important;
+        }
+
+        .article-content {
+            width: 90%;
+            margin: auto;
+        }
+
+        .body-content {
+            margin-top: 50px;
+        }
+
+        .circle {
+            position: relative;
+            left: 30%;
+            top: 50px;
+        }
+        
+
+    }
+
+
+    @@media only screen and (max-width: 768px)
+    {
+        .hero-fqs {
+            padding: 20px !important;
+        }
+        .text-uppercase{
+            font-size:18px !important;
+        }
+        .mega-tabs .nav-tabs > li span {
+            display: inline-block;
+        }
+        .fg-img{
+            width: 100%;
+        }
+            
+        .circle-img-banner{
+            width: 80% !important;
+            /* margin: auto; */
+            margin-left: 30px;
+            margin-bottom: 30px;
+        }
+        .move-content-left{
+            text-align:center;
+        }
+        .mega-tabs{
+            overflow-y: scroll !important;
+        }
+        .new-way-bank-tab{
+           overflow-y: inherit !important;
+        }
+        .mega-tabs .nav-tabs{
+            border: none;
+            min-width: 60px !important;
+            /* overflow-x: scroll; */
+            width: 698px;
+        }
+            
+        .mega-tabs .nav-tabs>li.loan-summary{
+            padding: 0px 0px;
+        }
+
+        .inner-check {
+            width: 85% !important;
+            margin: auto;
+            position: relative;
+            top: 20px;
+        }
+        .audacious-reward-btn {
+            margin-top: 20px;
+        }
+        .article-content {
+            width: 90%;
+            margin: auto;
+        }
+
+        .check-class-name {
+            height: 288px !important;
+        }
+
+        .body-content {
+            margin-top: 50px;
+            
+        }
+
+        .circle {
+            position: relative;
+            left: 30%;
+            top: 50px;
+        }
+        .test-class {
+                    text-align: center !important;
+                    font-size: 22px !important;
+        }
+        .app-platform{
+           width: 118px !important;
+           border-radius: 0px !important;
+        }     
+    }
+
     .tablename-content {
         text-align: center;
         font: normal normal 600 18px/28px Montserrat;
         letter-spacing: 0px;
         color: #002B60;
         opacity: 1;
-        min-height: 94px;
+        font-size: 16px;
     }
+
     .tableid-content {
         text-align: center;
         font: normal normal 600 21px/25px Montserrat;
@@ -89,6 +622,7 @@
         opacity: 1;
         min-height: 50px;
     }
+
     .tableheading-content {
             text-align: left;
             font: normal normal 300 13px/16px Montserrat;
@@ -96,51 +630,30 @@
             color: #333333;
             opacity: 1;
     }
+
+    .hero-static-caption{
+        top: -31px !important;
+    }
     .audacious-rewards {
         text-align: center;
         font: normal normal bold 55px Montserrat;
         letter-spacing: 0px;
-        color: #1e9ff2;
+        color: #88BC47;
+        font-size:42px !important;
     }
     .container {
         padding-left: 0px;
     }
     .mega-tabs {
         margin-left: 80px;
+        margin-top: 100px;
         margin-right: 80px;
         text-transform: none;
     }
-    .audacious-reawards-section {
-        background-color: #002B60 !important;
+    .infoGraphic-container {
+        background-color: #00346A !important;
     }
 
-    @@media (min-width: 280px) and (max-width: 320px) {
-        .audacious-rewards {
-            font: normal normal bold 50px Montserrat !important;
-        }
-    }
-
-    @@media (min-width: 280px) and (max-width: 540px) {
-        .number-to-call {
-            padding: 65px;
-        }
-    }
-
-    @@media(max-width:767px) {
-        .mega-tabs .nav-tabs > li.loan-summary {
-            padding: 0px;
-        }
-
-        .loan-summary-container {
-            top: -140px;
-        }
-    }
-
-    @@media only screen and (max-width: 768px) {
-        .mega-tabs .nav-tabs > li span {
-            display: inline-block;
-        }
-    }
     @@media (min-width: 280px) and (max-width: 820px) {
         .mega-tabs {
             margin-left: 0px;
@@ -150,92 +663,758 @@
             padding-left: 2px;
             padding-right: 2px;
         }
-    }
-    @@media(min-width: 767px) and (max-width: 991px) {
-        .mega-tabs .nav-tabs > li a {
-            min-height: 50px;
+        
+         .fg-img{
+          width: 100%;
+        }
+        .article-content {
+            width: 90%;
+            margin: auto;
+        }
+        
+        .circle-img-banner{
+            width:80% !important;
+            /* margin: auto; */
+            margin-left: 30px;
+            margin-bottom: 30px;
+        }
+        .audacious-reward-btn {
+            margin-top: 20px;
+        }
+
+        .body-content {
+            margin-top: 50px;
+        }
+        
+        .fg-img{
+          width: 100%;
+        }
+
+        .move-content-left {
+            text-align: center;
+        }
+        .circle {
+            position: relative;
+            left: 30%;
+            top: 50px;
         }
     }
     @@media (min-width: 921px) and (max-width: 1024px) {
         .mega-tabs .nav-tabs > li a {
             min-height: 50px;
         }
+        .audacious-reward-btn {
+            margin-top: 20px;
+        }
+        
+         .fg-img{
+          width: 100%;
+        }
+
+        .body-content {
+            margin-top: 50px;
+        }
+        .download-button{
+            width: 221px !important;
+            opacity: 1;
+            font-size: 14px;
+            padding: -12px;
+            margin-top: 5px;
+            margin-bottom: 18px;
+            margin-left:380px;
+            height: 45px !important;
+            text-align:center;
+        }
+    }
+    @@media(min-width: 767px) and (max-width: 991px){
+        .mega-tabs .nav-tabs > li a {
+           min-height: 50px;
+        }
+        .inner-check {
+            width: 85% !important;
+            margin: auto;
+            position: relative;
+            top: 20px;
+        }
+        
+        .fg-img{
+          width: 100%;
+        }
+        
+        .audacious-reward-btn {
+            margin-top: 20px;
+        }
+
+        .move-content-left {
+            text-align: center;
+        }
+
+        .body-content {
+            margin-top: 50px;
+        }
+
+        .circle {
+            position: relative;
+            left: 30%;
+            top: 50px;
+        }
+        
+        .circle-img-banner{
+            width:80% !important;
+            /* margin: auto; */
+            margin-left: 30px;
+            margin-bottom: 30px;
+       }
+       .download-button{
+            width: 221px !important;
+            opacity: 1;
+            font-size: 14px;
+            padding: -12px;
+            margin-top: 5px;
+            margin-bottom: 18px;
+            margin-left:225px;
+            height: 45px !important;
+            text-align:center;
+        }
+        .test-class {
+            text-align: center !important;
+            font-size: 22px !important;
+        }
+    
+    }
+
+    @@media (min-width: 1000px) and (max-width: 10000px) {
+
+        #popUpHuawei {
+            margin-right: -45rem;
+            margin-top: -82px;
+        }
+
+        .modal-dialog {
+            width: 900px !important;
+        }
+    }
+
+    @@media (min-width: 768px) and (max-width: 1024px) {
+        #popUpHuawei {
+            margin-right: -35rem;
+            margin-top: -68px;
+        }
+
+        .col-sm-6 img {
+            width: 160px;
+        }
+
+        .modal-dialog {
+            width: 790px !important;
+            padding-left: 30px;
+            padding-right: 50px;
+        }
+        .app-platform{
+           width: 118px !important;
+           border-radius: 0px !important;
+        } 
+    }
+    @@media (min-width: 375px) and (max-width: 428px) {
+       .online-banking-li {
+            text-align: left;
+            font-size: 20px !important;
+            margin-left: 5px;
+        }
+        .new-way-bank-tab{
+           margin-left: 6px !important;
+           margin-right: 6px !important;
+        }
+        .new-way-bank-title{
+           margin-left: 26px;
+           margin-right: 26px;
+        }
+    }
+    @@media (min-width: 360px) and (max-width: 360px) {
+       .online-banking-li {
+            text-align: left;
+            font-size: 20px !important;
+            margin-left: -5px;
+        }
+        .new-way-bank-tab{
+           margin-left: 6px !important;
+           margin-right: 6px !important;
+        }
+        .new-way-bank-title{
+           margin-left: 26px;
+           margin-right: 26px;
+        }
+    }
+    @@media (min-width: 320px) and (max-width: 320px) {
+       .online-banking-li {
+            text-align: left;
+            font-size: 20px !important;
+            margin-left: -15px;
+        }
+        .new-way-bank-tab{
+           margin-left: 6px !important;
+           margin-right: 6px !important;
+           padding:25px 11px;
+        }
+        .new-way-bank-title{
+           margin-left: 26px;
+           margin-right: 26px;
+        }
+    }
+    @@media (min-width: 280px) and (max-width: 280px) {
+       .online-banking-li {
+            text-align: left;
+            font-size: 17px !important;
+            margin-left: -10px;
+        }
+        .new-way-bank-tab{
+           margin-left: 12px !important;
+           margin-right: 6px !important;
+           padding:25px 11px;
+        }
+        .new-way-bank-title{
+           margin-left: 26px;
+           margin-right: 26px;
+        }
+    }
+    @@media (min-width: 540px) and (max-width: 540px) {
+       .online-banking-li {
+            text-align: center;
+            font-size: 20px !important;
+            margin-left: -100px;
+        }
+        .new-way-bank-tab{
+           margin-left: 6px !important;
+           margin-right: 6px !important;
+           padding:25px 11px;
+        }
+        .new-way-bank-title{
+           margin-left: 26px;
+           margin-right: 0px;
+        }
+    }
+    @@media (min-width: 1114px) and (max-width: 1280px) {
+        .check-class-name {
+          height: 240px;
+        }
+        .button.primary.span-buttons.audacious-reward-btn {
+           height: 58px;
+        }
+    }
+    @@media only screen and (max-width: 1024px)
+    {
+       .button.primary.span-buttons.audacious-reward-btn {
+           height: 58px;
+        }
     }
 </style>
 <section class="audacious-reawards-section">
     @*HERO BANNER*@
     @Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
-    @Html.Partial("_pageShoulderNew", heroShoulder1 as ContentModels.HeroShoulder)
     
+    <div style="background: #002B60 !important;">
+        @Html.Partial("_pageShoulderNew", heroShoulder1 as ContentModels.HeroShoulder)
+        
+    </div>
+
+    
+
     <div class="campaign-more-container">
-        <div class="container">
-           <div>          
-                    @*HERO SHOULDER*@
+        <div class="container audacious-container">
+
+            <div>
+
+                @*HERO SHOULDER*@
+
                 @{
-                   var heroShoulder = (HeroShoulderHome)children?.Where(c => c is HeroShoulderHome).FirstOrDefault();
+                    var heroShoulder = (HeroShoulderHome)children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulderhome").FirstOrDefault();
+
                     if (heroShoulder != null)
                     {
-                       <div class="loan-summary-container">
-                         <div class="container">
-                           <div class="mega-tabs">
-                                @*Nav tabs*@
-                              <ul id="go_to_tab_content" class="nav nav-tabs eq-height" role="tablist">
-                                @{
-                                    var isFirstRow = true;
-                                    foreach (HomeShoulderItem tab in heroShoulder.Items)
-                                    {
-                                        <li role="presentation" class="@(isFirstRow ? "active" : "") loan-summary ">
-                                            <a href="#@tab.TabId.Replace(" ", "")" aria-controls="profile " role="tab" data-toggle="tab">
-                                                <span class="tablename-content">@tab.TabName</span>                                              
-                                           </a>
-                                            <div> <span class="tableid-content">@tab.TabId</span></div>
-                                            <div><span class="tableheading-content">@tab.TabHeading</span></div>
-                                        </li>
-                                        isFirstRow = false;
+                        <div class="loan-summary-container">
+                            <div class="container">
+                                <div class="mega-tabs">
+                                    @*Nav tabs*@
+                                    <ul id="go_to_tab_content" class="nav nav-tabs eq-height" role="tablist">
+                                        @{
+                                            var isFirstRow = true;
+                                            foreach (HomeShoulderItem tab in heroShoulder.Items)
+                                            {
+
+                                                <li role="presentation" class="@(isFirstRow ? "active" : "") loan-summary ">
+                                                    <a href="#@tab.TabId.Replace(" ", "").Replace(",", "").Replace("%","")" aria-controls="profile " role="tab" data-toggle="tab">
+                                                        <span class="tablename-content" style="position: relative;bottom: -19px;">@tab.TabName</span>
+                                                        <br /><br
+                                                    <span class="tableid-content">@tab.TabId</span><br />
+                                                       </a>
+                                                    <span class="tableheading-content">@tab.TabHeading</span>
+                                                </li>
+                                                isFirstRow = false;
+                                            }
+                                        }
+                                    </ul>
+                                </div>
+                                <!-- Tab panes -->
+
+                                <div class="tab-content">
+                                    @{
+                                        bool isFirstTab = true;
+                                        foreach (HomeShoulderItem tab in heroShoulder.Items)
+                                        {
+                                            <div role="tabpanel" class="tab-pane @(isFirstTab ? "active" : "")" id="@tab.TabId.Replace(" ", "").Replace(",", "").Replace("%","")">
+
+
+
+                                                <div class="row">
+
+                                                    @{
+                                                        var item2 = tab.Value<IEnumerable<IPublishedElement>>("tabBodyContent").FirstOrDefault();
+                                                    }
+
+
+                                                    @if (item2 != null)
+                                                    {
+                                                        <div class="col-sm-10 col-sm-offset-1">
+                                                            <div class="campaign-list">
+                                                                @{
+                                                                    var data = item2.Value<IEnumerable<IPublishedElement>>("sectionContent");
+                                                                }
+                                                                @foreach (var item in data)
+                                                                {
+                                                                    var image = item.Value("tabSubItemImage");
+                                                                    String url = ((IPublishedContent)image).Url.ToString();
+                                                                    String altTag = ((IPublishedContent)image).Value("altTag").ToString();
+
+                                                                    <div class="col-sm-6 banner-image-section img-heigt circle-img">
+                                                                        <img class="circle-img-banner " src="@url" alt="@altTag" />
+
+                                                                    </div>
+
+
+                                                                    <div class="col-sm-10 desc-tab banner-right move-content-left">
+                                                                        <div class="article-content">
+                                                                            <div class="body-content ul-bullets">
+                                                                             @Html.Raw(item.Value("tabSubItemTextContent"))
+                                                                            </div>
+                                                                        </div>
+                                                                        @foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>
+                                                                            )item.Value("tabSubItemLinks"))
+                                                                        {
+                                                                            if (link.Name.Contains("Register") || link.Name.Contains("Join African Bank"))
+                                                                            {
+                                                                                <div class="ctabuttons">
+                                                                                    <div>
+                                                                                        <a class="button primary span-buttons" href="@link.Url" target="_blank" style="color: white;">@link.Name</a>
+                                                                                    </div>
+                                                                                </div>
+                                                                            }
+                                                                            else if (link.Name.Contains("Learn more MyWORLD"))
+                                                                            {
+                                                                                <div class="ctabuttons">
+                                                                                    <div>
+                                                                                        <a class=" download-guide button primary span-buttons " href="@link.Url" target="_blank" style="color: white;">@link.Name</a>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                            }
+                                                                        }
+                                                                    </div>
+
+
+                                                                }
+                                                            </div>
+                                                        </div>
+
+
+                                                    }
+
+
+                                                </div>
+                                            </div>
+                                            isFirstTab = false;
+                                        }
+
                                     }
-                                }
-                               
-                              </ul>
-                           </div>
-                         </div>
-                       </div>
+                                </div>
+
+                            </div>
+                        </div>
                     }
-              }
-          </div>
+                }
+
+            </div>
         </div>
     </div>
 
-        @Html.Partial("_pageRenderAudaciousRewards", tabBody as ContentModels.TabBody)
-        <div class="check-class-name">
-            @Html.Raw(mobileBlurp)
-            @Html.Partial("_keyBenefits", new CustomModels.HowToApplyDataContainer("", "", null, applyDocs))
-        </div>
-        <div class="number-to-call">@Html.Raw(@heroBody.Value("richTextBox"))</div>
+    <div class="infoGraphic-container">
+   <video class="desktop-video" width="100%" height="540" loop muted autoplay="autoplay">
+      <source src="/media/u0jp0t4b/african-bank-animation-1.mp4" type="video/mp4">
+      <source src="/media/u0jp0t4b/african-bank-animation-1.mp4" muted type="video/mp4">
+    </video>
 
-        @*Global site tag (gtag.js) - Google Analytics*@
-        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-21394042-6"></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag() { dataLayer.push(arguments); }
-            gtag('js', new Date());
+   <video class="mobile-video" style="padding: 30px 0px 0px" width="100%" loop muted autoplay="autoplay">
+      <source src="/media/mnukqjsi/01-african-bank-animation-mobile.mp4" type="video/mp4">
+      <source src="/media/mnukqjsi/01-african-bank-animation-mobile.mp4" type="video/mp4">
+    </video>
+    </div>
 
-            gtag('config', 'UA-21394042-6', { 'optimize_id': 'GTM-T7N9LBL' });
-        </script>
-
-        @*CALL BACK FORM*@
+    @Html.Partial("_pageRenderAudaciousRewards", tabBody as ContentModels.TabBody)
+    
+      @*<div class="audacious-reward-box">
+               @Html.Raw(@heroBody.Value("richTextBox"))
+      </div>*@
+ 
+   
+    <div class="hero-fqs">
+        
+    <div class="container">
+      <div class="row hero-fqs">
+          
+        @* Start here *@
         @{
-            var _floatingFormViewModel = children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
-            @Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)
-        }
-        @section scripts
-{
+                var groups = (IEnumerable<QuestionGroup>)questionGroups;
+                int intCounter = 0;
+                foreach (var group in groups)
+                {
+                    var questions = group.Value<IEnumerable<IPublishedElement>>("questionsAndAnswers") ?? new List<IPublishedContent>();
+                    // var Id = Regex.Replace(name.Replace("African Bank", string.Empty), @"[^0-9a-zA-Z]+", string.Empty);
+                    
+                    foreach (var question in questions)
+                    {
+                        var Q = question.Value("question");
+                        var A = question.Value("answer");
 
-            <script type="text/javascript">
-                $(".internet-banking-row:even").css("background", "#FFFFFF 0% 0% no-repeat padding-box");
-                $(".internet-banking-row:odd").css("background", "#F6F6F6 0% 0% no-repeat padding-box");
-                $(".borderbottom:even").css("background", "#FFFFFF 0% 0% no-repeat padding-box");
-                $(".borderbottom:odd").css("background", "#F6F6F6 0% 0% no-repeat padding-box");
+                        if (intCounter == 0) {
 
-            </script>
-        }
+                            <div class="faq-item">
+                                <div class="item-content">
+                                 <h5 style="
+                                        font: normal normal bold 29px/35px Montserrat;
+                                        letter-spacing: 0px;
+                                        color: #002B60;
+                                        opacity: 1;
+                                        padding-bottom: 20px;font-size: 21px;">FAQs</h5>
+                                    <h4 class="title text-uppercase">
+                                      <img src="/media/455muwk3/component-13-1.svg"/>
+                                        @Q
+                                    </h4>
+                                    <div class="faq content">
+                                        @A
+                                    </div>
+                                </div>
+                                @*<div class="download-icon faq-button"><i class="fas fa-long-arrow-alt-down" aria-hidden="true"></i></div>*@
+                            </div>
+                            
+                            <div class="row">
+                              <div class="col-lg-12 col-md-12" style="/* width: 100%; */text-align: center;padding: 20px;">
+                                <img width="80%" src="@cardUrl" />
+                            </div>
+                            
+                        <div class="col-md-12" >
+                             <a class="button primary download-button" href="/media/ypxagkio/audacious-rewards-faqs-2.pdf" target="_blank" style="color: white;"> 
+                               <span>Download PDF</span>
+                             </a>
+                            </div>
+                            
+                            </div>
+                         
+                        } 
+                        else
+                        {
+                            <div class="faq-item">
+                                <div class="item-content">
+                                   
+                                    <h4 class="title text-uppercase">
+                                      <img src="/media/455muwk3/component-13-1.svg"/>
+                                        @Q
+                                    </h4>
+                                    <div class="faq content">
+                                        @A
+                                    </div>
+                                </div>
+                            </div>
+                         }
+                        intCounter+=1;
+                    }
+                    
+                }
+            }
+        @* End here *@
+          
+         
+     </div>
+    </div>
+    </div>
+ 
+   @*The New Way banking tab section*@
+    <div class="container">
+        <div class="row"></div>
+    </div>
+    <div class="container">
+        <div class="mega-tabs new-way-bank-tab">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs eq-height" role="tablist">
+                <li role="presentation" class="online-banking-li">
+                    The new way of banking
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="container payments-section full margin-bottom-30">
+        <div class="margin-top-20 visible-xs"></div>
+        <div class="row">
+            <h4 class="container margin-bottom-20 align-center new-way-bank-title" style="font-size: 23px;">@tabWaysToBank.Value("partialViewClassName")</h4>
+            @{
+                int cardIterator = 0;
+                bool increaseCardHeight = false;
+    
+                foreach (var item in sectionCardsContent)
+                {
+    
+                    if (cardIterator == (int)sectionCardsContent.Count() - 1)
+                    {
+                        increaseCardHeight = true;
+                    }
+                    var cardTitle = item.Value<string>
+                        ("NCcardTitle");
+                    var cardDesc = item.Value<string>
+                        ("NCcardDescription");
+                    var icon = item.Value<IPublishedContent>
+                        ("NCcardIcon");
+                    <div class="col-sm-4 margin-bottom-20">
+                        <div class="@(increaseCardHeight ? " cellphone-button-banking-campaign" : "" )">
+                            <div class="text-left center-align white-link-color richtextbox-blue-bg">
+                                <img src="@icon.Url" alt="@icon.Value(" altTag")" class="image-center-resizer" />
+                                <p class="title blue-color font-size-20">@cardTitle</p>
+                                <p>@cardDesc</p>
+                            </div>
+                        </div>
+                        @{
+                            if (!cardTitle.Contains("App"))
+                            {
+                                <div class="col-md-4 center-align margin-bottom-20 margin-right-50 banking-options-buttons">
+                                    <a href="@registerNowButtonLink" class="button span-buttons green-button" id="">
+                                        @onlineButtonText
+                                    </a>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col-md-4 center-align margin-bottom-20 margin-left-50 banking-options-buttons">
+                                    <span class="button span-buttons green-button view_OnlineApps downloadNow" data-item="@popupAppTitle*@popQRCode*@popAndroidApp*@popIOsApp" target="_blank">@downloadNow.EbankItbuttonText</span>
+                                </div>
+                            }
+                        }
+                    </div>
+                    cardIterator += 1;
+                }
+            }
+        </div>
+    </div>
+    
+    @Html.Partial("_renderPopUpContent", new ContainerViewModel()
+    {
+        HTMLContent = @<text>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6 left-col">
+                        <img width="150" id="popUpImage" />
+                        <p id="popUpParaDescription"></p>
+    
+                        <div class="ctabuttons">
+                            <span class="">
+                                <a href="https://accounts.google.com/SignUp?hl=en" target="_blank" class="no-deco"><div class="button primary span-buttons" id="popUpButton"></div></a>
+                            </span>
+                        </div>
+    
+                    </div>
+                </div>
+            </div>
+        </text>
+    })
+
+    @Html.Partial("_renderPopUpContent2", new ContainerViewModel()
+    {
+        HTMLContent2 = @<text>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-15">
+    
+                        <br /><br />
+    
+                    </div>
+                    
+                    <div class="col-xs-12 col-sm-4">
+                        <a id="AndroidUrl" href="@androidButtonLink">
+                            <img width="200" id="popUpAndroid" />
+                        </a>
+                    </div>
+                    <div class="col-xs-12 col-sm-4">
+                        <a id="iOSUrl" href="@iosButtonLink">
+                            <img width="200" id="popUpIOS" />
+                        </a>
+                    </div>
+                    <div class="col-xs-12 col-sm-4">
+                        <a id="HuaweiUrl" href="@huaweiButtonLink">
+                            <img loading="lazy" width="200" id="popUpIOS" src="@popHuaweiApp" />
+                        </a>
+                    </div>
+    
+                </div>
+            </div>
+        </text>
+    })
+    @* End The New Way banking tab section *@
+    
+    
+    <div class="check-class-name">
+
+        <div class="inner-check">
+            <p style="text-align: center; font: normal normal bold 24px/29px Montserrat; letter-spacing: 0px; color: #002b60; opacity: 1; padding-top: 24px; padding-bottom: 12px;">Access your rewards anytime, anywhere!</p>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <a class="button primary span-buttons audacious-reward-btn" href="/media/llknypvn/audacious-rewards-programme-terms-and-conditions-v12-_30-03-2023-pdf.pdf" target="_blank">Terms & Conditions</a>
+                </div>
+
+                <div class="col-sm-6">
+                    <a class="button primary span-buttons audacious-reward-btn " href="/media/ixrhnjv0/audacious-rewards-faqs.pdf" target="_blank">Audacious Rewards FAQs</a>
+
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+
+  
+
+    <div class="online-banking-container">
+
+        <div class="container">
+
+        </div>
+    </div>
+    @*Global site tag (gtag.js) - Google Analytics*@
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-21394042-6"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-21394042-6', { 'optimize_id': 'GTM-T7N9LBL' });
+    </script>
+
+    @*CALL BACK FORM*@
+    @{
+        var _floatingFormViewModel = children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+        
+         @*@Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)*@
+        
+    }
+    @section scripts
+    {
+
+        <script type="text/javascript">
+            $(".internet-banking-row:even").css("background", "#FFFFFF 0% 0% no-repeat padding-box");
+            $(".internet-banking-row:odd").css("background", "#F6F6F6 0% 0% no-repeat padding-box");
+            $(".borderbottom:even").css("background", "#FFFFFF 0% 0% no-repeat padding-box");
+            $(".borderbottom:odd").css("background", "#F6F6F6 0% 0% no-repeat padding-box");
+
+            function getMobileOperatingSystem()
+            {
+                var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        
+                if (/windows phone/i.test(userAgent)) {
+                    return "Windows Phone";
+                }
+        
+                if (/android/i.test(userAgent)) {
+                    return "Android";
+                }
+        
+                if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                    return "iOS";
+                }
+                
+                if (/huawei/i.test(userAgent)) {
+                    return "Huawei";
+                }
+                return "unknown";
+            }
+            $(document).ready(function(){
+                var downloadPath = window.location.href;
+                var hastagDownload = downloadPath.substring(downloadPath.length-9, downloadPath.length);
+        
+                var emoji = String.fromCodePoint(0x1F60A);
+                var platform = "";
+                var appendHTML = "<div class='hidden-sm hidden-md hidden-lg'><div class='row'><div class='col-xs-12'> " +
+                                "<span class='copy'>For easier navigation and to get familiar with our products - we reckon you should use our app</span>" +
+                                "</div></div>" +
+                                "<div class='row'><div class='col-xs-12'><a class='app-platform button primary clearfix' style='background-color: #88bc47 !important;' " +
+                                "href=''>Get it!</a></div></div></div>" +
+                                "<div class='hidden-xs row'><div class='col-xs-12 col-sm-1 col-md-1 col-lg-1' style='padding-left:10%;'>" +
+                                "<i class='fa fa-mobile' aria-hidden='true' style='font-size:58px;'></i></div>" +
+                                "<div class='col-xs-12 col-sm-7 col-md-7 col-lg-7' style='text-align: left;padding-left: 50px;'>" +
+                                "<span class='copy'>For easier navigation and to get familiar with our products - we reckon you should use our app</span></div>" +
+                                "<div class='hidden-xs col-sm-3 col-md-3 col-lg-3' style='margin: 9px;padding-right: 2px;'>" +
+                                "<a class='app-platform button primary clearfix' style='background-color: #88bc47 !important;' href='' >Get it!</a>" +
+                                "</div></div>";
+        
+                switch(getMobileOperatingSystem())
+                {
+                    case "Android":
+                        platform = $("#AndroidUrl").attr('href');
+        
+                        $('.modal-title').text('Hi, Android User ' + emoji);
+                        $('.modal-body').text("");
+        
+                        $('.modal-body').append(appendHTML);
+                        $('.app-platform').attr('href', platform);
+                        $('.copy').html('@mobileBlurp');
+                        $(window).load(function(){
+                            $('#generic2').modal('show');
+                        });
+                        break;
+        
+                    case "iOS":
+                        platform = $("#iOSUrl").attr('href');
+                        $('.modal-title').text('Hi, iOS User ' + emoji);
+                        $('.modal-body').text("");
+                        $('.modal-body').append(appendHTML);
+                        $('.copy').html('@mobileBlurp');
+        
+                        $('.app-platform').attr('href', platform);
+                        $(window).load(function(){
+                            $('#generic2').modal('show');
+                        });
+                        break;
+                        
+                    case "Huawei":
+                        platform = $("#HuaweiUrl").attr('href');
+                        $('.modal-title').text('Hi, Huawei User ' + emoji);
+                        $('.modal-body').text("");
+                        $('.modal-body').append(appendHTML);
+                        $('.copy').html('@mobileBlurp');
+        
+                        $('.app-platform').attr('href', platform);
+                        $(window).load(function(){
+                            $('#generic2').modal('show');
+                        });
+                        break; 
+                        
+                    default:
+                     console.log("click");
+        
+                }
+            });
+            $(".btn_ok_modal").click(function () {
+               $('#generic').modal('hide');
+            });
+
+        </script>
+        
+    }
 </section>

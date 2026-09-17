@@ -1,5 +1,2673 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
+	var Children = Model.Children;
+	
+	    var footer = Children?.Where(c => c is RichTextEditor).FirstOrDefault();
+	    var baseUrl = "https://api.stg.africanbank.net";
+	  
+    // Set the regex pattern in a C# variable
+    var emailRegexPattern = @"^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$";
+
 }
+
+@* the fun starts here *@
+
+<style>
+
+
+        body{
+            font: normal normal normal 16px/19px sans-serif;
+            background-color: #fff ;
+        }
+
+
+        .hidden {
+            display: none;
+        }
+        .show{
+            display: block;
+        }
+        /* Combined styles.css */
+
+        .subform-group1{
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-direction: row;
+        }
+  .scrollable-form-container {
+    padding: 0px 65px;
+    height: 315px;
+    overflow-y: auto;
+
+  }
+
+  .scrollable-form-container2 {
+    height: 260px !important;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .claim-container {
+    min-height: 335px;
+    margin-top: 40px;
+    margin-right: 10px;
+    margin-left: 0%;
+    margin-bottom: 30px;
+}
+
+    /* width */
+::-webkit-scrollbar {
+  width: 5px;
+}F
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey; 
+  border-radius: 10px;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #00A7D6 0% 0% !important; 
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #00A7D6; 
+}
+
+  
+  
+
+        .d-flex {
+            display: block;
+        }
+
+        .claim-container-step2 {
+            display: none;
+        }
+        
+        
+        .subform-group .form-group{
+                border: none !important;
+        }
+        
+        .subform-group{
+            display: flex;
+            flex-direction: column;
+            align-content: space-around;
+            justify-content: flex-start;
+            align-items: stretch;
+        }
+
+        .progress {
+            left: 60px;
+            position: relative;
+        }
+
+        .input_form {
+            border-color: #CCCCCC;
+        }
+
+        .input_form:focus {
+            border-color: #00285A;
+        }
+        .input_form.is-valid {
+            border-color: #88BC47;
+        }
+        .input_form.is-invalid {
+            border-color: #FF0347;
+        }
+        .btn.btn-brand-1 {
+            margin: 0px 65px;
+            width: 72% !important;
+        }
+        .docUploadFooter-flex-container {
+            display: flex;
+            flex-direction: column;
+        }
+        .input_form
+        .text-white {
+            color: white;
+        }
+
+        .footer-text {
+            margin-top: 14px;
+        }
+
+        .grid-flow {
+            width: 100%;
+            position: relative;
+            display: grid;
+            grid-auto-flow: row;
+            grid-template-columns: 1fr 50% 1fr;
+            padding: 0 20px;
+        }
+
+        .active {
+            text-decoration: none;
+            color: #000000 !important;
+        }
+
+        .step.active {
+            font-size: 20px !important;
+            text-decoration: underline !important;
+            text-decoration-color: #00285a !important;
+            text-underline-offset: 5px !important;
+            font-weight: bold !important;
+        }
+
+        .footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #00285A;
+            color: white;
+        }
+
+        .it .btn-orange {
+            background-color: transparent;
+            border-color: #777!important;
+            color: #777;
+            text-align: left;
+            width: 100%;
+        }
+
+        .it input.form-control {
+            height: 54px;
+            border: none;
+            margin-bottom: 0px;
+            border-radius: 0px;
+            border-bottom: 1px solid #ddd;
+            box-shadow: none;
+        }
+
+        .it .form-control:focus {
+            border-color: #ff4d0d;
+            box-shadow: none;
+            outline: none;
+        }
+
+        .fileUpload {
+            position: relative;
+            overflow: hidden;
+            margin: 10px;
+        }
+
+        .fileUpload input.upload {
+            position: absolute;
+            top: 0;
+            right: 0;
+            margin: 0;
+            padding: 0;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0;
+            filter: alpha(opacity=0);
+        }
+
+        .it .btn-new, .it .btn-next {
+            margin: 30px 0px;
+            border-radius: 0px;
+            background-color: #333;
+            color: #f5f5f5;
+            font-size: 16px;
+            width: 155px;
+        }
+
+        .it .btn-next {
+            background-color: #ff4d0d;
+            color: #fff;
+        }
+
+        .it .btn-check {
+            cursor: pointer;
+            line-height: 54px;
+            color: red;
+        }
+
+        .it .uploadDoc {
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 16px;
+            text-align: center;
+            margin: 30px 0px;
+        }
+
+        .it #uploader .docErr {
+            position: absolute;
+            right: auto;
+            left: 10px;
+            top: -56px;
+            padding: 10px;
+            font-size: 15px;
+            background-color: #fff;
+            color: red;
+            box-shadow: 0px 0px 7px 2px rgba(0,0,0,0.2);
+            display: none;
+        }
+
+        .it #uploader .docErr:after {
+            content: '\f0d7';
+            display: inline-block;
+            font-family: FontAwesome;
+            font-size: 50px;
+            color: #fff;
+            position: absolute;
+            left: 30px;
+            bottom: -40px;
+            text-shadow: 0px 3px 6px rgba(0,0,0,0.2);
+        }
+
+        /* General styles */
+
+        .application-type-dropdown {
+            width: 105%;
+            padding: 10px;
+            border-radius: 30px !important; 
+            border: none; /* Remove the border */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow effect */
+            transition: box-shadow 0.3s ease-in-out; /* Smooth transition for shadow */
+        }
+
+        .application-type-dropdown-type2 {
+            display: none;
+            width: 110%;
+            padding: 10px;
+            border-radius: 30px !important;
+            border: none; /* Remove the border */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow effect */
+            transition: box-shadow 0.3s ease-in-out; /* Smooth transition for shadow */
+        }
+
+        .claim-flex-item1-white-bg-p {
+            text-align: right;
+            font: normal normal medium 32px/39px Montserrat !important;
+            letter-spacing: 0px;
+            color: #EEEEEE;
+        }
+
+        .claim-flex-item1-green-bg-p {
+            margin: 145px 0px !important;
+            font: italic normal 800 62px / 39px Montserrat;
+            letter-spacing: 0px;
+            color: #C4D82E !important;
+        }
+
+        .claim-flex-item1-bg {
+            background-color: #000000 !important;
+            background-image: url(https://publishing.v5.stg.africanbankdmz.net/media/gy0ce4vp/landingpage_starburst2.png?width=500&mode=max&animationprocessmode=first) !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+        }
+
+        .has-success .form-control {
+            border-color: #C4D82E !important;
+        }
+
+        .stepper-text-header {
+            font: normal normal 600 14px/15px Montserrat;
+            letter-spacing: 0px;
+            color: #00132A;
+            opacity: 1;
+        }
+
+        .main-stepper-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 70%;
+            background-color: transparent;
+        }
+
+        .stepper-container {
+            display: block !important;
+            width: 60%;
+            padding: 0;
+            background: transparent;
+        }
+
+        .stepper-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            background-color: transparent;
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            padding: 10px 0;
+            cursor: pointer;
+            position: relative;
+            font-size: 1rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .step:not(:last-child)::after {
+            content: '\203A';
+            display: inline-block;
+            margin-left: 10px;
+            margin-right: 10px;
+            color: #6c757d;
+        }
+
+        .claim-step-content {
+            display: none;
+        }
+
+        .claim-step-content.active {
+            display: block;
+        }
+
+        p {
+            margin: 0px 0px
+        }
+
+        h2 {
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        .stepper-p {
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+        .stepper-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #000000;
+        }
+
+        .stepper-input {
+            margin-top: 15px;
+            width: 50%;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .stepper-button {
+            padding: 10px 20px;
+            margin: 10px 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            font-size: 0.6rem;
+        }
+
+        button.claim-prev-button {
+            background-color: #6c757d00;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+        
+        .declaring {
+            margin: 0px 57px;
+        }
+
+        .next-button {
+            border: none;
+            width: 70%;
+            background: #C4D82E;
+            box-shadow: 2px 5px 10px #00000029;
+            border-radius: 50px;
+            height: 45px;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .claim-prev-button {
+            background: transparent;
+            float: left;
+            gap: 5px;
+            display: flex;
+            align-items: center;
+            border: none;
+            padding: 10px;
+            color: white !important;
+            cursor: pointer;
+        }
+
+        .claim-prev-button svg {
+            transition: all 0.3s ease;
+            fill: transparent;
+        }
+
+        .claim-prev-button p {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .claim-prev-button:hover svg {
+            width: 25px;
+            height: 25px;
+        }
+
+        .form-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #001b47;
+            color: white;
+            padding: 20px;
+            font-size: 1.5rem;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .form-title strong {
+            color: #ffd700;
+        }
+
+        .form-content {
+            height: 450px;
+            width: 800px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            margin-bottom:50px;
+        }
+
+        .claim-flex-container {
+            display: flex;
+            width: 100%;
+        }
+
+        .claim-flex-item-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .claim-flex-item {
+           
+            max-width: 50%;
+            border-radius: 15px 0 0 15px;
+            min-height: 449px;
+            max-height: 449px;
+            flex: 1;
+            position: relative;
+            background: transparent;
+        }
+
+        .border-radius img {
+            max-width: 100%;
+        }
+
+        /* Additional styles */
+        .control-label {
+            text-transform: capitalize !important;
+        }
+
+        .has-success .form-control {
+            border-color: #C4D82E;
+        }
+
+        .alert {
+            padding: 5px !important;
+            margin-bottom: 0px !important;
+        }
+
+        .form-control:focus {
+            border-color: #00285A !important;
+        }
+
+        .col-md-12 {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .textarea_input {
+            margin-bottom: 25px;
+            max-height: 70px !important;
+            min-height: 70px !important;
+        }
+
+        .form-control {
+            height: 45px;
+        }
+        
+        .form-control.step3 {
+
+            color: black;
+            font-size:  12px;
+            height: 25px;
+        }
+        
+         .form-control.step5 {
+
+            color: black;
+            font-size:  12px;
+            height: 50px;
+        }
+        .form-control.step4 {
+            width: 100%;
+            color: black;
+            font-size:  12px;
+            height: 25px;
+        }
+
+        .form-group {
+            margin-top: 25px !important;
+        }
+
+        .input_form {
+            margin-top: 5px;
+            background: #FFFFFF;
+            border: 1px solid #DBDBDB;
+            border-radius: 30px;
+            opacity: 1;
+            width: 107%;
+            padding-left: 17px;
+        }
+
+        .text-centered {
+            display: flex;
+            flex-direction: column !important;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            color: white;
+        }
+
+        .text-centered p {
+            margin: 75px;
+            color: white;
+            text-align: center;
+        }
+
+        /* Add this to your existing CSS */
+        .mY-footer {
+            margin: -8px;
+            background-color: #000000;
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        .navbar{
+            background-color: #000000;
+            color: white;
+        }
+        .navbar-default{
+            background-color: #000000;
+            color: white;
+        }
+        .error {
+            color: red;
+            display: none;
+        }
+        .mY-footer .container {
+            display: grid;
+            grid-template-columns: 20% 60% 20%;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .mY-footer .navbar-brand {
+            display: flex;
+            justify-content: center;
+        }
+
+        .mY-footer .navbar-brand img {
+            height: 40px;
+            width: auto;
+        }
+
+        .mY-footer .footer-text {
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .mY-footer .footer-text a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .mY-footer .footer-text a:hover {
+            text-decoration: underline;
+        }
+
+        .mY-footer .flex-container {
+            display: flex;
+            flex-direction: row; /* Ensure elements are inline */
+            align-items: center; /* Center items vertically */
+            justify-content: center; /* Center items horizontally */
+        }
+
+        .svg{
+            margin: 13px 0px 10px 210px;
+        }
+
+        .custom-file-input-container {
+            display: flex;
+            align-items: center;
+            border: 1px solid #DBDBDB; /* Adds a 1px solid black border */
+            border-radius: 30px;
+            padding: 1px;
+            height: 30px;
+            width:80%;
+        }
+
+.custom-file-input {
+    display: none;
+}
+
+.custom-file-label {
+    background-color: #5BCFFA;
+    color: white;
+    padding: 5px 8px;
+    border-radius: 30px;
+    cursor: pointer;
+    margin-right: 8px;
+    margin-left: 2px;
+    font: normal normal normal 12px/15px Montserrat;
+    letter-spacing: 0px;
+    opacity: 1;
+}
+
+.custom-file-label:hover {
+    background-color: #0056b3;
+}
+
+.replay-button {
+    background-color: #ff4d0d;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.replay-button:hover {
+    background-color: #e0440c;
+}
+
+.file-info {
+    margin-top: 10px;
+}
+
+.file-info p {
+    margin: 0;
+}
+
+
+.text-centered-2 p {
+    margin: 75px 75px 75px 0px !important;
+}
+
+        /* Responsive styles */
+        @@media (max-width: 992px) {
+         .form-control.step3 {
+    color: black;
+    font-size: 20px;
+    height: 45px;
+}
+        
+        .claim-flex-item {
+                width:800px;
+                max-width: 100%;
+            }
+
+            .mY-footer .container {
+                line-height: 1.5;
+                grid-template-columns: 100%;
+            }
+            .svg{
+                margin:  0px 0px 0px 15px;
+            }
+    
+            .claim-container {
+                flex: auto;
+                margin-left: 8%;
+                margin-right: 13%;
+                height: 630px;
+                margin-top: 26px;
+                margin-right: 10px;
+                margin-left: 0%;
+                margin-bottom: 30px;
+            }
+
+            .claim-flex-item {
+                border-radius: 30px 30px 0px 0px;
+                min-height: 221px;
+                max-height: 700px;
+                flex: 1;
+                position: relative;
+                background: transparent;
+            }
+
+            .main-stepper-container {
+                display: flex;
+                background-color: transparent;
+                align-content: stretch;
+                flex-direction: column;
+                justify-content: space-evenly;
+            }
+
+            .form-content {
+                height: 100%;
+                width: 100%;
+                background-color: white;
+                border-radius: 42px;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            }
+
+            .stepper-container {
+                width: 80%;
+            }
+
+            .input {
+                width: 70%;
+            }
+
+            .claim-flex-container {
+                flex-direction: column;
+            }
+        }
+
+        @@media (max-width: 768px) {
+        
+        .scrollable-form-container {
+            padding: 0px 65px;
+            height: 560px; 
+            overflow-y: auto;
+        }
+        
+        
+        .claim-container {
+            height: 630px;
+            margin-top: 26px;
+            margin-right: 10px;
+            margin-left: 0%;
+            margin-bottom: 30px;
+        }
+            .claim-flex-item1-bg {
+                border-radius: 15px 15px 0px 0px !important;
+                min-height: 0px !important;
+                background-color: #00285A !important;
+            }
+
+            .form-content {
+                width: 100%;
+                height: auto;
+            }
+
+            .stepper-container {
+                width: 90%;
+            }
+
+            .input {
+                width: 100%;
+            }
+
+            .claim-flex-container {
+                flex-direction: column;
+            }
+        }
+
+        @@media (max-width: 576px) {
+
+
+            .form-content {
+                width: 100%;
+                height: auto;
+            }
+
+            .stepper-container {
+                width: 100%;
+            }
+
+            .step {
+                font-size: 0.875rem;
+            }
+
+            .next-button {
+                font-size: 0.875rem;
+            }
+
+            .claim-flex-container {
+                flex-direction: column;
+            }
+        }
+
+
+
+   .dropdown-button {
+            white-space: nowrap; /* Prevent text from wrapping */
+            overflow: hidden; /* Hide text overflow */
+            text-overflow: ellipsis; /* Show ellipsis when text overflows */
+            display: block; /* Ensure the button takes full width available */
+            width: 100%; /* Ensure button width is constrained */
+            max-width: 300px; /* Set a maximum width if needed */
+            /* Optional: Add padding to ensure the text is visually constrained */
+            padding: 0.375rem 0.75rem;
+        }
+        /* Ensure the dropdown menu does not affect button width */
+        .dropdown-menu {
+            width: auto; /* Adjust dropdown menu width if needed */
+        }
+   .custom-dropdown .dropdown-menu {
+    margin-right: -135px;
+   }
+   
+ 
+
+.loader-wrapper {
+  display: none; /* Hidden by default */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+}
+
+
+.loader {
+ 
+  width: 50px;
+  padding: 8px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #25b09b;
+  --_m:
+    conic-gradient(#0000 10%,#000),
+    linear-gradient(#000 0 0) content-box;
+  -webkit-mask: var(--_m);
+          mask: var(--_m);
+  -webkit-mask-composite: source-out;
+          mask-composite: subtract;
+  animation: l3 1s infinite linear;
+}
+
+@@keyframes l3 {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+
+
+  .checkbox-dropdown {
+        padding: 10px;
+        max-height: 200px;
+        overflow-y: auto;
+        display: none; /* Hidden by default */
+    }
+
+    .checkbox-dropdown.show {
+        display: block; /* Show when the dropdown button is clicked */
+    }
+
+
+    .dropdown-item input[type="checkbox"] {
+        margin-right: 10px;
+    }
+    
+
+    .custom-dropdown {
+        position: relative;
+    }
+
+
+.custom-dropdown .dropdown-toggle {
+    margin-bottom: 10px;
+    background: white;
+    width: 100%;
+    padding: 10px;
+    border-radius: 30px !important;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease-in-out;
+    text-align: left;
+    position: relative; /* Allows positioning of the icon */
+}
+
+.custom-dropdown .dropdown-toggle .fa,
+.custom-dropdown .dropdown-toggle .dropdown-icon {
+    position: absolute;
+    right: 15px; /* Distance from the right edge of the button */
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; /* Prevents the icon from capturing clicks */
+    font-size: 12px; /* Adjust icon size as needed */
+    color: #333; /* Color of the icon */
+}
+
+    .custom-dropdown .dropdown-menu {
+        width: 100%;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .hidden {
+        display: none;
+    }
+    
+    ul {
+    display: block;
+    list-style-type: none; 
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    padding-inline-start: 0px;
+    unicode-bidi: isolate;
+}
+
+li {
+    color:black;
+    margin-bottom: 5px; /* Optional: Add spacing between list items */
+}
+
+
+.checkbox-dropdown ul {
+  padding: 0;
+  list-style: none;
+  max-width: 200px; /* Adjust width as needed */
+}
+
+.checkbox-dropdown .dropdown-item {
+  display: flex;
+  align-items: flex-start;
+  overflow: hidden;
+  padding-right: 10px; /* Adjust padding to add some space */
+}
+
+.checkbox-dropdown .dropdown-item input[type="checkbox"] {
+  flex-shrink: 0; /* Prevents the checkbox from shrinking */
+  margin-right: 10px; /* Adds space between the checkbox and text */
+}
+
+.text-content {
+  display: inline-block;
+  overflow: hidden;
+  text-indent: -18px; /* Indents text to align with the checkbox */
+  padding-left: 18px; /* Adds padding equal to the text-indent to create space for the checkbox */
+  max-width: 100%; /* Ensures the text does not overflow */
+  word-break: break-word; /* Breaks long words to prevent overflow */
+}
+.dropdown-item {
+    width: 100%;
+    /* text-wrap: nowrap; */
+    padding: 5px 6px 5px 10px;
+}
+
+
+
+
+.file-name{
+    white-space: nowrap;
+    width: 120px;
+  
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@@keyframes spin {
+    0%, 100% {
+        box-shadow: .2em 0px 0 0px currentcolor;
+    }
+    12% {
+        box-shadow: .2em .2em 0 0 currentcolor;
+    }
+    25% {
+        box-shadow: 0 .2em 0 0px currentcolor;
+    }
+    37% {
+        box-shadow: -.2em .2em 0 0 currentcolor;
+    }
+    50% {
+        box-shadow: -.2em 0 0 0 currentcolor;
+    }
+    62% {
+        box-shadow: -.2em -.2em 0 0 currentcolor;
+    }
+    75% {
+        box-shadow: 0px -.2em 0 0 currentcolor;
+    }
+    87% {
+        box-shadow: .2em -.2em 0 0 currentcolor;
+    }
+}
+
+
+
+
+.inline-label {
+  font-size: small;
+  font-weight: 600;
+  margin-right: 10px; /* Adds space between the label and input */
+  white-space: nowrap; /* Keeps the label text on one line */
+  overflow: hidden;    /* Prevents text overflow */
+  text-overflow: ellipsis;
+}
+
+.radioButtonClass{
+    color: black;
+    font-weight: 300;
+    font-size: smaller;
+}
+
+      
+
+    .alert-container {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .alert-box {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: left;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        max-width: 350px;
+        width: 100%;
+    }
+
+    .alert-content {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .alert-icon {
+        font-size: 2em;
+        margin-right: 15px;
+    }
+
+    .alert-title {
+        font-size: 1.5em;
+        margin-bottom: 5px;
+    }
+
+    .alert-message {
+        font-size: 1em;
+    }
+
+    .alert-btn {
+        width: 100%;
+        background-color: #3085d6;
+        color: #fff;
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        text-align: center;
+    }
+
+    .alert-btn:hover {
+        background-color: #0062cc;
+    }
+
+    .alert-success .alert-box {
+        border-left: 5px solid #28a745;
+    }
+
+    .alert-success .alert-icon {
+        color: #28a745;
+    }
+
+    .alert-warning .alert-box {
+        border-left: 5px solid #ffc107;
+    }
+
+    .alert-warning .alert-icon {
+        color: #ffc107;
+    }
+
+    .alert-danger .alert-box {
+        border-left: 5px solid #dc3545;
+    }
+
+    .alert-danger .alert-icon {
+        color: #dc3545;
+    }
+
+
+    .dropdown {
+  position: relative;
+  font-size: 14px;
+  color: #333;
+}
+
+.dropdown .dropdown-list {
+  padding: 12px;
+  background: #fff;
+  position: absolute;
+  top: 30px;
+  left: 2px;
+  right: 2px;
+  box-shadow: 0 1px 2px 1px rgba(0, 0, 0, 0.15);
+  transform-origin: 50% 0;
+  transform: scale(1, 0);
+  transition: transform 0.15s ease-in-out 0.15s;
+  max-height: 66vh;
+  overflow-y: scroll;
+}
+
+.dropdown .dropdown-option {
+  display: block;
+  padding: 8px 12px;
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+}
+
+.dropdown .dropdown-label {
+    background: white;
+    width: 98%;
+    padding: 10px;
+    border-radius: 30px !important;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease-in-out;
+    text-align: left;
+    display: block;
+  cursor: pointer;
+}
+
+.dropdown .dropdown-label:before {
+  content: "▼";
+  float: right;
+}
+
+.dropdown.on .dropdown-list {
+  z-index: 12;
+  transform: scale(1, 1);
+  transition-delay: 0s;
+}
+
+.dropdown.on .dropdown-option {
+  opacity: 1;
+  transition-delay: 0.2s;
+}
+
+.dropdown.on .dropdown-label:before {
+  content: "▲";
+}
+
+[type="checkbox"] {
+  position: relative;
+  top: -1px;
+  margin-right: 4px;
+}
+
+/* New CSS for additional dropdowns */
+.additional-dropdowns {
+  margin-top: 20px;
+}
+
+.additional-dropdowns .dropdown {
+  display: none; /* Hide additional dropdowns initially */
+  position: relative; /* Allow them to be positioned relative to their container */
+}
+
+.additional-dropdowns .dropdown.show {
+  display: block; /* Show the currently relevant dropdown */
+}
+
+
+</style>
+    
+    <nav class="navbar navbar-default" style="background-color: black; margin: -8px;">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="https://publishing.v5.stg.africanbankdmz.net/en/home/complaint-form/">
+                    <svg id="Layer" class="svg" height="40px"  data-name="Layer" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 396.81 127.43">
+                        <defs>
+                          <style>
+                            .cls-1 {
+                              fill: url(#linear-gradient);
+                            }
+
+                            .cls-1, .cls-2, .cls-3, .cls-4 {
+                              stroke-width: 0px;
+                            }
+
+                            .cls-2 {
+                              fill: hsl(0, 0%, 100%);
+                            }
+
+                            .cls-3 {
+                              fill: url(#linear-gradient-2);
+                            }
+
+                            .cls-4 {
+                              fill: url(#linear-gradient-3);
+                            }
+                          </style>
+                          <linearGradient id="linear-gradient" x1="-3003.03" y1="2372.22" x2="-2944.19" y2="2286.57" gradientTransform="translate(554.55 -3686.67) rotate(-45)" gradientUnits="userSpaceOnUse">
+                            <stop offset="0" stop-color="#84d3ec"/>
+                            <stop offset=".75" stop-color="#00a6d5"/>
+                            <stop offset=".8" stop-color="#019fd0"/>
+                            <stop offset=".88" stop-color="#038bc5"/>
+                            <stop offset=".96" stop-color="#086cb2"/>
+                            <stop offset="1" stop-color="#0b5ca9"/>
+                          </linearGradient>
+                          <linearGradient id="linear-gradient-2" x1="-3063.26" y1="2262.81" x2="-2935.17" y2="2262.81" gradientTransform="translate(554.55 -3686.67) rotate(-45)" gradientUnits="userSpaceOnUse">
+                            <stop offset=".1" stop-color="#1e582c"/>
+                            <stop offset=".18" stop-color="#357934"/>
+                            <stop offset=".26" stop-color="#48963c"/>
+                            <stop offset=".34" stop-color="#56ab41"/>
+                            <stop offset=".42" stop-color="#5fb744"/>
+                            <stop offset=".5" stop-color="#62bc46"/>
+                            <stop offset=".75" stop-color="#c4d92f"/>
+                            <stop offset=".83" stop-color="#a8d035"/>
+                            <stop offset="1" stop-color="#63bc45"/>
+                            <stop offset="1" stop-color="#62bc46"/>
+                          </linearGradient>
+                          <linearGradient id="linear-gradient-3" x1="-3019.54" y1="2354.65" x2="-3054.6" y2="2287.56" gradientTransform="translate(554.55 -3686.67) rotate(-45)" gradientUnits="userSpaceOnUse">
+                            <stop offset="0" stop-color="#1d2f5e"/>
+                            <stop offset=".36" stop-color="#0b5ca9"/>
+                            <stop offset=".5" stop-color="#1864af"/>
+                            <stop offset=".68" stop-color="#2069b3"/>
+                            <stop offset="1" stop-color="#236bb5"/>
+                            <stop offset="1" stop-color="#fff"/>
+                          </linearGradient>
+                        </defs>
+                        <g id="Layer" data-name="Layer">
+                          <g>
+                            <g>
+                              <path class="cls-1" d="m88.65,88.65c0,.84-.03,1.67-.05,2.5-.23,9.21-3.86,18.35-10.89,25.37l38.82-38.82c14.54-14.54,14.54-38.11,0-52.65-5.03-5.03-11.13-8.31-17.57-9.87-8.62-2.08-17.84-1.04-25.86,3.11l-2.91,1.59c12.57,21.1,18.73,44.95,18.46,68.75Z"/>
+                              <path class="cls-3" d="m15.19,98.96c-2.08-8.62-1.04-17.84,3.12-25.86,0,0,1.05-1.95,1.59-2.91,5.76-10.24,12.99-19.87,21.71-28.58,8.71-8.71,18.35-15.95,28.58-21.71.97-.54,2.91-1.59,2.91-1.59,8.02-4.15,17.24-5.19,25.86-3.11L47.83,1.53c-12.66-3.75-26.93-.62-36.92,9.37C1.03,20.78-2.14,34.83,1.4,47.38l13.78,51.58Z"/>
+                              <path class="cls-4" d="m15.19,98.96c-2.08-8.62-1.04-17.84,3.12-25.86,0,0,1.05-1.95,1.59-2.91,21.1,12.57,44.95,18.73,68.75,18.46,0,0-.03,1.67-.05,2.5-.23,9.21-3.86,18.35-10.89,25.37-14.54,14.54-38.11,14.54-52.65,0-5.03-5.03-8.31-11.13-9.87-17.57Z"/>
+                            </g>
+                            <path class="cls-2" d="m236.91,75.77v-19.09c0-4.97-4.04-9-9-9s-9,4.04-9,9v19.09h-7.69v-19.09c0-9.21,7.49-16.7,16.7-16.7s16.7,7.49,16.7,16.7v19.09h-7.69Zm-163.5-26.93c-1.57-2.7-3.71-4.87-6.38-6.44-1.59-.93-3.31-1.59-5.15-1.97h0s0,0,0,0c-7.87-1.59-13.12,3-13.59,7.89,2.97-1.29,11.22-2.64,15.46.6h0s0,0,0,0c1.27.9,2.3,2.07,3.07,3.49.88,1.63,1.33,3.52,1.33,5.61s-.45,3.92-1.33,5.55c-.88,1.63-2.1,2.93-3.63,3.86-1.52.93-3.28,1.4-5.24,1.4s-3.67-.47-5.21-1.41c-1.27-.77-2.34-1.79-3.17-3.03h0s0,0,0,0c-3.69-5.39-2.57-12.29-1.28-16.09-6.9,1.26-9.29,8.82-7.53,15.03h0c.36,1.34.85,2.62,1.49,3.81,1.44,2.69,3.44,4.85,5.94,6.42,2.51,1.58,5.38,2.38,8.52,2.38s6.02-.8,8.52-2.38c.96-.61,1.85-1.3,2.66-2.08v4.27h7.86v-18.25h0c-.08-3.19-.87-6.1-2.36-8.68Zm23.53-23.04c-2.67.08-5.07.72-7.15,1.92-2.22,1.29-3.98,3.11-5.22,5.41-1.23,2.29-1.86,5.02-1.86,8.11v.28h-5.58v6.87h5.58v27.38h7.86v-27.38h9.23v-6.87h-9.23v-.9c0-1.56.29-2.92.87-4.05.57-1.1,1.38-1.98,2.41-2.61,1.03-.62,2.25-.94,3.63-.94,0,0,0,0,.01,0h3.92v-7.24h-4.48v.02Zm107.02,23.04c1.57,2.71,2.37,5.8,2.37,9.18v17.74h-7.86v-4.27c-.81.78-1.7,1.47-2.66,2.08-2.51,1.58-5.38,2.38-8.52,2.38s-6.02-.8-8.52-2.38c-2.5-1.57-4.5-3.73-5.94-6.42-1.44-2.68-2.17-5.75-2.17-9.13s.8-6.48,2.36-9.18c1.57-2.7,3.72-4.87,6.41-6.44,2.69-1.57,5.75-2.37,9.09-2.37s6.39.8,9.06,2.37c2.66,1.57,4.81,3.74,6.38,6.44Zm-5.24,9.18c0-2.09-.45-3.98-1.33-5.61-.88-1.63-2.1-2.92-3.63-3.86-1.52-.93-3.28-1.4-5.24-1.4s-3.66.47-5.21,1.41c-1.55.94-2.79,2.24-3.69,3.86-.9,1.63-1.36,3.52-1.36,5.61s.46,3.91,1.36,5.54c.9,1.63,2.14,2.93,3.69,3.86,1.54.93,3.3,1.41,5.21,1.41s3.71-.47,5.24-1.4c1.53-.94,2.75-2.23,3.63-3.86.88-1.63,1.33-3.5,1.33-5.55Zm175.13,2.45l13.12,15.3h9.84l-16.66-19.43,16.05-16.05h-10.55l-11.79,11.79v-23.73h-7.86v47.42h7.86v-15.3ZM116.78,40.3c-2.67.08-5.07.72-7.15,1.92-2.22,1.29-3.98,3.11-5.22,5.41-1.23,2.29-1.86,5.02-1.86,8.11v20.03h7.86v-20.65c0-1.56.29-2.92.87-4.05.57-1.1,1.38-1.98,2.41-2.61,1.03-.62,2.25-.94,3.63-.94,0,0,0,0,.01,0h3.92v-7.24h-4.48v.02Zm46.63,25.32c-.65.72-1.4,1.34-2.23,1.84-1.52.91-3.31,1.38-5.3,1.38s-3.78-.46-5.3-1.38c-1.53-.92-2.75-2.19-3.62-3.8-.88-1.61-1.33-3.51-1.33-5.64s.45-4.04,1.33-5.67c.88-1.62,2.1-2.91,3.62-3.83,1.52-.91,3.31-1.38,5.3-1.38s3.78.46,5.3,1.38c.83.5,1.58,1.12,2.22,1.85l.54.61,5.3-5.3-.54-.54c-1.07-1.09-2.3-2.03-3.65-2.81-2.67-1.53-5.76-2.3-9.18-2.3s-6.57.77-9.24,2.3c-2.67,1.53-4.8,3.67-6.33,6.36-1.53,2.69-2.3,5.83-2.3,9.33s.77,6.58,2.3,9.27c1.53,2.69,3.66,4.83,6.33,6.36,2.67,1.53,5.77,2.3,9.24,2.3s6.57-.77,9.24-2.3c1.34-.77,2.56-1.7,3.62-2.78l.54-.54-5.32-5.32-.54.61Zm-33.7-39.83c-1.32,0-2.47.48-3.42,1.43-.95.95-1.43,2.1-1.43,3.42s.48,2.47,1.43,3.42c.95.95,2.1,1.43,3.42,1.43s2.47-.48,3.42-1.43c.95-.95,1.43-2.1,1.43-3.42s-.48-2.47-1.43-3.42c-.95-.95-2.1-1.43-3.42-1.43Zm-3.93,18.42s0,0,0,0v27.57s0,0,0,0v3.99h7.86v-7.86h0v-19.77h0v-7.86h-7.86v3.92Zm210,12.47c0-4.97,4.04-9,9-9s9,4.04,9,9v19.09h7.69v-19.09c0-9.21-7.49-16.7-16.7-16.7s-16.7,7.49-16.7,16.7v19.09h7.69v-19.09Zm-59.12,11.06c-2.97,1.29-11.22,2.64-15.46-.6h0c-1.27-.9-2.3-2.07-3.07-3.49-.88-1.63-1.33-3.52-1.33-5.61s.45-3.92,1.33-5.55c.88-1.63,2.1-2.93,3.63-3.86,1.52-.93,3.28-1.4,5.24-1.4s3.67.47,5.21,1.41c1.27.77,2.34,1.79,3.17,3.03h0s0,0,0,0c3.69,5.39,2.57,12.29,1.28,16.09,6.9-1.26,9.29-8.82,7.53-15.03h0c-.36-1.34-.85-2.62-1.49-3.81-1.44-2.69-3.44-4.85-5.94-6.42-2.51-1.58-5.38-2.38-8.52-2.38s-6.02.8-8.52,2.38c-.96.61-1.85,1.3-2.66,2.08v-16.21h-7.86v30.19h0c.08,3.19.87,6.1,2.36,8.68,1.57,2.7,3.71,4.87,6.38,6.44,1.59.93,3.31,1.59,5.14,1.97h0c7.87,1.6,13.12-2.99,13.59-7.88Zm44.55-18.9c1.57,2.71,2.37,5.8,2.37,9.18v17.74h-7.86v-4.27c-.81.78-1.7,1.47-2.66,2.08-2.51,1.58-5.38,2.38-8.52,2.38s-6.02-.8-8.52-2.38c-2.5-1.57-4.5-3.73-5.94-6.42-1.44-2.68-2.17-5.75-2.17-9.13s.8-6.48,2.36-9.18c1.57-2.7,3.72-4.87,6.41-6.44,2.69-1.57,5.75-2.37,9.09-2.37s6.39.8,9.06,2.37c2.66,1.57,4.81,3.74,6.38,6.44Zm-5.24,9.18c0-2.09-.45-3.98-1.33-5.61-.88-1.63-2.1-2.92-3.63-3.86-1.52-.93-3.28-1.4-5.24-1.4s-3.66.47-5.21,1.41c-1.55.94-2.79,2.24-3.69,3.86-.9,1.63-1.36,3.52-1.36,5.61s.46,3.91,1.36,5.54c.9,1.63,2.14,2.93,3.69,3.86,1.54.93,3.3,1.41,5.21,1.41s3.71-.47,5.24-1.4c1.53-.94,2.75-2.23,3.63-3.86.88-1.63,1.33-3.5,1.33-5.55Z"/>
+                          </g>
+                        </g>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+<br>
+<br>
+<br>
+
+
+<div id="customAlert" class="alert-container" style="display: none;">
+    <div class="alert-box">
+        <div class="alert-content">
+            <span class="alert-icon">&#10004;</span> <!-- Default Success Icon -->
+            <div class="alert-text">
+                <h2 class="alert-title">Alert Title</h2>
+                <p class="alert-message">This is a custom alert message!</p>
+            </div>
+        </div>
+        <button id="alertOkBtn" class="alert-btn">OK</button>
+    </div>
+</div>
+
+    <section class="main-stepper-container">
+        <div class="stepper-container">
+            <div class="stepper-header">
+                <div class="step active" data-step="1">Personal Details</div>
+                <div class="step" data-step="2">Complaint Details</div>
+                <div class="step" data-step="3">Review</div>
+                <div class="step" data-step="4">Submit</div>
+            </div>
+        </div>
+
+        <div id="loanForm" class="needs-validation" novalidate>
+            <div id="ajax-form-success-log-claim" class="ajax-form-success ajax-alert alert alert-success square" style="display: none">
+                Thank you.
+            </div>
+            <div id="ajax-form-error-log-claim" class="ajax-form-error ajax-alert alert alert-danger square" style="display: none">
+                An error occurred while trying to submit the document. For any queries, please contact our call centre on 0861888786.
+            </div>
+            <div class="form-content">
+                
+                <div class="claim-step-content active" data-step="1">
+                    <div class="claim-flex-container">
+                        <div class="claim-flex-item claim-flex-item1-bg ">
+                            <div class="text-centered">
+                                <p class="claim-flex-item1-white-bg-p">Please fill in your details to get started with your complaint.</p>
+                            
+                            </div>
+                        </div>
+                        <div class="claim-flex-item claim-flex-item-content">
+                           
+                            <div class="claim-container">
+
+                                
+                                <div class="scrollable-form-container">
+                                
+                                        <div class="form-group">
+                                            <label for="FullnameInput" class="col-md-12 control-label stepper-label">Full Name:</label>
+                                            <div class="col-md-12">
+                                                <input class="form-control input_form" id="FullnameInput" maxlength="50" name="FormFields.Fullname" placeholder="Full Name" type="text" value=""  required />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="CellPhoneInput" class="col-md-12 control-label stepper-label">Cellphone Number:</label>
+                                            <div class="col-md-12">
+                                                <input class="form-control input_form" id="CellPhoneInput" maxlength="11" name="FormFields.CellPhone" placeholder="Mobile Number" type="text" value="" pattern="\d*" required />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="EmailInput" class="col-md-12 control-label stepper-label">Email:</label>
+                                            <div class="col-md-12">
+                                                <input class="form-control input_form" id="EmailInput" maxlength="50" name="FormFields.Email" placeholder="Email" type="text" value=""  required />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="ClientNumber" class="col-md-12 control-label stepper-label">Client Number (Optional):</label>
+                                            <div class="col-md-12">
+                                                <input class="form-control input_form" id="ClientNumber" maxlength="20" name="FormFields.ClientNumber" placeholder="Client Number" type="text" value=""  />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="" class="col-md-12 control-label stepper-label">Identification Type:</label>
+                                            <input type="radio" id="idType" name="identificationType" value="ID" checked>
+                                            <label for="SAIDInput" class="radioButtonClass">RSA ID</label><br>
+                                            <input type="radio" id="passportType" name="identificationType" value="Passport">
+                                            <label for="PassportNumberInput" class="radioButtonClass">Passport Number</label><br>
+                                            <div class="col-md-12">
+                                                <input class="form-control input_form" id="SAIDInput" maxlength="13" name="FormFields.IdNumber" placeholder="RSA ID" type="text" value="" pattern="\d*" required>
+                                            </div>
+                                        </div>
+                                        
+                                        
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <p class="combo-btn-text primary stepper-p">
+                                            <button type="submit" class="btn-brand-1 btn next-button button hover-up">Next</button>
+                                        </p>
+                                    </div>
+                                </div>
+                            
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="claim-step-content " data-step="2">
+                    <div class="claim-flex-container">
+                        <div class="claim-flex-item claim-flex-item1-bg">
+                            <button type="button" class="claim-prev-button" style="color: transparent;">
+                                <svg class="claim-pre-chevron" width="20px" height="20px"  viewBox="0 0 24 24" fill="transparent" xmlns="http://www.w3.org/2000/svg">
+                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                    <g id="SVGRepo_iconCarrier">
+                                        <rect width="24" height="24" fill="transparent"></rect>
+                                        <path d="M14.5 17L9.5 12L14.5 7" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </g>
+                                </svg>
+                                Back
+                            </button>
+                            <div class="text-centered-2 text-centered">
+                                <p class="claim-flex-item1-white-bg-p">Your file should be less than 5mb .jpeg, .png, .pdf, .docx, .xlsx.</p>
+                            </div>
+                        </div>
+                        <div class="claim-flex-item claim-flex-item-content">
+                            <div class="claim-container claim-container-step">
+                            <div class="scrollable-form-container">
+                                <!-- <p style="color:#000000;" class="stepper-p stepper-text-header">Your file should be less than 5mb .jpeg, .png, .pdf, .docx, .xlsx</p> -->
+                                <div class="form-group">
+                                    <label for="ApplicationType" class="col-md-12 control-label stepper-label">Complain Category:</label>
+                                    <div class="col-md-12 d-flex">
+                                        <!-- Regular Dropdown -->
+                                        <!-- <div class="col-md-12" style="padding-right: 15px;">
+                                            <select class="form-control application-type-dropdown" id="ApplicationType" name="Loan" required>
+                                                <option type="" value="" selected disabled>Please Select Complain Category</option>
+                                                <option value="ProductOrService">Product or Service</option>
+                                                <option value="ServiceAdvice">Service Advice</option>
+                                                <option value="CustomerService">Customer Service</option>
+                                                <option value="ProductOrServiceAccess">Product or Service Access</option>
+                                            </select>
+                                        </div> -->
+                                        <div class="col-md-12 dropdown" data-control="checkbox-dropdown" style="padding-right: 15px;">
+                                            <label class="dropdown-label">Please Select Complain Category</label>
+                                            <div class="col-md-12" >
+                                                <div class="dropdown-list">
+                                            
+                                                    <label class="dropdown-option">
+                                                      <input type="checkbox" name="dropdown-group" value="Selection 1" data-dropdown-id="Product or Service" />
+                                                      Product or Service
+                                                    </label>
+                                                    
+                                                    <label class="dropdown-option">
+                                                      <input type="checkbox" name="dropdown-group" value="Selection 2" data-dropdown-id="Service Advice" />
+                                                      Service Advice
+                                                    </label>
+                                                    
+                                                    <label class="dropdown-option">
+                                                      <input type="checkbox" name="dropdown-group" value="Selection 3" data-dropdown-id="Customer Service" />
+                                                      Customer Service
+                                                    </label>
+                                                    
+                                                    <label class="dropdown-option">
+                                                      <input type="checkbox" name="dropdown-group" value="Selection 4" data-dropdown-id="Product or Service Access" />
+                                                      Product or Service Access
+                                                    </label>
+                                                         
+                                                  </div>
+                                            </div>
+                                            
+                                        </div>
+                                        
+                                        <!-- Dropdowns with Checkboxes -->
+                                        <div class="col-md-12" >
+                                            <div class="additional-dropdowns">
+                                            
+                                                    <div class="custom-dropdown hidden dropdown" id="Product or Service">
+                                                        <button type="button" class="btn btn-default dropdown-toggle form-control" data-toggle="dropdown">
+                                                            Complaints Relating to Product or Service.
+                                                            <span class="dropdown-icon">&#x25BC;</span>
+                                                        </button>
+                                                        <div class="dropdown-menu checkbox-dropdown">
+                                                            <ul>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Value Added Services">Value added services
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Unfair Product Features">Unfair product features
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Unfair/confusing Product Pricing">Unfair/confusing product pricing
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Unfair Fees/charges">Unfair fees/charges
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Unfair Service">Unfair service
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Poor Interest Rate On Account"> Poor interest rate on account
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Inadequate User Systems/expectations Not Met">Inadequate user systems/expectations not met
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Misleading Information/disclosures Provided">Misleading information/disclosures provided
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Inaccurate Information/disclosures Provided">Inaccurate information/disclosures provided
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Unclear,Confusing, or Incomplete Information/disclosures Provided">Unclear, confusing, or incomplete information/disclosures provided
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Failure To Provide Contract/account Information"> Failure to provide contract/account information
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Confusing Terms And Conditions">Confusing terms and conditions
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Too Much Confusing Fine Print">Too much confusing fine print
+                                                                    </label>
+                                                                </li>
+                                                            </ul> 
+                                                        </div>
+                                                    </div>
+                                                
+                                                    <!--  -->
+                                                    <div class="custom-dropdown hidden dropdown" id="Service Advice">
+                                                        <button type="button" class="btn btn-default dropdown-toggle form-control" data-toggle="dropdown">
+                                                            Complaints Relating to Products or Service Advice
+                                                            <span class="dropdown-icon">&#x25BC;</span> 
+                                                        </button>
+                                                        <div class="dropdown-menu checkbox-dropdown">
+                                                            <ul>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Misleading information"> Misleading information
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Benefits not explained correctly"> Benefits not explained correctly
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Lack of knowledge, skill or integrity"> Lack of knowledge, skill or integrity
+                                                                    </label>
+                                                                </li>
+                                                        
+                                                            </ul> 
+                                                        </div>
+                                                    </div>
+                                                
+                                                    <div class="custom-dropdown hidden dropdown" id="Customer Service">
+                                                        <button type="button" class="btn btn-default dropdown-toggle form-control" data-toggle="dropdown">
+                                                            Complaints Relating to Customer Service
+                                                            <span class="dropdown-icon">&#x25BC;</span> 
+                                                        </button>
+        
+                                                        <div class="dropdown-menu checkbox-dropdown">
+                                                            <ul>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Incompetence"> Incompetence
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Non-responsiveness"> Non-responsiveness
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Lack of knowledge, skill or integrity"> Lack of knowledge, skill or integrity
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Rudeness"> Rudeness
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Client service standards of service providers"> Client service standards of service providers
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Complaints handling - poor communication on process/decision"> Complaints handling - poor communication on process/decision
+                                                                    </label>
+                                                                </li>
+                                                        
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                
+                                                    <div class="custom-dropdown hidden dropdown" id="Product or Service Access">
+                                                        <button type="button" class="btn btn-default dropdown-toggle form-control" data-toggle="dropdown">
+                                                            Complaints Relating to Products or Services
+                                                            <span class="dropdown-icon">&#x25BC;</span> 
+                                                        </button>
+                                                        <div class="dropdown-menu checkbox-dropdown">
+        
+                                                            <ul>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Product access/changes - access to funds"> Product access/changes - access to funds
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Product access/changes - unreasonable penalties to access product"> Product access/changes - unreasonable penalties to access product
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Product changes, switches, redemptions"> Product changes, switches, redemptions
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Product access/changes - early termination charges"> Product access/changes - early termination charges
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="dropdown-item">
+                                                                        <input type="checkbox" value="Product access/changes/switches - ability to make changes"> Product access/changes/switches - ability to make changes
+                                                                    </label>
+                                                                </li>
+                                                               
+                                                        
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="subform-group">
+                                    <label for="complaintDescription"  class="col-md-12 control-label stepper-label">Complaint Description:</label>
+                                    <textarea class="form-control" id="complaintDescription" rows="3" placeholder="Enter Complaint Description" style="border: 1px solid #DBDBDB;"></textarea>
+                                </div>
+
+                                <!--<div class="subform-group">-->
+                                <!--    <label for="complaintDetails"  class="col-md-12 control-label stepper-label">Complaint Details:</label>-->
+                                <!--    <textarea class="form-control" id="complaintDetails" rows="3" placeholder="Enter Complaint Details"></textarea>-->
+                                <!--</div>-->
+                               
+                                <div class="form-group">
+                                    <label for="idCopy" class="col-md-12 control-label stepper-label">Add an Attachment (Optional):</label>
+                                    <div class="row-md-12 upload">
+                                        <div class="custom-file-input-container">
+                                            <input type="file" id="idCopy" name="filename" class="custom-file-input">
+                                            <label for="idCopy" class="custom-file-label">Upload</label>
+                                            <div class="invalid-feedback"><p class="file-name">Complaint Doc</p></div>
+                                            <div class="progress-container">
+                                                <div class="progress">
+                                                    <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                               
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <p class="combo-btn-text primary stepper-p">
+                                            <button type="submit" class="btn-brand-1 btn next-button button hover-up">Next</button>
+                                        </p>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="claim-step-content " data-step="3">
+                    <div class="claim-flex-container">
+                        <div class="claim-flex-item claim-flex-item1-bg">
+                            <button type="button" class="claim-prev-button" style="color: transparent;">
+                                <svg class="claim-pre-chevron" width="20px" height="20px"  viewBox="0 0 24 24" fill="transparent" xmlns="http://www.w3.org/2000/svg">
+                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                    <g id="SVGRepo_iconCarrier">
+                                        <rect width="24" height="24" fill="transparent"></rect>
+                                        <path d="M14.5 17L9.5 12L14.5 7" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </g>
+                                </svg>
+                                Back
+                            </button>
+                            <div class="text-centered-2 text-centered">
+                                <p class="claim-flex-item1-white-bg-p">Please review your details before submitting.</p>
+                            </div>
+                        </div>
+                        <div class="claim-flex-item claim-flex-item-content">
+                           
+                            <div class="claim-container">
+                                
+                                <div class="scrollable-form-container">
+                                    <h4 style="text-align: center;">Complaint Summary :</h4>
+                                    <div class="form-group" style="display: flex;margin-top: 25px !important;justify-content: center;" >
+                                        <form id="dynamicForm">
+                                            <div class="subform-group1">
+                                                <label for="Fullname" class="inline-label">Name:</label>
+                                                <input type="text" class="form-control step3" id="Fullname" placeholder="Enter Name" style="border: none;background: none;" disabled/>
+                                            </div>    
+                                            <div class="subform-group1">
+                                                <label for="CellPhone" class="inline-label">Contact Number:</label>
+                                                <input type="text" class="form-control step3" id="CellPhone" placeholder="Enter Contact Number"  style="border: none;background: none;" disabled/>
+                                            </div>
+                                            <div class="subform-group1">
+                                                <label for="Email" class="inline-label" >E-Mail:</label>
+                                                <input type="email" class="form-control step3" id="Email" placeholder="Enter E-Mail"  style="border: none;background: none;" disabled/>
+                                            </div>
+                                            <div class="subform-group1">
+                                              <label for="ClientNumberInput" class="inline-label">Client Number:</label>
+                                              <input type="text" class="form-control step3" id="ClientNumberInput" placeholder="Client Number"  style="border: none;background: none;" disabled/>
+                                            </div>
+                                            <div class="subform-group1">
+                                                <label for="SAID" class="inline-label">ID:</label>
+                                                <input type="text" class="form-control step3" id="SAID" placeholder="SAID"  style="border: none;background: none;" disabled/>
+                                            </div>
+                                            <div class="subform-group1">
+                                                <label for="ComplaintDescription" class="inline-label">Complaint Description:</label>
+                                                <!--<textarea class="form-control step3" id="ComplaintDescription" rows="3" placeholder="Enter Complaint Description" style="border: none;background: none;" disabled></textarea>-->
+                                                <!--<textarea class="form-control step3" id="ComplaintDescription" rows="3" placeholder="Enter Complaint Description" style="border: none; background: none; overflow: hidden;" disabled></textarea>-->
+                                                <!--<input type="text" class="form-control step3" id="ComplaintDescription" placeholder="Enter Complaint Description"  style="border: none;background: none;" disabled/>-->
+                                                <textarea class="form-control step5" id="ComplaintDescription" placeholder="Enter Complaint Description" style="overflow-wrap: break-word; white-space: normal; border: none; background: none;" disabled></textarea>
+
+                                            </div>
+                                            <!-- <div class="subform-group1">-->
+                                            <!--    <label for="ComplaintDetails">Complaint Details:</label>-->
+                                            <!--    <textarea class="form-control" id="ComplaintDetails" rows="3" placeholder="Enter Complaint Details" style="border: none;"></textarea>-->
+                                            <!--</div> -->
+                                            <!-- Additional fields for dynamic content -->
+                                           <div style="display: flex; justify-content: center;">
+                                              <h4>Complaint Details:</h4>
+                                            </div>
+
+
+                                            <div class="selected-values" id="selected-values-display"></div>
+
+                                        </form>
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <p class="combo-btn-text primary stepper-p">
+                                            <button type="submit" class="btn next-button button hover-up">Next</button>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="claim-step-content " data-step="4">
+                    <div class="claim-flex-container">
+                        <div class="claim-flex-item claim-flex-item1-bg">
+                            <button type="button" class="claim-prev-button" style="color: transparent;">
+                                <svg class="claim-pre-chevron" width="20px" height="20px"  viewBox="0 0 24 24" fill="transparent" xmlns="http://www.w3.org/2000/svg">
+                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                    <g id="SVGRepo_iconCarrier">
+                                        <rect width="24" height="24" fill="transparent"></rect>
+                                        <path d="M14.5 17L9.5 12L14.5 7" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </g>
+                                </svg>
+                                Back
+                            </button>
+                            <div class="text-centered-2 text-centered">
+                                <p class="claim-flex-item1-white-bg-p">Please fill in your details to get started with your application.</p>
+                            </div>
+                        </div>
+                        <div class="claim-flex-item claim-flex-item-content">
+                           
+                                <div class="claim-container">
+                                <!-- <p style="color:#000000;" class="stepper-p stepper-text-header">Please fill in your details to get started with your application.</p> -->
+                                
+                                <div class="scrollable-form-container scrollable-form-container2">
+                                
+                                        <div class="form-group">
+                                            <p>
+                                                  For more information on the complaints process, please click the link below. 
+                                                  <br>
+                                                  <a target="_blank" href="https://publishing.v5.stg.africanbankdmz.net/media/umkbperu/african-bank-customer-complaints-policy-1.pdf">Complaints policy.</a>
+                                                  <br><br>
+                                                  African Bank is committed to addressing complaints in order to rectify any challenges or shortcomings that you as a client may face. Please contact us if you are aggrieved in any way as your feedback is important to us.
+                                                  <br><br><br>
+                                                  I agree that African Bank Limited will process personal information that I have provided in order to address the related feedback or concern. African Bank Limited maintains all information shared with the Bank in accordance with its privacy policy. 
+                                                  @*<a target="_blank" href="https://publishing.v5.stg.africanbankdmz.net/media/salf3g11/african-bank-customer-complaints-policy_approved-1.pdf">privacy policy</a>.*@
+                                                  <br><br>
+                                                  
+                                            </p>
+                                        </div>
+                                       
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12  declaring">
+                                        <div class="col-md-2"></div>
+                                        <label class="col-md-8">
+                                            <input type="checkbox" id="disclaimer" required>
+                                            I, <strong>
+                                                
+                                            <input type="text" class="form-control" id="Fullname200" 
+                                                  style="font-weight: 600; font-size: larger; height: 20px; background: none; border: none; 
+                                                  white-space: nowrap; max-width: 160px; min-width: 0; overflow: hidden; 
+                                                  width: 160px;" 
+                                            disabled="">
+                                                
+                                           
+                                            </strong> declare the above to be true and correct
+                                        </label>
+                                        <div class="col-md-2"></div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <p class="combo-btn-text primary stepper-p">
+                                            <button type="submit" class="btn-brand-1 btn next-button submitForm button hover-up">Next</button>
+                                        </p>
+                                    </div>
+                                </div>
+                            
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="claim-step-content " data-step="5">
+                    <div class="claim-flex-container">
+                        <div class="claim-flex-item claim-flex-item1-bg">
+                        
+                            <div class="text-centered">
+                                <p class="claim-flex-item1-white-bg-p">Please fill in your details to get started with your application.</p>
+                            </div>
+                        </div>
+                        <div class="claim-flex-item claim-flex-item-content">
+                                <div class="claim-container">
+                                <!-- <p style="color:#000000;" class="stepper-p stepper-text-header">Please fill in your details to get started with your application.</p> -->
+                                <p class="claim-flex-item1-green-bg-p">Thank you</p>                            
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="mY-footer mt-auto py-3">
+        <div class="container">
+            <div>
+                <a class="navbar-brand" href="~/en/home/">
+                    <img src="https://publishing.v5.stg.africanbankdmz.net/media/h50duhhg/asset-5.svg" height="40px" alt="Brand Logo">
+                </a>
+            </div>
+            <div class="footer-text">
+                Copyright 2024 African Bank. An authorised financial services and registered credit provider Reg No. 2014/176899/06 (NCRCP7638)
+            </div>
+            <div class="footer-text" style="margin-top: -5px;">
+                <!--<a href="/doc/TermsAndConditions.PDF" class="text-white" target="_blank">-->
+                <!--    <div class="flex-container">-->
+                <!--        <p class="text-white">Terms </p>-->
+                <!--        <p class="text-white"> &amp; Conditions</p>-->
+                <!--    </div>-->
+                <!--</a>-->
+            </div>
+        </div>
+    </footer>
+
+
+<div class="loader-wrapper">
+  <div class="loader"></div>
+</div>
+    
+    <!-- Content here -->
+
+<script>
+
+
+        var selectedValuesStore;
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const fileTypes = ['pdf', 'docx', 'rtf', 'jpg', 'jpeg', 'png', 'txt', 'heic'];
+            let formData = { step1: {}, step2: {} };
+            let globalbase64String;
+            let formValue;
+    
+            $(document).ready(function() {
+                initializeDropdowns();
+                initializeFileUploads();
+                initializeStepperNavigation();
+                initializeOutsideClickHandler();
+                initializeFileChangeHandler();
+                initializeIdentificationTypeToggle();
+                
+                
+                
+            });
+            
+
+            // Function to handle the identification type toggle
+            function initializeIdentificationTypeToggle() {
+                $('input[name="idType"]').change(function() {
+                    const selectedValue = $(this).val();
+                    if (selectedValue === "ID") {
+                        $('#SAIDInput').prop('disabled', false);
+                        $('#PassportNumberInput').prop('disabled', true).val('');
+                    } else if (selectedValue === "Passport") {
+                        $('#PassportNumberInput').prop('disabled', false);
+                        $('#SAIDInput').prop('disabled', true).val('');
+                    }
+                });
+            }
+            
+            
+
+    function getCheckedIdentificationType() {
+        return $('input[name="identificationType"]:checked').val() || '';
+    }
+
+    function logInitialCheckedType() {
+        var initialCheckedType = getCheckedIdentificationType();
+       
+    }
+
+    function handleIdentificationTypeChange() {
+        var checkedTypeString = getCheckedIdentificationType();
+      
+    }
+
+    // Initialize and log the default checked value when the page loads
+    logInitialCheckedType();
+
+    // Set up the event listener for change events
+    $('#idType, #passportType').change(function() {
+        handleIdentificationTypeChange();
+    });
+
+            
+
+    
+    
+            // Function to initialize dropdowns
+            function initializeDropdowns() {
+                $('#ApplicationType').change(handleApplicationTypeChange);
+    
+                $('.custom-dropdown .dropdown-toggle').on('click', function() {
+                    $(this).next('.checkbox-dropdown').toggleClass('show');
+                    $('.custom-dropdown .dropdown-toggle').css({ 'margin': '0px 0px 15px 0px' });
+                });
+    
+                $('.checkbox-dropdown input[type="checkbox"]').on('change', function() {
+                    updateDropdownText($(this));
+                });
+            }
+    
+            function showAlert(type, icon, title, message) {
+                const alertContainer = $('#customAlert');
+                alertContainer.removeClass('alert-success alert-warning alert-danger');
+                alertContainer.addClass(type);
+                $('.alert-icon').html(icon);
+                $('.alert-title').text(title);
+                $('.alert-message').text(message);
+                alertContainer.fadeIn();
+            }
+    
+            function hideAlert() {
+                $('#customAlert').fadeOut();
+            }
+    
+            function alertSuccess(message) {
+                showAlert('alert-success', '&#10004;', 'Success', message);
+                setTimeout(hideAlert, 13000);
+            }
+    
+            function alertWarning(message) {
+                showAlert('alert-warning', '&#9888;', 'Warning', message);
+                setTimeout(hideAlert, 3000);
+            }
+    
+            function alertDanger(message) {
+                showAlert('alert-danger', '&#10060;', 'Danger', message);
+                setTimeout(hideAlert, 3000);
+            }
+    
+            $('#alertOkBtn').on('click', function() {
+                hideAlert();
+            });
+    
+            function handleApplicationTypeChange() {
+                const selectedValue = $(this).val();
+                $('.application-type-dropdown-type2').hide();
+                if (['ProductOrService', 'ServiceAdvice', 'CustomerService', 'ProductOrServiceAccess'].includes(selectedValue)) {
+                    $('#' + selectedValue).show();
+                    $('.application-type-dropdown').css({ 'margin': '0px 0px 15px 0px' });
+                } else {
+                    $('.d-flex').css({ 'display': 'block' });
+                }
+            }
+    
+function updateDropdownText(checkbox) {
+    let selected = [];
+    checkbox.closest('.checkbox-dropdown').find('input[type="checkbox"]:checked').each(function() {
+        selected.push($(this).parent().text().trim());
+    });
+
+    let text = selected.length > 0 ? selected.join(', ') : 'Choose Option';
+
+    const maxLength = 50;
+    if (text.length > maxLength) {
+        text = text.substring(0, maxLength) + '...';
+    }
+
+    checkbox.closest('.custom-dropdown').find('.dropdown-toggle').text(text);
+}
+
+            function initializeFileUploads() {
+                $('.up').change(function() {
+                    handleFileSelection($(this));
+                    readURL(this);
+                });
+    
+                $('.replace-file-button').click(function() {
+                    $(this).closest('.fileUpload').find('.up').click();
+                });
+            }
+    
+            function handleFileSelection(inputElement) {
+                const profilePicValue = inputElement.val().split('\\').pop().substring(0, 20);
+                if (profilePicValue) {
+                    const fileUpload = inputElement.closest('.fileUpload')[0];
+                    if (fileUpload) {
+                        $(fileUpload).find('.upl').text(profilePicValue);
+                        const replaceButton = $('<button class="btn btn-warning replace-file-button">Upload</button>');
+                        $(fileUpload).append(replaceButton);
+                        replaceButton.click(function() {
+                            $(this).closest('.fileUpload').find('.up').click();
+                        });
+                    }
+                }
+            }
+    
+            function initializeStepperNavigation() {
+                $('.next-button').click(function() {
+                    handleNextStep($(this));
+                });
+    
+                $('.claim-prev-button').click(function() {
+                    const currentStep = parseInt($(this).closest('.claim-step-content').attr('data-step'));
+                    updateStep(currentStep - 1);
+                });
+            }
+
+// function handleNextStep(button) {
+//     const currentStep = parseInt(button.closest('.claim-step-content').attr('data-step'));
+//     handleStepData(currentStep);
+
+//     if (currentStep === 1 || currentStep === 2) {
+//         if (!validateStep(currentStep)) return;
+//     }
+
+//     const nextStep = currentStep + 1;
+
+//     if (currentStep === 4) {
+//         postFormData().then((success) => {
+//             if (success) {
+//                 updateStep(nextStep);
+//             } else {
+//                 alertDanger('Form submission failed. Please try again.');
+//             }
+//         });
+//     } else {
+//         updateStep(nextStep);
+
+//         // Check if transitioning to step 3
+//         if (nextStep === 3) {
+//             logAllFormData();
+//             populateStep3(formValue);
+//             logAllFormData();
+
+//             // Populate selectedValues in step 3
+            
+            
+//             displaySelectedValues(selectedValuesStore);
+//         } else if (nextStep === 4) {
+//             logAllFormData();
+//             populateStep4(formValue);
+//         }
+//     }
+// }
+
+function handleNextStep(button) {
+    const currentStep = parseInt(button.closest('.claim-step-content').attr('data-step'));
+    handleStepData(currentStep);
+
+    if (currentStep === 1 || currentStep === 2) {
+        if (!validateStep(currentStep)) return;
+    }
+
+    const nextStep = currentStep + 1;
+
+    if (currentStep === 4) {
+        // Check if the checkbox is checked
+        if (!$('#disclaimer').is(':checked')) {
+            alertDanger('Please check the disclaimer to proceed.');
+            return; // Prevent moving to the next step if not checked
+        }
+
+        postFormData().then((success) => {
+            if (success) {
+                updateStep(nextStep);
+            } else {
+                alertDanger('Form submission failed. Please try again.');
+            }
+        });
+    } else {
+        updateStep(nextStep);
+
+        // Check if transitioning to step 3
+        if (nextStep === 3) {
+            logAllFormData();
+            populateStep3(formValue);
+            logAllFormData();
+
+            // Populate selectedValues in step 3
+            displaySelectedValues(selectedValuesStore);
+        } else if (nextStep === 4) {
+            logAllFormData();
+            populateStep4(formValue);
+        }
+    }
+}
+
+
+            function initializeOutsideClickHandler() {
+                $(document).on('click', function(event) {
+                    if (!$(event.target).closest('.custom-dropdown').length) {
+                        $('.checkbox-dropdown').removeClass('show');
+                    }
+                });
+            }
+    
+            function initializeFileChangeHandler() {
+                $('#idCopy').on('change', function() {
+                    handleFileChange($(this));
+                });
+            }
+    
+            function handleFileChange(input) {
+                if (input[0].files.length > 0) {
+                    var file = input[0].files[0];
+                    $('.file-name').text(file.name);
+    
+                    var reader = new FileReader();
+                    reader.onload = function(event) {
+                        var base64String = event.target.result.split(',')[1];
+                        globalbase64String = base64String;
+                    };
+                    reader.readAsDataURL(file);
+    
+                    simulateUploadProgress();
+                }
+            }
+    
+            function simulateUploadProgress() {
+                var progress = 0;
+                var interval = setInterval(function() {
+                    progress += 10;
+                    $('.progress-bar').css('width', progress + '%').attr('aria-valuenow', progress).text(progress + '%');
+                    $('.progress').css({
+                        'left': '50px',
+                        'position': 'relative'
+                    });
+    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                    }
+                }, 200);
+            }
+    
+            function updateStep(activeStep) {
+                $('.claim-step-content').removeClass('active');
+                $(`.claim-step-content[data-step="${activeStep}"]`).addClass('active');
+    
+                $('.step').removeClass('active');
+                $(`.step[data-step="${activeStep}"]`).addClass('active');
+            }
+    
+            function handleStepData(step) {
+                const stepData = {};
+                $(`.claim-step-content[data-step="${step}"] .form-control`).each(function() {
+                    stepData[this.id] = $(this).val();
+                });
+    
+                if (step === 1) {
+                    formData.step1 = stepData;
+                } else if (step === 2) {
+                    formData.step2 = stepData;
+                }
+            }
+    
+            function populateStep4(data) {
+                document.getElementById('Fullname200').value = data.step1Data.FullnameInput || '';
+            }
+    
+function populateStep3(data, group) {
+
+
+    // Populate form fields with data from the previous steps
+    document.getElementById('Fullname').value = data.step1Data.FullnameInput || '';
+    document.getElementById('CellPhone').value = data.step1Data.CellPhoneInput || '';
+    document.getElementById('Email').value = data.step1Data.EmailInput || '';
+    document.getElementById('ClientNumberInput').value = data.step1Data.clientNumberInput || '';
+    document.getElementById('SAID').value = data.step1Data.SAIDInput || '';
+    document.getElementById('ComplaintDescription').value = data.step2Data.complaintDescription || '';
+    document.getElementById('complaintDetails').value = data.step2Data.complaintDetails || '';
+
+    // Reference to the container where checkboxes will be added
+    const checkboxContainer = document.getElementById('selected-values-display');
+
+
+
+    // Clear the existing checkboxes to prevent duplicates
+    checkboxContainer.innerHTML = '';
+
+    // Ensure `group` and `group.selectedValues` are defined
+    if (group && group.selectedValues) {
+
+
+        // Iterate over each selected value
+        group.selectedValues.forEach((value) => {
+            // Create the checkbox container for each item
+            const checkboxWrapper = document.createElement('div');
+            checkboxWrapper.classList.add('subform-group2');
+
+            // Create the checkbox input element
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = value;
+            checkbox.value = value;
+            checkbox.checked = true; // Checkbox is checked by default
+
+            // Create the label element for the checkbox
+            const label = document.createElement('label');
+            label.htmlFor = value;
+            label.textContent = value;
+
+            // Append the checkbox and label to the wrapper
+            checkboxWrapper.appendChild(checkbox);
+            checkboxWrapper.appendChild(label);
+
+            // Append the wrapper to the main container
+            checkboxContainer.appendChild(checkboxWrapper);
+        });
+    } else {
+    
+    }
+}
+
+// Example call to the function
+// Make sure to call this function whenever you move to step 3, passing in the required data and group objects.
+populateStep3(data, group);
+
+    
+function validateStep(step) {
+                let isValid = true;
+                $(`.claim-step-content[data-step="${step}"] input[required], .claim-step-content[data-step="${step}"] select[required]`).each(function() {
+                    if (!$(this).val()) {
+                        $(this).addClass('is-invalid');
+                        alertWarning(`Please fill out the ${$(this).attr('id')} field.`);
+                        isValid = false;
+                    } else {
+                        $(this).removeClass('is-invalid');
+                    }
+                });
+                return isValid;
+            }
+            
+            // Function to start the loader
+function startLoader() {
+                $('.loader-wrapper').fadeIn(); // Show the loader with a fade-in effect
+            }
+            
+            // Function to stop the loader
+function stopLoader() {
+                $('.loader-wrapper').fadeOut(); // Hide the loader with a fade-out effect
+            }
+            
+function getKeysWithValues(originalData) {
+                const result = { keysWithValues: [] };
+            
+                for (const key in originalData) {
+                    if (Array.isArray(originalData[key]) && originalData[key].length >= 1) {
+                        result.keysWithValues.push(key);
+                    }
+                }
+            
+                return JSON.stringify(result.keysWithValues);
+            }
+            
+
+// A simple XOR function to "encrypt" the string with a key
+function xorEncrypt(input, key) {
+    let output = "";
+    for (let i = 0; i < input.length; i++) {
+        output += String.fromCharCode(input.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+    }
+    return output;
+}
+
+// Encrypt the data object using the XOR method, then encode with Base64
+function encryptData(data) {
+    const secretKey = "your-secret-key"; // Use a strong key
+    // Convert the data to a JSON string
+    const dataStr = JSON.stringify(data);
+    // Encrypt the string with XOR
+    const xorEncrypted = xorEncrypt(dataStr, secretKey);
+    // Encode the result using Base64 so it can be safely sent in JSON
+    return btoa(xorEncrypted);
+}
+
+function postFormData() {
+    startLoader();
+
+    return new Promise((resolve) => {
+        let obj = {
+            "fullName": $('#Fullname').val(),
+            "email": $('#Email').val(),
+            "clientAccountNumber": $('#ClientNumberInput').val(),
+            "complaintDescription": $('#complaintDescription').val(),
+            "complaintType": getKeysWithValues(selectedValuesStore),
+            "disclaimer": "Yes",
+            "productService": JSON.stringify(selectedValuesStore["Product or Service"]),
+            "productServiceAdvice": JSON.stringify(selectedValuesStore["Service Advice"]),
+            "productServiceAccess": JSON.stringify(selectedValuesStore["Product or Service Access"]),
+            "customerService": JSON.stringify(selectedValuesStore["Customer Service"]),
+            "contactNumber": $('#CellPhone').val(),
+            "identityType": getCheckedIdentificationType(),
+            "identityNumber": $('#SAID').val(),
+            "complaintAttachment": globalbase64String,
+            "hasAttachment": globalbase64String ? true : false,
+            "complaintAttachmentFileName": "img"
+        };
+
+        // Encrypt the data before sending
+        const encryptedData = encryptData(obj);
+
+        $.ajax({
+            url: 'https://prod-49.westeurope.logic.azure.com:443/workflows/ef87a171855f4bddaebbd8708d43e51b/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Ue4vqqv6Ra_XOGFJSvmCir5ccu0w-UmOl9ZcQ_ynrUk',
+            method: 'POST',
+            data: JSON.stringify({ data: encryptedData }), // Send the encrypted payload
+            contentType: 'application/json',
+            success: function(response) {
+                stopLoader();
+                alertSuccess(response.Message + " Reference number : " + response.ReferenceNumber);
+                resolve(true);
+            },
+            error: function(error) {
+                stopLoader();
+                alertDanger('Form submission failed. Please try again.');
+                resolve(false);
+            }
+        });
+    });
+}
+
+
+function logAllFormData() {
+    formValue = {
+        step1Data: {},
+        step2Data: {},
+        selectedCheckboxes: []
+    };
+
+    // Collect form data from step 1
+    formValue.step1Data.FullnameInput = $('#FullnameInput').val();
+    formValue.step1Data.CellPhoneInput = $('#CellPhoneInput').val();
+    formValue.step1Data.EmailInput = $('#EmailInput').val();
+    formValue.step1Data.clientNumberInput = $('#ClientNumber').val();
+    formValue.step1Data.SAIDInput = $('#SAIDInput').val();
+
+    // Collect form data from step 2
+    formValue.step2Data.complaintDescription = $('#complaintDescription').val();
+    // formValue.step2Data.complaintDetails = $('#complaintDetails').val();
+    formValue.step2Data.uploadIdCopy = $('#idCopy').val();
+
+    // Collect selected checkbox values for each dropdown
+    $('.application-type-dropdown-type2').each(function() {
+        const dropdownId = $(this).attr('id');
+        const selectedValues = [];
+
+        $(this).find('input[type="checkbox"]:checked').each(function() {
+            selectedValues.push($(this).val());
+        });
+
+        if (selectedValues.length > 0) {
+            formValue.selectedCheckboxes.push({ dropdownId: dropdownId, selectedValues: selectedValues });
+        }
+    });
+
+
+}
+
+            
+function readURL(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+    
+                    reader.onload = function(e) {
+                        $('#blah').attr('src', e.target.result);
+                    };
+    
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+});
+    
+     
+(function($) {
+  var CheckboxDropdown = function(el) {
+    var _this = this;
+    this.isOpen = false;
+    this.areAllChecked = false;
+    this.$el = $(el);
+    this.$label = this.$el.find('.dropdown-label');
+    this.$checkAll = this.$el.find('[data-toggle="check-all"]').first();
+    this.$inputs = this.$el.find('[type="checkbox"]');
+    
+    this.onCheckBox();
+    
+    this.$label.on('click', function(e) {
+      e.preventDefault();
+      _this.toggleOpen();
+    });
+    
+    this.$checkAll.on('click', function(e) {
+      e.preventDefault();
+      _this.onCheckAll();
+    });
+    
+    this.$inputs.on('change', function(e) {
+      _this.onCheckBox();
+    });
+  };
+  
+  CheckboxDropdown.prototype.onCheckBox = function() {
+    this.updateStatus();
+    this.toggleAdditionalDropdowns();
+  };
+  
+  CheckboxDropdown.prototype.updateStatus = function() {
+    var checked = this.$el.find(':checked');
+    
+    this.areAllChecked = false;
+    this.$checkAll.html('Check All');
+    
+    if (checked.length <= 0) {
+      this.$label.html('Select Options');
+    } else if (checked.length === 1) {
+      this.$label.html(checked.parent('label').text());
+    } else if (checked.length === this.$inputs.length) {
+      this.$label.html('All Selected');
+      this.areAllChecked = true;
+      this.$checkAll.html('Uncheck All');
+    } else {
+      this.$label.html(checked.length + ' Selected');
+    }
+  };
+  
+  CheckboxDropdown.prototype.onCheckAll = function(checkAll) {
+    if (!this.areAllChecked || checkAll) {
+      this.areAllChecked = true;
+      this.$checkAll.html('Uncheck All');
+      this.$inputs.prop('checked', true);
+    } else {
+      this.areAllChecked = false;
+      this.$checkAll.html('Check All');
+      this.$inputs.prop('checked', false);
+    }
+    
+    this.updateStatus();
+  };
+  
+  CheckboxDropdown.prototype.toggleOpen = function(forceOpen) {
+    var _this = this;
+    
+    if (!this.isOpen || forceOpen) {
+      this.isOpen = true;
+      this.$el.addClass('on');
+      $(document).on('click', function(e) {
+        if (!$(e.target).closest('[data-control]').length) {
+          _this.toggleOpen();
+        }
+      });
+    } else {
+      this.isOpen = false;
+      this.$el.removeClass('on');
+      $(document).off('click');
+    }
+  };
+
+  CheckboxDropdown.prototype.toggleAdditionalDropdowns = function() {
+    var checked = this.$el.find(':checked');
+    $('.additional-dropdowns .dropdown').each(function() {
+      var $dropdown = $(this);
+      var id = $dropdown.attr('id');
+      var shouldShow = checked.filter('[data-dropdown-id="' + id + '"]').length > 0;
+      $dropdown.toggleClass('show', shouldShow);
+    });
+  };
+  
+  var checkboxesDropdowns = document.querySelectorAll('[data-control="checkbox-dropdown"]');
+  for (var i = 0, length = checkboxesDropdowns.length; i < length; i++) {
+    new CheckboxDropdown(checkboxesDropdowns[i]);
+  }
+})(jQuery);
+
+$(document).ready(function() {
+        $('.next-button').on('click', function() {
+            // Create an object to hold selected values for each dropdown
+            let selectedValues = {};
+
+            // Iterate over each dropdown
+            $('.custom-dropdown').each(function() {
+                let dropdownId = $(this).attr('id');
+                let values = [];
+                
+                // Find checked checkboxes within this dropdown
+                $(this).find('input[type="checkbox"]:checked').each(function() {
+                    values.push($(this).val());
+                });
+
+                // Store the selected values in the object with dropdown ID as key
+                selectedValues[dropdownId] = values;
+            });
+
+            // Log the selected values to the console
+
+
+            selectedValuesStore = selectedValues;
+
+            if ($('[data-step="3"]').length > 0) {
+                $('#selected-values-display').empty();
+             // Display the selected values on the page
+             $.each(selectedValues, function(dropdownId, values) {
+                    if (values.length > 0) {
+                        $('#selected-values-display').append('<label class="inline-label">' + dropdownId + ':</label>');
+                        $('#selected-values-display').append('<ul style="display: flex;flex-direction: column;align-items: flex-start;"></ul>');
+                        $.each(values, function(index, value) {
+                            $('#selected-values-display ul:last').append(`<input type="text" class="form-control step4" placeholder="" style="border: none; background: none;" disabled value="${value}" />`);
+                        });
+                    }
+            });
+        }
+
+
+
+        });
+    });
+
+function displaySelectedValues(selectedValues) {
+    // Clear previous content
+    $('#selected-values-display').empty();
+
+    // Iterate through each dropdown and its selected values
+    $.each(selectedValues, function(dropdownId, values) {
+        if (values.length > 0) {
+            // Append dropdown header
+            $('#selected-values-display').append('<h4>' + dropdownId + ' :</h4>');
+            
+            // Create a new unordered list for the values
+            const ul = $('<ul></ul>');
+
+            // Iterate through selected values and append them as list items
+            $.each(values, function(index, value) {
+                ul.append('<li>' + value + '</li>');
+            });
+
+            // Append the list to the display container
+            $('#selected-values-display').append(ul);
+        }
+    });
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+        const idRadio = document.getElementById('idType');
+        const passportRadio = document.getElementById('passportType');
+        const saidInput = document.getElementById('SAIDInput');
+
+        // Event listener for radio buttons
+        idRadio.addEventListener('change', function() {
+            if (this.checked) {
+                updateValidation('ID');
+            }
+        });
+
+        passportRadio.addEventListener('change', function() {
+            if (this.checked) {
+                updateValidation('Passport');
+            }
+        });
+
+        function updateValidation(type) {
+            if (type === 'ID') {
+                saidInput.setAttribute('maxlength', '13');
+                saidInput.setAttribute('pattern', '\\d{13}');
+                saidInput.setAttribute('placeholder', 'Enter 13-digit ID number');
+                saidInput.setAttribute('title', 'ID number must be 13 digits');
+                saidInput.setAttribute('minlength', '13');
+                saidInput.setAttribute('maxlength', '13');
+            } else {
+                saidInput.setAttribute('maxlength', '20');
+                saidInput.setAttribute('pattern', '.{6,20}');
+                saidInput.setAttribute('placeholder', 'Enter Passport number');
+                saidInput.setAttribute('title', 'Passport number must be between 6 and 20 characters');
+                saidInput.removeAttribute('minlength');
+            }
+        }
+
+        // Initial validation setup based on default selection
+        if (idRadio.checked) {
+            updateValidation('ID');
+        } else if (passportRadio.checked) {
+            updateValidation('Passport');
+        }
+    });
+    
+    
+    
+
+</script>

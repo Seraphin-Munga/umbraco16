@@ -45,6 +45,12 @@
     var headerImage_small = heroHeader?.Value<IPublishedContent>("imageSmall")?.Url;
 
 }
+<style>
+    .mega-tabs .nav-tabs>li.active:after {
+        top: unset !important;
+        bottom: -18px;
+    }
+</style>
 <!-- HERO BANNER -->
 @Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
 <!-- HERO CONTINUED-->

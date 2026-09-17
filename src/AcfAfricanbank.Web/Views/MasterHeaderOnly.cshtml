@@ -59,7 +59,7 @@ else
     homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
 }
 
-var disclaimersData = homePageElements.Children.Where(o => o.ContentType.Alias == "ebankITListSectionText").ToList();
+@*var disclaimersData = homePageElements.Children.Where(o => o.ContentType.Alias == "ebankITListSectionText").ToList();
 
 var disclaimers = disclaimersData.FirstOrDefault().Children;
 IPublishedContent disclaimerValue = null;
@@ -79,7 +79,7 @@ foreach (var content in disclaimers)
         break;
     }
 }
-
+*@
 var heroBodyBlog = (HeroBody)homePageElements.Children.Where(x => x is HeroBody).FirstOrDefault();
 var heroBodyBlogLink = heroBodyBlog.Children.Where(x => x.ContentType.Alias.ToLower() == "link").FirstOrDefault();
 
@@ -96,6 +96,7 @@ var seo_description = Model.Value("descrition_tag");
 var seo_keywords = Model.Value("keywords_tag");
 String twitter_default_image = "/media/51288/ab-logo_icon_blue_30x30-2.png";
 
+
 if (Model.Value<IPublishedContent>("image") != null)
 {
     twitter_default_image = Model.Value("image").ToString();
@@ -111,6 +112,17 @@ if (Model.Children.Where(c => c is BlogDetailsElements).FirstOrDefault() != null
         twitter_default_image = ((ContentModels.Image)headerItem.Value("Image")).Url;
     }
 }
+
+@*var url = Request.Url.OriginalString.Trim();
+var uri = new Uri(url);
+
+var query = HttpUtility.ParseQueryString(uri.Query);
+
+var userSettings = "";
+if (Request.Cookies["AfricanBank"] != null)
+{
+    userSettings = Request.Cookies["AfricanBank"]["Value"];
+}*@
 var utm_source = Request.Params["utm_source"];
 var utm_medium = Request.Params["utm_medium"];
 var utm_campaign = Request.Params["utm_campaign"];
@@ -128,6 +140,13 @@ var utm_campaign = Request.Params["utm_campaign"];
         var uri = new Uri(url);
 
         var query = HttpUtility.ParseQueryString(uri.Query);
+       
+
+var userSettings = "";
+if (Request.Cookies["AfricanBank"] != null)
+{
+    userSettings = Request.Cookies["AfricanBank"]["Value"];
+}
 
         if (url.EndsWith("/"))
         {
@@ -171,8 +190,318 @@ var utm_campaign = Request.Params["utm_campaign"];
 
     @RenderSection("Header", required: false)
 
-    <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="/media/51288/ab-logo_icon_blue_30x30-2.png" />
+    <style>
+        
+        .cookieimg {
+            height: 50px;
+        }
 
+        .cookie-btn {
+            background-color: #fff;
+            border: 1px solid #fff;
+            color: #002b60;
+            padding: 4px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 0px;
+            font-size: 12px;
+            margin: 1px 1px;
+            position: absolute;
+            font-weight: bold;
+            width: 90%;
+            font-size: 75%;
+        }
+
+        .reject-cookie {
+            background-color: #fff;
+            border: 1px solid #fff;
+            color: #002b60;
+            padding: 4px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 0px;
+            font-size: 12px;
+            margin: 1px 1px;
+            position: absolute;
+            right: 10px;
+            top: 15px;
+            font-weight: bold;
+        }
+
+
+        .decline {
+            background-color: #fff;
+            border: 1px solid #fff;
+            color: #002b60;
+            padding: 4px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 0px;
+            font-size: 12px;
+            margin: 1px 1px;
+            position: absolute;
+            right: 118px;
+            top: 15px;
+            font-weight: bold;
+        }
+
+        .settings-cookie {
+            position: absolute;
+            background: no-repeat;
+            border: none;
+            color: #002b60 !important;
+            font-weight: bold;
+            width: 100%;
+            font-size: 80%;
+            margin-top: 8px;
+        }
+
+        .settings-cookie1 {
+            position: absolute;
+            background: no-repeat;
+            border: none;
+            color: #002b60 !important;
+            font-weight: bold;
+            width: 100%;
+            font-size: 80%;
+            margin-top: 7px;
+            margin-left: -20px;
+        }
+
+
+
+        .cookie-consent > img {
+            height: 35px;
+            float: left;
+            opacity: 0.45;
+            margin-top: 11px;
+            margin-right: 10px;
+        }
+
+        .cookie-consent {
+            position: fixed;
+            top: 0px;
+            width: 100%;
+            height: 63px;
+            color: #fff;
+            line-height: 20px;
+            padding-left: 10px;
+            padding-right: 10px;
+            font-size: 75%;
+            background: #b2bfcf;
+            z-index: 120;
+            border-radius: 0px;
+            display: inline-block;
+            box-shadow: 0px 5px 5px #00000035;
+            padding-top: 12px;
+        }
+
+
+        .ml-1 {
+            color: #002b60 !important;
+            font-weight: bold;
+        }
+
+        .message {
+            margin-top: 23px;
+        }
+
+        .policy {
+            position: absolute;
+            right: 90px;
+            top: 23px;
+        }
+         @@media (min-width: 768px) {
+            #lb-content {
+                width: 500px;
+            }
+
+            .i_image {
+                height: 300px;
+            }
+        }
+         
+    </style>
+<style>
+     @if (userSettings == "")
+    {
+
+        <style>
+         @@media (min-width: 280px) and (max-width: 653px) {
+            .cookie-consent {
+                height: 155px !important;
+                font-size: 80%;
+            }
+
+            .dropdown-container .navbar-header {
+                margin-top: 140px;
+            }
+
+            .decline {
+                top: 78px;
+            }
+            .policy {
+                top: 83px;
+            }
+                .padding-top-15 {
+                    padding-top: 20px;
+                }
+
+                .cookieimg {
+                    height: 30px;
+                }
+
+                .cookie-btn {
+                    font-size: 60%;
+                }
+
+                .settings-cookie {
+                    font-size: 60%;
+                }
+            }
+
+            @@media (min-width: 360px) and (max-width: 640px) {
+                .cookieimg {
+                    height: 30px;
+                }
+
+              @*  .cookie-consent > img {
+                    display: none;
+                }*@
+
+                .decline {
+                    top: 95px;
+                    right: 90px;
+                }
+
+                .policy {
+                    position: absolute;
+                    right: 170px;
+                    top: 102px;
+                }
+
+                .cookie-consent {
+                    height: 140px !important;
+                   @* padding-left: 20px;
+                    padding-right: 20px;
+                    text-align: center; *@
+                }
+
+                .dropdown-container .navbar-header {
+                    margin-top: 140px;
+                }
+
+                .dropdown-container.navbar-default .navbar-collapse {
+                    margin-top: 140px;
+                }
+            }
+
+            @@media (min-width: 411px) and (max-width: 731px) {
+                .cookieimg {
+                    height: 30px;
+                }
+
+               @* .cookie-consent > img {
+                    display: none;
+                }*@
+
+
+                .decline {
+                    top: 88px;
+                    right: 115px;
+                }
+
+                .policy {
+                    position: absolute;
+                    right: 190px;
+                    top: 95px;
+                }
+            }
+
+
+
+            @@media (min-width: 768px) and (max-width: 1024px) {
+                .cookieimg {
+                    height: 30px;
+                }
+
+
+
+                .message {
+                    text-align: center;
+                }
+
+                .decline {
+                    top: 48px;
+                }
+
+                .policy {
+                    position: absolute;
+                    right: 90px;
+                    top: 55px;
+                }
+
+                .cookie-consent {
+                    height: 100px !important;
+                    padding-left: 20px;
+                    padding-right: 20px;
+                }
+
+                .dropdown-container .navbar-header {
+                    margin-top: 80px;
+                }
+
+                .dropdown-container.navbar-default .navbar-collapse {
+                    margin-top: 0px;
+                }
+
+                .dropdown-container .navbar-right {
+                    margin-top: 80px;
+                }
+            }
+
+            @@media (min-width: 1024px) and (max-width: 1366px) {
+                .cookieimg {
+                    height: 30px;
+                }
+                .policy {
+                    top: 25px;
+                }
+                    .message {
+                    width: 80%;
+                    text-align: center;
+                }
+
+                .decline {
+                    top: 18px;
+                }
+
+                .dropdown-container .navbar-header {
+                    margin-top: 40px;
+                }
+
+                .dropdown-container.navbar-default .navbar-collapse {
+                    margin-top: 40px;
+                }
+
+                .cookie-consent {
+                    height: 65px !important;
+                    padding-left: 20px;
+                    padding-right: 20px;
+                }
+
+                .dropdown-container .navbar-right {
+                    margin-top: 40px;
+                }
+            }
+        </style>
+
+    }
+</style>
 
     @{ 
         if (currentPage.Id == 40240)
@@ -272,6 +601,66 @@ var utm_campaign = Request.Params["utm_campaign"];
     }
 
 </head>
+ <script type="text/javascript" src="~/scripts/jquery-1.10.2.min.js"></script>
+   @if (userSettings == "")
+    {
+ <div class="headers" id="headers">
+            <div class="cookie-consent">
+                @*  <img class="cookie" src="/Media/dqxpfbcm/cookies.svg" style="height: 50px; float: left; opacity: 0.45;">
+                    <div class="message">
+                        <p>This site uses cookies to provide you with a great user experience. By using our site, you agree to our use of cookies. </p>
+                    </div>
+
+                    <div class="accept-btn">
+                        <a href="https://africanbank.co.za/en/home/cookie-policy/" class="policy ml-1">Tell Me More!</a>
+                        <button onclick="AcceptCookie()" class="decline">Accept</button>
+                    </div> *@
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-2 col-sm-2 col-xs-2 padding-top-15">
+                            <img class="cookieimg" src="/media/dg2nd10f/cookies.svg" style=" float: left; opacity: 0.45;">
+                        </div>
+                        <div class="col-md-6 col-sm-10 col-xs-10">
+                            <p>This site uses cookies to provide you with a great user experience. By using our site, you agree to our use of cookies.</p>
+                        </div>
+                        <div class="col-md-4 col-sm-12 col-xs-12">
+                            <div class="row">
+                                <div class="col-md-3 col-sm-3 col-xs-3">
+                                    <a class="settings-cookie" href="http://cmsdev1.africanbank.net/en/home/cookie-policy/">Tell Me More!</a>
+                                </div>
+                                <div class="col-md-3 col-sm-3 col-xs-3">
+                                    <a class="settings-cookie" data-cc="c-settings" href="#">Settings</a>
+
+                                    @* <button type="button" class="settings-cookie1" data-cc="c-settings">Settings</button> *@
+                                </div>
+                                <div class="col-md-3 col-sm-3 col-xs-3">
+                                    <button class="cookie-btn" onclick="AcceptCookie()">Accept All</button>
+                                </div>
+                                <div class="col-md-3 col-sm-3 col-xs-3" style="padding-left:12px">
+                                    <button class="cookie-btn" onclick="CloseCookie()">Reject All</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+         <style>
+
+            @@media (min-width: 1200px) and (max-width: 2000px) {
+                .dropdown-container .navbar-header {
+                    margin-top: 35px;
+                }
+
+                .dropdown-container.navbar-default .navbar-collapse {
+                    margin-top: 35px;
+                }
+            }
+        </style>
+       } 
 <body class="frontpage theme-font-@font theme-color-@colorTheme">
 
     <!-- Google Tag Manager (noscript) -->
@@ -303,9 +692,13 @@ var utm_campaign = Request.Params["utm_campaign"];
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
     <link href="~/javascripts/datetime/bootstrap-datetimepicker.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Montserrat:200,300,400,600,700" rel="stylesheet">
+    <link href="/css/cookieconsent.css" rel="stylesheet" />
+    
 
-    <script type="text/javascript" src="~/scripts/jquery-1.10.2.min.js"></script>
+   
     <script type='text/javascript' src='//platform-api.sharethis.com/js/sharethis.js#property=5ca6063b9b272f00119abd21&product=inline-share-buttons' async='async'></script>
+    <script type="text/javascript" src="/scripts/cookieconsent.js"></script>
+
 
     @{ 
         if (currentPage.Id == 40240)
@@ -378,7 +771,140 @@ var utm_campaign = Request.Params["utm_campaign"];
 
     <!--START Hotjar Tracking Code for www.africanbank.co.za -->
     <script>
+window.addEventListener('load', function () {
 
+                // obtain plugin
+                var cc = initCookieConsent();
+
+                // run plugin with your configuration
+                cc.run({
+                    current_lang: 'en',
+                    autoclear_cookies: true,                   // default: false
+                    page_scripts: true,                        // default: false
+
+                    // mode: 'opt-in'                          // default: 'opt-in'; value: 'opt-in' or 'opt-out'
+                    // delay: 0,                               // default: 0
+                    // auto_language: '',                      // default: null; could also be 'browser' or 'document'
+                    autorun: false,                          // default: true
+                    // force_consent: false,                   // default: false
+                    // hide_from_bots: false,                  // default: false
+                    // remove_cookie_tables: false             // default: false
+                    // cookie_name: 'cc_cookie',               // default: 'cc_cookie'
+                    // cookie_expiration: 182,                 // default: 182 (days)
+                    // cookie_necessary_only_expiration: 182   // default: disabled
+                    // cookie_domain: location.hostname,       // default: current domain
+                    // cookie_path: '/',                       // default: root
+                    // cookie_same_site: 'Lax',                // default: 'Lax'
+                    // use_rfc_cookie: false,                  // default: false
+                    // revision: 0,                            // default: 0
+
+                    onFirstAction: function (user_preferences, cookie) {
+                        console.log("onFirstAction called");
+                        // callback triggered only once on the first accept/reject action
+                       if (user_preferences.accept_type == "all") {
+                           AcceptCookie();
+                       } else {
+                           CloseCookie();
+                     }
+                    },
+
+                    onAccept: function (cookie) {
+                        console.log("onAccept called");
+                        // callback triggered on the first accept/reject action, and after each page load
+
+                    },
+
+                    onChange: function (cookie, changed_categories) {
+                        console.log("onChange called");
+                        if (cookie.level.length > 1 ) {
+                            AcceptCookie();
+                        }
+
+                       @* if (cookie.level.length == 1) {
+                            CloseCookie();
+                        } *@
+                        // callback triggered when user changes preferences after consent has already been given
+                    },
+
+                    languages: {
+                        'en': {
+                            consent_modal: {
+                                title: 'We use cookies!',
+                                description: 'This site uses cookies to provide you with a great user experience. By using our site, you agree to our use of cookies.  <a href="http://localhost:50053/en/home/privacy-policy/">Tell Me More!</a> <br/>  <button type="button" data-cc="c-settings" class="cc-link">Settings</button>',
+                                primary_btn: {
+                                    text: 'Accept all',
+                                    role: 'accept_selected'              // 'accept_selected' or 'accept_all'
+                                },
+                                secondary_btn: {
+                                    text: 'Reject all',
+                                    role: 'accept_necessary'        // 'settings' or 'accept_necessary'
+                                }
+                            },
+                            settings_modal: {
+                                title: 'Cookie preferences',
+                                save_settings_btn: 'Save settings',
+                                accept_all_btn: 'Accept all',
+                                reject_all_btn: 'Reject all',
+                                close_btn_label: 'Close',
+                                cookie_table_headers: [
+                                    { col1: 'Name' },
+                                    { col2: 'Domain' },
+                                    { col3: 'Expiration' },
+                                    { col4: 'Description' }
+                                ],
+                                blocks: [
+                                    {
+                                        title: 'Cookie usage 📢',
+                                        description: 'I use cookies to ensure the basic functionalities of the website and to enhance your online experience. You can choose for each category to opt-in/out whenever you want. For more details relative to cookies and other sensitive data, please read the full <a href="http://cmsdev1.africanbank.net/en/home/privacy-policy/" class="cc-link">privacy policy</a>.'
+                                    }, {
+                                        title: 'Strictly necessary cookies',
+                                        description: 'These cookies are essential for the proper functioning of my website. Without these cookies, the website would not work properly',
+                                        toggle: {
+                                            value: 'necessary',
+                                            enabled: true,
+                                            readonly: true          // cookie categories with readonly=true are all treated as "necessary cookies"
+                                        }
+                                    }, {
+                                        title: 'Performance and Analytics cookies',
+                                        description: 'These cookies allow the website to remember the choices you have made in the past',
+                                        toggle: {
+                                            value: 'analytics',     // your cookie category
+                                            enabled: false,
+                                            readonly: false
+                                        },
+                                        cookie_table: [             // list of all expected cookies
+                                            {
+                                                col1: '^_ga',       // match all cookies starting with "_ga"
+                                                col2: 'google.com',
+                                                col3: '2 years',
+                                                col4: 'description ...',
+                                                is_regex: true
+                                            },
+                                            {
+                                                col1: '_gid',
+                                                col2: 'google.com',
+                                                col3: '1 day',
+                                                col4: 'description ...',
+                                            }
+                                        ]
+                                    }, {
+                                        title: 'Advertisement and Targeting cookies',
+                                        description: 'These cookies collect information about how you use the website, which pages you visited and which links you clicked on. All of the data is anonymized and cannot be used to identify you',
+                                        toggle: {
+                                            value: 'targeting',
+                                            enabled: false,
+                                            readonly: false
+                                        }
+                                    }, {
+                                        title: 'More information',
+                                        description: 'For any queries in relation to our policy on cookies and your choices, please <a class="cc-link" href="hhttp://localhost:50053/en/home/about-us-contact-us/">contact us</a>.',
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                });
+            });
 
 
 
@@ -519,32 +1045,102 @@ var utm_campaign = Request.Params["utm_campaign"];
                             callback: {
                                 callback: function (value, validator, $field) {
 
-                                    var idNumber = value;
+                                if (value != "") {
+							  var idNumber = value;
+														  
+							  if (!/^\d{13}$/.test(idNumber)) {
+								return false;
+							  }
 
-                                if (null === idNumber || 0 === idNumber.length) return !1;
-                                var correct = !0;
-                                    if (13 !== idNumber.length || isNaN(parseFloat(idNumber)) && isFinite(idNumber)) return !1;
-                                    var yob = parseInt(idNumber.substring(0, 2));
-                                    var currentYear = @DateTime.Now.Year;
-                                    if (yob + 2000 < currentYear) {yob = 2000 + yob
-                                    } else { yob = yob + 1900; }
+							  // Extract the date of birth from the ID number
+							  const dob = idNumber.substring(0, 6);
+							  var year = parseInt(dob.substring(0, 2), 10);
+							  const month = parseInt(dob.substring(2, 4), 10);
+							  const day = parseInt(dob.substring(4, 6), 10);
 
-                                var tempDate = new Date(idNumber.substring(0, 2), idNumber.substring(2, 4) - 1, idNumber.substring(4, 6)),
-                                    id_date = tempDate.getDate(),
-                                    id_month = tempDate.getMonth();
-                                    if (currentYear - yob >= 70 || currentYear - yob < 18) {
-                                        return {
-                                            valid: false,
-                                            message: '@ResourceHelper.GetResource("GenericContactForm_SAID_InvalidAge")'
-                                        }
-                                    } // make sure the applicant is not over 70 years of age or younger than 18
-                                (tempDate.getYear() != idNumber.substring(0, 2) || id_month != idNumber.substring(2, 4) - 1 || id_date != idNumber.substring(4, 6)) && (correct = !1);
-                                                                    for (var tempTotal = 0, checkSum = 0, multiplier = 1, i = 0; 13 > i; ++i) tempTotal = parseInt(idNumber.charAt(i)) * multiplier, tempTotal > 9 && (tempTotal = parseInt(tempTotal.toString().charAt(0)) + parseInt(tempTotal.toString().charAt(1))), checkSum += tempTotal, multiplier = multiplier % 2 === 0 ? 1 : 2;
-                                return checkSum % 10 !== 0 && (correct = !1), correct
+							  // Check if the birth year is valid (assuming someone born in 2001 or later)
+							  if (year < 1 || year > 99) {
+								return false;
+							  }
 
-                                }
-                            }
+							  // Adjust the birth year to a full year (2000s for 01-99, 1900s for 00)
+							  if (year > 99) {
+								year = year + 2000;
+							  } else if (year <= 98) {
+								year = year + 1900 + 100;
+								const _currentDate = new Date();
+								if (year > _currentDate.getFullYear()) {
+									year = year - 100;
+								}
+							  }
+							
+							  const syear = Number(year.toString().slice(2,4)); // Number(idNumber.slice(0, 2));
+							  // const month = Number(idNumber.slice(2, 4));
+							  const sday = Number(idNumber.slice(4, 6));
+
+							  // Determine birth century
+							  const birthCentury = syear < 22 ? 2000 : 1900;
+
+							  // Calculate birthdate
+							  const birthdate = new Date(`${birthCentury + syear}-${month}-${sday}`);
+
+							  // Calculate age
+							  const currentDate = new Date();
+							  const age = currentDate.getFullYear() - birthdate.getFullYear();
+
+
+							  // Check if the birth month is valid (between 1 and 12)
+							  if (month < 1 || month > 12) {
+								return false;
+							  }
+
+							  // Check if the day is valid for the given month and year
+							  const maxDaysInMonth = new Date(year, month, 0).getDate();
+							  if (day < 1 || day > maxDaysInMonth) {
+								return false;
+							  }
+
+							  // Check if the seventh digit (gender) is odd for males and even for females
+                              var gendercode = idNumber.substring(6, 10);
+                              var gender = parseInt(gendercode) < 5000 ? "female" : "male";
+							  
+
+							  // Check if the eighth digit (citizenship) is 0 for South African citizens
+                              // get country ID for citzenship
+                              var citzenship = parseInt(idNumber.substring(10, 11)) == 0 ? "Yes" : "No";
+							  const citizenshipDigit = parseInt(idNumber.charAt(7), 10);
+							  if (citzenship !== "Yes") {
+								return false;
+							  }
+								
+							  // Calculate the checksum using the Luhn algorithm
+							   const idArray = idNumber.split('').map(Number);
+							   const checksumDigit = idArray.pop();
+							   const sum = idArray.reduceRight((acc, digit, index) => {
+								 const double = index % 2 === 0 ? digit * 2 : digit;
+								 return acc + (double > 9 ? double - 9 : double);
+							   }, 0);
+							   const calculatedChecksum = (10 - (sum % 10)) % 10;
+
+							   // Check if the calculated checksum matches the provided checksum 
+							   // ...use age check as well as an extra check
+							   if (calculatedChecksum !== checksumDigit) {
+									if (age >= 18 && age <= 80) {
+										return true;
+									} else {
+										return false;
+									}
+							   } else {
+								   return true;
+							   }
+							  
+
+							  // All checks passed; the ID number is valid
+							  return true;
+							}
+							}
                         }
+						}
                     },
                     'FormFields.email': {
                         message: '@ResourceHelper.GetResource("GenericContactForm_InvalidValue")',
@@ -644,7 +1240,7 @@ var utm_campaign = Request.Params["utm_campaign"];
                     }
             requestInProgress = true;
             $("#form-loader").show();
-            debugger;
+            
                     //AJAX.request('/public/contacform/submit', {
             AJAX.request('/leads/apply', {
                         data: data,
@@ -786,6 +1382,78 @@ var utm_campaign = Request.Params["utm_campaign"];
             });
         </script>
     }
+    <script type="text/javascript">
+           function CloseCookie(){
+              var x = document.getElementById("headers");
+              if (x.style.display === "inline") {
+                x.style.display = "none";
+              } else {
+                x.style.display = "none";
+            }
+            $('.dropdown-container .navbar-header').css({ marginTop: '0px' });
+            $('.dropdown-container.navbar-default .navbar-collapse').css({ marginTop: '0px' });
+            $('.dropdown-container .navbar-right').css({ marginTop: '0px' });
+        }
+
+        function AcceptCookie(){
+              var cookieborder = document.getElementById("headers");
+              var access_key = "African Bank";
+              var _cookiedata = stringToencrypt("TestCookie",access_key);
+
+              if (cookieborder.style.display === "inline") {
+                 cookieborder.style.display = "none";
+              } else {
+                  cookieborder.style.display = "none";
+              }
+
+              $('.dropdown-container .navbar-header').css({ marginTop : '0px' });
+              $('.dropdown-container.navbar-default .navbar-collapse').css({ marginTop : '0px' });
+              $('.dropdown-container .navbar-right').css({marginTop : '0px' });
+
+              setCookie("AfricanBank",_cookiedata,365);
+
+              var data_storage =  document.cookie.split(";")[5];
+              var data_save = data_storage.substring(13,data_storage.length);
+
+            var cookieData = {
+                "HasAccepted": 1,
+                "UserData": _cookiedata
+            };
+
+           /* $.ajax({
+                // headers: { '__RequestVerificationToken': token },
+                url: '/umbraco/surface/JSONWriter/SaveCookieData',
+                type: "POST",
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify({ form: cookieData }),
+                success: function (data) {
+                    console.log("done");
+                },
+                error: function (err) {
+                    console.log("server error");
+                }
+            }); */
+
+        }
+
+        function setCookie(abname, abvalue, expire) {
+
+          var gdate = new Date();
+          gdate.setTime(gdate.getTime() + (expire * 24 * 60 * 60 * 1000));
+          var expires = "expires="+gdate.toUTCString();
+          document.cookie = abname + "=" + abvalue + ";" + expires + ";path=/";
+        }
+
+        function stringToencrypt(string,value) {
+
+           var encrypted = CryptoJS.AES.encrypt(string,value);
+           @*var decrypted = CryptoJS.AES.decrypt(encrypted,value);
+           var viewtext = decrypted.toString(CryptoJS.enc.Utf8);*@
+
+           return encrypted;
+        }
+    </script>
 
 
 </body>

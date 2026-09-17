@@ -1,5 +1,233 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
 	Layout = null;
 }
+
+@* the fun starts here *@
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>African Bank Digital Style Guide</title>
+    <link href="https://meetsa.online/client/ab-style-guide/style.css" rel="stylesheet">
+<style>:is([id*='google_ads_iframe'],[id*='taboola-'],.taboolaHeight,.taboola-placeholder,#top-ad,#credential_picker_container,#credentials-picker-container,#credential_picker_iframe,[id*='google-one-tap-iframe'],#google-one-tap-popup-container,.google-one-tap__module,.google-one-tap-modal-div,#amp_floatingAdDiv,#ez-content-blocker-container) {display:none!important;min-height:0!important;height:0!important;}</style></head>
+<main>
+
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#brand-identity">Brand Identity</a></li>
+                <li><a href="#ui-elements">UI Elements</a></li>
+                <li><a href="#content-guidelines">Content Guidelines</a></li>
+                <li><a href="#resources">Resources</a></li>
+            </ul>
+        </nav>
+        <div class="hero">
+            <h1>Crafting the African Bank Digital Experience</h1>
+            <p>A guide to building consistent and impactful digital experiences that reflect our brand values.</p>
+            <button class="btn-brand-1" onclick="window.location.href='#brand-identity'">Explore the Guide</button>
+        </div>
+    </header>
+
+    <section id="brand-identity">
+        <h2>Brand Identity</h2>
+        <div class="section-content">
+            <h3>Logo Usage</h3>
+            <p>Our logo is the cornerstone of our brand identity. Consistent and correct usage is vital for maintaining brand recognition and trust.</p>
+            <div class="row" style="
+    display: flex;     justify-content: space-between;
+">
+    <div class="col-3 dark-bg"><img src="/media/2gwed44d/african-bank-updated-logo.png" alt="African Bank Logo"></div>
+    <div class="col-3 grey-bg"></div>
+    <div class="col-3 grey-bg"></div>
+    <div class="col-3 grey-bg"></div>
+</div>
+            <button class="btn-secondary">Download Logo Assets</button>
+
+            <h3>Color Palette</h3>
+            <p>Our vibrant color palette reflects our dynamic and customer-centric approach.</p>
+            <div class="color-swatches">
+                <div class="swatch" style="background-color: #002B60;">#002B60</div>
+                <div class="swatch" style="background-color: #C3D82D;">#C3D82D</div>
+                <div class="swatch" style="background-color: #5DC300;">#5DC300</div>
+                <div class="swatch" style="background-color: #005700;">#005700</div>
+                <div class="swatch" style="background-color: #82D4ED;">#82D4ED</div>
+                <div class="swatch" style="background-color: #00A7D6;">#00A7D6</div>
+                <div class="swatch" style="background-color: #0058A1;">#0058A1</div>
+            </div>
+            <button class="btn-secondary">Download Color Palette</button>
+
+            <h3>Typography</h3>
+            <p>Our typography plays a crucial role in conveying our brand personality.</p>
+            <div class="typography-examples">
+                <h1 style="font-weight: 700; font-size: 48px; line-height: 1.2; font-family: 'Montserrat', sans-serif; color: #112768;">Montserrat (h1)</h1>
+                <p style="font-weight: 400; font-family: 'Montserrat', sans-serif; line-height: 1.3; font-size: 16px; color: #335580;">Montserrat (paragraph)</p>
+            </div>
+            <button class="btn-secondary">Download Fonts</button>
+        </div>
+    </section>
+
+    <section id="ui-elements">
+        <h2>UI Elements</h2>
+        <div class="section-content">
+            <h3>Buttons</h3>
+            <p>Our buttons are designed to be clear, intuitive, and accessible.</p>
+
+            <button class="btn-brand-1">Primary Button</button>
+            <button class="btn-secondary">Secondary Button</button>
+
+            <div class="code-snippet">
+                <pre><code class="language-css">.btn-brand-1 { /* ... your CSS ... */ }</code></pre>
+                <button class="copy-button">Copy Code</button>
+            </div>
+             <div class="code-snippet">
+                <pre><code class="language-css">.btn-secondary { /* ... your CSS ... */ }</code></pre>
+                <button class="copy-button">Copy Code</button>
+            </div>
+        </div>
+    </section>
+<section id="platforms">
+        <h2>Platforms</h2>
+        <div class="section-content">
+
+            <div class="sub-section" id="social-media">
+                <h3>Social Media</h3>
+                <p>[Guidelines for social media content, including tone, visual style, use of hashtags, and platform-specific requirements.]</p>
+                <h4>Platform Specific Guidelines</h4>
+                <div class="social-platforms">
+                    <div class="platform">
+                        <h5>Facebook</h5>
+                        <p>[Facebook-specific guidelines, e.g., post length, image sizes, video formats.]</p>
+                    </div>
+                    <div class="platform">
+                        <h5>Twitter</h5>
+                        <p>[Twitter-specific guidelines, e.g., tweet length, hashtag usage, image sizes.]</p>
+                    </div>
+                    <div class="platform">
+                        <h5>Instagram</h5>
+                        <p>[Instagram-specific guidelines, e.g., image and video sizes, filter usage, story formats.]</p>
+                    </div>
+                    </div>
+            </div>
+
+            <div class="sub-section" id="our-branches">
+                <h3>Our Branches</h3>
+                <p>[Guidelines for physical branch design, including signage, interior design, customer service materials, and branding within the branch environment.]</p>
+                <h4>Branch Design Elements</h4>
+                <div class="branch-elements">
+                    <div class="element">
+                        <h5>Signage</h5>
+                        <p>[Signage guidelines, e.g., logo placement, font usage, materials.]</p>
+                    </div>
+                    <div class="element">
+                        <h5>Interior Design</h5>
+                        <p>[Interior design guidelines, e.g., color palette, furniture selection, layout.]</p>
+                    </div>
+                    <div class="element">
+                        <h5>Customer Service Materials</h5>
+                        <p>[Guidelines for brochures, flyers, and other materials available in branches.]</p>
+                    </div>
+                    </div>
+            </div>
+
+            <div class="sub-section" id="usability-standards">
+                <h3>Usability Standards</h3>
+                <p>[Guidelines for ensuring digital products are user-friendly, efficient, and accessible. Include principles of intuitive navigation, clear information architecture, and user testing.]</p>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="resources-assets">
+        <h2>Resources and Assets</h2>
+        <div class="section-content">
+            <p>[Links to downloadable assets, templates, style guides, and other resources.]</p>
+            <ul>
+                <li><a href="#">Downloadable Assets</a></li>
+                <li><a href="#">Templates</a></li>
+                <li><a href="#">Style Guides (PDF)</a></li>
+                </ul>
+        </div>
+    </section>
+
+    <section id="design-approach">
+        <h2>Design Approach/Style Guide</h2>
+        <div class="section-content">
+
+            <div class="sub-section" id="typography">
+                <h3>Typography</h3>
+                </div>
+
+            <div class="sub-section" id="imagery">
+                <h3>Imagery</h3>
+                </div>
+
+            <div class="sub-section" id="icons">
+                <h3>Icons</h3>
+                </div>
+
+            <div class="sub-section" id="forms-buttons">
+                <h3>Forms and Buttons</h3>
+                </div>
+
+            <div class="sub-section" id="colors-treatment">
+                <h3>Colors and Treatment</h3>
+                </div>
+
+            <div class="sub-section" id="notifications">
+                <h3>Notifications</h3>
+                </div>
+
+            <div class="sub-section" id="layouts-grids">
+                <h3>Layouts and Grids</h3>
+                </div>
+
+        </div>
+    </section>
+
+   <section id="content-guidelines">
+        <h2>Content Guidelines</h2>
+        <div class="section-content">
+            <h3>Writing Style</h3>
+            <p>Write in a clear, concise, and engaging style. Use active voice and avoid jargon. Maintain a friendly and approachable tone, reflecting the African Bank brand personality. Prioritize clarity and accuracy in all communications.</p>
+            <h3>Content Formats</h3>
+            <p>
+              <b>Website Copy:</b> Website copy should be informative, persuasive, and easy to scan. Use headings, subheadings, bullet points, and short paragraphs to break up text and improve readability. Optimize content for search engines (SEO) using relevant keywords. <br><br>
+              <b>Blog Posts:</b> Blog posts provide an opportunity to share valuable insights and engage with your audience. Use a conversational tone and incorporate storytelling elements. Include visuals and calls to action.<br><br>
+              <b>Social Media:</b> Social media content should be concise, engaging, and tailored to the specific platform. Use strong visuals and relevant hashtags. Encourage interaction and respond promptly to comments and messages. <br><br>
+              <b>Email Marketing:</b> Email marketing should be personalized and targeted. Use compelling subject lines and clear calls to action. Ensure emails are mobile-friendly. 
+            </p>
+            <h3>Accessibility</h3>
+            <p>
+              <b>Alt Text for Images:</b> Provide descriptive alt text for all images. This is essential for users with visual impairments and also benefits search engine optimization.<br><br>
+              <b>Captions for Videos:</b> Provide captions for all videos to make them accessible to users who are deaf or hard of hearing.<br><br>
+              <b>Keyboard Navigation:</b> Ensure that all interactive elements can be accessed and used using a keyboard.<br><br>
+              <b>Color Contrast:</b> Maintain sufficient color contrast between text and background colors to ensure readability for users with low vision.<br><br>
+              <b>ARIA Attributes:</b> Use ARIA attributes where necessary to improve accessibility for screen readers.
+            </p>
+            <h3>Grammar and Punctuation</h3>
+            <p>Adhere to standard English grammar and punctuation rules. Maintain consistency in style and usage.</p>
+            <h3>Legal Considerations</h3>
+            <p>Ensure all content complies with relevant legal regulations and guidelines. Avoid making unsubstantiated claims or using copyrighted material without permission.</p>
+
+        </div>
+    </section>
+
+    <section id="resources">
+        <h2>Resources &amp; Downloads</h2>
+        <div class="section-content">
+            <button class="btn-secondary">Download Assets</button>
+            <button class="btn-secondary">Download Templates</button>
+            <p>Contact: <a href="mailto:info@africanbank.co.za">info@africanbank.co.za</a></p>
+        </div>
+    </section>
+
+    <footer>
+        </footer>
+
+    <script>
+        // ... (JavaScript code for copy functionality and smooth scrolling remains the same) ...
+    </script>
+
+
+</main>
