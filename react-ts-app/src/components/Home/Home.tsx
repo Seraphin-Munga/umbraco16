@@ -3,7 +3,7 @@ import { useAppDispatch } from '../../store/hooks';
 import { fetchHome } from '../../store/slices/homeSlice';
 import { HeroCarousel } from './HeroCarousel';
 import { BankWithAudacity } from './BankWithAudacity';
-import { LoanCalculator } from './LoanCalculator';
+import { LoanCalculator } from '../ui/LoanCalculator/LoanCalculator';
 import { MyWorldAccount } from './MyWorldAccount';
 import { DebitCardShowcase } from './DebitCardShowcase';
 import { RewardsSection } from './RewardsSection';

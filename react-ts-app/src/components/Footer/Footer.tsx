@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import type { FooterCategory } from '../../api/contentApi';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchFooterData } from '../../store/slices/footerSlice';
+import { FooterLogo } from '../icons/FooterLogo';
+import { FooterPattern } from '../icons/FooterPattern';
 
 // Ported from Views/MasterNew.cshtml's <footer> (the layout PageHome.cshtml
 // actually uses) + Views/Partials/_pageBottomNavigation.cshtml. Styling comes
@@ -62,7 +64,7 @@ export function Footer() {
         <div className="footer-copyright">
           <div className="row">
             <div className="col-sm-7">
-              <img src="/images/africanbank-logo-white.svg" width="170" alt="African Bank" />
+              <FooterLogo />
               <div
                 className="copyright-text"
                 dangerouslySetInnerHTML={{ __html: disclaimerMarkup }}
@@ -70,7 +72,7 @@ export function Footer() {
             </div>
 
             <div className="col-sm-5">
-              <img className="pattern hidden-xs" src="/images/footer-pattern.svg" alt="footer-pattern" />
+              <FooterPattern className="pattern hidden-xs" />
               <div className="pull-right">
                 <a href="#" target="_blank" rel="noreferrer">
                   <i className="footer-social fa" aria-hidden="true">

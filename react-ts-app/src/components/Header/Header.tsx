@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Logo } from './Logo';
+import { Logo } from '../icons/Logo';
 import { NavModal } from './NavModal';
 import {
   PERSONAL_MENU_CATEGORY_ORDER,
