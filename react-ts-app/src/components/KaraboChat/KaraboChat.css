@@ -1,52 +1,48 @@
-/* #chatIconImg / #openChatButton ported verbatim from the header <style>
-   block the rest of that snippet came from - #iframe-karabochat itself had
-   no rules in that snippet (only an unrelated #iframe-karaboChat-speechBubble
-   id, a tooltip element this widget doesn't have), so its positioning below
-   is this component's own, matching #openChatButton's fixed/bottom-right
-   placement and z-index. */
-#iframe-karabochat {
+/* Ported from master.cshtml's <style> blocks - these ids belong to DOM the
+   mvskarabo.js script injects itself (see KaraboChat.tsx's own comment),
+   not markup this app authors. Positions/sizes match the source exactly. */
+
+#iframe-karaboChat-speechBubble {
   position: fixed;
-  bottom: 100px;
-  right: 20px;
+  bottom: 168px;
+  right: 118px !important;
+  background-color: rgb(0, 43, 96);
+  color: rgb(255, 255, 255);
+  padding: 10px 14px;
+  border-radius: 16px 16px 0px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 5px;
   z-index: 200;
-  border: none;
-  border-radius: 16px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease;
+  font-size: 12px;
 }
 
-#chatIconImg {
-  height: 119px !important;
-  max-height: 119px !important;
-}
-
-#openChatButton {
-  background-color: transparent;
-  border-radius: 60px;
-  position: fixed;
-  bottom: 20px;
-  right: -20px !important;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  z-index: 200;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-@media (min-width: 256px) and (max-width: 768px) {
+/* master.cshtml only applies this breakpoint's overrides while its cookie
+   consent banner hasn't been dismissed yet (`userSettings == ""`) - applied
+   unconditionally here instead, since this app has no equivalent cookie-
+   consent state to gate it on, and the button should be positioned
+   correctly on mobile regardless. */
+@media (min-width: 300px) and (max-width: 766px) {
   #chatIconImg {
-    height: 119px !important;
-    max-height: 119px !important;
+    height: 160px !important;
+  }
+
+  #iframe-karaboChat-speechBubble {
+    bottom: 127px !important;
+    right: 68px !important;
+    background-color: rgb(0, 43, 96);
+    color: rgb(255, 255, 255);
+    padding: 10px 14px;
+    border-radius: 16px 16px 0px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 5px;
+    z-index: 200;
+    font-size: 12px;
   }
 
   #openChatButton {
     background-color: transparent;
     border-radius: 60px;
     position: fixed;
-    bottom: 0px;
-    right: -20px !important;
+    bottom: 3px !important;
+    right: -26px !important;
     color: #fff;
     border: none;
     cursor: pointer;
@@ -54,10 +50,5 @@
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-
-  #iframe-karabochat {
-    bottom: 80px;
-    right: 10px;
   }
 }
