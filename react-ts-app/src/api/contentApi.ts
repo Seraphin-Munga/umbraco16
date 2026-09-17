@@ -314,10 +314,18 @@ export interface Footer {
   disclaimerMarkup: string;
 }
 
+// The Delivery API returns media urls as a path relative to the Umbraco
+// backend (e.g. "/media/xxxxx/image.jpg"), not an absolute url - resolving
+// that against this SPA's own origin instead of the backend's is exactly
+// how a real CMS-authored image silently 404s. Prefixed with the same
+// API_BASE used for the content fetch itself so it resolves the same way
+// in both dev (empty - see vite.config.ts's matching /media proxy) and a
+// deployed environment (VITE_UMBRACO_API_BASE_URL).
 function mapMediaUrl(value: unknown): string {
   const first = Array.isArray(value) ? value[0] : value;
   const url = (first as { url?: unknown } | null | undefined)?.url;
-  return typeof url === 'string' ? url : '';
+  if (typeof url !== 'string' || !url) return '';
+  return url.startsWith('/') ? `${API_BASE}${url}` : url;
 }
 
 // One "relatedLink" item from a link category's nested linkItems block list.
