@@ -26,6 +26,12 @@ import type {
   TestimonialItem,
   WhatsNew,
 } from '../components/Home/types';
+import type { HeroCarouselSlide, HeroProductGridItem } from '../components/Home/HeroCarousel';
+import type { AudacityCard } from '../components/Home/BankWithAudacity';
+import type { RewardsCard } from '../components/Home/RewardsSection';
+import type { BusinessAudacitySlide } from '../components/Home/BusinessAudacitySection';
+import type { VideoTestimonial } from '../components/Home/Testimonials';
+import type { LoanCalculatorProps } from '../components/ui/LoanCalculator/LoanCalculator';
 
 export interface DeliveryLink {
   url: string;
@@ -578,6 +584,326 @@ export async function fetchWhatsNew(signal?: AbortSignal): Promise<WhatsNew | nu
   } catch {
     return null;
   }
+}
+
+// ============================================================
+// HOME PAGE SECTIONS (homePage doctype - Block List page builder)
+// ============================================================
+//
+// Reads the CMS-managed `homePage` content node created by Program.cs's
+// `create-home-schema` command - a single "sections" Block List whose
+// allowed block types (heroCarouselBlock, bankWithAudacityBlock, ...)
+// mirror the ten static <section>s Home.tsx currently renders one-to-one.
+// Sections come back in editor-defined order, so Home.tsx just maps over
+// them - reordering/adding/removing a section is then a backoffice edit,
+// no deploy required. This is entirely separate from fetchHomePage above,
+// which reads the OLD heroHeaderHome/heroShoulderHome/testimonials/
+// heroFeetHome content types (a different, not-currently-rendered page
+// shape) - the two are unrelated doctypes.
+//
+// Every nested Block List property name used by any of the ten block
+// types must be listed once in the expand tree below, regardless of which
+// block type it belongs to (Umbraco's expand syntax matches by property
+// name, not by content type) - see TOP_NAVIGATION_EXPAND's own comment
+// for the bracket-tree/ordering rules this follows.
+const HOME_PAGE_SECTIONS_EXPAND =
+  'properties[sections[properties[' +
+  'slides[properties[$all]],' +
+  'gridItems[properties[$all]],' +
+  'cards[properties[$all]],' +
+  'features[properties[$all]],' +
+  'contactCards[properties[$all]],' +
+  'videos[properties[$all]],' +
+  '$all],$all]';
+
+function str(value: unknown, fallback = ''): string {
+  return typeof value === 'string' ? value : fallback;
+}
+
+function num(value: unknown, fallback: number | null = null): number | null {
+  return typeof value === 'number' ? value : fallback;
+}
+
+// Strips tags from a Rich Text property's markup for components whose
+// description/body props render plain text today - loses inline
+// formatting (e.g. RewardsSection's "mobile App" bold) rather than risking
+// dangerouslySetInnerHTML changes across every consuming component in the
+// same pass as wiring up the fetch itself.
+function stripHtml(markup: string): string {
+  return markup.replace(/<[^>]+>/g, '').trim();
+}
+
+// A MultiUrlPicker property (cta/link/applyLink/downloadLink/...) - `null`
+// when the editor hasn't picked a link yet, same "no real destination"
+// convention as mapLinks' own '#' handling elsewhere in this file.
+function mapButton(value: unknown): { label: string; url: string } | null {
+  const link = mapLinks(value)[0];
+  if (!link || link.url === '#') return null;
+  return { label: link.title, url: link.url };
+}
+
+function mapHomeHeroSlide(props: Record<string, unknown>): HeroCarouselSlide {
+  const button = mapButton(props.cta);
+  return {
+    imageUrl: mapMediaUrl(props.image),
+    titleMain: str(props.titleMain),
+    titleHighlight: str(props.titleHighlight),
+    description: str(props.description),
+    buttonLabel: button?.label ?? '',
+    buttonUrl: button?.url ?? '#',
+  };
+}
+
+function mapHomeGridItem(props: Record<string, unknown>): HeroProductGridItem {
+  const link = mapButton(props.link);
+  return {
+    iconUrl: mapMediaUrl(props.icon),
+    label: str(props.label),
+    url: link?.url ?? '#',
+  };
+}
+
+function mapHomeContentCard(props: Record<string, unknown>, index?: number): AudacityCard {
+  const button = mapButton(props.cta);
+  return {
+    id: `content-card-${index ?? 0}`,
+    title: str(props.title),
+    description: str(props.description),
+    buttonLabel: button?.label ?? '',
+    buttonUrl: button?.url ?? '#',
+  };
+}
+
+function mapHomeRewardsCard(props: Record<string, unknown>, index?: number): RewardsCard {
+  const button = mapButton(props.cta);
+  return {
+    id: `rewards-card-${index ?? 0}`,
+    imageUrl: mapMediaUrl(props.image),
+    imageAlt: '',
+    description: stripHtml(mapRichText(props.description)),
+    buttonLabel: button?.label ?? '',
+    buttonUrl: button?.url ?? '#',
+  };
+}
+
+function mapHomeBusinessSlide(props: Record<string, unknown>): BusinessAudacitySlide {
+  return {
+    title: str(props.title),
+    paragraphs: [stripHtml(mapRichText(props.body))].filter(Boolean),
+  };
+}
+
+function mapHomeContactCard(props: Record<string, unknown>): { title: string; subtitle: string } {
+  return { title: str(props.title), subtitle: str(props.subtitle) };
+}
+
+function mapHomeTestimonialVideo(props: Record<string, unknown>, index?: number): VideoTestimonial {
+  return {
+    id: `testimonial-${index ?? 0}`,
+    videoId: str(props.videoId),
+    thumbnailUrl: mapMediaUrl(props.thumbnail),
+  };
+}
+
+export type HomePageSection =
+  | { kind: 'heroCarouselBlock'; slides: HeroCarouselSlide[]; gridItems: HeroProductGridItem[] }
+  | { kind: 'bankWithAudacityBlock'; heading: string; cards: AudacityCard[] }
+  | { kind: 'loanCalculatorBlock'; props: Partial<LoanCalculatorProps> }
+  | {
+      kind: 'myWorldAccountBlock';
+      heading: string;
+      highlightWord: string;
+      subheading: string;
+      features: string[];
+      ctaLabel: string | null;
+      ctaUrl: string | null;
+    }
+  | { kind: 'debitCardShowcaseBlock'; imageUrl: string; alt: string }
+  | {
+      kind: 'rewardsSectionBlock';
+      heading: string;
+      subheading: string;
+      intro: string;
+      cards: RewardsCard[];
+    }
+  | {
+      kind: 'tap2GlassBlock';
+      heading: string;
+      downloadUrl: string | null;
+      downloadLabel: string | null;
+      imageUrl: string;
+      imageAlt: string;
+      description: string;
+    }
+  | {
+      kind: 'businessAudacityBlock';
+      heading: string;
+      slides: BusinessAudacitySlide[];
+      videoThumbnailUrl: string;
+      contactCards: { title: string; subtitle: string }[];
+    }
+  | {
+      kind: 'appDownloadBlock';
+      heading: string;
+      subheading: string;
+      description: string;
+      downloadUrl: string | null;
+      downloadLabel: string | null;
+      imageUrl: string;
+      imageAlt: string;
+    }
+  | { kind: 'testimonialsBlock'; heading: string; videos: VideoTestimonial[] };
+
+function mapHomePageSection(
+  contentType: string,
+  props: Record<string, unknown>,
+): HomePageSection | null {
+  switch (contentType) {
+    case 'heroCarouselBlock':
+      return {
+        kind: 'heroCarouselBlock',
+        slides: mapBlocks(props.slides, mapHomeHeroSlide),
+        gridItems: mapBlocks(props.gridItems, mapHomeGridItem),
+      };
+
+    case 'bankWithAudacityBlock':
+      return {
+        kind: 'bankWithAudacityBlock',
+        heading: str(props.heading),
+        cards: mapBlocks(props.cards, mapHomeContentCard),
+      };
+
+    case 'loanCalculatorBlock': {
+      const applyLink = mapButton(props.applyLink);
+      const loanProps: Partial<LoanCalculatorProps> = {};
+      const minAmount = num(props.minAmount);
+      const maxAmount = num(props.maxAmount);
+      const defaultAmount = num(props.defaultAmount);
+      const minTerm = num(props.minTerm);
+      const maxTerm = num(props.maxTerm);
+      if (minAmount !== null) loanProps.minAmount = minAmount;
+      if (maxAmount !== null) loanProps.maxAmount = maxAmount;
+      if (defaultAmount !== null) loanProps.defaultAmount = defaultAmount;
+      if (minTerm !== null) loanProps.minTerm = minTerm;
+      if (maxTerm !== null) loanProps.maxTerm = maxTerm;
+      if (applyLink) loanProps.applyUrl = applyLink.url;
+      const imageUrl = mapMediaUrl(props.image);
+      if (imageUrl) loanProps.imageUrl = imageUrl;
+      const imageAlt = str(props.imageAlt);
+      if (imageAlt) loanProps.imageAlt = imageAlt;
+      loanProps.imagePosition = props.imageOnRight === true ? 'right' : 'left';
+      return { kind: 'loanCalculatorBlock', props: loanProps };
+    }
+
+    case 'myWorldAccountBlock': {
+      const cta = mapButton(props.cta);
+      return {
+        kind: 'myWorldAccountBlock',
+        heading: str(props.heading),
+        highlightWord: str(props.highlightWord),
+        subheading: str(props.subheading),
+        features: mapBlocks(props.features, (p) => str(p.text)).filter(Boolean),
+        ctaLabel: cta?.label ?? null,
+        ctaUrl: cta?.url ?? null,
+      };
+    }
+
+    case 'debitCardShowcaseBlock':
+      return {
+        kind: 'debitCardShowcaseBlock',
+        imageUrl: mapMediaUrl(props.image),
+        alt: str(props.alt),
+      };
+
+    case 'rewardsSectionBlock':
+      return {
+        kind: 'rewardsSectionBlock',
+        heading: str(props.heading),
+        subheading: str(props.subheading),
+        intro: stripHtml(mapRichText(props.intro)),
+        cards: mapBlocks(props.cards, mapHomeRewardsCard),
+      };
+
+    case 'tap2GlassBlock': {
+      const download = mapButton(props.downloadLink);
+      return {
+        kind: 'tap2GlassBlock',
+        heading: str(props.heading),
+        downloadUrl: download?.url ?? null,
+        downloadLabel: download?.label ?? null,
+        imageUrl: mapMediaUrl(props.image),
+        imageAlt: str(props.imageAlt),
+        description: str(props.description),
+      };
+    }
+
+    case 'businessAudacityBlock':
+      return {
+        kind: 'businessAudacityBlock',
+        heading: str(props.heading),
+        slides: mapBlocks(props.slides, mapHomeBusinessSlide),
+        videoThumbnailUrl: mapMediaUrl(props.videoThumbnail),
+        contactCards: mapBlocks(props.contactCards, mapHomeContactCard),
+      };
+
+    case 'appDownloadBlock': {
+      const download = mapButton(props.downloadLink);
+      return {
+        kind: 'appDownloadBlock',
+        heading: str(props.heading),
+        subheading: str(props.subheading),
+        description: str(props.description),
+        downloadUrl: download?.url ?? null,
+        downloadLabel: download?.label ?? null,
+        imageUrl: mapMediaUrl(props.image),
+        imageAlt: str(props.imageAlt),
+      };
+    }
+
+    case 'testimonialsBlock':
+      return {
+        kind: 'testimonialsBlock',
+        heading: str(props.heading),
+        videos: mapBlocks(props.videos, mapHomeTestimonialVideo),
+      };
+
+    default:
+      return null;
+  }
+}
+
+function mapTypedBlocks<T>(
+  value: unknown,
+  map: (contentType: string, props: Record<string, unknown>) => T | null,
+): T[] {
+  const items = (value as RawBlockListValue | null | undefined)?.items;
+  if (!Array.isArray(items)) return [];
+
+  return items
+    .map((item) => {
+      const contentType = item?.content?.contentType;
+      const props = item?.content?.properties;
+      if (!contentType || !props) return null;
+      return map(contentType, props);
+    })
+    .filter((section): section is T => section !== null);
+}
+
+/**
+ * Fetches the CMS-managed `homePage` node's `sections` Block List, mapped
+ * into Home.tsx's per-component prop shapes and returned in editor-defined
+ * order. Returns [] if the node doesn't exist yet (e.g. `create-home-schema`
+ * was run but no content was ever created/published in the backoffice) -
+ * Home.tsx falls back to its own fully-static section list in that case.
+ */
+export async function fetchHomePageSections(signal?: AbortSignal): Promise<HomePageSection[]> {
+  const homePage = await fetchOne(
+    `?filter=contentType:homePage&expand=${HOME_PAGE_SECTIONS_EXPAND}&take=1`,
+    signal,
+  );
+  if (!homePage) return [];
+
+  return mapTypedBlocks(homePage.properties.sections, mapHomePageSection);
 }
 
 // ============================================================
