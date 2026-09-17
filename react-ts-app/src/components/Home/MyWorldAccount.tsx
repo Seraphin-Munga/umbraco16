@@ -1,3 +1,5 @@
+import { Button } from '../ui/Button/Button';
+
 // Ported from the "MyWORLD bank account" promo section of the current live
 // home page markup. Static content (matches the source exactly) passed as
 // props with defaults so it stays reusable.
@@ -33,9 +35,7 @@ export function MyWorldAccount({
               <div className="mb-50">
                 <div className="combo-btn mt-50 text-start column1">
                   <p className="combo-btn-text primary">
-                    <a href={ctaUrl} className="btn btn-brand-1 hover-up">
-                      {ctaLabel}
-                    </a>
+                    <Button href={ctaUrl}>{ctaLabel}</Button>
                   </p>
                 </div>
               </div>

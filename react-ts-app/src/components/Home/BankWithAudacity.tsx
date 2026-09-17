@@ -1,3 +1,5 @@
+import { Button } from '../ui/Button/Button';
+
 // Ported from the "#bank-with-audacity" section of the current live home
 // page markup - a static grid of product upsell cards. Content is hardcoded
 // (matches the source exactly, including its "Apply now for a REWARDS" /
@@ -93,14 +95,14 @@ export function BankWithAudacity({ cards = DEFAULT_CARDS }: BankWithAudacityProp
                 </div>
                 <div>
                   <p className="primary">
-                    <a
+                    <Button
                       href={card.buttonUrl}
-                      className="btn-brand-link hover-up"
+                      variant="brand-link"
                       role="button"
                       aria-label={`Apply now for a ${card.title}`}
                     >
                       {card.buttonLabel}
-                    </a>
+                    </Button>
                   </p>
                 </div>
               </div>

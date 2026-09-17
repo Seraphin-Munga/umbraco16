@@ -1,4 +1,5 @@
 import type { KeyboardEvent } from 'react';
+import { Button } from '../ui/Button/Button';
 
 // Ported from the "#loan-calculator" section of the current live home page
 // markup. Static display only - the sliders/inputs are uncontrolled and show
@@ -135,9 +136,9 @@ export function LoanCalculator({
               <div className="combo-btn">
                 <div className="mt-50 text-start column1">
                   <p className="combo-btn-text primary">
-                    <a href={applyUrl} className="btn btn-brand-1 hover-up" role="button" aria-label="apply for a loan button">
+                    <Button href={applyUrl} role="button" aria-label="apply for a loan button">
                       Apply Now
-                    </a>
+                    </Button>
                   </p>
                 </div>
               </div>

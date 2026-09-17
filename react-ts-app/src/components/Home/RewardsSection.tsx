@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Button } from '../ui/Button/Button';
 
 // Ported from the "borrow-section" / Audacious Rewards block of the current
 // live home page markup (the "borrow-section" class name is a leftover from
@@ -93,9 +94,7 @@ export function RewardsSection({ cards = DEFAULT_CARDS }: RewardsSectionProps) {
                   </div>
                   <div className="combo-btn mt-50 text-start column1">
                     <p className="combo-btn-text primary">
-                      <a href={card.buttonUrl} className="btn btn-brand-1 hover-up">
-                        {card.buttonLabel}
-                      </a>
+                      <Button href={card.buttonUrl}>{card.buttonLabel}</Button>
                     </p>
                   </div>
                 </div>

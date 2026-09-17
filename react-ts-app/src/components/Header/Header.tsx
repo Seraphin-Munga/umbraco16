@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { fetchTopNavigation, type MenuInfoItem } from '../../api/contentApi';
 import { Logo } from './Logo';
 import { NavModal } from './NavModal';
 import {
@@ -7,6 +6,8 @@ import {
   PERSONAL_MENU_EXTERNAL_LINKS,
   PERSONAL_MENU_PAGES,
 } from '../../routes/personalMenuPages';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { fetchHeaderNavigation } from '../../store/slices/headerSlice';
 import './Header.css';
 
 // Mirrors Configuration["online_upload"] in Navigation.cshtml, used for the
@@ -17,8 +18,9 @@ const ONLINE_UPLOAD_URL = import.meta.env.VITE_ONLINE_UPLOAD_URL || '#';
 // The "PERSONAL" top-level item's dropdown is rendered from our own ported
 // route list instead of the CMS fetch below - it always shows and links to
 // real routes in this app regardless of the Umbraco backend being reachable.
-// Every other top-level item (Business, etc.) still comes from
-// fetchTopNavigation as before.
+// Every other top-level item (Business, etc.) still comes from the header
+// slice's fetchHeaderNavigation thunk (src/store/slices/headerSlice.ts) as
+// before.
 const PERSONAL_MENU_GROUPS = PERSONAL_MENU_CATEGORY_ORDER.map((category) => ({
   category,
   pages: PERSONAL_MENU_PAGES.filter((page) => page.category === category),
@@ -26,9 +28,10 @@ const PERSONAL_MENU_GROUPS = PERSONAL_MENU_CATEGORY_ORDER.map((category) => ({
 }));
 
 export function Header() {
-  const [menu, setMenu] = useState<MenuInfoItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+  const { data, status, error } = useAppSelector((state) => state.header);
+  const menu = data?.menu ?? [];
+  const loading = status === 'idle' || status === 'loading';
 
   const [navOpen, setNavOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -40,20 +43,9 @@ export function Header() {
   const [openMegaMenuKey, setOpenMegaMenuKey] = useState<string | null>(null);
 
   useEffect(() => {
-    const controller = new AbortController();
-
-    fetchTopNavigation(controller.signal)
-      .then(({ menu }) => {
-        setMenu(menu);
-      })
-      .catch((err: unknown) => {
-        if (err instanceof DOMException && err.name === 'AbortError') return;
-        setError(err instanceof Error ? err.message : 'Failed to load navigation.');
-      })
-      .finally(() => setLoading(false));
-
-    return () => controller.abort();
-  }, []);
+    const promise = dispatch(fetchHeaderNavigation());
+    return () => promise.abort();
+  }, [dispatch]);
 
   return (
     <div className="header-container">

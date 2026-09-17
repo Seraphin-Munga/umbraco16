@@ -1,28 +1,22 @@
-import { useEffect, useState } from 'react';
-import { fetchFooter, type FooterCategory } from '../../api/contentApi';
+import { useEffect } from 'react';
+import type { FooterCategory } from '../../api/contentApi';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { fetchFooterData } from '../../store/slices/footerSlice';
 
 // Ported from Views/MasterNew.cshtml's <footer> (the layout PageHome.cshtml
 // actually uses) + Views/Partials/_pageBottomNavigation.cshtml. Styling comes
 // entirely from the vendored style.css/media-query.css (footer, footer-category,
 // footer-social, footer-copyright, ...) - see index.html.
 export function Footer() {
-  const [categories, setCategories] = useState<FooterCategory[]>([]);
-  const [disclaimerMarkup, setDisclaimerMarkup] = useState('');
+  const dispatch = useAppDispatch();
+  const { data } = useAppSelector((state) => state.footer);
+  const categories = data?.categories ?? [];
+  const disclaimerMarkup = data?.disclaimerMarkup ?? '';
 
   useEffect(() => {
-    const controller = new AbortController();
-
-    fetchFooter(controller.signal)
-      .then(({ categories, disclaimerMarkup }) => {
-        setCategories(categories);
-        setDisclaimerMarkup(disclaimerMarkup);
-      })
-      .catch((err: unknown) => {
-        if (err instanceof DOMException && err.name === 'AbortError') return;
-      });
-
-    return () => controller.abort();
-  }, []);
+    const promise = dispatch(fetchFooterData());
+    return () => promise.abort();
+  }, [dispatch]);
 
   const linkCategories = categories.filter(
     (category): category is Extract<FooterCategory, { kind: 'links' }> =>

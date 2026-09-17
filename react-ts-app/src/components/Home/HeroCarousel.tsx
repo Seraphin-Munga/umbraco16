@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Button } from '../ui/Button/Button';
 
 // Ported from the "#heroSlider" carousel + "#productGrid" static grid in the
 // current live home page markup - a single <section class="section-rounded-edge-3">
@@ -182,9 +183,9 @@ export function HeroCarousel({
                   <p className="hidden-xs font-lg text-white">{slide.description}</p>
                   <div className="combo-btn mt-50 text-start column1">
                     <p className="combo-btn-text primary">
-                      <a href={slide.buttonUrl} className="btn btn-brand-1 hover-up" role="button">
+                      <Button href={slide.buttonUrl} role="button">
                         {slide.buttonLabel}
-                      </a>
+                      </Button>
                     </p>
                   </div>
                 </div>
