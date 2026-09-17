@@ -1,5 +1,126 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageManageYourAccount>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models;
+@using Web.Helpers
+@using Umbraco.Web.Models
+@using System.Collections.Generic;
+@using System.Text.RegularExpressions
 @{
-	Layout = null;
+
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var Children = Model.Children;
+
+    // Get specific Children
+   
+   
+var heroBody = Children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+  
+ var sectioncard = heroBody.Children.Where(c => c.Name == "FAQ").FirstOrDefault();
+      var sectioncardAfricanBank = sectioncard.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var sectioncards = sectioncardAfricanBank.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+var noCampx1 = 1;
+    ContentModels.TabBody createOwnWorldOfBanking = null;
+      var partialName = sectioncard.Value("PartialViewName");
+      createOwnWorldOfBanking = (TabBody)sectioncard;
 }
+ <link rel="stylesheet" href="/css/projectmagic.css" /> 
+ <style>
+     ol, ul {
+    list-style: revert-layer !important;
+}
+ </style>
+ <section class="section-800 bg-grey-60">
+                <div class="container">
+                  <div class="row d-flex align-items-center row-change">
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                       <h1 class="color-brand-1 mt-15 mb-20">
+                        Privacy Policy
+                      </h1>
+                       <p class="font-md color-brand-1">African Bank Limited (registration number: 2014/176899/06) ("African Bank", "us", "we" or "our") respects your privacy and is committed to protecting and preserving the personal information of all persons who visit any of our African Bank branches ("Branches"), call into or interacts in any way with our call centre ("Call Centre").</p>
+                      
+                    </div>
+                    
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                      <img
+                        class="d-block"
+                        src="/media/rpfd5feh/12-loan_bg.png"
+                        alt="iori"
+                      /> 
+                       
+                    </div>
+                  </div>
+                </div>
+</section>
+ 
+<section class="section-800">
+<div class="container " >
+    <div class="row align-items-center d-flex row-change md-text-center">
+        <div class="col-xl-12 col-lg-12 col-md-12">
+              <h1 class="color-brand-1 mt-15 mb-20 text-center faqHeader">@createOwnWorldOfBanking.Value("partialViewClassName")</h1>
+             
+               <div class="accordion accordionStyle2" id="accordionFAQ">
+                    <div class="row">
+                   @foreach (var item in sectioncards)
+
+                    {
+                        var cardTitle = item.Value<string>("nCcardTitle");
+                        <div class="col-lg-12">
+                            <div class="accordion-item">
+                                <h5 class="accordion-header">
+                                    <button class="accordion-button text-heading-5">@cardTitle</button>
+                                </h5><div id="accordion-body" class="accordion-collapse collapse">
+                                    <div class="accordion-body">@Html.Raw(item.Value<string>("mediumDescription"))</div>
+                                </div>
+                            </div>
+                        </div>
+                                                    
+                        noCampx1 += 1;
+
+                    }
+                    </div>
+                </div>
+        </div>
+        
+    </div>
+</div>
+</section>   
+
+
+@section scripts
+{
+<script>
+  
+  $(document).ready(function(){
+
+        $(".accordion-button").click(function(){
+            
+         
+    var isCollapsed = $(this).hasClass('collapsed');
+    
+           $(".accordion-button").removeClass('collapsed');
+           
+           if(isCollapsed == false) {
+            $(this).toggleClass("collapsed");
+           }
+
+           
+ var isCollapsedContent = $(this).parent().next(".accordion-collapse").hasClass('collapse');
+            $(".accordion-collapse").addClass('collapse');
+            if(isCollapsedContent == true) {
+                $(this).parent().next(".accordion-collapse").toggleClass('collapse');
+           }
+
+           
+
+        });
+
+    });
+
+
+    </script>
+  
+}
+
+

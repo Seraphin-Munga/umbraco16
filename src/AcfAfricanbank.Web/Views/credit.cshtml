@@ -1,5 +1,539 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCredit>
+@using AcfAfricanbank.Core.Models.Forms
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
+
+var children = Model.Children;
+var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+
+var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+var headerImage_large = heroHeader?.Value<IPublishedContent>("image")?.Url;
+
+var sectioncard = heroBody.Children.Where(c => c.Name == "Tab Body").FirstOrDefault();
+var sectioncardAfricanBank = sectioncard.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+var sectioncards = sectioncardAfricanBank.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+
+var images = heroBody.Children.Where(c => c.Name == "Images").FirstOrDefault();
+var AfricanBankimages = images.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+var allimages = AfricanBankimages .Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+
+ var bodyTitle = heroBody?.Value("bodyTitle").ToString();
+ var bodyDescription = heroBody?.Value("bodyDescription").ToString();
+    
+ContentModels.TabBody createOwnWorldOfBanking = null;
+var partialName = images.Value("PartialViewName");
+createOwnWorldOfBanking = (TabBody)images;
+  var nodeId = Model.Id;    
+}
+<!--css styling-->
+<link rel="stylesheet" href="/css/projectmagic.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+<style>
+
+/*hero section*/
+#videoContainer {
+    position: relative;
+    width: 100%;
+    height: 98vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    }
+
+#placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(0, 52, 119, 0.60), rgba(0, 52, 119, 0.60)), url(@headerImage_large) no-repeat center center;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s;
+    }
+
+.gala-title {
+   font-weight: 200; 
+   font-size: 42px;
+    line-height: 1.2; 
+    margin-bottom: 20px;
+    }
+    
+.gala-span {
+    font-weight: 700; 
+    font-style: italic;
+    }
+
+#myButton {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    text-transform: uppercase;
+    padding: 10px 24px;
+    background-color: #5dc300;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: width 0.3s;
+    }
+
+.button-icon {
+        height: 28px;
+        width: 28px;
+        border: 1.5px solid #fff;
+        border-radius: 50%;
+        margin-left: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+#myButton.expanded {
+    min-width: 140px;
+    padding: 13px 24px;
+}
+
+
+/*end of hero section*/
+
+.video-container {
+    position: relative;
+    width: 535px;
+    height: 535px;
+}
+
+video {
+    width: 100%;
+    height: 100%;
+    mix-blend-mode: screen; /* Try different modes like screen, overlay, darken, lighten, etc. */
+}
+
+#placeholderText h1 {
+    color: #fff !important;
+}
+
+.section-500{
+    display: flex;
+    min-height: 700px;
+   align-items: center; 
+}
+
+.bg-gradient {
+ background: transparent linear-gradient(247deg, #031F4E 0%, #02214D 21%, #053975 44%, #074D92 60%, #2EAEDC 100%) 0% 0% no-repeat padding-box;
+}
+
+.heading-text {
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  text-align: center;
+}
+
+.heading-text span {
+  font-weight: 100;
+}
+
+ul {
+  list-style: none;
+}
+
+.color-brand-white {
+        color:#FFFFFF !important;
+    }
+    
+.color-brand-green{
+        color: #C4D82E !important;
+    }
+    
+h3{
+    color:#FFFFFF !important;
+}
+
+.cta-text {
+    font-size: 11px !important;
+    line-height: 1.5;
+    color:#FFFFFF !important;
+}
+
+/* Responsive image gallery rules begin*/
+
+.image-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.image-gallery > li {
+  flex-basis: 350px; /*width: 350px;*/
+  position: relative;
+}
+
+.image-gallery::after {
+  content: "";
+  flex-basis: 350px;
+}
+
+.image-gallery li img {
+  object-fit: cover;
+  max-width: 100%;
+  height: auto;
+  vertical-align: middle;
+  border-radius: 5px;
+}
+
+.overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(57, 57, 57, 0.502);
+  top: 0;
+  left: 0;
+  transform: scale(0);
+  transition: all 0.2s 0.1s ease-in-out;
+  color: #fff;
+  border-radius: 5px;
+  /* center overlay text */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* hover */
+.image-gallery li:hover .overlay {
+  transform: scale(1);
+}
+
+/*carousel styling*/
+.swiper {
+      width: 60%;
+      height: 100%;
+    }
+
+    .swiper-slide {
+      text-align: center;
+      font-size: 18px;
+      background: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    width: 250px !important;
+    height: 700px;
+    margin-left: 15px;
+    border-radius: 5px;
+    }
+    
+    .swiper-slide img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .swiper-button-next, .swiper-button-prev{
+    width: 60px;
+    height: 60px;
+    padding: 14px;
+    border-radius: 50%;
+    background: #1aa7ec !important;
+    color: #fff !important;
+    }
+    
+    .swiper-button-next:after {
+        font-size: 10px !important;
+    }
+    
+    .swiper-button-prev:after {
+        font-size: 10px !important;
+    }
+    
+    /*cta styling*/
+        .section-cta {
+        display: flex;
+        align-items: center;
+        padding-top: 40px;
+        padding-bottom: 40px;
+        width: 100%;
+        min-height: 250px;
+        background:#222222;
+    }
+    
+    .image-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #fff !important;
+    }
+
+
+    @@media (max-width: 896px) {
+    
+    .video-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    }
+    
+    #myButton {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    text-transform: uppercase;
+    top: 70%;
+    padding: 10px 24px;
+    background-color: #B6D133;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: width 0.3s;
+    z-index: 10;
+    }
+    
+    .swiper {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .swiper-button-next {
+        right: 20px;
+      }
+
+     .swiper-button-prev {
+        left: 20px;
+     }
+    
+    .section-800 img {
+         max-width: 100% !important;
+        }
+    }
+    
+
+</style>
+
+<!--end of styling-->
+@*hero section*@
+@{
+        int idIterator = 0;
+        foreach (var item in sectioncards){
+           
+           var title = item.Value<string>("tabSubItemTitle");
+           var description = item.Value<string>("genericCardContent");
+           List<Umbraco.Web.Models.Link> itemLink = new List<Umbraco.Web.Models.Link>();
+
+            foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)item.Value("tabSubItemLinks"))
+            {
+               itemLink.Add(link);
+
+            }
+            if (idIterator == 0)
+            {
+                <div id="videoContainer" class="md-text-center">
+                    <div id="placeholder">
+                        <div id="placeholderText" class="container">
+                            <div class="row d-flex align-items-center md-text-center">
+                                <div class="col-md-6">
+                                @if(string.IsNullOrEmpty(title)){
+                                 @Html.Raw(@heroBody.Value("bodyFooterTitle"))
+                                    <p></p>
+                                    }
+                                    else{
+                                   <h1 class="color-brand-1 mt-15 mb-20">@title</h1>
+                                    }
+                                    @item.Value("tabSubItemTextContent")
+                                    <div>
+                                        <div class="mt-20 text-start"><a href="@itemLink[0].Url" class="btn btn-brand-1 arrow-right">@itemLink[0].Name</a></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+          idIterator += 1;
+        }
+    }
+    
+    @{
+        int idIterator1 = 0;
+        foreach (var item in sectioncards){
+           var tabSubItemImage = item.Value<IPublishedContent>("tabSubItemImage")?.Url;
+           var title = item.Value<string>("tabSubItemTitle");
+           var description = item.Value<string>("genericCardContent");
+           List<Umbraco.Web.Models.Link> itemLink = new List<Umbraco.Web.Models.Link>();
+
+            foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)item.Value("tabSubItemLinks"))
+            {
+               itemLink.Add(link);
+
+            }
+            if(idIterator1 > 0 && idIterator1 < 4){
+                if (idIterator1%2 == 0)
+                {
+                    <section class="section pb-40 pt-40 bg-grey-60">
+                        <div class="container">
+                            <div class="row align-items-center  d-flex flex-row-reverse row-change md-text-center">
+                                
+                                <div class="col-xl-6 col-lg-6 col-md-6">
+                                    <h1 class="color-brand-1 mt-15 mb-20">
+                                        @title
+                                    </h1>
+                                    <p class="font-md color-brand-1 mt-20">
+                                        @item.Value("tabSubItemTextContent")
+                                    </p>
+                                    <div class="combo-btn">
+                                        <div class="mt-50 text-start">
+                                             <p class="combo-btn-text primary"><a href=" @itemLink[0].Url" class="btn  btn-brand-1 hover-up"> @itemLink[0].Name</a></p>
+                                        </div>
+                                      
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6">
+                                    <img class="d-block" src="@tabSubItemImage" alt="iori" />
+                                </div>
+                            </div>
+                       </div>
+                    </section>
+                }
+                else{
+                    <section class="section ptb-80">
+                        <div class="container">
+                            <div class="row d-flex align-items-center row-change md-text-center">
+                                <div class="col-xl-6 col-lg-6 col-md-6">
+                                    <h1 class="color-brand-1 mt-15 mb-20">
+                                        @title
+                                    </h1>
+                                    <p class="font-md color-brand-1 mt-20">
+                                        @item.Value("tabSubItemTextContent")
+                                    </p>
+                                    <div class="combo-btn">
+                                        <div class="mt-50 text-start">
+                                             <p class="combo-btn-text primary"><a href=" @itemLink[0].Url" class="btn  btn-brand-1 hover-up"> @itemLink[0].Name</a></p>
+                                        </div>
+                                       
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6">
+                                    <img class="d-block" src="@tabSubItemImage" alt="iori" />
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                }
+                                           
+            }
+          idIterator1 += 1;
+        }
+    }
+
+                                           @*gallery section*@
+                                            @if (nodeId == 18915)
+{
+    <section class="section-800">
+        <div class="container-fluid">
+            <div class="row d-flex align-items-center text-center row-change md-text-center mb-20">
+              <div class="col-md-3"></div>
+              <div class="col-md-6">
+                   @Html.Raw(@heroBody.Value("bodyFooterTitle"))
+              @* <h1 class="gala-title color-brand-1">We back <span class="gala-span">you</span>.</h1>*@
+                <p class="font-md color-grey-500">
+                  @createOwnWorldOfBanking.Value("partialViewClassName")
+                </p>
+              </div>
+              <div class="col-md-3"></div>
+            </div>
+            <!--gallery part-->
+            <div class="row">
+                <ul class="image-gallery">
+                    @foreach (var item in allimages)
+                   {
+                        var cardTitle = item.Value<string>("nCcardTitle");
+                        var cardIcon = item.Value<IPublishedContent>("nCcardIcon")?.Url;
+                        <li>
+                          <img src="@cardIcon" alt="" />
+                          <div class="overlay"><span class="image-title">@cardTitle</span></div>
+                        </li>
+                   }
+                 </ul>
+            </div>
+            
+        </div>
+    </section>
+      }
+                                                @*number to call*@
+                                                 
+@*<section class="section-cta">
+    <div class="container">
+        @bodyTitle
+        @bodyDescription
+       @Html.Raw(@heroBody.Value("richTextBox"))
+    </div>
+</section>*@
+
+<section class="section ptb-40 bg-grey-60">
+<div class="container " >
+    <div class="row align-items-center d-flex row-change md-text-center">
+        <div class="col-xl-12 col-lg-12 col-md-12">
+              <h1 class="color-brand-1 mt-15 mb-20 faqHeader">@bodyTitle</h1>
+             <p class="font-md color-brand-1 mb-30">@bodyDescription</p>
+               <div class="accordion accordionStyle2" id="accordionFAQ">
+                    <div class="row">
+                  
+                        <div class="col-lg-12">
+                            <div class="accordion-item">
+                              <h5 class="accordion-header">
+                                    <button class="accordion-button text-heading-5">Customer Contact Center</button>
+                                </h5>
+                                <div id="accordion-body" class="accordion-collapse collapse">
+                                    <div class="accordion-body"> @Html.Raw(@heroBody.Value("richTextBox"))</div>
+                                </div>
+                            </div>
+                        </div>
+                                                    
+                       
+                    </div>
+                </div>
+        </div>
+        
+    </div>
+</div>
+</section>   
+@section scripts
+{
+    <script>
+  
+  $(document).ready(function(){
+
+        $(".accordion-button").click(function(){
+            
+         
+    var isCollapsed = $(this).hasClass('collapsed');
+    
+           $(".accordion-button").removeClass('collapsed');
+           
+           if(isCollapsed == false) {
+            $(this).toggleClass("collapsed");
+           }
+
+           
+ var isCollapsedContent = $(this).parent().next(".accordion-collapse").hasClass('collapse');
+            $(".accordion-collapse").addClass('collapse');
+            if(isCollapsedContent == true) {
+                $(this).parent().next(".accordion-collapse").toggleClass('collapse');
+           }
+
+           
+
+        });
+
+    });
+
+
+    </script>
 }

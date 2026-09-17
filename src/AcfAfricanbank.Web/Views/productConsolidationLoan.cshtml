@@ -1,4 +1,5 @@
 ﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageLoans>
+@using AcfAfricanbank.Core.Models.Forms;
 @using ContentModels = Umbraco.Web.PublishedModels;
 @using CustomModels = Web.Models;
 
@@ -38,6 +39,12 @@
     var headerImage_small = heroHeader?.Value<IPublishedContent>("imageSmall")?.Url;
 
 }
+<style>
+    .mega-tabs .nav-tabs>li.active:after {
+        top: unset !important;
+        bottom: -18px;
+    }
+</style>
 <!-- HERO BANNER -->
 @Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
 <!-- HERO CONTINUED-->
@@ -55,10 +62,11 @@
 <!-- TESTIMONIALS -->
 @Html.Partial("_testimonials", testimonialTab as Testimonials)
 <!-- CALL BACK FORM -->
-@{
+<!-- CALL BACK FORM20240214 -->
+@*{
     var _floatingFormViewModel = children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
     @Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)
-}
+}*@
 
 @section scripts
 {
@@ -82,23 +90,4 @@
         });
 
     </script>
-    <style>
-        @@media (min-width: 376px) and (max-width: 414px) {
-            .mega-tabs .nav-tabs > li.active:after {
-                top: auto;
-            }
-        }
-
-        @@media only screen and (max-width: 414px) {
-            .mega-tabs .nav-tabs > li.active:after {
-                bottom: -18px;
-            }
-        }
-
-        @@media (max-width: 360px) {
-            .mega-tabs .nav-tabs > li.active:after {
-                top: auto;
-            }
-        }
-    </style>
 }

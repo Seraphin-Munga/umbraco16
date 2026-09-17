@@ -20,14 +20,39 @@
     var testimonialTab = children?.Where(c => c.ContentType.Alias.ToLower() == "testimonials").FirstOrDefault();
 
 
-    var items = heroKnees.Value("items");
+@*newcode*@
+      var keybenfits = heroBody.Children.Where(c => c is RichTextEditor).FirstOrDefault();
+      var fisrtsection = heroBody.Children.Where(c => c.Name == "FirstSection").FirstOrDefault();
+      var fisrtsectioncontent = fisrtsection .Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var nofisrtsectioncontent = fisrtsectioncontent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+      
+      var funeralplansection = heroBody.Children.Where(c => c.Name == "Funeral Plan").FirstOrDefault();
+      var funeralplansectioncontent = funeralplansection .Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var nofuneralcontent = funeralplansectioncontent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
 
+    var step3 = fisrtsection?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+    var step3caards = step3.Select(c => c as Card).ToList();
+    
+    var step4section = heroBody.Children.Where(c => c.Name == "Step4 Section").FirstOrDefault();
+      var step4sectionsectioncontent = step4section .Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var nostep4content = step4sectionsectioncontent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+    
+      var faqsection = heroBody.Children.Where(c => c.Name == "FAQ").FirstOrDefault();
+      var faqsectionsectioncontent = faqsection .Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var faqcontentqa = faqsectionsectioncontent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+    
+    var noCampx1 = 1;
+   
+@*end newcode*@
+
+    var items = heroKnees.Value("items");
+  
     var keyBenefits = heroBody.Children(x => x.ContentType.Alias.ToLower() == "richtexteditor").FirstOrDefault();
     var cardImageDescriptions = heroBody.Children(x => x is Card).ToList();
     var contactUs = heroBody.Children(x => x.ContentType.Alias.ToLower() == "herobodycontactus").FirstOrDefault();
 
     // Call me back
-    var callMeBack = children?.Where(c => c.ContentType.Alias.ToLower() == "callmeback").FirstOrDefault();
+     var callMeBack = children?.Where(c => c.ContentType.Alias.ToLower() == "callmeback").FirstOrDefault();
 
     // Get Specific Grandchildren
     var bodyCards = heroBody?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
@@ -57,7 +82,85 @@
 
 }
 
+ <link rel="stylesheet" href="/css/projectmagic.css" /> 
+
 <style type="text/css">
+
+
+
+ .reverse-row{
+     display: flex;
+    flex-direction: row-reverse;
+ }   
+
+.flex-row-reverse {
+    flex-direction: row-reverse;
+}
+   .right-icon {
+    right: 6px;
+    }
+  @*  .arrow-right::after {
+    content: '\276F';
+    font-size: 12px;
+    margin-left: 40px;
+}*@
+
+.accordion-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 1rem 1.25rem;
+    font-size: 1rem;
+    color: #212529;
+    text-align: left;
+    background-color: transparent;
+    border: 1px solid rgba(0, 0, 0, .125);
+    border-radius: 0;
+    overflow-anchor: none;
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out, border-radius .15s ease;
+}
+
+.accordionStyle2 .accordion-button:after {
+   content: '\276F';
+     transition: transform 0.3s ease;
+   
+}
+
+ .inline-checklist ul li::before {
+    color: #112768;
+}
+.accordion-button:not(.collapsed)::after {
+    background-image: unset;
+}
+.accordion-button:not(.collapsed)::after {
+   background-image: unset !important;
+}
+
+.accordion-button.collapsed::after {
+     transform: rotate(90deg);
+   
+}
+      
+
+.accordion-button:after {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-left: auto;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 1.25rem;
+    transition: transform .2s ease-in-out;
+}
+
+.font-md {
+    font-weight: 400 !important;
+    font-family: "Montserrat", sans-serif !important;
+    line-height: 1.2;
+    font-size: 18px !important;
+}
+
     .mega-tabs .nav-tabs>li.active:after {
         top: unset !important;
         bottom: -18px;
@@ -69,6 +172,7 @@
     }
 
     .campaign-more-container {
+       background-color: #E5E5E5 !important;;
         margin-top: 80px;
         padding: 27px;
     }
@@ -94,10 +198,10 @@
         font-family: 'Arial Narrow Bold', sans-serif;
         font-weight: 900;
     }
-
+    
     .setp-box{
         width:94px;
-        margin-left: -16px;
+        margin-left: -18px;
     }
 
     @*.text-color {
@@ -112,207 +216,1492 @@
         margin-right: 15px;
         margin-left:15px;
     }
-    
-        #rates-container {
-            margin-top: 50px;
+    #rates-container {
+        margin-top: 50px;
+    }
+
+    .unlisted, .listed {
+        margin: 0;
+        padding: 0;
+    }
+
+    .unlisted {
+        counter-reset: foo;
+        display: table;
+    }
+
+    .listed {
+        list-style: none;
+        counter-increment: foo;
+        display: table-row;
+        width: 100%;
+    }
+
+        .listed::before {
+            content: "";
+            font-family: 'Glyphicons Halflings';
+            font-size: 12px;
+            margin-right: 13px;
+            color: #88bc47;
+            display: table-cell;
+            text-align: right;
+            padding-right: .8em;
         }
 
-        .unlisted, .listed {
-            margin: 0;
-            padding: 0;
-        }
 
-        .unlisted {
-            counter-reset: foo;
-            display: table;
-        }
+    .benefitsHeader {
+        text-align: center;
+        margin-bottom: 25px;
+    }
 
-        .listed {
-            list-style: none;
-            counter-increment: foo;
-            display: table-row;
-            width: 100%;
-        }
+    .hero-static-caption {
+        top: -30px;
+    }
 
-            .listed::before {
-                content: "";
-                font-family: 'Glyphicons Halflings';
-                font-size: 12px;
-                margin-right: 13px;
-                color: #88bc47;
-                display: table-cell;
-                text-align: right;
-                padding-right: .8em;
-            }
+    .keyBenefitsSection {
+        padding-bottom: 4vh;
+    }
+    .hidden-sm, .hidden-md {
+        display: none;
+    }
 
-
-        .benefitsHeader {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .hero-static-caption {
-            top: -30px;
-        }
-
-        .keyBenefitsSection {
-            padding-bottom: 4vh;
-        }
-
-        .hidden-sm, .hidden-md {
-            display: none;
-        }
-
-        @@media (max-width: 768px) {
-            @* Why is this rule in place?
+    @@media (max-width: 768px) {
+        @* Why is this rule in place?
         .hidden-xs {
             display: initial !important;
         } *@
-
-            .hand-helds {
-                text-align: center !important;
-            }
+        
+        .hand-helds {
+            text-align: center !important;
         }
+    }
 
-        .campaign-product-container {
-            padding: 50px;
-            background: #f7f7f7;
-            position: relative;
-            top: -30px;
-            margin-top: 50px;
+    .campaign-product-container {
+        padding: 50px;
+        background: #f7f7f7;
+        position: relative;
+        top: -30px;
+        margin-top: 50px;
+    }
+
+    .investment-calculator {
+        margin-top: 100px;
+    }
+
+    .mainHeaderText {
+        background: #f7f7f7;
+        position: relative;
+        padding: 20px;
+        bottom: -47px;
+    }
+
+    .long-description {
+        margin-left: 50px;
+        margin-top: 20px;
+    }
+    
+     .long-des {
+        margin-bottom: -100px !important;
+    }
+
+    .text-step {
+        @*text-align: center;*@
+        margin-bottom: -20px;
+        position: relative;
+        top: 4px;
+        color: #002b60;
+        font-weight: bold;
+        margin-left: 46px;
+        font-size:18px;
+    }
+
+
+    @@media (max-width: 640px) {
+        .col-sm-12 {
+            margin: 10px;
         }
 
         .investment-calculator {
-            margin-top: 100px;
-        }
-
-        .mainHeaderText {
-            background: #f7f7f7;
-            position: relative;
-            padding: 20px;
-            bottom: -47px;
-        }
-
-        .long-description {
-            margin-left: 50px;
             margin-top: 20px;
         }
-
-        .long-des {
-            margin-bottom: -100px !important;
+        .box-step-text {
+         font-size: 50px;
+         width: 100%;
         }
+    }
 
-        .text-step {
-            @*text-align: center;*@
-            margin-bottom: -20px;
-            position: relative;
-            top: 4px;
-            color: #002b60;
-            font-weight: bold;
-            margin-left: 46px;
-            font-size: 18px;
+    @@media (min-width: 480px) {
+        .keyBenefitsSection {
+            padding-top: 20px;
         }
+    }
 
-
-        @@media (max-width: 640px) {
-            .col-sm-12 {
-                margin: 10px;
-            }
-
-            .investment-calculator {
-                margin-top: 20px;
-            }
-
-            .box-step-text {
-                width: 280px;
-                margin: auto;
-                margin-top: -30px;
-                margin-left: 70px;
-                font-size: 10px;
-            }
+   @@media (max-width: 767px) {
+        .campaign-product-container.full {
+            margin: 10px -15px;
         }
-
-        @@media (min-width: 480px) {
-            .keyBenefitsSection {
-                padding-top: 20px;
-            }
+        
+        .sign{
+           display: block !important;
+         }
+         
+         .text-step{
+           margin-left: 0 !important;
+             font-size: 27px;
+           margin-top: 20p
+         }
+        
+         
+         .setp-box{
+         position: relative !important;
+           top: -30px !important;
+               margin-left: 0px;
+          }
+        
+        .box-step-text {
+            width: 100%;
+            margin: auto;
+            margin-top: -30px;
+    
+            font-size: 10px;
         }
+        
+     .container-step {
+         height: auto !important;
+             padding-bottom: 33px;
+               background: none !important;
+    }
+    
+      .padding-funeral{
+           padding-left: 0;
+           margin-left: -54px;
 
-        @@media (max-width: 767px) {
-            .campaign-product-container.full {
-                margin: 10px -15px;
-            }
+       }
+       
+      
+        
+  .hero-static-caption .hero-static-description, .hero-static-caption p {
+        font-size: 18px !important;
+        margin-bottom: 32px;
+     }
+        
+    } 
+    
+    
 
-            .box-step-text {
-                width: 280px;
-                margin: auto;
-                margin-top: -30px;
-                margin-left: 70px;
-                font-size: 10px;
-            }
-
-            .container-step {
-                height: auto !important;
-            }
-
-            .padding-funeral {
-                padding-left: 48px;
-            }
-
-            .margin-funeral {
-                margin-left: -40px;
-            }
-        }
-
-
-
-        .step {
+    .step {
             background: #002b60;
-            background-image: linear-gradient(to right, #687b92fc, #002b60);
+            background-image: linear-gradient(80DEG, #009ED3 , #002b60 60%);
             width: 83px;
-            border-top-right-radius: 7px;
-            border-bottom-right-radius: 7px;
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
             height: 30px;
             color: #fff;
             padding: 4px;
             font-weight: bold;
             font-size: 18px;
-        }
-
-            .step:after {
-                content: "";
-                display: block;
-                position: absolute;
-                top: 0px;
-                left: 98%;
-                border-style: solid;
-                border-color: transparent #002b60;
-                border-width: 16px 0px 14px 32px;
-                width: 0;
-                height: 0px;
-            }
-
-        .container-step {
-            background: #a9a9a9;
-            height: 30px;
-            margin-top: 30px
-        }
-
-        .premiums-member {
-            margin-top: 90px;
-        }
-
-        .member-margin {
-            margin-left: 53px;
-        }
-
-    @@media (min-width: 280px) and (max-width: 350px) {
-        .box-step-text {
-            width: 200px;
-        }
     }
+    .step:after {
+        content: "";
+        display: block;
+        position: absolute;
+        top: 0px;
+        left: 97px;
+        border-style: solid;
+        border-color: transparent #002b60;
+        border-width: 16px 0px 14px 32px;
+        width: 0;
+        height: 0px;
+    }
+    .container-step {
+        background: #a9a9a9;
+        height: 30px;
+        margin-top: 30px
+    }
+    
+    .premiums-member{
+        margin-top: 90px;
+    }
+    
+    .member-margin{
+        margin-left: 53px;
+    }
+ 
+     .myWorld-campaign-images{
+         width: 80% !important;
+      }
+      
+      .font-weigh-key-benefits > strong{
+         font-weight: 900;
+       }
+       .font-weigh-key-benefits{
+         font-weight: 600;
+        }
+    .font-children{
+      font-size: 16px !important;
+     }
+     
+     
+     
+
 </style>
 
+@*
+ @{
+         int idIterator = 0;
+           foreach (var item in nofisrtsectioncontent ){
+                var cardTitle = item.Value<string>("nCcardTitle");
+                var cardTitleId = cardTitle.Trim().ToString().Replace(" ", "").ToString() + idIterator.ToString();
+                var cardDesc = item.Value<string>("nClongDescription");
+                var cardDescmedium = item.Value<string>("mediumDescription");
+                var icon = item.Value<IPublishedContent>("nCcardIcon");
+               
+                
+                
+                 if (idIterator%2 == 0)
+                    {
+                        <section class="section-800 bg-grey-60">
+                            <div class="container">
+                                <div class="row align-items-center d-flex row-change">
+                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                        <h1 class="color-brand-1 mt-15 mb-20">@cardTitle</h1>
+                                        <p class="font-md color-brand-1">@Html.Raw(item.Value<string>("mediumDescription"))</p>
+                                        <div class="mt-50 text-start">
+                                            @Html.Raw(item.Value<string>("nClongDescription"))
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                        <img Class="d-block"
+                                             src="@icon.Url"
+                                             alt="@icon.Value("altTag")" />
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        }
+                        else{
+                        
+                             <section class="section-800">
+                                <div class="container">
+                                    <div class="row align-items-center row-change d-flex flex-row-reverse">
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                            <h1 class="color-brand-1 mb-20">@cardTitle</h1>
+                                            <p class="font-md color-grey-500">@Html.Raw(item.Value<string>("mediumDescription"))</p>
+                                            <div class="mt-50 text-start">
+                                             @Html.Raw(item.Value<string>("nClongDescription"))
+                                            </div>
+                                        </div>
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                             <img
+                                              Class="d-block"
+                                              src="@icon.Url"
+                                             alt="@icon.Value("altTag")" />
+                                            
+                                        </div>
+                                    </div>
+                                     <div class="row d-flex align-items-center row-change">
+                                          @Html.Raw(@keybenfits.Value("textEditor"))
+                                     </div>
+                                </div>
+                            </section>
+                        }
+          idIterator += 1;
+            }
+        }
+*@
+
+
+<section class="section-800 bg-grey-60">
+  <div class="container">
+    <div class="row d-flex align-items-center row-change">
+      <div class="col-xl-6 col-lg-6 col-md-6">
+        <h1 class="color-brand-1 mt-15 mb-20">African Bank Funeral Plan</h1>
+        <p class="font-md color-brand-1">
+              African Bank’s Funeral Plan will cover unexpected costs of a funeral.
+          Give your loved ones the send-off they deserve. Choose an affordable
+          cover option for you and your loved ones. Or anyone important to you.
+          We cover 8 out of 10 customers with our funeral plan.
+        </p>
+        
+         <div class="mt-50 text-start">
+          <a class="btn btn-brand-1 hover-up" href="https://ib.africanbank.co.za/SignIn.aspx"
+            >Apply Now<svg
+              stroke="currentColor"
+              fill="currentColor"
+              stroke-width="0"
+              viewBox="0 0 16 16"
+              class="right-icon"
+              height="1em"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"
+              ></path></svg
+          ></a>
+        </div>
+      </div>
+      <div class="col-xl-6 col-lg-6 col-md-6">
+        <img class="d-block" src="/media/5t0neons/best-bank.png" alt="iori" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-800">
+  <div class="container">
+    <div class="row align-items-center row-change flex-row-reverse reverse-row">
+      <div class="col-xl-6 col-lg-6 col-md-6">
+        <h1 class="color-brand-1 mt-15 mb-20">Funeral Plan</h1>
+  
+    
+        <div class="mt-50 text-start">
+          <a class="btn btn-brand-1 hover-up" href="https://ib.africanbank.co.za/SignIn.aspx"
+            >APPLY NOW<svg
+              stroke="currentColor"
+              fill="currentColor"
+              stroke-width="0"
+              viewBox="0 0 16 16"
+              class="right-icon"
+              height="1em"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"
+              ></path></svg
+          ></a>
+        </div>
+      </div>
+      <div class="col-xl-6 col-lg-6 col-md-6">
+        <img
+                  class="d-block"
+                  src="/media/5t0neons/best-bank.png"
+                  alt="iori"
+                />
+      </div>
+ 
+    </div>
+     <div class="row">
+      @Html.Raw(@keybenfits.Value("textEditor"))
+    </div>
+  </div>
+</section>
+
+<div class="campaign-more-container">
+    <div class="container">
+        <h2 class="h2-color">Key benefits</h2>
+        <div class="row">
+                <div class="row "> 
+                        <div class="col-md-3 col-sm-12 circle">
+                            <div class="center-align">
+                                        <img class="myWorld-campaign-images" src="/media/iamei34s/abw2207_003_funeral_images-1.png" alt="family of four posing for a picture">
+
+                                <p class="body-content margin-top-20 text-color">
+                                    </p><p class="blue-color font-weigh-key-benefits"><strong>Breadwinners cover up</strong><br><strong>to R100 000</strong>, <strong>each</strong>, for the<br>main member and spouse</p>
+                                    
+                                <p></p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-12 circle">
+                            <div class="center-align">
+                                        <img class="myWorld-campaign-images" src="/media/wzbb1twk/abw2207_003_funeral_images-2.png" alt="2 happy boys">
+
+                                <p class="body-content margin-top-20 text-color">
+                                    </p><p class="blue-color font-weigh-key-benefits"><strong>AT NO COST cover up to</strong><br><strong>R20 000, each</strong>, for up to 8<br>children, with our family or<br>single parent and child plans</p>
+                                    
+                                <p></p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-12 circle">
+                            <div class="center-align">
+                                        <img class="myWorld-campaign-images" src="/media/oignurki/abw2207_003_funeral_images-3.png" alt="Framed family portrait">
+
+                                <p class="body-content margin-top-20 text-color">
+                                    </p><p class="blue-color font-weigh-key-benefits"><strong>LOW PREMIUMS for cover</strong><br><strong>up to R50 000, each</strong>, for<br>up to 8 extended family<br>members</p>
+                                    
+                                <p></p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-12 circle">
+                            <div class="center-align">
+                                        <img class="myWorld-campaign-images" src="/media/wskmqnyr/abw2207_003_funeral_images-4.png" alt="African man looking at a device">
+
+                                <p class="body-content margin-top-20 text-color">
+                                    </p><p class="blue-color font-weigh-key-benefits">For <strong>BIG COVER</strong> for your<br>family to start, pay your<br>1st <strong>low premium</strong></p>
+                                    
+                                <p></p>
+                            </div>
+                        </div>
+                </div>
+        </div>
+  
+    </div>
+</div>
+@*
+@Html.Partial("_keyBenefits", new CustomModels.HowToApplyDataContainer(bodyTitle, bodyRedirects, bodyButton as IEbankItabstractButton, applyDocs))
+ *@
+<section class="section-800 ">
+  <div class="container">
+    <div class="row d-flex align-items-center row-change flex-row-reverse reverse-row">
+      <div class="col-xl-6 col-lg-6 col-md-6">
+        <h1 class="color-brand-1 mt-15 mb-20">Step 1</h1>
+        <p class="font-md color-brand-1">
+          Covering immediate family members who depend on you
+        </p>
+        <h4 class="color-brand-1 mt-20">Key Benefits</h4>
+        <div class="mt-30 mb-30">
+          <ul class="list-ticks list-ticks-2">
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              > Married breadwinners with children who depend on them, choose FAMILY COVER
+            </li>
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >Married couples who depend on each other, choose MAIN MEMBER & SPOUSE COVER
+            </li>
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >Single breadwinners with children who depend on them, choose MAIN MEMBER
+                    & CHILDREN COVER
+            </li>
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >Single breadwinners, choose MAIN MEMBER COVER to support their family financially
+            </li>
+            <h4 class="color-brand-1 mt-20">How much cover would your family need to be supported financially?</h4>
+            <li class=" mt-20">
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >
+             Breadwinners cover up to R100 000, each,for the main member and spouse
+            </li>
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >
+              AT NO COST cover up to R20 000, each, for up to 8 children, with our family or single parent and child plans
+            </li>
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >Add your spouse and / or up to 8 children who depends on you
+            </li>
+          </ul>
+        </div>
+
+      </div>
+      <div class="col-xl-6 col-lg-6 col-md-6">
+        <img
+                  class="d-block"
+                  src="/media/5t0neons/best-bank.png"
+                  alt="iori"
+                />
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="section-800 bg-grey-60">
+  <div class="container">
+    <div class="row d-flex align-items-center row-change flex-row-reverse">
+      <div class="col-xl-6 col-lg-6 col-md-6">
+        <h1 class="color-brand-1 mt-15 mb-20">Step 2</h1>
+        <p class="font-md color-brand-1">
+          Covering extended family members, who you are supporting
+        </p>
+        <h4 class="color-brand-1 mt-20">Key Benefits</h4>
+        <div class="mt-30 mb-30">
+          <ul class="list-ticks list-ticks-2">
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              > Grand Parents
+            </li>
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >Parents or Parents-in-Law
+            </li>
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >Aunts or Uncles
+            </li>
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >Nieces or Nephews
+            </li>
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >Non biological or adopted children
+            </li>
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >Children over 21
+            </li>
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >Even your domestic or gardener can be covered
+            </li>
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >Add up to 8 Extended Family Members who you are supporting
+            </li>
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >Who must receive the claims pay-out? Choose a beneficiary you trust to support the family financially
+            </li>
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >How to pay your 1st low premium for BIG COVER to start
+            </li>
+             <h4 class="color-brand-1 mt-15">Choose cover levels for extended family at LOW PREMIUMS</h4>
+             <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >How to pay your 1st low premium for BIG COVER to start
+            </li>
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >Add up to 8 Extended Family Members who you are supporting
+            </li>
+             <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >Who must receive the claims pay-out? Choose a beneficiary you trust to support the family financially
+            </li>
+             <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >How to pay your 1st low premium for BIG COVER to start
+            </li>
+          </ul>
+        </div>
+
+
+
+      </div>
+      <div class="col-xl-6 col-lg-6 col-md-6">
+        <img
+                  class="d-block"
+                  src="/media/5t0neons/best-bank.png"
+                  alt="iori"
+                />
+      </div>
+      
+    </div>
+
+  </div>
+</section>
+
+<section class="section-800">
+  <div class="container">
+    <div class="row  align-items-center ">
+      <div class="col-xl-6 col-lg-6 col-md-6">
+        <h1 class="color-brand-1 text-center mt-15 mb-20">
+         Step 3 Choose cover levels for extended family at LOW PREMIUMS
+        </h1>
+      </div>
+       <div class="col-xl-6 col-lg-6 col-md-6">
+      
+      </div>
+      <div class="col-xl-12 col-lg-12 col-md-12">
+        <img src="/media/rz0easnv/abw2207_003_funeral_pricing_structure.jpg" alt="" style="width: 110%;">
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section-800 bg-grey-60">
+  <div class="container">
+    <div class="row d-flex align-items-center row-change flex-row-reverse reverse-row">
+      <div class="col-xl-6 col-lg-6 col-md-6">
+        <h1 class="color-brand-1 mt-15 mb-20">Step 4</h1>
+        <p class="font-md color-brand-1">
+          For BIG COVER to start for your family, pay your 1st low premium
+        </p>
+        <h4 class="color-brand-1 mt-20">Key Benefits</h4>
+        <div class="mt-30 mb-30">
+          <ul class="list-ticks list-ticks-2">
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              > Approve the Debicheck request from our own bank on your own bank internet banking or App
+            </li>
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              > From your bank account into which your salary is deposited
+            </li>
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >On the day that your salary is deposited
+            </li>
+    
+            
+          </ul>
+        </div>
+
+      </div>
+      <div class="col-xl-6 col-lg-6 col-md-6">
+        <img
+                  class="d-block"
+                  src="/media/5t0neons/best-bank.png"
+                  alt="iori"
+                />
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section ">
+            <div class="container">
+                <div class="box-newsletter">
+                    <div class="row d-flex text-center">
+                        <div class="col-lg-12 col-md-12">
+                            <span class="font-lg color-brand-1">1 Number to call</span>
+                            <h3 class="color-brand-1 mb-15 mt-5">0861 123 456</h3>
+                            <p class="font-xs my-3 color-grey-500">MyWorld Terms and Conditions | Website Terms and Conditions | Registration Terms and Conditions</p>
+                            <p class="font-xs color-grey-500">*Banking fees are based on Solidarity's methodology of comparing defined baskets of transactions(12,17,25 and 30 transactions) across 6 biggest entry level bank accounts. In this way, an average industry price was obtained.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+@*
+
+@{
+         int idIterator1 = 0;
+           foreach (var item in nofuneralcontent ){
+                var cardTitle = item.Value<string>("nCcardTitle");
+               
+                var cardDesc = item.Value<string>("nClongDescription");
+                var cardDescmedium = item.Value<string>("mediumDescription");
+                var icon = item.Value<IPublishedContent>("nCcardIcon");
+               
+                
+                
+                 if (idIterator1 %2 == 0)
+                    {
+<section class="section-800 bg-grey-60">
+  <div class="container">
+    <div class="row d-flex align-items-center row-change d-flex flex-row-reverse">
+      <div class="col-xl-6 col-lg-6 col-md-6">
+        <h1 class="color-brand-1 mt-15 mb-20">@cardTitle</h1>
+       @Html.Raw(item.Value<string>("mediumDescription"))
+       @Html.Raw(item.Value<string>("nClongDescription"))
+         
+      </div>
+      <div class="col-xl-6 col-lg-6 col-md-6">
+        <img class="d-block" src="@icon.Url" alt="@icon.Value("altTag")" />
+      </div>
+    </div>
+  </div>
+</section>
+                        }
+                        else{
+                        
+                             <section class="section-800 ">
+                                <div class="container">
+                                    <div class="row align-items-center row-change d-flex">
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                            <h1 class="color-brand-1 mb-20">@cardTitle</h1>
+                                            <p class="font-md color-grey-500">@Html.Raw(item.Value<string>("mediumDescription"))</p>
+                                            <div class="mt-50 text-start">
+                                             @Html.Raw(item.Value<string>("nClongDescription"))
+                                            </div>
+                                        </div>
+                                       
+                                    </div>
+                                </div>
+                            </section>
+                        }
+          idIterator1 += 1;
+            }
+        }
+        
+      
+
+<section class="section-800 bg-grey-60">
+  <div class="container">
+    <div class="row d-flex align-items-center row-change flex-row-reverse">
+      <div class="col-xl-6 col-lg-6 col-md-6">
+        <h1 class="color-brand-1 mt-15 mb-20">Step 2</h1>
+        <p class="font-md color-brand-1">
+          Covering extended family members, who you are supporting
+        </p>
+        <h4 class="color-brand-1 mt-20">Key Benefits</h4>
+        <div class="mt-30 mb-30">
+          <ul class="list-ticks list-ticks-2">
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              > Grand Parents
+            </li>
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >Parents or Parents-in-Law
+            </li>
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >Aunts or Uncles
+            </li>
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >Nieces or Nephews
+            </li>
+            <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >Non biological or adopted children
+            </li>
+             <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >Children over 21
+            </li>
+             <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >Even your domestic or gardener can be covered
+            </li>
+             <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >Add up to 8 Extended Family Members who you are supporting
+            </li>
+             <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >Who must receive the claims pay-out? Choose a beneficiary you trust to support the family financially
+            </li>
+             <li>
+              <svg
+                class="w-6 h-6 icon-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path></svg
+              >How to pay your 1st low premium for BIG COVER to start
+            </li>
+          </ul>
+        </div>
+
+
+
+      </div>
+      <div class="col-xl-6 col-lg-6 col-md-6">
+        <img
+                  class="d-block"
+                  src="/media/5t0neons/best-bank.png"
+                  alt="iori"
+                />
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-800 ">
+
+  <div class="container">
+    <div class="row d-flex align-items-center row-change reverse-row">
+      <div class="col-xl-6 col-lg-6 col-md-6">
+        <h1 class="color-brand-1 mt-15 mb-20">Choose cover levels for extended family at LOW PREMIUMS</h1>
+        <p class="font-md color-brand-1">
+          LOW PREMIUMS for cover up to R50 000, each, for
+up to 8 extended family members
+        </p>
+        
+      </div>
+      <div class="col-xl-6 col-lg-6 col-md-6">
+        <img class="d-block" src="/media/oignurki/abw2207_003_funeral_images-3.png" alt="iori" style="width: 30vw;" />
+      </div>
+    </div>
+  </div>
+</section>  
+ *@ 
+@*
+@if (step3caards!= null && step3caards.Any())
+            {
+            int cardIChestterator = 0;
+            int navIChestterator = 0;
+
+            
+                foreach (Card benefit in step3caards)
+                {
+                String cardIdTag = "card" + cardIChestterator.ToString();
+               <section class="section-800">
+  <div class="container">
+    <div class="row  align-items-center ">
+      <div class="col-xl-12 col-lg-12 col-md-12">
+        <h1 class="color-brand-1 text-center mt-15 mb-20">
+         @benefit.CardTitle
+        </h1>
+      </div>
+      <div class="col-xl-12 col-lg-12 col-md-12">
+        <img src="@benefit.CardIcon.Url" alt="" style="width: 95%;">
+      </div>
+    </div>
+  </div>
+</section>
+               
+                ++cardIChestterator;
+                navIChestterator++;
+                }
+                }
+*@
+
+
+
+@*
+
+
+@{
+         int idIterator2 = 0;
+           foreach (var item in nostep4content){
+                var cardTitle = item.Value<string>("nCcardTitle");
+         
+                var cardDesc = item.Value<string>("nClongDescription");
+                var cardDescmedium = item.Value<string>("mediumDescription");
+                var icon = item.Value<IPublishedContent>("nCcardIcon");
+               
+                
+                
+                 if (idIterator2 %2 == 0)
+                    {
+                        <section class="section-800 bg-grey-60 ">
+  <div class="container">
+    <div class="row d-flex align-items-center row-change d-flex flex-row-reverse">
+      <div class="col-xl-6 col-lg-6 col-md-6">
+        <h1 class="color-brand-1 mt-15 mb-20">@cardTitle</h1>
+       @Html.Raw(item.Value<string>("mediumDescription"))
+      <div class="mt-50 text-start">
+                                             @Html.Raw(item.Value<string>("nClongDescription"))
+                                            </div>
+         
+      </div>
+      <div class="col-xl-6 col-lg-6 col-md-6">
+        <img class="d-block" src="@icon.Url" alt="@icon.Value("altTag")" />
+      </div>
+    </div>
+  </div>
+</section>
+                        }
+                        else{
+                        
+                             <section class="section-800">
+                                <div class="container">
+                                    <div class="row align-items-center row-change d-flex">
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                            <h1 class="color-brand-1 mb-20">@cardTitle</h1>
+                                            <p class="font-md color-grey-500">@Html.Raw(item.Value<string>("mediumDescription"))</p>
+                                            <div class="mt-50 text-start">
+                                             @Html.Raw(item.Value<string>("nClongDescription"))
+                                            </div>
+                                        </div>
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                             <img
+                                              Class="d-block"
+                                              src="@icon.Url"
+                                             alt="@icon.Value("altTag")" />
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        }
+          idIterator2 += 1;
+            }
+        }
+*@
+
+@*
+ <section class="section-800 bg-grey-60">
+<div class="container " >
+    <div class="row align-items-center d-flex row-change">
+        <div class="col-xl-12 col-lg-12 col-md-12">
+              <h1 class="color-brand-1 mt-15 mb-20 text-center faqHeader">Open your MyWorld Overdraft now</h1>
+               <div class="accordion accordionStyle2" id="accordionFAQ">
+                    <div class="row">
+                    
+                   @foreach (var item in faqcontentqa)
+
+                    {
+                    
+                        var cardTitle = item.Value<string>("nCcardTitle");
+                        <div class="col-lg-12">
+                            <div class="accordion-item">
+                                <h5 class="accordion-header">
+                                    <button class="accordion-button text-heading-5">@cardTitle</button>
+                                </h5><div id="accordion-body" class="accordion-collapse collapse">
+                                    <div class="accordion-body">@Html.Raw(item.Value<string>("mediumDescription"))</div>
+                                </div>
+                            </div>
+                        </div>
+                                                    
+                        noCampx1 += 1;
+
+                    }
+                    </div>
+                </div>
+        </div>
+        
+    </div>
+</div>
+</section>   
+
+*@
+
+
+@*<section class="section-800 bg-grey-60">
+<div class="container " >
+    <div class="row align-items-center d-flex row-change">
+        <div class="col-xl-12 col-lg-12 col-md-12">
+              <h1 class="color-brand-1 mt-15 mb-20 text-center faqHeader">Open your MyWorld Overdraft now</h1>
+               <div class="accordion accordionStyle2" id="accordionFAQ">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="accordion-item">
+                                <h5 class="accordion-header">
+                                    <button class="accordion-button text-heading-5">  What Is The Maximum Amount I Can Borrow From African Bank?</button>
+                                </h5><div id="accordion-body" class="accordion-collapse collapse">
+                                    <div class="accordion-body">Vel tenetur officiis ab reiciendis dolor aut quae doloremque est ipsum natus et consequatur animi aut sunt dolores ut quasi rerum. Aut velit velit id quasi velit eum reiciendis laudantium quo galisum incidunt aut velit animi hic temporibus blanditiis sit odit iure. Eum laborum dolores ea molestias fuga qui temporibus accusantium qui soluta aliquid ab vero soluta.</div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h5 class="accordion-header">
+                                    <button class="accordion-button text-heading-5">  What Is The Maximum Amount I Can Borrow From African Bank?</button>
+                                </h5><div id="accordion-body" class="accordion-collapse collapse">
+                                    <div class="accordion-body">Vel tenetur officiis ab reiciendis dolor aut quae doloremque est ipsum natus et consequatur animi aut sunt dolores ut quasi rerum. Aut velit velit id quasi velit eum reiciendis laudantium quo galisum incidunt aut velit animi hic temporibus blanditiis sit odit iure. Eum laborum dolores ea molestias fuga qui temporibus accusantium qui soluta aliquid ab vero soluta.</div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h5 class="accordion-header">
+                                    <button class="accordion-button text-heading-5">  What Is The Maximum Amount I Can Borrow From African Bank?</button>
+                                </h5><div id="accordion-body" class="accordion-collapse collapse">
+                                    <div class="accordion-body">Vel tenetur officiis ab reiciendis dolor aut quae doloremque est ipsum natus et consequatur animi aut sunt dolores ut quasi rerum. Aut velit velit id quasi velit eum reiciendis laudantium quo galisum incidunt aut velit animi hic temporibus blanditiis sit odit iure. Eum laborum dolores ea molestias fuga qui temporibus accusantium qui soluta aliquid ab vero soluta.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+        
+    </div>
+</div>
+</section>   *@
+
+
+        
+@*  <section class="section-800 bg-grey-60">
+          <div class="container">
+            <div class="row d-flex align-items-center row-change reverse-row">
+              <div class="col-xl-12 col-lg-12 col-md-12">
+                <h1 class="color-brand-1 text-center mt-15 mb-20">
+                Premiums Calculator
+                </h1>
+                
+                <div class="container">
+                    @{
+                        int count = 1;
+                        foreach (var row in items as List<ContentModels.NCcard>)
+                        {
+                            <div class="row">
+                                <div class="container-step margin-bottom-15 margin-right-15 margin-left-15">
+                                    <div class="col-sm-1 setp-box">
+                                        <div class="step">
+                                            <span>@row.Value("nCcardDescription") @count</span>
+                                        </div>
+                                    </div>    
+                                    <div class="col-sm-10 box-step-text">
+                                        <p class="text-step">@row.Value("NCcardTitle")</p>
+                                    </div>
+                
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="long-description">
+                                    @Html.Raw(@row.Value("mediumDescription"))
+                                </div>
+                            </div>
+                
+                            if (row.ImageListAndDescriptions != null)
+                            {
+                                <div class="row">
+                                    @{
+                                        if (row.ImageListAndDescriptions.ToList().Count > 1)
+                                        {
+                                            foreach (var _item in row.ImageListAndDescriptions.ToList())
+                                            {
+                                                if (_item.Image != null)
+                                                {
+                                                    <div class="col-sm-5">
+                                                        <div class="row">
+                                                            <div class="col-md-6 col-sm-12 hand-helds">
+                                                                <img src="@_item.Image.Url" alt="" />
+                                                            </div>
+                                                            <div class="col-md-6 col-sm-12 hand-helds">
+                                                                @Html.Raw(_item.Description)
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                            <div class="row">
+                                                <div class="col-sm-12 long-des">
+                                                    @Html.Raw(@row.Value("nClongDescription"))
+                                                </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            if (row.ImageListAndDescriptions.Count() == 1)
+                                            {
+                                                if (row.ImageListAndDescriptions.FirstOrDefault().Image != null)
+                                                {
+                                                        if (row.ImageListAndDescriptions.FirstOrDefault().Description.ToString() == "")
+                                                        {
+                                                         
+                                                            <div class="center-align hidden-xs hidden-sm visible-md visible-lg">
+                                                                <img src="@row.ImageListAndDescriptions.FirstOrDefault().Image.Url" alt="" style="width: 95%;">
+                                                            </div>
+                
+                                                            <div class="col-xs-12 center-align visible-xs visible-sm hidden-md hidden-lg">
+                                                                <img src="@row.NCcardIcon.Url" alt="@row.NCcardIcon.Value("altTag")" />
+                                                            </div>
+                                                          
+                                                        }
+                                                        else
+                                                        {
+                
+                                                            <div class="col-sm-1"></div>
+                                                            <div class="col-md-3 col-sm-12 hand-helds">
+                                                                <img src="@row.ImageListAndDescriptions.FirstOrDefault().Image.Url" alt="" />
+                                                            </div>
+                                                            <div class="col-md-8 col-sm-12 hand-helds">
+                                                                @Html.Raw(row.NClongDescription)
+                                                            </div>
+                                                        }
+                                                        <div class="row">
+                                                            <div class="col-sm-12 member-margin">
+                                                                @Html.Raw(row.ImageListAndDescriptions.FirstOrDefault().Description)
+                                                            </div>
+                                                        </div>
+                                                }
+                
+                                            }
+                                        }
+                                    }
+                                </div>
+                            }
+                
+                            count++;
+                        }
+                    }
+                
+                </div>
+                
+                <div class="mainHeaderText">
+                    @Html.Raw(contactUs.Value("mainHeaderText"))
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </section> *@
+
+
+@*
 <!-- HERO BANNER -->
 @Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
 
@@ -326,7 +1715,6 @@
     {
         int iterator = 0;
         <div class="row @(benefitsModel.BenefitCards.Count > 3 ? " card-slider" : "" ) ">
-            @* eq-height *@
             @{
                 int imgIterator = 0;
                 foreach (Card benefit in benefitsModel.BenefitCards)
@@ -358,16 +1746,22 @@
         </div>
     }
 
-    @*<div class="campaign-product-container full">
+
+    <div class="campaign-product-container full">
 
             //benefitsModel
             @Html.Partial("_benefitsSection", benefitsModel)
-        </div>*@
+        </div>
+
 
     @Html.Raw(heroBody.Value("richTextBox"));
 
 </div>
 @Html.Partial("_keyBenefits", new CustomModels.HowToApplyDataContainer(bodyTitle, bodyRedirects, bodyButton as IEbankItabstractButton, applyDocs))
+
+
+*@
+
 
 <!-- PRODUCT INFORMATION-->
 @*<div class="container">
@@ -379,143 +1773,40 @@
 
 
 <!-- SUBMIT YOU CLAIM -->
-@* @Html.Partial("_claimForm") *@
+ @Html.Partial("_claimForm") 
 
-<div class="margin-top-20 visible-xs"></div>
+<!--<div class="margin-top-20 visible-xs"></div>-->
 
-@* INVESTMENT CALCULATOR *@
-
-
-<div class="container">
-    @{
-        int count = 1;
-        foreach (var row in items as List<ContentModels.NCcard>)
-        {
-            <div class="row">
-                <div class="container-step margin-bottom-15 margin-right-15 margin-left-15">
-                    <div class="col-sm-1 setp-box">
-                        <div class="step">
-                            <span>@row.Value("nCcardDescription") @count</span>
-                        </div>
-                    </div>
-                    <div class="col-sm-10 box-step-text">
-                        <p class="text-step">@row.Value("NCcardTitle")</p>
-                    </div>
-
-                </div>
-            </div>
-            <div class="row">
-                <div class="long-description">
-                    @Html.Raw(@row.Value("mediumDescription"))
-                </div>
-            </div>
-
-            if (row.ImageListAndDescriptions != null)
-            {
-                <div class="row">
-                    @{
-                        if (row.ImageListAndDescriptions.ToList().Count > 1)
-                        {
-                            foreach (var _item in row.ImageListAndDescriptions.ToList())
-                            {
-                                if (_item.Image != null)
-                                {
-                                    <div class="col-sm-5">
-                                        <div class="row">
-                                            <div class="col-md-6 col-sm-12 hand-helds">
-                                                <img src="@_item.Image.Url" alt="" />
-                                            </div>
-                                            <div class="col-md-6 col-sm-12 hand-helds">
-                                                @Html.Raw(_item.Description)
-                                            </div>
-                                        </div>
-                                    </div>
-                                }
-                            }
-                            <div class="row">
-                                <div class="col-sm-12 long-des">
-                                    @Html.Raw(@row.Value("nClongDescription"))
-                                </div>
-                            </div>
-                        }
-                        else
-                        {
-                            if (row.ImageListAndDescriptions.Count() == 1)
-                            {
-                                if (row.ImageListAndDescriptions.FirstOrDefault().Image != null)
-                                {
-                                    if (row.ImageListAndDescriptions.FirstOrDefault().Description.ToString() == "")
-                                    {
-                                        @*</div>*@
-                                        <div class="center-align hidden-xs hidden-sm visible-md visible-lg">
-                                            <img src="@row.ImageListAndDescriptions.FirstOrDefault().Image.Url" alt="" style="height: 50.7vh;">
-                                        </div>
-
-                                        <div class="col-xs-12 center-align visible-xs visible-sm hidden-md hidden-lg">
-                                            <img src="@row.NCcardIcon.Url" alt="@row.NCcardIcon.Value("altTag")" /> @* style="height: 70vh;" *@
-                                        </div>
-                                        @*<div class="container">*@
-                                    }
-                                    else
-                                    {
-
-                                        <div class="col-sm-1"></div>
-                                        <div class="col-md-3 col-sm-12 hand-helds">
-                                            <img src="@row.ImageListAndDescriptions.FirstOrDefault().Image.Url" alt="" />
-                                        </div>
-                                        <div class="col-md-8 col-sm-12 hand-helds">
-                                            @Html.Raw(row.NClongDescription)
-                                        </div>
-                                    }
-                                    <div class="row">
-                                        <div class="col-sm-12 member-margin">
-                                            @Html.Raw(row.ImageListAndDescriptions.FirstOrDefault().Description)
-                                        </div>
-                                    </div>
-                                }
-
-                            }
-                        }
-                    }
-                </div>
-            }
-
-            count++;
-        }
-    }
-
-</div>
-
-<div class="mainHeaderText">
-    @Html.Raw(contactUs.Value("mainHeaderText"))
-</div>
-
-
-
-
-@* TODO:// Phase 2
-    <div class="container investment-cal-form">
-            <div class="row">
-                <div class="col-md-12">
-                    <div id="calculator">
-                        <div class="ajax-form-success ajax-alert alert alert-success square errorcalculatores" style="display: none;">@ResourceHelper.GetResource("ErrorCalculatores")</div>
-                        <section id="form-preloader">
-                            <div class="loader" id="form-preloader-loader">
-                                <div class="loader-img"></div>
-                            </div>
-                        </section>
-                        <div id="calculatorfuneral-form"></div>
-                        <div id="calculator-container"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+@* INVESTMENT CALCULATOR 
+INVESTMENT CALCULATOR here
 *@
 
 
 
 
-<div class="margin-top-50 hidden-xs"></div>
+ TODO:// Phase 2
+<div class="container investment-cal-form">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="calculator">
+                    <div class="ajax-form-success ajax-alert alert alert-success square errorcalculatores" style="display: none;">@ResourceHelper.GetResource("ErrorCalculatores")</div>
+                    <section id="form-preloader">
+                        <div class="loader" id="form-preloader-loader">
+                            <div class="loader-img"></div>
+                        </div>
+                    </section>
+                    <div id="calculatorfuneral-form"></div>
+                    <div id="calculator-container"></div>
+                </div>
+            </div>
+        </div>
+    </div> 
+    
+
+
+
+
+<!--<div class="margin-top-50 hidden-xs"></div>-->
 
 <!-- HOW TO APPLY-->
 @* @Html.Partial("_howToApplySection", new CustomModels.HowToApplyDataContainer(bodyTitle, bodyDescription, bodyButton as IEbankItabstractButton, applyDocs)) *@
@@ -527,7 +1818,7 @@
 @* @Html.Partial("_testimonials", testimonialTab as Testimonials) *@
 
 <!-- CALL BACK FORM -->
-@Html.Partial("_callMeBackForm", callMeBack as ContentModels.CallMeBack)
+ @Html.Partial("_callMeBackForm", callMeBack as ContentModels.CallMeBack) 
 
 
 
@@ -540,7 +1831,35 @@
     <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculator1.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculatorHandler.min.js")"></script>
 
+
+
+
     <script type="text/javascript">
+    
+    $(document).ready(function(){
+  $(".accordion-header").click(function() {
+    var button = $(this).find('.accordion-button');
+    var content = $(this).next();
+
+    // Toggle active class on button and rotate chevron
+    button.toggleClass("collapsed");
+
+    // Toggle the accordion panel
+    if (content.css('display') === "none") {
+      content.css('display', 'block');
+      // Apply CSS styles to only this accordion-button if needed
+      button.css({
+        'background-color': '#ECF1F2'
+      });
+    } else {
+      content.css('display', 'none');
+      // Optional: Reset styles when the accordion is collapsed
+      button.css({
+        'background-color': '' // Reset to default or specify another value
+      });
+    }
+  });
+});
 
                     $(document).ready(function () {
                         var imageBgCss = "url('" + "@headerImage_large" + "')";
@@ -674,7 +1993,7 @@
                         function Popup(data) {
                             //var mywindow = window.open('', 'Calculator Results');
                             //mywindow.document.write('<html><head><title>Calculator Results</title>');
-                            //mywindow.document.write('<link rel="stylesheet" href="/Content/ebankITMasterCss.min.css?V=1277zadzhbh32" type="text/css"  media="all" />');
+                            //mywindow.document.write('<button rel="stylesheet" href="/Content/ebankITMasterCss.min.css?V=1277zadzhbh32" type="text/css"  media="all" />');
                             //mywindow.document.write('</head><body >');
                             //mywindow.document.write(data);
                             //mywindow.document.write('</body><script>window.print();window.close();<\/script></html>');
@@ -921,3 +2240,4 @@
                     }
     </script>
 }
+

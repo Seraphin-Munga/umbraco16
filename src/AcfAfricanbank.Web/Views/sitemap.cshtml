@@ -1,42 +1,30 @@
-﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
-@using Umbraco.Web.Composing
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
 @using System.Linq;
 @{
     Layout = null;
-    Response.Write("<?xml version='1.0' encoding='UTF-8' ?>");
     Response.ContentType = "text/xml";
-}
+}<?xml version='1.0' encoding='UTF-8' ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-    @ListChildNodes(Umbraco.Content(Current.UmbracoHelper.AssignedContentItem.Id).AncestorOrSelf(1))
+    @ListChildNodes(Umbraco.TypedContent(UmbracoContext.Current.PageId).AncestorOrSelf(1))
 </urlset>
 @helper ListChildNodes(IPublishedContent startNode)
-{
-    string[] stringArray = { "hero-body", "video-hub" };
-    foreach (var node in startNode.Children/*.Where("hideInXmlSitemap == false")*/)
     {
-
-        if ((node is HeroBodyFaq) == false)
+        foreach (var node in startNode.Children.Where("hideInXmlSitemap == false"))
         {
-
-            string hasAnyName = Array.Find(stringArray, x => node.Url.Contains(x.ToString()));
-            if (string.IsNullOrEmpty(hasAnyName))
+            if (node.TemplateId > 0)
             {
-                if (node.TemplateId > 0)
-                {
-                    <url>
-                        <loc>@GetUrlWithDomainPrefix(node.Url)</loc>
-                        <lastmod>@(string.Format("{0:s}+00:00", node.UpdateDate))</lastmod>
-                    </url>
-                }
-                if (node.Level <= 100 && node.Children.Count() > 0)
-                {
-                    @ListChildNodes(node)
-                }
+                <url>
+                    <loc>@GetUrlWithDomainPrefix(node.Url)</loc>
+                    <lastmod>@(string.Format("{0:s}+00:00", node.UpdateDate))</lastmod>
+                </url>
+            }
+            if (node.Level <= 100 && node.Children.Count() > 0)
+            {
+                @ListChildNodes(node)
             }
         }
-    }
 }
 @functions {
     private static string GetUrlWithDomainPrefix(string url)

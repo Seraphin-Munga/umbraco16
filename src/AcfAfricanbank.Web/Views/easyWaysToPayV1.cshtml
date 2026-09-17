@@ -1,5 +1,324 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
 }
+
+@* the fun starts here *@
+
+  <link rel="stylesheet" href="/css/projectmagic.css" /> 
+<style>
+
+/* Default styles */
+.flex-row-reverse-mobile {
+    display: block;
+}
+
+
+
+@@media (max-width: 896px) and (min-width: 320px) {
+
+    .flex-row-reverse-mobile {
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: center; /* Adjust as needed */
+    }
+
+    .flex-row-reverse-mobile .content {
+        flex: 1;
+    }
+
+    .flex-row-reverse-mobile .d-block {
+        flex: 1;
+    }
+
+    .submit-claim-row-change {
+        margin-top: 0px;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+}
+
+.section {
+    margin-top: -5px !important;
+    display: inline-block;
+    width: 100%;
+    
+}
+    .mega-tabs .nav-tabs>li.active:after {
+        top: unset !important;
+        bottom: -18px;
+    }
+    
+    
+
+    
+   @@media (min-width: 540px) and (max-width: 720px) {
+            .hero-static-banner {
+                height: 200px;
+            }
+        }
+         @@media (min-width: 768px) and (max-width: 1024px) {
+            .hero-static-banner {
+                height: 285px;
+            }
+            .hero-static-caption {
+                top: -40px;
+            }
+        }
+        
+@@media (max-width : 999px){
+
+
+
+        .claim-flex-item2 {
+
+            padding: 20px
+
+    }
+
+}
+ .card-we-do {
+    display: flow;
+   padding-top: 0px;
+}
+.card-offer-small {
+   
+    height: 180px;
+}
+
+.card-img-text {
+display:flex;
+align-items: center;
+    margin-left: -10px;
+}
+.card-we-do .card-image {
+    max-width: 90px;
+}
+
+</style>
+
+
+<!--product intro-->
+<section class="section-800 bg-grey-60">
+                <div class="container">
+                  <div class="row d-flex align-items-center row-change">
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                       <h1 class="color-brand-1 mt-15 mb-20">
+                        Make payments easily
+                      </h1>
+                       <p class="font-md color-brand-1">We've made paying your account as easy as possible so that you can make a payment wherever you are.</p>
+                    </div>
+                    
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                      <img
+                        class="d-block"
+                        src="/media/rpfd5feh/12-loan_bg.png"
+                        alt="iori"
+                      /> 
+                       
+                    </div>
+                  </div>
+                </div>
+</section>
+
+<!--product card section-->
+<section class="section-800">
+    <div class="container">
+        <div class="row mt-40 mb-40 align-items-center">
+            <div class="col-lg-6">
+                <div class="card-offer-small card-we-do hover-up">
+                    <div class="card-img-text">
+                        <div class="card-image">
+                            <img class="d-block" src="/media/ppjkqzkw/easy-repayments.png" alt="iori"> 
+                        </div>
+                        <div class="card-info">
+                            <h4 class="color-brand-1 mb-10">
+                                <a class="color-brand-1">VISA OR MASTERCARD PAYMENT</a>
+                            </h4>
+                            
+                        </div>
+                    </div>
+                    <p class="font-md color-grey-500 mb-5">Your repayments are covered for up to 12 months</p>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card-offer-small card-we-do hover-up">
+                    <div class="card-img-text">
+                        <div class="card-image">
+                            <img class="d-block" src="/media/ppjkqzkw/easy-repayments.png" alt="iori"> 
+                        </div>
+                        <div class="card-info">
+                            <h4 class="color-brand-1 mb-10">
+                                <a class="color-brand-1">BRANCH PAYMENTS</a>
+                            </h4>
+                            
+                        </div>
+                    </div>
+                    <p class="font-md color-grey-500 mb-5">Your repayments are covered for up to 12 months</p>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card-offer-small card-we-do hover-up">
+                    <div class="card-img-text">
+                        <div class="card-image">
+                            <img class="d-block" src="/media/ppjkqzkw/easy-repayments.png" alt="iori"> 
+                        </div>
+                        <div class="card-info">
+                            <h4 class="color-brand-1 mb-10">
+                                <a class="color-brand-1">MOBILE OR DEBIT ORDER</a>
+                            </h4>
+                            
+                        </div>
+                    </div>
+                    <p class="font-md color-grey-500 mb-5">Your repayments are covered for up to 12 months</p>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card-offer-small card-we-do hover-up">
+                    <div class="card-img-text">
+                        <div class="card-image">
+                            <img class="d-block" src="/media/ppjkqzkw/easy-repayments.png" alt="iori"> 
+                        </div>
+                        <div class="card-info">
+                            <h4 class="color-brand-1 mb-10">
+                                <a class="color-brand-1">IN STORE PAYMENTS</a>
+                            </h4>
+                            
+                        </div>
+                    </div>
+                    <p class="font-md color-grey-500 mb-5">Your repayments are covered for up to 12 months</p>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card-offer-small card-we-do hover-up">
+                    <div class="card-img-text">
+                        <div class="card-image">
+                            <img class="d-block" src="/media/ppjkqzkw/easy-repayments.png" alt="iori"> 
+                        </div>
+                        <div class="card-info">
+                            <h4 class="color-brand-1 mb-10">
+                                <a class="color-brand-1">EFT PAYMENTS</a>
+                            </h4>
+                            
+                        </div>
+                    </div>
+                    <p class="font-md color-grey-500 mb-5">Your repayments are covered for up to 12 months</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--payment option-->
+<section class="section-800 bg-grey-60">
+                <div class="container">
+                  <div class="row d-flex align-items-center row-change">
+                      <div class="col-xl-6 col-lg-6 col-md-6">
+                      <img
+                        class="d-block"
+                        src="/media/rpfd5feh/12-loan_bg.png"
+                        alt="iori"
+                      /> 
+                       
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                       <h1 class="color-brand-1 mt-15 mb-20">
+                        Payment options
+                      </h1>
+                       <p class="font-md color-brand-1">We have gone out of our way to make paying your account easy. With many different ways to pay, it couldn't be easier to keep your account and credit rating healthy. Keeping up with your monthly payment has never been easier.</p>
+                    </div>
+                  </div>
+                </div>
+</section>
+
+<!--branch payments-->
+<section class="section-800">
+                <div class="container">
+                  <div class="row d-flex align-items-center row-change">
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                       <h1 class="color-brand-1 mt-15 mb-20">
+                        Branch Payments
+                      </h1>
+                       <p class="font-md color-brand-1">Pay using your cheque, debit, credit or SASSA bank card at our African Bank branches. Cash payments are accepted at selected branches</p>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                      <img
+                        class="d-block"
+                        src="/media/rpfd5feh/12-loan_bg.png"
+                        alt="iori"
+                      /> 
+                       
+                    </div>
+                  </div>
+                </div>
+</section>
+
+<!--mobile or debt option-->
+<section class="section-800 bg-grey-60">
+                <div class="container">
+                  <div class="row d-flex align-items-center row-change">
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                      <img
+                        class="d-block"
+                        src="/media/rpfd5feh/12-loan_bg.png"
+                        alt="iori"
+                      /> 
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                       <h1 class="color-brand-1 mt-15 mb-20">
+                        Mobile or Debit Order
+                      </h1>
+                       <p class="font-md color-brand-1">African Bank is committed to offering you the easiest, most convenient ways to interact with us and your accounts. Whether you want to accelerate payment or make a payment arrangement to reduce arrears on your account, we can help you online outside normal business hours.</p>
+                      <p class="font-md color-brand-1 mt-20">
+                          Login to pay your African Bank account online using your Visa or Mastercard; or set up a once off or recurring debit order deduction from your bank account. Alternatively, you may dial *120*225# from your cell phone. Please note that payment using your Visa or MasterCard is not currently available on *120*225#.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+</section>
+
+<!--in-store option-->
+<section class="section-800">
+                <div class="container">
+                  <div class="row d-flex align-items-center row-change">
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                       <h1 class="color-brand-1 mt-15 mb-20">
+                        In Store Payments
+                      </h1>
+                       <p class="font-md color-brand-1">Use your unique EasyPay or Pay&#64;: reference number found on your statement to make a payment at the following outlets:</p>
+                       <p class="font-md color-brand-1 mt-20">EasyPay: Shoprite Checkers, Pick n Pay, PEP, Boxer, Woolworths Pay&#64;: Ackermans, Shoprite Checkers, Pick n Pay, USave Or alternatively, call 011 207 4500 to get your EasyPay or Pay&#64; number.</p>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                      <img
+                        class="d-block"
+                        src="/media/rpfd5feh/12-loan_bg.png"
+                        alt="iori"
+                      /> 
+                       
+                    </div>
+                  </div>
+                </div>
+</section>
+
+<!--eft option-->
+<section class="section-800 bg-grey-60">
+                <div class="container">
+                  <div class="row d-flex align-items-center row-change">
+                      <div class="col-xl-6 col-lg-6 col-md-6">
+                      <img
+                        class="d-block"
+                        src="/media/rpfd5feh/12-loan_bg.png"
+                        alt="iori"
+                      /> 
+                    </div>
+                    
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                       <h1 class="color-brand-1 mt-15 mb-20">
+                        EFT Payments
+                      </h1>
+                       <p class="font-md color-brand-1">Choose African Bank from your Internet Banking beneficiary list to transfer a payment electronically</p>
+                    </div>
+                    
+                  </div>
+                </div>
+</section>

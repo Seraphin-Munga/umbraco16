@@ -1,0 +1,16 @@
+﻿
+@helper GeneratePaging(int currentPage, int totalPages)
+{
+    if (totalPages > 1)
+    {
+        <ul class="paging">
+            @for (int p = 1; p < totalPages + 1; p++)
+            {
+                string selected = (p == currentPage) ? "selected" : String.Empty;
+                <li class="@selected">
+                    <a href="?page=@p" title="Go to page @p of results">@p</a>
+                </li>
+            }
+        </ul>
+    }
+}

@@ -1,5 +1,466 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
 }
+
+@* the fun starts here *@
+
+<style>
+  body {
+    font-family: "Arial", sans-serif;
+    background-color: #f8fbff;
+    margin: 0;
+    padding: 0;
+    color: #1a1a1a;
+  }
+  
+    /* Input invalid state */
+  .invalid-input {
+      border-color: red !important;
+  }
+
+  /* Radio question label invalid state */
+  .question-item.invalid > label {
+      color: red !important;
+  }
+
+  .card-container {
+    max-width: 1100px;
+    margin: 50px auto;
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    position: relative;
+  }
+
+  .alert-banner {
+    background-color: #e8f3ff;
+    border-left: 4px solid #0072ce;
+    padding: 15px 20px;
+    margin-bottom: 30px;
+    color: #003366;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .alert-banner strong {
+    color: #002a61;
+  }
+
+  .section-header {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #002a61;
+  }
+
+  .section-description {
+    font-size: 15px;
+    color: #444;
+    margin-bottom: 30px;
+    line-height: 1.6;
+  }
+
+  .info-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .input-group {
+    flex: 1 1 45%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #002a61;
+  }
+
+  .text-input,
+  .email-input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border 0.2s;
+  }
+
+  .text-input:focus,
+  .email-input:focus {
+    border-color: #0072ce;
+  }
+
+  .divider {
+    margin: 30px 0;
+    border: none;
+    border-top: 1px solid #d9e4dd;
+  }
+
+  .questions-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .question-item {
+    flex: 1 1 45%;
+    font-weight: 500;
+    color: #003366;
+    font-size: 15px;
+  }
+
+  .options-group {
+    margin-top: 10px;
+  }
+
+  .options-group label {
+    font-weight: normal;
+    display: block;
+    color: #222;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .radio-input {
+    margin-right: 6px;
+    accent-color: #0072ce;
+  }
+
+  .checkbox-input {
+    accent-color: #0072ce;
+    transform: scale(1.1);
+    margin-right: 8px;
+  }
+
+  .contact-button {
+    position: absolute;
+    top: 20px;
+    right: 40px;
+    background-color: transparent;
+    border: 1.5px solid #0072ce;
+    color: #0072ce;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .contact-button:hover {
+    background-color: #0072ce;
+    color: #fff;
+  }
+
+  .consent-section {
+    font-size: 14px;
+    margin-top: 20px;
+    color: #002a61;
+  }
+
+  .consent-section strong {
+    color: #0072ce;
+  }
+
+  .submit-wrapper {
+    text-align: right;
+    margin-top: 25px;
+  }
+
+  .submit-button {
+    background-color: #39b54a;
+    color: #fff;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background 0.3s;
+  }
+
+  .submit-button:hover {
+    background-color: #2e993c;
+  }
+
+  @@media (max-width: 768px) {
+    .input-group, .question-item {
+      flex: 1 1 100%;
+    }
+
+    .card-container {
+      padding: 20px;
+    }
+
+    .contact-button {
+      position: static;
+      margin-top: 15px;
+    }
+  }
+</style>
+
+<button class="contact-button">Contact us</button>
+
+<div class="container">
+  <div class="alert-banner">
+    Please <strong>proceed only if your business is actively registered with Companies and Intellectual Property Commission (CIPC).</strong>
+    Businesses that are not registered or in the process of deregistration will not be considered.
+  </div>
+</div>
+
+<div class="card-container">
+    
+  <div class="section-header">Pre-qualification check</div>
+  <div class="section-description">
+    Please complete the questionnaire below to see if your business may pre-qualify for the small enterprise loan.
+    Select the option that best applies to each question and <strong>ensure that all sections are completed.</strong>
+  </div>
+
+  <!-- Personal and Business Info -->
+  <form class="info-form">
+    <div class="input-group">
+      <label for="name">Name</label>
+      <input type="text" id="name" class="text-input" value="">
+    </div>
+
+    <div class="input-group">
+      <label for="surname">Surname</label>
+      <input type="text" id="surname" class="text-input" value="">
+    </div>
+
+    <div class="input-group">
+      <label for="email">Email address</label>
+      <input type="email" id="email" class="email-input" value="">
+    </div>
+
+    <div class="input-group">
+      <label for="contact">Contact number</label>
+      <input type="text" id="contact" class="text-input" value="">
+    </div>
+
+    <div class="input-group" style="flex: 1 1 100%;">
+      <label for="business">Registered business name</label>
+      <input type="text" id="business" class="text-input" value="">
+    </div>
+  </form>
+
+  <hr class="divider">
+
+  <!-- Questionnaire Section -->
+  <div class="questions-wrapper">
+
+    <div class="question-item">
+      <label>Is your business at least 51% black-owned?</label>
+      <div class="options-group">
+        <label><input type="radio" name="blackOwned" class="radio-input" /> Yes</label>
+        <label><input type="radio" name="blackOwned" class="radio-input" /> No</label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label>Is your business 100% owned by South African citizens?</label>
+      <div class="options-group">
+        <label><input type="radio" name="citizenOwned" class="radio-input" /> Yes</label>
+        <label><input type="radio" name="citizenOwned" class="radio-input" /> No</label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label>Are your employees at least 70% South African citizens?</label>
+      <div class="options-group">
+        <label><input type="radio" name="employeesSA" class="radio-input" /> Yes</label>
+        <label><input type="radio" name="employeesSA" class="radio-input" /> No</label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label>Do all non-South African employees have valid work permits?</label>
+      <div class="options-group">
+        <label><input type="radio" name="permits" class="radio-input" /> Yes</label>
+        <label><input type="radio" name="permits" class="radio-input" /> No</label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label>Where is your business located?</label>
+      <div class="options-group">
+        <label><input type="radio" name="location" class="radio-input" /> Township</label>
+        <label><input type="radio" name="location" class="radio-input" /> Rural</label>
+        <label><input type="radio" name="location" class="radio-input" /> Other</label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label>Does your business have a valid municipal licence?</label>
+      <div class="options-group">
+        <label><input type="radio" name="municipalLicence" class="radio-input" /> Yes</label>
+        <label><input type="radio" name="municipalLicence" class="radio-input" /> No</label>
+        <label><input type="radio" name="municipalLicence" class="radio-input" /> Willing to apply</label>
+        <label><input type="radio" name="municipalLicence" class="radio-input" /> Not willing to apply</label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label>What is your business type?</label>
+      <div class="options-group">
+        <label><input type="radio" name="businessType" class="radio-input" /> Cooperative</label>
+        <label><input type="radio" name="businessType" class="radio-input" /> Sole proprietor</label>
+        <label><input type="radio" name="businessType" class="radio-input" /> Private company (Pty) Ltd</label>
+        <label><input type="radio" name="businessType" class="radio-input" /> Partnership</label>
+        <label><input type="radio" name="businessType" class="radio-input" /> Other</label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label>Is your business registered with the CIPC?</label>
+      <div class="options-group">
+        <label><input type="radio" name="cipc" class="radio-input" /> Yes</label>
+        <label><input type="radio" name="cipc" class="radio-input" /> No</label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label>Is your business registered with UIF?</label>
+      <div class="options-group">
+        <label><input type="radio" name="uif" class="radio-input" /> Yes</label>
+        <label><input type="radio" name="uif" class="radio-input" /> No</label>
+        <label><input type="radio" name="uif" class="radio-input" /> Willing to register</label>
+        <label><input type="radio" name="uif" class="radio-input" /> Not willing to register</label>
+      </div>
+    </div>
+
+    <div class="question-item">
+      <label>Is your business registered with SARS?</label>
+      <div class="options-group">
+        <label><input type="radio" name="sars" class="radio-input" /> Yes</label>
+        <label><input type="radio" name="sars" class="radio-input" /> No</label>
+        <label><input type="radio" name="sars" class="radio-input" /> Willing to register</label>
+        <label><input type="radio" name="sars" class="radio-input" /> Not willing to register</label>
+      </div>
+    </div>
+
+    <div class="question-item" style="flex: 1 1 100%;">
+      <label>Does your business have a valid business bank account?</label>
+      <div class="options-group">
+        <label><input type="radio" name="bankAccount" class="radio-input" /> Yes</label>
+        <label><input type="radio" name="bankAccount" class="radio-input" /> No</label>
+        <label><input type="radio" name="bankAccount" class="radio-input" /> Willing to open one</label>
+        <label><input type="radio" name="bankAccount" class="radio-input" /> Not willing to open one</label>
+      </div>
+    </div>
+
+  </div>
+
+  <hr class="divider">
+
+  <div class="consent-section">
+    <label>
+      <input type="checkbox" name="marketing" class="checkbox-input"/>
+      I would like to receive marketing updates from African Bank.
+    </label>
+    <p style="margin-top: 10px;">
+      By clicking <strong>‘submit’</strong>, I hereby declare that the information provided above is <strong>true and correct.</strong>
+    </p>
+  </div>
+
+  <div class="submit-wrapper">
+    <button class="submit-button">Submit</button>
+  </div>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const form = document.querySelector(".info-form");
+    const inputs = form.querySelectorAll("input[type='text'], input[type='email']");
+    const questionItems = document.querySelectorAll(".question-item");
+    const contactInput = document.getElementById("contact");
+
+    // Regex for SA phone numbers (0 or +27)
+    const saPhoneRegex = /^(0[6-8]\d{8}|\+27[6-8]\d{8})$/;
+
+    // Function to validate radio group
+    function validateRadioGroup(question) {
+        const radios = question.querySelectorAll("input[type='radio']");
+        const anyChecked = Array.from(radios).some(r => r.checked);
+        if (!anyChecked) {
+            question.classList.add("invalid");
+        } else {
+            question.classList.remove("invalid");
+        }
+        return anyChecked;
+    }
+
+    // Live validation for text/email inputs
+    inputs.forEach(input => {
+        input.addEventListener("input", () => {
+            let isValid = input.checkValidity() && input.value.trim() !== "";
+
+            // Special check for contact field
+            if (input === contactInput) {
+                // Remove any spaces the user may type
+                const value = input.value.trim().replace(/\s+/g, "");
+                isValid = saPhoneRegex.test(value);
+            }
+
+            if (!isValid) {
+                input.classList.add("invalid-input");
+            } else {
+                input.classList.remove("invalid-input");
+            }
+        });
+    });
+
+    // Live validation for radio buttons
+    questionItems.forEach(q => {
+        const radios = q.querySelectorAll("input[type='radio']");
+        radios.forEach(r => {
+            r.addEventListener("change", () => {
+                validateRadioGroup(q);
+            });
+        });
+    });
+
+    // On submit validation
+    form.addEventListener("submit", e => {
+        e.preventDefault();
+        let valid = true;
+
+        // Validate inputs
+        inputs.forEach(input => {
+            let isValid = input.checkValidity() && input.value.trim() !== "";
+
+            if (input === contactInput) {
+                const value = input.value.trim().replace(/\s+/g, "");
+                isValid = saPhoneRegex.test(value);
+            }
+
+            if (!isValid) {
+                input.classList.add("invalid-input");
+                valid = false;
+            } else {
+                input.classList.remove("invalid-input");
+            }
+        });
+
+        // Validate radio groups
+        questionItems.forEach(q => {
+            if (!validateRadioGroup(q)) valid = false;
+        });
+
+        if (valid) {
+            alert("Form submitted successfully!");
+            form.reset();
+            inputs.forEach(i => i.classList.remove("invalid-input"));
+            questionItems.forEach(q => q.classList.remove("invalid"));
+        } else {
+            alert("Please complete all required fields correctly.");
+        }
+    });
+});
+</script>

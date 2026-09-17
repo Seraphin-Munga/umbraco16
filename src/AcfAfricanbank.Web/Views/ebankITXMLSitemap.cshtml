@@ -9,17 +9,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-    @ListChildNodes(Umbraco.Content(Current.UmbracoHelper.AssignedContentItem.Id).AncestorOrSelf(1))
+        @ListChildNodes(Umbraco.Content(Current.UmbracoHelper.AssignedContentItem.Id).AncestorOrSelf(1))
 </urlset>
 @helper ListChildNodes(IPublishedContent startNode)
-{
-    string[] stringArray = { "hero-body", "video-hub" };
-    foreach (var node in startNode.Children/*.Where("hideInXmlSitemap == false")*/)
     {
-
+        string[] stringArray = { "hero-body", "video-hub" };
+        foreach (var node in startNode.Children/*.Where("hideInXmlSitemap == false")*/)
+        {
+        
         if ((node is HeroBodyFaq) == false)
         {
-
+        
             string hasAnyName = Array.Find(stringArray, x => node.Url.Contains(x.ToString()));
             if (string.IsNullOrEmpty(hasAnyName))
             {
@@ -34,7 +34,7 @@
                 {
                     @ListChildNodes(node)
                 }
-            }
+            } 
         }
     }
 }

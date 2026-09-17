@@ -1,5 +1,4571 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
-	Layout = null;
+	    Layout = "Master.cshtml";
+	 
+     var children = Model.Children;
+var firstChild = children?.FirstOrDefault();
+
+IEnumerable<IPublishedElement> productCards = Enumerable.Empty<IPublishedElement>();
+
+IEnumerable<IPublishedElement> callDepositHerobodyChildrenItems = Enumerable.Empty<IPublishedElement>();
+
+
+// Find the "Call Deposits" section
+IPublishedContent callDepositHerobody = null;
+
+    if (Model.Name == "Call Deposits")
+    {
+        callDepositHerobody = Umbraco.Content(19109); // Example node for Call
+    }
+    else if (Model.Name == "Notice Deposits")
+    {
+        callDepositHerobody = Umbraco.Content(19110); // Example node for Notice
+    }
+    else if (Model.Name == "Fixed Deposits")
+    {
+        callDepositHerobody = Umbraco.Content(19111); // Another fallback
+    }
+ else if (Model.Name == "Online Money Manager (OMM)")
+    {
+        callDepositHerobody = Umbraco.Content(19112); // Another fallback
+    }
+
+ else if (Model.Name == "OMM Notice Deposits")
+    {
+        callDepositHerobody = Umbraco.Content(19815); // Another fallback
+    }
+    else if (Model.Name == "OMM Call Deposits")
+    {
+        callDepositHerobody = Umbraco.Content(19825); // Another fallback
+    }
+    else if (Model.Name == "OMM Fixed Deposits")
+    {
+        callDepositHerobody = Umbraco.Content(19829); // Another fallback
+    }
+
+IPublishedElement heroShoulder = null;
+if (callDepositHerobody?.Children != null)
+{
+    heroShoulder = callDepositHerobody.Children.FirstOrDefault(c => c.Name == "Hero Shoulder");
+    callDepositHerobodyChildrenItems = heroShoulder?.Value<IEnumerable<IPublishedElement>>("items");
 }
+
+
+// Extract product cards from the first child tab
+if (firstChild != null)
+{
+    var tabBodyContent = firstChild.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+    var genericContent = tabBodyContent?
+        .FirstOrDefault(c => c.ContentType.Alias == "nCTabGenericContent");
+
+    productCards = genericContent?.Value<IEnumerable<IPublishedElement>>("sectionContent");
+}
+
+// Now `callDepositHerobodyChildrenItems` and `productCards` can be safely used further
+
+
+}
+
+@* the fun starts here *@
+<style>
+.floating-btn {
+    position: fixed;
+    top: 40%;
+    right: -54px;
+    transform: translateY(-50%) rotate(-90deg);
+    z-index: 9999;
+    width: 148px;
+    height: 38px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 12px 16px;
+    color: var(--text-primary-blue, #002B60);
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 20px;
+    border-radius: var(--border-radius-md, 2px) var(--border-radius-md, 2px) var(--border-radius-none, 0px) var(--border-radius-none, 0px);
+    border-top: 1px solid var(--border-primary, #002B60);
+    border-right: 1px solid var(--border-primary, #002B60);
+    border-left: 1px solid var(--border-primary, #002B60);
+    background: var(--surface-primary, #FFF);
+    box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.11);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+.mb-59{
+    margin-bottom:60px;
+}
+.omm-table-wrapper{
+    width: 100%;
+    padding: 32px;
+    flex-direction: column;
+    align-items: flex-start;
+  
+    border-radius: 8px;
+    background: var(--Base-White, #FDFDFD);
+    box-shadow: 0px 9px 18px 0px rgba(0, 0, 0, 0.15);   
+}
+/*card-styles*/
+.btn:focus, .btn.focus, .btn:active:focus, .btn:active.focus, .btn.active:focus, .btn.active.focus {
+    outline: none;
+}
+.btn-default svg {
+    top: 4px;
+    position: relative;
+}
+    .scroll-container {
+      overflow-x: auto;
+      white-space: nowrap;
+      position: relative;
+      scroll-behavior: smooth;
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+    .scroll-container::-webkit-scrollbar {
+      display: none;  /* Chrome, Safari, Opera */
+    }
+
+    .scroll-item {
+      vertical-align: top;
+      width: 300px;
+      margin-right: 10px;
+      white-space: normal;
+    }
+
+    .indicator-dots {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .indicator-dots .dot {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      margin: 0 5px;
+      background-color: #ccc;
+      border-radius: 50%;
+    }
+
+    .indicator-dots .dot.active {
+      background-color: #5DC303;
+    }
+.btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle) {
+    border-bottom-right-radius: 32px;
+    border-top-right-radius: 32px;
+}
+.btn-group>.btn:last-child:not(:first-child), .btn-group>.dropdown-toggle:not(:first-child) {
+    border-bottom-left-radius: 32px;
+    border-top-left-radius: 32px;
+}
+.panel-custom{
+
+    
+    display: flex;
+    height: 410px;
+    padding: 20px 26px;
+    flex-direction: column;
+    width: 100%;
+    align-items: flex-start;
+    gap: 32px;
+    flex: 1 0 0;
+    border-radius: 8px;
+    background: var(--Base-White, #FDFDFD);
+    box-shadow: 0px 9px 18px 0px rgba(0, 0, 0, 0.15);
+}
+.panel-heading{
+        padding: 0px;
+        background: unset !important;
+        color: var(--Brand-AB-Blue, #012B60) !important;
+        font-family: Montserrat;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 32px;
+        height: 90px;
+        text-align:left;
+    }
+    
+    .panel-body{
+         background: unset !important;
+         color: var(--Brand-AB-Blue, #012B60) !important;
+        font-family: Montserrat;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 24px; /* 150% */
+        padding:0px !important;
+    }
+    
+
+/*end card styles*/
+.tncps a{
+    color: #5dc300;
+    display: flex
+}
+.prime-time-heading{
+    display: flex;
+    height: 56px;
+    padding: 8px 0;
+    justify-content: center;
+    align-items: center;
+    align-self: stretch;
+    font-weight: bold;
+    font-size: 21px;
+    border-bottom: 3px solid #5dc200;
+}
+.table-bottm-heading{
+display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 40px 0 0 0;
+    text-align: center;
+    gap: 20px;
+
+}
+.tab-long-text-heading{
+color: var(--Brand-AB-Blue, #012B60);
+    
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+}
+.leran-more-img-arrow{
+    position: absolute; 
+    left: 0; 
+    top: 0;
+}
+.tooltip {
+     margin-bottom: -79px;
+    position: relative;
+    display: inline-block;
+    position: absolute;
+    z-index: 1;
+    display: block !important;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    letter-spacing: normal;
+    line-break: auto;
+    line-height: 1.42857;
+    text-align: left;
+    text-align: start;
+    text-decoration: none;
+    text-shadow: none;
+    text-transform: none;
+    white-space: normal;
+    word-break: normal;
+    word-spacing: normal;
+    word-wrap: normal;
+    font-size: 12px;
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
+ .tooltip.top {
+    margin-top: -3px;
+    padding: 5px 0;
+}
+.inline-download-link {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.inline-download-link svg.icon-inline {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+.table-pdf {
+  display: inline-block;
+  vertical-align: middle;
+}
+</style>
+
+<style>
+
+@*.download-pdf{
+    display:flex;
+    
+}*@
+.table-bordered>tbody>tr>td {
+    font-size:14px;
+    justify-content: left;
+    text-wrap-mode: nowrap;
+}
+td.download-pdf:hover {
+  cursor: pointer;
+}
+
+
+#chatIconImg {
+    display: none;
+}
+#iframe-karaboChat-speechBubble {
+    display: none;
+}
+
+label {
+    letter-spacing: .5px;
+    color: #464855;
+    text-transform: math-auto;
+    font-weight: 400;
+}
+
+.mtb-b-40 {
+    position: relative;
+    top: -70px;
+    margin: 70px 0px !important;
+}
+.mtb-b-40-omm {
+    position: relative;
+    
+}
+.img-responsive {
+    display: block;
+    max-width: 70%;
+    height: auto;
+}
+.bg-white-90{
+    height:90px;
+    background:white;
+}
+
+.bg-white22 {
+      background-color: #fff;  
+    width: 100%;
+    overflow: hidden;  
+    padding: 20px;  
+    box-sizing: border-box;
+    background-color: white;
+    color: #012B60;
+}
+
+.bg-white-nd{
+    height:190px;
+    background:white;
+}
+
+.toolpick-position{
+    flex-shrink: 0;
+    position: relative;
+    top: 2px;
+}
+
+.bg-white-50{
+    height:50px;
+    background:white;
+}
+
+.sub-header-p-learn-m img{
+    margin-right:8px;
+}
+
+.nav>li>a{
+    padding: 20px 5px;
+}
+.tab-top-content{
+    margin-top:20px;
+    margin-bottom:20px;
+    color: var(--Brand-AB-Blue, #012B60);
+
+    /* Heading/H3/Semibold */
+    font-family: Montserrat;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 38px; /* 126.667% */
+}
+.btn-green-class{
+    font-weight:600px;
+    display: flex;
+    width: 200px;
+    height: 48px;
+    padding: 12px 16px;
+    justify-content: center;
+    align-items: center;
+    color:white;
+    gap: 8px; 
+    border-radius: var(--border-radius-md, 2px);
+    background: var(--surface-action, #5DC400);
+    
+    /* Shadows Light Mode/SM */
+    box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.04);
+}
+
+.carousel-content p {
+     font-size: 16px;
+    margin: 5px 0px !important;
+}
+
+.carousel-content {
+    margin-top: 40px;
+    line-height: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+    text-align: start;
+    height: 100%;
+    color: #fff;
+}
+
+.header-learn-m {
+    text-align: start;
+    color: var(--Base-White, #FDFDFD);
+    font-family: Montserrat;
+    font-size: 48px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 60px;
+    margin-bottom: 16px !important;
+}
+
+.sub-header-learn-m {
+    color: var(--Base-White, #FDFDFD);
+    font-family: Montserrat;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 30px;
+    margin-bottom: 16px !important;
+}
+
+.ps-80{
+    position: relative;
+    top: -29px;
+}
+
+
+.ps-290{
+    position: relative;
+    top: 280px;
+}
+.ps-530{
+    position: relative;
+    top: 680px;
+}
+.section-bg-blue {
+    height: 400px;
+    background: #002b60 !important;
+}
+.mtb-30{
+    margin-top:30px;
+    margin-bottom:10px;
+}
+
+.sub-text-header {
+    margin-top: 50px;
+    color: #012B60;
+    /* Heading/H4/Semibold */
+    font-family: Montserrat;
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 32px; /* 133.333% */
+}
+
+.sub-text-header-omm {
+    margin-top: 50px;
+    color: #012B60;
+    /* Heading/H4/Semibold */
+    font-family: Montserrat;
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 32px; /* 133.333% */
+}
+
+.sub-text-header2 {
+    margin-top: 50px;
+    color: #012B60;
+    /* Heading/H4/Semibold */
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 32px; /* 133.333% */
+}
+.sub-text-header2-omm {
+    margin-top: 50px;
+    color: #012B60;
+    /* Heading/H4/Semibold */
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 32px; /* 133.333% */
+}
+.table {
+    width: 100%;
+}
+.nav-tabs 00li > a {
+    border: 1px solid transparent;
+    color: #555;
+}
+
+
+.table-bordered>tbody>tr>td {
+    color: #012B60;
+    font-weight: 400;
+}
+.table > thead > tr > th {
+    color: #012B60;
+    font-weight: 600;
+}
+
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+     border-top: none !important;  
+     border-left: none !important; 
+     border-right: none !important; 
+     font-size:16px;
+     color: #012B60;
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+    color: #555;
+    background-color: #fff;
+    border: 3px solid #ddd;
+    border-bottom-color: #5DC400 !important; /* Green bottom border */
+    cursor: default;
+}
+
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+    color: #555;
+    background-color: #fff;
+    border: 3px solid #ddd;
+    border-bottom-color: #5DC400; /* Set bottom border to green */
+    cursor: default;
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+    color: #555;
+    background-color: #fff;
+    border: 3px solid #ddd;
+    border-bottom-color: #5DC400; /* Set bottom border to green */
+    cursor: default;
+}
+
+.tab-table-100{
+    width:100%;
+}
+
+
+.tab-main-container{
+    display: flex;
+    width: 100%;
+    padding: 32px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 32px;
+    
+    border-radius: 8px;
+    background: var(--Base-White, #FDFDFD);
+    box-shadow: 0px 9px 18px 0px rgba(0, 0, 0, 0.15);
+    
+}
+
+.tab-text{
+    display: flex;
+    height: 56px;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1 0 0;
+    color: var(--text-primary-blue, #002B60);
+    text-align: center;
+    
+    /* Body/Small/Semibold */
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 20px; /* 142.857% */
+}
+
+.nav-tabs>li {
+    width: 50%;
+}
+
+.nav-tabs{
+    display: flex;
+    height: 56px;
+    padding: 8px 0px;
+    justify-content: center;
+    align-items: center;
+    align-self: stretch;
+    background: var(--surface-primary, #FFF);
+
+    /* Shadows Light Mode/XS */
+    box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.08);
+}
+
+
+    .table>thead>tr>th {
+        border-bottom: 1px solid var(--border-default, #D5D7DA);
+        background: var(--surface-page, #F5F5F5);
+    }
+    .table-striped>tbody>tr:nth-of-type(odd) {
+        background-color: transparent;
+    }
+    
+    .table-bordered {
+        border: 1px solid transparent;
+    }
+    
+    .table-bordered>thead>tr>th {
+     border: 1px  transparent !important; 
+}
+
+.table-bordered>tbody>tr>td {
+    border-right: 0;
+    border-left: 0;
+
+}
+    
+    /*.table-bordered>tbody>tr>td, .table-bordered>tfoot>tr>th, .table-bordered>tfoot>tr>td {*/
+    /*     border: 0px transparent; */
+    /*}*/
+
+    /*.table-bordered>tbody>tr>td, .table-bordered>tfoot>tr>th, .table-bordered>tfoot>tr>td {*/
+    /*     border: 1px solid #ddd; */
+    /*}*/
+    .dropdown-menu label {
+      display: block;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    .dropdown-menu input[type="checkbox"] {
+      margin-right: 8px;
+    }
+    .rate-table {
+      margin-left: -16px;
+      margin-top: 20px;
+    }
+    @*.table th, .table td {
+      text-align: center;
+    }*@
+
+.ml-0{margin-left: 0px;}
+.ml-32{margin-left: 32px;}
+
+.nav-tabs-2 li.active a .dot, .nav-tabs-2 li a:hover .dot {
+    border: none;
+    background-color: #5DC303;
+}
+
+.header-learn-m{
+    color: var(--Base-White, #FDFDFD);
+
+/* Heading/H1/Semibold */
+font-family: Montserrat;
+font-size: 48px;
+font-style: normal;
+font-weight: 600;
+line-height: 60px; /* 125% */
+margin-bottom: 16px !important;
+}
+.sub-header-learn-m{
+    color: var(--Base-White, #FDFDFD);
+
+    /* Body/xlarge/Regular */
+    font-family: Montserrat;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 30px; /* 150% */
+    margin-bottom: 16px !important;
+}
+
+.sub-header-p-learn-m{
+    color: var(--Base-White, #FDFDFD);
+/* Body/Medium/Regular */
+font-family: Montserrat;
+font-size: 16px;
+font-style: normal;
+font-weight: 400;
+line-height: 24px; /* 150% */
+margin: 0; 
+position: relative; 
+padding-left: 30px;
+}
+.tab-content {
+     padding: 0px; 
+     margin-top: 0px; 
+     border-top: none; 
+     background: transparent !important; 
+}
+
+.nav-tabs-2 li:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 28%;
+    width: 1.997px;
+    height: 0px;
+    background-color: rgba(0, 0, 0, .075);
+}
+
+.nav-tabs-2 li {
+    list-style: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+     border-right: none !important; 
+}
+
+
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+    text-wrap-mode: nowrap;
+    
+}
+.nav-tabs-2>li.active>a, .nav-tabs>li.active>a:hover, .nav-tabs>li.active>a:focus {
+    text-wrap-mode: nowrap;
+    color: #555;
+    background-color: transparent;
+    border: 3px solid transparent;
+    border-bottom-color: transparent;
+    cursor: default;
+}
+.nav.nav-tabs-2 {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  padding: 0;
+  margin: 0;
+  border: none; /* Optional: remove default border if needed */
+}
+
+.nav.nav-tabs-2 > li {
+  float: none; /* Remove default float */
+  margin: 0 -17px; /* Add spacing between tabs */
+}
+      /* Adjust padding for the tab links */
+      .nav-tabs-2 > li > a {
+        padding: 10px;
+      }
+      /* Style for the dot indicators */
+      .nav-tabs-2 li a .dot {
+        display: block;
+        width: 12px;
+        height: 12px;
+        background-color: transparent;
+        border-radius: 50%;
+        margin: 0 auto;
+        border: solid 1px #012B60;
+        transition: background-color 0.3s ease;
+      }
+      /* Active and hover state */
+      .nav-tabs-2 li.active a .dot,
+      .nav-tabs-2 li a:hover .dot {
+        background-color: #5DC303;
+      }
+      .section-bg-grey{
+          background: var(--Gray-100, #F5F5F5);
+      }
+      
+      .who-can-apply-p{
+        color: var(--Brand-AB-Blue, #012B60);
+
+        /* Body/Medium/Regular */
+        font-family: Montserrat;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 24px; /* 150% */
+      }
+
+.btn-primary:hover {
+    color: #fff;
+    background-color: #5DC400;
+    border-color: none;
+}
+
+    /*Section 1 style start here*/
+#section-2{
+    height: 550px;
+}
+
+#section-3{
+    height: 600px; 
+}
+.customer-container{
+  height:200px;  
+}
+.mtb-40 {
+    margin-top: 40px !important;
+    margin-bottom: 40px !important;
+}
+.mtb-24{
+    margin-top: 24px !important;
+    margin-bottom: 24px !important; 
+}
+
+.mtb-32 {
+    margin: 32px 0px;
+}
+
+.mp-0 {
+    margin: 0px;
+    padding: 0px;
+}
+
+.p-32 {
+    padding:32px;
+}
+
+
+.mt-40 {
+    margin-top: 40px !important;
+}
+.content-center{
+    display: flex;
+    height: 320px;
+    align-content: center;
+    align-items: center;
+    padding: 0px !important;
+ 
+}
+
+.flex__list-container{
+    display: flex;
+    align-items: center;
+}
+
+.bottom-section-2 {
+    background-color: #5dc300 !important;
+    height: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.content-sub-start{
+    display: grid;
+    align-content: start;
+    align-items: start;
+}
+
+    /*section 1 styles end here*/
+    
+    /*section 2 start here*/
+        .tab-content {
+           /* border-bottom: 1px solid #E9EAEB;*/
+            padding: 20px 0px;
+            border-top: none;
+            background: #fff;
+        }
+        
+        .tab-content-2 {
+           
+            padding: 20px 0px;
+            border-top: none;
+            background: #fff;
+        }
+
+      .btn-font-color{
+          color : #012B60 !important;
+      }
+          .header-section {
+            line-height: 2;
+            text-align: start;
+            margin-bottom: 40px;
+            margin-top: 50px;
+
+        }
+        .cards-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        
+        .card-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          
+          }
+        .card-text {
+            font-size: 16px;
+        }
+        .card-title {
+
+            
+            color: var(--Brand-AB-Blue, #012B60);
+
+            /* Body/xlarge/Semibold */
+            font-family: Montserrat;
+            font-size: 20px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 30px; /* 150% */
+        }
+        
+        .card {
+            display: grid;
+            width: 242px;
+            height: 242px;
+            padding: 20px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            background: var(--Base-White, #FDFDFD);
+        }
+         .card-body {
+            line-height: 2;
+            display: flex;
+            align-items: center;
+            justify-content:space-evenly ;
+            align-content: center;
+            flex-direction: column;
+            flex-wrap: nowrap;
+          }
+  
+    /*section 3 start here*/
+    .bg-grey{
+        background: linear-gradient(180deg, rgba(245,245,245,1) 81%, rgba(255,255,255,1) 81%);
+     
+    }
+    .bg-grey-omm{
+        background: linear-gradient(180deg, rgba(245,245,245,1) 40%, rgba(255,255,255,1) 40%);
+     
+    }
+    .bg-grey2{
+        min-height: 550px;
+        background: #F5F5F5;
+    }
+    .bg-grey3 {
+    min-height: 381px;px;
+    background: #F5F5F5;
+}
+
+
+    
+      .custom-bullets {
+    list-style-type: none;
+    padding-left: 0px;
+  }
+  
+      .custom-img {
+    max-width: 100%;
+    height: auto;
+    width: 80%; /* Adjust size as needed */
+    margin: 0 auto;
+  } 
+  
+.custom-img-2 {
+    max-width: 100%;
+    height: auto;
+    width: 332px;
+    margin : -130px 0px 0px 0px;
+     
+  }
+  .font-weight-600{
+        font-weight : 600;
+    }
+    .highlight-text {
+      flex: 1;
+    }
+    .bottom-section {
+      background-color: #5dc300 !important;
+      height: 7.906px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .bottom-section-2 {
+      background-color: #5dc300 !important;
+      height:1px;
+      width: 560px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .contact-us {
+          background-color: white;
+  }
+  .section-large-card{
+    background:white;
+    position: relative;
+    top: 52px;
+    padding: 32px;
+    border-radius: 10px;  
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Soft shadow */
+  }
+  
+.section-large-card-2 {
+    margin-top: 20px;
+    margin-bottom:20px;
+    height: fit-content;
+    position: relative;
+    top: -5px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+  
+  
+    /*section 3 end here*/
+    /*section 0 start here*/
+    .bg-nothing-white{
+        height:100px;
+        background-color:white;
+        color:#012B60;
+    }
+    /*section 0 end here*/
+    
+    /*Section 5 start here*/
+    .app-btn{
+        border: none;
+        background: none;
+    }
+    
+    /*section 5 end here*/
+    
+    /*Tab section start here*/
+        /* Main container */
+.tabs-container {
+    display: flex;
+    margin: 0px auto;
+    font-family: Arial, sans-serif;
+    border-radius: 8px;
+    overflow: hidden;
+
+}
+
+        /* Main container */
+.tabs-container-2 {
+    display: flex;
+    margin: 0px auto;
+    font-family: Arial, sans-serif;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 500px;
+
+}
+
+/* Tab buttons on the left */
+.tab-buttons {
+    min-height:200px;
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    background: white;
+    border-right: 1px solid #E9EAEB;
+    border-bottom: 1px solid #E9EAEB;
+    color:#012B60;
+}
+
+.doc-size-solution {
+    color: var(--Brand-AB-Blue, #012B60);
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 38px;
+
+}
+
+
+
+/* Add the icon only for active tabs */
+.tab-btn:hover, .tab-btn.active {
+    display: flex;
+    width: 200px;
+    height: 32px;
+    flex-direction: row;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--Brand-AB-Blue, #5DC303) !important;
+    font-family: Montserrat;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 600;
+    }
+    
+    
+    
+.tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between icon and text */
+    width: 200px;
+    height: 32px;
+    flex-shrink: 0;
+    color: var(--Brand-AB-Blue, #012B60) !important;
+    font-family: Montserrat;
+    font-size: 18px;
+    font-weight: 600;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+/* Hide SVG by default */
+.tab-btn span {
+    display: none;
+}
+.active{
+    color: #012B60 !important;
+}
+/* Show SVG only on the active tab */
+.tab-btn.active span {
+    display: inline-flex;
+}
+
+/* Optional: Make sure the tab content is visually appealing */
+.tab-content {
+    flex: 1;
+    padding: 0px 20px;
+    background: transparent;
+}
+.tab-content-p{
+    color: var(--Brand-AB-Blue, #012B60);
+
+/* Body/Medium/Regular */
+font-family: Montserrat;
+font-size: 16px;
+font-style: normal;
+font-weight: 400;
+line-height: 24px; /* 150% */
+}
+
+/* Tab content on the right */
+\
+
+.tab-panel {
+    display: none;
+}
+
+
+.text-style {
+    color: #012B60 !important;
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 38px;
+}
+
+
+.tab-panel.active {
+    display: block;
+    display: flex; /* Align SVG and text inline */
+    align-items: center; /* Ensure vertical alignment */
+    gap: 8px; /* Add spacing between SVG and text */
+}
+
+ 
+    /*Tab section end here*/
+.grey-line {
+    border: none;
+    height: 1px;
+    background-color: #E9EAEB;
+    margin: 40px 20px;
+}
+
+
+#section-1{
+    height: 475px;
+}
+#section-1-omm{
+    height: 380px;
+}
+.customer-container{
+  height:200px;  
+}
+
+.image-section{
+    margin-bottom: -200px;
+}
+.image-position {
+    position: relative;
+    top: -80px;
+}
+
+/*Back button start here*/
+.back-section{
+    height:60px;
+    display: flex;
+    background: white;
+    min-height: 50px;
+    align-items: center;
+}
+
+.back-section a{
+    background:none !important;
+    border:none !important;
+}
+
+/*Back button end here*/
+
+.custom-card {
+    overflow: none;
+    border-radius: 10px;
+    background-color:white;
+}
+.custom-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.custom-row {
+    flex-grow: 1;
+}
+.bg-blue{
+    background-color:#002b60;
+    color:white;
+}
+.bg-white{
+    
+    background-color:white;
+    color:#012B60;
+}
+.bg-white1{
+    height:360px;
+    background-color:white;
+    color:#012B60;
+}
+.bg-white2 {
+    min-height: 770px;
+    background-color: white;
+    color: #012B60;
+}
+
+.bg-nothing-white{
+    height:100px;
+    background-color:white;
+    color:#012B60;
+}
+.content-center{
+    display: flex;
+    height: 320px;
+    align-content: center;
+    align-items: center;
+ 
+}
+.content-center-2{
+     color:#012B60;
+    align-content: center;
+    align-items: center;
+ 
+}
+
+.content-sub-start{
+    display: grid;
+    align-content: start;
+    align-items: start;
+}
+
+
+.content-sub-start-2{
+    align-content: start;
+    align-items: start;
+}
+
+.content-sub-start-3{
+    display: grid;
+    align-content: start;
+    align-items: start;
+    font-size:15px;
+}
+
+
+/*Cards Css start here*/
+        .business-section {
+            padding: 50px 0;
+            text-align: center;
+        }
+        .business-section h2 {
+            color: #002F6C;
+            font-weight: bold;
+        }
+        .business-section p {
+            color: #4F5B66;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .account-card {
+            background: #FDFDFD;
+            text-align: left;
+            height: 344px;
+            padding: 48px 32px;
+            align-items: flex-start;
+            align-content: flex-start;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0px 9px 18px 0px rgba(0, 0, 0, 0.15);
+        }
+        .card-divider {
+            width: 100%;
+            height: 2px;
+            background-color: #6FCF97;
+            margin: 10px 0;
+        }
+        .btn-learn {
+            border: 1px solid #002F6C;
+            color: #002F6C;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+        .btn-learn:hover {
+            background-color: #002F6C;
+            color: #fff;
+        }
+        .btn-apply, .btn-download {
+            background-color: #6FCF97;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+        }
+        .btn-apply:hover, .btn-download:hover {
+            background-color: #57B881;
+        }
+        .card-image {
+            position: absolute;
+            top: -15px;
+            right: 10px;
+            width: 80px;
+        }
+        .get-in-touch {
+            position: fixed;
+            right: 0;
+            top: 50%;
+            background: #002F6C;
+            color: white;
+            padding: 10px;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            border-radius: 8px 0 0 8px;
+            cursor: pointer;
+        }
+        .cards-position{
+            top: 50px;
+            position: relative;
+            margin: 55px 0px;  
+        }
+        .font-size-24-weight-600 {
+            font-size: 24px !important;
+            font-weight: 600 !important ;
+        }
+        .mtb-40 {
+            margin: 40px 0px !important;
+        }
+/*Cards Css end here*/
+
+.section-1-heading{
+    color: var(--Base-White, #FDFDFD);
+    /* Heading/H1/Semibold */
+    font-family: Montserrat;
+    font-size: 48px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 60px; 
+   
+}
+.section-1-p{
+        color: var(--Base-White, #FDFDFD);
+        
+        /* Body/xlarge/Regular */
+        font-family: Montserrat;
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 30px; /* 150% */
+    }
+.btn-primary{
+display: flex;
+width: 160px;
+height: 48px;
+padding: 12px 16px;
+justify-content: center;
+align-items: center;
+gap: 8px;
+flex-shrink: 0;
+color: var(--text-primary, #FFF);
+border:none;
+/* Body/Small/Semibold */
+font-family: Montserrat;
+font-size: 14px;
+font-style: normal;
+font-weight: 600;
+line-height: 20px; /* 142.857% */
+
+border-radius: var(--border-radius-md, 32px);
+background: var(--surface-action, #5DC400);
+
+/* Shadows Light Mode/SM */
+box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.11);
+}
+
+
+.panel-custom-1{
+    
+    border-radius: 8px;
+background: var(--Base-White, #FDFDFD);
+box-shadow: 0px 9px 18px 0px rgba(0, 0, 0, 0.15);
+height: 344px;
+padding: 48px 32px;
+align-items: flex-start;
+align-content: flex-start;
+flex-shrink: 0;
+flex-wrap: wrap;
+}
+
+.section-2-heading{
+   color: var(--Brand-AB-Blue, #012B60);
+/* Heading/H3/Semibold */
+font-family: Montserrat;
+font-size: 30px;
+font-style: normal;
+font-weight: 600;
+line-height: 38px; /* 126.667% */ 
+}
+
+.section-2-p{
+    color: var(--Brand-AB-Blue, #012B60);
+
+/* Body/Medium/Regular */
+font-family: Montserrat;
+font-size: 16px;
+font-style: normal;
+font-weight: 400;
+line-height: 24px; /* 150% */
+}
+
+.section-2-p-1{
+color: #012B60;
+font-family: Montserrat;
+font-size: 16px;
+font-weight: 600;
+line-height: 24px;
+margin-top: 48px;
+}
+
+.key-feature{
+    color: var(--Brand-AB-Blue, #012B60);
+    /* Heading/H3/Semibold */
+    font-family: Montserrat;
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 38px; /* 126.667% */
+}
+
+.pricing-tnc{
+    color: var(--Brand-AB-Blue, #012B60);
+margin-top:100px;
+/* Heading/H3/Semibold */
+font-family: Montserrat;
+font-size: 30px;
+font-style: normal;
+font-weight: 600;
+line-height: 38px; /* 126.667% */
+}
+
+.pricing-tnc-2{
+    color: var(--Brand-AB-Blue, #012B60);
+
+/* Heading/H3/Semibold */
+font-family: Montserrat;
+font-size: 30px;
+font-style: normal;
+font-weight: 600;
+line-height: 38px; /* 126.667% */
+}
+
+.easy-application{
+    color: var(--Brand-AB-Blue, #012B60);
+
+/* Heading/H3/Semibold */
+font-family: Montserrat;
+font-size: 30px;
+font-style: normal;
+font-weight: 600;
+line-height: 38px; /* 126.667% */
+margin-bottom:10px;
+}
+.easy-application-p{
+    color: var(--Brand-AB-Blue, #012B60);
+
+/* Body/xlarge/Regular */
+font-family: Montserrat;
+font-size: 20px;
+font-style: normal;
+font-weight: 400;
+line-height: 30px; /* 150% */
+margin-bottom:21px;
+}
+.doc-heading{
+    color: var(--Brand-AB-Blue, #012B60);
+
+/* Heading/H3/Semibold */
+font-family: Montserrat;
+font-size: 30px;
+font-style: normal;
+font-weight: 600;
+line-height: 38px; /* 126.667% */
+}
+
+.padding-right-svg{
+ /* top: 6px;*/
+  position: relative;
+  padding-right:10px;  
+}
+.padding-left-svg{
+  /*top: 6px;*/
+  position: relative;
+  padding-left:10px;
+  font-size: 16px;
+}
+.mb-48-mt-22{
+    margin: 22px 0px 48px 0px !important
+}
+
+.tab-panel {
+    display: none; /* Hide all tab content by default */
+}
+
+.tab-panel.active {
+    display: block; /* Show only the active tab content */
+}
+
+
+  /* Section-5/Accordion style start here*/
+               .accordion {
+                 font-weight: bold; /* Explicitly setting font-weight */
+                 font-family: Montserrat, sans-serif; /* Specifying the font family */
+                 background-color: #fff;
+                 color: #012B60;
+                 cursor: pointer;
+                 padding: 16px;
+                 width: 100%;
+                 text-align: left;
+                 font-size: 15px;
+                 transition: 0.4s;
+                 border-radius: 0px;
+                 border: solid 1px #efefef;
+              /*    margin-bottom: 10px; Space between inactive accordion buttons */
+                 position: relative; /* Needed for absolute positioning of the arrow */
+               }
+               
+               .accordion::after {
+                 content: '\276F'; /* Heavy Chevron Unicode character */
+                 font-size: 15px; /* Adjust as needed */
+                 color: #012B60;
+                 position: absolute;
+                 right: 20px;
+                 top: 50%;
+                 transform: translateY(-50%) rotate(90deg);
+                 transition: transform 0.4s;
+                 display:block;
+               }
+               
+              button.accordion.active{
+                 color: #012B60 !important; 
+              }
+
+               .active::after {
+                 transform: translateY(-50%) rotate(-90deg);
+               }
+               
+               .myPanel {
+                    border: solid 1px #efefef;
+                    font-family: Montserrat, sans-serif;
+                    padding: 37px 50px 25px 22px;
+                    background-color: #fff;
+                    color: #012B60;
+                    display: none;
+                    overflow: hidden;
+                    border-top: none;
+                    margin-top: -20px !important;
+               }
+               
+               .myPanel p {
+                       font-weight: 400;
+               }
+               
+                 .faqHeader {
+                   font: normal normal bold 30px/52px Montserrat;
+                   letter-spacing: 0px;
+                   color: #F9F9F9;
+                   opacity: 1;
+                   margin: 0 auto; /* This ensures that the margin is auto on both sides for block-level centering */
+                   padding: 20px 0; /* Adds some padding above and below the text */
+                 }
+               /*
+Accordion style end here
+               */
+ @@media (min-width: 767px) and (max-width: 999px) {
+      .scroll-container {
+        overflow-x: visible;
+        white-space: normal;
+      }
+      .scroll-item {
+        width: 100%;
+        margin-right: 0;
+      }
+      .indicator-dots {
+        display: none;
+      }
+      }
+@@media (max-width: 767px) and (min-width: 256px){
+    h1, .text-style {
+
+        margin-top: 0px;
+        }
+.sub-text-header2 {
+    margin-top: 0px;
+    
+    }
+    .panel-default>.panel-heading {
+        margin-left: -10px;
+        font-size: 18px;
+    }
+    .panel-heading {
+        padding: 0px !important;
+        padding-top: 0px !important;
+        height: 70px !important;
+    }
+     .indicator-dots {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    }
+    .panel-custom{
+    margin-top: 15px;
+        margin-left: 15px;
+        display: flex;
+        flex-direction: column;
+        height: 400px;
+        min-height: 250px;
+    }
+
+    .panel-body {
+        flex-grow: 1;
+    }
+         .scroll-item {
+            display: inline-block;
+        }
+          .btn-group >.btn-contact {
+        width: 112px;
+    }
+        .btn-group >.btn-learn {
+        width: 120px;
+        margin-right: 15px;
+    }
+.tab-main-container {
+    
+    gap: 23px;
+    }
+      .btn-learn {
+
+            width: 140px;
+        }
+.notice-desc {
+padding: 0px 0px 20px 7px;
+}
+.rate-table {
+    margin-left: unset;
+    }
+    .fixeddeposit-rate-table{
+    margin-left: -22px;
+    }
+    .fixeddeposit-rate-table table{
+    min-width: 341px;
+    }
+    .mobile-benefit-layout{
+    display:flex;
+    flex-direction: column-reverse;
+    }
+                 .faqHeader {
+                   font: normal normal bold 20px Montserrat;
+                   }
+    .table-bottm-heading{
+    display: grid;
+        justify-content: space-between;
+        align-items: center;
+        margin: 40px 0 0 0;
+        text-align: left;
+    }
+   .nav-tabs>li>a {
+    margin-right: 1px;
+}
+}
+@@media (max-width: 325px) {
+    .text-style1 {
+        height: 90px;
+    }
+    .section-large-card-2 {
+        margin: -40px 0px !important;
+        height: 80px;
+        top: -10px !important;
+    }
+    .img-wrapper img {
+        top: 109px !important;
+    }
+
+    #section-1-omm > .customer-container {
+        height: 500px !important;
+    }
+    
+    .section-1-heading {
+        margin-top: 136px;
+        font-size: 30px !important;
+        line-height: 46px !important;
+    }
+    
+    .sub-text-header {
+    font-size: 20px;
+    }
+    .sub-text-header-omm {
+    font-size: 20px;
+    }
+}
+
+@@media (max-width: 760px) {
+#section-1-omm {
+    height: 480px;
+}
+.carousel-content {
+
+        margin-top: 20px;
+
+    }
+    .benefit-item{
+        font-size:16px;
+    }
+    
+    .header-learn-m {
+        font-size: 30px;
+    }
+    
+    .sub-text-header {
+
+    font-size: 24px;
+}
+.tncps{
+        left: -20px;
+        width: 285px;
+        position: relative;
+    @*top: -40px !important;*@
+}
+
+.table>thead>tr>th {
+    padding: 10px;
+}
+
+.ps-80{
+    top: 1px;
+}
+
+    .sub-text-header-flexed {
+        margin-right: 10px ;
+        margin-left: 10px;
+        margin-bottom: 1px !important;
+
+    }
+
+.bg-white-380 {
+    height: 380px !important;
+    background: white;
+}
+
+.call-deposit-table{
+    margin-left:15px;
+    margin-right:15px;
+}
+
+@*.xs-bg-white {
+    height: 390px;
+}*@
+
+.bg-white1 {
+    min-height: 480px;
+    }
+
+.benefits-section-omm {
+    height: 675px !important;
+}
+
+@*.benefits-section2 {
+    height: 540px !important;
+}*@
+
+.benefits-section-cd {
+    height: 650px !important;
+}
+
+.benefits-section-wrapper-cd{
+    height: 740px !important;
+}
+
+.bg-white-50 {
+    display:block;
+    height:50px;
+    background:white;
+}
+
+#section-1 {
+    height: 470px;
+}
+
+.ps-530 {
+    position: relative;
+    top: 860px;
+}
+
+.back-section button {
+    right: 150px;
+    position: relative;
+    background: none !important;
+    border: none !important;
+}
+
+  /* General mobile adjustments */
+  #section-1, #section-2 {
+    padding: 40px 0 !important;
+  }
+
+  .image-position {
+    position: static !important;
+    width: 80% !important;
+    height: auto !important;
+    margin: 20px 0 !important;
+  }
+
+  /* Text adjustments */
+  .section-1-heading {
+    margin-top: 105px;
+    font-size: 34px ;
+    line-height: 45px !important;
+  }
+
+  .section-1-p {
+    font-size: 16px !important;
+    line-height: 24px !important;
+  }
+
+  .section-2-heading,
+  .key-feature,
+  .pricing-tnc,
+  .easy-application,
+  .doc-heading {
+    font-size: 24px !important;
+    line-height: 32px !important;
+  }
+
+  /* Card adjustments */
+  .card {
+    width: 100% !important;
+    height: auto !important;
+    margin: 15px 0;
+    padding: 15px !important;
+  }
+
+  .card-title {
+    font-size: 18px !important;
+    line-height: 24px !important;
+  }
+
+  .card-text {
+    font-size: 14px !important;
+  }
+
+  /* Tab section adjustments */
+  .tabs-container {
+    flex-direction: column;
+  }
+
+  .tab-buttons {
+    width: 100% !important;
+    flex-direction: row;
+    overflow-x: auto;
+    border-right: none;
+  }
+
+  .tab-btn {
+    white-space: nowrap;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+  }
+
+  .tab-btn.active {
+    border-bottom-color: #012B60;
+  }
+
+  /* Image adjustments */
+  .custom-img-2 {
+    width: 100% !important;
+    margin: 20px 0 !important;
+  }
+
+  /* Section spacing */
+  .content-center,
+  .content-center-2 {
+    padding: 20px 0;
+  }
+  
+    .content-center-4 {
+        height: 310px;
+    }
+  
+  <!--.content-center-2 {-->
+  <!--  height: 330px;-->
+  <!--  }-->
+
+  .mtb-40, .mt-40 {
+    margin: 20px 0 !important;
+  }
+
+  /* Card grid adjustments */
+  .cards-container {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* Pricing card adjustments */
+  .section-large-card  {
+    top: 0 !important;
+    margin: 20px 0 !important;
+    height: auto !important;
+  }
+  
+  
+  .section-large-card-2 {
+    margin: -33px 0px !important;
+    height: fit-content;
+    top:10px;
+  }
+  
+  .table>thead>tr>th {
+    font-size: 9px;
+    }
+    .notice-table>thead>tr>th{
+    font-size:16px;
+    }
+    .omm-notice-table>thead>tr>th{
+        font-size:13px;
+        }
+    .tab-content {
+        padding: 0px 0px
+    }
+    .btngroupcard{
+        position: unset !important;
+        bottom: 0 !important;
+       
+    }
+       
+    #section-3 {
+        height: unset !important;
+    }
+       
+    .tab-table-100 {
+        left: -7px;
+        position: relative;
+        width: 100%;
+    }
+    .Notice-heading .prime-time-heading{
+    @*max-width: 273px;*@
+    }
+    
+    .tab-main-container {
+        padding: unset;
+    }
+     .bg-white-nd {
+    height: 280px;
+    }
+    .tab-top-content {
+
+    font-size: 20px;
+  }  
+  
+  .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+
+    font-size: 14px;
+    }
+  
+    
+      }
+
+</style>
+
+<style>
+    td svg {
+        position: relative;
+        top: 4px;
+        right: 6px;
+    }
+    .tab-long-text{
+        color: var(--Brand-AB-Blue, #012B60);
+
+        /* Body/Medium/Regular */
+        font-family: Montserrat;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 24px; /* 150% */
+    }
+    .text-style1 {
+        margin-top: 40px;
+        color: #012B60 !important;
+        font-size: 30px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 38px;
+    }
+
+    .custom-bullets {
+        list-style-type: none;
+        padding-left: 0px;
+    }
+    
+    .btn-font-color {
+        color: #012B60 !important;
+    }
+    
+    .bg-white-500 {
+        height:300px;
+    }
+
+    .bg-white {
+        background-color: white;
+        color: #012B60;
+    }
+    
+    .panel-heading-1{
+         background: unset !important;
+         color: var(--Brand-AB-Blue, #012B60) !important;
+        font-family: Montserrat;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 32px; 
+    }
+    
+    .panel-body-1{
+         background: unset !important;
+         color: var(--Brand-AB-Blue, #012B60) !important;
+        font-family: Montserrat;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 24px; /* 150% */
+    }
+    
+    .btngroupcard{
+            position: absolute !important;
+            bottom: 47px;
+            display: flex;
+            gap: 10px;
+    }
+    
+    
+        .dropdown-menu label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .dropdown-menu {
+     
+      overflow-y: auto;
+    }
+.filter-tags {
+    width: 100%;
+    overflow: overlay;
+    display: flex;
+    margin-top: 10px;
+}
+.filter-tag {
+    margin-right: 15px;
+    text-wrap-mode: nowrap;
+        color: var(--text-primary-blue, #002B60);
+
+        /* Body/Small/Regular */
+        font-family: Montserrat;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 20px; /* 142.857% */
+        width: max-content;
+        display: flex;
+        padding: 8px;
+        align-items: center;
+        gap: 24px;
+        border-radius: var(--border-radius-xl, 8px);
+        border: 1px solid var(--border-default, #D5D7DA);
+        background: var(--surface-primary, #FFF);
+    }
+.filter-tag .remove-tag {
+      margin-bottom: -6px;
+      margin-left: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
+    .btn-contact {
+    font-weight: 600;
+    margin-top: 25px;
+    border-radius: var(--border-radius-md, 32px);
+    background: var(--surface-action, #5DC400) !important;
+    box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.11);
+    width: 130px;
+    color: #fff;
+    padding: 11px;
+}
+    
+    
+    .btn-learn{
+        border-radius: var(--border-radius-md, 32px);
+        border: 1px solid var(--border-primary, #002B60) !important;
+        background: var(--surface-primary, #FFF) !important;
+        box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.11);
+        width: 130px;
+        padding: 11px;
+        margin-top:25px;
+    }
+    .btn-learn:hover {
+       color: #002B60 !important;
+    }
+    .benefits-section2 {
+      
+        top: 20px;
+        position: relative;
+        border-radius: 8px;
+        background: var(--Base-White, #FDFDFD);
+        box-shadow: 0px 9px 18px 0px rgba(0, 0, 0, 0.15);
+        padding: 32px;
+        margin-top: 32px;
+
+    }
+    .benefits-section1 {
+        top: 50px;
+        position: relative;
+        border-radius: 8px;
+        background: var(--Base-White, #FDFDFD);
+        box-shadow: 0px 9px 18px 0px rgba(0, 0, 0, 0.15);
+        padding: 32px;
+        margin-top: 32px;
+        margin-bottom: 80px;
+    }
+    
+    .benefits-section {
+        top: 35px;
+        position: relative;
+        border-radius: 8px;
+        background: var(--Base-White, #FDFDFD);
+        box-shadow: 0px 9px 18px 0px rgba(0, 0, 0, 0.15);
+        padding: 32px;
+        margin-top: 32px;
+    }
+    
+    .benefit-item {
+        display: flex;
+        padding-bottom: 11px;
+        color: var(--Brand-AB-Blue, #012B60);
+        font-family: Montserrat;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 24px;
+    }
+    .benefit-item-note{
+        padding-top: 10px;
+        color: var(--Brand-AB-Blue, #012B60);
+        font-family: Montserrat;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 24px;
+    }
+    .benefit-item svg {
+        margin-right: 8px;
+        margin-top: 2px;
+        flex-shrink: 0;
+    }
+    
+    btn .caret {
+    margin-left: 30px;
+}
+
+.table-wrapper {
+  margin-bottom: -160px;
+    width: 100%;
+}
+table {
+  width: 100%;
+  min-width: 600px;  /* or whatever your table's natural min size is */
+  table-layout: auto;
+}
+
+.mlr{
+ font-size:16px;   
+}
+    
+    .benefit-title {
+        color: var(--Brand-AB-Blue, #012B60) !important;
+        display: contents;
+        font-family: Montserrat;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 24px;
+    }
+    
+    .img-bene{
+            max-width: 100% !important;
+    }
+
+
+   @@media(max-width:600px){
+   
+   .sub-text-header-omm {
+    font-size: 24px;
+    }
+   
+   .annual-effect{
+        text-wrap-mode: nowrap;
+   }
+   
+   
+    .filter-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px; /* or your preferred spacing */
+    }
+    
+    .remove-tag {
+      display: inline-flex;
+      align-items: center;
+    }
+    
+    .remove-tag svg {
+      flex-shrink: 0;
+    }
+   
+  <!--.filter-tags {-->
+  <!--      flex-direction: column;-->
+  <!-- }-->
+   
+   .p-42{
+        top: 42px;
+        position: relative;
+   
+   }
+    .content-center-2-1-1 {
+        height: 295px;
+    }
+   
+   .accordion::after {
+        right: 8px;
+   }
+   .custom-bullets, .btn-font-color, .mt-40{
+        top: -3px;
+   }
+   
+   @* .benefits-section-wrapper {
+        min-height: 635px;
+    }*@
+    
+    .benefits-section-wrapper-omm-1 {
+        height: 1044px;
+    }
+    
+    .benefits-section-wrapper-fixed {
+        margin-left:15px;
+        margin-right:15px;
+        height: 822px;
+    }
+    
+    @*.benefits-section-fixed{
+        height: 600px !important;
+    }*@
+    
+    .bg-white-245 {
+        height: 144px !important;
+    }
+    
+    .text-style1 {
+        text-align: justify;
+        top: -25px;
+        position: relative;
+        margin-top: 46px;
+        color: #012B60 !important;
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 38px;
+    }
+    
+    .benefits-section {
+        margin-right: 15px;
+        margin-left: 15px;
+    }
+   
+   .sub-text-header2 {
+        margin-right: 15px;
+        margin-left: 15px;
+    }
+     .sub-text-header2-omm {
+        margin-right: 15px;
+        margin-left: 15px;
+    }
+   .section-bg-blue {
+        height: fit-content;
+        background: #002b60 !important;
+    }
+
+    table {
+        width: 100%;
+        min-width: 338px;
+    }
+    
+    .sub-text-header {
+        margin-right: 10px;
+        margin-left: 10px;
+        margin-bottom: 20px;
+        margin-top: 20px;
+    }
+    
+    .sub-text-header-omm {
+        margin-right: 10px;
+        margin-left: 10px;
+        margin-bottom: 20px;
+        margin-top: 50px;
+    }
+    
+    .filter-btn{
+        
+        margin-left: 0px;
+    }
+
+    .sub-text-style spam {
+        margin-right: 10px;
+        margin-left: 10px;
+    }
+    .img-wrapper {
+      text-align: center;
+    }
+
+    .img-wrapper img {
+      top: 21px;
+      position: relative;
+      display: inline-block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    .text-style {
+        font-size: 20px;
+        text-align: left;
+    }
+    h1,.text-style {
+        font-size: 30px;
+        text-align: left;
+        margin-top:0px;
+    }
+    .mlr{
+        margin-right: 10px;
+        margin-left: 10px;
+    }
+    
+   }
+ @@media only screen and (min-width: 360px) and (max-width: 375px) {
+    table {
+        min-width: fit-content;
+    }
+}
+   @@media(max-width:999px){
+
+        .nacm{
+            display:block !important;
+        }
+        .nacm-rate{
+            display:none !important;
+        }
+        
+        .table>thead>tr>th {
+            padding: 9px;
+        }
+        .omm-notice-table>thead>tr>th{
+        padding: 5px;
+        max-width: 101px;
+        white-space: normal;
+        }
+   }
+</style>
+@{
+    var columns = callDepositHerobodyChildrenItems.ToList();
+
+    // Get the max number of rows across all columns
+    var maxRows = columns
+        .Select(c =>
+        {
+            var tabBodyContent = c?.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+            var genericContent = tabBodyContent?.FirstOrDefault(t => t.ContentType.Alias == "nCTabGenericContent");
+            var sectionContent = genericContent?.Value<IEnumerable<IPublishedElement>>("sectionContent");
+            return sectionContent?.Count() ?? 0;
+        })
+        .Max();
+}
+
+<a href="/en/home/contact-us" class="floating-btn">Get in touch</a>
+   @*          @if(Model.Name  == "OMM Call Deposits" || Model.Name  == "OMM Notice Deposits" || Model.Name  == "OMM Fixed Deposits"){
+<section class="back-section" id="learn-more-btn-back">
+  <div class="rmv container">
+    <a href="/en/home/invest-v1/online-money-manager-omm/">
+            <svg width="68" height="24" viewBox="0 0 68 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4.25 12.2744L19.25 12.2744" stroke="#012B60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10.2998 18.299L4.2498 12.275L10.2998 6.25" stroke="#012B60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M33.47 17V7.2H37.866C38.9953 7.2 39.8633 7.42867 40.47 7.886C41.0767 8.334 41.38 8.95 41.38 9.734C41.38 10.266 41.2587 10.714 41.016 11.078C40.7827 11.442 40.4653 11.722 40.064 11.918C39.6627 12.114 39.2287 12.212 38.762 12.212L39.014 11.792C39.574 11.792 40.0687 11.89 40.498 12.086C40.9273 12.282 41.268 12.5713 41.52 12.954C41.772 13.3273 41.898 13.794 41.898 14.354C41.898 15.194 41.5807 15.8473 40.946 16.314C40.3207 16.7713 39.3873 17 38.146 17H33.47ZM34.87 15.866H38.09C38.8647 15.866 39.4573 15.7353 39.868 15.474C40.2787 15.2127 40.484 14.802 40.484 14.242C40.484 13.6727 40.2787 13.2573 39.868 12.996C39.4573 12.7347 38.8647 12.604 38.09 12.604H34.744V11.47H37.74C38.4493 11.47 39 11.3393 39.392 11.078C39.784 10.8167 39.98 10.4247 39.98 9.902C39.98 9.37933 39.784 8.98733 39.392 8.726C39 8.46467 38.4493 8.334 37.74 8.334H34.87V15.866ZM48.4757 17V15.432L48.4057 15.138V12.464C48.4057 11.8947 48.2377 11.456 47.9017 11.148C47.575 10.8307 47.0804 10.672 46.4177 10.672C45.979 10.672 45.5497 10.7467 45.1297 10.896C44.7097 11.036 44.355 11.2273 44.0657 11.47L43.5057 10.462C43.8884 10.154 44.3457 9.92067 44.8777 9.762C45.419 9.594 45.9837 9.51 46.5717 9.51C47.589 9.51 48.373 9.75733 48.9237 10.252C49.4744 10.7467 49.7497 11.5027 49.7497 12.52V17H48.4757ZM46.0397 17.084C45.489 17.084 45.0037 16.9907 44.5837 16.804C44.173 16.6173 43.8557 16.3607 43.6317 16.034C43.4077 15.698 43.2957 15.32 43.2957 14.9C43.2957 14.4987 43.389 14.1347 43.5757 13.808C43.7717 13.4813 44.0844 13.22 44.5137 13.024C44.9524 12.828 45.5404 12.73 46.2777 12.73H48.6297V13.696H46.3337C45.6617 13.696 45.209 13.808 44.9757 14.032C44.7424 14.256 44.6257 14.5267 44.6257 14.844C44.6257 15.208 44.7704 15.502 45.0597 15.726C45.349 15.9407 45.7504 16.048 46.2637 16.048C46.7677 16.048 47.2064 15.936 47.5797 15.712C47.9624 15.488 48.2377 15.1613 48.4057 14.732L48.6717 15.656C48.4944 16.0947 48.1817 16.4447 47.7337 16.706C47.2857 16.958 46.721 17.084 46.0397 17.084ZM55.4709 17.084C54.7149 17.084 54.0382 16.9207 53.4409 16.594C52.8529 16.2673 52.3909 15.8193 52.0549 15.25C51.7189 14.6807 51.5509 14.0273 51.5509 13.29C51.5509 12.5527 51.7189 11.8993 52.0549 11.33C52.3909 10.7607 52.8529 10.3173 53.4409 10C54.0382 9.67333 54.7149 9.51 55.4709 9.51C56.1429 9.51 56.7402 9.64533 57.2629 9.916C57.7949 10.1773 58.2056 10.5693 58.4949 11.092L57.4729 11.75C57.2302 11.386 56.9316 11.12 56.5769 10.952C56.2316 10.7747 55.8582 10.686 55.4569 10.686C54.9716 10.686 54.5376 10.7933 54.1549 11.008C53.7722 11.2227 53.4689 11.526 53.2449 11.918C53.0209 12.3007 52.9089 12.758 52.9089 13.29C52.9089 13.822 53.0209 14.284 53.2449 14.676C53.4689 15.068 53.7722 15.3713 54.1549 15.586C54.5376 15.8007 54.9716 15.908 55.4569 15.908C55.8582 15.908 56.2316 15.824 56.5769 15.656C56.9316 15.4787 57.2302 15.208 57.4729 14.844L58.4949 15.488C58.2056 16.0013 57.7949 16.398 57.2629 16.678C56.7402 16.9487 56.1429 17.084 55.4709 17.084ZM61.2312 15.208L61.2592 13.486L65.5292 9.58H67.1532L63.8772 12.8L63.1492 13.416L61.2312 15.208ZM60.1392 17V6.612H61.4832V17H60.1392ZM65.8092 17L62.8972 13.388L63.7652 12.31L67.4612 17H65.8092Z" fill="#012B60"/>
+            </svg>
+        </a>
+    </div>
+</section>
+}else{*@
+<section class="back-section" id="learn-more-btn-back">
+  <div class="rmv container">
+    <a href="/en/home/invest-v1">
+            <svg width="68" height="24" viewBox="0 0 68 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4.25 12.2744L19.25 12.2744" stroke="#012B60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10.2998 18.299L4.2498 12.275L10.2998 6.25" stroke="#012B60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M33.47 17V7.2H37.866C38.9953 7.2 39.8633 7.42867 40.47 7.886C41.0767 8.334 41.38 8.95 41.38 9.734C41.38 10.266 41.2587 10.714 41.016 11.078C40.7827 11.442 40.4653 11.722 40.064 11.918C39.6627 12.114 39.2287 12.212 38.762 12.212L39.014 11.792C39.574 11.792 40.0687 11.89 40.498 12.086C40.9273 12.282 41.268 12.5713 41.52 12.954C41.772 13.3273 41.898 13.794 41.898 14.354C41.898 15.194 41.5807 15.8473 40.946 16.314C40.3207 16.7713 39.3873 17 38.146 17H33.47ZM34.87 15.866H38.09C38.8647 15.866 39.4573 15.7353 39.868 15.474C40.2787 15.2127 40.484 14.802 40.484 14.242C40.484 13.6727 40.2787 13.2573 39.868 12.996C39.4573 12.7347 38.8647 12.604 38.09 12.604H34.744V11.47H37.74C38.4493 11.47 39 11.3393 39.392 11.078C39.784 10.8167 39.98 10.4247 39.98 9.902C39.98 9.37933 39.784 8.98733 39.392 8.726C39 8.46467 38.4493 8.334 37.74 8.334H34.87V15.866ZM48.4757 17V15.432L48.4057 15.138V12.464C48.4057 11.8947 48.2377 11.456 47.9017 11.148C47.575 10.8307 47.0804 10.672 46.4177 10.672C45.979 10.672 45.5497 10.7467 45.1297 10.896C44.7097 11.036 44.355 11.2273 44.0657 11.47L43.5057 10.462C43.8884 10.154 44.3457 9.92067 44.8777 9.762C45.419 9.594 45.9837 9.51 46.5717 9.51C47.589 9.51 48.373 9.75733 48.9237 10.252C49.4744 10.7467 49.7497 11.5027 49.7497 12.52V17H48.4757ZM46.0397 17.084C45.489 17.084 45.0037 16.9907 44.5837 16.804C44.173 16.6173 43.8557 16.3607 43.6317 16.034C43.4077 15.698 43.2957 15.32 43.2957 14.9C43.2957 14.4987 43.389 14.1347 43.5757 13.808C43.7717 13.4813 44.0844 13.22 44.5137 13.024C44.9524 12.828 45.5404 12.73 46.2777 12.73H48.6297V13.696H46.3337C45.6617 13.696 45.209 13.808 44.9757 14.032C44.7424 14.256 44.6257 14.5267 44.6257 14.844C44.6257 15.208 44.7704 15.502 45.0597 15.726C45.349 15.9407 45.7504 16.048 46.2637 16.048C46.7677 16.048 47.2064 15.936 47.5797 15.712C47.9624 15.488 48.2377 15.1613 48.4057 14.732L48.6717 15.656C48.4944 16.0947 48.1817 16.4447 47.7337 16.706C47.2857 16.958 46.721 17.084 46.0397 17.084ZM55.4709 17.084C54.7149 17.084 54.0382 16.9207 53.4409 16.594C52.8529 16.2673 52.3909 15.8193 52.0549 15.25C51.7189 14.6807 51.5509 14.0273 51.5509 13.29C51.5509 12.5527 51.7189 11.8993 52.0549 11.33C52.3909 10.7607 52.8529 10.3173 53.4409 10C54.0382 9.67333 54.7149 9.51 55.4709 9.51C56.1429 9.51 56.7402 9.64533 57.2629 9.916C57.7949 10.1773 58.2056 10.5693 58.4949 11.092L57.4729 11.75C57.2302 11.386 56.9316 11.12 56.5769 10.952C56.2316 10.7747 55.8582 10.686 55.4569 10.686C54.9716 10.686 54.5376 10.7933 54.1549 11.008C53.7722 11.2227 53.4689 11.526 53.2449 11.918C53.0209 12.3007 52.9089 12.758 52.9089 13.29C52.9089 13.822 53.0209 14.284 53.2449 14.676C53.4689 15.068 53.7722 15.3713 54.1549 15.586C54.5376 15.8007 54.9716 15.908 55.4569 15.908C55.8582 15.908 56.2316 15.824 56.5769 15.656C56.9316 15.4787 57.2302 15.208 57.4729 14.844L58.4949 15.488C58.2056 16.0013 57.7949 16.398 57.2629 16.678C56.7402 16.9487 56.1429 17.084 55.4709 17.084ZM61.2312 15.208L61.2592 13.486L65.5292 9.58H67.1532L63.8772 12.8L63.1492 13.416L61.2312 15.208ZM60.1392 17V6.612H61.4832V17H60.1392ZM65.8092 17L62.8972 13.388L63.7652 12.31L67.4612 17H65.8092Z" fill="#012B60"/>
+            </svg>
+        </a>
+    </div>
+</section>
+
+    <section class="section-bg-blue">
+    <div class="container">
+         <div class="row">
+             
+             @if(Model.Name  == "Online Money Manager (OMM)" || Model.Name  == "Call Deposits" || Model.Name  == "OMM Call Deposits"|| Model.Name  == "Notice Deposits" || Model.Name  == "OMM Notice Deposits" || Model.Name  == "Fixed Deposits" || Model.Name  == "OMM Fixed Deposits"){
+                <div class="col-md-12 carousel-content">
+                   
+           @foreach(var item in productCards)
+        {
+        var title = item.Value<string>("tabsubitemtitle");
+            if(@title == "omm" || @title == "calldeposit" || @title == "ommcalldeposit" || @title == "noticedeposit" || @title == "ommnotice" || @title  == "fixeddeposit" || @title  == "ommfixeddeposit")
+            {
+            List<Umbraco.Web.Models.Link>
+                    itemLink = new List<Umbraco.Web.Models.Link>();
+
+                        foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)item.Value("tabSubItemLinks"))
+                            {
+                            itemLink.Add(link);
+                            }
+                            
+                                 @item.Value("tabSubItemTextContent")
+                        <div class="row mtb-40">
+                                <a href="@itemLink[0].Url" class="btn btn-primary">@itemLink[0].Name</a>
+                       </div>
+                            }
+                            }
+               
+                </div>
+              }
+    
+              
+            </div>
+    </div>
+</section>
+
+
+<!--<div class="bottom-section" id="section-1.0"></div>-->
+
+
+@if(Model.Name  == "Call Deposits"){
+<section class="bg-white1" id="section-2.1">
+    <div class="container">
+  <div class="row">
+ 
+        <div class="col-xs-12 content-center-2" >
+          <div class="content-sub-start-2 ps-80">
+              
+                <p class="sub-text-header">
+                    Why choose a Call Deposit?
+                </p>
+                
+                <p class="sub-text-style container">
+                    @Html.Raw(Model.Value("descriptions"))
+                </p>
+                
+                
+                <p class="sub-text-header2">
+                    Your potential earnings with a Call Deposit account
+                </p>
+                
+                @*
+                <section class="call-deposit-table">
+                    <div class="">
+                      <div class="rate-table">
+                        <table class="table table-bordered table-striped" id="ratesTable">
+                          <thead>
+                            <tr>
+                              <th>Period 
+                              <svg class="toolpick-position" data-toggle="tooltip" title="An investment period is the fixed length of time your funds are invested (e.g. days, weeks, months or years)." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_6894_15778)">
+                    <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"></path>
+                    </g>
+                    <defs>
+                    <clipPath id="clip0_6894_15778">
+                    <rect width="24" height="24" fill="white"></rect>
+                    </clipPath>
+                    </defs>
+                    </svg>
+                    </th>
+                                            
+                                <th>NACM
+              <svg class="toolpick-position" data-toggle="tooltip" title="Nominal Annual Compounded Monthly (NACM) refers to the actual interest earned over a one-month period, calculated on an annual basis." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_6894_15778)">
+    <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+    </g>
+    <defs>
+    <clipPath id="clip0_6894_15778">
+    <rect width="24" height="24" fill="white"/>
+    </clipPath>
+    </defs>
+    </svg>
+    
+              </th>
+                              <th>Yield
+                              <svg class="toolpick-position" data-toggle="tooltip" title="The basic interest rate earned in a year, before any extra growth is added." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g clip-path="url(#clip0_6894_15778)">
+                            <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"></path>
+                            </g>
+                            <defs>
+                            <clipPath id="clip0_6894_15778">
+                            <rect width="24" height="24" fill="white"></rect>
+                            </clipPath>
+                            </defs>
+                            </svg>
+                    
+                              </th>
+                              <th class="annual-effect">Annual Effective
+                              
+                              <svg class="toolpick-position" data-toggle="tooltip" title="The actual interest earned in a year, including the monthly growth." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_6894_15778)">
+                                <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"></path>
+                                </g>
+                                <defs>
+                                <clipPath id="clip0_6894_15778">
+                                <rect width="24" height="24" fill="white"></rect>
+                                </clipPath>
+                                </defs>
+                                </svg>
+                    
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                              <tr>
+                                <td>Call</td>
+                                <td>8.00%</td>
+                                <td>8.00%</td>
+                                <td>8.30%</td>
+                              </tr>
+
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                </section>
+                *@
+                
+                 <section class="call-deposit-table">
+                    <div class="">
+                      <div class="rate-table">
+                        <table class="table table-bordered table-striped" id="ratesTable">
+ <thead>
+                            <tr>
+                              <th>Period 
+                              <svg class="toolpick-position" data-toggle="tooltip" title="An investment period is the fixed length of time your funds are invested (e.g. days, weeks, months or years)." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_6894_15778)">
+                    <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"></path>
+                    </g>
+                    <defs>
+                    <clipPath id="clip0_6894_15778">
+                    <rect width="24" height="24" fill="white"></rect>
+                    </clipPath>
+                    </defs>
+                    </svg>
+                    </th>
+                                            
+                                <th>NACM
+              <svg class="toolpick-position" data-toggle="tooltip" title="Nominal Annual Compounded Monthly (NACM) refers to the actual interest earned over a one-month period, calculated on an annual basis." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_6894_15778)">
+    <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+    </g>
+    <defs>
+    <clipPath id="clip0_6894_15778">
+    <rect width="24" height="24" fill="white"/>
+    </clipPath>
+    </defs>
+    </svg>
+    
+              </th>
+                              <th>Yield
+                              <svg class="toolpick-position" data-toggle="tooltip" title="The basic interest rate earned in a year, before any extra growth is added." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g clip-path="url(#clip0_6894_15778)">
+                            <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"></path>
+                            </g>
+                            <defs>
+                            <clipPath id="clip0_6894_15778">
+                            <rect width="24" height="24" fill="white"></rect>
+                            </clipPath>
+                            </defs>
+                            </svg>
+                    
+                              </th>
+                              <th class="annual-effect">Annual Effective
+                              
+                              <svg class="toolpick-position" data-toggle="tooltip" title="The actual interest earned in a year, including the monthly growth." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_6894_15778)">
+                                <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"></path>
+                                </g>
+                                <defs>
+                                <clipPath id="clip0_6894_15778">
+                                <rect width="24" height="24" fill="white"></rect>
+                                </clipPath>
+                                </defs>
+                                </svg>
+                    
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                              
+                            @for (int rowIndex = 0; rowIndex < maxRows; rowIndex++)
+                                {
+                                    <tr>
+                                        @foreach (var colItem in columns)
+                                        {
+                                            var tabBodyContent = colItem?.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+                                            var genericContent = tabBodyContent?.FirstOrDefault(t => t.ContentType.Alias == "nCTabGenericContent");
+                                            var sectionContent = genericContent?.Value<IEnumerable<IPublishedElement>>("sectionContent")?.ToList();
+                        
+                                            var cellItem = (sectionContent != null && rowIndex < sectionContent.Count) ? sectionContent[rowIndex] : null;
+                        
+                                            <td>@(cellItem?.Value("ncCardTitle") ?? "")</td>
+                                        }
+                                    </tr>
+                                }
+                              
+                       
+                              
+
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                </section>
+            
+          </div>
+        </div>
+
+  </div>
+</div>
+</section>
+}
+@if(Model.Name  == "OMM Call Deposits"){
+<section class="bg-white1" id="section-2.1">
+    <div class="container">
+  <div class="row">
+ 
+        <div class="col-xs-12 content-center-2" >
+          <div class="content-sub-start-2 ps-80">
+              
+                <p class="sub-text-header">
+                    Why choose an OMM Call Deposit?
+                </p>
+                
+                <p class="sub-text-style container">
+                    @Html.Raw(Model.Value("descriptions"))
+                </p>
+                
+                
+                <p class="sub-text-header2">
+                    Your potential earnings with an OMM Call Deposit account
+                </p>
+
+                
+                 <section class="call-deposit-table">
+                    <div class="">
+                      <div class="rate-table">
+                        <table class="table table-bordered table-striped" id="ratesTable">
+ <thead>
+                            <tr>
+                              <th>Period 
+                              <svg class="toolpick-position" data-toggle="tooltip" title="An investment period is the fixed length of time your funds are invested (e.g. days, weeks, months or years)." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_6894_15778)">
+                    <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"></path>
+                    </g>
+                    <defs>
+                    <clipPath id="clip0_6894_15778">
+                    <rect width="24" height="24" fill="white"></rect>
+                    </clipPath>
+                    </defs>
+                    </svg>
+                    </th>
+                                            
+                                <th>NACM
+              <svg class="toolpick-position" data-toggle="tooltip" title="Nominal Annual Compounded Monthly (NACM) refers to the actual interest earned over a one-month period, calculated on an annual basis." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_6894_15778)">
+    <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+    </g>
+    <defs>
+    <clipPath id="clip0_6894_15778">
+    <rect width="24" height="24" fill="white"/>
+    </clipPath>
+    </defs>
+    </svg>
+    
+              </th>
+                              <th>Yield
+                              <svg class="toolpick-position" data-toggle="tooltip" title="The basic interest rate earned in a year, before any extra growth is added." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g clip-path="url(#clip0_6894_15778)">
+                            <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"></path>
+                            </g>
+                            <defs>
+                            <clipPath id="clip0_6894_15778">
+                            <rect width="24" height="24" fill="white"></rect>
+                            </clipPath>
+                            </defs>
+                            </svg>
+                    
+                              </th>
+                              <th class="annual-effect">Annual Effective
+                              
+                              <svg class="toolpick-position" data-toggle="tooltip" title="The actual interest earned in a year, including the monthly growth." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_6894_15778)">
+                                <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"></path>
+                                </g>
+                                <defs>
+                                <clipPath id="clip0_6894_15778">
+                                <rect width="24" height="24" fill="white"></rect>
+                                </clipPath>
+                                </defs>
+                                </svg>
+                    
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                              
+                            @for (int rowIndex = 0; rowIndex < maxRows; rowIndex++)
+                                {
+                                    <tr>
+                                        @foreach (var colItem in columns)
+                                        {
+                                            var tabBodyContent = colItem?.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+                                            var genericContent = tabBodyContent?.FirstOrDefault(t => t.ContentType.Alias == "nCTabGenericContent");
+                                            var sectionContent = genericContent?.Value<IEnumerable<IPublishedElement>>("sectionContent")?.ToList();
+                        
+                                            var cellItem = (sectionContent != null && rowIndex < sectionContent.Count) ? sectionContent[rowIndex] : null;
+                        
+                                            <td>@(cellItem?.Value("ncCardTitle") ?? "")</td>
+                                        }
+                                    </tr>
+                                }
+                              
+                       
+                              
+
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                </section>
+            
+          </div>
+        </div>
+
+  </div>
+</div>
+</section>
+}
+
+
+@if(Model.Name  == "Fixed Deposits"){
+<section class="bg-white22" id="section-2.1">
+    <div class="container">
+  <div class="row">
+ 
+        <div class="col-xs-12 content-center-2" >
+          <div class="content-sub-start-2">
+              
+                <p class="sub-text-header sub-text-header-flexed">
+                    Why choose a Fixed Deposit?
+                </p>
+                
+                <p class="sub-text-style">
+                   <span class="mlr"> @Html.Raw(Model.Value("descriptions")) </span>
+                </p>
+                
+                
+                <p class="sub-text-header2">
+                    Your potential earnings with our Fixed Deposit investment option
+                </p>
+                <div class="table-wrapper">
+                    <section class="call-deposit-table">
+                        <div class="container">
+      <br>
+      <div class="row">
+        <div class="col-12 filter-btn">
+          <p>Filter by period</p>
+          <div class="dropdown">
+            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+              Select all that apply <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" id="periodFilterDropdown" style="padding: 10px;">
+              <li><label><input type="checkbox" class="period-filter" value="1 Week"> 1 Week</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="2 Weeks"> 2 Week</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="3 Weeks"> 3 Week</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="1 Month"> 1 Month</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="2 Months"> 2 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="3 Months"> 3 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="4 Months"> 4 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="5 Months"> 5 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="6 Months"> 6 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="7 Months"> 7 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="8 Months"> 8 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="9 Months"> 9 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="10 Months"> 10 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="11 Months"> 11 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="12 Months"> 12 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="18 Months"> 18 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="24 Months"> 24 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="36 Months"> 36 Months</label></li>
+              <li><button id="clearPeriods" class="btn btn-xs btn-link">Clear All</button></li>
+            </ul>
+          </div>
+          <!-- Dynamic filter tags will appear here -->
+          <div class="filter-tags" id="activeFilters"></div>
+        </div>
+      </div>
+    
+      <br>
+      <div class="rate-table fixeddeposit-rate-table">
+        <table class="table table-bordered table-striped omm-notice-table" id="ratesTable">
+        
+          <thead>
+            <tr>
+              <th>Period 
+              <svg class="toolpick-position" data-toggle="tooltip" title="An investment period is the fixed length of time your funds are invested (e.g. days, weeks, months or years)." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_6894_15778)">
+    <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+    </g>
+    <defs>
+    <clipPath id="clip0_6894_15778">
+    <rect width="24" height="24" fill="white"/>
+    </clipPath>
+    </defs>
+    </svg>
+    </th>
+                            <th class="hidden-xs nacm-rate">NACM Rate
+              <svg class="toolpick-position" data-toggle="tooltip" title="Nominal Annual Compounded Monthly (NACM) refers to the actual interest earned over a one-month period, calculated on an annual basis." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_6894_15778)">
+    <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+    </g>
+    <defs>
+    <clipPath id="clip0_6894_15778">
+    <rect width="24" height="24" fill="white"/>
+    </clipPath>
+    </defs>
+    </svg>
+    
+              </th>
+              <th class="visible-xs nacm">NACM
+              <svg class="toolpick-position" data-toggle="tooltip" title="Nominal Annual Compounded Monthly (NACM) refers to the actual interest earned over a one-month period, calculated on an annual basis." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_6894_15778)">
+    <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+    </g>
+    <defs>
+    <clipPath id="clip0_6894_15778">
+    <rect width="24" height="24" fill="white"/>
+    </clipPath>
+    </defs>
+    </svg>
+    
+              </th>
+              <th>Yield
+              <svg class="toolpick-position" data-toggle="tooltip" title="The basic interest rate earned in a year, before any extra growth is added." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip0_6894_15778)">
+            <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+            </g>
+            <defs>
+            <clipPath id="clip0_6894_15778">
+            <rect width="24" height="24" fill="white"/>
+            </clipPath>
+            </defs>
+            </svg>
+    
+              </th>
+              <th class="annual-effect">
+              Annual Effective
+                            <svg class="toolpick-position" data-toggle="tooltip" title="The actual interest earned in a year, including the monthly growth." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip0_6894_15778)">
+            <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+            </g>
+            <defs>
+            <clipPath id="clip0_6894_15778">
+            <rect width="24" height="24" fill="white"/>
+            </clipPath>
+            </defs>
+            </svg>
+              
+    
+              </th>
+            </tr>
+          </thead>
+            <tbody>
+                              
+                            @for (int rowIndex = 0; rowIndex < maxRows; rowIndex++)
+                                {
+                                    <tr>
+                                        @foreach (var colItem in columns)
+                                        {
+                                            var tabBodyContent = colItem?.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+                                            var genericContent = tabBodyContent?.FirstOrDefault(t => t.ContentType.Alias == "nCTabGenericContent");
+                                            var sectionContent = genericContent?.Value<IEnumerable<IPublishedElement>>("sectionContent")?.ToList();
+                        
+                                            var cellItem = (sectionContent != null && rowIndex < sectionContent.Count) ? sectionContent[rowIndex] : null;
+                        
+                                            <td>@(cellItem?.Value("ncCardTitle") ?? "")</td>
+                                        }
+                                    </tr>
+                                }
+
+            </tbody>
+        </table>
+      </div>
+    </div>
+                    </section>
+                    <div class="row mtb-b-40 container">
+                                    <a href="/en/home/contact-us#Sales-enquiry" class="btn btn-primary">Contact us</a>
+                    </div>
+                
+                </div>
+            
+          </div>
+        </div>
+
+  </div>
+</div>
+</section>
+}
+@if(Model.Name  == "OMM Fixed Deposits"){
+<section class="bg-white bg-white-nd" id="section-2.1">
+    <div class="container">
+        <div class="row">
+ 
+        <div class="col-xs-12 content-center-4" >
+          <div class="content-sub-start-2 p-42">
+              
+                <p class="sub-text-header">
+                    Why choose an OMM Fixed Deposit?
+                </p>
+                
+                <p class="sub-text-style">
+                    @Html.Raw(Model.Value("descriptions"))
+                </p>
+                
+                
+          </div>
+        </div>
+
+  </div>
+    </div>
+</section>
+}
+@if(Model.Name  == "OMM Fixed Deposits"){
+<section class="bg-grey">
+    <div class="container">
+  <div class="row">
+ 
+        <div class="col-xs-12 content-center-2" >
+          <div class="content-sub-start-2">
+                <p class="sub-text-header2-omm">
+                    Your potential earnings with our OMM Fixed Deposit investment option
+                </p>
+                <div class="table-wrapper-omm">
+                    <section class="call-deposit-table">
+                        <div class="container omm-table-wrapper">
+      <br>
+      <div class="row">
+        <div class="col-12 filter-btn">
+          <p>Filter by period</p>
+          <div class="dropdown">
+            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+              Select all that apply <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" id="periodFilterDropdown" style="padding: 10px;">
+              <li><label><input type="checkbox" class="period-filter" value="1 Week"> 1 Week</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="2 Weeks"> 2 Week</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="3 Weeks"> 3 Week</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="1 Month"> 1 Month</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="2 Months"> 2 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="3 Months"> 3 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="4 Months"> 4 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="5 Months"> 5 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="6 Months"> 6 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="7 Months"> 7 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="8 Months"> 8 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="9 Months"> 9 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="10 Months"> 10 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="11 Months"> 11 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="12 Months"> 12 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="18 Months"> 18 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="24 Months"> 24 Months</label></li>
+              <li><label><input type="checkbox" class="period-filter" value="36 Months"> 36 Months</label></li>
+              <li><button id="clearPeriods" class="btn btn-xs btn-link">Clear All</button></li>
+            </ul>
+          </div>
+          <!-- Dynamic filter tags will appear here -->
+          <div class="filter-tags" id="activeFilters"></div>
+        </div>
+      </div>
+    
+      <br>
+      <div class="rate-table fixeddeposit-rate-table">
+        <table class="table table-bordered table-striped omm-notice-table" id="ratesTable">
+        
+          <thead>
+            <tr>
+              <th>Period 
+              <svg class="toolpick-position" data-toggle="tooltip" title="An investment period is the fixed length of time your funds are invested (e.g. days, weeks, months or years)." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_6894_15778)">
+    <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+    </g>
+    <defs>
+    <clipPath id="clip0_6894_15778">
+    <rect width="24" height="24" fill="white"/>
+    </clipPath>
+    </defs>
+    </svg>
+    </th>
+                            <th class="hidden-xs nacm-rate">NACM Rate
+              <svg class="toolpick-position" data-toggle="tooltip" title="Nominal Annual Compounded Monthly (NACM) refers to the actual interest earned over a one-month period, calculated on an annual basis." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_6894_15778)">
+    <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+    </g>
+    <defs>
+    <clipPath id="clip0_6894_15778">
+    <rect width="24" height="24" fill="white"/>
+    </clipPath>
+    </defs>
+    </svg>
+    
+              </th>
+              <th class="visible-xs nacm">NACM
+              <svg class="toolpick-position" data-toggle="tooltip" title="Nominal Annual Compounded Monthly (NACM) refers to the actual interest earned over a one-month period, calculated on an annual basis." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_6894_15778)">
+    <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+    </g>
+    <defs>
+    <clipPath id="clip0_6894_15778">
+    <rect width="24" height="24" fill="white"/>
+    </clipPath>
+    </defs>
+    </svg>
+    
+              </th>
+              <th>Yield
+              <svg class="toolpick-position" data-toggle="tooltip" title="The basic interest rate earned in a year, before any extra growth is added." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip0_6894_15778)">
+            <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+            </g>
+            <defs>
+            <clipPath id="clip0_6894_15778">
+            <rect width="24" height="24" fill="white"/>
+            </clipPath>
+            </defs>
+            </svg>
+    
+              </th>
+              <th class="annual-effect">
+              Annual Effective
+                            <svg class="toolpick-position" data-toggle="tooltip" title="The actual interest earned in a year, including the monthly growth." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip0_6894_15778)">
+            <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+            </g>
+            <defs>
+            <clipPath id="clip0_6894_15778">
+            <rect width="24" height="24" fill="white"/>
+            </clipPath>
+            </defs>
+            </svg>
+              
+    
+              </th>
+            </tr>
+          </thead>
+            <tbody>
+                              
+                            @for (int rowIndex = 0; rowIndex < maxRows; rowIndex++)
+                                {
+                                    <tr>
+                                        @foreach (var colItem in columns)
+                                        {
+                                            var tabBodyContent = colItem?.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+                                            var genericContent = tabBodyContent?.FirstOrDefault(t => t.ContentType.Alias == "nCTabGenericContent");
+                                            var sectionContent = genericContent?.Value<IEnumerable<IPublishedElement>>("sectionContent")?.ToList();
+                        
+                                            var cellItem = (sectionContent != null && rowIndex < sectionContent.Count) ? sectionContent[rowIndex] : null;
+                        
+                                            <td>@(cellItem?.Value("ncCardTitle") ?? "")</td>
+                                        }
+                                    </tr>
+                                }
+
+            </tbody>
+        </table>
+      </div>
+        <div class="row mtb-b-40-omm container">
+                                    <a href="/en/home/contact-us#Sales-enquiry" class="btn btn-primary">Contact us</a>
+                    </div>
+    </div>
+                    </section>
+                  
+                
+                </div>
+            
+          </div>
+        </div>
+
+  </div>
+</div>
+</section>
+}
+@if(Model.Name  == "Notice Deposits"){
+<section class="bg-white bg-white-nd" id="section-2.1">
+    <div class="container">
+        <div class="row">
+ 
+        <div class="col-xs-12 content-center-4" >
+          <div class="content-sub-start-2 p-42">
+              
+                <p class="sub-text-header">
+                    Why choose a Notice Deposit?
+                </p>
+                
+                <p class="sub-text-style">
+                    @Html.Raw(Model.Value("descriptions"))
+                </p>
+                
+                
+          </div>
+        </div>
+
+  </div>
+    </div>
+</section>
+}
+@if(Model.Name  == "OMM Notice Deposits"){
+<section class="bg-white bg-white-nd" id="section-2.1">
+    <div class="container">
+        <div class="row">
+ 
+        <div class="col-xs-12 content-center-4" >
+          <div class="content-sub-start-2 p-42">
+              
+                <p class="sub-text-header">
+                    Why choose an OMM Notice Deposit?
+                </p>
+                
+                <p class="sub-text-style">
+                    @Html.Raw(Model.Value("descriptions"))
+                </p>
+                
+                
+          </div>
+        </div>
+
+  </div>
+    </div>
+</section>
+}
+
+@if(Model.Name  == "Online Money Manager (OMM)"){
+<section class="bg-white" id="section-2.1">
+    <div class="container">
+        <div class="row">
+ 
+        <div class="col-xs-12 content-center-2-1-1 mb-59" >
+          <div class="content-sub-start-2">
+              
+                <p class="sub-text-header-omm">
+                    Why choose Online Money Manager?
+                </p>
+                
+                <p class="sub-text-style container">
+                    @Html.Raw(Model.Value("descriptions"))
+                </p>
+                
+                
+          </div>
+        </div>
+
+  </div>
+    </div>
+</section>
+
+@*cards*@
+<section class="bg-grey-omm" id="section-3">
+    <div class="container p-0 mtb-15 two-cards">
+        @foreach (var item in productCards)
+{
+    if (item.Value<string>("tabsubitemtitle") == "Our offerings")
+    { 
+        <div class="col-xs-12 content-center-2">
+            <div class="content-sub-start-2">
+              <h1 class="text-style">Our offerings</h1>
+            </div>
+        </div>
+
+ <div class="row">
+    <!-- Call Deposits -->
+    
+
+			 <div class="hidden-xs" id="">
+					@foreach (var x in item.Value<IEnumerable<IPublishedElement>>("genericcardcontent"))
+						{
+						 var cardDesc = x.Value<string>("mediumDescription");
+						 List<Umbraco.Web.Models.Link> itemLink = new List<Umbraco.Web.Models.Link>();
+                                                    foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)x.Value("nccardUrl"))
+                                                    {
+                                                        itemLink.Add(link);
+                                                    }
+										<div class="col-sm-4 col-md-4">
+								  <div class="panel panel-default panel-custom">
+									<div class="panel-heading"><strong>@x.Value("nCcardtitle")</strong></div>
+									<div class="panel-body">
+									  @Html.Raw(cardDesc)
+									  <div class="btn-group btngroupcard">
+										<a href="@itemLink[0].Url" class="btn btn-default btn-learn"> 
+										@itemLink[0].Name 
+
+							</a>
+									<a href="@itemLink[1].Url" class="btn btn-contact">@itemLink[1].Name</a>        
+										
+									  </div>
+									</div>
+								  </div>
+								</div>
+			  
+
+							  }
+						      
+			</div>
+  </div>
+  }
+  }
+ </div>
+ <div class="container visible-xs">
+  <div class="scroll-container" id="scrollContainer">
+    
+     @foreach (var item in productCards)
+{
+    if (item.Value<string>("tabsubitemtitle") == "Our offerings")
+    { 
+	foreach (var x in item.Value<IEnumerable<IPublishedElement>>("genericcardcontent"))
+						{
+						 var cardDesc = x.Value<string>("mediumDescription");
+						 List<Umbraco.Web.Models.Link> itemLink = new List<Umbraco.Web.Models.Link>();
+                                                    foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)x.Value("nccardUrl"))
+                                                    {
+                                                        itemLink.Add(link);
+                                                    }
+    <div class="scroll-item">
+      <div class="panel panel-default panel-custom">
+        <div class="panel-heading"><strong>@x.Value("nCcardtitle") </strong></div>
+        <div class="panel-body">
+          @Html.Raw(cardDesc)
+        </div>
+        <div class="card-panel-footer">
+          <div class="btn-group">
+            <a href="@itemLink[0].Url" class="btn btn-default btn-learn">@itemLink[0].Name</a>
+            <a href="@itemLink[1].Url" class="btn btn-contact">@itemLink[1].Name</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    }
+	}
+	}
+  </div>
+
+
+  <div class="indicator-dots" id="dots">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    
+  </div>
+
+</div>
+</section>
+@*end cards*@
+}
+
+
+@if(Model.Name  == "Notice Deposits"){
+
+
+<section class="bg-grey">
+<div class="container">
+    
+    <p class="tab-top-content">
+        Choose the Notice Deposit option that works for you
+    </p>
+    
+    <div class="tab-main-container">
+        <!-- Nav tabs -->
+   @* <ul class="nav nav-tabs">
+      <li><a class="tab-text" href="#longTerm" data-toggle="tab">Prime-Time Deposit</a></li>
+      <li><a class="tab-text" href="#longTerm" data-toggle="tab">Prime-Time Deposit</a></li>
+    </ul>*@
+    
+    <!-- Tab panes -->
+    <div class="tab-content">
+      <div class="tab-pane fade in active Notice-heading" id="longTerm">
+        <div class="container tab-table-100">
+            <p class="prime-time-heading">Prime-Time Deposit</p>
+                <p class="mlr tab-long-text">This account lets you invest funds for a specified term at a rate <strong>linked to the current Prime Rate*</strong>. It offers predictable returns based on market conditions. African Bank reserves the right to limit availability of this product at our discretion.</p>
+
+      <div class="rate-table">
+        <table class="table table-bordered table-striped notice-table" id="ratesTable">
+          <thead>
+            <tr>
+              <th style="text-wrap-mode: nowrap;">Period 
+              <svg class="toolpick-position" data-toggle="tooltip" title="An investment period is the fixed length of time your funds are invested (e.g. days, weeks, months or years)." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_6894_15778)">
+    <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+    </g>
+    <defs>
+    <clipPath id="clip0_6894_15778">
+    <rect width="24" height="24" fill="white"/>
+    </clipPath>
+    </defs>
+    </svg>
+    </th>
+              <th class="hidden- nacm-rate">NACM Rate
+              <svg class="toolpick-position" data-toggle="tooltip" title="Nominal Annual Compounded Monthly (NACM) refers to the actual interest earned over a one-month period, calculated on an annual basis." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_6894_15778)">
+    <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+    </g>
+    <defs>
+    <clipPath id="clip0_6894_15778">
+    <rect width="24" height="24" fill="white"/>
+    </clipPath>
+    </defs>
+    </svg>
+    
+              </th>
+              <th class="visible-xs nacm" style="text-wrap-mode: nowrap;">NACM
+              <svg class="toolpick-position" data-toggle="tooltip" title="Nominal Annual Compounded Monthly (NACM) refers to the actual interest earned over a one-month period, calculated on an annual basis." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_6894_15778)">
+    <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+    </g>
+    <defs>
+    <clipPath id="clip0_6894_15778">
+    <rect width="24" height="24" fill="white"/>
+    </clipPath>
+    </defs>
+    </svg>
+    
+              </th>
+              @*<th class="annual-effect">Annual Effective
+              <svg class="toolpick-position" data-toggle="tooltip" title="The actual interest earned in a year, including the monthly growth." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip0_6894_15778)">
+            <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+            </g>
+            <defs>
+            <clipPath id="clip0_6894_15778">
+            <rect width="24" height="24" fill="white"/>
+            </clipPath>
+            </defs>
+            </svg>
+    
+              </th>
+              <th>
+              Fact Sheet & Product Rules
+              
+    
+              </th>*@
+            </tr>
+          </thead>
+          <tbody>
+             
+@for (int rowIndex = 0; rowIndex < 5; rowIndex++)
+{
+    <tr>
+        @for (int colIndex = 0; colIndex < columns.Count(); colIndex++)
+        {
+            var colItem = columns.ElementAt(colIndex);
+            var tabBodyContent = colItem?.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+            var genericContent = tabBodyContent?.FirstOrDefault(t => t.ContentType.Alias == "nCTabGenericContent");
+            var sectionContent = genericContent?.Value<IEnumerable<IPublishedElement>>("sectionContent")?.ToList();
+
+            var cellItem = (sectionContent != null && rowIndex < sectionContent.Count) ? sectionContent[rowIndex] : null;
+
+          
+           
+            if (colIndex != 3 && colIndex != 2)
+            {
+                <td>@(cellItem?.Value("ncCardTitle") ?? "")</td>
+                }
+           
+        }
+    </tr>
+}
+
+                   
+            </tbody>
+
+                                  
+                   
+        </table>
+      </div>
+    </div>
+      </div>
+     
+    </div>
+    
+    
+        <p class="mlr tab-long-text">*Prime rate that serves as a base rate for various financial institutions, influenced by the central bank's policy (e.g. repo rate).</p>
+        
+    <div class="notice-desc">
+                <a type="button" href="https://business-infinityonboarding.africanbank.co.za/" class="btn btn-primary">Apply now</a>
+    </div>
+    
+</div>
+@*<div class="container">
+<div class="row">
+    <div class="col-md-8 col-xs-12">
+    <p class="tab-long-text-heading">Our Online Money Manager Notice Products offer an expanded options and support all entity types and Agents. </p>
+    
+</div>
+<div class="col-md-4 col-xs-12">
+    <a type="button" href="https://business-infinityonboarding.africanbank.co.za/" class="btn btn-primary">View more</a>
+</div>
+</div>
+</div>*@
+<div class="table-bottm-heading">
+    <div>
+        <p class="tab-long-text-heading">Our Online Money Manager Notice Products offer an expanded options and support all entity types and Agents. </p>
+    </div>
+    <div>
+        <a type="button" href="/en/home/invest-v1/omm-notice-deposits/" class="btn btn-primary">View more</a>
+    </div>
+</div>
+
+
+</div>    
+
+
+</section>
+
+}
+
+@if(Model.Name  == "OMM Notice Deposits"){
+
+
+<section class="bg-grey">
+<div class="container">
+    
+    <p class="tab-top-content">
+        Choose the OMM Notice Deposit option that works for you
+    </p>
+    
+    <div class="tab-main-container">
+        <!-- Nav tabs -->
+    <ul class="nav nav-tabs">
+      <li class="active"><a class="tab-text" href="#shortTerm" data-toggle="tab">Flexi Notice Deposit</a></li>
+      <li><a class="tab-text" href="#longTerm" data-toggle="tab">Prime-Time Deposit</a></li>
+    </ul>
+    
+    <!-- Tab panes -->
+    <div class="tab-content">
+      <div class="tab-pane fade in active" id="shortTerm">
+        <div class="container tab-table-100">
+                <p class="mlr tab-long-text">This account offers flexibility by allowing you to invest funds for a specified term with an interest rate linked to the current Prime Rate. You can choose your notice period to align with your cash flow needs. The <b>minimum investment size is R250 000 with a maximum of R25 million</b>. We reserve the right to cap this product at our discretion.</p>
+
+      <div class="rate-table">
+        <table class="table table-bordered table-striped omm-notice-table" id="ratesTable">
+          <thead>
+            <tr>
+              <th style="text-wrap-mode: nowrap;">Period 
+              <svg class="toolpick-position" data-toggle="tooltip" title="An investment period is the fixed length of time your funds are invested (e.g. days, weeks, months or years)." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_6894_15778)">
+    <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+    </g>
+    <defs>
+    <clipPath id="clip0_6894_15778">
+    <rect width="24" height="24" fill="white"/>
+    </clipPath>
+    </defs>
+    </svg>
+    </th>
+              <th class="hidden- nacm-rate">NACM Rate
+              <svg class="toolpick-position" data-toggle="tooltip" title="Nominal Annual Compounded Monthly (NACM) refers to the actual interest earned over a one-month period, calculated on an annual basis." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_6894_15778)">
+    <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+    </g>
+    <defs>
+    <clipPath id="clip0_6894_15778">
+    <rect width="24" height="24" fill="white"/>
+    </clipPath>
+    </defs>
+    </svg>
+    
+              </th>
+              <th class="visible-xs nacm" style="text-wrap-mode: nowrap;">NACM
+              <svg class="toolpick-position" data-toggle="tooltip" title="Nominal Annual Compounded Monthly (NACM) refers to the actual interest earned over a one-month period, calculated on an annual basis." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_6894_15778)">
+    <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+    </g>
+    <defs>
+    <clipPath id="clip0_6894_15778">
+    <rect width="24" height="24" fill="white"/>
+    </clipPath>
+    </defs>
+    </svg>
+    
+              </th>
+              <th class="annual-effect">Annual Effective
+              <svg class="toolpick-position" data-toggle="tooltip" title="The actual interest earned in a year, including the monthly growth." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip0_6894_15778)">
+            <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+            </g>
+            <defs>
+            <clipPath id="clip0_6894_15778">
+            <rect width="24" height="24" fill="white"/>
+            </clipPath>
+            </defs>
+            </svg>
+    
+              </th>
+              <th>
+              Fact Sheet & Product Rules
+              
+    
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+              
+@for (int rowIndex = 0; rowIndex < 5; rowIndex++)
+{
+    <tr>
+        @for (int colIndex = 0; colIndex < columns.Count(); colIndex++)
+        {
+            var colItem = columns.ElementAt(colIndex);
+            var tabBodyContent = colItem?.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+            var genericContent = tabBodyContent?.FirstOrDefault(t => t.ContentType.Alias == "nCTabGenericContent");
+            var sectionContent = genericContent?.Value<IEnumerable<IPublishedElement>>("sectionContent")?.ToList();
+
+            var cellItem = (sectionContent != null && rowIndex < sectionContent.Count) ? sectionContent[rowIndex] : null;
+
+            if (colIndex == 3)
+            {
+                <td class="download-pdf">
+                    <a 
+                        href="@(cellItem?.Value("ncCardTitle") ?? "#")"
+                        download
+                        rel="noopener noreferrer"
+                        class="inline-download-link"
+                        style="display: ruby;"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <g clip-path="url(#clip0_7035_15339)">
+                                <path d="M8.66732 3.33333V7.33333H9.44732L8.00065 8.78L6.55398 7.33333H7.33398V3.33333H8.66732ZM10.0007 2H6.00065V6H3.33398L8.00065 10.6667L12.6673 6H10.0007V2ZM12.6673 12H3.33398V13.3333H12.6673V12Z" fill="#5dc300"></path>
+                            </g>
+                            <defs>
+                                <clipPath id="clip0_7035_15339">
+                                    <rect width="16" height="16" fill="white"></rect>
+                                </clipPath>
+                            </defs>
+                        </svg>
+                        <span class="table-pdf visible-xs">PDF</span>
+                        <span class="table-pdf hidden-xs">Download PDF</span>
+                    </a>
+                </td>
+            }
+            else
+            {
+                <td>@(cellItem?.Value("ncCardTitle") ?? "")</td>
+            }
+        }
+    </tr>
+}
+
+                   
+            </tbody>
+
+                                  
+                   
+        </table>
+      </div>
+    </div>
+      </div>
+      <div class="tab-pane fade" id="longTerm">
+            <div class="container tab-table-100">
+            <p class="mlr tab-long-text">This account lets you invest funds for a specified term at a rate <b>linked to the current Prime Rate*</b>.
+                It offers predictable returns based on market conditions. <b>Invest from a minimum of R50 000</b>. 
+                African Bank reserves the right to limit availability of this product at our discretion.</p>
+
+    
+            <div class="rate-table">
+                <table class="table table-bordered table-striped omm-notice-table" id="ratesTable">
+                  <thead>
+                    <tr>
+                      <th style="text-wrap-mode: nowrap;">Period 
+                      <svg class="toolpick-position" data-toggle="tooltip" title="An investment period is the fixed length of time your funds are invested (e.g. days, weeks, months or years)." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g clip-path="url(#clip0_6894_15778)">
+                        <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+                        </g>
+                        <defs>
+                        <clipPath id="clip0_6894_15778">
+                        <rect width="24" height="24" fill="white"/>
+                        </clipPath>
+                        </defs>
+                        </svg>
+                        </th>
+                    <th class="hidden-xs nacm-rate">NACM Rate
+              <svg class="toolpick-position" data-toggle="tooltip" title="Nominal Annual Compounded Monthly (NACM) refers to the actual interest earned over a one-month period, calculated on an annual basis." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_6894_15778)">
+    <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+    </g>
+    <defs>
+    <clipPath id="clip0_6894_15778">
+    <rect width="24" height="24" fill="white"/>
+    </clipPath>
+    </defs>
+    </svg>
+    
+              </th>
+              <th class="visible-xs nacm" style="text-wrap-mode: nowrap;">NACM
+              <svg class="toolpick-position" data-toggle="tooltip" title="Nominal Annual Compounded Monthly (NACM) refers to the actual interest earned over a one-month period, calculated on an annual basis." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_6894_15778)">
+    <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+    </g>
+    <defs>
+    <clipPath id="clip0_6894_15778">
+    <rect width="24" height="24" fill="white"/>
+    </clipPath>
+    </defs>
+    </svg>
+    
+              </th>
+                      <th class="annual-effect">Annual Effective
+                      <svg class="toolpick-position" data-toggle="tooltip" title="The actual interest earned in a year, including the monthly growth." width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_6894_15778)">
+                    <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#5DC400"/>
+                    </g>
+                    <defs>
+                    <clipPath id="clip0_6894_15778">
+                    <rect width="24" height="24" fill="white"/>
+                    </clipPath>
+                    </defs>
+                    </svg>
+            
+                      </th>
+                      <th>
+                      Fact sheet & Product rules
+                  
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                      
+                      
+                      
+@for (int rowIndex = 5; rowIndex < maxRows; rowIndex++)
+{
+    <tr>
+        @for (int colIndex = 0; colIndex < columns.Count(); colIndex++)
+        {
+            var colItem = columns.ElementAt(colIndex);
+            var tabBodyContent = colItem?.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+            var genericContent = tabBodyContent?.FirstOrDefault(t => t.ContentType.Alias == "nCTabGenericContent");
+            var sectionContent = genericContent?.Value<IEnumerable<IPublishedElement>>("sectionContent")?.ToList();
+
+            var cellItem = (sectionContent != null && rowIndex < sectionContent.Count) ? sectionContent[rowIndex] : null;
+
+            if (colIndex == 3)
+            {
+                <td class="download-pdf">
+                    <a 
+                        href="@(cellItem?.Value("ncCardTitle") ?? "#")"
+                        download
+                        rel="noopener noreferrer"
+                        class="inline-download-link"
+                        style="display: ruby;"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <g clip-path="url(#clip0_7035_15339)">
+                                <path d="M8.66732 3.33333V7.33333H9.44732L8.00065 8.78L6.55398 7.33333H7.33398V3.33333H8.66732ZM10.0007 2H6.00065V6H3.33398L8.00065 10.6667L12.6673 6H10.0007V2ZM12.6673 12H3.33398V13.3333H12.6673V12Z" fill="#5dc300"></path>
+                            </g>
+                            <defs>
+                                <clipPath id="clip0_7035_15339">
+                                    <rect width="16" height="16" fill="white"></rect>
+                                </clipPath>
+                            </defs>
+                        </svg>
+                        <span class="table-pdf visible-xs">PDF</span>
+                        <span class="table-pdf hidden-xs">Download PDF</span>
+                    </a>
+                </td>
+            }
+            else
+            {
+                <td>@(cellItem?.Value("ncCardTitle") ?? "")</td>
+            }
+        }
+    </tr>
+}
+
+                      
+                
+                  </tbody>
+                  
+                  
+                  
+                </table>
+              </div>
+      
+           
+        
+    </div>
+      </div>
+    </div>
+    
+    
+        <p class="mlr tab-long-text">*Prime rate that serves as a base rate for various financial institutions, 
+            influenced by the central bank's policy (e.g. repo rate).</p>
+        
+    <div class="notice-desc">
+                <a type="button" href="/en/home/contact-us#Sales-enquiry" class="btn btn-primary">Contact us</a>
+    </div>
+    
+</div>
+</div>    
+
+
+</section>
+
+}
+@if(Model.Name  == "Notice Deposit"){
+
+
+
+
+
+<section class="bg-grey" id="section-3">
+
+
+<div class="container margin-top">
+    
+    <div class="row">
+  
+    
+@foreach (var item in productCards)
+{
+   
+    if (item.Value<string>("tabsubitemtitle") == "Our offerings")
+    {
+    
+      <h1 class="panel-heading-1">@item.Value("tabsubitemtitle")</h1>
+      
+      
+      foreach(var x in item.Value<IEnumerable<IPublishedElement>>("genericcardcontent"))
+          { 
+          
+          
+        <div class="col-sm-6 col-md-6">
+      <div class="panel panel-default panel-custom-1">
+        <div class="panel-heading-1"><strong>@x.Value("nCcardtitle")</strong></div>
+        <div class="panel-body-1">
+          <p> @x.Value("mediumdescription")</p>
+      
+        </div>
+      </div>
+    </div>
+          
+          }
+        
+  
+    }
+    
+    
+}
+
+  </div>
+ 
+    
+    </div>
+    </section>
+    
+
+
+}
+
+
+
+
+
+ 
+
+
+@*@if(Model.Name  == "Online Money Manager (OMM)"){
+
+<section class="bg-grey3" id="section-3-0">
+    <div class="benefits-section-wrapper-omm-1">
+        <div class="container benefits-section benefits-section-omm">
+          <div class="row mobile-benefit-layout">
+        <!-- Text Column -->
+        <div class="col-sm-7">
+          <h3 class="text-style"><strong>Benefits</strong></h3>
+          <hr style="border: 1px solid #52c41a;margin-left: 0;">
+          
+          
+          <div class="benefit-item">
+        <svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </svg>
+            <span class="benefit-title">No setup fees, </span>
+            bank charges, or third-party payment fees.
+          </div>
+          <div class="benefit-item">
+        <svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </svg>
+           Property  <span class="benefit-title"> guarantee issuance at no cost.</span>
+          </div>
+          <div class="benefit-item">
+        <svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </svg>
+            Simple, <span class="benefit-title">highly competitive interest rates—</span>one rate for everyone
+          </div>
+          <div class="benefit-item">
+        <svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </svg>
+            <span class="benefit-title">Easy to use </span>and navigate.
+          </div>
+          <div class="benefit-item">
+        <svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </svg>
+            Safe and <span class="benefit-title">secure online banking</span> for your <span class="benefit-title">convenience</span>.
+          </div>
+          <div class="benefit-item">
+        <svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </svg>
+            In-depth <span class="benefit-title">reporting and accounting</span> tools.
+          </div>
+          <div class="benefit-item">
+        <svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </svg>
+            <span class="benefit-title">Flexible options</span> - call accounts, fixed deposits, and notice deposits.
+          </div>
+          <div class="benefit-item">
+        <svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </svg>
+            Set up <span class="benefit-title">recurring payments</span> easily.
+          </div>
+          <a href="http://cmsdev.africanbank.net/en/home/contact-us#Sales-enquiry" class="btn btn-contact">Contact us
+     
+          </a>
+        </div>
+        
+    
+        <!-- Image Column -->
+        <div class="col-sm-5 text-center">
+          <div class="img-wrapper">
+            <img src="/media/bzipjmfu/vector-11.png" alt="Smiling Person at Desk" class="img-responsive">
+          </div>
+        </div>
+      </div>
+        
+    </div>
+    </div>
+    
+    
+</section>
+<section class="bg-white-90"></section>
+}*@
+
+@if(Model.Name  == "Online Money Manager (OMM)" || Model.Name  == "OMM Call Deposits" || Model.Name  == "Call Deposits" || Model.Name  == "Notice Deposits" || Model.Name  == "OMM Notice Deposits" ){
+
+    <section class="bg-grey" id="section-3-0">
+    <div class="benefits-section-wrapper">
+        <div class="container benefits-section benefits-section2">
+          <div class="row mobile-benefit-layout">
+        <!-- Text Column -->
+        
+          
+         @foreach (var item in productCards)
+{
+    if (item.Value<string>("tabsubitemtitle") == "Benefits")
+    {
+        var tabSubItemImage = item.Value<IPublishedContent>("tabSubItemImage")?.Url;
+
+        <div class="col-sm-7">
+            <h3 class="text-style"><strong>Benefits</strong></h3>
+            <hr style="border: 2px solid #52c41a;margin-left: 0;width:107px">
+
+            @{
+                var itemLink = new List<Umbraco.Web.Models.Link>();
+
+                var links = item.Value<IEnumerable<Umbraco.Web.Models.Link>>("tabSubItemLinks");
+                if (links != null)
+                {
+                    foreach (var link in links)
+                    {
+                        itemLink.Add(link);
+                    }
+                }
+            }
+
+            @foreach (var x in item.Value<IEnumerable<IPublishedElement>>("genericcardcontent"))
+            {
+             var cardDesc = x.Value<string>("mediumDescription");
+    var cleanText = System.Text.RegularExpressions.Regex.Replace(cardDesc, "<.*?>", "");
+                <div class="benefit-item">
+                    <svg width="20" height="20" viewBox="0 0 25 25" fill="none">
+                        <path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+
+                    @*<span class="benefit-title">@x.Value("nCcardtitle")</span>*@
+                    @Html.Raw(cardDesc)
+                </div>
+            }
+
+            @if (itemLink.Any())
+            {
+                <a href="@itemLink[0].Url" class="btn btn-contact">
+                    @itemLink[0].Name
+                </a>
+            }
+        </div>
+
+        <div class="col-sm-5 text-center">
+            <div class="img-wrapper">
+                <img src="@tabSubItemImage" alt="Smiling Person at Desk" class="img-responsive img-bene">
+            </div>
+        </div>
+    }
+}
+        
+      </div>
+   
+
+@if (Model.Name == "Call Deposits" || Model.Name == "OMM Call Deposits")
+{
+    <p class="benefit-item-note">*Prime rate that serves as a base rate for various financial institutions, influenced by the central bank's policy (e.g. repo rate).</p>
+}
+      
+       
+    </div>
+    </div>
+</section>
+<section class="bg-white-90 xs-bg-white"></section>
+}
+
+
+@if(Model.Name  == "Fixed Deposits" || Model.Name  == "OMM Fixed Deposits"){
+<section class="bg-grey" id="section-3-0">
+<div class="benefits-section-wrapper-fixed">
+    <div class="container benefits-section2 benefits-section-fixed">
+      <div class="row mobile-benefit-layout">
+    <!-- Text Column -->
+    @foreach (var item in productCards)
+{
+    if (item.Value<string>("tabsubitemtitle") == "Benefits")
+    {
+        var tabSubItemImage = item.Value<IPublishedContent>("tabSubItemImage")?.Url;
+
+        <div class="col-sm-7">
+            <h3 class="text-style"><strong>Benefits</strong></h3>
+            <hr style="border: 2px solid #52c41a;margin-left: 0;width:107px">
+
+            @{
+                var itemLink = new List<Umbraco.Web.Models.Link>();
+
+                var links = item.Value<IEnumerable<Umbraco.Web.Models.Link>>("tabSubItemLinks");
+                if (links != null)
+                {
+                    foreach (var link in links)
+                    {
+                        itemLink.Add(link);
+                    }
+                }
+            }
+
+            @foreach (var x in item.Value<IEnumerable<IPublishedElement>>("genericcardcontent"))
+            {
+             var cardDesc = x.Value<string>("mediumDescription");
+    var cleanText = System.Text.RegularExpressions.Regex.Replace(cardDesc, @"</?p>", "");
+                <div class="benefit-item">
+                    <svg width="20" height="20" viewBox="0 0 25 25" fill="none">
+                        <path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+
+                    <span class="benefit-title">@x.Value("nCcardtitle")</span>
+                    @cleanText
+                </div>
+            }
+
+            @if (itemLink.Any())
+            {
+                <a href="@itemLink[0].Url" class="btn btn-contact">
+                    @itemLink[0].Name
+                </a>
+            }
+        </div>
+
+        <div class="col-sm-5 text-center">
+            <div class="img-wrapper">
+                <img src="@tabSubItemImage" alt="Smiling Person at Desk" class="img-responsive img-bene">
+            </div>
+        </div>
+    }
+}
+  </div>
+    
+</div>
+</div>
+</section>
+<section class="bg-white-90 bg-white-245"></section>
+}
+
+
+
+
+
+
+
+@if(Model.Name  == "Call Deposits" || Model.Name  == "OMM Call Deposits" ){
+<section class="bg-grey" id="section-13">
+    
+    <div class="container ">
+        <h3 class="text-style1"><strong>T&Cs</strong></h3>
+
+        <div class="row bg-white section-large-card-2">
+    <div class="col-md-12">
+      <div class="highlight-section">
+          
+          <div class="col-md-8 col-sm-8">
+              <div class="highlight-text">
+                          
+       <ul class="custom-bullets btn-font-color mt-40">
+          @foreach(var item in productCards)
+        {
+            if(@item.Value<string>("tabsubitemtitle") == "tnc")
+            {
+            @*@Html.Raw(item.Value("tabSubItemTextContent"))*@
+            List<Umbraco.Web.Models.Link>
+                    itemLink = new List<Umbraco.Web.Models.Link>();
+
+                        foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)item.Value("tabSubItemLinks"))
+                            {
+                           itemLink.Add(link);
+                            }
+              <li class="tncps" style="position: relative;top: -30px;">
+            <a href="@itemLink[0].Url" download href="javascript:void(0)" rel="noopener noreferrer">
+            <span class="padding-right-svg">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip0_2820_19214)">
+            <path d="M14 2H6C4.9 2 4.01 2.9 4.01 4L4 20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2ZM6 20V4H13V9H18V20H6Z" fill="#5dc300"></path>
+            </g>
+            <defs>
+            <clipPath id="clip0_2820_19214">
+            <rect width="24" height="24" fill="white"></rect>
+            </clipPath>
+            </defs>
+            </svg>
+            </span>      
+               
+            
+               <span style="font-weight: 600;text-decoration: underline !important;">@itemLink[0].Name</span> 
+              <span class="padding-left-svg">   
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip0_2820_19216)">
+            <path d="M19 9H15V3H9V9H5L12 16L19 9ZM11 11V5H13V11H14.17L12 13.17L9.83 11H11ZM5 18H19V20H5V18Z" fill="#5dc300"></path>
+            </g>
+            <defs>
+            <clipPath id="clip0_2820_19216">
+            <rect width="24" height="24" fill="white"></rect>
+            </clipPath>
+            </defs>
+            </svg>
+             </span> 
+             </a>
+  </li>
+              
+              <li class="tncps" style="position: relative;top: -25px;">
+            <a href="@itemLink[1].Url" download href="javascript:void(0)" rel="noopener noreferrer">
+            <span class="padding-right-svg">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip0_2820_19214)">
+            <path d="M14 2H6C4.9 2 4.01 2.9 4.01 4L4 20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2ZM6 20V4H13V9H18V20H6Z" fill="#5dc300"></path>
+            </g>
+            <defs>
+            <clipPath id="clip0_2820_19214">
+            <rect width="24" height="24" fill="white"></rect>
+            </clipPath>
+            </defs>
+            </svg>
+            </span>      
+               
+            
+               <span style="font-weight: 600;text-decoration: underline !important;">@itemLink[1].Name</span> 
+              <span class="padding-left-svg">   
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip0_2820_19216)">
+            <path d="M19 9H15V3H9V9H5L12 16L19 9ZM11 11V5H13V11H14.17L12 13.17L9.83 11H11ZM5 18H19V20H5V18Z" fill="#5dc300"></path>
+            </g>
+            <defs>
+            <clipPath id="clip0_2820_19216">
+            <rect width="24" height="24" fill="white"></rect>
+            </clipPath>
+            </defs>
+            </svg>
+             </span> 
+             </a>
+  </li>
+                            
+            
+            }
+            }
+        
+  
+            
+
+        </ul>
+
+          
+        
+        </div>
+          </div>
+          
+      </div>
+    </div>
+    
+  </div>
+
+    </div>
+     
+</section>
+}else if( Model.Name  == "Notice Deposits" ||  Model.Name  == "OMM Notice Deposits" || Model.Name  == "Online Money Manager (OMM)"){
+
+<section class="bg-grey" id="section-13">
+    
+    <div class="container ">
+        <h3 class="text-style1"><strong>Product Information & Rules</strong></h3>
+
+        <div class="row bg-white section-large-card-2">
+    <div class="col-md-12">
+      <div class="highlight-section">
+          
+          <div class="col-md-8 col-sm-8">
+              <div class="highlight-text">
+                    <ul class="custom-bullets btn-font-color mt-40">
+                   @foreach(var item in productCards)
+        {
+            if(@item.Value<string>("tabsubitemtitle") == "tnc")
+            {
+             @*@Html.Raw(item.Value("tabSubItemTextContent"))*@
+            List<Umbraco.Web.Models.Link>
+                    itemLink = new List<Umbraco.Web.Models.Link>();
+
+                        foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)item.Value("tabSubItemLinks"))
+                            {
+                            
+                            
+<li class="tncps" style="position: relative; top: -13px;">
+    <a href="@link.Url" download rel="noopener noreferrer" aria-label="Download Terms and Conditions PDF">
+        <!-- Left SVG icon -->
+        <span class="padding-right-svg">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g clip-path="url(#clip0_2820_19214)">
+                    <path d="M14 2H6C4.9 2 4.01 2.9 4.01 4L4 20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2ZM6 20V4H13V9H18V20H6Z" fill="#5dc300"></path>
+                </g>
+                <defs>
+                    <clipPath id="clip0_2820_19214">
+                        <rect width="24" height="24" fill="white"></rect>
+                    </clipPath>
+                </defs>
+            </svg>
+        </span>
+
+        <!-- Link text -->
+        <span style="font-weight: 600; text-decoration: underline !important;">@link.Name</span> 
+
+        <!-- Right SVG icon -->
+        <span class="padding-left-svg">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g clip-path="url(#clip0_2820_19216)">
+                    <path d="M19 9H15V3H9V9H5L12 16L19 9ZM11 11V5H13V11H14.17L12 13.17L9.83 11H11ZM5 18H19V20H5V18Z" fill="#5dc300"></path>
+                </g>
+                <defs>
+                    <clipPath id="clip0_2820_19216">
+                        <rect width="24" height="24" fill="white"></rect>
+                    </clipPath>
+                </defs>
+            </svg>
+        </span>
+    </a>
+</li>
+}
+            }
+            }
+            
+
+         
+               
+                    
+
+   
+                </ul>
+        </div>
+          </div>
+          
+      </div>
+    </div>
+    
+  </div>
+
+    </div>
+     
+</section>
+}
+else if( Model.Name  == "Fixed Deposits" || Model.Name  == "OMM Fixed Deposits" ){
+<section class="bg-grey" id="section-13">
+    
+    <div class="container ">
+        <h3 class="text-style1"><strong>T&Cs</strong></h3>
+
+        <div class="row bg-white section-large-card-2">
+    <div class="col-md-12">
+      <div class="highlight-section">
+          
+          <div class="col-md-8 col-sm-8">
+              <div class="highlight-text">
+          <ul class="custom-bullets btn-font-color mt-40">
+        
+           @foreach(var item in productCards)
+        {
+            if(@item.Value<string>("tabsubitemtitle") == "tnc")
+            {
+            List<Umbraco.Web.Models.Link>
+                    itemLink = new List<Umbraco.Web.Models.Link>();
+
+                        foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)item.Value("tabSubItemLinks"))
+                            {
+                            itemLink.Add(link);
+                            }
+                               <li class="tncps" style="position: relative;top: -13px;">
+            <a href="@itemLink[0].Url" download href="javascript:void(0)" rel="noopener noreferrer">
+            <span class="padding-right-svg">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip0_2820_19214)">
+            <path d="M14 2H6C4.9 2 4.01 2.9 4.01 4L4 20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2ZM6 20V4H13V9H18V20H6Z" fill="#5dc300"></path>
+            </g>
+            <defs>
+            <clipPath id="clip0_2820_19214">
+            <rect width="24" height="24" fill="white"></rect>
+            </clipPath>
+            </defs>
+            </svg>
+            </span>      
+               
+            
+               <span style="font-weight: 600;text-decoration: underline !important;">@itemLink[0].Name</span> 
+              <span class="padding-left-svg">   
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip0_2820_19216)">
+            <path d="M19 9H15V3H9V9H5L12 16L19 9ZM11 11V5H13V11H14.17L12 13.17L9.83 11H11ZM5 18H19V20H5V18Z" fill="#5dc300"></path>
+            </g>
+            <defs>
+            <clipPath id="clip0_2820_19216">
+            <rect width="24" height="24" fill="white"></rect>
+            </clipPath>
+            </defs>
+            </svg>
+             </span> 
+             </a>
+  </li>
+            
+            }
+            }
+     
+
+           
+   
+        </ul>
+
+          
+        
+        </div>
+          </div>
+          
+      </div>
+    </div>
+    
+  </div>
+
+    </div>
+     
+</section>
+}
+
+@if(Model.Name  == "Call Deposits" || Model.Name  == "Fixed Deposits" || Model.Name  == "OMM Notice Deposits"){
+    <section class="bg-white-90"></section>
+}
+@if(Model.Name  == "Online Money Manager (OMM)" ){
+<section class="bg-grey3" id="section-3-0">
+    <div class="benefits-section-wrapper">
+        <div class="container benefits-section ">
+      <div class="row mobile-benefit-layout">
+    <!-- Text Column -->
+     @foreach (var item in productCards)
+{
+    if (item.Value<string>("tabsubitemtitle") == "other benfits")
+    {
+    <div class="col-sm-12">
+      <h3 class="text-style"><strong>Who can benefit from OMM?</strong></h3>
+      <hr style="border: 2px solid #52c41a;margin-left: 0;width:107px">
+
+
+       @foreach (var x in item.Value<IEnumerable<IPublishedElement>>("genericcardcontent"))
+            {
+             var cardDesc = x.Value<string>("mediumDescription");
+    var cleanText = System.Text.RegularExpressions.Regex.Replace(cardDesc, @"</?p>", "");
+                <div class="benefit-item">
+                    <svg width="20" height="20" viewBox="0 0 25 25" fill="none">
+                        <path d="M19.75 11.7257L4.75 11.7257" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M13.7002 5.70131L19.7502 11.7253L13.7002 17.7503" stroke="#5DC303" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+
+                     @Html.Raw(cardDesc)
+                </div>
+            }
+    </div>
+}
+}
+
+  </div>
+    
+</div>
+    </div>
+</section>
+
+}
+@if(Model.Name  != "Online Money Manager (OMM)" && Model.Name  != "Notice Deposits"){
+
+<section class="section-6 section-327 section4-img-bg-image bg-grey2" id="faq" aria-labelledby="faq-tab" role="tabmyPanel">
+    <div class="container">
+        <h5 class="faqHeader btn-font-color">FAQ's</h5>
+
+        @foreach(var item in productCards)
+        {
+            if(@item.Value<string>("tabsubitemtitle") == "FAQs")
+            {
+                foreach(var x in item.Value<IEnumerable<IPublishedElement>>("genericcardcontent"))
+                {
+                    // Each 'x' here represents a single FAQ item, dynamically creating the accordion
+                    <button class="accordion" aria-expanded="false" aria-controls="@x.Value("nCcardtitle")">
+                        @x.Value("nCcardtitle")
+                    </button>
+
+                    <div class="myPanel" id="@x.Value("nCcardtitle")" style="display: none;">
+                        <div class="highlight-text">
+                            @x.Value("mediumdescription")
+                        </div>
+                    </div>
+                }
+            }
+        }
+    </div>
+</section>
+
+}else{
+<section class="bg-white-90"></section>
+}
+
+
+
+
+
+<script>
+            // Accordion Script (if applicable)
+    $(".accordion").click(function() {
+        $(this).toggleClass("active");
+        var myPanel = $(this).next(".myPanel");
+        var wasOpen = myPanel.css("display") === "block";
+
+        $(".myPanel").css("display", "none");
+        $(".accordion").removeClass("active");
+
+        if (!wasOpen) {
+            myPanel.css("display", "block");
+            $(this).addClass("active");
+        }
+    });
+    
+    
+
+
+// If you want to remove the whole tag when anywhere in the tag is clicked
+$(document).on('click', '.filter-tag', function() {
+  $(this).remove();
+});
+
+ 
+    
+    $(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();   
+});
+
+
+
+
+
+const scrollContainer = document.getElementById('scrollContainer');
+const dots = document.getElementById('dots').children;
+const items = scrollContainer.getElementsByClassName('scroll-item');
+
+// Update dots on scroll
+scrollContainer.addEventListener('scroll', () => {
+  let scrollLeft = scrollContainer.scrollLeft;
+  let itemWidth = items[0].offsetWidth + 10; // +10 margin
+  let index = Math.round(scrollLeft / itemWidth);
+
+  for (let i = 0; i < dots.length; i++) {
+    dots[i].classList.toggle('active', i === index);
+  }
+});
+
+// Make dots clickable
+for (let i = 0; i < dots.length; i++) {
+  dots[i].addEventListener('click', () => {
+    let itemWidth = items[0].offsetWidth + 10; // +10 margin
+    scrollContainer.scrollTo({
+      left: i * itemWidth,
+      behavior: 'smooth'
+    });
+  });
+}
+ 
+
+</script>
+
+<script>
+    $(document).ready(function() {
+  console.log('DOM ready');
+
+  function toggleContainerClass() {
+    console.log('Width:', $(window).width());
+    if ($(window).width() <= 767) {
+      console.log('Removing container class');
+      $('.rmv').removeClass('container');
+    } else {
+      console.log('Adding container class');
+      $('.rmv').addClass('container');
+    }
+  }
+
+  toggleContainerClass();
+
+  $(window).on('resize', function() {
+    toggleContainerClass();
+  });
+});
+
+</script>
+
+
+
+<script>
+$(document).ready(function () {
+
+ 
+
+    function renderActiveTags(periods) {
+        const $container = $('#activeFilters');
+        $container.empty();
+
+        periods.forEach(period => {
+            $container.append(`
+                <span class="filter-tag">${period}
+                    <span class="remove-tag" data-value="${period}">×</span>
+                </span>
+            `);
+        });
+    }
+
+    function filterTable() {
+        const selectedPeriods = $('.period-filter:checked').map(function () {
+            return $(this).val();
+        }).get();
+
+        renderActiveTags(selectedPeriods);
+
+        $('#ratesTable tbody tr').each(function () {
+            const period = $(this).find('td:first').text().trim();
+            if (selectedPeriods.length === 0 || selectedPeriods.includes(period)) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+
+        
+    }
+
+    // Checkbox filter change
+    $('.period-filter').on('change', function () {
+        filterTable();
+    });
+
+    // Remove filter tag
+    $(document).on('click', '.remove-tag', function () {
+        const val = $(this).data('value');
+        $(`.period-filter[value="${val}"]`).prop('checked', false);
+        filterTable();
+    });
+
+    // Clear all filters
+    $('#clearPeriods').on('click', function () {
+        $('.period-filter').prop('checked', false);
+        filterTable();
+    });
+
+    // Initialize
+    filterTable();
+});
+</script>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.download-pdf a').forEach(function (link) {
+    link.addEventListener('click', function () {
+      console.log('User initiated download:', link.href);
+      // You could add analytics code here
+    });
+  });
+});
+
+
+</script>

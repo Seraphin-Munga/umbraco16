@@ -7,7 +7,7 @@
 @using System.Text.RegularExpressions
 
 @{
-    Layout = "Master.cshtml";
+    Layout = "Master.cshtml"; 
 
     // All Current Page Children
     var children = Model.Children;
@@ -122,8 +122,8 @@
     // Mobile App Modal Data
     var popupAppTitle = "Download African App using one of the following";
     var popQRCode = "/media/51852/image001.png";
-    var popAndroidApp = "/media/51814/GooglePlayStoreDownloadImageLink.png";
-    var popIOsApp = "/media/51813/appstoredownloadimagelink.png";
+    var popAndroidApp="/media/pt2b4b3q/googleplaystoredownloadimagelink.png";
+    var popIOsApp="/media/pejn1h1x/appstoredownloadimagelink.png";
 }
 
 <style>
@@ -146,6 +146,7 @@
 
 @Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
 <br />
+
 <div class="container">
     <div class="internet-banking-container full image-full">
 
@@ -181,7 +182,7 @@
     </div>
 </div>
 <br />
-@*Blue Background Start*@
+
 <div class="campaign-myworld-container">
     <div class="container payments-section full blue-button">
         <div class="margin-top-20 visible-xs"></div>
@@ -214,7 +215,7 @@
         </div>
     </div>
 </div>
-@*Blue Background End*@
+
 <div class="green-pointer-banking-campaign"></div>
 <div class="hover-block"></div>
 <div class="container">
@@ -266,7 +267,7 @@
                         else
                         {
                             <div class="col-md-4 center-align margin-bottom-20 margin-left-50 banking-options-buttons">
-                                <span class="button span-buttons green-button view_OnlineApps downloadNow" data-item="@popupAppTitle*@popQRCode*@popAndroidApp*@popIOsApp" target="_blank">@downloadNow.EbankItbuttonText</span>
+                                <span class="button span-buttons green-button view_OnlineApps downloadNow" data-item="@popupAppTitle@popQRCode@popAndroidApp@popIOsApp" target="_blank">@downloadNow.EbankItbuttonText</span>
                             </div>
                         }
                     }

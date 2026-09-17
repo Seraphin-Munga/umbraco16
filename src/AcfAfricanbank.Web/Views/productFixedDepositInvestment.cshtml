@@ -1,4 +1,5 @@
 ﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using AcfAfricanbank.Core.Models.Forms
 @using ContentModels = Umbraco.Web.PublishedModels;
 @using Web.Helpers
 @using CustomModels = Web.Models;
@@ -19,9 +20,9 @@
     var infoGraphic = heroBody.Children.Last().Children.FirstOrDefault();
     TabBody tabInfoGraphicData = (TabBody)heroBody.Children.Last(); // based on the child item node on the parent list
     var buttonLinkData = tabInfoGraphicData.Children.Where(x => x.ContentType.Alias.ToString().ToLower() == "ebankititem2").FirstOrDefault();
-    var imageUrlString = ((ContentModels.Image)((IPublishedContent)infoGraphic.Value("ebankITImage"))).Url;
+    @*var imageUrlString = ((ContentModels.Image)((IPublishedContent)infoGraphic.Value("ebankITImage"))).Url;
     var altTagImageUrl = ((ContentModels.Image)((IPublishedContent)infoGraphic.Value("ebankITImage"))).AltTag;
-
+*@
     var heroKnees = children?.Where(c => c.ContentType.Alias.ToLower() == "heroknees").FirstOrDefault();
     var testimonialTab = children?.Where(c => c.ContentType.Alias.ToLower() == "testimonials").FirstOrDefault();
     var homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
@@ -177,6 +178,54 @@
             font-size: 12px;
         }
     }
+    
+        @@media (min-width: 1000px) and (max-width: 10000px) {
+        .row-pop {
+            margin-top: 10px;
+        }
+        
+        #popUpHuawei {
+             margin-right: -59rem;
+             margin-top: -125px;
+         }
+         
+          #popUpIOS {
+             margin-top: -45px;
+             margin-right: -55rem;
+         }
+         
+         #popUpAndroid {
+             margin-right: -45px;
+         }
+         
+        .modal-dialog {
+            width: 900px !important;
+        }
+    }
+    
+    @@media (min-width: 768px) and (max-width: 1024px) {
+        .row-pop {
+            margin-top: 10px;
+        }
+        
+        #popUpHuawei {
+             margin-right: -59rem;
+             margin-top: -125px;
+         }
+         
+          #popUpIOS {
+             margin-top: -45px;
+             margin-right: -55rem;
+         }
+         
+         #popUpAndroid {
+             margin-right: -45px;
+         }
+         
+        .modal-dialog {
+            width: 800px !important;
+        }
+    }
 </style>
 
 
@@ -192,10 +241,10 @@
     <div class="row">
 
         <div class="col-md-4">
-            <img class="info-img" src="@imageUrlString" alt="@altTagImageUrl">
+           @* <img class="info-img" src="@imageUrlString" alt="@altTagImageUrl"> *@
         </div>
         <div class="col-md-8 info-button">
-            @infoGraphic.Value("ebankItContent")
+         @* @infoGraphic.Value("ebankItContent")*@
             @{
                 if (buttonLinkData != null)
                 {
@@ -261,13 +310,60 @@
 @Html.Partial("_testimonials", testimonialTab as Testimonials)
 
 <!-- CALL BACK FORM -->
+@*
 @{
     var _floatingFormViewModel = children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
     @Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)
-}
+}*@
 
 <!-- POPUP DIALOG -->
 @Html.Partial("_ebankITModal")
+
+<div class="modal fade" id="generic" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><b>&times;</b></button>
+                <h4 class="modal-title" id="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade in" id="generic2" role="dialog" style="padding-right: 17px;">
+    <div class="modal-dialog">
+        <div class="modal-content sizer">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><b>×</b></button>
+                <h4 class="modal-title" id="modal-title">Download the African Bank App</h4>
+            </div>
+            
+         <div class="modal-body">
+            <div class="row-pop">
+                <div class="col-sm-4">
+                    <a href="https://play.google.com/store/apps/details?id=za.co.android.africanbank" target="_blank">
+                        <img width="200" id="popUpAndroid" alt="google-play-store-african-bank-android-app" src="/media/fbvhlda4/googleplaystoredownloadimagelink.png">
+                    </a>
+                </div>
+                 <br><br>
+                 <div class="col-sm-4">
+                     <a href="https://itunes.apple.com/us/app/apple-store/id1357204405?mt=8" target="_blank">
+                        <img width="200" id="popUpIOS" alt="ios-african-bank-app" src="/media/prml1k4v/appstoredownloadimagelink.png">
+                     </a> 
+                 </div>
+                 <br><br>
+                 <div class="col-sm-4" >
+                      <a href="https://appgallery.huawei.com/#/app/C103438901">
+                    <img width="200" id="popUpHuawei" src="/media/iiwdllmg/huaweiappgallery.png" />
+                 </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
 
 @section scripts
 {
@@ -279,8 +375,80 @@
     <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculator1.min.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculatorHandler.min.js")"></script>
     <script type="text/javascript">
+    
+    function getMobileOperatingSystem() 
+    {
+        var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        
+        if (/windows phone/i.test(userAgent)) {
+            return "Windows Phone";
+        }
+    
+        if (/android/i.test(userAgent)) {
+            return "Android";
+        }
+    
+        if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+            return "iOS";
+        }
+    
+        return "unknown";
+    }
 
    $(document).ready(function () {
+       
+         var downloadPath = window.location.href;
+        var hastagDownload = downloadPath.substring(downloadPath.length-9, downloadPath.length);
+
+        var emoji = String.fromCodePoint(0x1F60A);
+        var platform = "";
+        var appendHTML = "<div class='hidden-sm hidden-md hidden-lg'><div class='row'><div class='col-xs-12'> " +
+                        "<span class='copy'> Discover new ways to bank conveniently and safely and do your banking your way. Download our Banking App now.</span>" +
+                        "</div></div>" +
+                        "<div class='row'><div class='col-xs-12'><a class='app-platform button primary clearfix' style='background-color: #88bc47 !important;' " +
+                        "href=''>Get it!</a></div></div></div>" +
+                        "<div class='hidden-xs row'><div class='col-xs-12 col-sm-1 col-md-1 col-lg-1' style='padding-left:10%;'>" +
+                        "<i class='fa fa-mobile' aria-hidden='true' style='font-size:58px;'></i></div>" +
+                        "<div class='col-xs-12 col-sm-7 col-md-7 col-lg-7' style='text-align: left;padding-left: 50px;'>" +
+                        "<span class='copy'>For easier navigation and to get familiar with our products - we reckon you should use our app</span></div>" +
+                        "<div class='hidden-xs col-sm-3 col-md-3 col-lg-3' style='margin: 9px;padding-right: 2px;'>" +
+                        "<a class='app-platform button primary clearfix' style='background-color: #88bc47 !important;' href='' >Get it!</a>" +
+                        "</div></div>";
+
+        switch(getMobileOperatingSystem())
+        {
+            case "Android":
+                platform = "https://play.google.com/store/apps/details?id=za.co.android.africanbank";
+                
+                @*$("#AndroidUrl").attr('href');*@
+
+                $('.modal-title').text('Hi, Android User ' + emoji);
+                $('.modal-body').text("");
+
+                $('.modal-body').append(appendHTML);
+                $('.app-platform').attr('href', platform);
+                @*$('.copy').html('@mobileBlurp');*@
+                $('#generic').modal("show");
+                break;
+
+            case "iOS":
+                platform = platform = "https://itunes.apple.com/us/app/apple-store/id1357204405?mt=8";
+                //$("#iOSUrl").attr('href');
+                $('.modal-title').text('Hi, iOS User ' + emoji);
+                $('.modal-body').text("");
+                $('.modal-body').append(appendHTML);
+                @*$('.copy').html('@mobileBlurp');*@
+
+                $('.app-platform').attr('href', platform);
+                $('#generic').modal("show");
+                break;
+            default:
+                console.log("click");
+
+        }
+        
+        
+    
         var imageBgCss = "url('" + "@headerImage_large" + "')";
         var imageMdCss = "url('" + "@headerImage_medium" + "')";
         var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_medium : headerImage_small)" + "')";
@@ -309,6 +477,7 @@
             headers: [
                    ['ITSAPP-DEVICE', '@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.ITSAPP-DEVICE"]'],
                    ['ITSAPP-LANG', 'en-GB'],
+                   ['ITSAPP-DEVICEID', '*'],
                    ['Content-type', 'application/json']
             ],
             translations: {

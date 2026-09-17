@@ -1,5 +1,868 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using AcfAfricanbank.Core.Models.Forms
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers
+@using CustomModels = Web.Models;
+@using System.Collections.Generic;
+
 @{
-	Layout = null;
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var children = Model.Children;
+
+    // Get specific Children
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochestinvestments").FirstOrDefault();
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+
+    var infoGraphic = heroBody.Children.Last().Children.FirstOrDefault();
+    TabBody tabInfoGraphicData = (TabBody)heroBody.Children.Last(); // based on the child item node on the parent list
+    var buttonLinkData = tabInfoGraphicData.Children.Where(x => x.ContentType.Alias.ToString().ToLower() == "ebankititem2").FirstOrDefault();
+    @*var imageUrlString = ((ContentModels.Image)((IPublishedContent)infoGraphic.Value("ebankITImage"))).Url;
+    var altTagImageUrl = ((ContentModels.Image)((IPublishedContent)infoGraphic.Value("ebankITImage"))).AltTag;
+*@
+    var heroKnees = children?.Where(c => c.ContentType.Alias.ToLower() == "heroknees").FirstOrDefault();
+    var testimonialTab = children?.Where(c => c.ContentType.Alias.ToLower() == "testimonials").FirstOrDefault();
+    var homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+
+    var viewName = Path.GetFileNameWithoutExtension(Server.MapPath(VirtualPath));
+
+    // Get Specific grand children
+
+    var bodyCards = heroBody?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+    var bodyButton = heroBody?.Children?.Where(c => c.ContentType.Alias == "ebankITAbstractButton").FirstOrDefault();
+    
+      ViewData["InvestmentName"] = "Fixed Deposit Calculator";
+      ViewData["InvestmentNameStr"] = "Fixed Deposit";
+    
+        var faq = heroBody.Children.Where(c => c.Name == "FAQs").FirstOrDefault();
+    var faqcontent = faq.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+    var faqcontentqa = faqcontent?.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+
+    var credit = heroBody.Children.Where(c => c.Name == "Credit Card").FirstOrDefault();
+    var creditCard = credit.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+    var creditCards = creditCard?.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+    
+    
+     var headeSection = heroBody.Children.Where(c => c.Name == "Fixed Deposit Header").FirstOrDefault();
+     var  myheader = headeSection.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+     var headers = myheader?.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+     
+     
+    var blackCard = heroBody.Children.Where(c => c.Name == "Black Credit").FirstOrDefault();
+    var blackCardCredit = blackCard.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+    var blackCardsCredit = blackCardCredit?.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+
+ var noCampx1 = 1;
+    
+    
+            var kneesTabHeaders = heroKnees?.Children?.Select(c => c.Value("title")?.ToString()).ToList();
+    var findOutMoreTab = heroKnees?.Children?
+        .Where(c => c.ContentType.Alias.ToLower() == "findoutmore").FirstOrDefault();
+
+  
+
+    var benefitsHeader = heroChest?.Value("benefitsTitle")?.ToString();
+    var benefitsDescription = heroChest?.Value("benefitsDescription")?.ToString();
+    var ratesTerms = heroChest?.Value<IEnumerable<string>>("ratesTerms");
+    var calculatorIntro = heroChest?.Value("calculatorIntro")?.ToString();
+    var calculatorButtonLabel = heroChest?.Value("calculatorButtonLabel")?.ToString();
+
+    var bodyTitle = heroBody?.Value("bodyTitle").ToString();
+    var bodyDescription = heroBody?.Value("bodyDescription").ToString();
+
+    var applyDocs = bodyCards.Select(c => c as Card).ToList();
+
+    var headerImage_large = heroHeader?.Value<IPublishedContent>("image")?.Url;
+    var headerImage_medium = heroHeader?.Value<IPublishedContent>("imageMedium")?.Url;
+    var headerImage_small = heroHeader?.Value<IPublishedContent>("imageSmall")?.Url;
+
+}
+
+
+<link rel="stylesheet" href="/css/projectmagic.css" >
+
+<style>
+    
+    .campaign-product-container, .investment-calculator{
+            background: unset !important;
+    }
+    
+    #ratesContainer{
+        margin: auto !important;
+    }
+    
+    .text-uppercase{
+        font-size: 17px !important;
+    }
+    
+    .card-shadow.rate-card .percentage{
+            color: #5dc300 !important;
+    }
+    
+    .table>tbody>tr.green>td {
+   color: #5dc300 !important;
+}
+
+#rates-container h3{
+        color: #112768 !important;
+}
+
+.info-grpahic a:first{
+    display: none !important;
+}
+
+.other-inv-term{
+    text-align: left;
+font: normal normal medium 15px/19px Montserrat !important;
+letter-spacing: 0px;
+color: #000E16 !important;
+    
+}
+    
+
+
+.primary-ghost-btn {
+    transition: 0.5s;
+    border: solid 2px #00285B;
+    padding: 9px 14px;
+    width: 220px;
+    height: 50px;
+    border-radius: 25px;
+    margin: 10px auto;
+    font-size: 14px;
+    font-weight: 600;
+    outline: none;
+    -webkit-outline: none;
+    background: none;
+    color: #00285B;
+    cursor: pointer;
+}
+
+
+    
+ .calculator-form select, .calculator-form div select {
+    transition: 0.35s;
+    background: #fff url(https://www.africanbank.co.za/media/1pzbuq4v/dropdown-select.svg) center;
+    background-position-x: center;
+    background-position-y: center;
+    background-repeat: repeat;
+    background-position: 93% 50%;
+    background-repeat: no-repeat;
+    -webkit-appearance: none;
+    color: #000000;
+}
+
+label{
+    font-size: 18px;
+    font-weight: bold;
+    color: #002b60;
+    margin-bottom: 0px;
+    width: 100%;
+    text-align: left;
+}
+
+
+.info-grpahic{
+     display: none !important;
+}
+
+.table-responsive {
+    border-radius: 15px !important;
+}
+
+/* Zebra striping */
+tr:nth-of-type(odd) { 
+	background: #eee; 
+	}
+
+th { 
+	background: #011F44; 
+	color: white !important; 
+	font-weight: bold;
+	font-size: 15px !important;
+	padding: 16px !important; 
+	border:none !important;
+	}
+
+td { 
+	border: 1px solid #ccc; 
+	padding: 10px !important; 
+	text-align: left; 
+	font-size: 15px !important;
+	vertical-align: center !important;
+	}
+
+/* 
+Max width before this PARTICULAR table gets nasty
+This query will take effect for any screen smaller than 760px
+and also iPads specifically.
+*/
+@@media 
+only screen and (max-width: 760px),
+(min-device-width: 768px) and (max-device-width: 1024px)  {
+
+	table { 
+	  	width: 100%; 
+	}
+
+	/* Force table to not be like tables anymore */
+	table, thead, tbody, th, td, tr { 
+		display: block; 
+	}
+	
+	/* Hide table headers (but not display: none;, for accessibility) */
+	thead tr { 
+		position: absolute;
+		top: -9999px;
+		left: -9999px;
+	}
+	
+	tr { border: 1px solid #ccc; }
+	
+	td { 
+		/* Behave  like a "row" */
+		border: none;
+		border-bottom: 1px solid #eee; 
+		position: relative;
+		padding-left: 50%; 
+	}
+
+	td:before { 
+		/* Now like a table header */
+		position: absolute;
+		/* Top/left values mimic padding */
+		top: 6px;
+		left: 6px;
+		width: 45%; 
+		padding-right: 10px; 
+		white-space: nowrap;
+		/* Label the data */
+		content: attr(data-column);
+
+		color: #000;
+		font-weight: bold;
+	}
+
+}
+</style>
+
+
+
+
+
+@foreach (var item in headers.Select((value, index) => new { Value = value, Index = index }))
+{
+    var cardIcon = item.Value.Value<IPublishedContent>("nCcardIcon")?.Url;
+    var title = item.Value.Value<string>("nCcardTitle");
+    var description = item.Value.Value<string>("mediumDescription");
+    var descriptionLong = item.Value.Value<string>("nClongDescription");
+
+    <section class="@((item.Index % 2 == 0) ? "pt-45 pb-45" : "pt-45 pb-45 bg-grey-60")">
+        <div class="container">
+            <div class="row align-items-center d-flex row-change md-text-center">
+                @if (item.Index % 2 != 0)
+                {
+                    <div class="col-md-6">
+                        <img src="@cardIcon" />
+                    </div>
+
+                }
+                <div class="col-md-6">
+                    <h2 class="color-brand-1 mb-20">
+                        @title
+                    </h2>
+                    @Html.Raw(description)
+
+
+                </div>
+                @if (item.Index % 2 == 0)
+                {
+                    <div class="col-md-6">
+                        <img src="@cardIcon" />
+                    </div>
+
+                }
+
+            </div>
+            <div>
+                @Html.Raw(descriptionLong)
+            </div>
+        </div>
+    </section>
+}
+
+
+
+<section class="pt-45 pb-45 bg-grey-60">
+    <div class="container">
+          <div>   <h2 class="color-brand-1 mt-15 mb-20 text-center ">@credit.Value("partialViewName")</h2></div>
+        <div class="row mt-50 align-items-center">
+            @foreach (var item in creditCards)
+
+            {
+                var cardTitle = item.Value<string>("nCcardTitle");
+                var cardIcon = item.Value<IPublishedContent>("nCcardIcon")?.Url;
+
+
+                <div class="col-lg-6">
+                    <div class="card-offer-small card-we-do">
+                        <div class="card-image">
+                            <img class="d-block"
+                                 src="@cardIcon"
+                                 alt="iori" />
+                        </div>
+                        <div class="card-info">
+                            <h4 class="color-brand-1 mb-10">
+                                @cardTitle
+                            </h4>
+                            <p class="font-md color-brand-1 color-grey-500 mb-5">@Html.Raw(item.Value<string>("mediumDescription"))</p>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            }
+        </div>
+
+
+    </div>
+</section>
+<!-- POPULAR RATES -->
+@{
+    // Get Properties from children
+    var benefitCards = heroChest?.Value<IEnumerable<IPublishedElement>>("benefitCards");
+    //var cards = benefitCards?.Select(c => c as NCcard).ToList();
+     var cards = new CustomModels.Benefits
+     {
+        Header = benefitsHeader,
+        Description = benefitsDescription,
+        BenefitCards1 = benefitCards.Select(c => c as NCcard).ToList()
+     };
+
+    var ratesAndBenefitsModel = new CustomModels.InvestmentRatesAndBenefits
+    {
+        RatesTermsAndConditions = ratesTerms,
+        CalculatorButtonText = calculatorButtonLabel,
+        CalculatorIntroduction = calculatorIntro,
+        Benefits =  cards
+
+    };
+
+    }
+    
+ <section class="pt-45 pb-45">
+    
+    @Html.Partial("_investmentRatesAndBenefitsSection", ratesAndBenefitsModel)
+  </section>
+  
+  
+  
+  @Html.Partial("_InvestmentCalculator")
+  
+  
+ 
+
+
+ @foreach (var item in blackCardsCredit.Select((value, index) => new { Value = value, Index = index }))
+{
+    var cardIcon = item.Value.Value<IPublishedContent>("nCcardIcon")?.Url;
+    var title = item.Value.Value<string>("nCcardTitle");
+    var description = item.Value.Value<string>("mediumDescription");
+    var descriptionLong = item.Value.Value<string>("nClongDescription");
+
+    <section class="@((item.Index % 2 == 0) ? "pt-45 pb-45" : "pt-45 pb-45 bg-grey-60")">
+        <div class="container">
+            <div class="row align-items-center d-flex row-change md-text-center">
+                @if (item.Index % 2 == 0)
+                {
+                    <div class="col-md-6">
+                        <img src="@cardIcon" />
+                    </div>
+
+                }
+                <div class="col-md-6">
+                    <h2 class="color-brand-1 mb-20">
+                        @title
+                    </h2>
+                    @Html.Raw(description)
+
+
+                </div>
+                @if (item.Index % 2 != 0)
+                {
+                    <div class="col-md-6">
+                        <img src="@cardIcon" />
+                    </div>
+
+
+                }
+
+            </div>
+            <div>
+                @Html.Raw(descriptionLong)
+            </div>
+        </div>
+    </section>
+    
+   } 
+    
+    
+    
+    
+@if (findOutMoreTab != null)
+            {
+               var tabTitle = findOutMoreTab.Value("title")?.ToString();
+              
+                
+                var downloadItems = findOutMoreTab.Value<IEnumerable<DownloadItem>>("downloadItems");
+                
+                    
+ <section class="pt-45 pb-45 bg-grey-60">
+     
+                <div class="container">
+                  <div class="col d-flex align-items-center row-change md-text-center">
+                    <div class="row-xl-6 row-lg-6 col-md-6">
+                       <h1 class="color-brand-1 mt-15 mb-20">
+                        @tabTitle
+                      </h1>
+                    </div>
+                    <div class="-xl-6 col-lg-6 col-md-6">
+                    
+                       
+                    </div>
+                    
+                  </div>
+                   <div class="">
+                    <div class="campaign-list">
+                       
+                        <ul>
+                             @if (downloadItems != null && downloadItems.Any())
+                {
+                             foreach (var link in downloadItems)
+                    {
+                                    <li>
+                                        <div class="row no-gutter download-item first">
+                                            <div class="col-sm-9">
+                                                <div class="download-descr">@link.DownloadTextDescription</div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <a href="@link.DownloadButtonRedirectLink2.Url" target="_blank" class="download-btn">
+                                                    @(string.IsNullOrEmpty(link.DownloadButtonText) ? "Download" : link.DownloadButtonText)
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                   
+                                }   
+                                }
+                        </ul>
+                        
+                    </div>
+                </div>
+                </div>
+</section>
+}
+
+
+    
+    
+    
+    
+    @* <section class="pt-45 pb-45">
+
+    <div class="container ">
+        <div class="row align-items-center d-flex row-change">
+            <div class="col-xl-12 col-lg-12 col-md-12">
+                <h1 class="color-brand-1 mt-15 mb-20 text-center faqHeader">FAQS</h1>
+                <div class="accordion accordionStyle2" id="accordionFAQ">
+                    <div class="row">
+                        @foreach (var item in faqcontentqa)
+
+                        {
+                            var cardTitle = item.Value<string>("nCcardTitle");
+                            <div class="col-lg-12">
+                                <div class="accordion-item">
+                                    <h5 class="accordion-header">
+                                        <button class="accordion-button text-heading-5">@cardTitle</button>
+                                    </h5><div id="accordion-body" class="accordion-collapse collapse">
+                                        <div class="accordion-body">@Html.Raw(item.Value<string>("mediumDescription"))</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            noCampx1 += 1;
+
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        </div>
+</section>
+;*@
+
+
+
+
+
+@section scripts
+{
+
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/handlebars-v4.0.5.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/jquery.xdomainrequest.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculator.js?ver=2.1")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculator1.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculatorHandler.min.js")"></script>
+    <script type="text/javascript">
+    
+    function getMobileOperatingSystem() 
+    {
+        var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        
+        if (/windows phone/i.test(userAgent)) {
+            return "Windows Phone";
+        }
+    
+        if (/android/i.test(userAgent)) {
+            return "Android";
+        }
+    
+        if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+            return "iOS";
+        }
+    
+        return "unknown";
+    }
+
+   $(document).ready(function () {
+       
+       
+       $(".i-loader").css("display", "none");
+       $(".investment-results").css("display", "none");
+       
+       
+       
+         var downloadPath = window.location.href;
+        var hastagDownload = downloadPath.substring(downloadPath.length-9, downloadPath.length);
+        
+        
+                      $(".accordion-button").click(function(){
+
+
+    var isCollapsed = $(this).hasClass('collapsed');
+
+           $(".accordion-button").removeClass('collapsed');
+
+           if(isCollapsed == false) {
+            $(this).toggleClass("collapsed");
+           }
+
+
+ var isCollapsedContent = $(this).parent().next(".accordion-collapse").hasClass('collapse');
+            $(".accordion-collapse").addClass('collapse');
+            if(isCollapsedContent == true) {
+                $(this).parent().next(".accordion-collapse").toggleClass('collapse');
+           }
+
+
+
+        });
+      
+      
+        $(".accordion").click(function() {
+        // Toggle the current accordion
+        $(this).toggleClass("active");
+        
+        // Get the panel related to this accordion
+        var panel = $(this).next(".panel");
+
+        // Check if the panel was already open
+        var wasOpen = panel.css("display") === "block";
+        
+        // Close all panels
+        $(".panel").css("display", "none");
+        $(".accordion").removeClass("active"); // Optionally remove the 'active' class from all accordions
+        
+        // If the clicked panel was not already open, open it
+        if (!wasOpen) {
+            panel.css("display", "block");
+            $(this).addClass("active"); // Optionally add 'active' class back to the clicked accordion
+        }
+    });
+
+        var emoji = String.fromCodePoint(0x1F60A);
+        var platform = "";
+        var appendHTML = "<div class='hidden-sm hidden-md hidden-lg'><div class='row'><div class='col-xs-12'> " +
+                        "<span class='copy'> Discover new ways to bank conveniently and safely and do your banking your way. Download our Banking App now.</span>" +
+                        "</div></div>" +
+                        "<div class='row'><div class='col-xs-12'><a class='app-platform button primary clearfix' style='background-color: #88bc47 !important;' " +
+                        "href=''>Get it!</a></div></div></div>" +
+                        "<div class='hidden-xs row'><div class='col-xs-12 col-sm-1 col-md-1 col-lg-1' style='padding-left:10%;'>" +
+                        "<i class='fa fa-mobile' aria-hidden='true' style='font-size:58px;'></i></div>" +
+                        "<div class='col-xs-12 col-sm-7 col-md-7 col-lg-7' style='text-align: left;padding-left: 50px;'>" +
+                        "<span class='copy'>For easier navigation and to get familiar with our products - we reckon you should use our app</span></div>" +
+                        "<div class='hidden-xs col-sm-3 col-md-3 col-lg-3' style='margin: 9px;padding-right: 2px;'>" +
+                        "<a class='app-platform button primary clearfix' style='background-color: #88bc47 !important;' href='' >Get it!</a>" +
+                        "</div></div>";
+
+        switch(getMobileOperatingSystem())
+        {
+            case "Android":
+                platform = "https://play.google.com/store/apps/details?id=za.co.android.africanbank";
+                
+                @*$("#AndroidUrl").attr('href');*@
+
+                $('.modal-title').text('Hi, Android User ' + emoji);
+                $('.modal-body').text("");
+
+                $('.modal-body').append(appendHTML);
+                $('.app-platform').attr('href', platform);
+                @*$('.copy').html('@mobileBlurp');*@
+                $('#generic').modal("show");
+                break;
+
+            case "iOS":
+                platform = platform = "https://itunes.apple.com/us/app/apple-store/id1357204405?mt=8";
+                //$("#iOSUrl").attr('href');
+                $('.modal-title').text('Hi, iOS User ' + emoji);
+                $('.modal-body').text("");
+                $('.modal-body').append(appendHTML);
+                @*$('.copy').html('@mobileBlurp');*@
+
+                $('.app-platform').attr('href', platform);
+                $('#generic').modal("show");
+                break;
+            default:
+                console.log("click");
+
+        }
+        
+        
+    
+        var imageBgCss = "url('" + "@headerImage_large" + "')";
+        var imageMdCss = "url('" + "@headerImage_medium" + "')";
+        var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_medium : headerImage_small)" + "')";
+        var CheckScreenSize;
+        (CheckScreenSize = function () {
+            var _width = $(window).outerWidth();
+            var _height = $(window).outerHeight();
+            if (_width <= 511) {
+                $("#heroHeader").css("background-image", imageSmCss);
+            }
+            else {
+                $("#heroHeader").css("background-image", imageBgCss);
+            }
+        })();
+        $(window).resize(CheckScreenSize);
+    });
+
+    $(function () {
+        $(".area_buttons_calculate").hide();
+        var hasError = true;
+        var data = {
+            product: 'Fixed',
+            rateContainer: '#rates-container',
+            calcFormContainer: '#calculatorfixed-form',
+            serviceUrl: '@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.Mobile.URL"]',
+            headers: [
+                   ['ITSAPP-DEVICE', '@System.Configuration.ConfigurationManager.AppSettings["ebankit.Portal.Services.ITSAPP-DEVICE"]'],
+                   ['ITSAPP-LANG', 'en-GB'],
+                   ['ITSAPP-DEVICEID', '*'],
+                   ['Content-type', 'application/json']
+            ],
+            translations: {
+                amount: '@ResourceHelper.GetResource("OnceOffInvestmentAmount")',
+                monthlyInterestRateIncrease: '@ResourceHelper.GetResource("MonthlyInterestRateIncrease")',
+                period: '@ResourceHelper.GetResource("Period")',
+                interestRatePa: '@ResourceHelper.GetResource("InterestRatePerAnnum")',
+                interestEarned: '@ResourceHelper.GetResource("InterestEarned")',
+                totalPayout: '@ResourceHelper.GetResource("TotalPayout")',
+                interestPayoutExpiry: '@ResourceHelper.GetResource("InterestPayoutOnExpiry")',
+                semiAnnualInterestPayout: '@ResourceHelper.GetResource("SemiAnnualInterestPayout")',
+                annualInterestPayout: '@ResourceHelper.GetResource("AnnualInterestPayout")',
+                minInvestAmount: '@ResourceHelper.GetResource("MinimumInvestmentAmount")',
+                monthlyInterPayout: '@ResourceHelper.GetResource("MonthlyInterestPayout")',
+                terms: '@ResourceHelper.GetResource("Terms",1)',
+                term: '@ResourceHelper.GetResource("Term",2)',
+                interestPayoutFrequency: '@ResourceHelper.GetResource("InterestPayoutFrequency")',
+                interestPayoutFreq: '@ResourceHelper.GetResource("InterestPayoutFreq")',
+                AmountMandatory: '@ResourceHelper.GetResource("InvestmentAmountIsMandatory")',
+                investmentReturns: '@ResourceHelper.GetResource("InvestmentReturns")',
+                after: '@ResourceHelper.GetResource("After")',
+                months: '@ResourceHelper.GetResource("Months")',
+                years: '@ResourceHelper.GetResource("Years")',
+                onceOffInvestmentAmountIsMandatory: '@ResourceHelper.GetResource("OnceOffInvestmentAmountIsMandatory")',
+                amountCannotBeLessThan: '@ResourceHelper.GetResource("AmountCannotBeLessThan")',
+                interestPayoutFrequency: '@ResourceHelper.GetResource("InterestPayoutFrequency")',
+                investmentReturnsMessage: '@ResourceHelper.GetResource("InvestmentReturnsMessage")',
+                ourOfferAmount: '@ResourceHelper.GetResource("OurOfferAmount")',
+                accept: '@ResourceHelper.GetResource("Accept")',
+                cancel: '@ResourceHelper.GetResource("Cancel")',
+                increaseCapital: '@ResourceHelper.GetResource("IncreaseCapital")',
+                fixedDescription: '@ResourceHelper.GetResource("FixedDescription")',
+                payoutFreqErrorMessage: '@ResourceHelper.GetResource("PayoutFreqErrorMessage")',
+                monthlyInvestmentThereafter: '@ResourceHelper.GetResource("MonthlyInvestmentThereafter")',
+                increaseOnceOff: '@ResourceHelper.GetResource("IncreaseOnceOff")',
+                changeInterestOption: '@ResourceHelper.GetResource("ChangeInterestOption")'
+            }
+        };
+        $(window).on('CalculatorLoading', function (e) {
+
+
+                var isMobileheaderHide = document.getElementsByClassName('tbl-header-selected');
+                if (isMobileheaderHide.length > 0) {
+                    $('#calculatorfixed-form table thead th.tbl-header-selected').addClass('hidden-xs');
+                    $('#calculatorfixed-form table thead th.background-interest-selected').removeClass('hidden-xs');
+                    $('#calculatorfixed-form table tbody td.tbl-header-selected').addClass('hidden-xs');
+                    $('#calculatorfixed-form table tbody td.background-interest-selected').removeClass('hidden-xs');
+                }
+                var isMobilebodyHide = document.getElementsByClassName('value_calculatorformate');
+                if (isMobilebodyHide.length > 0) {
+                    $('#calculatorfixed-form table tbody tr td.value_calculatorformate').addClass('hidden-xs');
+                    $('#calculatorfixed-form table tbody tr td.background-interest-selected').removeClass('hidden-xs');
+                }
+
+            df=e;
+            var _state = e.state;
+            var _target = e.target;
+
+            $(".errorcalculatores").hide();
+
+            if (_target !== 'rates') {
+                if (_state) {
+                    $("#form-preloader").show();
+                    // $("#calculatorfixed-form").hide();
+                    $("#calculator-container").hide();
+
+                    ChangePageControls(false);
+                } else {
+                    $("#form-preloader").hide();
+                    if (hasError) {
+                        $(".errorcalculatores").show();
+                        // $("#calculatorfixed-form").hide();
+                        $("#calculator-container").hide();
+                    } else {
+                        $(".errorcalculatores").hide();
+                        // $("#calculatorfixed-form").show();
+                        $("#calculator-container").show();
+                        $('.money').autoNumeric('init', { aSep: ' ', aDec: '.', aSign: 'R' });
+                    }
+
+                    ChangePageControls(Calculator.isCalculatorValid('Fixed'));
+                }
+            } else {
+                if (_state) {
+                    $("#rates-form-preloader").show();
+                    $('.rate-table').show();
+                } else {
+                    $("#rates-form-preloader").hide();
+                    $('.rate-table').show();
+                }
+            }
+
+        });
+
+        //$(window).on('CalculatorValidationHandler', function (e) {
+        //    var _state = e.state;
+
+        //    ChangePageControls(_state);
+
+        //});
+
+        $(window).on('Error', function (e) {
+
+            var _target = e.target;
+
+            if (_target) {
+                if (_target === 'rates') {
+                    if (!e.errorDescription) {
+                        $(".rate-table").show();
+                        $("#rates-form-preloader").hide();
+
+                        return;
+                    }
+
+                    $(".rate-table").hide();
+                    $("#rates-form-preloader").hide();
+                    $(".errorrates").show();
+                } else {
+
+                    if (!e.errorDescription) {
+                        hasError = false;
+
+                        $("#form-preloader").hide();
+                        // $("#calculatorfixed-form").show();
+                        $("#calculator-container").show();
+                        ChangePageControls(false);
+
+                        $(".errorcalculatores").hide();
+
+                        return;
+                    } else {
+
+                        hasError = true;
+                        $("#form-preloader").hide();
+                        // $("#calculatorfixed-form").hide();
+                        $("#calculator-container").hide();
+                        $(".errorcalculatores").show();
+                        ChangePageControls(false);
+                    }
+                }
+            }
+        });
+
+        function ChangePageControls(enabled) {
+            $(".area_buttons_calculate").hide();
+            if (enabled) {
+                $("#buttonPrint").removeClass("disabledbutton");
+                $(".area_buttons_calculate").show();
+            }
+            else {
+                $("#buttonPrint").addClass("disabledbutton");
+
+            }
+        }
+
+      //  console.log("pepe " ,JSON.stringify(data,null,2));
+        Calculator.init(data);
+        $("#buttonPrint").click(function () {
+            CalculatorHandler.printRatesDoc(data);
+        });
+
+    });
+
+     $(function () {
+                $(window).on('CalculatorLoading', function (e) {
+                    var _state = e.state;
+                    var _target = e.target;
+                    if (_state) {
+                        if (_target === 'rates') {
+                            $("#rates-form-preloader").show();
+                        }
+                    } else {
+                        if (_target === 'rates') {
+                            $("#rates-form-preloader").hide();
+                        }
+                    }
+                })
+            });
+
+    $(document).on('click', '#calculateFixedDeposit', function (event) {
+        $('#fixedResultsMobile').css('height', '280px');
+    });
+
+
+    $(".btn_ok_modal").click(function () {
+
+      //  window.open($("#linkib").val(), "_blank");
+        $('#myModal').modal('hide');
+    });
+
+    </script>
 }

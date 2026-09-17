@@ -1,5 +1,218 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCampaign>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models;
+@using Web.Helpers
+
+@using Umbraco.Web.Models
+@using System.Text.RegularExpressions
+
 @{
-	Layout = null;
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var children = Model.Children;
+
+    // Get specific Children
+   
+
+    var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
+
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    var heroKnees = children?.Where(c => c.ContentType.Alias.ToLower() == "heroknees").FirstOrDefault();
+    
+        var tabs = (IEnumerable<IPublishedContent>
+        )heroBody?.Children.Where(c => c.ContentType.Alias.ToLower() == "tabbody").ToList();
+
+    ContentModels.TabBody newWaysOfBanking = null;
+    ContentModels.TabBody createOwnWorldOfBanking = null;
+    ContentModels.TabBody myWorldTermsAndConditions = null;
+
+    tabs.ToList().ForEach(x =>
+    {
+        var partialName = x.Value("PartialViewName");
+
+        if (partialName.ToString() == "_cardRenderDescribedCards")
+        {
+            newWaysOfBanking = (TabBody)x;
+        }
+        
+    });
+  var contentcard= heroBody.Children.Where(c => c.Name == "Create you own world of banking").FirstOrDefault();
+     @* var contenttabcard = contentcard.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var contentcards = contenttabcard.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+*@
+var firstcard = contentcard?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+         var firstcards = firstcard.Select(c => c as Card).ToList();
+         
+         var applyDocs = firstcards?.Select(c => c as Card).FirstOrDefault();
+         var navigate = applyDocs.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").FirstOrDefault();
+         
+    var newWaysItems = (IEnumerable<IPublishedElement>)newWaysOfBanking.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+    var oneNumberControl = heroBody.Children.Where(c => c is RichTextEditor).FirstOrDefault();
+    var lotoTermsTab = heroBody.Children.Where(c => c is RichTextEditor).Last();
+ 
+ 
+  var kneesTabHeaders = heroKnees?.Children?.Select(c => c.Value("title")?.ToString()).ToList();
+    var findOutMoreTab = heroKnees?.Children?
+        .Where(c => c.ContentType.Alias.ToLower() == "findoutmore").FirstOrDefault();
 }
+
+ <link rel="stylesheet" href="/css/projectmagic.css" /> 
+
+ @if (firstcards!= null && firstcards.Any())
+            {
+
+                foreach (Card benefit in firstcards)
+                {
+                <section class="pb-40 pt-40 bg-grey-60">
+                <div class="container">
+                  <div class="row d-flex align-items-center row-change md-text-center">
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                       <h1 class="color-brand-1 mt-15 mb-20">
+                        @benefit.CardTitle
+                      </h1>
+                       @benefit.CardDescriptionLongText
+                     <div class="combo-btn">
+<div class="mt-50 text-start column1">
+<p class="combo-btn-text primary"><a href="@navigate.Url" class="btn  btn-brand-1 hover-up">@navigate.Name</a></p>
+</div>
+</div>
+                      
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                      <img
+                        class="d-block"
+                        src="@benefit.CardIcon.Url"
+                        alt="iori"
+                        
+                      /> 
+                       
+                    </div>
+                  </div>
+                </div>
+</section>
+                }
+            }
+ @{
+       int idIterator = 0;
+       foreach (var item in newWaysItems){
+           var cardTitle = item.Value<string>("NCcardTitle");
+                    var cardTitleId = cardTitle.Trim().ToString().Replace(" ", "").ToString() + idIterator.ToString();
+                    var cardDesc = item.Value<string>("mediumDescription");
+                    var icon = item.Value<IPublishedContent>("NCcardIcon");
+            
+            if (idIterator%2 == 0)
+                {
+                    <section class="@(@idIterator == 0 ? "section pt-40 pb-40" : "section-800")">
+                        <div class="container">
+                          <div class="row align-items-center d-flex row-change flex-row-reverse md-text-center">
+                            <div class="col-xl-6 col-lg-6 col-md-6">
+                               <h1 class="color-brand-1 mt-15 mb-20">
+                                @Html.Raw(HttpUtility.HtmlDecode(@cardDesc))
+                                </h1>
+                                @Html.Raw(@item.Value("mainDescription"))
+                               
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-6">
+                              <img
+                                class="d-block"
+                                src="@icon.Url"
+                                alt="iori"
+                                
+                              /> 
+                               
+                            </div>
+                          </div>
+                        </div>
+                    </section>
+            
+            }
+                
+            else{
+                    <section class="section pt-40 pb-40  bg-grey-60">
+                        <div class="container">
+                          <div class="row align-items-center row-change d-flex  md-text-center">
+                          
+                            <div class="col-xl-6 col-lg-6 col-md-6">
+                              <h1 class="color-brand-1 mt-15 mb-20">
+                                @Html.Raw(HttpUtility.HtmlDecode(@cardDesc))
+                                </h1>
+                                @Html.Raw(@item.Value("mainDescription"))
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-6">
+                              <img
+                                class="d-block"
+                                src="@icon.Url"
+                                alt="iori"
+                                
+                              /> 
+                               
+                            </div>
+                            
+                          </div>
+                        </div>
+                    </section>
+                }
+                
+                idIterator += 1;
+        }
+   }
+
+@if (findOutMoreTab != null)
+            {
+               var tabTitle = findOutMoreTab.Value("title")?.ToString();
+              
+                
+                var downloadItems = findOutMoreTab.Value<IEnumerable<DownloadItem>>("downloadItems");
+                
+                    
+ <section class="pb-40 pt-40 bg-grey-60">
+     
+                <div class="container">
+                  <div class="col d-flex align-items-center row-change">
+                    <div class="row-xl-6 row-lg-6 col-md-6">
+                       <h1 class="color-brand-1 mt-15 mb-20">
+                        @tabTitle
+                      </h1>
+                    </div>
+                    <div class="-xl-6 col-lg-6 col-md-6">
+                    
+                       
+                    </div>
+                    
+                  </div>
+                   <div class="">
+                    <div class="campaign-list">
+                       
+                        <ul>
+                             @if (downloadItems != null && downloadItems.Any())
+                {
+                             foreach (var link in downloadItems)
+                    {
+                                    <li>
+                                        <div class="row no-gutter download-item first">
+                                            <div class="col-sm-9">
+                                                <div class="download-descr">@link.DownloadTextDescription</div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <a href="@link.DownloadButtonRedirectLink2.Url" target="_blank" class="download-btn">
+                                                    @(string.IsNullOrEmpty(link.DownloadButtonText) ? "Download" : link.DownloadButtonText)
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                   
+                                }   
+                                }
+                        </ul>
+                        
+                    </div>
+                </div>
+                </div>
+</section>
+}
+
+<!-- NUMBER TO CALL -->
+@*<div class="number-to-call">@Html.Raw(@oneNumberControl.Value("textEditor"))</div>*@
+
+

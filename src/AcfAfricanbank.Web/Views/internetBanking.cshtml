@@ -1,4 +1,5 @@
 ﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using AcfAfricanbank.Core.Models.Forms
 @using ContentModels = Umbraco.Web.PublishedModels;
 @using Web.Helpers;
 @using CustomModels = Web.Models;
@@ -12,6 +13,8 @@
     var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
     var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
     var heroBody = (HeroBody)children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    
+    var bodyFooterTitle = heroBody?.Value("bodyFooterTitle").ToString();
     // Get Properties from children
     var tableItems = heroBody.Children(x => x is TableChecklist).FirstOrDefault();
     var chestTitle = heroChest?.Value("chestTitle").ToString();
@@ -31,26 +34,1892 @@
 
     var mobileBlurpData = heroBody.Children(x => x.ContentType.Alias.ToLower() == "richtexteditor").FirstOrDefault();
     var mobileBlurp = mobileBlurpData.Value("TextEditor");
+    
+    @*NEW CONTENT*@
+     var firstsection = heroBody.Children.Where(c => c.Name == "OnlineSection").FirstOrDefault();
+      var firstsectioncontent = firstsection.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var firstcontent = firstsectioncontent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+      
+      
+    @*END NEW CONTENT*@
 }
-
+  <link rel="stylesheet" href="/css/projectmagic.css" /> 
 <style type="text/css">
+
     @@media (min-width: 280px) and (max-width: 540px) {
-        .green-pointer {
+       .green-pointer {
             margin-top: -63px;
         }
-            .onenumbercall {
-                text-align: center;
-                margin-top: 0;
-                margin-bottom: 10px;
-                line-height: 1.1;
-                display: block;
-            }
+    }
+    .onenumbercall {
+        text-align: center;
+        margin-top: 0;
+        margin-bottom: 10px;
+        line-height: 1.1;
+        display: block;
+    }
 
-            .modal .modal-dialog .modal-content .modal-header {
-                background-color: transparent;
-                border-bottom: 1px solid #eee;
+    .modal .modal-dialog .modal-content .modal-header {
+        background-color: transparent;
+        border-bottom: 1px solid #eee;
+    }
+    .reverse-row{
+     display: flex;
+    flex-direction: row-reverse;
+ } 
+ 
+     @@media (max-width: 768px) {
+       
+
+            .hidden-sm {
+                  display:none !important;
             }
+    
+    }
+    
+.btn.btn-brand-1:hover .right-icon {
+    color: unset !important;
+    transform: translate(10px);
+}
+
 </style>
+
+  @{
+         int idIterator = 0;
+           foreach (var item in firstcontent){
+               var tabSubItemImage = item.Value<IPublishedContent>("tabSubItemImage")?.Url;
+               var tabSubItemIcon = item.Value<IPublishedContent>("tabSubItemIcon")?.Url;
+    var title = item.Value<string>("tabSubItemTitle");
+    var description = item.Value<string>("genericCardContent");
+    
+    
+     List<Umbraco.Web.Models.Link> itemLink = new List<Umbraco.Web.Models.Link>();
+     
+                foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)item.Value("tabSubItemLinks"))
+                {
+                    itemLink.Add(link);
+                    
+                }
+    
+                
+                
+                 if (idIterator%2 == 0)
+                    {
+                 <section class="section-800 bg-grey-60">
+                <div class="container">
+                  <div class="row align-items-center  d-flex row-change md-text-center">
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                       <h1 class="color-brand-1 mt-15 mb-20">
+                        @title
+                      </h1>
+                      <p class="font-md color-brand-1 mt-20">
+                        @item.Value("tabSubItemTextContent")
+                      </p>
+                      
+                      @if(itemLink.Count() > 1){
+                                @*   if(itemLink(a=>a.Contains("DOWNLOAD NOW"))){*@
+                              if (itemLink.Any(link => link.Name.Contains("DOWNLOAD NOW")))
+{
+                                              <div class="combo-btn">
+                                            <div class="mt-50 text-start column1">
+                                            <p class="combo-btn-text primary"><a href="@itemLink[0].Url" class="btn  btn-brand-1 hover-up">@itemLink[0].Name</a></p>
+                                               
+                                            </div>
+                                            <div class="mt-50 text-start column2">
+                                                  <p class="secondary dowload-icon">
+                                               <a class="btn btn-brand-1 hover-up  btn-me " style="border: 1px solid #29418A;color: #29418A !important;background: none;" href="@itemLink[1].Url">@itemLink[1].Name
+                                                    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="right-icon" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M320 336h76c55 0 100-21.21 100-75.6s-53-73.47-96-75.6C391.11 99.74 329 48 256 48c-69 0-113.44 45.79-128 91.2-60 5.7-112 35.88-112 98.4S70 336 136 336h56m0 64.1 64 63.9 64-63.9M256 224v224.03">
+                                                    </path></svg></a>
+                                              </p>
+                                              
+                                              
+                                               
+                                                    
+                                            </div>
+                                            
+                                            
+                                            
+                                       
+                                            
+                                            
+                                            
+                                        </div>    
+
+                                   }
+                               else{
+                              <div class="combo-btn">
+                  <div class="mt-50 text-start column1">
+<p class="combo-btn-text primary"><a href="@itemLink[0].Url" class="btn  btn-brand-1 hover-up">@itemLink[0].Name</a></p>
+</div>
+<div class="mt-50 text-start column2">
+<p class="combo-btn-text secondary"><a href="@itemLink[1].Url" class="btn btn-brand-secondary hover-up">@itemLink[1].Name</a></p>
+</div>
+                </div>
+                               }
+                      
+                         }
+                      
+                      else{
+                       <div class="combo-btn">
+<div class="mt-50 text-start column1">
+<p class="combo-btn-text primary"><a href="@itemLink[0].Url" class="btn  btn-brand-1 hover-up">@itemLink[0].Name</a></p>
+</div>
+</div>
+                      }
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                      <img
+                        class="d-block"
+                        src="@tabSubItemImage"
+                        alt="iori"
+                        
+                      /> 
+                       
+                    </div>
+                  </div>
+                </div>
+</section>
+                        }
+                        else{
+                        
+<section class="section-800">
+    <div class="container">
+        <div class="row align-items-center d-flex flex-row-reverse row-change md-text-center">
+            <div class="col-xl-6 col-lg-6 col-md-6">
+                <h1 class="color-brand-1 mt-15 mb-20">@title</h1>
+                <p class="font-md color-brand-1">@item.Value("tabSubItemTextContent")</p>
+               
+                  @if(itemLink.Count() > 1){
+                        <div class="combo-btn">
+                  <div class="mt-50 text-start column1">
+<p class="combo-btn-text primary"><a href="@itemLink[0].Url" class="btn  btn-brand-1 hover-up">@itemLink[0].Name</a></p>
+</div>
+<div class="mt-50 text-start column2">
+<p class="combo-btn-text secondary"><a href="@itemLink[1].Url" class="btn btn-brand-secondary hover-up">@itemLink[1].Name</a></p>
+</div>
+                </div>
+                      }
+                      else{
+                       <div class="combo-btn">
+<div class="mt-50 text-start column1">
+<p class="combo-btn-text primary"><a href="@itemLink[0].Url" class="btn  btn-brand-1 hover-up">@itemLink[0].Name</a></p>
+</div>
+</div>
+                      }
+            </div>
+            <div class="col-xl-6 col-lg-6 col-md-6">
+              
+                <img
+                        class="d-block"
+                        src="@tabSubItemImage"
+                        alt="iori"
+                        
+                      /> 
+            </div>
+        </div>
+    </div>
+</section>
+                        }
+          idIterator += 1;
+            }
+        }
+        
+        
+        
+        
+        
+        
+  <section class="section-800 hidden-sm">
+<div class="container">
+       <div>
+           <h1 class="color-brand-1 mt-15 mb-20 text-center">Features available online</h1>
+       </div>
+    <div class="row align-items-center d-flex row-change">
+        <div class="col-xl-12 col-lg-12 col-md-12">
+            <h1 class="color-brand-1 mt-15 mb-20 text-center faqHeader"></h1>
+            <div class="accordion accordionStyle2" id="accordionFAQ">
+                <div class="row">
+                    <!-- All -->
+                    <div class="col-lg-12">
+                        <div class="accordion-item">
+                            <h5 class="accordion-header">
+                                <button class="accordion-button text-heading-5">All</button>
+                            </h5>
+                            <div id="accordion-body" class="accordion-collapse collapse">
+                                <div class="accordion-body">
+                                    <div class="row desk-table">
+    <div class="col-md-12">
+        <div class="margin-top-10">
+            <table class="table " style="margin: auto; width:100%">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th class="color-brand-1 0" id="0">
+                         
+                          Internet Banking
+                        </th>
+                        <th class="color-brand-1 1" id="1">
+                           
+                     African Bank App
+                        </th>
+                        <th class="color-brand-1 2" id="2">
+                            
+                          CellPhone Banking
+                        </th>
+                           <th class="color-brand-1 2" id="2">
+                            
+                       Whatsapp Banking
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Placeholder for table body content -->
+                    <tr class="accordion1 ">
+                        <td>Free to use</td>
+                        <td style="text-align: center">
+                            <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+                        </td>
+                        <td style="text-align: center">
+                            <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+                        </td>
+                        <td style="text-align: center">
+                            <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+                        </td>
+                        <td style="text-align: center">
+                            <i class="" style="color: green"></i>
+                        </td>
+                    </tr>
+                    <tr class="accordion1 ">
+                        <td>Balances</td>
+                        <td style="text-align: center">
+                            <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+                        </td>
+                        <td style="text-align: center">
+                            <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+                        </td>
+                        <td style="text-align: center">
+                            <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+                        </td>
+                        <td style="text-align: center">
+                            <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+                        </td>
+                    </tr>
+                    <tr class="accordion1 ">
+                        <td>Statements</td>
+                        <td style="text-align: center">
+                            <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+                        </td>
+                        <td style="text-align: center">
+                            <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+                        </td>
+                        <td style="text-align: center">
+                            <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+                        </td>
+                        <td style="text-align: center">
+                            <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+                        </td>
+                    </tr>
+                    <tr class="accordion1 ">
+                        <td>Settlement Quote</td>
+                        <td style="text-align: center">
+                            <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+                        </td>
+                        <td style="text-align: center">
+                            <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+                        </td>
+                        <td style="text-align: center">
+                            <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+                        </td>
+                        <td style="text-align: center">
+                            <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+                        </td>
+                    </tr>
+                    <tr class="accordion1 ">
+                        <td>Upload Documents</td>
+                        <td style="text-align: center">
+                            <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+                        </td>
+                        <td style="text-align: center">
+                            <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+                        </td>
+                        <td style="text-align: center">
+                            <i class="" style="color: green"></i>
+                        </td>
+                        <td style="text-align: center">
+                            <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ONLINE BANKING PROFILE -->
+                    <div class="col-lg-12">
+                        <div class="accordion-item">
+                            <h5 class="accordion-header">
+                                <button class="accordion-button text-heading-5">ONLINE BANKING PROFILE</button>
+                            </h5>
+                            <div id="accordion-body" class="accordion-collapse collapse">
+                                <div class="accordion-body">
+                                 <div class="row desk-table">
+    <div class="col-md-12">
+        <div class="margin-top-10">
+            <table class="table " style="margin: auto; width:100%">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th class="color-brand-1 0" id="0">
+                         
+                          Internet Banking
+                        </th>
+                        <th class="color-brand-1 1" id="1">
+                           
+                     African Bank App
+                        </th>
+                        <th class="color-brand-1 2" id="2">
+                            
+                          CellPhone Banking
+                        </th>
+                           <th class="color-brand-1 2" id="2">
+                            
+                       Whatsapp Banking
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                   
+      <tr class="accordion2 " aria-expanded="false" style="height: 0px">
+        <td>Register for online banking</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion2 " aria-expanded="false" style="height: 0px">
+        <td>Login</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion2 " aria-expanded="false" style="height: 0px">
+        <td>Setup my ﬁngerprint login</td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion2 " aria-expanded="false" style="height: 0px">
+        <td>Forgot my username</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion2 " aria-expanded="false" style="height: 0px">
+        <td>Forgot my PIN</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion2 " aria-expanded="false" style="height: 0px">
+        <td>Forgot my password</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion2 " aria-expanded="false" style="height: 0px">
+        <td>Reset online banking profile</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion2 " aria-expanded="false" style="height: 0px">
+        <td>Change my PIN</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion2 " aria-expanded="false" style="height: 0px">
+        <td>Change my password</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion2 " aria-expanded="false" style="height: 0px">
+        <td>Update my details</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion2 " aria-expanded="false" style="height: 0px">
+        <td>Send me statements</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion2 " aria-expanded="false" style="height: 0px">
+        <td>Enrol for cellphone banking</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion2 " aria-expanded="false" style="height: 0px">
+        <td>Set online banking limits</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion2 " aria-expanded="false" style="height: 0px">
+        <td>Setup SMS for money in money out</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MY ACCOUNTS -->
+                    <div class="col-lg-12">
+                        <div class="accordion-item">
+                            <h5 class="accordion-header">
+                                <button class="accordion-button text-heading-5">MY ACCOUNTS</button>
+                            </h5>
+                            <div id="accordion-body" class="accordion-collapse collapse">
+                                <div class="accordion-body">
+                                <div class="row desk-table">
+    <div class="col-md-12">
+        <div class="margin-top-10">
+            <table class="table " style="margin: auto; width:100%">
+                <thead>
+                    <tr>
+                
+<th></th>
+<th class="color-brand-1 0" id="0">
+ 
+  Internet Banking
+</th>
+<th class="color-brand-1 1" id="1">
+   
+African Bank App
+</th>
+<th class="color-brand-1 2" id="2">
+    
+  CellPhone Banking
+</th>
+   <th class="color-brand-1 2" id="2">
+    
+Whatsapp Banking
+</th>
+                    </tr>
+                </thead>
+                <tbody>
+             <tr class="accordion3" aria-expanded="false" style="height: 0px">
+        <td>Get my credit report</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion3" aria-expanded="false" style="height: 0px">
+        <td>View pending applications</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion3" aria-expanded="false" style="height: 0px">
+        <td>View all my accounts</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion3" aria-expanded="false" style="height: 0px">
+        <td>View my account balances</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion3" aria-expanded="false" style="height: 0px">
+        <td>View my account transaction list</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion3" aria-expanded="false" style="height: 0px">
+        <td>Switch my debit orders</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion3" aria-expanded="false" style="height: 0px">
+        <td>Debit order disputes</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion3" aria-expanded="false" style="height: 0px">
+        <td>View my interaction history</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MyWORLD -->
+                    <div class="col-lg-12">
+                        <div class="accordion-item">
+                            <h5 class="accordion-header">
+                                <button class="accordion-button text-heading-5">MyWORLD</button>
+                            </h5>
+                            <div id="accordion-body" class="accordion-collapse collapse">
+                                <div class="accordion-body">
+                               <div class="col-md-12">
+        <div class="margin-top-10">
+            <table class="table " style="margin: auto; width:100%">
+                <thead>
+                    <tr>
+                
+<th></th>
+<th class="color-brand-1 0" id="0">
+ 
+  Internet Banking
+</th>
+<th class="color-brand-1 1" id="1">
+   
+African Bank App
+</th>
+<th class="color-brand-1 2" id="2">
+    
+  CellPhone Banking
+</th>
+   <th class="color-brand-1 2" id="2">
+    
+Whatsapp Banking
+</th>
+                    </tr>
+                </thead>
+                <tbody>
+               <tr class="accordion4 ">
+        <td>Make instant transfers</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion4 ">
+        <td>Buy prepaid</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion4 ">
+        <td>Transaction history</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion4 ">
+        <td>Stop or dispute debit orders</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion4 ">
+        <td>Get my statement</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion4 ">
+        <td>Get my tax certificate</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion4 ">
+        <td>Get my account details</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion4 ">
+        <td>Stop a card</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion4 ">
+        <td>Re-activate a card</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion4 ">
+        <td>Manage my card limits</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- INVESTMENTS -->
+                    <div class="col-lg-12">
+                        <div class="accordion-item">
+                            <h5 class="accordion-header">
+                                <button class="accordion-button text-heading-5">INVESTMENTS</button>
+                            </h5>
+                            <div id="accordion-body" class="accordion-collapse collapse">
+                                <div class="accordion-body">
+                                  <div class="row desk-table">
+                                      
+                                      <div class="row desk-table">
+    <div class="col-md-12">
+        <div class="margin-top-10">
+            <table class="table " style="margin: auto; width:100%">
+                <thead>
+                    <tr>
+                  <th></th>
+<th class="color-brand-1 0" id="0">
+ 
+  Internet Banking
+</th>
+<th class="color-brand-1 1" id="1">
+   
+African Bank App
+</th>
+<th class="color-brand-1 2" id="2">
+    
+  CellPhone Banking
+</th>
+   <th class="color-brand-1 2" id="2">
+    
+Whatsapp Banking
+</th>
+                    </tr>
+                </thead>
+                <tbody>
+                 <tr class="accordion5 ">
+        <td>Investment calculator</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion5 ">
+        <td>Call me back</td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion5 ">
+        <td>Apply online or view status</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion5 ">
+        <td>View my balance and interest rate</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion5 ">
+        <td>Change interest payout frequency</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion5 ">
+        <td>Re-invest</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion5 ">
+        <td>Get my statement</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion5 ">
+        <td>Get my tax certiﬁcate</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion5 ">
+        <td>Request a withdrawal</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion5 ">
+        <td>Cancel withdrawal</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion5 ">
+        <td>Change disbursement details</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+ 
+                                  </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LOAN -->
+                    <div class="col-lg-12">
+                        <div class="accordion-item">
+                            <h5 class="accordion-header">
+                                <button class="accordion-button text-heading-5">LOAN</button>
+                            </h5>
+                            <div id="accordion-body" class="accordion-collapse collapse">
+                                <div class="accordion-body">
+                           <div class="row desk-table">
+    <div class="col-md-12">
+        <div class="margin-top-10">
+            <table class="table " style="margin: auto; width:100%">
+                <thead>
+                    <tr>
+                <th></th>
+<th class="color-brand-1 0" id="0">
+ 
+  Internet Banking
+</th>
+<th class="color-brand-1 1" id="1">
+   
+African Bank App
+</th>
+<th class="color-brand-1 2" id="2">
+    
+  CellPhone Banking
+</th>
+   <th class="color-brand-1 2" id="2">
+    
+Whatsapp Banking
+</th>
+                    </tr>
+                </thead>
+                <tbody>
+                     <tr class="accordion6">
+                <td>
+                    Apply online
+                </td>
+                <td style="text-align:center">
+                    <i class="fa fas fa-check-circle fa-2x" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">Call back</td>
+                <td style="text-align:center">Call back</td>
+            </tr>
+            <tr class="accordion6">
+                <td>
+                    Know my balances due
+                </td>
+                <td style="text-align:center">
+                    <i class="fa fas fa-check-circle fa-2x" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="fa fas fa-check-circle fa-2x" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="fa fas fa-check-circle fa-2x" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="" style="color:green;"></i>
+                </td>
+            </tr>
+            <tr class="accordion6">
+                <td>
+                    Know my instalment and due date
+                </td>
+                <td style="text-align:center">
+                    <i class="fa fas fa-check-circle fa-2x" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="fa fas fa-check-circle fa-2x" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="" style="color:green;"></i>
+                </td>
+            </tr>
+            <tr class="accordion6">
+                <td>
+                    Pay my loan
+                </td>
+                <td style="text-align:center">
+                    <i class="fa fas fa-check-circle fa-2x" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="fa fas fa-check-circle fa-2x" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="fa fas fa-check-circle fa-2x" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="" style="color:green;"></i>
+                </td>
+            </tr>
+            <tr class="accordion6">
+                <td>
+                    Activate a payment break
+                </td>
+                <td style="text-align:center">
+                    <i class="fa fas fa-check-circle fa-2x" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="fa fas fa-check-circle fa-2x" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="" style="color:green;"></i>
+                </td>
+            </tr>
+            <tr class="accordion6">
+                <td>
+                    Cancel a payment break
+                </td>
+                <td style="text-align:center">
+                    <i class="fa fas fa-check-circle fa-2x" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="fa fas fa-check-circle fa-2x" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="" style="color:green;"></i>
+                </td>
+            </tr>
+            <tr class="accordion6">
+                <td>
+                    Get my statement
+                </td>
+                <td style="text-align:center">
+                    <i class="fa fas fa-check-circle fa-2x" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="fa fas fa-check-circle fa-2x" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="fa fas fa-check-circle fa-2x" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="" style="color:green;"></i>
+                </td>
+            </tr>
+            <tr class="accordion6">
+                <td>
+                    Get my paid up letter
+                </td>
+                <td style="text-align:center">
+                    <i class="fa fas fa-check-circle fa-2x" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="fa fas fa-check-circle fa-2x" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="fa fas fa-check-circle fa-2x" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="" style="color:green;"></i>
+                </td>
+            </tr>
+            <tr class="accordion6">
+                <td>
+                    Get my settlement quote
+                </td>
+                <td style="text-align:center">
+                    <i class="fa fas fa-check-circle fa-2x" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="fa fas fa-check-circle fa-2x" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="fa fas fa-check-circle fa-2x" style="color:green;"></i>
+                </td>
+                <td style="text-align:center">
+                    <i class="" style="color:green;"></i>
+                </td>
+            </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CREDIT CARD -->
+                    <div class="col-lg-12">
+                        <div class="accordion-item">
+                            <h5 class="accordion-header">
+                                <button class="accordion-button text-heading-5">CREDIT CARD</button>
+                            </h5>
+                            <div id="accordion-body" class="accordion-collapse collapse">
+                                <div class="accordion-body">
+                              <div class="row desk-table">
+    <div class="col-md-12">
+        <div class="margin-top-10">
+            <table class="table " style="margin: auto; width:100%">
+                <thead>
+                    <tr>
+                  <th></th>
+<th class="color-brand-1 0" id="0">
+ 
+  Internet Banking
+</th>
+<th class="color-brand-1 1" id="1">
+   
+African Bank App
+</th>
+<th class="color-brand-1 2" id="2">
+    
+  CellPhone Banking
+</th>
+   <th class="color-brand-1 2" id="2">
+    
+Whatsapp Banking
+</th>
+                    </tr>
+                </thead>
+                <tbody>
+           <tr class="accordion7">
+        <td>Apply online</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center"></td>
+        <td style="text-align: center">Call back</td>
+      </tr>
+      <tr class="accordion7">
+        <td>Know my available balances</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion7">
+        <td>Know my balances due</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion7">
+        <td>Know my instalment due date</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion7">
+        <td>Stop a card</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion7">
+        <td>Re-activate a card</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion7">
+        <td>Manage my card limit</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion7">
+        <td>Pay my credit card</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion7">
+        <td>Buy prepaid</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion7">
+        <td>Get my statement</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion7">
+        <td>Get my paid up letter</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion7">
+        <td>Get my settlement quote</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion7">
+        <td>Get my tax certiﬁcate</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FUNERAL INSURANCE -->
+                    <div class="col-lg-12">
+                        <div class="accordion-item">
+                            <h5 class="accordion-header">
+                                <button class="accordion-button text-heading-5">FUNERAL INSURANCE</button>
+                            </h5>
+                            <div id="accordion-body" class="accordion-collapse collapse">
+                                <div class="accordion-body">
+                                  <div class="row desk-table">
+    <div class="col-md-12">
+        <div class="margin-top-10">
+            <table class="table " style="margin: auto; width:100%">
+                <thead>
+                    <tr>
+                  <th></th>
+<th class="color-brand-1 0" id="0">
+ 
+  Internet Banking
+</th>
+<th class="color-brand-1 1" id="1">
+   
+African Bank App
+</th>
+<th class="color-brand-1 2" id="2">
+    
+  CellPhone Banking
+</th>
+   <th class="color-brand-1 2" id="2">
+    
+Whatsapp Banking
+</th>
+                    </tr>
+                </thead>
+                <tbody>
+                      <tr class="accordion8">
+        <td>Know the status of my application</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion8">
+        <td>Know my insurance cover</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion8">
+        <td>Know my premium</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion8">
+        <td>View / add my beneﬁciaries</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+      <tr class="accordion8">
+        <td>Submit my claim</td>
+        <td style="text-align: center">
+          <i class="fa fas fa-check-circle fa-2x" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+        <td style="text-align: center">
+          <i class="" style="color: green"></i>
+        </td>
+      </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</section>       
+
+@*<section class="section-800">
+                <div class="container">
+                  <div class="row align-items-center row-change">
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                       <h1 class="color-brand-1 mt-15 mb-20">
+                        Online Banking
+                      </h1>
+                      <p class="font-md color-brand-1 mt-20">
+                        We understand that time is important to you, which is why we have made online banking simple and easy to use. Save time using our quick ways to bank and save money because it is free-to-use.
+                      </p>
+                      <div class="mt-50 text-start"><a href="https://ib.africanbank.co.za/SignIn.aspx" class="btn btn-brand-1 arrow-right"> Register now </a></div>
+                      
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                      <img
+                        class="d-block"
+                        src="/media/iitf2tc4/best-bank.png"
+                        alt="iori"
+                        
+                      /> 
+                       
+                    </div>
+                  </div>
+                </div>
+</section>*@
+
+@*<section class="section-800 bg-grey-60">
+    <div class="container">
+        <div class="row align-items-center flex-row-reverse row-change reverse-row">
+            <div class="col-xl-6 col-lg-6 col-md-6">
+                <h1 class="color-brand-1 mt-15 mb-20">Internet Banking</h1>
+                <p class="font-md color-brand-1">Register NOW to enjoy Internet banking. Once you've registered, log in to start using internet banking.
+Remember, you will need an email address, cellphone number and ID to register.</p>
+               
+                <div class="combo-btn">
+                    <div class="mt-50 text-start column1">
+                        <a class="btn btn-brand-1 hover-up" href="/bank#">
+                            <p class="combo-btn-text">Create Email</p>
+                            <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" class="right-icon" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"></path>
+                            </svg>
+                        </a>
+                    </div>
+                    <div class="mt-50 text-start column2">
+                        <a class="btn btn-brand-1 hover-up" href="/bank#">
+                            <p class="combo-btn-text">Register Now</p>
+                            <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" class="right-icon" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6 col-lg-6 col-md-6">
+                <!--<img src="/media/hq4dqum3/comb_internet-banking.png" alt="internet-banking-login-app-and-web" style="max-height: 250px; ">-->
+                <img
+                        class="d-block"
+                        src="/media/iitf2tc4/best-bank.png"
+                        alt="iori"
+                        
+                      /> 
+            </div>
+        </div>
+    </div>
+</section>*@
+
+@*<section class="section-800">
+    <div class="container">
+        <div class="row align-items-center flex-row-reverse row-change">
+            <div class="col-xl-6 col-lg-6 col-md-6">
+                <h1 class="color-brand-1 mt-15 mb-20">African Bank App</h1>
+                <p class="font-md color-brand-1">Search for African Bank on the GooglePlay or AppStore to download and install.
+                    You will need an email address, cellphone number and ID to register
+                    Android 4.4 KITKAT and IOS version 9.3, iPhone 5 and later versions are compatible.
+                    Low-end devices may be incompatible due to feature limitations.
+                    Remember, you’ll need an email address to download the African Bank App..
+                </p>
+                <div class="combo-btn">
+                    <div class="mt-50 text-start column1">
+                        <a class="btn btn-brand-1 hover-up" href="/bank#">
+                            <p class="combo-btn-text">Create Email</p>
+                            <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" class="right-icon" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"></path>
+                            </svg>
+                        </a>
+                    </div>
+                    <div class="mt-50 text-start column2">
+                        <a class="btn btn-brand-1 hover-up" href="/bank#">Download Now<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="right-icon" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M320 336h76c55 0 100-21.21 100-75.6s-53-73.47-96-75.6C391.11 99.74 329 48 256 48c-69 0-113.44 45.79-128 91.2-60 5.7-112 35.88-112 98.4S70 336 136 336h56m0 64.1 64 63.9 64-63.9M256 224v224.03"></path></svg></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6 col-lg-6 col-md-6">
+                <!--<img src="/media/hq4dqum3/comb_internet-banking.png" alt="internet-banking-login-app-and-web" style="max-height: 250px; ">-->
+                <img
+                        class="d-block"
+                        src="/media/iitf2tc4/best-bank.png"
+                        alt="iori"
+                        
+                      /> 
+            </div>
+        </div>
+    </div>
+</section>*@
+
+@*<section class="section-800 bg-grey-60">
+                <div class="container">
+                  <div class="row align-items-center row-change reverse-row">
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                       <h1 class="color-brand-1 mt-15 mb-20">
+                        Cellphone Banking
+                      </h1>
+                      <p class="font-md color-brand-1 mt-20">
+                        Register for cellphone banking with your consultant in branch or on <b>Register NOW.</b>
+                        Dial <b>*120*225#</b> to accept the terms and start banking from your phone. 
+                      </p>
+                      <div class="mt-50 text-start"><a href="https://ib.africanbank.co.za/SignIn.aspx" class="btn btn-brand-1 arrow-right"> Register now </a></div>
+                      
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                      <img
+                        class="d-block"
+                        src="/media/iitf2tc4/best-bank.png"
+                        alt="iori"
+                        
+                      /> 
+                       
+                    </div>
+                  </div>
+                </div>
+</section>*@
+
+@*<section class="section-800 ">
+    <div class="container">
+        <div class="row align-items-center flex-row-reverse row-change">
+            <div class="col-xl-6 col-lg-6 col-md-6">
+                <h1 class="color-brand-1 mt-15 mb-20">Whatsapp Banking</h1>
+                <p class="font-md color-brand-1 mt-20">
+                        We understand that time is important to you, which is why we have made online banking simple and easy to use. Save time using our quick ways to bank and save money because it is free-to-use.
+                      </p>
+                <div class="combo-btn">
+                    <div class="mt-50 text-start column1">
+                        <a class="btn btn-brand-1 hover-up" href="/bank#">
+                            <p class="combo-btn-text">Create Email</p>
+                            <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" class="right-icon" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"></path>
+                            </svg>
+                        </a>
+                    </div>
+                    <div class="mt-50 text-start column2">
+                        <a class="btn btn-brand-1 hover-up" href="/bank#">
+                            <p class="combo-btn-text">Register Now</p>
+                            <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" class="right-icon" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6 col-lg-6 col-md-6">
+                <!--<img src="/media/hq4dqum3/comb_internet-banking.png" alt="internet-banking-login-app-and-web" style="max-height: 250px; ">-->
+                <img
+                        class="d-block"
+                        src="/media/iitf2tc4/best-bank.png"
+                        alt="iori"
+                        
+                      /> 
+            </div>
+        </div>
+    </div>
+</section>*@
+
+
+
+  
+
+
+
+@*
 
 <!-- HERO BANNER -->
 @Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
@@ -116,9 +1985,9 @@
 
                                 if (mobiItem.Value("category").ToString() == "All")
                                 {
-                                    <div class="col-xs-4"><img src="/media/51865/yes-internet-banking-icon.svg" alt="yes-internet-banking-icon" width="80%"></div>
-                                    <div class="col-xs-4"><img src="/media/51903/icon_yes_app.svg" alt="icon-yes-app" width="80%"></div>
-                                    <div class="col-xs-4"><img src="/media/51904/icon_yes_cell.svg" alt="icon-yes-cell" width="80%"></div>
+                                    <div class="col-xs-4"><img src="/media/cznhvbf1/yes-internet-banking-icon.svg" alt="yes-internet-banking-icon" width="80%"></div>
+                                    <div class="col-xs-4"><img src="/media/keig23yt/icon_yes_app.svg" alt="icon-yes-app" width="80%"></div>
+                                    <div class="col-xs-4"><img src="/media/0twjqhgz/icon_yes_cell.svg" alt="icon-yes-cell" width="80%"></div>
                                 }
                                 else
                                 {
@@ -132,29 +2001,29 @@
 
                                     if (internetBanking.OptionForBanking == "Internet Banking" && (bool)internetBanking.IsSelected)
                                     {
-                                        <div class="col-xs-4"><img src="/media/51865/yes-internet-banking-icon.svg" alt="yes-internet-banking-icon" width="80%" /></div>
+                                        <div class="col-xs-4"><img src="/media/cznhvbf1/yes-internet-banking-icon.svg" alt="yes-internet-banking-icon" width="80%" /></div>
                                     }
                                     else
                                     {
-                                        <div class="col-xs-4"><img src="/media/51867/no-internet-banking-icon.svg" alt="no-internet-banking-icon" width="80%" /></div>
+                                        <div class="col-xs-4"><img src="/media/lxwdcgq3/no-internet-banking-icon.svg" alt="no-internet-banking-icon" width="80%" /></div>
                                     }
 
                                     if (africanBankApp.OptionForBanking == "African Bank App" && (bool)africanBankApp.IsSelected)
                                     {
-                                        <div class="col-xs-4"><img src="/media/51903/icon_yes_app.svg" alt="icon-yes-app" width="80%" /></div>
+                                        <div class="col-xs-4"><img src="/media/keig23yt/icon_yes_app.svg" alt="icon-yes-app" width="80%" /></div>
                                     }
                                     else
                                     {
-                                        <div class="col-xs-4"><img src="/media/51901/icon_no_app.svg" alt="icon-no-app" width="80%" /></div>
+                                        <div class="col-xs-4"><img src="/media/jd2hm45r/icon_no_app.svg" alt="icon-no-app" width="80%" /></div>
                                     }
 
                                     if (cellPhoneBanking.OptionForBanking == "CellPhone Banking" && (bool)cellPhoneBanking.IsSelected)
                                     {
-                                        <div class="col-xs-4"><img src="/media/51904/icon_yes_cell.svg" alt="icon-yes-cell" width="80%" /></div>
+                                        <div class="col-xs-4"><img src="/media/0twjqhgz/icon_yes_cell.svg" alt="icon-yes-cell" width="80%" /></div>
                                     }
                                     else
                                     {
-                                        <div class="col-xs-4"><img src="/media/51902/icon_no_cell.svg" alt="icon-no-cell" width="80%" /></div>
+                                        <div class="col-xs-4"><img src="/media/w01dqi1p/icon_no_cell.svg" alt="icon-no-cell" width="80%" /></div>
                                     }
                                 }
                             }
@@ -279,6 +2148,11 @@
         }
     </div>
 </div>
+
+
+
+
+*@
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-21394042-6"></script>
 <script>
@@ -292,6 +2166,30 @@
 {
 
     <script type="text/javascript">
+    
+    
+               $(".accordion-button").click(function(){
+            
+         
+    var isCollapsed = $(this).hasClass('collapsed');
+    
+           $(".accordion-button").removeClass('collapsed');
+           
+           if(isCollapsed == false) {
+            $(this).toggleClass("collapsed");
+           }
+
+           
+ var isCollapsedContent = $(this).parent().next(".accordion-collapse").hasClass('collapse');
+            $(".accordion-collapse").addClass('collapse');
+            if(isCollapsedContent == true) {
+                $(this).parent().next(".accordion-collapse").toggleClass('collapse');
+           }
+
+           
+
+        });
+    
 
     function getMobileOperatingSystem()
     {
@@ -341,7 +2239,9 @@
                 $('.modal-body').append(appendHTML);
                 $('.app-platform').attr('href', platform);
                 $('.copy').html('@mobileBlurp');
-                $('#generic').modal("show");
+                $(window).load(function(){
+                    $('#generic2').modal('show');
+                });
                 break;
 
             case "iOS":
@@ -352,10 +2252,12 @@
                 $('.copy').html('@mobileBlurp');
 
                 $('.app-platform').attr('href', platform);
-                $('#generic').modal("show");
+                $(window).load(function(){
+                    $('#generic2').modal('show');
+                });
                 break;
             default:
-               
+             console.log("click");
 
         }
     });
@@ -363,6 +2265,9 @@
     $(".btn_ok_modal").click(function () {
         $('#generic').modal('hide');
     });
+    
+    
+    
 
     </script>
 }

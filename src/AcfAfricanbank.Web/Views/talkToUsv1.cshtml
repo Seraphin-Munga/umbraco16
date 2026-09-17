@@ -1,5 +1,237 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCampaign>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models;
+@using Web.Helpers
+@using Umbraco.Web.Models
+@using System.Text.RegularExpressions
+
 @{
-	Layout = null;
+    Layout = "Master.cshtml";
+    var children = Model.Children;
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    
+    
+    var bodyCards = heroBody?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+    var applyDocs = bodyCards?.Select(c => c as Card).FirstOrDefault();
+    var cardImage = applyDocs.Value("cardIcon");
+      String cardUrl = ((IPublishedContent)cardImage).Url.ToString();
+    var cardLink= applyDocs.Value("buttonLink");
+   
+    var navigate1 = applyDocs.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").FirstOrDefault();
+    var navigate2 = applyDocs.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").Last();
+    
+     var info= heroBody.Children.Where(c => c.Name == "Information").FirstOrDefault();
+      var infocard = info.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var infocards = infocard.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+    
 }
+<link rel="stylesheet" href="/css/projectmagic.css" />
+<style>
+.accordion .accordion-button {
+    padding: 25px 30px 20px 30px !important;
+}
+.accordion .accordion-body {
+    padding: unset;
+    
+}
+    .btn-primary {
+    color: #002B60;
+    background-color: #F2F2F2;
+    box-shadow: 2px 5px 10px #00000029;
+}
+.btn-primary.active{
+    color: #FFFFFF !important;
+    background-color: #8095AF !important;
+    border: #8095af;
+}
+.nav-tabs>li>a:hover {
+    background: #8095af;
+    font-weight: bold;
+    border: #8095af;
+}
+
+.nav-tabs {
+    border-bottom: transparent;
+}
+.nav-tabs>li>a {
+    margin-right: 20px;
+    border-radius: 20px;
+    padding:10px;
+}
+nav>li>a {
+    padding: 10px;
+}
+
+@@media (max-width: 999.98px) {
+    .accordionStyle2.accordion .accordion-body {
+        padding: unset !important;
+    }
+}
+@@media (max-width: 767px) {
+  .custom-class {
+        margin-bottom: 10px !important;
+    }
+   .nav-tabs {
+        display: grid;
+    }
+    
+}
+</style>
+<section class="section pt-50 pb-40  bg-grey-60">
+                            <div class="container">
+                                <div class="row align-items-center d-flex row-change md-text-center">
+                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                        <h1 class="color-brand-1 mt-15 mb-20">@applyDocs.Value("cardTitle")</h1>
+                                        <p class="font-md color-brand-1"></p><p class="font-md color-brand-1">@applyDocs.Value("cardDescriptionLongText")</p><p></p>
+                                        <div class="combo-btn">
+<div class="mt-50 text-start column1">
+<p class="combo-btn-text primary"><a href="@navigate1.Url" class="btn  btn-brand-1 hover-up">@navigate1.Name</a></p>
+</div>
+<div class="mt-50 text-start column2">
+<p class="combo-btn-text secondary"><a href="@navigate2.Url" class="btn btn-brand-secondary hover-up">@navigate2.Name</a></p>
+</div>
+</div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                        <img class="d-block" src="@cardUrl" alt="">
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        
+ 
+     <section class="section pb-40 pt-40">
+        <div class="container">
+            <ul class="nav nav-tabs" id="myTabs">
+              
+                    @if (infocards != null)
+                {
+                    int tabCounter = 1;
+                    foreach (var item in infocards)
+                    {
+                     
+                        @*<li class="custom-class">
+                            <a class="btn btn-primary btn-tab @(tabCounter == 1 ? "active" : "")" data-toggle="tab" href="#@tabCounter">@item.Value("TabSubItemTitle")</a>
+                        </li>*@
+                        
+                         if(tabCounter == 1) {
+                    <li class="custom-class">
+                            <a class="btn btn-primary btn-tab active" data-toggle="tab" href="#@tabCounter">@item.Value("TabSubItemTitle")</a>
+                        </li>
+                } else {
+                 <li class="custom-class">
+               <a class="btn btn-primary btn-tab" href="#" onclick="window.open('http://cmsdev.africanbank.net/en/home/branch-locator/', '_blank'); return false;">
+    @item.Value("TabSubItemTitle")
+</a>
+        @*  <a class="btn btn-primary btn-tab" href="http://cmsdev.africanbank.net/en/home/branch-locator/">@item.Value("TabSubItemTitle")</a>*@
+                        </li>
+                }
+                        tabCounter++;
+                    }
+                }
+               
+            </ul>
+            
+            <div class="tab-content">
+                    
+                @if (infocards != null)
+                {
+                    int tabCounter = 1;
+                    foreach (var item in infocards)
+                    {
+                        <div id="@tabCounter" class="tab-pane fade @(tabCounter == 1 ? "in active" : "")">
+                               
+                                @if (item.Value("TabSubItemTitle").ToString() == "CONTACT INFORMATION")
+                                {
+                                
+                                  var cards = item.Value<IEnumerable<NCcard>>("genericCardContent");
+                                  @item.Value("tabSubItemTextContent")
+                                    
+                                    
+                                    foreach (var mycard in cards)
+                                    {
+                                      
+                                      var cardTitle = mycard.Value<string>("nCcardTitle");
+                                     
+                                       <div class="accordion accordionStyle2" id="accordionFAQ">
+                    <div class="row">
+                       
+                        <div class="col-lg-12">
+                            <div class="accordion-item">
+                                <h5 class="accordion-header">
+                                    <button class="accordion-button text-heading-5">@cardTitle</button>
+                                </h5>
+                                 <div id="accordion-body" class="accordion-collapse collapse">
+                                    <div class="accordion-body">@Html.Raw(mycard.Value<string>("mediumDescription"))</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                                        }                       
+                            
+                                }
+                               
+                           @* else if (item.Value("TabSubItemTitle").ToString() == "LOCATE A BRANCH")
+                            {
+                                var cards = item.Value<IEnumerable<NCcard>>("genericCardContent");
+                                @item.Value("tabSubItemTextContent")
+                                    foreach (var mycard in cards)
+                                    {
+                                      
+                                      var cardTitle = mycard.Value<string>("nCcardTitle");
+                                      var carddesc = mycard.Value<string>("nCcardDescription");
+                                       var icon = mycard.Value<IPublishedContent>("nCcardIcon");
+                                       
+                                    }
+                                }
+        *@
+                           
+                        </div>
+                        tabCounter++;
+                    }
+                }
+    
+            </div>
+        </div>
+    </section>
+                        
+<script>
+$(document).ready(function() {
+    $(".accordion-button").click(function(){
+
+    var isCollapsed = $(this).hasClass('collapsed');
+           $(".accordion-button").removeClass('collapsed');
+           if(isCollapsed == false) {
+            $(this).toggleClass("collapsed");
+           }
+ 
+           
+var isCollapsedContent = $(this).parent().next(".accordion-collapse").hasClass('collapse');
+            $(".accordion-collapse").addClass('collapse');
+            if(isCollapsedContent == true) {
+                $(this).parent().next(".accordion-collapse").toggleClass('collapse');
+           }
+ 
+           
+ 
+        });
+
+
+     $("#myTabs a").click(function (e) {
+            e.preventDefault();
+
+            // Remove "active" class from all tabs
+            $("#myTabs a").removeClass("active");
+            $(".tab-content > div").removeClass("in active");
+
+            // Add "active" class to the clicked tab
+            $(this).addClass("active");
+
+            // Show the corresponding tab content
+            $($(this).attr("href")).addClass("in active");
+        });
+
+
+});
+</script>

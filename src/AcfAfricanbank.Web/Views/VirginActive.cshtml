@@ -62,7 +62,8 @@
     ContentModels.EbankItabstractButton androidDownloadNow = null;
     ContentModels.EbankItabstractButton iosDownloadNow = null;
     ContentModels.EbankItabstractButton downloadNow = null;
-
+    ContentModels.EbankItabstractButton huaweiDownloadNow = null;
+    
     foreach (var button in bodyButtons)
     {
         if (button.Value("EbankItbuttonText").ToString().Contains("Register / Login"))
@@ -83,6 +84,10 @@
         {
             iosDownloadNow = (ContentModels.EbankItabstractButton)button;
         }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("Huawei"))
+        {
+            huaweiDownloadNow = (ContentModels.EbankItabstractButton)button;
+        }
         else
         {
             downloadNow = (ContentModels.EbankItabstractButton)button;
@@ -100,13 +105,32 @@
     registerNowButton?.EbankItbuttonExternalLink :
     registerNowButton.EbankItbuttonInternalLink?.Url;
     registerNowButtonLink = (string.IsNullOrEmpty(registerNowButtonLink)) ? "#" : registerNowButtonLink;
-
+    
+    var androidButtonLink = "#";
+    androidButtonLink = string.IsNullOrEmpty(androidDownloadNow?.EbankItbuttonInternalLink?.Url) ?
+    androidDownloadNow?.EbankItbuttonExternalLink :
+    androidDownloadNow.EbankItbuttonInternalLink?.Url;
+    androidButtonLink = (string.IsNullOrEmpty(androidButtonLink)) ? "#" : androidButtonLink;
+    
+    var iosButtonLink = "#";
+    iosButtonLink = string.IsNullOrEmpty(iosDownloadNow?.EbankItbuttonInternalLink?.Url) ?
+    iosDownloadNow?.EbankItbuttonExternalLink :
+    iosDownloadNow.EbankItbuttonInternalLink?.Url;
+    iosButtonLink = (string.IsNullOrEmpty(iosButtonLink)) ? "#" : iosButtonLink;
+    
+    var huaweiButtonLink = "#";
+    huaweiButtonLink = string.IsNullOrEmpty(huaweiDownloadNow?.EbankItbuttonInternalLink?.Url) ?
+    huaweiDownloadNow?.EbankItbuttonExternalLink :
+    huaweiDownloadNow.EbankItbuttonInternalLink?.Url;
+    huaweiButtonLink = (string.IsNullOrEmpty(huaweiButtonLink)) ? "#" : huaweiButtonLink;
+    
     var onlineButtonText = registerNowButton.Value("EbankItbuttonText");
 
-    var popupAppTitle = "Download African App using one of the following";
-    var popQRCode = "/media/51852/image001.png";
+    var popupAppTitle = "Download the App using one of the following";
+    var popQRCode = "/media/ylalxyxb/image001.png";
     var popAndroidApp = "/media/pt2b4b3q/GooglePlayStoreDownloadImageLink.png";
     var popIOsApp = "/media/pejn1h1x/appstoredownloadimagelink.png";
+    var popHuaweiApp = "/media/di0py4qr/appgallery-logo-2.png";
 }
 <style type="text/css">
     .margin-bottom-20 {
@@ -311,6 +335,32 @@
             text-align: center;
         }
     }
+    .modal .modal-dialog .modal-content .modal-header {
+        background-color: transparent;
+        border-bottom: 1px solid #eee;
+    }
+    @@media (min-width: 1000px) and (max-width: 10000px) {
+        .modal-dialog {
+            width: 900px !important;
+        }
+    }
+
+    @@media (min-width: 768px) and (max-width: 1024px) {
+        
+        .col-sm-6 img {
+            width: 160px;
+        }
+
+        .modal-dialog {
+            width: 790px !important;
+            padding-left: 30px;
+            padding-right: 50px;
+        }
+        .app-platform{
+           width: 118px !important;
+           border-radius: 0px !important;
+        } 
+    }
 </style>
 
 <!-- HERO Header -->
@@ -413,7 +463,7 @@
     }
 </div>
 
-@Html.Partial("_renderPopUpContent2", new ContainerViewModel()
+@*@Html.Partial("_renderPopUpContent2", new ContainerViewModel()
 {
 HTMLContent2 = @<text>
         <div class="modal-body">
@@ -430,7 +480,39 @@ HTMLContent2 = @<text>
             </div>
         </div>
 </text>
-})
+})*@
+
+@Html.Partial("_renderPopUpContent2", new ContainerViewModel()
+    {
+        HTMLContent2 = @<text>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-15">
+    
+                        <br /><br />
+    
+                    </div>
+                    
+                    <div class="col-xs-12 col-sm-4">
+                        <a id="AndroidUrl" href="@androidButtonLink">
+                            <img width="200" id="popUpAndroid" />
+                        </a>
+                    </div>
+                    <div class="col-xs-12 col-sm-4">
+                        <a id="iOSUrl" href="@iosButtonLink">
+                            <img width="200" id="popUpIOS" />
+                        </a>
+                    </div>
+                    <div class="col-xs-12 col-sm-4">
+                        <a id="HuaweiUrl" href="@huaweiButtonLink">
+                            <img loading="lazy" width="200" id="popUpHuawei" src="@popHuaweiApp" />
+                        </a>
+                    </div>
+    
+                </div>
+            </div>
+        </text>
+    })
 
 @Html.Partial("_renderPopUpContent", new ContainerViewModel()
 {
@@ -438,7 +520,9 @@ HTMLContent = @<text>
         <div class="modal-body">
             <div class="row">
                 <div class="col-md-12">
-                    Your Opt-Out has been submitted.
+                    <br /> 
+                    Your request has been submitted and one of our friendly consultants will contact you.
+                    <br /><br />
                 </div>
                 <br />
                 <br />
@@ -447,10 +531,10 @@ HTMLContent = @<text>
         </div>
 </text>
 })
-@section Scripts
+@section scripts
                         {
-    <script>
-
+    <script type="text/javascript">
+       
         $('#frmVirginActive').bootstrapValidator({
                 feedbackIcons: {
                     valid: 'glyphicon glyphicon-ok-sign',
@@ -576,35 +660,20 @@ HTMLContent = @<text>
                         }
                     },
                     'referenceNumber': {
-                        message: 'Reference number entered is not valid',
+                        message: 'Value inserted is not valid',
                         validators: {
                             notEmpty: {
-                                message: 'Reference number is required'
+                                message: 'Reference Number is required'
                             },
-                            numeric: {
-                                message: 'Only numeric values allowed'
-                            },
-                            stringLength: {
-                                min: 10,
-                                max: 10,
-                                message: 'Reference number can only be 10 digits only'
-                            },
-                            callback: {
-                                callback: function (value, validator, $field) {
-                                    if (value != "") {
-                                        var cellNumber = value;
-                                        if (null === cellNumber || 0 === cellNumber.length || 10 !== cellNumber.length || cellNumber === '0000000000') return !1; // not 0000000
-                                        if ('0' !== cellNumber.substring(0, 1)) return !1; // starts with 0
-                                        return !0;
-                                    }
-                                    return true;
-                                }
+                            regexp: {
+                                regexp: /^[a-zA-Z]/,
+                                message: 'Please enter a valid reference number'
                             }
                         }
                     }
                 }
             });
-
+       
         function form_validation_revalidate(form_id) {
             var validator = $(form_id).data('bootstrapValidator');
             var n = validator.validate().getInvalidFields().length;
@@ -616,7 +685,7 @@ HTMLContent = @<text>
             }
 
         }
-
+        
         $(document).ready(function () {
             $('#sendVAForm').on('click', function (e) {
                 e.preventDefault();
@@ -630,7 +699,7 @@ HTMLContent = @<text>
                         marketingObj.Email = $('#email').val(),
                         marketingObj.Cellphone = $('#cellPhone').val(),
                         marketingObj.ReferenceNumber = $('#referenceNumber').val()
-
+                        
                     $('.hang-tight').show('slow');
                     var token = $('input[name="__RequestVerificationToken"]')[0].value;
                     $.ajax({
@@ -643,14 +712,25 @@ HTMLContent = @<text>
                         success: function (data) {
                             $('#generic')[0].children[0].children[0].children[0].children[1].innerHTML = 'Thank you!';
                             $('#generic').modal('show');
-                            debugger;
-                            call_me("#frmVirginActive", 1, "Virgin Active", "contact_type");
                         },
                         error: function (error) {
                             console.log(error);
                             //$('.pause-form').hide();
                             //instance.terminate_process("process");
                         }
+                        //}).done(function (html) {
+                        //    console.log(html);
+                        //}).fail(function (e) {
+                        //    console.log(e.responseText);
+                        //});
+                        //setTimeout(function () {
+                        //    $('.hang-tight').hide('slow');
+                        //    $('#generic')[0].children[0].children[0].children[0].children[1].innerHTML = 'Thank you!';
+                        //    $('#generic').modal('show');
+                        //    if ($('#sendOptOut').attr('disabled') === 'disabled') {
+                        //        $('#sendOptOut').removeAttr('disabled');
+                        //    }
+                        //}, 5000);
                     });
                 }
 

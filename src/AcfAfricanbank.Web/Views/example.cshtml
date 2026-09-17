@@ -1,5 +1,1236 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
 }
+
+@* the fun starts here *@
+
+<style>
+    #basic-addon1{
+            border-bottom-left-radius: 30px;
+    border-top-left-radius: 30px;
+    }
+    #basic-addon1 select{
+    background: none;
+    border: none;
+    }
+    #basic-addon2 select{
+    background: none ;
+    border: none !important;
+    }
+    #mobile,
+    #fullname{
+    width: 50%;
+    color: #3D565F;
+    background: #F8F7F8 0% 0% no-repeat padding-box;
+    border: 2px solid #DBDBDB;
+    border-radius: 30px;
+    opacity: 1;
+   
+    border-bottom-left-radius: 0px;
+    border-top-left-radius: 0px;
+    }
+   .input {
+     margin-bottom:0 !important;  
+   }
+   #idnumber{
+     width: 50%;  
+   }
+   
+   .gross-addon{
+     width: 0;  
+   }
+   #basic-addon2 {
+    border-bottom-right-radius: 30px;
+    border-top-right-radius: 30px;
+}
+  #grosssalary{
+    
+    color: #3D565F;
+    background: #F8F7F8 0% 0% no-repeat padding-box;
+    border: 2px solid #DBDBDB;
+    border-radius: 30px;
+    opacity: 1;
+   
+    border-bottom-right-radius: 0px;
+    border-top-right-radius: 0px;
+    }
+</style>
+<style>
+.cookie-notice {
+    display:none;
+}
+.zoom-in {
+  opacity: 0;
+  transform: scale(0.85);
+  transition: transform 1s ease, opacity 1s ease;
+  will-change: transform, opacity;
+}
+
+.zoom-in.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+.qqheader {
+    display: none;  /* Hide by default */
+    opacity:0;
+}
+.card-upsale {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: 1px solid #f2f2f2;
+    padding: 20px;
+    margin: 15px;
+    border-radius: 29px;
+    height: 170px;
+    box-shadow: rgba(50, 50, 105, 0.10) 0px 2px 15px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
+}
+.major-title {
+    font-weight: 200 !important;
+    font-size: 72px !important;
+    line-height: 1;
+}
+.span-major-title {
+    font-weight: 700 !important;
+    font-size: 72px !important;
+    font-style: italic !important;
+}
+.header_tab.active {
+    color: #fff !important;
+}
+@*
+.accordion.active{
+    color: #000 !important;
+    font-weight: 400 !important;
+}
+
+
+label{
+        color: #000 !important;
+    font-weight: 600 !important;
+}*@
+
+
+   .error-message {
+        color: red;
+        display: none;
+    }
+
+    .invalid {
+        border: 2px solid red !important;
+    }
+
+
+input:focus {
+  outline: none !important;
+}
+
+
+      .progress-bar-container {
+            display: none;
+            width: 100%;
+            height: 25px !important;
+            background-color: #f3f3f3;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .progress-bar {
+            width: 0;
+            height: 25px !important;
+            background-color: #4caf50;
+            text-align: center;
+            color: white;
+            border-radius: 5px;
+        }
+
+@*docupload styles*@
+#status ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+/* Style each list item */
+#status ul li {
+    position: relative;
+    padding-left: 31px; /* Space for the checkmark */
+    font-size: 14px;
+}
+
+/* Add a checkmark before each list item */
+#status ul li:before {
+   content: "";/* Unicode for checkmark */
+   font-family: "Glyphicons Halflings";
+   font-size: 17px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: #5DC300; 
+
+}
+#step4 {
+    position: relative;
+    padding-bottom: 50px; /* Adjust based on button height */
+}
+
+#submitBtn {
+    position: absolute;
+    bottom: 10px;
+    right: 0px;
+}
+@*end docupload styles*@
+</style>
+
+<style>
+  @*  /* Use ID for maximum specificity */
+    #name-form .field-row {
+      display: flex !important;
+      align-items: center !important;
+      gap: 0 !important;
+    }
+
+    /* Attribute selector for extra specificity */
+    [class*="rounded-left"] {
+      border-top-left-radius: 30px !important;
+      border-bottom-left-radius: 30px !important;
+      border-right: 0 !important;
+    }
+
+    [class*="rounded-right"] {
+      border-top-right-radius: 30px !important;
+      border-bottom-right-radius: 30px !important;
+    }
+
+    /* Double class specificity */
+    .select-class::placeholder { /* Modern browsers */
+        color: #3993b3;
+
+    }
+    
+
+    .select-class {
+      min-height: 52px !important;
+      min-width: 80px !important;
+      height:30px !important; 
+      border-radius:30px 0 0 30px !important; 
+      border-right:none;
+        margin-bottom: 16px;
+        font-size: 14px;
+        outline: none;
+        padding: 16px 20px;
+        border: 2px solid #DBDBDB;
+        color: #3D565F;
+        background: #F8F7F8 0% 0% no-repeat padding-box;
+    }
+    .select-class-groccery{
+              min-height: 52px !important;
+      min-width: 80px !important;
+      height:30px !important; 
+      border-radius:0 30px 30px 0 !important; 
+      border-left:0 !important;
+        margin-bottom: 16px;
+        font-size: 14px;
+        outline: none;
+        padding: 16px 20px;
+        border: 2px solid #DBDBDB;
+        color: #3D565F;
+        background: #F8F7F8 0% 0% no-repeat padding-box;
+    }
+    
+    /* Important fallback */
+    .no-flex-gap #title {
+      margin-right: 10px !important;
+    }
+
+    /* Reset for input field */
+    #fullname.fullname-reset {
+    margin-left: -4px !important;
+   
+    width: 78% !important;
+    padding-left: 10px !important;
+    min-height: 49px !important;
+    
+    outline: none;
+  
+     
+    }
+     #grosssalary {
+
+        width: 100% !important;
+
+    }
+    input, button, select, textarea {
+    font-family: inherit !important;
+    }
+    .custom-select {
+    position: relative;
+    display: inline-block;
+
+}
+
+select #title {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 100%;
+    padding: 12px 35px 12px 15px;
+    border: 2px solid #012B60;
+    border-radius: 4px;
+    background: white;
+    font-size: 16px;
+}
+
+.custom-select::after {
+    content: '\25BC'; /* Down arrow */
+    font-size: 14px;
+    color: #012B60;
+    position: absolute;
+    right: 15px;
+    top: 40%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    transition: transform 0.3s ease;
+}
+
+/* Optional: Rotate arrow when select is focused */
+select:focus ~ .custom-select::after {
+    transform: translateY(-50%) rotate(180deg);
+}
+   *@ 
+</style>
+
+    <link href="/css/animate.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined">
+    <link href="/css/ab-style.css" rel="stylesheet">
+    
+    
+    
+    <div class="loader" id="loader" style="display: none;">
+    <div class="message">loading...</div>
+    </div>
+    
+    <div class="qqheader">
+    <span id="tab1" class="header_tab active" onclick="nextStep(1)">
+        @*<span id="tab1" class="header_tab active" onclick="nextStep(1)">*@
+        Product Selection
+        <i class="material-icons completed-icon">check_circle</i>
+    </span>
+    <span id="tab2" class="header_tab" onclick="nextStep(2)">
+    @* <span id="tab2" class="header_tab" onclick="">*@
+        Personal Details
+        @*mounika*@
+        <i class="material-icons completed-icon">check_circle</i>
+        @*mounika end*@
+    </span>
+    <span id="tab3" class="header_tab" onclick="nextStep(3)">
+       @* <span id="tab3" class="header_tab" onclick="">*@
+        Your Offer
+        @*mounika*@
+        <i class="material-icons completed-icon">check_circle</i>
+        @*mounika end*@
+    </span>
+    </div>
+       <section id="step1" class="step active mtb-30" aria-labelledby="bank-with-audacity">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 mb-30">
+               <h1 id="bank-with-audacity" class="color-brand-1 major-title mb-20 md-text-center" role="heading" aria-level="1">
+                <span class="span-major-title">Select a Product</span>
+           <br>That's Best For You!
+          </h1>
+            </div>
+        </div>
+        
+         <div class="row visible">
+             <div class="zoom-in">
+                   <div class="col-xs-12 col-sm-6 col-md-4 mb-30" role="listitem" onclick="openDialog('amountModal')">
+           <div class="card-upsale" role="region" aria-labelledby="card-borrow">
+                <div class="title">
+                    <h4 id="card-borrow" class="color-brand-1">Personal Loan</h4>
+                </div>
+                <div class="description" aria-label="Description">
+                   <p class="font-sm-2 color-brand-1">Get up to R350,000.</p>
+                </div>
+                <div>
+                    <button class="btn btn-primary" fdprocessedid="gy36fd">Apply</button>
+                </div>
+            </div>
+           </div>
+           <div class="col-xs-12 col-sm-6 col-md-4 mb-30" role="listitem" onclick="openMyWorldStep()">
+           <div class="card-upsale" role="region" aria-labelledby="card-saveandinvest">
+                <div class="title">
+                    <h4 id="card-saveandinvest" class="color-brand-1">MyWorld Bank Account</h4>
+                </div>
+                <div class="description" aria-label="Description">
+                   <p class="font-sm-2 color-brand-1">Up to 6 accounts in one.</p>
+                </div>
+                <div>
+                   <button class="btn btn-primary" fdprocessedid="28ztxw">Apply</button>
+                </div>
+            </div>
+           </div>
+           <div class="col-xs-12 col-sm-6 col-md-4 mb-30" role="listitem" onclick="openDialog('investmentsModal')">
+           <div class="card-upsale" role="region" aria-labelledby="card-bank">
+                <div class="title">
+                    <h4 id="card-bank" class="color-brand-1">Investment Account</h4>
+                </div>
+                <div class="description" aria-label="Description">
+                   <p class="font-sm-2 color-brand-1">Earn interest on your savings.</p>
+                </div>
+                <div>
+                   <button class="btn btn-primary" fdprocessedid="q7xok">Apply</button>
+                </div>
+            </div>
+           </div>
+           <div class="col-xs-12 col-sm-6 col-md-4 mb-30" role="listitem" onclick="openDialog('investmentsModal')">
+           <div class="card-upsale" role="region" aria-labelledby="card-insure">
+                <div class="title">
+                    <h4 id="card-insure" class="color-brand-1">Funeral Cover</h4>
+                </div>
+                <div class="description" aria-label="Description">
+                   <p class="font-sm-2 color-brand-1">Peace of mind for your family.</p>
+                </div>
+                <div>
+                     <button class="btn btn-primary" fdprocessedid="6ewy8l">Apply</button>
+                </div>
+            </div>
+           </div>
+             </div>
+         
+           
+
+     </div>
+       
+    </div>
+    
+</section>
+    <div class="qqcontainer">
+     
+    @*  <div id="step1" class="step active">
+            <h1 class="color-brand-1 mt-15 mb-20  text-center">Select a Product That's Best For You!</h1>
+            
+            <div class="product-grid">
+                <div class="product-card" onclick="openDialog('amountModal')">
+                    <h4 class="color-brand-1 mb-10">Personal Loan</h4>
+                    <p class="font-md color-brand-1 mb-15">Get up to R350,000</p>
+                    <button class="btn btn-primary" fdprocessedid="gy36fd">Apply</button>
+                </div>
+                <div class="product-card" onclick="openMyWorldStep()">
+                    <h4 class="color-brand-1 mb-10">MyWorld Bank Account</h4>
+                    <p class="font-md color-brand-1 mb-15">Up to 6 accounts in one</p>
+                    <button class="btn btn-primary" fdprocessedid="28ztxw">Apply</button>
+                </div>
+                <div id="openDialogBtn" class="product-card"  onclick="openDialog('investmentsModal')">
+                    <h4 class="color-brand-1 mb-10">Investment Account</h4>
+                    <p class="font-md color-brand-1 mb-15">Earn interest on your savings</p>
+                    <button class="btn btn-primary" fdprocessedid="q7xok">Apply</button>
+                </div>
+                <div class="product-card"  onclick="openDialog('investmentsModal')">
+                    <h4 class="color-brand-1 mb-10">Funeral Cover</h4>
+                    <p class="font-md color-brand-1 mb-15">Peace of mind for your family</p>
+                    <button class="btn btn-primary" fdprocessedid="6ewy8l">Apply</button>
+                </div>
+            </div>
+        </div>
+        *@
+    
+        <div id="step2" class="step">
+            <h1 class="color-brand-1 mt-15 mb-20  text-center">Enter Your Details</h1>
+            <p class="font-md color-brand-1 mb-20">Please enter your details below to get started.</p>
+            <div class="accordion active" onclick="toggleAccordion('personalDetailsAccordion')">
+                <i class="material-symbols-outlined check-icon">check</i>
+                Personal Details
+                <i class="material-icons">expand_less</i>
+            </div>
+            <div id="personalDetailsAccordion" class="accordion_content" style="display:block">
+                  <label for="fullname">Full Name</label>
+                    
+               <div class="input-group">
+                  <span class="input-group-addon" id="basic-addon1"><select><option>mr</option><option>ms</option></select></span>
+                  <input type="text" id="fullname" name="fullname" placeholder="Enter your full name" class="rounded-right fullname-reset" class="form-control" aria-describedby="basic-addon1">
+                </div>
+                <label for="idnumber">ID Number</label>
+                <input type="number" id="idnumber" name="idnumber" placeholder="Enter your ID number">
+        
+                <label for="mobile">Mobile Number</label>
+               <div class="input-group">
+                  <span class="input-group-addon" id="basic-addon1">+27</span>
+                  <input type="tel" id="mobile" class="form-control" placeholder="Enter Mobile Number" maxlength="9" aria-describedby="basic-addon1">
+                </div>
+               
+                 
+              <!--   <a href="#" class="verify-number" onclick="openDialog('otpModal')">Verify Number</a> -->
+            </div>
+        
+            <div id="income_accordion" class="accordion" onclick="toggleAccordion('incomeExpenses')">
+                Income &amp; Expenses
+                <i class="material-icons">expand_more</i>
+            </div>
+            <div id="incomeExpenses" class="accordion_content">
+                 <label for="selectyourbank">Select Your Bank</label>
+                
+               <select id="yourbank" name="yourbank">
+                    <option value="africanbank">African Bank</option>
+                    <option value="nedbank">Ned Bank</option>
+                  
+                </select>
+                   @* <label for="salaryandfrequency">Your Gross Salary and frequency</label>
+                    <div class="field-row">
+                       <!-- Added inline style as final fallback -->
+                         <div class="input-with-prefix">
+                      <span class="currency-prefix">R</span>
+                       <input type="text" id="grosssalary" name="grosssalary" placeholder="0" oninput="formatCurrency(this)" class="rounded-right fullname-reset"
+                               style="border-radius:30px 0 0 30px !important;">
+                    </div>
+                          
+                        <div class="custom-select" style="position:absolute;">
+                            <select id="grosssalary" name="grosssalary" class="select-class-groccery" >
+                              <option>Monthly</option>
+                              <option>Annually</option>
+                              <option>Semi-Annually</option>
+                            
+                            </select>
+                        </div>
+                    </div>*@
+                    
+               <label for="salaryandfrequency">Your Gross Salary and frequency</label>  
+               <div class="input-group">
+                 <span class="currency-prefix">R</span>
+                  <input type="text" id="grosssalary" name="grosssalary" placeholder="0" oninput="formatCurrency(this)" class="rounded-right fullname-reset" class="form-control" aria-describedby="basic-addon1">
+                   <span class="input-group-addon gross-addon" id="basic-addon2">
+                       <select id="grosssalary" name="grosssalary" class="select-class-groccery" >
+                              <option>Monthly</option>
+                              <option>Annually</option>
+                              <option>Semi-Annually</option>
+                              </select>
+                              </span>
+                </div>
+                    
+                @*<label for="income">Monthly Income</label>
+                <input type="text" id="income" name="income" placeholder="R 0" oninput="formatCurrency(this)">
+        
+                <label for="expenses">Living Expenses</label>
+                <input type="text" id="expenses" name="expenses" placeholder="R 0" oninput="formatCurrency(this)">*@
+                <label for="income">Monthly Income</label>
+                    <div class="input-with-prefix">
+                      <span class="currency-prefix">R</span>
+                      <input type="text" id="income" name="income" placeholder="0" oninput="formatCurrency(this)">
+                    </div>
+                    <label for="expenses">Living Expenses</label>
+                    <div class="input-with-prefix">
+                      <span class="currency-prefix">R</span>
+                      <input type="text" id="expenses" name="expenses" placeholder="0" oninput="formatCurrency(this)" onfocus="openDialog('expensivemodal')">
+                    </div>
+            </div>
+        
+            <div id="address_accordion" class="accordion hidden" onclick="toggleAccordion('addressDetails')">
+                Address
+                <i class="material-icons">expand_more</i>
+            </div>
+            <div id="addressDetails" class="accordion_content">
+                
+                
+                <label for="income">Province</label>
+                <input type="text" id="income" name="income" placeholder="Enter your monthly income">
+        
+                <label for="expenses">Postal Address</label>
+                <input type="number" id="expenses" name="expenses" placeholder="Enter your living expenses">
+            </div>
+        @*522025*@
+        <div id="employment_accordion" class="accordion" onclick="toggleAccordion('employmentDetailsAccordion')">
+                
+                Employment Details
+                <i class="material-icons">expand_more</i>
+            </div>
+            <div id="employmentDetailsAccordion" class="accordion_content">
+                  <label for="youremployer">Your Employer</label>
+                  
+                  <div class="search-controls">
+                                       
+                    <input type="employer" id="youremployer" name="youremployer" placeholder="African Bank">
+                  
+                    <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                                           
+                  </div>
+               
+               <label for="occupationstatus">Occupation Status</label>
+                
+               <select id="occupationstatus" name="occupationstatus">
+                    <option value="">Select Occupation Status</option>
+                    <option value="employed">Employed</option>
+                    <option value="self-employed">Self-Employed</option>
+                    <option value="unemployed">Unemployed</option>
+                    <option value="student">Student</option>
+                    <option value="retired">Retired</option>
+                </select>
+          <label for="occupationtype">Occupation Type</label>
+                
+               <select id="occupationtype" name="occupationtype">
+                    <option value="">Select Occupation Type</option>
+                    <option value="permanent">Permanent</option>
+                    <option value="contract">Contract</option>
+                    
+                </select>
+                
+                  <label for="employmentstartdate">Employment Start Date</label> 
+                  
+                  <div class="employment-start">
+                                       
+                    <input type="date" id="startdate" name="startdate" placeholder="Employment start date">
+
+                                           
+                  </div>
+              
+               
+              <!--   <a href="#" class="verify-number" onclick="openDialog('otpModal')">Verify Number</a> -->
+            </div>
+        @*end522025*@
+            <div class="buttons">
+                <button class="btn btn-tertiary" onclick="nextStep(1)">Back</button>
+                <button class="btn btn-primary" onclick="openCreditCheckModal()">Next</button>
+            </div>
+        </div>
+    
+        <div id="step3" class="step">
+            <div id="personaloanoffers">
+                <h1 id="loanOfferTitle" class="color-brand-1 mt-15 mb-20  text-center">Your Loan Offers</h1>
+                
+                        <!-- Filter Cards -->
+                    <div class="filter-row">
+                        <div class="filter-card" onclick="filterOffers('all')">All</div>
+                        <div class="filter-card" onclick="filterOffers('combo')">Combo</div>
+                        <div class="filter-card" onclick="filterOffers('loan')">Loan</div>
+                        <div class="filter-card" onclick="filterOffers('credit')">Credit</div>
+                    </div>
+                    <!-- Scrollable Offers Section -->
+                    <div class="offers-container" id="offersContainer">
+                        <div class="product-grid" id="productGrid"></div>
+                    </div>
+            
+               
+            </div>
+            <div id="myworldloanoffers" style="display:none">
+                <h1 id="loanOfferTitle">Myworld account</h1>
+                <img class="d-block" style="text-align:center;" src="https://www.africanbank.co.za/media/m0edwmxu/images_digital_in-seed_500x500-10-1.png" alt=""> 
+            </div>
+        </div>
+    
+        <div id="step4" class="step">
+            <h1 class="color-brand-1 mt-15 mb-20  text-center">Upload Documents</h1>
+            <div class="upload-area"><p class="font-md color-brand-1">Click to Upload ID</p></div>
+            @*<div class="upload-area">Click to Upload Proof of Income</div>*@
+            <div class="progress-bar-container">
+               <div class="progress-bar">0%</div>
+            </div>
+            <div id="status">
+                <p class="font-md color-brand-1 mt-20 mb-20">Selected Files:</p>
+                <ul id="fileList"></ul>
+           </div>
+           <button id="submitBtn" class="btn btn-primary" disabled>Submit</button>
+        </div>
+        
+    
+        <div id="investmentsModal" class="model_overlay hidden">
+            <div class="grid_modal_dialog">
+                <div class="modal_content">
+                    <div class="modal_header">
+                        <i class="material-icons close-icon" onclick="closeDialog('investmentsModal')">close</i>
+                    </div>
+                    <div class="modal_body">
+                        <h2>Pick an investment type that suits your needs</h2>
+                        <p>orem ipsum odor amet, consectetuer adipiscing elit. Montes eget volutpat dignissim adipiscing ante nascetur cursus.</p>
+        
+                        <div class="modal_product_grid">
+                            <div class="modal_product_card" onclick="openDialog('amountModalinv')">
+                                <h3>Fixed Deposit</h3>
+                                <p>Make a single deposit for 3 to 60 months</p>
+                                <div class="modal_grid_btn">
+                                    <button class="btn btn-primary-link" onclick="submitInvestmentType('investmentsModal', 'Fixed Deposit')">Get Started</button>
+                                </div>
+                            </div>
+                            <div class="modal_product_card">
+                                <h3>Notice deposits</h3>
+                                <p>Access your money with 7, 32 or 90 days’ notice</p>
+                                <div class="modal_grid_btn">
+                                    <button class="btn btn-primary-link" onclick="submitInvestmentType('investmentsModal', 'Personal Loan')">Get Started</button>
+                                </div>
+                            </div>
+                            <div class="modal_product_card" onclick="openDialog('investmentsModal')">
+                                <h3>Investment Account</h3>
+                                <p>Earn interest on your savings</p>
+                                <div class="modal_grid_btn">
+                                    <button class="btn btn-primary-link" onclick="submitInvestmentType('investmentsModal', 'Personal Loan')">Get Started</button>
+                                </div>
+                            </div>
+                            <div class="modal_product_card">
+                                <h3>Access accumulator</h3>
+                                <p>Earn increasing interest with anytime access</p>
+                                <div class="modal_grid_btn">
+                                    <button class="btn btn-primary-link" onclick="submitInvestmentType('investmentsModal', 'Personal Loan')">Get Started</button>
+                                </div>
+                            </div>
+                            <div class="modal_product_card">
+                                <h3>Tax free investment</h3>
+                                <p>Invest for 12 months or more, without paying tax</p>
+                                <div class="modal_grid_btn">
+                                    <button class="btn btn-primary-link" onclick="submitInvestmentType('investmentsModal', 'Funeral Cover')">Get Started</button>
+                                </div>
+                            </div>
+                            
+                                <div class="modal_product_card">
+                                <h3>Stokvel</h3>
+                                <p>A savings account that allows a group of people to save together to achieve shared goals and dreams.</p>
+                                <div class="modal_grid_btn">
+                                    <button class="btn btn-primary-link" onclick="submitInvestmentType('investmentsModal', 'Funeral Cover')">Get Started</button>
+                                </div>
+                            </div>
+                            
+                        </div>
+        
+                    </div>
+                </div>
+            </div>
+        </div>
+ 
+        <div id="otpModal" class="model_overlay hidden">
+            <div class="modal_dialog">
+                <div class="modal_content">
+                    <div class="modal_header">
+                        <i class="material-icons close-icon" onclick="closeDialog('otpModal')">close</i>
+                    </div>
+                    <div class="modal_body">
+                        <h2>Verify your Cell Phone number</h2>
+                        <p>Please enter the OTP sent to your mobile number ***********1234<br>Give it a few seconds....</p>
+        
+                        <div class="input_container">
+                            <label for="loanAmount">OTP Number</label>
+                            <input type="text" id="otp" name="otp" placeholder="Enter OTP">
+                            <span class="error-message" id="error-message">Invalid OTP</span>
+                        </div>
+                        <a href="https://meetsa.online/client/ab-qq/#" class="resend-otp">Did not receive OTP? <span>Resend</span></a>
+                    </div>
+                    <div class="modal_footer">
+                        <button class="btn btn-primary" onclick="verifyOTP('otpModal')">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="amountModal" class="model_overlay hidden">
+            <div class="modal_dialog">
+                <div class="modal_content">
+                    <div class="modal_header">
+                        <i class="material-icons close-icon" onclick="closeDialog('amountModal')">close</i>
+                    </div>
+                    <div class="modal_body">
+                       
+
+
+                  <h2 class="color-brand-1 mt-15 mb-20">How much are you looking for the personal loan?</h2>
+                <!--Calculator -->
+                 <div class="calculator-form ">
+						<p class="cal-loan-disclaimer" id="" style="padding:5px 0px" >Please enter Loan amount between <bold>R2 000</bold> to <bold>R500 000</bold></p>
+						<label class="cal-amount">Amount</label>
+						
+						<input id="input-Amount1" class="loan-inpt" type="text" value="2000" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57">
+                             
+
+						
+						<div class="range-wrap">
+                            <div class="range-value" id="rangeV1"></div>
+                            <input id="slide-range1" type="range" class="loan-range" min="2000" max="500000" step="500" value="2000">
+                        </div>
+                    
+                        
+                        <div class="loans" style="margin-bottom: -7px">
+                            <div class="col-1" style="text-align: left; font-size:14px">R2 000</div>
+                            <div></div>
+                            <div class="col-2" style="text-align: right; font-size:14px">R500 000</div>
+                        </div>
+						
+						<label class="cal-amount">Repayment Term</label>
+                        <select class="loan-select-term" id="term1">
+                            <option value="7">7 Months</option>
+                            <option value="9">9 Months</option>
+                            <option value="12">12 Months</option>
+                            <option value="18">18 Months</option>
+                            <option value="24">24 Months</option>
+                            <option value="30">30 Months</option>
+                            <option value="36">36 Months</option>
+                            <option value="42">42 Months</option>
+                            <option value="48">48 Months</option>
+                            <option value="60">60 Months</option>
+                            <option value="72">72 Months</option>
+                        </select>
+                 
+                        
+						
+						<div class="range-wrap">
+                            <div class="range-value" id="rangeV2"></div>
+                            <input id="input-month1" type="range" class="loan-range" min="7" max="72" value="7">
+                        </div>
+                    
+                        
+                        <div class="Months" style="margin-bottom: -7px">
+                            <div class="col-1" style="text-align: left; font-size:14px">7 Months</div>
+                            <div></div>
+                            <div class="col-2" style="text-align: right; font-size:14px">72 Months</div>
+                        </div>
+                    
+					    <label class="cal-amount">Monthly Repayment will be</label>
+    		        
+    		              <input id="installment_calc1"  class="loan-inpt-return" type="text" value="879.53" readonly>
+    		        
+			</div>			
+         
+     
+                    </div>
+                    <div class="modal_footer">
+                        <button class="btn btn-primary" onclick="submitLoanAmount('amountModal')">Get Started</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        
+        <div id="amountModalinv" class="model_overlay hidden">
+            <div class="modal_dialog">
+                <div class="modal_content">
+                    <div class="modal_header">
+                        <i class="material-icons close-icon" onclick="closeDialog('amountModalinv')">close</i>
+                    </div>
+                    <div class="modal_body">
+                        <h2>How much are you looking to invest?</h2>
+                        <p>We offer personal loans from <strong>R 500</strong> to <strong>R 5 000 000 000</strong></p>
+        
+                        <div class="input_container">
+                            <label for="loanAmount">Your Amount</label>
+                            <input type="text" id="loanAmount" name="loanAmount" placeholder="Enter loan amount" oninput="syncInputWithTrackBar(this.value)">
+                            <span class="error-message" id="error-message">Please enter a value between R 2 000 and R 350 000</span>
+                        </div>
+        
+                        <div class="slider-container">
+                            <input type="range" id="loanRange" name="loanRange" min="2000" max="350000" step="1000" value="2000" 
+                            oninput="syncInputWithTrackBar(this.value)">
+                            <div class="range-labels">
+                                <span>R 2 000.00</span>
+                                <span>R 350 000.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal_footer">
+                        <button class="btn btn-primary" onclick="submitLoanAmount('amountModal')">Get Started</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    
+    
+        <div id="creditQuestionsModal" class="model_overlay hidden">
+            <div class="modal_dialog">
+                <div class="modal_content">
+                    <div class="modal_header">
+                        <i class="material-icons close-icon" onclick="closeDialog('creditQuestionsModal')">close</i>
+                    </div>
+                    <div class="modal_body">
+                        <h2 class="color-brand-1 mt-15 mb-20">Credit Questions</h2>
+                        <div class="toggle">
+                            <label>
+                                <input type="checkbox" id="debtReview" name="debtReview">
+                                <span class="slider"></span>
+                            </label>
+                            <span class="font-md color-brand-1">Are you under debt review?</span>
+                        </div>
+                        <div class="toggle">
+                            <label>
+                                <input type="checkbox" id="insolvent" name="insolvent">
+                                <span class="slider"></span>
+                            </label>
+                            <span class="font-md color-brand-1">Are you insolvent?</span>
+                        </div>
+                        <div class="toggle">
+                            <label>
+                                <input type="checkbox" id="popiaConsent" name="popiaConsent">
+                                <span class="slider"></span>
+                            </label>
+                            <span class="font-md color-brand-1">Do you consent to POPIA?</span>
+                        </div>
+                    </div>
+                    
+                    <div class="modal_footer">
+                        <button class="btn btn-primary" onclick="submitCreditQuestions('creditQuestionsModal')">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <div id="creditBureauCheckModal" class="model_overlay hidden">
+            <div class="creditBureau_modal_dialog">
+                <div class="modal_content">
+                    <div class="creditBureau_modal_header">
+                        <i class="material-icons close-icon" onclick="closeDialog('creditBureauCheckModal')">close</i>
+                    </div>
+                    <div class="creditBureau_modal_body">
+                        <h2 class="color-brand-1 mt-15 mb-20">Quick Verifications</h2>
+                        
+                        <!-- Black Section Initially Hidden -->
+                        <div id="creditCheckStatus" class="credit_check_status">
+                            <span><strong>Credit Bureau Check </strong></span>
+                            <span>Complete</span>
+                            <i class="material-icons">sentiment_satisfied</i>
+                        </div>
+        
+                        <!-- Dynamic Text -->
+                        <p id="verificationText" class="font-md color-brand-1">Credit Bureau Check Checking . . .</p>
+        
+                        <div class="creditBureau_loading">
+                            <p class="font-md color-brand-1">Loading</p>
+                            <span class="dots">. . . ..</span>
+                        </div>
+                    </div>
+                </div>
+           </div>
+    
+        </div>
+        <div id="expensivemodal" class="model_overlay hidden">
+            <div class="modal_dialog">
+                <div class="modal_content">
+                    <div class="modal_header">
+                        <i class="material-icons close-icon" onclick="closeDialog('expensivemodal')">close</i>
+                    </div>
+                    <div class="modal_body">
+                        <h2 class="color-brand-1 mt-15 mb-20">Calculate Your Expenses</h2>
+                        <label for="rent">Rent</label>
+                    <div class="input-with-prefix">
+                      <span class="currency-prefix">R</span>
+                      <input type="text" id="rent" name="rent" placeholder="0" oninput="formatCurrency(this)">
+                    </div>
+                    <label for="transport">Transport</label>
+                    <div class="input-with-prefix">
+                      <span class="currency-prefix">R</span>
+                      <input type="text" id="transport" name="transport" placeholder="0" oninput="formatCurrency(this)">
+                    </div>
+                    <label for="groceries">Groceries</label>
+                    <div class="input-with-prefix">
+                      <span class="currency-prefix">R</span>
+                      <input type="text" id="groceries" name="groceries" placeholder="0" oninput="formatCurrency(this)">
+                    </div>
+                    <label for="others">Others</label>
+                    <div class="input-with-prefix">
+                      <span class="currency-prefix">R</span>
+                      <input type="text" id="others" name="others" placeholder="0" oninput="formatCurrency(this)">
+                    </div>
+                    <label for="maintenance">Do you have maintenance mode?</label>
+                    <div class="input-with-prefix-radio">
+                      <input type="radio" id="maintenance-yes" name="maintenance" value="yes">
+                      <label for="maintenance-yes">Yes</label>
+                    
+                      <input type="radio" id="maintenance-no" name="maintenance" value="no">
+                      <label for="maintenance-no">No</label>
+                    </div>
+                </div>
+                    <div class="modal_footer">
+                        <button class="btn btn-primary" onclick="verifyexpensive('expensivemodal')">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+      
+
+        <script src="/scripts/abQQ/newQQscript.js"></script> 
+        <!-- <script src="dynamicContent.js"></script> -->
+    
+<span id="PING_IFRAME_FORM_DETECTION" style="display: none;"></span><grammarly-desktop-integration data-grammarly-shadow-root="true"><template shadowrootmode="open"><style>
+      div.grammarly-desktop-integration {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select:none;
+        user-select:none;
+      }
+
+      div.grammarly-desktop-integration:before {
+        content: attr(data-content);
+      }
+    </style><div aria-label="grammarly-integration" role="group" tabindex="-1" class="grammarly-desktop-integration" data-content="{&quot;mode&quot;:&quot;full&quot;,&quot;isActive&quot;:true,&quot;isUserDisabled&quot;:false}"></div></template></grammarly-desktop-integration>
+      
+  
+  
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  
+  <script>
+    
+    $(document).ready(function() {
+        // Real-time Validation for ID Number (13 digits)
+function isSouthAfricanIDValid(id) {
+    const regex = /^\d{13}$/; // A simple regex for SA ID: 13 digits
+    return regex.test(id);
+}
+
+// Real-time ID number validation
+$('#idnumber').on('input', function() {
+    const idnumber = $(this).val();
+    const isValid = isSouthAfricanIDValid(idnumber);
+
+    if (!isValid && idnumber.length > 0) {
+        $('#idnumber').addClass('invalid');
+        $('#error-message').show();
+    } else {
+        $('#idnumber').removeClass('invalid');
+        $('#error-message').hide();
+    }
+});
+
+
+@*
+  function nextStep(stepNumber) {
+    
+     
+        // Check if the tab is not active and doesn't already have the icon
+     if ($('#tab' + stepNumber).hasClass('active')) {
+    // Remove the completed icon when the tab is active
+    $('#tab' + stepNumber).find('.completed-icon').remove();
+} else if ($('#tab' + stepNumber).find('.completed-icon').length === 0) {
+    // Append the check icon if not already present
+    $('#tab' + stepNumber).append('<i class="material-icons completed-icon">check_circle</i>');
+}
+
+    }
+
+    // Set up click event for each tab
+    $('.header_tab').click(function() {
+   
+        const stepNumber = $(this).attr('id').replace('tab', '');
+        nextStep(stepNumber);
+    });*@
+
+$('#fullname').on('input', function() {
+   
+    if ($(this).val() === "") {
+        $('#fullname').addClass('invalid');
+        $('#error-message').show();
+    } else {
+        $('#fullname').removeClass('invalid');
+        $('#error-message').hide();
+    }
+    
+    @*mounik*@
+     // Update the loan offer title in Step 3 with the entered name
+    const fullName = $(this).val();
+    if (fullName) {
+        // If the name is entered, set the title to "Hi [Full Name], here are your loan offers"
+        $('#loanOfferTitle').text('Hi ' + fullName + ', here are your loan offers');
+    } else {
+        // If the name is not entered, revert to the default title "Your Loan Offers"
+        $('#loanOfferTitle').text('Your Loan Offers');
+    }
+    @*mounik*@
+});
+
+
+$('#income').on('input', function() {
+   
+    if ($(this).val() === "") {
+        $('#income').addClass('invalid');
+        $('#error-message').show();
+    } else {
+        $('#income').removeClass('invalid');
+        $('#error-message').hide();
+    }
+});
+
+$('#grosssalary').on('input', function() {
+   
+    if ($(this).val() === "") {
+        $('#grosssalary').addClass('invalid');
+        $('#error-message').show();
+    } else {
+        $('#grosssalary').removeClass('invalid');
+        $('#error-message').hide();
+    }
+});
+
+$('#expenses').on('input', function() {
+   
+    if ($(this).val() === "") {
+        $('#expenses').addClass('invalid');
+        $('#error-message').show();
+    } else {
+        $('#expenses').removeClass('invalid');
+        $('#error-message').hide();
+    }
+});
+
+$('#youremployer').on('input', function() {
+   
+    if ($(this).val() === "") {
+        $('#youremployer').addClass('invalid');
+        $('#error-message').show();
+    } else {
+        $('#youremployer').removeClass('invalid');
+        $('#error-message').hide();
+    }
+});
+$('#occupationstatus').on('input', function() {
+   
+    if ($(this).val() === "") {
+        $('#occupationstatus').addClass('invalid');
+        $('#error-message').show();
+    } else {
+        $('#occupationstatus').removeClass('invalid');
+        $('#error-message').hide();
+    }
+});
+$('#occupationtype').on('input', function() {
+   
+    if ($(this).val() === "") {
+        $('#occupationtype').addClass('invalid');
+        $('#error-message').show();
+    } else {
+        $('#occupationtype').removeClass('invalid');
+        $('#error-message').hide();
+    }
+});
+// Real-time Mobile Number validation (Basic validation for mobile number)
+ $('#mobile').on('input', function() {
+        const mobileNumber = $(this).val();
+           // Regex to check if the number is exactly 9 digits
+        const isValidMobile = /^[0-9]{9}$/.test(mobileNumber);
+        
+        // Show error if the input is invalid or has incorrect number of digits
+        if (!isValidMobile && mobileNumber.length > 0) {
+            $('#mobile').addClass('invalid');
+            $('#mobile-error').show();
+        } else {
+            $('#mobile').removeClass('invalid');
+            $('#mobile-error').hide();
+        }
+    });
+
+
+
+// Handling the "Next" button and form transitions
+function openCreditCheckModal() {
+
+}
+
+
+@*docupload script*@
+// Initialize an array to store selected files
+let allFiles = [];
+
+function uploadFiles(fileInput) {
+    const progressBarContainer = $(fileInput).closest('.upload-area');
+    const bar = $('.progress-bar-container');
+    bar.css('display', 'block');
+    const progressBar = $('.progress-bar');
+    const files = fileInput.files;
+    const fileNames = Array.from(files).map(file => file.name);
+    allFiles = [...allFiles, ...files];
+    $('#status').html('<p class="font-md color-brand-1 mt-20 mb-20">Selected Files:</p><ul>' + allFiles.map((file, index) => `
+        <li>
+            ${file.name} 
+            <span class="close" data-index="${index}">×</span>
+            <hr style="border-color: #ccc;">
+        </li>
+    `).join('') + '</ul>');
+    $('.close').click(function() {
+        const index = $(this).data('index');
+        removeFile(index);
+    });
+    $(fileInput).closest('.upload-area').hide();
+    let progress = 0;
+    // Check if "Uploading files..." is already added
+     let uploadingTextAdded = false;
+
+    let interval = setInterval(function() {
+        progress += 10;
+        progressBar.text(progress + '%');
+        progressBar.css('width', progress + '%');
+        
+           // Show "Uploading files..." only once
+    if (progress < 100 && !uploadingTextAdded) {
+        $('#status').prepend('<p class="font-md color-brand-1 mt-20 mb-20">Uploading files...</p>');
+        uploadingTextAdded = true; // Prevent adding the message again
+    }
+
+    
+        if (progress >= 100) {
+            clearInterval(interval);
+             $('#status').find('p:contains("Uploading files...")').remove();
+            $('#status').append('<p class="font-md color-brand-1 mt-20 mb-20">Files uploaded successfully!</p>');
+            $('#submitBtn').prop('disabled', false); // Enable the submit button
+        }
+    }, 500);
+}
+
+function removeFile(index) {
+    allFiles.splice(index, 1);
+    $('#status').html('<p class="font-md color-brand-1 mt-20 mb-20">Selected Files:</p><ul>' + allFiles.map((file, index) => `
+        <li>
+            ${file.name} 
+            <span class="close" data-index="${index}">×</span>
+            <hr style="border-color: #ccc;">
+        </li>
+    `).join('') + '</ul>');
+    $('.close').click(function() {
+        const index = $(this).data('index');
+        removeFile(index);
+    });
+    
+     if (allFiles.length === 0) {
+        $('.progress-bar-container').hide();
+    }
+
+     if (allFiles.length === 0) {
+        $('#submitBtn').prop('disabled', true);
+    }
+}
+
+function createFileInput() {
+    const input = $('<input type="file" multiple />');
+    input.on('change', function() {
+        uploadFiles(input[0]);
+    });
+    return input;
+}
+
+$('.upload-area').click(function() {
+    const input = createFileInput();
+    input.trigger('click');
+});
+    })  
+   
+   document.addEventListener("DOMContentLoaded", () => {
+    const elements = document.querySelectorAll('.zoom-in');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target); // animate only once
+        }
+      });
+    }, {
+      threshold: 0.1
+    });
+
+    elements.forEach(el => observer.observe(el));
+  }); 
+  </script>
+
+

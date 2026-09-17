@@ -27,7 +27,7 @@
     ContentModels.EbankItabstractButton androidDownloadNow = null;
     ContentModels.EbankItabstractButton iosDownloadNow = null;
     ContentModels.EbankItabstractButton downloadNow = null;
-
+    ContentModels.EbankItabstractButton huaweiDownloadNow = null;
 
     foreach (var button in bodyButtons)
     {
@@ -49,6 +49,10 @@
         {
             iosDownloadNow = (ContentModels.EbankItabstractButton)button;
         }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("Huawei"))
+        {
+            huaweiDownloadNow = (ContentModels.EbankItabstractButton)button;
+        }
         else
         {
             downloadNow = (ContentModels.EbankItabstractButton)button;
@@ -66,6 +70,24 @@
     learnMoreButton?.EbankItbuttonExternalLink :
     learnMoreButton.EbankItbuttonInternalLink?.Url;
     learnMoreButtonLink = (string.IsNullOrEmpty(learnMoreButtonLink)) ? "#" : learnMoreButtonLink;
+    
+    var androidButtonLink = "#";
+    androidButtonLink = string.IsNullOrEmpty(androidDownloadNow?.EbankItbuttonInternalLink?.Url) ?
+    androidDownloadNow?.EbankItbuttonExternalLink :
+    androidDownloadNow.EbankItbuttonInternalLink?.Url;
+    androidButtonLink = (string.IsNullOrEmpty(androidButtonLink)) ? "#" : androidButtonLink;
+    
+    var iosButtonLink = "#";
+    iosButtonLink = string.IsNullOrEmpty(iosDownloadNow?.EbankItbuttonInternalLink?.Url) ?
+    iosDownloadNow?.EbankItbuttonExternalLink :
+    iosDownloadNow.EbankItbuttonInternalLink?.Url;
+    iosButtonLink = (string.IsNullOrEmpty(iosButtonLink)) ? "#" : iosButtonLink;
+    
+    var huaweiButtonLink = "#";
+    huaweiButtonLink = string.IsNullOrEmpty(huaweiDownloadNow?.EbankItbuttonInternalLink?.Url) ?
+    huaweiDownloadNow?.EbankItbuttonExternalLink :
+    huaweiDownloadNow.EbankItbuttonInternalLink?.Url;
+    huaweiButtonLink = (string.IsNullOrEmpty(huaweiButtonLink)) ? "#" : huaweiButtonLink;
 
     // End get generic shoulder button
 
@@ -123,10 +145,11 @@
     var btnLearnMoreId = viewName + "_" + onlineButtonText.ToString().Replace(" ", "") + "_" + "MyWorld5Swipe-Campaign";
 
     // Mobile App Modal Data
-    var popupAppTitle = "Download African App using one of the following";
-    var popQRCode = "/media/51852/image001.png";
-    var popAndroidApp = "/media/51814/GooglePlayStoreDownloadImageLink.png";
-    var popIOsApp = "/media/51813/appstoredownloadimagelink.png";
+    var popupAppTitle = "Download the App using one of the following";
+    var popQRCode = "/media/ylalxyxb/image001.png";
+    var popAndroidApp = "/media/pt2b4b3q/GooglePlayStoreDownloadImageLink.png";
+    var popIOsApp = "/media/pejn1h1x/appstoredownloadimagelink.png";
+    var popHuaweiApp = "/media/di0py4qr/appgallery-logo-2.png";
     // End Mobile App
 
     // Create Modal campaign
@@ -169,12 +192,12 @@
         margin-top: -160px;
         border-radius: 15px;
     }
-    .modal-dialog {
+    /*.modal-dialog {
         top: 30%;
     }
     .modal .modal-dialog .modal-content .modal-header h4 {
         font-size: 16px;
-    }
+    }*/
     a:link{
       text-decoration: none;
     }
@@ -211,7 +234,7 @@
         display: block;
     }
 
-    .modal .modal-dialog .modal-content .modal-header {
+   /* .modal .modal-dialog .modal-content .modal-header {
         @*border: 0;*@
          background-color: #c5d82f;
         border-radius: 26px;
@@ -223,10 +246,10 @@
 
     h4 {
         font-weight: 600;
-    }
+    }*/
 
 
-    .modal-content {
+   /* .modal-content {
         background-color: #c5d82f;
         border-radius: 26px;
     }
@@ -237,7 +260,7 @@
 
     .modal .modal-dialog .modal-content .modal-header .close {
         color: #ffffff;
-    }
+    }*/
 
     .close {
         text-shadow: 0 0px 0 #fff;
@@ -506,7 +529,32 @@
             margin-top: -10px;
         }
     }
+    .modal .modal-dialog .modal-content .modal-header {
+        background-color: transparent;
+        border-bottom: 1px solid #eee;
+    }
+    @@media (min-width: 1000px) and (max-width: 10000px) {
+        .modal-dialog {
+            width: 900px !important;
+        }
+    }
 
+    @@media (min-width: 768px) and (max-width: 1024px) {
+        
+        .col-sm-6 img {
+            width: 160px;
+        }
+
+        .modal-dialog {
+            width: 790px !important;
+            padding-left: 30px;
+            padding-right: 50px;
+        }
+        .app-platform{
+           width: 118px !important;
+           border-radius: 0px !important;
+        } 
+    }
 </style>
 @Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
 
@@ -745,7 +793,7 @@
     </text>
 })
 
-@Html.Partial("_renderPopUpContent2", new ContainerViewModel()
+@*@Html.Partial("_renderPopUpContent2", new ContainerViewModel()
 {
     HTMLContent2 = @<text>
         <div class="modal-body">
@@ -762,7 +810,39 @@
             </div>
         </div>
     </text>
-})
+})*@
+
+@Html.Partial("_renderPopUpContent2", new ContainerViewModel()
+    {
+        HTMLContent2 = @<text>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-15">
+    
+                        <br /><br />
+    
+                    </div>
+                    
+                    <div class="col-xs-12 col-sm-4">
+                        <a id="AndroidUrl" href="@androidButtonLink">
+                            <img width="200" id="popUpAndroid" />
+                        </a>
+                    </div>
+                    <div class="col-xs-12 col-sm-4">
+                        <a id="iOSUrl" href="@iosButtonLink">
+                            <img width="200" id="popUpIOS" />
+                        </a>
+                    </div>
+                    <div class="col-xs-12 col-sm-4">
+                        <a id="HuaweiUrl" href="@huaweiButtonLink">
+                            <img loading="lazy" width="200" id="popUpHuawei" src="@popHuaweiApp" />
+                        </a>
+                    </div>
+    
+                </div>
+            </div>
+        </text>
+    })
 
 @section scripts
 {

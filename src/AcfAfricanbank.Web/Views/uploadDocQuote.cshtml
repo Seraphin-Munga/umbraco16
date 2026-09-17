@@ -1,14 +1,77 @@
 ﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
 
 @{
-  Layout = "Master.cshtml";
+  Layout = "MasterHeaderOnly.cshtml";
+  
+  
+   
+     var quickTitle =  "url";
     
 }
+
+
+
+
+
 
 @* the fun starts here *@
 
 
 <style>
+.mt-24 {
+    margin-top:24px;
+    
+}
+.mb-34 {
+    margin-bottom:34px;
+}
+
+.parent-container{
+  height: 89.6vh;
+   /* overflow: hidden;*/
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+   
+}
+
+.step-subtitle{
+    font-size: 10px !important;
+}
+
+.loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.dot-loader {
+  width: 40px;
+  aspect-ratio: 4;
+  background:
+    radial-gradient(circle closest-side, red 90%, transparent) 0 50%,
+    radial-gradient(circle closest-side, green 90%, transparent) 50% 50%,
+    radial-gradient(circle closest-side, blue 90%, transparent) 100% 50%;
+  background-size: calc(100%/3) 100%;
+  background-repeat: no-repeat;
+  clip-path: inset(0 100% 0 0);
+  animation: dotAnim 1s steps(4) infinite;
+}
+
+@@keyframes dotAnim {
+  to {
+    clip-path: inset(0 -34% 0 0);
+  }
+}
+
+
     .cookie-notice {
         display: none;
     }
@@ -30,19 +93,17 @@
     }
 
     .accordion.error-border {
-        border: 1px solid #f00;
+        border: 1px solid #D0021B;
     }
 
-    .accordion .material-symbols-outlined {
-        margin-left: auto;
-    }
+    
 
     .check-icon {
         display: none;
         color: green;
-        font-size: 22px;
+        font-size: 16px;
         float: right;
-        margin-right: 10px;
+       margin-right:3px;
     }
 
     .arrow-icon {
@@ -59,112 +120,120 @@
 <link href="/css/ab-style.css" rel="stylesheet">
 
 
-
-<div class="loader-first" id="loader" style="display: none;">
+@* <h1>@quickTitle</h1>*@
+<div class="parent-container">
+    <div class="loader-first" id="loader" style="display: none;">
     <div class="message">loading...</div>
-</div>
-
-<div class="qqheader">
-    <span id="tab1" class="header_tab active" onclick="nextStep(1)">
-        @*<span id="tab1" class="header_tab active" onclick="nextStep(1)">*@
-        Product Selection
+    </div>
+<div class="">
+   <div class="qqheader">
+    <span id="tab1" class="header_tab active hidden" onclick="nextStep(1)">
+       
+        Product selection
         <i class="material-icons completed-icon">check_circle</i>
     </span>
     <span id="tab2" class="header_tab" onclick="nextStep(2)">
         @* <span id="tab2" class="header_tab" onclick="">*@
-        Personal Details
-        @*mounika*@
-        <i class="material-icons completed-icon">check_circle</i>
-        @*mounika end*@
+        <span class="step-subtitle">Step 1</span>
+        <br>
+        <span>Personal details 
+       
+        </span>
+         <i class="material-icons completed-icon">check_circle</i>
     </span>
     <span id="tab3" class="header_tab" onclick="nextStep(3)">
         @* <span id="tab3" class="header_tab" onclick="">*@
-        Your Offer
-        @*mounika*@
-        <i class="material-icons completed-icon">check_circle</i>
-        @*mounika end*@
+        <span class="step-subtitle">Step 2</span>
+        <br>
+       <span>Your quick quote 
+       
+       </span> 
+       <i class="material-icons completed-icon">check_circle</i>
     </span>
-</div>
-
+</div> 
 <section id="step1" class="step active mtb-30" aria-labelledby="bank-with-audacity">
     <div class="container">
         <div class="row">
             <div class="col-xs-12 mb-30">
-                <h1 id="bank-with-audacity" class="color-brand-1 major-title mb-20 md-text-center" role="heading" aria-level="1">
-                    <span class="span-major-title">Select a Product</span>
-                    <br>That's Best For You!
-                </h1>
+                <h1><span class="major-title">Select a Product</span><br><span class="span-major-title">that's best for you!</span></h1>
+              
             </div>
         </div>
 
-        <div class="row visible">
-            <div class="zoom-in">
-                <div class="col-xs-12 col-sm-4 col-md-4 mb-30" role="listitem" onclick="openDialog('amountModal')">
+        <div class="row" style="display: flex;justify-content: space-between;flex-wrap: wrap;">
+           
+                <div class="col-xs-12 col-sm-4 col-md-4 mb-30 ps-0" role="listitem" onclick="openDialog('amountModal')">
                     <div class="card-upsale" role="region" aria-labelledby="card-borrow">
                         <div class="title">
-                            <h4 id="card-borrow" class="color-brand-1">Personal Loan</h4>
+                            @*@Model.Value("quickLoansIDNumber")*@
+
+
+                            <h4 id="card-borrow" class="color-brand-1">Personal Loan and Credit Card</h4>
                         </div>
                         <div class="description" aria-label="Description">
-                            <p class="font-sm-2 color-brand-1">Get up to R350,000.</p>
+                            <p class="font-sm-2 color-brand-1">When life happens, you deserve peace of mind. Get a fixed term loan up to R500 000.</p>
                         </div>
                         <div>
                             <button class="btn btn-primary" fdprocessedid="gy36fd">Apply</button>
                         </div>
                     </div>
                 </div>
-                <div class="col-xs-12 col-sm-4 col-md-4 mb-30" role="listitem">
+                <div class="col-xs-12 col-sm-4 col-md-4 mb-30 ps-0" role="listitem">
                     <div class="card-upsale" role="region" aria-labelledby="card-saveandinvest">
                         <div class="title">
                             <h4 id="card-saveandinvest" class="color-brand-1">MyWorld Bank Account</h4>
                         </div>
                         <div class="description" aria-label="Description">
-                            <p class="font-sm-2 color-brand-1">Up to 6 accounts in one.</p>
+                            <p class="font-sm-2 color-brand-1">Open an account that grows with you. Enjoy lower banking fees, and instant transfers.</p>
                         </div>
                         <div>
-                            <button class="btn btn-primary" fdprocessedid="28ztxw" onclick="openDialog('thankyoumodal')" @* onclick="window.open('/en/home/banking/#MyWorld', '_blank')"*@>Apply</button>
+                            <button class="btn btn-primary" fdprocessedid="28ztxw" onclick="window.open('/en/home/banking/#MyWorld', '_blank')">Apply</button>
                         </div>
                     </div>
                 </div>
-                <div class="col-xs-12 col-sm-4 col-md-4 mb-30" role="listitem">
+                <div class="col-xs-12 col-sm-4 col-md-4 mb-30 ps-0" role="listitem">
                     <div class="card-upsale" role="region" aria-labelledby="card-bank">
                         <div class="title">
                             <h4 id="card-bank" class="color-brand-1">Investment Account</h4>
                         </div>
                         <div class="description" aria-label="Description">
-                            <p class="font-sm-2 color-brand-1">Earn interest on your savings.</p>
+                            <p class="font-sm-2 color-brand-1">Make your money work with you. Start investing today and grow towards the future you deserve.</p>
                         </div>
                         <div>
-                            <button class="btn btn-primary" fdprocessedid="q7xok" onclick="window.open('/en/home/product-fixed-deposit-investment/', '_blank')">Apply</button>
+                            <button class="btn btn-primary" fdprocessedid="q7xok" onclick="window.open('/en/home/product-fixed-deposit-investment/#myCalculator', '_blank')">Apply</button>
                         </div>
                     </div>
                 </div>
-                <div class="col-xs-12 col-sm-4 col-md-4 mb-30" role="listitem">
+                <div class="col-xs-12 col-sm-4 col-md-4 mb-30 ps-0" role="listitem">
                     <div class="card-upsale" role="region" aria-labelledby="card-insure">
                         <div class="title">
                             <h4 id="card-insure" class="color-brand-1">Funeral Cover</h4>
                         </div>
                         <div class="description" aria-label="Description">
-                            <p class="font-sm-2 color-brand-1">Peace of mind for your family.</p>
+                            <p class="font-sm-2 color-brand-1">Protect your loved ones with dignity. Get a reliable funeral cover that backs you.</p>
                         </div>
                         <div>
-                            <button class="btn btn-primary" fdprocessedid="6ewy8l" onclick="window.open('/en/home/product-funeral-cover/', '_blank')">Apply</button>
+                            <button class="btn btn-primary" fdprocessedid="6ewy8l" onclick="window.open('/en/home/product-funeral-cover/#funeral-calculator', '_blank')">Apply</button>
                         </div>
                     </div>
                 </div>
-                <div class="col-xs-12 col-sm-4 col-md-4 mb-30" role="listitem">
+                <div class="col-xs-12 col-sm-4 col-md-4 mb-30 ps-0" role="listitem">
                     <div class="card-upsale" role="region" aria-labelledby="card-insure">
                         <div class="title">
                             <h4 id="card-insure" class="color-brand-1">Isiko</h4>
                         </div>
                         <div class="description" aria-label="Description">
-                            <p class="font-sm-2 color-brand-1">Save and Shop, all in one place.</p>
+                            <p class="font-sm-2 color-brand-1">Build a future that reflects who you are. An account designed for community.</p>
                         </div>
                         <div>
                             <button class="btn btn-primary" fdprocessedid="6ewy8l" target="_blank" onclick="window.open('https://www.africanbank.co.za/en/home/Isiko', '_blank')">Apply</button>
                         </div>
                     </div>
                 </div>
-            </div>
+                 <div class="col-xs-12 col-sm-4 col-md-4 mb-30 ps-0" role="listitem">
+                   
+                </div>
+            
         </div>
     </div>
 </section>
@@ -177,21 +246,26 @@
         <input id="sessionId" type="hidden" value="@(Guid.NewGuid().ToString())" />
         <input id="processID" type="hidden" value="" />
         <div id="step2" class="step">
-            <h1 class="color-brand-1 major-title1 mt-15 mb-20">Enter Your Details</h1>
-            <p class="font-md color-brand-1 mb-20">Please enter your details below to get started.</p>
+            <div id="offerLoader" class="loader-overlay">
+              <div class="dot-loader"></div>
+            </div>
+            <h1 class="color-brand-1 major-title1 mt-24 mb-34">Enter Your Details</h1>
+            <p class="font-md color-brand-1 mb-20">Please enter your details below to continue:</p>
             <div id="globalError"></div>
             <div class="accordion active" onclick="toggleAccordion('personalDetailsAccordion')">
 
-                Personal Details
+                1. Personal details
                 <i class="material-symbols-outlined check-icon" style="display: none;">check</i>
                 <i class="material-icons">expand_less</i>
             </div>
 
             <div id="personalDetailsAccordion" class="accordion_content" style="display:block">
-
-                <label for="fullname">Your Title and Fullnames</label>
+              <div class="row">
+                  
+                <div class="col-md-6">
+                    <label for="fullname">Full name(s)</label>
                 <div class="input-group">
-                    <span class="input-group-addon" id="basic-addon1">
+                   <span class="input-group-addon title-id" id="basic-addon1">
                         <select id="title">
                             <option>Title</option>
                             <option value="Mr">Mr</option>
@@ -199,74 +273,134 @@
                             <option value="Ms">Ms</option>
                         </select>
                     </span>
-                    <input type="text" id="fullname" name="fullname" placeholder="Enter your full name" class="rounded-right fullname-reset" class="form-control" aria-describedby="basic-addon1">
+                    <input type="text" id="fullname" name="fullname" placeholder="Enter here" class="rounded-right fullname-reset" class="form-control" aria-describedby="basic-addon1" autofocus>
 
                 </div>
                 <span class="error-message" id="fullname-error"></span>
-                <span class="error-message" id="title-error"></span>
-
-                <label for="idnumber">Your ID Number</label>
+               @* <span class="error-message" id="title-error"></span>*@
+                    
+                </div>
+              <div class="col-md-6">
+                   <label for="fullname">Surname</label>
                 <div class="input-group">
-                    <input type="text" id="idnumber" name="idnumber" placeholder="Enter your ID number" maxlength="13" min-length="8">
+                  
+                    <input type="text" id="surname" name="surname" placeholder="Enter here" class="rounded-right fullname-reset" class="form-control" aria-describedby="basic-addon1" autofocus>
+
+                </div>
+                <span class="error-message" id="surname-error"></span>
+              </div>
+
+             
+    
+              </div>
+<div class="row">
+       <div class="col-md-6">
+                    <label for="idnumber">ID number</label>
+                <div class="input-group">
+                    <input type="text" id="idnumber" name="idnumber" placeholder="Enter here" maxlength="13" min-length="8">
                 </div>
                 <span class="error-message" id="idnumber-error"></span>
+                    
+                </div>
 
-                <label for="mobile">Your Cellphone Number</label>
+               <div class="col-md-6">
+                    <label for="mobile">Contact number</label>
                 <div class="input-group">
-                    <span class="input-group-addon" id="basic-addon1">+27</span>
-                    <input type="tel" id="mobile" class="rounded-right mobile-reset" placeholder="Enter Mobile Number" maxlength="9" aria-describedby="basic-addon1">
+                   @* <span class="input-group-addon" id="basic-addon1">+27</span>*@
+                    <input type="tel" id="mobile" class="rounded-right mobile-reset" placeholder="Enter here" maxlength="10" aria-describedby="basic-addon1">
                 </div>
                 <span class="error-message" id="mobile-error"></span>
-
-                <label for="email">Your Email Address</label>
+                   
+               </div>
+</div>
+               @* <label for="email">Your Email Address</label>
                 <div class="input-group">
                     <input type="text" id="email-id" class="rounded-right mobile-reset" placeholder="Enter your email" aria-describedby="basic-addon1">
                 </div>
-                <span class="error-message" id="email-error"></span>
+                <span class="error-message" id="email-error"></span>*@
 
             </div>
 
             <div id="income_accordion" class="accordion" onclick="toggleAccordion('incomeExpenses')">
-                Income &amp; Expenses
+                2. Income &amp; expenses
                 <i class="material-symbols-outlined check-icon" style="display: none;">check</i>
                 <i class="material-icons">expand_more</i>
             </div>
             <div id="incomeExpenses" class="accordion_content">
-
-
-                <label for="salaryandfrequency">Your Gross Salary and frequency</label>
+              <div class="row">
+                  <div class="col-md-6">
+                       <label for="salaryandfrequency">Gross income (in Rands)</label>
                 <div class="input-group">
-                    <span class="currency-prefix">R</span>
-                    <input type="text" id="grosssalary" name="grosssalary" placeholder="0" oninput="formatCurrency(this)" class="rounded-right fullname-reset" class="form-control" aria-describedby="basic-addon1">
-                    <span class="input-group-addon gross-addon" id="basic-addon2">
+                  @*  <span class="currency-prefix">R</span>*@
+                    <input type="text" id="grosssalary" name="grosssalary" placeholder="Enter here" oninput="formatCurrency(this)" class="rounded-right fullname-reset" class="form-control" aria-describedby="basic-addon1">
+                   @* <span class="input-group-addon gross-addon" id="basic-addon2">
                         <select id="grosssalary-select" name="grosssalary" class="select-class-groccery">
+                            <option value="M">Monthly</option>
+                            <option value="F">Fortnightly</option>
+                            <option value="W">Weekly</option>
+                        </select>
+                    </span>*@
+                </div>
+                <span class="error-message" id="grosssalary-error"></span>
+                  </div>
+                <div class="col-md-6">
+                    
+
+                <label for="income">Net income (in Rands)</label>
+                <div class="input-group-R">
+                    @*<span class="currency-prefix">R</span>*@
+                    <input type="text" id="income" name="income" placeholder="Enter here" oninput="formatCurrency(this)" class="rounded-right fullname-reset" class="form-control" aria-describedby="basic-addon1">
+                </div>
+                <span class="error-message" id="income-error"></span>
+                </div>
+                @*<div class="col-md-6">
+                       <label for="salaryandfrequency">Frequency</label>
+                <div class="input-group">
+                  
+                    <input type="text" id="grosssalary" name="grosssalary" placeholder="Enter here" oninput="formatCurrency(this)" class="rounded-right fullname-reset" class="form-control" aria-describedby="basic-addon1">
+                   <span class="input-group-addon gross-addon" id="basic-addon2">
+                        <select id="grosssalary-select" name="grosssalary" class="select-class-groccery">
+                            <option value="">Select here</option>
                             <option value="M">Monthly</option>
                             <option value="F">Fortnightly</option>
                             <option value="W">Weekly</option>
                         </select>
                     </span>
                 </div>
-                <span class="error-message" id="grosssalary-error"></span>
-
-
-                <label for="income">Your Net Income</label>
-                <div class="input-group-R">
-                    <span class="currency-prefix">R</span>
-                    <input type="text" id="income" name="income" placeholder="0" oninput="formatCurrency(this)" class="rounded-right fullname-reset" class="form-control" aria-describedby="basic-addon1">
+                <span class="error-message" id="frequency-error"></span>
+                  </div>*@
+            
+              </div>
+<div class="row">
+    <div class="col-md-6">
+                   <label for="selectyouremployeeType">Frequency</label>
+                <div class="custom-select-wrapper">
+                    <select id="frequencytype" name="frequencytype">
+                            <option value="">Select here</option>
+                            <option value="M">Monthly</option>
+                            <option value="F">Fortnightly</option>
+                            <option value="W">Weekly</option>
+                    </select>
+                      <span class="glyphicon glyphicon-menu-down"></span>
                 </div>
-                <span class="error-message" id="income-error"></span>
-
-                <label for="expenses">Your Living Expenses</label>
+                <span class="error-message" id="frequencytype-error"></span>
+                
+            </div>
+                <div class="col-md-6">
+                    <label for="expenses">Living expenses (in Rands)</label>
 
                 <div class="input-group-R">
-                    <span class="currency-prefix">R</span>
-                    <input type="text" id="expenses" name="expenses" placeholder="0" oninput="formatCurrency(this)" class="rounded-right fullname-reset" class="form-control" aria-describedby="basic-addon1" onfocus="openDialog('expensivemodal')">
+                    @*<span class="currency-prefix">R</span>*@
+                    <input type="text" id="expenses" name="expenses" placeholder="Enter here" oninput="formatCurrency(this)" class="rounded-right fullname-reset" class="form-control" aria-describedby="basic-addon1" onfocus="openDialog('expensivemodal')" autocomplete="off">
 
                 </div>
                 <span class="error-message" id="expenses-error"></span>
+                </div>
+</div>
+               
             </div>
 
-            <div id="address_accordion" class="accordion hidden" onclick="toggleAccordion('addressDetails')">
+            @*<div id="address_accordion" class="accordion hidden" onclick="toggleAccordion('addressDetails')">
                 Address
                 <i class="material-symbols-outlined check-icon" style="display: none;">check</i>
                 <i class="material-icons">expand_more</i>
@@ -278,7 +412,7 @@
                 <div class="autocomplete">
                     <input type="text" id="province" placeholder="Start typing a province..." />
                     <div id="autocomplete-list" class="autocomplete-items"></div>
-                    @* <span class="glyphicon glyphicon-menu-down"></span>*@
+                   
                 </div>
                 <span class="error-message" id="province-error"></span>
 
@@ -293,45 +427,62 @@
                     <input type="text" id="postalcode" name="postalcode" placeholder="Enter your postal code">
                 </div>
                 <span class="error-message" id="postalcode-error"></span>
-            </div>
+            </div>*@
             @*522025*@
             <div id="employment_accordion" class="accordion" onclick="toggleAccordion('employmentDetailsAccordion')">
-                Employment Details
+                3. Employment & bank details
                 <i class="material-symbols-outlined check-icon" style="display: none;">check</i>
                 <i class="material-icons">expand_more</i>
             </div>
             <div id="employmentDetailsAccordion" class="accordion_content">
-
-                <label for="selectyourbank">Select Your Bank</label>
+                <div class="row">
+                     <div class="col-md-6">
+                         <label for="selectyourbank">Select your bank</label>
                 <div class="custom-select-wrapper">
                     <select id="yourbank" name="yourbank">
                     </select>
                     <span class="glyphicon glyphicon-menu-down"></span>
                 </div>
                 <span class="error-message" id="yourbank-error"></span>
+                     </div>
 
-                <label for="selectyouremployeeType">Select Your Employment Sector</label>
-                <div class="custom-select-wrapper">
+            <div class="col-md-6">
+                   <label for="selectyouremployeeType">Employment sector</label>
+                <div class="custom-select-wrapper tooltip-wrapper"
+         data-tooltip="Government Sector refers to the South African government’s payroll system used for processing salaries of public sector employees.">
                     <select id="employeeType" name="employeeType">
+                        <option value="">Select here</option>
                         <option value="RET">Other</option>
-                        <option value="PER">Personal</option>
+                        <option value="PER">Government Sector</option>
+                        @*<option value="PER">Persal</option>*@
+                        
                     </select>
                     <span class="glyphicon glyphicon-menu-down"></span>
                 </div>
 
                 <span class="error-message" id="employeeType-error"></span>
                 
-                <label for="youremployer">Search Your Employer</label>
+            </div>
+                
+              
+               
+                </div>
+               <div class="row">
+                    <div class="col-md-6">
+                    <label for="youremployer">Search your employer</label>
                 <div class="search-controls">
-                    <input type="text" id="youremployer" name="youremployer" placeholder="African Bank">
+                    <input type="text" id="youremployer" name="youremployer" placeholder="Search here">
                     <span class="glyphicon glyphicon-search"></span>
                 </div>
                 <span class="error-message" id="youremployer-error"></span>
 
-
-                <label for="occupationstatus">Select Your Employment Status</label>
+               </div>
+               
+              <div class="col-md-6">
+                   <label for="occupationstatus">Select your employment status</label>
                 <div class="custom-select-wrapper">
                     <select id="occupationstatus" name="occupationstatus">
+                         <option value="">Select here</option>
                         <option value="STE">State Pension / Grant</option>
                         <option value="SEL">Micro entrepreneur</option>
                         <option value="SEA">Seasonal Worker</option>
@@ -344,22 +495,17 @@
                     <span class="glyphicon glyphicon-menu-down"></span>
                 </div>
                 <span class="error-message" id="occupationstatus-error"></span>
+                   
+               </div>
+               </div>
+               <div class="row">
+                   <div class="col-md-6">
+                         
 
-                <label for="occupationtype">Select Your Occupation Type</label>
-                <div class="custom-select-wrapper">
-                    <select id="occupationtype" name="occupationtype">
-                        <option value="">Select Occupation Type</option>
-                        <option value="permanent">Permanent</option>
-                        <option value="contract">Contract</option>
-                    </select>
-                    <span class="glyphicon glyphicon-menu-down"></span>
-                </div>
-                <span class="error-message" id="occupationtype-error"></span>
-
-                <label for="employmentstartdate">Your Employment Start Date</label>
+                <label for="employmentstartdate">Employment start date</label>
                 <div class="form-group">
                     <div class="input-group">
-                        <input type="text" id="datetimeInput" placeholder="Employee start Date">
+                        <input type="text" id="datetimeInput" placeholder="Select here">
                         <span class="input-group-addon" id="calendarIcon">
                             <span class="glyphicon glyphicon-calendar"></span>
                         </span>
@@ -367,12 +513,25 @@
                 </div>
                 <span class="error-message" id="datetimeInput-error"></span>
                 <!--   <a href="#" class="verify-number" onclick="openDialog('otpModal')">Verify Number</a> -->
+               </div>
+                   
+                
+               <div class="col-md-6">
+                    <label for="occupationtype">Select your occupation type</label>
+                <div class="custom-select-wrapper">
+                    <select id="occupationtype" name="occupationtype">
+                        <option value="">Select here</option>
+                        <option value="permanent">Permanent</option>
+                        <option value="contract">Contract</option>
+                    </select>
+                    <span class="glyphicon glyphicon-menu-down"></span>
+                </div>
+                <span class="error-message" id="occupationtype-error"></span>
+               </div> 
+               </div>
             </div>
             @*end522025*@
-            <div class="buttons">
-                <button class="btn btn-tertiary" onclick="nextStep(1)">Back</button>
-                <button class="btn btn-primary" onclick="openCreditCheckModal()">Next</button>
-            </div>
+           
         </div>
 
 
@@ -381,8 +540,8 @@
 
     <div id="step3" class="step">
         <div id="personaloanoffers">
-            <h1 id="loanOfferTitle" class="color-brand-1 mt-15 mb-20  text-center">Your Loan Offers</h1>
-            <p class="font-md color-brand-1 mb-20 text-center">Please see your indicative offers from the below.</p>
+            <h1 id="loanOfferTitle" class="color-brand-1 mt-15 mb-20  text-center">Great News! You Qualify - view your <span class="offer-title-heading">personalised loan quick quotes</span> below.</h1>
+            <p class="font-md color-brand-1 mb-20 text-center">Please note: These are quick, estimated quotes based on the information provided. The final amount and rates may vary upon a detailed assessment of your profile needs and requirements.</p>
             <!-- Filter Cards -->
             <div id="filterData" class="filter-row">
 
@@ -391,10 +550,60 @@
             <div class="offers-container" id="offersContainer">
                 <div class="product-grid" id="productGrid"></div>
             </div>
+            <div class="declaration">
+                <p class="font-md color-brand-1 mt-10 mb-20 text-center">
+                    To continue your loan application and begin the final assessment process, please register or log in to your account.
+                </p>
+            
+             
+            </div>
+            <div id="newCustomer" class="register-section" hidden>
+                  @* <label class="custom-checkbox">
+                    <input type="checkbox" id="consentCheckbox">
+                    <span class="slider-qa font-md color-brand-1">I give African Bank Limited consent to create my online banking profile</span>
+                </label>*@
+                <div class="footer-declare">
+                <button class="btn btn-tertiary"
+                        onclick="window.location.href='https://publishing.v5.stg.africanbankdmz.net/en/home/product-personal-loan-v1'">
+                    Close
+                </button>
+            
+                <button class="btn btn-primary"
+                        id="registerBtn"
+                        onclick="window.location.href='https://ib.v5.stg.africanbankdmz.net/'"
+                        >
+                    Finish Registration and apply
+                </button>
+            </div>
+            </div>
+            
+            <div id="existingCustomer" class="login-section" >
+                  
+                <div class="footer-declare">
+                <button class="btn btn-tertiary"
+                        onclick="window.location.href='https://publishing.v5.stg.africanbankdmz.net/en/home/product-personal-loan-v1'">
+                    Close
+                </button>
+            
+                <button class="btn btn-primary"
+                        id="registerBtn"
+                        onclick="window.location.href='https://ib.v5.stg.africanbankdmz.net/'"
+                        >
+                    Register or Login to Apply
+                </button>
+            </div>
+            </div>
         </div>
 
     </div>
-
+    <!-- Congratulations Screen -->
+@*<div id="congratsScreen" class="hidden">
+  <div class="congrats-content text-center">
+    <h1>🎉 Congratulations!</h1>
+    <p>Your loan offer has been successfully accepted.</p>
+    <button class="btn btn-primary" onclick="goBackToOffers()">Back to Offers</button>
+  </div>
+</div>*@
     @* <div id="step4" class="step">
             <h1 class="color-brand-1 mt-15 mb-20  text-center">Upload Documents</h1>
             <div class="upload-area"><p class="font-md color-brand-1">Click to Upload ID</p></div>
@@ -457,10 +666,10 @@
 
 
 
-                    <h2 class="color-brand-1 mt-15 mb-20">How much are you looking for the personal loan?</h2>
+                    <h2 class="color-brand-1 mt-15 mb-20">How much would you like to borrow for your Loan?</h2>
                     <!--Calculator -->
                     <div class="calculator-form ">
-                        <p class="cal-loan-disclaimer" id="" style="padding:5px 0px">Please enter Loan amount between <bold>R2 000</bold> to <bold>R500 000</bold></p>
+                        <p class="cal-loan-disclaimer" id="" style="padding:5px 0px">Please enter Loan amount between <b>R2 000</b> to <b>R500 000.</b></p>
                         <label class="cal-amount">Amount</label>
 
                         <input id="input-Amount1" class="loan-inpt" type="text" value="2000" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57">
@@ -473,10 +682,10 @@
                         </div>
 
 
-                        <div class="loans" style="margin-bottom: -7px">
-                            <div class="col-1" style="text-align: left; font-size:14px">R2 000</div>
-                            <div></div>
-                            <div class="col-2" style="text-align: right; font-size:14px">R500 000</div>
+                        <div class="loans">
+                            <div class="col-1" style="text-align: left; font-size:14px; color:#335580;">R2 000</div>
+                            
+                            <div class="col-2" style="text-align: right; font-size:14px;color:#335580;">R500 000</div>
                         </div>
 
                         <label class="cal-amount">Repayment Term</label>
@@ -502,13 +711,13 @@
                         </div>
 
 
-                        <div class="Months" style="margin-bottom: -7px">
-                            <div class="col-1" style="text-align: left; font-size:14px">7 Months</div>
-                            <div></div>
-                            <div class="col-2" style="text-align: right; font-size:14px">72 Months</div>
+                        <div class="Months">
+                            <div class="col-1" style="text-align: left; font-size:14px;color:#335580;">7 Months</div>
+                            
+                            <div class="col-2" style="text-align: right; font-size:14px;color:#335580;">72 Months</div>
                         </div>
 
-                        <label class="cal-amount">Monthly Repayment will be</label>
+                        <label class="cal-amount">Your Monthly Repayment will be</label>
 
                         <input id="installment_calc1" class="loan-inpt-return" type="text" value="879.53" readonly>
 
@@ -522,7 +731,7 @@
             </div>
         </div>
     </div>
-    <div id="creditQuestionsModal" class="model_overlay hidden">
+    @*<div id="creditQuestionsModal" class="model_overlay hidden">
         <div class="modal_dialog">
             <div class="modal_content">
                 <div class="modal_header">
@@ -535,7 +744,7 @@
                             <input type="checkbox" id="debtReview" name="debtReview" onchange="updateSliderText(this)">
                             <span class="slider"><span class="slider-text">No</span></span>
                         </label>
-                        <span class="font-md color-brand-1">I am not under debt review?</span>
+                        <span class="slider-qa font-md color-brand-1">I am not under debt review?</span>
 
                     </div>
                     <div class="toggle">
@@ -543,14 +752,24 @@
                             <input type="checkbox" id="insolvent" name="insolvent" onchange="updateSliderText(this)">
                             <span class="slider"><span class="slider-text">No</span></span>
                         </label>
-                        <span class="font-md color-brand-1">I am not insolvent?</span>
+                        <span class="slider-qa font-md color-brand-1">I am not insolvent?</span>
                     </div>
                     <div class="toggle">
                         <label>
                             <input type="checkbox" id="popiaConsent" name="popiaConsent" onchange="updateSliderText(this)">
                             <span class="slider"><span class="slider-text">No</span></span>
                         </label>
-                        <span class="font-md color-brand-1">I consent to POPIA and give permission to generate a quote?</span>
+                        
+                        <a href="https://www.africanbank.co.za/media/icynwcb2/african-bank-privacy-policy-final-19092018-pdf.pdf"> 
+                        <span class="slider-qa font-md color-brand-1">I consent to POPIA and give permission to generate a quote?</span></a>
+                       
+                    </div>
+                    <div class="toggle">
+                        <label>
+                            <input type="checkbox" id="popiaPermission" name="popiaPermission" onchange="updateSliderText(this)">
+                            <span class="slider"><span class="slider-text">No</span></span>
+                        </label>
+                        <span class="slider-qa font-md color-brand-1">Can we inform you of African Bank specials and offers??</span>
                     </div>
                 </div>
 
@@ -559,7 +778,96 @@
                 </div>
             </div>
         </div>
+    </div>*@
+    <div id="cancelModal" class="model_overlay hidden">
+    <div class="modal_dialog">
+        <div class="modal_content">
+            <div class="modal_header">
+                <i class="material-icons close-icon" onclick="closeDialog('cancelModal')">close</i>
+            </div>
+            <div class="modal_body">
+                <h2 class="color-brand-1 mt-15 mb-20">Confirmation</h2>
+                 <p class="font-md color-brand-1 mb-20">Are you sure you want to cacel?</p>
+               
+            </div>
+
+
+            <div class="modal_footer">
+              <button class="btn btn-primary" onclick="closeDialog('cancelModal')">No, Continue</button>
+                <button class="btn btn-tertiary" onclick="window.location.href='https://publishing.v5.stg.africanbankdmz.net/en/home/get-a-quote-1/'">Yes, Continue</button>
+            </div>
+        </div>
     </div>
+</div>
+    <div id="creditQuestionsModal" class="model_overlay hidden">
+    <div class="modal_dialog">
+        <div class="modal_content">
+            <div class="modal_header">
+                <i class="material-icons close-icon" onclick="closeDialog('creditQuestionsModal')">close</i>
+            </div>
+            <div class="modal_body">
+                <h2 class="color-brand-1 mt-15 mb-20">Your credit status and preferences</h2>
+                 <p class="font-md color-brand-1 mb-20">In accordance with the Protection of Personal Information Act (POPIA).</p>
+                <div class="toggle">
+                    <label>
+                        <div>
+                            <input type="checkbox" id="debtReview" name="debtReview" onchange="updateSliderText(this)">  
+                        </div>
+                        <div>
+                            <span class="slider-qa font-md color-brand-1">I confirm that I am not under debt review.</span> 
+                        </div>
+                    </label>
+                </div>
+
+                <div class="toggle">
+                    <label>
+                        <div>
+                            <input type="checkbox" id="insolvent" name="insolvent" onchange="updateSliderText(this)"> 
+                        </div>
+                        <div>
+                            <span class="slider-qa font-md color-brand-1">I confirm that I have not been declared bankrupt.</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="toggle">
+                    <label>
+                        <div>
+                            <input type="checkbox" id="popiaConsent" name="popiaConsent" onchange="updateSliderText(this)"> 
+                        </div>
+                        <div>
+                            <span class="slider-qa font-md color-brand-1">
+                            <a href="https://www.africanbank.co.za/media/icynwcb2/african-bank-privacy-policy-final-19092018-pdf.pdf">
+                                Do you give African Bank consent to process your personal information?
+                            </a>
+                        </span> 
+                        </div>
+                    </label>
+                </div>
+                <hr class="toggle-line">
+                <div class="toggle">
+                    <label>
+                        <div>
+                            <input type="checkbox" id="popiaPermission" name="popiaPermission" onchange="updateSliderText(this)"> 
+                        </div>
+                        <div>
+                            <span class="slider-qa font-md color-brand-1">Can we inform you of African Bank specials and offers?</span>
+                        </div>
+                    </label>
+                </div>
+
+            </div>
+
+
+            <div class="modal_footer">
+                <button type="button" class="btn btn-link p-0" onclick="selectAllCreditQuestions()">Select All</button>
+                @*<button class="btn btn-primary" onclick="selectAllCreditQuestions()">select all</button>*@
+                <button class="btn btn-primary" onclick="submitCreditQuestions('creditQuestionsModal')" disabled>Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
+
     <div id="creditBureauCheckModal" class="model_overlay hidden">
         <div class="creditBureau_modal_dialog">
             <div class="modal_content">
@@ -570,11 +878,11 @@
                     <h2 class="color-brand-1 mt-15 mb-20">Quick Verifications</h2>
 
                     <!-- Black Section Initially Hidden -->
-                  @*  <div id="creditCheckStatus" class="credit_check_status">
-                        <span><strong>Credit Bureau Check </strong></span>
+                   <div id="creditCheckStatus" class="credit_check_status">
+                       @* <span><strong>Credit Bureau Check </strong></span>
                         <span>Complete</span>
-                        <i class="material-icons">sentiment_satisfied</i>
-                    </div>*@
+                        <i class="material-icons">sentiment_satisfied</i>*@
+                    </div>
 
                     <!-- Dynamic Text -->
                     <p id="verificationText" class="font-md color-brand-1">Credit Bureau Check Checking . . .</p>
@@ -601,10 +909,10 @@
         <div id="terminate-to-call-me">
             
             <div class="modal_header">
-                    <i class="material-icons close-icon" onclick="closeDialog('quick-drop-off')">close</i>
+                    <i class="material-icons close-icon callme-close"  id="callmeclose" onclick="closeDialog('quick-drop-off')">close</i>
                 </div>
             <p></p>
-            <p class="color-brand-1 mt-15 mb-20" style="font-size: 16px;font-weight: 300;line-height: 19px;">Please note that if you proceed with a Call Me Back you will need to provide our agents with all your details to complete your application for credit.</p>
+            <p class="color-brand-1 mt-15 mb-20">Please note that if you proceed with a Call Me Back you will need to provide our agents with all your details to complete your application for credit.</p>
             <section id="form-loader">
                 <div class="loader" id="loader-rates-form-preloader">
                     <div class="loader-img"></div>
@@ -663,11 +971,11 @@
                         <div class="row">
                             <div class="col-xs-12">
 
-                                <button type="button" id="st-panel-submit1" onclick="open_call_me_for_qq()" class="btn btn-primary call-me btn-hover-blue">Call Me</button>
+                                <button type="button" id="st-panel-submit1" onclick="open_call_me()" class="btn btn-primary call-me btn-hover-blue">Call Me</button>
                             </div>
                         </div>
                     </div>
-                   <p class="color-brand-1 mt-15 mb-20" style="font-size: 16px;font-weight: 300;line-height: 19px;">By pressing Next, I consent to African Bank using my personal information with credit bureaus to assess my credit worthiness and for the purpose of offering credit products to me. This consent shall remain in force and in effect until such time that I withdraw this consent to African Bank.</p></label> 
+                   <p class="color-brand-1 mt-15 mb-20">By pressing Next, I consent to African Bank using my personal information with credit bureaus to assess my credit worthiness and for the purpose of offering credit products to me. This consent shall remain in force and in effect until such time that I withdraw this consent to African Bank.</p></label> 
                            
                 
             </div>
@@ -701,52 +1009,74 @@
         <div class="thankyoumodal_modal_dialog">
             <div class="modal_content">
                 <div class="modal_header">
-                    <i class="material-icons close-icon" onclick="closeDialog('thankyoumodal')">close</i>
+                    <i class="material-icons close-icon callme-close" id="thankyouclose" onclick="closeDialog('thankyoumodal')">close</i>
                 </div>
                 <div class="modal_body">
                     <h2 class="color-brand-1 mt-15 mb-20">Thank you<span class="fullname"></span></h2>
-                    <p class="color-brand-1 mt-15 mb-20">You have an existing application. Would you like to proceed with one of the folllowing options?</p>
+                    <div></div>
+                    <p id="text-error" class="color-brand-1 mt-15 mb-20">You have an active application in progress. Please select one of the options below to continue.</p>
+                   <div id="terminate-quick-loan">
+                  @* <button class="btn btn-secondary" onclick="window.open('https://ib.v5.stg.africanbankdmz.net/', '_blank')">Registation and continue</button>
+                    *@
+                    <button class="btn btn-primary" onclick="window.open('https://ib.v5.stg.africanbankdmz.net/', '_blank')">Login or Register to continue</button>
                 </div>
+                </div>
+                </div>
+               <hr>
+                <h2 class="title-help color-brand-1 mt-15 mb-20">Need help?</h2>
                 <div class="thankyoumodal_modal_footer">
-                    <button class="btn btn-primary" onclick="window.open('https://ib.v5.stg.africanbankdmz.net/', '_blank')">Login/Register</button>
-                   
-                     <div id="terminate-quick-loan"> <button class="btn btn-secondary" id="call_me_back">Call Me Back</button></div>
+                
+                     <div id="terminate-quick-loan"> <button class="btn btn-secondary" id="call_me_back">Call Me Back</button>
                     <button class="btn btn-secondary" onclick="window.open('/en/home/branch-locator/', '_blank')">Branch Locator</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="otpModal" class="model_overlay">
-        <div class="modal_dialog">
-            <div class="modal_content">
-                <div class="modal_header">
-                    <i class="material-icons close-icon" onclick="closeDialog('otpModal')">close</i>
-                </div>
-                <div class="modal_body">
-                    <h2>Verify your Cell Phone number</h2>
-                    <p id="optNumberUser"></p>
-
-                    <div class="input_container">
-                        <label for="loanAmount">OTP Number</label>
-                        <input type="text" id="oneTimePIN" name="otp" placeholder="Enter OTP"
-                               maxlength="6" minlength="6" pattern="^\d{6}$" required>
-
-                        <span class="error-message" id="error-message">Invalid OTP</span>
                     </div>
-                    <a onclick="openCreditCheckModal()" class="resend-otp">Did not receive OTP? <span>Resend</span></a>
-
-                    <div style="text-align:center; margin-top:30px; color:#000; font-weight:700" id="timer">01:00</div>
-
-                    <div id="errors"></div>
-                </div>
-                <div class="modal_footer">
-                    <button id="confirmButton" class="btn btn-primary" onclick="verifyOTP('otpModal')" disabled>Confirm</button>
-
                 </div>
             </div>
         </div>
     </div>
+
+   
+    <div id="otpModal" class="model_overlay hidden">
+         @Html.AntiForgeryToken()
+    <div class="modal_dialog">
+        <div class="modal_content">
+            <div class="modal_header">
+                <i class="material-icons close-icon" onclick="closeDialog('otpModal')">close</i>
+            </div>
+            <div class="modal_body">
+                <h2 class="color-brand-1 mt-15">Verify your information</h2>
+                <p id="optNumberUser"></p>
+
+                <div class="input_container">
+                    <label for="loanAmount">OTP Number:</label>
+
+                    <!-- Visible OTP Boxes -->
+                    <div id="otp-boxes">
+                        <input type="text" class="otp-input" maxlength="1" oninput="handleBoxInput(this, 0)">
+                        <input type="text" class="otp-input" maxlength="1" oninput="handleBoxInput(this, 1)">
+                        <input type="text" class="otp-input" maxlength="1" oninput="handleBoxInput(this, 2)">
+                        <input type="text" class="otp-input" maxlength="1" oninput="handleBoxInput(this, 3)">
+                        <input type="text" class="otp-input" maxlength="1" oninput="handleBoxInput(this, 4)">
+                        <input type="text" class="otp-input" maxlength="1" oninput="handleBoxInput(this, 5)">
+                    </div>
+
+                    <!-- Original input used for existing JS -->
+                    <input type="hidden" id="oneTimePIN" name="otp" required pattern="^\d{6}$">
+
+                    <span class="error-message" id="error-message">Invalid OTP</span>
+                </div>
+
+                <p class="color-brand-1">Did not receive OTP? <a onclick="openCreditCheckModal()" class="resend-otp">Resend</a></p>
+
+                <div style="text-align:center; margin-top:30px; color:#002b60; font-weight:700" id="timer">01:00</div>
+
+                <div class="error-message" id="errors"></div>
+            </div>
+            <div class="modal_footer">
+                <button id="confirmButton" class="btn btn-primary" onclick="verifyOTP('otpModal')" disabled>Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -759,37 +1089,37 @@
                 <div class="modal_body">
                     <h2 class="color-brand-1 mt-15 mb-20">Calculate Your Expenses</h2>
 
-                    <span style="line-height:18px; font-size:12px" class="color-brand-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="15px" height="12px" viewBox="0,0,256,256">
+                    <span style="line-height:18px; font-size:12px" class="color-brand-1 expense-span">
+                       @* <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="15px" height="12px" viewBox="0,0,256,256">
                             <g fill="#002b60" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(5.12,5.12)"><path d="M25,2c-12.703,0 -23,10.297 -23,23c0,12.703 10.297,23 23,23c12.703,0 23,-10.297 23,-23c0,-12.703 -10.297,-23 -23,-23zM25,11c1.657,0 3,1.343 3,3c0,1.657 -1.343,3 -3,3c-1.657,0 -3,-1.343 -3,-3c0,-1.657 1.343,-3 3,-3zM29,38h-2h-4h-2v-2h2v-13h-2v-2h2h4v2v13h2z"></path></g></g>
-                        </svg>Please do not include medical aid contribution reflected on your payslip. Also do not include repayments on loans and other credit e.g. credit cards, clothing accounts and bonds. Please include the following expenses: accommodation, groceries, transport, medical expenses, education and child maintenance.
+                        </svg>*@Please do not include medical aid contribution reflected on your payslip. Also do not include repayments on loans and other credit e.g. credit cards, clothing accounts and bonds. You may include the following expenses: accommodation, groceries, transport, medical expenses, education and child maintenance.
                     </span>
                     <label for="rent">Rent</label>
 
-                    <div class="input-group-R">
+                    <div class="input-group-R tooltip" data-tooltip="Enter your monthly housing costs such as rent, mortgage payments, or levies. Do not include home loans already reflected on your credit profile.">
                         <span class="currency-prefix">R</span>
-                        <input type="text" id="rent" name="rent" placeholder="0" oninput="formatCurrency(this); updateLiveTotal(); " class="rounded-right fullname-reset" class="form-control" aria-describedby="basic-addon1">
+                        <input type="text" id="rent" name="rent" placeholder="0" oninput="formatCurrency(this); updateLiveTotal(); " class="rounded-right fullname-reset" class="form-control" aria-describedby="basic-addon1" autocomplete="off">
 
                     </div>
                     <label for="transport">Transport</label>
 
-                    <div class="input-group-R">
+                    <div class="input-group-R tooltip" data-tooltip="Include costs such as fuel, public transport, ride-hailing, or vehicle running costs. Exclude car finance repayments already listed on your credit profile.">
                         <span class="currency-prefix">R</span>
-                        <input type="text" id="transport" name="transport" placeholder="0" oninput="formatCurrency(this); updateLiveTotal();" class="rounded-right fullname-reset" class="form-control" aria-describedby="basic-addon1">
+                        <input type="text" id="transport" name="transport" placeholder="0" oninput="formatCurrency(this); updateLiveTotal();" class="rounded-right fullname-reset" class="form-control" aria-describedby="basic-addon1" autocomplete="off">
 
                     </div>
                     <label for="groceries">Groceries</label>
 
-                    <div class="input-group-R">
-                        <span class="currency-prefix">R</span>
-                        <input type="text" id="groceries" name="groceries" placeholder="0" oninput="formatCurrency(this); updateLiveTotal();" class="rounded-right fullname-reset" class="form-control" aria-describedby="basic-addon1">
+                    <div class="input-group-R tooltip" data-tooltip="Enter your average monthly household grocery and food expenses (supermarket, household essentials).">
+                      <span class="currency-prefix">R</span>
+                        <input type="text" id="groceries" name="groceries" placeholder="0" oninput="formatCurrency(this); updateLiveTotal();" class="rounded-right fullname-reset" class="form-control" aria-describedby="basic-addon1" autocomplete="off">
 
                     </div>
-                    <label for="others">Others(Medical Expenses, Education and Child Maintenance )</label>
+                    <label for="others">Other(Medical Expenses, Education and Child Maintenance)</label>
 
-                    <div class="input-group-R">
+                    <div class="input-group-R tooltip" data-tooltip="Enter any other regular monthly living expenses not already captured above and not listed on your credit profile.">
                         <span class="currency-prefix">R</span>
-                        <input type="text" id="others" name="others" placeholder="0" oninput="formatCurrency(this); updateLiveTotal(); " class="rounded-right fullname-reset" class="form-control" aria-describedby="basic-addon1">
+                        <input type="text" id="others" name="others" placeholder="0" oninput="formatCurrency(this); updateLiveTotal(); " class="rounded-right fullname-reset" class="form-control" aria-describedby="basic-addon1" autocomplete="off">
 
                     </div>
                     @* <label for="maintenance">Do you have maintenance mode?</label>
@@ -801,21 +1131,26 @@
                             <label for="maintenance-no">No</label>
                         </div>*@
                     <div id="expenses-total-error" class="error-text">
-                        Total expenses should not be zero.
+                        Total expenses should not be zero
                     </div>
 
                 </div>
-                <p id="expense-summary" class="mt-15 color-brand-1 text-center">Total Monthly Expences: <strong>R 0</strong></p>
+                <p id="expense-summary" class="mt-15 color-brand-1 text-center">Total monthly expences: <strong>0</strong></p>
                 <div class="modal_footer">
-                    <button class="btn btn-primary" onclick="verifyexpensive('expensivemodal')">Confirm</button>
+                    <button class="btn btn-primary" onclick="verifyexpensive('expensivemodal')">Continue</button>
                 </div>
             </div>
         </div>
     </div>
+
+<div
+  id="unsuccessful-config"
+  style="display:none"
+  data-close-url="@quickTitle"
+  data-branch-url="@quickTitle">
 </div>
 
 <span id="PING_IFRAME_FORM_DETECTION" style="display: none;"></span>
-
 <grammarly-desktop-integration data-grammarly-shadow-root="true">
     <template shadowrootmode="open">
         <style>
@@ -842,6 +1177,25 @@
         <div aria-label="grammarly-integration" role="group" tabindex="-1" class="grammarly-desktop-integration" data-content="{&quot;mode&quot;:&quot;full&quot;,&quot;isActive&quot;:true,&quot;isUserDisabled&quot;:false}"></div>
     </template>
 </grammarly-desktop-integration>
+</div>
+
+<div>
+    <div class="container buttons hidden">
+               @* <button class="btn btn-tertiary" onclick="nextStep(1)">Back</button>*@
+               <button class="btn btn-tertiary" onclick="openDialog('cancelModal')">Cancel</button>
+                <button class="btn btn-primary" id="continebtn" onclick="openCreditCheckModal()" disabled>Continue</button>
+            </div>
+<footer class="footer-copyright1">
+  <p class="left-text">© Copyright 2025 African Bank. An authorized financial services and credit provider Reg No. 2014/176899/06 (NCRCP7638)</p>
+  <p class="right-text">Terms & Conditions</p>
+</footer>
+</div>
+ 
+</div>
+
+
+
+
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
  <script type="text/javascript" src="~/scripts/jquery-1.10.2.min.js"></script>
@@ -863,6 +1217,7 @@
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
 <script src="/scripts/abQQ/newQQscript.js"></script>
+
 
 
 
@@ -989,4 +1344,118 @@ $(".call-me-back-message").html("");
         }
     });
 }
+
+ @*function open_call_me_for_qq() {
+     if ($('#call_me_success').css('display') === 'block') {
+    setTimeout(function() {
+      location.reload();
+    }, 3000); // 5 seconds
+     $('.callme-close').click(function(){
+           location.reload();
+
+    });
+  }
+  }*@
+$('#st-panel-submit1').click(function() {
+    // Wait a bit (e.g. 1 second) to allow any changes in visibility to happen
+    setTimeout(function() {
+        if (
+            $('#call_me_success').css('display') === 'block' ||
+            $('#terminate-process').css('display') === 'block' ||
+            $('#terminate-offline').css('display') === 'block' ||
+            $('#call-me-back-message').css('display') === 'block'
+        ) {
+            // Reload page after 5 seconds
+            setTimeout(function() {
+                location.reload();
+            }, 3000);
+
+            // Add click handler to .callme-close that reloads immediately
+            $('.callme-close').one('click', function() {
+                location.reload();
+            });
+        }
+    }, 2000); // Delay checking visibility by 1 second
+});
+
+$(document).ready(function() {
+    const inputs = $('input');
+        inputs.on('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const currentIndex = inputs.index(this);
+                    if (currentIndex < inputs.length - 1) {
+                        const nextInput = inputs.eq(currentIndex + 1);
+                        nextInput.focus();
+                       
+ 
+                        // Scroll into view if field is below visible area
+                      //  $('html, body, .qqcontainer').animate({
+                        //    scrollTop: nextInput.offset().top - $('.qqcontainer').offset().top + $('.qqcontainer').scrollTop() - 50
+                        //}, 500);
+                        // Scroll properly inside container (or window)
+                const $container = $('.qqcontainer');
+                const containerTop = $container.offset().top;
+                const containerScroll = $container.scrollTop();
+                const inputTop = nextInput.offset().top;
+
+                // Calculate target scroll position relative to the container
+                const scrollTo = inputTop - containerTop + containerScroll - 50;
+
+                // Animate to bring the next field into view
+                $container.animate({ scrollTop: scrollTo }, 400);
+                    } else {
+                        $('#step2').submit();
+                    }
+                }
+            });
+    // Assuming your steps have a class 'step' and active step has class 'active'
+   function focusStep2Input() {
+       const fullNameVal = $("#fullname").val().trim();
+
+    // Check if the string length is 0 (empty)
+    if (fullNameVal.length === 0) {
+        $("#fullname").focus();
+    }
+   }
+
+    // Call once in case step2 is already active on load
+   focusStep2Input();
+
+    // Listen for changes (if you toggle steps via click)
+    $(".step").on("click", function() {
+        // You may be toggling 'active' class manually
+        // Use a small delay to ensure the class has been toggled
+        setTimeout(focusStep2Input, 10);
+    });
+    $(".accordion").on("click", function() {
+        // Find the related accordion content
+        const targetId = $(this).attr("onclick")?.match(/'(.*?)'/)?.[1];
+        if (!targetId) return;
+
+        const $content = $("#" + targetId);
+
+        // Wait a short moment in case of animation / display toggle
+        setTimeout(function() {
+            // Focus the first input, select, or textarea inside that accordion
+            const $firstField = $content.find("input, select, textarea").first();
+            if ($firstField.length) {
+                $firstField.focus();
+            }
+        }, 100);
+    });
+});
+
+
+</script>
+
+
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+    const modalId = localStorage.getItem('openModal');
+    if (modalId) {
+        openDialog(modalId);           // open the modal
+        localStorage.removeItem('openModal'); // clear flag
+    }
+});
 </script>

@@ -1,5 +1,225 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCampaign>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models;
+@using Web.Helpers
+
+@using Umbraco.Web.Models
+@using System.Text.RegularExpressions
+
 @{
-	Layout = null;
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var children = Model.Children;
+
+    // Get specific Children
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+
+    var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
+
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    var oneNumberControl = heroBody.Children.Where(c => c is RichTextEditor).FirstOrDefault();
+    var lotoTermsTab = heroBody.Children.Where(c => c is RichTextEditor).Last();
+    
+    // Get the (generic Open Now that will be used throughout the page) button from the Hero Shoulder
+    IEnumerable<IPublishedContent>
+        bodyButtons = (IEnumerable<IPublishedContent>
+            )heroBody.Children.Where(c => c is ContentModels.EbankItabstractButton);
+    ContentModels.EbankItabstractButton openNowButton = null;
+    ContentModels.EbankItabstractButton learnMoreButton = null;
+    ContentModels.EbankItabstractButton androidDownloadNow = null;
+    ContentModels.EbankItabstractButton iosDownloadNow = null;
+    ContentModels.EbankItabstractButton downloadNow = null;
+
+    foreach (var button in bodyButtons)
+    {
+        if (button.Value("EbankItbuttonText").ToString().Contains("Register / Login"))
+        {
+            openNowButton = (ContentModels.EbankItabstractButton)button;
+        }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("Learn More"))
+        {
+            learnMoreButton = (ContentModels.EbankItabstractButton)button;
+        }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("Android"))
+        {
+            androidDownloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("iOS"))
+        {
+            iosDownloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+        else
+        {
+            downloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+    }
+
+    var openNowButtonLink = "#";
+    openNowButtonLink = string.IsNullOrEmpty(openNowButton?.EbankItbuttonInternalLink?.Url) ?
+    openNowButton?.EbankItbuttonExternalLink :
+    openNowButton.EbankItbuttonInternalLink?.Url;
+    openNowButtonLink = (string.IsNullOrEmpty(openNowButtonLink)) ? "#" : openNowButtonLink;
+
+    var learnMoreButtonLink = "#";
+    learnMoreButtonLink = string.IsNullOrEmpty(learnMoreButton?.EbankItbuttonInternalLink?.Url) ?
+    learnMoreButton?.EbankItbuttonExternalLink :
+    learnMoreButton.EbankItbuttonInternalLink?.Url;
+    learnMoreButtonLink = (string.IsNullOrEmpty(learnMoreButtonLink)) ? "#" : learnMoreButtonLink;
+
+    // End get generic shoulder button
+
+    var chestTitle = heroChest?.Value("chestTitle").ToString();
+    var chestDescription = heroChest?.Value("chestDescription").ToString();
+    var chestCards = heroChest?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+
+    
+
+    //Create your won world of banking
+
+    var tabs = (IEnumerable<IPublishedContent>
+        )heroBody?.Children.Where(c => c.ContentType.Alias.ToLower() == "tabbody").ToList();
+
+    ContentModels.TabBody newWaysOfBanking = null;
+    ContentModels.TabBody createOwnWorldOfBanking = null;
+    ContentModels.TabBody myWorldTermsAndConditions = null;
+
+    tabs.ToList().ForEach(x =>
+    {
+        var partialName = x.Value("PartialViewName");
+
+        if (partialName.ToString() == "_cardRenderDescribedCards")
+        {
+            newWaysOfBanking = (TabBody)x;
+        }
+        
+    });
+
+
+    var newWaysItems = (IEnumerable<IPublishedElement>)newWaysOfBanking.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+    
+    var viewName = Path.GetFileNameWithoutExtension(Server.MapPath(VirtualPath)); //used mainly to identify the page
+    var buttonText = openNowButton.EbankItbuttonText;
+    var onlineButtonText = learnMoreButton.EbankItbuttonText;
+    var btnId = viewName + "_" + buttonText.ToString().Replace(" ", "") + "_" + "banking-campaign";
+
+    var btnLearnMoreId = viewName + "_" + onlineButtonText.ToString().Replace(" ", "") + "_" + "banking-campaign";
+
+    // Mobile App Modal Data
+    var popupAppTitle = "Download African App using one of the following";
+    var popQRCode = "/media/51852/image001.png";
+    var popAndroidApp="/media/pt2b4b3q/googleplaystoredownloadimagelink.png";
+    var popIOsApp="/media/pejn1h1x/appstoredownloadimagelink.png";
 }
+
+<style>
+   .campaign-myworld-container {
+        background-image: url("/media/edkc04ez/african-banking-1935x255.png");
+   }
+   .sign {
+        border-radius: 100px;
+        background: #f7f7f7;
+        
+    }
+    .registerLogin {
+        width:unset;
+        text-align:right;
+    }
+    .onenumbercall {
+        text-align: center;
+        margin-top: 0;
+        margin-bottom: 10px;
+        line-height: 1.1;
+        display: block;
+    }
+    .desc{
+       margin-bottom: 2px !important;
+    }
+    hr {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    }
+    .mega-tabs { margin-bottom: 0px !important; }
+    .mega-tabs .nav-tabs>li{ padding: 20px 20px !important;}
+    .sign{color: #f7f7f7; !important}
+    .loto-line { border-top: 1px solid #778368; margin-top:20px; margin-bottom:20px;}
+    .button { padding: 16px 61px;}
+    .button.primary.sign { background-color: #88bc47;}
+    .payments-section .title { margin-bottom: 0px; }
+    @@media only screen and (min-width: 268px) and (max-width: 968px) {
+       .hero-static-banner {height: 528px;}
+       .sign{width: 70%;}
+    }
+    @@media only screen and (min-width: 390px) and (max-width: 968px) {
+       .hero-static-banner {height: 528px;}
+       .sign{width: 70%;}
+    }
+    @@media (max-width: 1439px) and (min-width: 768px) {
+        .sign {
+            width: 90% !important;
+            margin-left:-35px;
+        }
+    }
+    
+</style>
+</style>
+
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+<br />
+
+@*Blue Background Start*@
+<div class="campaign-myworld-container">
+    <div class="container payments-section full blue-button">
+        <div class="margin-top-20 visible-xs"></div>
+        <div class="row myworld-campaign-section-container">
+            @{
+                int idIterator = 0;
+                foreach (var item in newWaysItems)
+                {
+                    var cardTitle = item.Value<string>("NCcardTitle");
+                    var cardTitleId = cardTitle.Trim().ToString().Replace(" ", "").ToString() + idIterator.ToString();
+                    var cardDesc = item.Value<string>("mediumDescription");
+                    var icon = item.Value<IPublishedContent>("NCcardIcon");
+                    <div class="col-sm-12 margin-bottom-10 hero-title desc">
+                        <div class="text-left white-link-color richtextbox-blue-bg">
+                            @Html.Raw(HttpUtility.HtmlDecode(@cardDesc))
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-3 registerLogin margin-bottom-20">
+                           
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        @Html.Raw(@item.Value("mainDescription"))
+                        <p class="loto-line"></p>
+                    </div>
+                    
+                    idIterator += 1;
+                }
+            }
+        </div>
+    </div>
+</div>
+@*Blue Background End*@
+<div class="green-pointer-banking-campaign"></div>
+<div class="hover-block"></div>
+<div class="container">
+    <div class="mega-tabs" style="margin-top:-92px">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs eq-height" role="tablist">
+            <li role="presentation" class="online-banking-li" style="text-transform: initial;">
+                 @Html.Raw(@lotoTermsTab.Value("textEditor"))
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- NUMBER TO CALL -->
+<div class="number-to-call">@Html.Raw(@oneNumberControl.Value("textEditor"))</div>
+
+

@@ -1,5 +1,743 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using AcfAfricanbank.Core.Models.Forms
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers;
+@using CustomModels = Web.Models;
+@using System.Collections.Generic;
+
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
+	    @*All Current Page Children*@
+    var children = Model.Children;
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder1 = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+
+    var heroBody = (HeroBody)children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    var footerDescription = heroBody.Value("richTextBox").ToString();
+
+    var cardImageDescriptions = heroBody.Children(x => x is Card).ToList();
+    var bodyCards = heroBody?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+    var applyDocs = bodyCards?.Select(c => c as Card).FirstOrDefault();
+    var cardImage = applyDocs.Value("cardIcon");
+      String cardUrl = ((IPublishedContent)cardImage).Url.ToString();
+    var cardLink= applyDocs.Value("buttonLink");
+   
+    var navigate = applyDocs.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").FirstOrDefault();
+   
+    var tabGroup = heroBody.Children(x => x.ContentType.Alias.ToLower() == "tabgroup").FirstOrDefault();
+    var tabHeader = tabGroup.Children(xx => xx.ContentType.Alias.ToLower() == "tabheader").FirstOrDefault();
+    var tabBody = (TabBody)tabHeader.Children(cc => cc.ContentType.Alias.ToLower() == "tabbody").First();
+    var headerImage_large = heroHeader?.Value<IPublishedContent>("image")?.Url;
+    var headerImage_medium = heroHeader?.Value<IPublishedContent>("imageMedium")?.Url;
+    var headerImage_small = heroHeader?.Value<IPublishedContent>("imageSmall")?.Url;
 }
+
+@* the fun starts here *@
+
+<style>
+    html, body{
+        overflow-x: hidden;
+        width: 100%;
+    }
+    .campaign-list ul {
+       list-style: disc;
+       margin-left: 24px;
+    }
+    .span-buttons{
+        display: inherit !important;
+        margin: 0 auto;
+        padding-top: 11px;
+        padding: 14px;
+        margin-top: 19px;
+    }
+    .button.primary {
+
+        border-radius: 25px;
+        top: 2172px;
+        left: 499px;
+        width: 230px;
+        height: 50px;
+        min-width: 250px;
+        background: #8CBE4D 0% 0% no-repeat padding-box;
+        box-shadow: none;
+        opacity: 1;
+    }
+    .check-class-name {
+        background: #fff;
+        height:198px;
+    }
+
+    .check-class-name .campaign-more-container {
+        background: rgb(246, 246, 246);
+    }
+    .audacious-reward-btn{
+        color: #002b60 !important;
+        background: transparent  !important;
+        width: 20% !important;
+        border: 1px solid #002b60;
+    }
+    .hero-static-caption {
+        margin-bottom: -40px;
+    }
+    .dg-tab1-title
+    {
+        text-align: left;
+        font: normal normal bold 20px Montserrat !important; 
+        letter-spacing: 0px;
+        color: #002b60 !important; 
+        opacity: 1;
+    }
+    .dg-tab1-desc{
+        text-align: left; 
+        font: normal normal normal 14px Montserrat !important; 
+        letter-spacing: 0px; 
+        color: #002b60 !important; 
+        opacity: 1; 
+        
+    }
+    
+    .tablename-content {
+        text-align: center;
+        font: normal normal 600 18px/28px Montserrat;
+        letter-spacing: 0px;
+        color: #002B60;
+        opacity: 1;
+        font-size: 16px;
+    }
+   
+ .tableid-content {
+    text-align: center;
+    font: normal normal 600 15px/25px Montserrat;
+    letter-spacing: 0px;
+    color: #89BC47;
+    opacity: 1;
+    min-height: 50px;
+  }
+   
+   .mega-tabs .nav-tabs>li span{
+     padding-bottom: 9px;
+   }
+   
+   .test-class{
+    font: normal normal bold 29px/35px Montserrat !important;
+    letter-spacing: 0px !important;
+    color: #002B60;
+    opacity: 1;
+   }
+  .read-more {
+   padding:12px !important;
+   }
+   .robot-img{
+   float:right;
+   }
+   .hero_shoulder_title{
+         font: normal normal bold 24px/74px Montserrat !important;
+         color: #88BC47;
+         letter-spacing: 0px;
+         text-align: center;
+    }
+     .hero_shoulder_subtitle{
+         text-align: center; 
+         font: normal normal bold 58px/74px Montserrat !important; 
+         letter-spacing: 0px;
+         color: #ffffff;
+       }
+      .hero-shoulder-subtext{
+        text-align: center;
+       font: normal normal normal 14px Montserrat;
+       letter-spacing: 0px; 
+       color: #ffffff; 
+       opacity: 1;
+      }
+ .btn-samsung-guide{
+    color: #002B60 !important;
+    border: 1px solid #002B60;
+    opacity: 1;
+    background: transparent !important;
+    width: 40rem !important;
+       
+   }
+  .tableheading-content {
+    text-align: left;
+    font: normal normal 300 13px/16px Montserrat;
+    letter-spacing: 0px;
+    color: #333333;
+    opacity: 1;
+  }
+  
+  .mega-tabs .nav-tabs > li.loan-summary > a {
+    color: #89BC47 !important;
+    font: normal normal 600 21px/25px Montserrat;
+    font-size: 15px;
+   }
+   
+   .mega-tabs {
+    margin-left: 50px;
+    margin-top: -40px;
+    margin-right: 50px;
+    text-transform: none;
+  } 
+  .circle-img-banner {
+    width: 50%;
+}
+
+.move-content-left {
+    margin-top: -170px !important;
+    margin-left: 17em !important;
+}
+
+.hero-static-caption{
+    background: transparent linear-gradient(180deg, #02397D 0%, #002B60 100%) 0% 0% no-repeat padding-box !important;
+    box-shadow: 0px -20px 15px #0000004F;
+    border-radius: 10px 10px 0px 0px;
+    opacity: 1;
+    padding-top: 18px;
+    top: -40px !important;
+}
+
+.mega-tabs .nav-tabs > li {
+    padding: 0px;
+}
+.loan-summary-container{
+top: -15px;
+}
+
+@@media (min-width: 280px) and (max-width: 428px){
+    .campaign-list ul {
+       list-style: disc;
+       margin-left: 10px;
+       margin-bottom: 30px;
+    }
+    .hero-static-caption {
+        margin-bottom: -10px;
+    }
+    .audacious-reward-btn {
+        width: 80% !important;
+    }  
+    .hero-shoulder-subtext{
+        padding-bottom: 10px;
+    }
+    .ul-bullets .read-more {
+        padding:0px !important;
+    }
+    .btn-samsung-guide {
+        width: 23rem !important;
+        padding: 0px 15px 0px 15px !important; 
+    }
+       .tableheading-content {
+          text-align: center;
+          margin-top: -13px;
+       }
+       .tablename-content {
+          margin-top: -34px;
+       }
+       .hero_shoulder_title{
+         font: normal normal bold 18px/24px Montserrat !important;
+         color: #88BC47;
+         letter-spacing: 0px;
+         text-align: center;
+       }
+       .hero_shoulder_subtitle{
+         text-align: center; 
+         font: normal normal bold 24px/24px Montserrat !important; 
+         letter-spacing: 0px;
+         color: #ffffff;
+         margin-top: 25px;
+       }
+       .card-shadow {
+            padding: 5px 15px 40px 15px !important;
+            margin-left: 14px !important;
+            margin-right: -14px;
+       }  
+        p.dg-tab1-title{
+           text-align: center; 
+           font: normal normal bold 20px/24px Montserrat;
+           letter-spacing: 0px;
+           color: #002b60; 
+           opacity: 1; 
+           margin-bottom: 18px;
+           margin-top: 17px;
+           margin-left: -10px !important;
+        }
+        p.dg-tab1-desc{
+            text-align: left; 
+            font: normal normal normal 14px/18px Montserrat; 
+            letter-spacing: 0px;
+            color: #002b60; 
+            opacity: 1; 
+            line-height: 20.2px !important;
+            margin-left: 6px;
+        } 
+        .img-heigt {
+           top: 7px;
+           margin-left: -0vw;
+        }
+        .hero-static-caption .hero-static-title, .hero-static-caption h1 {
+            margin-bottom: 0px !important;
+        }
+        .mobile-blog {
+            display: block !important;
+            margin-top: -91px;
+        }
+        .tab-desc-btn {
+           margin-top: 0px;
+        }
+    }
+
+@@media (min-width: 500px) and (max-width: 540px){
+        .hero-static-caption {
+            margin-bottom: -10px;
+        }
+    	.hero_shoulder_title {
+           font: normal normal bold 24px/39px Montserrat !important;
+    	}
+        .campaign-list ul {
+          list-style: disc;
+          margin-left: 24px;
+          margin-bottom: 30px;
+        }
+}
+
+@@media  (min-width: 280px) and (max-width: 820px)
+{
+        .mega-tabs {
+            margin-left: -20px;
+            margin-right: -20px;
+        }
+        
+        .btn-samsung-guide {
+        width: 23rem !important;
+        }
+    }
+
+@@media  (min-width: 280px) and (max-width: 767.8px)
+   {
+        .mega-tabs .nav-tabs > li {
+           border-right: none;
+          }
+         .robot-img{
+            width:100%;
+          }
+       .mega-tabs .nav-tabs {
+        border: none;
+        min-width: 60px !important;
+        }
+        .mega-tabs {
+       }
+	
+       .mega-tabs .nav-tabs>li.loan-summary {
+        padding: 1px 5px;
+       }
+       
+       .btn-samsung-guide {
+        width: 23rem !important;
+       }
+      .card-shadow {
+        padding: 50px;
+        border-radius: 8px;
+        background-color: #fff;
+        box-shadow: 0 2px 6px 0 rgb(69 73 91 / 8%);
+        height: auto;
+        margin-top: 24px;
+        margin-left: 6px;
+        margin-bottom: 30px;
+        }
+        .mega-tabs {
+           overflow-y: scroll !important; 
+           background-color: #f7f7f7;
+           margin-bottom: 60px;
+           text-align: center;
+           font-size: 16px;
+           position: relative;
+           z-index: 10;
+        }
+        .mega-tabs .nav-tabs {
+            border: none;
+            min-width: 60px !important;
+            width: 698px;
+        }
+      .tableheading-content{
+        text-align: center;
+       }
+        .mega-tabs .nav-tabs > li.active:after{
+           display: none;
+        }
+          .karabo-img{
+        height:300px !important;
+   }
+   .robot-img{
+   height:400px !important;
+   }
+   }
+    @@media (min-width: 429px) and (max-width: 767.8px){
+      .mega-tabs {
+           margin-bottom: -15px;
+          
+        }
+     }
+  @@media (min-width: 767px) and (max-width: 767.8px)
+    {
+      .hidden-xs {
+        display: none !important;
+       }
+
+        .hidden-sm {
+                display:block !important;
+            }
+   }
+@@media only screen and (max-width: 768px)
+    {
+        .mega-tabs .nav-tabs>li span {
+            display: unset;
+        }
+    }
+@@media (min-width: 768px)
+{
+        .col-sm-offset-1 {
+            margin-left: 1.33333% !important;
+       }
+   }
+
+@@media (min-width: 280px) and (max-width: 915px)
+{
+.hero-static-caption {
+    margin-bottom: -20px;
+}
+    .hero-static-caption {
+        
+        top: -20px !important;
+    }
+ }
+ @@media (min-width: 412px) and (max-width: 915px)
+{
+        .hero-static-banner {
+            height: 470px;
+            }
+   }
+@@media (min-width: 768px) and (max-width: 769px){
+        .img-view{
+            margin-top: -15px;
+        }
+   }
+@@media (min-width: 768px) and (max-width: 912px){
+       p.hero_shoulder_title {
+          font: normal normal bold 24px/30px Montserrat !important;
+        }
+         p.hero_shoulder_subtitle {
+          font: normal normal bold 58px/54px Montserrat !important;
+        }
+   }
+@@media  (max-width: 900px)
+{
+        .robot-img{
+          width:100%;
+        }
+    }
+
+@@media (max-width: 920px) and (min-width: 900px)
+{
+        .robot-img {
+            
+            float:none !important;
+        }
+   }
+@@media (max-width: 1023px) and (min-width: 768px)
+{
+        .padding-top-zero {
+            
+            padding-top: 0% !important;
+           
+        }
+        .margin-top-40 {
+         margin-bottom: 0px !important; 
+            margin-top: 36px;
+        }
+    }
+@@media (max-width: 1034px) and (min-width: 1020px)
+   {
+        .robot-img {
+            float:none !important;
+        }
+   }
+
+</style>
+
+<section>
+                                       @*HERO BANNER*@
+    @Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+    
+    <div style="background: #002B60 !important;">
+        @Html.Partial("_pageShoulderNew", heroShoulder1 as ContentModels.HeroShoulder)
+		
+    </div>
+       <div>
+                @{
+                    var heroShoulder = (HeroShoulderHome)children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulderhome").FirstOrDefault();
+
+                    if (heroShoulder != null)
+                    {
+                        <div class="loan-summary-container">
+                            <div class="container">
+                                <div class="mega-tabs hidden-xs">
+                                    @*Nav tabs*@
+                                    <ul id="go_to_tab_content" class="nav nav-tabs eq-height" role="tablist">
+                                        @{
+                                            var isFirstRow = true;
+                                            foreach (HomeShoulderItem tab in heroShoulder.Items)
+                                            {
+
+                                                <li role="presentation" class="@(isFirstRow ? "active" : "") loan-summary ">
+                                                    <a href="#@tab.TabId.Replace(" ", "").Replace(",", "").Replace("%","")" aria-controls="profile " role="tab" data-toggle="tab">
+                                                        <span class="tablename-content" style="position: relative;bottom: -19px;">@tab.TabName</span>
+                                                        <br /><br/>
+                                                    <span class="tableid-content">@tab.TabId</span><br />
+                                                       </a>
+                                                    <span class="tableheading-content">@tab.TabHeading</span> 
+                                                </li>
+                                                isFirstRow = false;
+                                            }
+                                        }
+                                    </ul>
+                                </div>
+                                                                
+                                      <div class="mega-tabs hidden-lg hidden-md hidden-sm">
+                                                    @*Nav tabs*@
+                                                    <ul id="go_to_tab_content" class="nav nav-tabs eq-height" role="tablist">
+                                                        @{
+                                                            var isFirstRowM = true;
+                                                            int leftValue = 20;
+                                                            foreach (HomeShoulderItem tab in heroShoulder.Items)
+                                                            {
+                                                                <li role="presentation" class="@(isFirstRowM ? " active" : "" ) loan-summary " style="width:100%">
+                                                                    <div class="col-md-4 card-shadow" style="@(!isFirstRowM ? "left:"+ leftValue +"px" : "")">
+                                                                        <a href="#@tab.TabId.Replace(" ", "").Replace(",", "").Replace("%","")" aria-controls="profile " role="tab" data-toggle="tab">
+                                                                            <span class="tablename-content">@tab.TabName</span>
+                                                                        </a>
+                                                                        <div> <span class="tableid-content">@tab.TabId</span></div>
+                                                                        <div><span class="tableheading-content">@tab.TabHeading</span></div>
+                                                                        
+                                                                             <div class="row">
+
+                                                    @{
+                                                        var item2 = tab.Value<IEnumerable<IPublishedElement>>("tabBodyContent").FirstOrDefault();
+                                                    }
+
+                                                    @if (item2 != null)
+                                                    {
+                                                        <div class="col-sm-10 col-sm-offset-1">
+                                                            <div class="campaign-list">
+                                                                @{
+                                                                    var data = item2.Value<IEnumerable<IPublishedElement>>("sectionContent");
+                                                                }
+                                                                @foreach (var item in data)
+                                                                {
+                                                                    var image = item.Value("tabSubItemImage");
+                                                                    String url = ((IPublishedContent)image).Url.ToString();
+                                                                    String altTag = ((IPublishedContent)image).Value("altTag").ToString();
+
+                                                                    <div class="col-sm-6 banner-image-section img-heigt circle-img">
+                                                                        <img style=" width: 213px;" class="circle-img-banner " src="@url" alt="@altTag" />
+                                                                    </div>
+
+                                                                    <div class="col-sm-10 desc-tab banner-right move-content-left">
+                                                                        <div class="article-content">
+                                                                            <div class="body-content ul-bullets">
+                                                                             @Html.Raw(item.Value("tabSubItemTextContent"))
+                                                                            </div>
+                                                                       </div>
+                                                                      @*  @foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>
+                                                                            )item.Value("tabSubItemLinks"))
+                                                                        {
+                                                                            if (link.Name.Contains("More Info") || link.Name.Contains("Join African Bank"))
+                                                                            {
+                                                                                <div class="ctabuttons tab-desc-btn">
+                                                                                    <div>
+                                                                                        <a class="button read-more primary span-buttons" href="@link.Url" target="_blank" style="color: white;">@link.Name</a>
+                                                                                    </div>
+                                                                                </div>
+                                                                            }
+                                                                            else if (link.Name.Contains("Buy your Samsung"))
+                                                                            {
+                                                                                <div class="ctabuttons tab-desc-btn">
+                                                                                    <div>
+                                                                                        <a class="btn-samsung-guide button primary span-buttons " href="@link.Url" target="_blank" style="color: white;">@link.Name</a>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                            }
+                                                                        }*@
+                                                                    </div>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                                                    </div>
+                                                                </li>
+                                                                isFirstRowM = false;
+                                                                leftValue = leftValue + 20;
+                                                            }
+                                                        }
+                                                    </ul>
+                                                </div>
+                                
+                                @*Tab panes*@
+							
+                                <div class="tab-content hidden-xs">
+                                    @{
+                                        bool isFirstTab = true;
+                                        foreach (HomeShoulderItem tab in heroShoulder.Items)
+                                        {
+                                            <div role="tabpanel" class="tab-pane @(isFirstTab ? "active" : "")" id="@tab.TabId.Replace(" ", "").Replace(",", "").Replace("%","")">
+
+                                                <div class="row">
+
+                                                    @{
+                                                        var item2 = tab.Value<IEnumerable<IPublishedElement>>("tabBodyContent").FirstOrDefault();
+                                                    }
+                                                    @if (item2 != null)
+                                                    {
+                                                        <div class="col-sm-10 col-sm-offset-1">
+                                                            <div class="campaign-list">
+                                                                @{
+                                                                    var data = item2.Value<IEnumerable<IPublishedElement>>("sectionContent");
+                                                                }
+                                                                @foreach (var item in data)
+                                                                {
+                                                                    var image = item.Value("tabSubItemImage");
+                                                                    String url = ((IPublishedContent)image).Url.ToString();
+                                                                    String altTag = ((IPublishedContent)image).Value("altTag").ToString();
+
+                                                                    <div class="col-sm-6 banner-image-section img-heigt circle-img">
+                                                                        <img class="circle-img-banner " src="@url" alt="@altTag" />
+
+                                                                    </div>
+
+                                                                    <div class="col-sm-10 desc-tab banner-right move-content-left">
+                                                                        <div class="article-content">
+                                                                            <div class="body-content ul-bullets">
+                                                                        
+                                                                             @Html.Raw(item.Value("tabSubItemTextContent"))
+                                                                            </div>
+                                                                        </div>
+                                                                      @*  @foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>
+                                                                            )item.Value("tabSubItemLinks"))
+                                                                        {
+                                                                            if (link.Name.Contains("More") || link.Name.Contains("Join African Bank"))
+                                                                            {
+                                                                                <div class="ctabuttons tab-desc-btn">
+                                                                                    <div>
+                                                                                        <a class="button primary span-buttons" href="@link.Url" target="_blank" style="color: white;">@link.Name</a>
+                                                                                    </div>
+                                                                                </div>
+                                                                            }
+                                                                            else if (link.Name.Contains("Samsung"))
+                                                                            {
+                                                                                <div class="ctabuttons tab-desc-btn">
+                                                                                    <div>
+                                                                                        <a class="btn-samsung-guide button primary span-buttons " href="@link.Url" target="_blank" style="color: white;">@link.Name</a>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                            }
+                                                                        }*@
+                                                                    </div>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                            isFirstTab = false;
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+           }
+                }
+
+            </div>
+            
+          
+	  
+   @Html.Partial("_PageRenderSwatchPay", tabBody as ContentModels.TabBody)
+
+   <div class="row img-view" style="background: #F6F6F6 0% 0% no-repeat padding-box;">
+                        @{ string anchorValueClick = "";
+                            if (navigate.Name == "Chat Now")
+                            {
+                                anchorValueClick = " onclick=javascript:document.getElementById('custom-care-button').click()";
+                            }
+                            }
+               <div class="col-md-6 col-sm-6 karabo-img" style=" display: grid; align-items: center; align-content: center; height: 600px;">
+                    <div class="vertical-align-c" style="padding: 0px 0px 0px 15%;">
+                <strong style="text-align: left;font: normal normal bold 29px Montserrat;letter-spacing: 0px;color: #002B60;opacity: 1;"> @applyDocs.Value("cardTitle")</strong>
+                <div class="margin-top-40" style="margin-bottom: 10px;">
+                                           <a  @anchorValueClick class="button primary"> @navigate.Name</a>
+                                        </div>
+                                   <div class="col-md-12 col-sm-12 hidden-xs"> <strong> @applyDocs.Value("cardDescriptionLongText")</strong>
+                                     </div> 
+                                </div>
+                                </div>
+                                  <div class="col-sm-6 col-md-6 " style="text-align: center; ">
+                                <img  class="robot-img " style="height:600px" " src="@cardUrl"  / >
+                                 </div>
+                                
+    </div>
+     <div class="check-class-name">
+        <div class="inner-check">
+             @Html.Raw(@heroBody.Value("richTextBox"))
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <a class="button primary span-buttons audacious-reward-btn " href="/media/mfxnk5f0/swatchpay-faqs.pdf" target="_blank">Swatch Pay FAQs</a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    @*Global site tag (gtag.js) - Google Analytics*@
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-21394042-6"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+       gtag('config', 'UA-21394042-6', { 'optimize_id': 'GTM-T7N9LBL' });
+    </script>
+
+                                            @*CALL BACK FORM*@
+    @{
+        var _floatingFormViewModel = children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+         @*   @Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)*@
+		
+    }
+    @section scripts
+   {
+        <script type="text/javascript">
+            $(".internet-banking-row:even").css("background", "#FFFFFF 0% 0% no-repeat padding-box");
+            $(".internet-banking-row:odd").css("background", "#F6F6F6 0% 0% no-repeat padding-box");
+            $(".borderbottom:even").css("background", "#FFFFFF 0% 0% no-repeat padding-box");
+            $(".borderbottom:odd").css("background", "#F6F6F6 0% 0% no-repeat padding-box");
+            
+            $(document).ready(function () {
+                var imageBgCss = "url('" + "@headerImage_large" + "')";
+                var imageMdCss = "url('" + "@headerImage_medium" + "')";
+                var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_medium : headerImage_small)" + "')";
+                var CheckScreenSize;
+                (CheckScreenSize = function () {
+                    var _width = $(window).outerWidth();
+                    var _height = $(window).outerHeight();
+                    if (_width <= 511) {
+                        $("#heroHeader").css("background-image", imageSmCss);
+                    }
+                    else {
+                        $("#heroHeader").css("background-image", imageBgCss);
+                    }
+                })();
+                $(window).resize(CheckScreenSize);
+            });
+        </script>
+    }
+</section>

@@ -1,5 +1,2008 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.BaseModernUI>
+@using CustomModels = Web.Models;
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using AcfAfricanbank.Core.Models.Forms
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
+	 var Children = Model.Children;
+	
+	 var heroShoulder = (HeroShoulderHome)Children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulderhome").FirstOrDefault();
+
+	  var herobody = Children?.Where(c => c is HeroBody).FirstOrDefault();
+	   var heroheader = Children?.Where(c => c is HeroHeader).FirstOrDefault();
+	 
+	 var headerImage_large = heroheader?.Value<IPublishedContent>("image")?.Url;
+	 var headerImage_Medium = heroheader?.Value<IPublishedContent>("imageMedium")?.Url;
+	 var headerImage_Small = heroheader?.Value<IPublishedContent>("imageSmall")?.Url;
+	  var headerImage_Last = heroheader?.Value<IPublishedContent>("video")?.Url;
+
+	  
+	  var sectioncard = herobody.Children.Where(c => c.Name == "FAQ").FirstOrDefault();
+      var sectioncardAfricanBank = sectioncard.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var sectioncards = sectioncardAfricanBank.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+      
+      var homecard = sectioncard?.Children?.Where(c => c.Name == "First Card");
+      var homecards = homecard.Select(c => c as Card).ToList();
+      
+       var applyDocs = homecards?.Select(c => c as Card).FirstOrDefault();
+       var navigate = applyDocs.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").FirstOrDefault();
+      
+       ContentModels.TabBody createOwnWorldOfBanking = null;
+      var partialName = sectioncard.Value("PartialViewName");
+      createOwnWorldOfBanking = (TabBody)sectioncard;
+      
 }
+
+    <link rel="stylesheet" href="/css/projectmagic.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <style>
+        
+          body{
+    overflow-x: hidden;
+}
+        
+            :root {
+        --color-dark: #000000;
+        --color-primary: #5DC300;
+        --color-secondary: #fff;
+        --font-color: #DDDDDD;
+        --font-light: #EEEEEE;
+        --font-paragraph-dark:#707070;
+        --card-bg: #222222;
+        --light-bg :#f2f2f2;
+        --font-blue:#5dc300;
+        --bg-color-dark:#0c0b0b;
+        
+    }
+       .download_button1 {
+            display: inline-flex;
+            align-items: center;
+            font-size: 18px;
+            text-decoration: none;
+        }
+
+        .download_button1 a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #007BFF;
+        }
+
+        .cloud-icon {
+            position: relative;
+            font-size: 24px; /* Adjust the size of the cloud icon */
+           margin-right: 30px; /* Space between icon and text */
+            display: inline-block;
+        }
+
+        .cloud-icon::before {
+            content: '☁️'; /* Unicode for cloud */
+            font-size: 24px; /* Same size as .cloud-icon */
+            position: absolute;
+           top: -20px;
+    left: 0;
+        }
+
+        .cloud-icon::after {
+            content: '↓'; /* Unicode for downwards arrow */
+            font-size: 16px; /* Adjust size of the arrow */
+            position: absolute;
+           bottom: -10px;
+    right: -20px;
+    color: black;
+        }
+
+        .download_button1 a:hover {
+            text-decoration: underline;
+            color: #0056b3;
+        }
+.download_button::after {
+    content: '\1F4E5'; /* Unicode for Package symbol */
+    font-size: 1.5em; /* Adjust size as needed */
+    margin-left: 8px; /* Optional: spacing between text and icon */
+}
+.fixed::after {
+    content: '\23E9'; /* Unicode for Package symbol */
+    font-size: 1.5em; /* Adjust size as needed */
+    margin-left: 8px; /* Optional: spacing between text and icon */
+}
+
+    .color-brand-1 {
+    color: #112768 !important;
+}
+
+.btn-app img {
+    display: block;
+    margin-bottom: 5px;
+    height: 25px !important;
+    width: 25px !important;
+}
+.btn-app  {
+font-size: small;
+}
+
+    
+.btn-app2 {
+    height: 25px;
+    filter: brightness(0) saturate(100%) invert(73%) sepia(18%) saturate(747%) hue-rotate(150deg) brightness(94%) contrast(98%);
+    transform: scale(1.2);
+}
+.mega-tabs .nav-tabs > li.loan-summary > a {
+    display: flex;
+    flex-direction: column;
+    color: #002b60;
+}
+
+.mega-tabs .nav-tabs > li.active > a, .mega-tabs .nav-tabs > li.active > a:hover, .mega-tabs .nav-tabs > li.active > a:focus {
+    color: #3BBCE2;
+    border: none;
+}
+
+.btn-app1 {
+    height: 25px;
+    filter: brightness(0) saturate(100%) invert(73%) sepia(18%) saturate(747%) hue-rotate(150deg) brightness(94%) contrast(98%);
+    transform: scale(1.2);
+}
+
+.section5 {
+    padding-top: 4%;
+    padding-bottom: 4%; 
+    background: #181c20 !important;
+    text-align: center;
+    line-height: 0.2;
+}
+
+    .section-bg-black{
+        background-color: var(--bg-color-dark);
+    }
+    .section-bg-white{
+        background-color: var(--color-secondary);
+    }
+    .section-bg-gray {
+       background-color: var(--card-bg); 
+    }
+    
+    .mega-tabs .nav-tabs > li.loan-summary > a {
+    display: flex;
+    flex-direction: column;
+    color: #002b60;
+    align-items: center;
+}
+    
+.section1-img-bg-image {
+    background-image: url('@headerImage_large');
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 90%;
+    padding: 100px 0; 
+}
+.section2-img-bg-image {
+    background-image: url('@headerImage_Medium');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 65%;
+    padding: 100px 0; 
+}
+.section3-img-bg-image {
+    display:flex;
+    background-image: url('@headerImage_Small');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    <!--height: 100%;-->
+    <!--padding: 100px 0;-->
+    justify-content: flex-start;
+    align-content: space-between;
+    flex-wrap: wrap;
+}
+.section4-img-bg-image {
+    display:flex;
+    background-image: url('@headerImage_Last');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100%;
+    padding: 100px 0;
+    justify-content: flex-start;
+    align-content: space-between;
+    flex-wrap: wrap;
+}
+
+
+
+footer .footer-social {
+    width: 48px;
+    height: 48px;
+    border-radius: 4px;
+    background-color: #000000;
+    border: solid 1px #ffffff;
+    box-shadow: 0 2px 1px 0 rgba(0, 0, 0, 0.03);
+    color: #ffffff;
+    padding: 15px;
+    margin-left: 10px;
+    text-align: center;
+    font-size: 18px;
+}
+
+footer .footer-copyright {
+    border-top: 1px solid #fff;
+    font-size: 9px;
+    margin-top: 60px;
+    padding-top: 30px;
+}
+
+
+footer{
+    background-color: black !important;
+}
+
+.color-brand-1{
+    color: #fff !important;
+}
+
+.color-brand-2{
+    font-size: 20px !important;
+}
+
+.color-brand-3{
+    font-size: 17px; !important;
+}
+
+
+.ab-business-cards {
+    min-height: 180;
+    color: #002963;
+    margin-bottom: 10px;
+    width: 215px;
+    padding: 8px;
+    left: 3%;
+    background: #222222;
+    border-radius: 25px;
+    padding: 25px;
+    color: #fff;
+    cursor: pointer;
+    text-align: center;
+}
+
+.ab-cards {
+    margin-top: 4%;
+    width: 30%;
+}
+
+
+
+.scroll-cards{
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+.ab-cards {
+    margin-bottom: 20px; /* Adjust as needed for vertical spacing */
+}
+
+.ab-business-cards {
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ab-business-cards .title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.ab-business-cards .descr {
+    font-size: 15px;
+    margin-top: 10px;
+}
+
+.ab-business-cards .button {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 20px;
+    color: #fff;
+    background-color: #5dc300;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.ab-business-cards .button:hover {
+    background-color: #4ba000;
+}
+
+.button {
+    background-color: #002b60;
+}
+
+.btn.btn-brand-1{
+    background:#00A7D6 0% 0% !important;
+}
+
+.btn-app1 {
+    filter: brightness(0) saturate(100%) invert(56%) sepia(50%) saturate(2870%) hue-rotate(55deg) brightness(105%) contrast(101%);
+    transform: scale(1.2);
+}
+
+@@media (min-width: 992px) {
+    .col-md-offset-1 {
+         margin-left: 0%; 
+    }
+}
+
+.2section{
+    margin-left:20px !important;
+}
+
+/* Section-5/Accordion style start here*/
+               .accordion {
+                 font-weight: bold; /* Explicitly setting font-weight */
+                 font-family: Montserrat, sans-serif; /* Specifying the font family */
+                 background-color: #222222;
+                 color: #9b9b9b;
+                 cursor: pointer;
+                 padding: 18px;
+                 width: 100%;
+                 text-align: left;
+                 font-size: 15px;
+                 transition: 0.4s;
+                 border-radius: 50px;
+                 border: none;
+                 margin-bottom: 10px; /* Space between inactive accordion buttons */
+                 position: relative; /* Needed for absolute positioning of the arrow */
+               }
+               
+               .accordion::after {
+                 content: '\276F'; /* Heavy Chevron Unicode character */
+                 font-size: 15px; /* Adjust as needed */
+                 color: #F9F9F9;
+                 position: absolute;
+                 right: 20px;
+                 top: 50%;
+                 transform: translateY(-50%);
+                 transition: transform 0.4s;
+               }
+               
+              
+               
+               .active {
+                 color: #F9F9F9;
+                 border-radius: 30px 30px 0 0; /* Rounded corners on the top when active */
+                 margin-bottom: 0; /* Remove space between button and panel for active accordion */
+               }
+               
+               .active::after {
+                 transform: translateY(-50%) rotate(90deg);
+               }
+               
+               .panel {
+                 font-family: Montserrat, sans-serif; /* Specifying the font family */
+                 padding:  18px 18px 25px 18px;
+                 background-color: #222222;
+                 color : #F9F9F9;
+                 display: none;
+                 overflow: hidden;
+                 border-radius: 0 0 30px 30px;; /* Round the bottom corners */
+                 border-top: none; /* Remove the border top to make it seamless with the button */
+                 margin-top: -1px; /* This ensures that the panel sits flush with the button */
+                 box-shadow: inset 0 3px 6px #222222; /* Optional: inner shadow to mimic the button's inset */
+               }
+               
+                 .faqHeader {
+                   font: normal normal bold 42px/52px Montserrat;
+                   letter-spacing: 0px;
+                   color: #F9F9F9;
+                   opacity: 1;
+                   margin: 0 auto; /* This ensures that the margin is auto on both sides for block-level centering */
+                   padding: 20px 0; /* Adds some padding above and below the text */
+                 }
+               /*
+               Accordion style end here
+               */
+               
+               
+               .font-black{
+      color: #000 !important;
+}
+
+.font-white {
+    color:var(--color-secondary) !important;
+}
+
+.tab-category {
+    font-weight: bold;
+    text-align: left;
+}
+
+.section6{
+    text-align: center;
+}
+
+
+.ab-business-cards .combo-btn .column1 .btn.btn-brand-1 {
+    min-width: 150px !important;
+    height: 40px !important;
+    padding: 10px 0 !important;
+    font-size: 12px !important;
+    left: 14px;
+    position: relative;
+             
+}
+
+.ab-business-cards .combo-btn .column1 .combo-btn-text::after {
+    font-size: 14px !important;
+    right: 6px !important;
+} 
+
+.table > tbody > tr.green > td {
+    color: #000 !important;
+  
+}
+@@media (min-width: 992px) {
+    .ab-cards {
+        margin-right: 20px; /* Adjust as needed for horizontal spacing */
+    }
+    .ab-cards:last-child {
+        margin-right: 0; /* Remove margin from the last card */
+    }
+}
+
+
+@*new styles*@
+.mega-tabs .nav-tabs > li.loan-summary {
+    width: 50%;
+    }
+    .mega-tabs .nav-tabs>li.active:after{
+        transform:none;
+    }
+    
+    .mega-tabs .nav-tabs>li.active{
+      border-radius: 0px 0px 0 0;
+    }
+    
+    @@media (max-width: 767px) {
+    
+    .mega-tabs.hidden-lg.hidden-md.hidden-sm {
+    
+    margin-bottom: 60px;
+    text-align: center;
+    font-size: 16px;
+    position: relative;
+    z-index: 10;
+    margin-left: -20px;
+    margin-right: -20px;
+    overflow-y: scroll;
+     }
+}
+@*new end styles*@
+    </style>
+
+@* the fun starts here 
+
+ @Html.Partial("_pageModernHeaderv2", heroheader as ContentModels.HeroHeader)
+        <!--banner section-->
+ *@       
+<section class="section-500 section-bg-black section1-img-bg-image">
+    <div class="container">
+        <div class="row align-items-center flex-row-reverse d-flex row-change md-text-center">
+             @if (homecards!= null && homecards.Any())
+            {
+                foreach (Card benefit in homecards)
+                {
+                <div class="col-xl-6 col-lg-6 col-md-6">
+                    <div><p class="font-white">@benefit.CardDescriptionLongText</div>
+                    <!--<p class="mt-20 font-white">We consider each customer’s needs and circumstances when tailor-making a solution.</p>-->
+                                        
+                </div>
+                 <div class="col-xl-6 col-lg-6 col-md-6">
+                    <img class="d-block" style="width: 400px;" src="@benefit.CardIcon.Url" alt="">
+                </div>
+                }
+                }
+        </div>
+    </div>
+</section>
+        
+@{
+
+ string getTabName(string TabId) {
+            string tabName = "";
+            switch(TabId) {
+                case "1" :
+                tabName = "CallDeposits";
+                break;
+                case "2" :
+                tabName = "PrimeTimeNoticeDeposits";
+                break;
+                case "3" :
+                tabName = "FlexiNoticeDeposits";
+                break;
+                 case "4" :
+                tabName = "Fixeddeposits";
+                break;
+            }
+        
+            return tabName;
+            
+        }
+}
+
+@{
+    
+    if (heroShoulder != null)
+    {
+        <div class="loan-summary-container">
+            <div class="container">
+                <div class="mega-tabs" style="margin-top:0px;">
+                    <!-- Nav tabs -->
+                    <ul id="go_to_tab_content" class="nav nav-tabs eq-height" role="tablist">
+                        @{
+                            var isFirstRow = true;
+                            foreach (var item in heroShoulder.Items)
+                            {
+                                var tab = (HomeShoulderItem)item;
+                                <li role="presentation" class="@(isFirstRow ? "active" : "") loan-summary " onclick="handleClick(@tab.TabName)">
+                                
+                                    <a href="#@getTabName(tab.TabId.Replace(" ", ""))" aria-controls="profile " role="tab" data-toggle="tab">
+                                        <img loading="lazy" src="@tab.TabIcon.Url" width="36" alt="@tab.TabIcon.Value("altTag")" class="btn-app2"/> <span class="hidden-xs">@tab.TabName</span>
+                                    </a>
+                                </li>
+                                isFirstRow = false;
+                            }
+                        }
+                    </ul>
+                </div>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                                    @{
+                                        bool isFirstTab = true;
+                                        foreach (HomeShoulderItem tab in heroShoulder.Items)
+                                        {
+                                            <div role="tabpanel" class="tab-pane @(isFirstTab ? "active" : "")" id="@getTabName(tab.TabId.Replace(" ", "").Replace(",", "").Replace("%",""))">
+                                                   @{
+                                                    var item2 = tab.Value<IEnumerable<IPublishedElement>>("tabBodyContent").FirstOrDefault();
+                                                    }
+                                                    @if (item2 != null)
+                                                    {
+                                                    
+                                                     var data = item2.Value<IEnumerable<IPublishedElement>>("sectionContent");
+                                                            
+                                                                foreach (var item in data)
+                                                                {
+                                        <div class="container">
+                                           <div class="row d-flex align-items-center row-change reverse-row md-text-center">
+                                                  
+                                                    
+                                                <div class="col-xl-7 col-lg-7 col-md-7">
+                                                
+                                                  <div class="tab-category font-black" style="display:block">
+                                                    @Html.Raw(item.Value("nCcardTitle"))
+                                                  </div>
+                                                  <p class="font-md"> @Html.Raw(item.Value("nCcardDescription"))</p>
+                            
+                                                        <div class="row">
+                                                            <div class="col-xl-6 col-lg-6 col-md-6">
+                                                               @Html.Raw(item.Value<string>("mediumDescription"))
+                                                            </div>
+                                                            
+                                                            <div class="col-xl-6 col-lg-6 col-md-6">
+                                                                <div class="mt-30 mb-30 inline-checklist">
+                                                                    <ul class="list-ticks list-ticks-2">
+                                                                
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                           
+                                                 
+                                                </div>
+                                               
+                                                <div class="col-xl-5 col-lg-5 col-md-5">
+                                                   <img class="d-block" src="/media/ubajaxnv/productbanner_image.png" alt="">
+                                                </div>
+                                               
+                                            </div>
+                                        </div>
+                                         <section class="col-xl-12 col-lg-12 col-md-12 pt-45 pb-45">
+                                                                
+                                                                   <div class="campaign-product-container full">
+                                                                          <!--START Ebankit-change rates-->
+                                                                        <script type="text/javascript">
+                                                                           
+                                                                        </script>
+                                                                        <div class="ajax-form-success ajax-alert alert alert-success square errorrates" style="display: none;">NoDictionary:[ErrorRates]</div>
+                                                                            <section id="rates-form-preloader" style="display: none;">
+                                                                                <div class="loader" id="loader-rates-form-preloader">
+                                                                                    <div class="loader-img"></div>
+                                                                                </div>
+                                                                            </section>
+                                                                            <div id="rates-container">
+                                                                    
+                                                                                @Html.Raw(item.Value("nClongDescription"))
+                                                                    
+                                                                            </div>
+                                                                 
+                                                                        </div>
+                                                                
+                                                             </section>
+                                               
+   }
+   }
+                                          </div>
+                                            isFirstTab = false;
+                                        }
+                                    }
+                                </div>
+            </div>
+        </div>
+    }
+    }
+    
+   
+    
+@*new code
+
+
+
+        
+            <div class="loan-summary-container">
+            <div class="container">
+                <div class="mega-tabs" style="margin-top:0px;">
+                    <!-- Nav tabs -->
+                    <ul id="go_to_tab_content" class="nav nav-tabs eq-height" role="tablist">
+                                <li role="presentation" class="loan-summary active">
+                                    <a class="btn-app" href="#loans" aria-controls="profile " role="tab" data-toggle="tab" aria-expanded="true">
+        
+                                         <img src="/media/fb0ou2kp/bank-icon.svg" alt="" class="btn-app1">
+                                        <span class="hidden-xs">Call Deposits</span>
+                                    </a>
+                                </li>
+                                <li class="btn-app" role="presentation" class="loan-summary">
+                                    <a href="#banking" aria-controls="profile " role="tab" data-toggle="tab" aria-expanded="false">
+                                        <img src="/media/fb0ou2kp/bank-icon.svg" alt="" class="btn-app1">
+                                        <span class="hidden-xs">Prime-Time Notice Deposits</span>
+                                    </a>
+                                </li>
+                                <li class="btn-app" role="presentation" class="loan-summary">
+                                    <a href="#saveAndInvest" aria-controls="profile " role="tab" data-toggle="tab" aria-expanded="false">
+                                        <img src="/media/fb0ou2kp/bank-icon.svg" alt="" class="btn-app1">
+                                        <span class="hidden-xs">Flexi Notice Deposits</span>
+                                    </a>
+                                </li>
+                                <li class="btn-app" role="presentation" class="loan-summary">
+                                    <a href="#fixedDeposits" aria-controls="profile " role="tab" data-toggle="tab" aria-expanded="false">
+                                        <img src="/media/fb0ou2kp/bank-icon.svg" alt="" class="btn-app1"> <span class="hidden-xs">Fixed deposits</span>
+                                    </a>
+                                </li>
+                                
+                                
+
+                    </ul>
+                </div>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="loans">
+                             
+                    <div class="container">
+                  <div class="row d-flex align-items-center row-change reverse-row md-text-center">
+                    <div class="col-xl-7 col-lg-7 col-md-7">
+                      <h1 class="color-brand-1 mt-15 mb-20 font-black">
+                        Call Deposits
+                      </h1>
+                      <p class="font-md color-brand-1 font-black">A Call Deposit account enables you to invest your cash at an attractive interest rate. The benefit of a Call Deposit account is that additional deposits can be added at any time and your funds are available on request, with no penalties</p>
+
+                        <div class="row">
+                        <div class="col-xl-6 col-lg-6 col-md-6">
+                        <div class="mt-30 mb-30 inline-checklist">
+                        <ul class="list-ticks list-ticks-2 ">
+                        <li><strong>A discretionary minimum deposit amount of R50 000 is required for Call Deposits</strong></li>
+                        <li><strong>Interest earned on a Call Deposit account can either be paid to your bank account or capitalised</strong></li>
+                        <li><strong>NO BANK CHARGES or FEES are levied on our cash deposit products</strong></li>
+                     
+                        </ul>
+                        </div>
+                        </div>
+                        <div class="col-xl-6 col-lg-6 col-md-6">
+                        <div class="mt-30 mb-30 inline-checklist">
+                        <ul class="list-ticks list-ticks-2">
+                    
+                        </ul>
+                        </div>
+                        </div>
+                        </div>
+                     
+                    </div>
+                            <div class="col-xl-5 col-lg-5 col-md-5">
+                               <img class="d-block" src="/media/ubajaxnv/productbanner_image.png" alt="">
+                            </div>
+                  </div>
+                </div>
+                    <section class="pt-45 pb-45">
+                        <div class="container">
+    <div class="campaign-product-container full">
+        <!--START Ebankit-change rates-->
+        <script type="text/javascript">
+           
+        </script>
+        <div class="ajax-form-success ajax-alert alert alert-success square errorrates" style="display: none;">NoDictionary:[ErrorRates]</div>
+        <section id="rates-form-preloader" style="display: none;">
+            <div class="loader" id="loader-rates-form-preloader">
+                <div class="loader-img"></div>
+            </div>
+        </section>
+        <div id="rates-container">
+
+            <div id="rates-container">
+
+                <h3 class="text-center">CALL DEPOSITS BENEFITS</h3>
+
+                <div class="table-responsive">
+
+                    <table class="table no-margin">
+
+                        <thead class="rates-header">
+
+                            <tr>
+
+                                <th class="column_rates">
+
+                                    <span class="ab-vertical-align">Period</span>
+
+                                </th>
+
+                                <th class="column_rates">
+
+                                    <span class="ab-vertical-align">NACM</span>
+
+                                </th>
+
+                                <th class="column_rates">
+
+                                    <span class="ab-vertical-align">Yield</span>
+
+                                </th>
+
+                                <th class="column_rates">
+
+                                    <span class="ab-vertical-align">Annual Effective</span>
+
+                                </th>
+
+                          
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody class="rates-rows">
+
+
+                            <tr class="green">
+
+                                <th scope="row">Call</th>
+
+                                <td>8.00%</td>
+
+                                <td>8.00%</td>
+
+                                <td>8.30%</td>
+
+                            
+
+                            </tr>
+
+
+                            <!--<tr class="green">-->
+
+                            <!--    <th scope="row">6 Months</th>-->
+
+                            <!--    <td>8.99%</td>-->
+
+                            <!--    <td>9.36%</td>-->
+
+                            <!--    <td>9.16%</td>-->
+
+                            <!--    <td>9.16%</td>-->
+
+                            <!--</tr>-->
+
+
+                            <!--<tr class="green">-->
+
+                            <!--    <th scope="row">12 Months</th>-->
+
+                            <!--    <td>9.00%</td>-->
+
+                            <!--    <td>9.38%</td>-->
+
+                            <!--    <td>9.17%</td>-->
+
+                            <!--    <td>9.38%</td>-->
+
+                            <!--</tr>-->
+
+
+                            <!--<tr class="green">-->
+
+                            <!--    <th scope="row">24 Months</th>-->
+
+                            <!--    <td>11.00%</td>-->
+
+                            <!--    <td>11.57%</td>-->
+
+                            <!--    <td>11.25%</td>-->
+
+                            <!--    <td>12.24%</td>-->
+
+                            <!--</tr>-->
+
+
+                            <!--<tr class="green">-->
+
+                            <!--    <th scope="row">36 Months</th>-->
+
+                            <!--    <td>9.44%</td>-->
+
+                            <!--    <td>9.85%</td>-->
+
+                            <!--    <td>9.62%</td>-->
+
+                            <!--    <td>10.86%</td>-->
+
+                            <!--</tr>-->
+
+
+                            <!--<tr class="green">-->
+
+                            <!--    <th scope="row">60 Months</th>-->
+
+                            <!--    <td>8.20%</td>-->
+
+                            <!--    <td>8.51%</td>-->
+
+                            <!--    <td>8.34%</td>-->
+
+                            <!--    <td>10.09%</td>-->
+
+                            <!--</tr>-->
+
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+         
+    </div>
+</div>
+                    </section>
+              
+            </div>
+                    <div role="tabpanel" class="tab-pane" id="banking">
+                               <div class="container">
+                  <div class="row d-flex align-items-center row-change reverse-row md-text-center">
+                    <div class="col-xl-7 col-lg-7 col-md-7">
+                      <h1 class="color-brand-1 mt-15 mb-20 font-black">
+                        Prime-Time Notice Deposits
+                      </h1>
+                      <p class="font-md color-brand-1 font-black">A Prime-Time Deposit account allows you to deposit funds for a specified investment term with an interest rate linked to the current Prime Rate</p>
+
+                        <div class="row">
+                        <div class="col-xl-6 col-lg-6 col-md-6">
+                        <div class="mt-30 mb-30 inline-checklist">
+                        <ul class="list-ticks list-ticks-2 ">
+                        <li><strong>A discretionary minimum deposit amount of R50 000 is required for Prime-Time deposits</strong></li>
+                        <li><strong>Interest earned on a Prime-Time Deposit account can either be paid to your bank account or capitalised</strong></li>
+                        <li><strong>NO BANK CHARGES or FEES are levied on our cash deposit products</strong></li>
+                     
+                        </ul>
+                        </div>
+                        </div>
+                        <div class="col-xl-6 col-lg-6 col-md-6">
+                        <div class="mt-30 mb-30 inline-checklist">
+                        <ul class="list-ticks list-ticks-2">
+                    
+                        </ul>
+                        </div>
+                        </div>
+                        </div>
+                   
+                    </div>
+                            <div class="col-xl-5 col-lg-5 col-md-5">
+                               <img class="d-block" src="/media/ubajaxnv/productbanner_image.png" alt="">
+                            </div>
+                  </div>
+                </div>
+                                <section class="pt-45 pb-45">
+                        <div class="container">
+    <div class="campaign-product-container full">
+        <!--START Ebankit-change rates-->
+        <script type="text/javascript">
+           
+        </script>
+        <div class="ajax-form-success ajax-alert alert alert-success square errorrates" style="display: none;">NoDictionary:[ErrorRates]</div>
+        <section id="rates-form-preloader" style="display: none;">
+            <div class="loader" id="loader-rates-form-preloader">
+                <div class="loader-img"></div>
+            </div>
+        </section>
+        <div id="rates-container">
+
+            <div id="rates-container">
+
+                <h3 class="text-center">TABLE OF RATES (UPDATE:16 July 2024)</h3>
+
+                <div class="table-responsive">
+
+                    <table class="table no-margin">
+
+                        <thead class="rates-header">
+
+                            <tr>
+
+                                <th class="column_rates">
+
+                                    <span class="ab-vertical-align">Period</span>
+
+                                </th>
+
+                                <th class="column_rates">
+
+                                    <span class="ab-vertical-align">NACM</span>
+
+                                </th>
+
+                                <th class="column_rates">
+
+                                    <span class="ab-vertical-align">Yield</span>
+
+                                </th>
+
+                                <th class="column_rates">
+
+                                    <span class="ab-vertical-align">Annual Effective</span>
+
+                                </th>
+
+                          
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody class="rates-rows">
+
+
+                            <tr class="green">
+
+                                <th scope="row">1 Week</th>
+
+                                <td>8.15%</td>
+
+                                <td>8.15%</td>
+
+                                <td>8.86%</td>
+
+                            
+
+                            </tr>
+
+
+                            <tr class="green">
+
+                                <th scope="row">2 Weeks</th>
+
+                                <td>8.30%</td>
+
+                                <td>8.30%</td>
+
+                                <td>8.62%</td>
+
+
+                            </tr>
+
+
+                            <tr class="green">
+
+                                <th scope="row">3 Weeks</th>
+
+                                <td>8.40%</td>
+
+                                <td>8.40%</td>
+
+                                <td>8.73%</td>
+
+                            </tr>
+
+
+                            <tr class="green">
+
+                                <th scope="row">1 Month</th>
+
+                                 <td>8.50%</td>
+
+                                <td>8.50%</td>
+
+                                <td>8.84%</td>
+
+                            </tr>
+
+
+                            <tr class="green">
+
+                                <th scope="row">2 Months</th>
+
+                                <td>8.52%</td>
+
+                                <td>8.55%</td>
+
+                                <td>8.86%</td>
+
+                            </tr>
+
+
+                            <tr class="green">
+
+                                <th scope="row">3 Months</th>
+
+                                <td>8.54%</td>
+
+                                <td>8.55%</td>
+
+                                <td>8.86%</td>
+
+                   
+
+                            </tr>
+                            
+                            <tr class="green">
+
+                                <th scope="row">3 Months</th>
+
+                                <td>8.54%</td>
+
+                                <td>8.55%</td>
+
+                                <td>8.86%</td>
+
+                   
+
+                            </tr>
+                            
+                            <tr class="green">
+
+                                <th scope="row">4 Months</th>
+
+                                <td>8.56%</td>
+
+                                <td>8.65%</td>
+
+                                <td>8.90%</td>
+
+                   
+
+                            </tr>
+                            
+                            <tr class="green">
+
+                                <th scope="row">5 Months</th>
+
+                                <td>8.63%</td>
+
+                                <td>8.75%</td>
+
+                                <td>8.98%</td>
+
+                   
+
+                            </tr>
+                            
+                             <tr class="green">
+
+                                <th scope="row">6 Months</th>
+
+                                <td>8.64%</td>
+
+                                <td>8.80%</td>
+
+                                <td>8.99%</td>
+
+                   
+
+                            </tr>
+                            
+                             <tr class="green">
+
+                                <th scope="row">6 Months</th>
+
+                                <td>8.64%</td>
+
+                                <td>8.80%</td>
+
+                                <td>8.99%</td>
+
+                   
+
+                            </tr>
+                            
+                             <tr class="green">
+
+                                <th scope="row">7 Months</th>
+
+                                <td>8.66%</td>
+
+                                <td>8.85%</td>
+
+                                <td>9.01%</td>
+
+                   
+
+                            </tr>
+                            
+                            
+                             <tr class="green">
+
+                                <th scope="row">8 Months</th>
+
+                                <td>8.65%</td>
+
+                                <td>8.88%</td>
+
+                                <td>9.00%</td>
+
+                   
+
+                            </tr>
+                            
+                             <tr class="green">
+
+                                <th scope="row">9 Months</th>
+
+                                <td>8.65%</td>
+
+                                <td>8.90%</td>
+
+                                <td>9.00%</td>
+
+                   
+
+                            </tr>
+                            
+                            <tr class="green">
+
+                                <th scope="row">10 Months</th>
+
+                                <td>8.66%</td>
+
+                                <td>8.95%</td>
+
+                                <td>9.01%</td>
+
+                   
+
+                            </tr>
+                            
+                             <tr class="green">
+
+                                <th scope="row">11 Months</th>
+
+                                <td>8.68%</td>
+
+                                <td>9.00%</td>
+
+                                <td>9.03%</td>
+
+                   
+
+                            </tr>
+                            
+                               <tr class="green">
+
+                                <th scope="row">12 Months</th>
+
+                                <td>8.69%</td>
+
+                                <td>9.05%</td>
+
+                                <td>9.04%</td>
+
+                   
+
+                            </tr>
+                               <tr class="green">
+
+                                <th scope="row">18 Months</th>
+
+                                <td>8.93%</td>
+
+                                <td>9.52%</td>
+
+                                <td>9.30%</td>
+
+                   
+
+                            </tr>
+                            <tr class="green">
+
+                                <th scope="row">24 Months</th>
+
+                                <td>8.93%</td>
+
+                                <td>9.74%</td>
+
+                                <td>9.30%</td>
+
+                   
+
+                            </tr>
+                            
+                            <tr class="green">
+
+                                <th scope="row">36 Months</th>
+
+                                <td>8.98%</td>
+
+                                <td>10.26%</td>
+
+                                <td>9.36%</td>
+
+                   
+
+                            </tr>
+
+
+
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+        
+    </div>
+</div>
+                    </section>
+                                <div class="margin-top-80 hidden-xs"></div>
+                            </div>
+                    <div role="tabpanel" class="tab-pane" id="saveAndInvest">
+                                <div class="container">
+                  <div class="row d-flex align-items-center row-change reverse-row md-text-center">
+                    <div class="col-xl-7 col-lg-7 col-md-7">
+                      <h1 class="color-brand-1 mt-15 mb-20 font-black">
+                        Flexi Notice Deposits
+                      </h1>
+                      <p class="font-md color-brand-1 font-black">A Flexi Notice Deposit account allows you to deposit funds for a specified investment term with an interest rate linked to the current Prime Rate</p>
+
+                        <div class="row">
+                        <div class="col-xl-6 col-lg-6 col-md-6">
+                        <div class="mt-30 mb-30 inline-checklist">
+                        <ul class="list-ticks list-ticks-2 ">
+                        <li><strong>A discretionary minimum deposit amount of R250 000 is required for Flexi Notice Deposits</strong></li>
+                        <li><strong>Interest earned on a Flexi Notice Deposit account can either be paid to your bank account or capitalised</strong></li>
+                        <li><strong>NO BANK CHARGES or FEES are levied on our cash deposit products</strong></li>
+                     
+                        </ul>
+                        </div>
+                        </div>
+                        <div class="col-xl-6 col-lg-6 col-md-6">
+                        <div class="mt-30 mb-30 inline-checklist">
+                        <ul class="list-ticks list-ticks-2">
+                    
+                        </ul>
+                        </div>
+                        </div>
+                        </div>
+                  
+                    </div>
+                            <div class="col-xl-5 col-lg-5 col-md-5">
+                               <img class="d-block" src="/media/ubajaxnv/productbanner_image.png" alt="">
+                            </div>
+                  </div>
+                </div>
+                <section class="pt-45 pb-45">
+                        <div class="container">
+                <div class="campaign-product-container full">
+        <!--START Ebankit-change rates-->
+        <script type="text/javascript">
+           
+        </script>
+        <div class="ajax-form-success ajax-alert alert alert-success square errorrates" style="display: none;">NoDictionary:[ErrorRates]</div>
+        <section id="rates-form-preloader" style="display: none;">
+            <div class="loader" id="loader-rates-form-preloader">
+                <div class="loader-img"></div>
+            </div>
+        </section>
+         <div id="rates-container">
+
+            <div id="rates-container">
+
+                <h3 class="text-center"></h3>
+
+                <div class="table-responsive">
+
+                    <table class="table no-margin">
+
+                        <thead class="rates-header">
+
+                            <tr>
+
+                                <th class="column_rates">
+
+                                    <span class="ab-vertical-align">Product</span>
+
+                                </th>
+
+                                <th class="column_rates">
+
+                                    <span class="ab-vertical-align">Rate NACM</span>
+
+                                </th>
+                                <th class="column_rates">
+
+                                    <span class="ab-vertical-align">Yield</span>
+
+                                </th>
+
+                                <th class="column_rates">
+
+                                    <span class="ab-vertical-align">Annual Effective</span>
+
+                                </th>
+
+                                <th class="column_rates">
+
+                                    <span class="ab-vertical-align">Fact Sheet & Product Rules</span>
+
+                                </th>
+
+                          
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody class="rates-rows">
+                                <tr class="green">
+                                    <td scope="row">32 Day Prime-Time Notice Deposit</td>
+                                    <td >8.75%</td>
+                                    <td ></td>
+                                    <td >9.11%</td>
+                                    <td  class="download_button">
+                                        <a href="/DBFile/Files/ee989f9e-cdaa-4921-afa0-634b5fdd4e63/Document">
+                                            <i class="fa fa-download" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr class="green">
+                                    <td scope="row">63 Day Prime-Time Notice Deposit</td>
+                                    <td >8.90%</td>
+                                    <td ></td>
+                                    <td >9.27%</td>
+                                    <td  class="download_button">
+                                        <a href="/DBFile/Files/fb136e41-2460-49f4-a2bb-823657f82263/Document">
+                                            <i class="fa fa-download" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr class="green">
+                                    <td scope="row">91 Day Prime-Time Notice Deposit</td>
+                                    <td >9.05%</td>
+                                    <td ></td>
+                                    <td >9.43%</td>
+                                    <td  class="download_button">
+                                        <a href="/DBFile/Files/b60387f0-7fe3-4055-b5e8-30ec8bb55519/Document">
+                                            <i class="fa fa-download" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr class="green">
+                                    <td scope="row">126 Day Prime-Time Notice Deposit</td>
+                                    <td >9.20%</td>
+                                    <td ></td>
+                                    <td >9.60%</td>
+                                    <td  class="download_button">
+                                        <a href="/DBFile/Files/52097172-14df-4c75-9dc9-947303f3de86/Document">
+                                            <i class="fa fa-download" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr class="green">
+                                    <td scope="row">182 Day Prime-Time Notice Deposit</td>
+                                    <td >9.50%</td>
+                                    <td ></td>
+                                    <td >9.92%</td>
+                                    <td  class="download_button">
+                                        <a href="/DBFile/Files/7c4bfcfb-4018-4e51-a6f2-c764de65b13e/Document">
+                                            <i class="fa fa-download" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr class="green">
+                                    <td scope="row">365 Day Prime-Time Notice Deposit</td>
+                                    <td >9.75%</td>
+                                    <td ></td>
+                                    <td >10.20%</td>
+                                    <td  class="download_button">
+                                        <a href="/DBFile/Files/9c13cc66-b655-4767-b454-945c182ab534/Document">
+                                            <i class="fa fa-download" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+          
+          
+    </div>
+</div>
+                    </section>
+                                <div class="margin-top-80 hidden-xs"></div>
+                            </div>
+                    <div role="tabpanel" class="tab-pane " id="fixedDeposits">
+                                <div class="container">
+                  <div class="row d-flex align-items-center row-change reverse-row md-text-center">
+                    <div class="col-xl-7 col-lg-7 col-md-7">
+                      <h1 class="color-brand-1 mt-15 mb-20 font-black">
+                        Fixed deposits
+                      </h1>
+                      <p class="font-md color-brand-1 font-black">A Fixed Deposit account allows you to invest funds for a specific period, with a pre-determined interest rate that does not fluctuate during the duration of your investment</p>
+
+                        <div class="row">
+                        <div class="col-xl-6 col-lg-6 col-md-6">
+                        <div class="mt-30 mb-30 inline-checklist">
+                        <ul class="list-ticks list-ticks-2 ">
+                        <li><strong>We reserve the right to cap these products at our sole discretion. Minimum Investment size per Prime-Time Notice Deposit product: R250 000.00 
+Maximum Investment size per Flexi Notice Deposit product: R25 million
+</strong></li>
+                      
+                     
+                        </ul>
+                        </div>
+                        </div>
+                        <div class="col-xl-6 col-lg-6 col-md-6">
+                        <div class="mt-30 mb-30 inline-checklist">
+                        <ul class="list-ticks list-ticks-2">
+                    
+                        </ul>
+                        </div>
+                        </div>
+                        </div>
+               
+                    </div>
+                            <div class="col-xl-5 col-lg-5 col-md-5">
+                               <img class="d-block" src="/media/ubajaxnv/productbanner_image.png" alt="">
+                            </div>
+                  </div>
+                </div>
+                 <div class="campaign-product-container full">
+        <!--START Ebankit-change rates-->
+        <script type="text/javascript">
+           
+        </script>
+        <div class="ajax-form-success ajax-alert alert alert-success square errorrates" style="display: none;">NoDictionary:[ErrorRates]</div>
+        <section id="rates-form-preloader" style="display: none;">
+            <div class="loader" id="loader-rates-form-preloader">
+                <div class="loader-img"></div>
+            </div>
+        </section>
+        <div id="rates-container">
+
+            <div id="rates-container">
+
+                <h3 class="text-center"></h3>
+
+                <div class="table-responsive">
+
+                    <table class="table no-margin">
+
+                        <thead class="rates-header">
+
+                            <tr>
+
+                                <th class="column_rates">
+
+                                    <span class="ab-vertical-align">Product</span>
+
+                                </th>
+
+                                <th class="column_rates">
+
+                                    <span class="ab-vertical-align">Rate NACM</span>
+
+                                </th>
+                                 <th class="column_rates">
+
+                                    <span class="ab-vertical-align">Yield</span>
+
+                                </th>
+                               
+
+                                <th class="column_rates">
+
+                                    <span class="ab-vertical-align">Annual Effective</span>
+
+                                </th>
+
+                                <th class="column_rates">
+
+                                    <span class="ab-vertical-align">Fact Sheet & Product Rules</span>
+
+                                </th>
+
+                          
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody class="rates-rows">
+                                <tr class="green">
+                                    <td scope="row">32 Day Prime-Time Notice Deposit</td>
+                                    <td >8.75%</td>
+                                    <td ></td>
+                                    <td >9.11%</td>
+                                    <td  class="download_button">
+                                        <a href="/DBFile/Files/ee989f9e-cdaa-4921-afa0-634b5fdd4e63/Document">
+                                            <i class="fa fa-download" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr class="green">
+                                    <td scope="row">63 Day Prime-Time Notice Deposit</td>
+                                    <td >8.90%</td>
+                                    <td ></td>
+                                    <td >9.27%</td>
+                                    <td  class="download_button">
+                                        <a href="/DBFile/Files/fb136e41-2460-49f4-a2bb-823657f82263/Document">
+                                            <i class="fa fa-download" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr class="green">
+                                    <td scope="row">91 Day Prime-Time Notice Deposit</td>
+                                    <td >9.05%</td>
+                                    <td ></td>
+                                    <td >9.43%</td>
+                                    <td  class="download_button">
+                                        <a href="/DBFile/Files/b60387f0-7fe3-4055-b5e8-30ec8bb55519/Document">
+                                            <i class="fa fa-download" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr class="green">
+                                    <td scope="row">126 Day Prime-Time Notice Deposit</td>
+                                    <td >9.20%</td>
+                                    <td ></td>
+                                    <td >9.60%</td>
+                                    <td  class="download_button">
+                                        <a href="/DBFile/Files/52097172-14df-4c75-9dc9-947303f3de86/Document">
+                                            <i class="fa fa-download" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr class="green">
+                                    <td scope="row">182 Day Prime-Time Notice Deposit</td>
+                                    <td >9.50%</td>
+                                    <td ></td>
+                                    <td >9.92%</td>
+                                    <td  class="download_button">
+                                        <a href="/DBFile/Files/7c4bfcfb-4018-4e51-a6f2-c764de65b13e/Document">
+                                            <i class="fa fa-download" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr class="green">
+                                    <td scope="row">365 Day Prime-Time Notice Deposit</td>
+                                    <td >9.75%</td>
+                                    <td ></td>
+                                    <td >10.20%</td>
+                                    <td  class="download_button">
+                                        <a href="/DBFile/Files/9c13cc66-b655-4767-b454-945c182ab534/Document">
+                                            <i class="fa fa-download" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+
+
+                        </tbody>
+                        <tbody  class="rates-rows">
+                            <tr class="green">
+                                    <td scope="row">Flexi Notice - 32 Days</td>
+                                    <td   >8.81%</td>
+                                    <td   ></td>
+                                    <td   >9.18%</td>
+                                    <td    class="download_button">
+                                        <a href="/DBFile/Files/8ab7a8ea-8abb-4db5-a32e-7f552110516d/Document">
+                                            <i class="fa fa-download" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            <tr class="green">
+                                    <td scope="row">Flexi - 42 Days</td>
+                                    <td   >9.00%</td>
+                                    <td   ></td>
+                                    <td   >9.38%</td>
+                                    <td    class="download_button">
+                                        <a href="/DBFile/Files/ab54a968-ec61-40d6-89f9-86a0e622040d/Document">
+                                            <i class="fa fa-download" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            <tr class="green">
+                                    <td scope="row">Flexi Notice - 91 Days</td>
+                                    <td   >9.17%</td>
+                                    <td   ></td>
+                                    <td   >9.56%</td>
+                                    <td    class="download_button">
+                                        <a href="/DBFile/Files/5c943c9c-c6a6-4ecd-bbce-167de80de830/Document">
+                                            <i class="fa fa-download" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            <tr class="green">
+                                    <td scope="row">Flexi Notice - 126 Days</td>
+                                    <td   >9.40%</td>
+                                    <td   ></td>
+                                    <td   >9.82%</td>
+                                    <td    class="download_button">
+                                        <a href="/DBFile/Files/b04225bb-4486-40ce-97c9-570488c1d804/Document">
+                                            <i class="fa fa-download" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            <tr class="green">
+                                    <td scope="row">Flexi Notice -182 Days</td>
+                                    <td   >9.64%</td>
+                                    <td   ></td>
+                                    <td   >10.07%</td>
+                                    <td    class="download_button">
+                                        <a href="/DBFile/Files/58c0f52e-90e7-40c5-8c13-d09695a7f314/Document">
+                                            <i class="fa fa-download" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+        
+    </div>
+                                <div class="margin-top-80 hidden-xs"></div>
+                            </div>
+                </div>
+            </div>
+        </div>
+        
+        *@
+      
+<section>
+    <div class="section5 row">
+
+    <div class="subsection5 col-lg-12 col-md-12 col-sm-12 col-xs-12">
+       <div class="descr">
+<p style="font-size: 25px; color: #5dc300;"><span style="font-weight: bold;">CONTACT US</span></p>
+<h3 style="line-height: 1.8;font-weight: 200;font-size: 25px;color: #ffff;" >
+    bcbinvestments@africanbank.co.za
+    </h3>
+<h3 style="font-weight: 200;font-size: 25px;color: #ffff;">0861 123 120</h3>
+</div>                 
+        
+                
+    </div>
+</div>
+    @*<div class="section5 row">
+
+                    <div class="subsection5 col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                       
+                       @Html.Raw(@herobody.Value("bodyFooterTitle"))   
+                       </div>
+                
+    </div>*@
+</section>
+            @*end home page code*@
+            
+            
+@*end new code*@
+
+@*<section class="section-500 ptb-150 section-bg-white section3-img-bg-image">
+    <div class="container">
+        <div class="row align-items-center d-flex row-change md-text-center">
+                <div class="col-xl-6 col-lg-6 col-md-6">
+                    <img class="d-block" src="/media/rsdokli5/productpage_image2.png" alt="">
+                  </div>
+                <div class="col-xl-6 col-lg-6 col-md-6">
+                    <h1 class="color-brand-1 mt-15 mb-20 color-brand-2 font-black">Why get our Business Transactional Account?</h1>
+                    <p class="font-md color-brand-1">
+                        
+                    </p>
+                    <p class="font-md color-brand-1 color-brand-3 font-black">
+                        Manage your business better with customised payment and lending 
+                        solutions, and an account you can access anytime, anywhere
+                    </p><p></p>
+                                        
+                    <div class="combo-btn">
+                    <div class="mt-50 text-start column1">
+                    <p class="combo-btn-text primary"><a href="https://ib.africanbank.co.za" class="btn  btn-brand-1 hover-up">OPEN NOW</a></p>
+                    </div>
+                    <div class="mt-50 text-start column2">
+                    <p class="combo-btn-text secondary"><a href="#myCalculator" class="btn btn-brand-secondary hover-up">VIEW FEES</a></p>
+                    </div>
+                    </div>
+                                        
+                </div>
+            </div>
+        </div>
+</section>*@
+@*<section>
+    <div class="section5 row">
+
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                       
+                        <div class="descr"><p style="font-size: 25px; color: #fbfbfb;">BUSINESS BANKING <span style="font-weight: bold;">DONE RIGHT!</span></p>
+                                <p style="color: #ffff; margin-left: 14%; margin-right: 14%; font-weight: bold;">Get Business Banking that works with African Bank. We're dedicated to supporting entrepreneurs, providing audacious, user-friendly banking solutions that foster growth and financial stability.</p></div>
+                                <div class="image">
+                                </div>
+                               
+                          <a href="https://onboarding.grindrodbank.co.za/onboardingui/#/onboardingui/sign-in?redirectURL=%2Fclient%2Fportfolio" class="button primary section5-btn"> Open Now</a>
+                   </div>
+                
+    </div>
+</section>*@
+
+@*<section class="section-6 section-800 section-bg-black section4-img-bg-image">
+        
+            <div class="container ">
+                        <h5 class="faqHeader">@createOwnWorldOfBanking.Value("partialViewClassName")</h5>
+                 
+           @foreach (var item in sectioncards)
+
+                    {
+                        var cardTitle = item.Value<string>("nCcardTitle");
+                       
+           
+                                 <button class="accordion">
+                                   @cardTitle
+                                 </button>
+                                 <div class="panel" style="display: none;">
+                                  @Html.Raw(item.Value<string>("mediumDescription"))
+                                 </div>
+                                 }
+                          
+             </div>
+    </section>*@
+<section class="section-7 section-bg-black">
+        <div class="section6">
+                 
+            <div class="row">
+                <div class=" terms col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    
+                 @Html.Raw(@herobody.Value("richTextBox"))   
+            </div>
+            
+    
+        </div>
+    </section>
+
+
+    
+<script>
+function handleClick(Name){
+    debugger;
+}
+// tapscards
+$(document).ready(function() {
+            $('.tabcard').on('click', function() {
+                var target = $(this).data('target');
+                
+                if ($(target).hasClass('active')) {
+                    $(target).removeClass('active').slideUp();
+                } else {
+                    $('.tabcontent').removeClass('active').slideUp();
+                    $(target).addClass('active').slideDown();
+                }
+            });
+        });
+
+    // Accordion 4 active tsbs Script start here
+    $(document).ready(function() {
+    // Existing code for tab functionality
+    $('.tabcard').on('click', function() {
+        var target = $(this).data('target');
+        
+        if ($(target).hasClass('active')) {
+            $(target).removeClass('active').slideUp();
+        } else {
+            $('.tabcontent').removeClass('active').slideUp();
+            $(target).addClass('active').slideDown();
+        }
+    });
+
+    // Activate the appropriate tab based on the URL hash
+    function activateTabFromHash() {
+        var hash = window.location.hash;
+
+        if (hash) {
+            // Remove 'active' class from all tabs and tab panes
+            $('.nav-tabs .active').removeClass('active');
+            $('.tab-pane.active').removeClass('active in');
+
+            // Activate the tab corresponding to the hash
+            $('a[href="' + hash + '"]').tab('show');
+            $(hash).addClass('active in');
+
+            // Scroll to the active tab
+            $('html, body').animate({
+                scrollTop: $(hash).offset().top
+            }, 300); // Adjust the duration as needed
+        }
+    }
+
+    // Run on page load
+    activateTabFromHash();
+
+    // Run on hash change
+    $(window).on('hashchange', function() {
+        activateTabFromHash();
+    });
+
+    // Accordion Script (if applicable)
+    $(".accordion").click(function() {
+        $(this).toggleClass("active");
+        var panel = $(this).next(".panel");
+        var wasOpen = panel.css("display") === "block";
+
+        $(".panel").css("display", "none");
+        $(".accordion").removeClass("active");
+
+        if (!wasOpen) {
+            panel.css("display", "block");
+            $(this).addClass("active");
+        }
+    });
+});
+   @* $(document).ready(function() {
+         var url = window.location.href;
+        var activeTab = url.substring(url.indexOf("#") + 1);
+        
+        if(url.indexOf("#") > -1){
+            
+        
+        $(".tab-pane").removeClass("active in");
+        
+       
+        $("#" + activeTab).addClass("active in");
+     
+        $('a[href="#'+ activeTab +'"]').tab('show')
+        
+        }
+        $(".accordion").click(function() {
+            // Toggle the current accordion
+            $(this).toggleClass("active");
+            
+            // Get the panel related to this accordion
+            var panel = $(this).next(".panel");
+    
+            // Check if the panel was already open
+            var wasOpen = panel.css("display") === "block";
+            
+            // Close all panels
+            $(".panel").css("display", "none");
+            $(".accordion").removeClass("active"); // Optionally remove the 'active' class from all accordions
+            
+            // If the clicked panel was not already open, open it
+            if (!wasOpen) {
+                panel.css("display", "block");
+                $(this).addClass("active"); // Optionally add 'active' class back to the clicked accordion
+            }
+        });
+    });*@
+    
+                $(document).ready(function () {
+                 
+                  var imageBgCss = "url('" + "/media/vnolspcn/pl_email_bb_op.png" + "')";
+                  var imageMdCss = "url('" + "/media/vnolspcn/pl_email_bb_op_med.gen.png" + "')";
+                  var imageSmCss = "url('" + "/media/vnolspcn/pl_email_bb_op.png" + "')";
+                  var CheckScreenSize;
+                  (CheckScreenSize = function () {
+                      
+                      var _width = $(window).outerWidth();
+                      var _height = $(window).outerHeight();
+                      if (_width <= 414) {
+                          $("#heroHeader").css("background-image", imageSmCss);
+                      }
+                      else {
+                          $("#heroHeader").css("background-image", imageBgCss);
+                      }
+                  })();
+                  $(window).resize(CheckScreenSize);
+              });
+
+            //   Accordion End here
+
+            document.addEventListener('DOMContentLoaded', () => {
+    const cards = document.querySelectorAll('.card');
+    const cardsContainer = document.querySelector('.cards-container');
+    const prevButton = document.getElementById('prev');
+    const nextButton = document.getElementById('next');
+    const pageNumbersContainer = document.getElementById('page-numbers');
+    const cardsPerPage = 3;
+    let currentPage = 0;
+    const totalPages = Math.ceil(cards.length / cardsPerPage);
+
+    function showPage(page) {
+        const start = page * cardsPerPage;
+        const end = start + cardsPerPage;
+        cards.forEach((card, index) => {
+            if (index >= start && index < end) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        prevButton.disabled = page === 0;
+        nextButton.disabled = page >= totalPages - 1;
+        updatePageNumbers();
+    }
+
+    function updatePageNumbers() {
+        pageNumbersContainer.innerHTML = '';
+        for (let i = 0; i < totalPages; i++) {
+            const pageNumber = document.createElement('button');
+            pageNumber.textContent = i + 1;
+            pageNumber.className = 'page-number';
+            if (i === currentPage) {
+                pageNumber.classList.add('active');
+            }
+            pageNumber.addEventListener('click', () => {
+                currentPage = i;
+                showPage(currentPage);
+            });
+            pageNumbersContainer.appendChild(pageNumber);
+        }
+    }
+
+    prevButton.addEventListener('click', () => {
+        if (currentPage > 0) {
+            currentPage--;
+            showPage(currentPage);
+        }
+    });
+
+    nextButton.addEventListener('click', () => {
+        if (currentPage < totalPages - 1) {
+            currentPage++;
+            showPage(currentPage);
+        }
+    });
+
+    showPage(currentPage);
+});
+</script>
+
+

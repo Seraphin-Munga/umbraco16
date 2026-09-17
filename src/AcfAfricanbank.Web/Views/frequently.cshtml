@@ -1,5 +1,396 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageManageYourAccount>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using System.Text.RegularExpressions
+@using Web.Helpers
+@using Umbraco.Core.Services;
+@using Umbraco.Core.PropertyEditors;
 @{
-	Layout = null;
+
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var Children = Model.Children;
+
+    // Get specific Children
+    var heroHeader = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+
+    var _heroBody = Children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+
+    var bodyBlurpDescription = _heroBody.Value("richTextBox");
+    var footBlurpDescription = _heroBody.Value("bodyFooterTitle");
+
+    var tabGroup = _heroBody.Children(x => x.ContentType.Alias.ToLower() == "tabgroup").FirstOrDefault();
+
+    var tabHeader = tabGroup.Children(xx => xx.ContentType.Alias.ToLower() == "tabheader").FirstOrDefault();
+
+    var tabBody = (TabBody)tabHeader.Children(cc => cc.ContentType.Alias.ToLower() == "tabbody").FirstOrDefault();
+
+    var heroChest = (HeroChestFaq)Children?.Where(c => c.ContentType.Alias.ToLower() == "herochestfaq").FirstOrDefault();
+
+    var sectionContent = (ICollection<IPublishedElement>)tabBody.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+
+    var questionGroups = sectionContent.Where(c => c.ContentType.Alias == "nCHeroBodyFaq").FirstOrDefault().Value("nCquestionGroups");
+    var dts = Services.DataTypeService;
+
+    var searchString = Request["searchstring"];
+
+    var categoriesDropdownId = 2493;
+
+    int isShowingCookie = 0;
+    var viewName = Umbraco.AssignedContentItem.Name.Replace(" ", "");
+    if (viewName == "CookiePolicy")
+    {
+        isShowingCookie = 1;
+    }
+    
+        var  faqsCard = _heroBody.Children.Where(c => c.Name == "Faqs Headers").FirstOrDefault();
+
+      var faqscardAfricanBank = faqsCard.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+
+      var faqscards = faqscardAfricanBank.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+
+   var noCampx1 = 1;
+var index= 0;
+}
+
+<link rel="stylesheet" href="/css/projectmagic.css" />
+<style>
+    
+    .filter select, .filter .input-group {
+    border: solid 1px #b3b3b3 !important;
+    border-radius: 25px;
+}
+html,body{
+    overflow-x: hidden;
+}
+.accordionStyle2.accordion .accordion-button {
+    padding: 20px 30px;
+}
+
+.input-group {
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+}
+
+.input-group-addon {
+    background-color: transparent !important;
+    border-radius: 25px !important;
+}
+#SearchKeyUp{
+   border-radius: 25px !important; 
+   box-shadow: none !important;
+}
+.form-control {
+   
+    padding: 15px 20px;
+}
+</style>
+
+ @{
+         int idIterator = 0;
+           foreach (var item in faqscards){
+               var tabSubItemImage = item.Value<IPublishedContent>
+    ("tabSubItemImage")?.Url;
+    var tabSubItemIcon = item.Value<IPublishedContent>
+        ("tabSubItemIcon")?.Url;
+        var title = item.Value<string>
+            ("tabSubItemTitle");
+            var description = item.Value<string>
+                ("genericCardContent");
+
+
+                List<Umbraco.Web.Models.Link>
+                    itemLink = new List<Umbraco.Web.Models.Link>
+                        ();
+
+                        foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>
+                            )item.Value("tabSubItemLinks"))
+                            {
+                            itemLink.Add(link);
+
+                            }
+
+
+
+                            if (idIterator%2 == 0)
+                            {
+                            <section class="section pb-40 pt-40 bg-grey-60">
+                                <div class="container">
+                                    <div class="row d-flex align-items-center row-change">
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                            <h1 class="color-brand-1 mt-15 mb-20">
+                                                @title
+                                            </h1>
+                                                @item.Value("tabSubItemTextContent")
+
+                                          @if(itemLink != null && itemLink.Count() > 0) {
+                                                    <div class="mt-50 text-start">
+                                                        <a class="btn btn-brand-1 hover-up" href="@itemLink[0].Url">
+                                                            @itemLink[0].Name
+                                                              <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="right-icon"
+                                                    height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke-linecap="round" 
+                                                    stroke-linejoin="round" stroke-width="32" 
+                                                    d="M320 336h76c55 0 100-21.21 100-75.6s-53-73.47-96-75.6C391.11 99.74 329 48 256 48c-69 0-113.44 45.79-128 91.2-60 5.7-112 35.88-112 98.4S70 336 136 336h56m0 64.1 64 63.9 64-63.9M256 224v224.03">
+                                                    </path></svg>
+                                                        </a>
+                                                    </div>
+
+                                            }
+
+                                        </div>
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                            <img class="d-block"
+                                                 src="@tabSubItemImage"
+                                                 alt="iori" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            }
+                            else{
+
+                            <section class="section-800 ">
+                                <div class="container">
+                                    <div class="row d-flex align-items-center row-change flex-row-reverse">
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                            <h1 class="color-brand-1 mt-15 mb-20">@title</h1>
+                                        @item.Value("tabSubItemTextContent")
+
+                                          
+                                        </div>
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+
+                                            <img class="d-block"
+                                                 src="@tabSubItemImage"
+                                                 alt="iori" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            }
+                            idIterator += 1;
+                            }
+                            }
+                            
+<!-- HERO CHEST -->
+@*<div class="container">*@
+
+
+    @{
+        if (isShowingCookie < 1)
+        {
+
+            if (heroChest.HasSearchContentTextbox)
+            {
+               <section class="section pb-40 pt-40">
+                   <div class="container">
+                     <div class="row filter margin-top-10 align-items-center">
+                                       
+                
+                        <div class="col-xl-6 col-lg-6 col-md-6">
+                            <div class="content-padding-15 align-center">
+                                @{
+                                  
+                                    IDataType dataType = dts.GetDataType(categoriesDropdownId); // Change number to your id from the data types section in backoffice
+                                    ValueListConfiguration prevalues = (ValueListConfiguration)dataType.Configuration;
+    
+                                    <select id="cmbCategories" class="form-control">
+                                        <option value="">@ResourceHelper.GetResource("Faq_Categories_Placeholder")</option>
+                                        @foreach (ValueListConfiguration.ValueListItem item in prevalues.Items)
+                                        {
+                                            <option value="@item.Value.Replace(" ", string.Empty).ToLower()">@item.Value</option>
+                                        }
+                                    </select>
+                                      
+                                }
+                            </div>
+                        </div>
+                        <div class="col-xl-6 col-lg-6 col-md-6">
+                            <div class="content-padding-15 align-center">
+                                @{
+                                    if (searchString != null)
+                                    {
+                                        @Html.Partial("_searchInput", searchString)
+                                    }
+                                    else
+                                    {
+                                        @Html.Partial("_searchInput")
+                                    }
+                                }
+                            </div>
+                        </div>
+                    
+                   </div>
+                </div>
+                
+                </section>
+            }
+        }
+    }
+
+  
+           
+                 @{
+                var groups = (IEnumerable<QuestionGroup>)questionGroups;
+                var sections = groups.Select(x => x.Value("groupName")).ToList();
+                    }
+                <div class="accordion accordionStyle2" id="accordionFAQ">
+                    <div class="row">
+                @foreach (var group in groups)
+                {
+                    var name = group.Value("groupName")?.ToString() ?? string.Empty;
+                    var questions = group.Value<IEnumerable<IPublishedElement>>("questionsAndAnswers") ?? new List<IPublishedContent>();
+                    var Id = Regex.Replace(name.Replace("African Bank", string.Empty), @"[^0-9a-zA-Z]+", string.Empty);
+                    
+         
+                    <div id="@name.Replace(" ", string.Empty).ToLower()" class="row sectionHeading">
+                        <section class="@((index % 2 == 0) ? "section pt-40 p-40 bg-grey-60" : "section pt-40 pb-40")"  ng-controller="ReportsAndArchievesController">
+      
+    <div class="container">
+        <div class="row align-items-center d-flex row-change md-text-center">
+            <div class="col-xl-12 col-lg-12 col-md-12">
+                  @*  <section class="@((item.Index % 2 == 0) ? "section-800" : "section-800 bg-grey-60")">*@
+                        <h1 id="@Id" class="color-brand-1 mt-15 text-center mb-20  main-title @name.Replace(" ", string.Empty).ToLower() searchItemHeader">
+                        
+                            @name
+                        </h1>
+                                        @{
+                                        int qcount = questions.Count();
+                                           }
+                                           
+             @foreach (var question in questions.Take(5))
+                        {
+                            var Q = question.Value("question");
+                            var A = question.Value("answer");
+
+                             <div class="accordion-item"  ng-show="stringContains('@Q', searchTerm)">
+                                        <h5 class="accordion-header">
+                                            <button class="accordion-button text-heading-5">@Q</button>
+                                        </h5>
+                                        <div class="accordion-collapse collapse">
+                                            <div class="accordion-body">@A</div>
+                                        </div>
+                                    </div>
+                                    
+                        }
+                        
+                                           
+                        
+                        <div class="row" id="moreFaqItems" style="display:none">
+                            @foreach (var question in questions.Skip(5))
+                            {
+                                var Q = question.Value("question");
+                                var A = question.Value("answer");
+    
+                                 <div class="accordion-item"  ng-show="stringContains('@Q', searchTerm)">
+                                            <h5 class="accordion-header">
+                                                <button class="accordion-button text-heading-5">@Q</button>
+                                            </h5>
+                                            <div class="accordion-collapse collapse">
+                                                <div class="accordion-body">@A</div>
+                                            </div>
+                                        </div>
+                                        qcount++;
+                            }
+                        </div>
+                       @if( qcount > 5){
+                           <div class="combo-btn" style="justify-content: center;">
+                               <div class="mt-50 column1">
+                                    <p class="combo-btn-text primary">
+                                        <a class="btn  btn-brand-1 hover-up toggleMoreLess" data-group-id="@name.Replace(" ", string.Empty).ToLower()">SHOW MORE</a>
+                                    </p>
+                                </div>
+                           </div>
+                          }
+                               
+                               
+                    </div>
+                        </div>
+        </div>
+        </section>
+    </div>
+    
+                   index += 1;
+                }
+            
+                </div>
+                </div>
+                
+            
+    
+ @* 
+</div>*@
+@section scripts
+{
+
+<script>
+    $(document).ready(function () {
+        // Show More / Show Less Toggle
+        $(".toggleMoreLess").click(function () {
+            var groupId = $(this).data("group-id");
+            var escapedGroupId = CSS.escape(groupId);
+            var moreItems = $("#" + escapedGroupId + " #moreFaqItems");
+
+            if (moreItems.is(":visible")) {
+                moreItems.slideUp();
+                $(this).text("Show More");
+            } else {
+                moreItems.slideDown();
+                $(this).text("Show Less");
+            }
+        });
+
+        // Accordion Collapse Toggle
+        $(".accordion-button").click(function () {
+            var isCollapsed = $(this).hasClass('collapsed');
+            $(".accordion-button").removeClass('collapsed');
+
+            if (!isCollapsed) {
+                $(this).toggleClass("collapsed");
+            }
+
+            var isCollapsedContent = $(this).parent().next(".accordion-collapse").hasClass('collapse');
+            $(".accordion-collapse").addClass('collapse');
+            if (isCollapsedContent) {
+                $(this).parent().next(".accordion-collapse").toggleClass('collapse');
+            }
+        });
+
+        // Category Change Handler
+        $("#cmbCategories").change(function () {
+            var selected = $("#cmbCategories option:selected").val();
+            $('.sectionHeading').each(function () {
+                if (selected === 'allcategories' || selected === '') {
+                    $(this).show();
+                } else {
+                    $(this).toggle($(this).context.id === selected);
+                }
+            });
+        });
+
+        // Input Length Check for SearchKeyUp
+        $('#SearchKeyUp').on('keyup', function () {
+            var inputLength = $(this).val().length;
+            console.log("Input length: " + inputLength);
+
+            // Trigger "Show Less" if inputLength > 0
+            if (inputLength > 0) {
+                $('.toggleMoreLess').each(function () {
+                    var groupId = $(this).data("group-id");
+                    var escapedGroupId = CSS.escape(groupId);
+                    var moreItems = $("#" + escapedGroupId + " #moreFaqItems");
+
+                    if (!moreItems.is(":visible")) {
+                        moreItems.slideDown();
+                        $(this).text("Show Less").css("display", "none"); 
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+   
 }

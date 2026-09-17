@@ -15,7 +15,7 @@
     var herochest = (HeroChestInvestors)Children?.Where(c => c.ContentType.Alias.ToLower() == "herochestinvestors").FirstOrDefault();
 
     var heroBody = (HeroBody)Children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
-
+    var linkToVault = heroBody.Value("bodyDescription");
     var tabBody = (TabBody)heroBody.Children(x => x.ContentType.Alias.ToLower() == "tabbody").FirstOrDefault();
 
     var _heroBodyInvestor = (HeroBodyInvestor)heroBody.Children?.Where(c => c.ContentType.Alias.ToLower() == "herobodyinvestor").FirstOrDefault();
@@ -52,14 +52,29 @@
 }
 
 <style type="text/css">
+    .sign-up-btn h2{ font-size:45px; }
+    ul.checklist li:before, .bank-story-caption ul li:before, .inline-checklist ul li:before{
 
-    ul.checklist li:before, .bank-story-caption ul li:before, .inline-checklist ul li:before {
-        content: "\2022";
+        content: none;
         font-size: 18px;
-        color: #88bc47;
+        color: transparent;
         margin-right: 7px;
+        
     }
-
+    ul.first-ul{
+        list-style-type: disclosure-closed;
+        margin-left:17px !important;
+    }
+    ul.second-ul{
+        
+        list-style-type: disc;
+        margin-left:33px !important;
+    }
+    ul.second-ul-others{
+        
+        list-style-type: disc;
+        margin-left:18px !important;
+    }
     hr {
         border-top: 1px solid #c9c5c5;
     }
@@ -188,17 +203,18 @@
             <div class="container">
 
                 <div class="row">
-                    <div class="col-sm-9">
+                    <div class="col-sm-9 sign-up-btn">
                         @Html.Raw(_heroBodyInvestor.SignupFormTitle)
                     </div>
                     <div class="col-sm-3 text-center">
-                        <a class="button secondary margin-top-10" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                        @*   *@
+                        <a href="https://thevault.exchange/start-profile-steps/?groupkey=ODM3OA==" target="_blank" class="button secondary margin-top-10" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample" >
                             @ResourceHelper.GetResource(_heroBodyInvestor.Value("OpenButtonCaption").ToString())
                         </a>
                     </div>
                 </div>
 
-                <div class="row">
+                @*<div class="row">
                     <div class="col-sm-8 col-sm-offset-2">
                         <div class="collapse margin-top-50" id="collapseExample">
 
@@ -365,7 +381,7 @@
                         </div>
                     </div>
 
-                </div>
+                </div>*@
 
             </div>
         </div>

@@ -1,5 +1,502 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using CustomModels = Web.Models;
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers
+@using Umbraco.Core.Services;
+
+
 @{
-	Layout = null;
+    Layout = "Master.cshtml";
+    var children = Model.Children;
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    
+    var header= heroBody.Children.Where(c => c.Name == "Headers").FirstOrDefault();
+    var myheader = header.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+    var headers = myheader.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+ 
+    ContentModels.TabBody cardheader = null;
+    var partialName1 = header.Value("PartialViewName");
+    cardheader = (TabBody)header;
+    
+    var cardsection = heroBody.Children.Where(c => c.Name == "Cards").FirstOrDefault();
+    var mainCard = cardsection.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+    var cards = mainCard?.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+    var idfirstcard = 0;
+    
+    ContentModels.TabBody cardheader2 = null;
+    var partialName2 = cardsection.Value("PartialViewName");
+    cardheader2 = (TabBody)cardsection;
+    
+    var faq = heroBody.Children.Where(c => c.Name == "FAQ").FirstOrDefault();
+    var faqsection = faq.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+    var faqs = faqsection?.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+    var noCampx1 = 1;
+      
+    ContentModels.TabBody createOwnWorldOfBankingfaq = null;
+    var partialName = faq.Value("PartialViewName");
+    createOwnWorldOfBankingfaq = (TabBody)faq;
+    
+    var blog = heroBody.Children.Where(c => c.Name == "Blogs").FirstOrDefault();
+    var blogsection = blog.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+    var blogs = blogsection?.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+    
+    ContentModels.TabBody blogheader = null;
+    var partialNameblog = blog.Value("PartialViewName");
+    blogheader = (TabBody)blog;
+    
+    var youtubelink = heroBody.Children.Where(c => c.Name == "Youtube").FirstOrDefault();
+    var youtubesection = youtubelink.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+    var youtube = youtubesection?.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+    
+    ContentModels.TabBody youtubeheader = null;
+    var partialNameyoutube = youtubelink.Value("PartialViewName");
+    youtubeheader = (TabBody)youtubelink;
+    
+    var headerImage_large = heroHeader?.Value<IPublishedContent>("image")?.Url;
 }
+
+@* the fun starts here *@
+
+<link rel="stylesheet" href="/css/projectmagic.css" />
+ @{
+    int idIterator = 0;
+    foreach (var item in headers){
+     var cardIcon = item.Value<IPublishedContent>("nCcardIcon")?.Url;
+     var title = item.Value<string>("nCcardTitle");
+     var description = item.Value<string>("mediumDescription");
+    
+        if (idIterator == 0)
+        {
+            <section class="section pt-40 pb-40 bg-grey-60">
+                <div class="container">
+                    <div class="row d-flex align-items-center row-change md-text-center">
+                        <div class="col-xl-6 col-lg-6 col-md-6">
+                            <h1 class="color-brand-1 mt-15 mb-20">@title </h1>
+                            @Html.Raw(description)
+                        </div>
+                        <div class="col-xl-6 col-lg-6 col-md-6">
+                            <img class="d-block" src="@cardIcon" alt="fraud-awareness">
+                        </div>
+                        
+                    </div>
+                </div>
+            </section>
+        }
+         idIterator += 1;    
+        }
+    }
+
+    <section class="ptb-50">
+        <div class="container">
+            <div class="row mt-50 align-items-center">
+                <h1 class="color-brand-2 mt-15 mb-20 text-center">@cardheader2.Value("partialViewName")</h1>
+            </div>
+            <div class="row mt-50 align-items-center">
+                @foreach (var item in cards)
+                {
+                    if(idfirstcard < 5){
+                        var cardTitle = item.Value<string>("nCcardTitle");
+                        var cardIcon = item.Value<IPublishedContent>("nCcardIcon")?.Url;
+                        var description = item.Value<string>("mediumDescription");
+                        <div class="col-lg-6">
+                            <div class="card-offer-small card-we-do">
+                                <div class="card-image">
+                                   <img class="d-block" src="@cardIcon" alt="fraud-awareness"> 
+                                </div>
+                                <div class="card-info">
+                                <h4 class="color-brand-2 mb-10">@cardTitle </h4> 
+                                @Html.Raw(description)
+                                </div>
+                                    
+                            </div>
+                        </div>        
+                    }
+                 idfirstcard += 1;
+                }
+                
+            </div>
+        </div>
+    </section>
+
+  @{
+        int idIterator1 = 0;
+        foreach (var item in headers){
+            var cardIcon = item.Value<IPublishedContent>("nCcardIcon")?.Url;
+            var title = item.Value<string>("nCcardTitle");
+            var description = item.Value<string>("mediumDescription");
+            if (idIterator1 == 1)
+            {
+                <section class="section pb-40 pt-40 bg-grey-60">
+                    <div class="container">
+                        <div class="row d-flex align-items-center row-change md-text-center">
+                            <div class="col-xl-6 col-lg-6 col-md-6">
+                                <img class="d-block" src="@cardIcon" alt="fraud-awareness">
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-6">
+                                <h1 class="color-brand-2 mt-15 mb-20">@title</h1>
+                                 @Html.Raw(description)
+                            </div>
+                        </div>
+                    </div>
+                </section>
+           }
+         idIterator1 += 1;    
+        }
+    }
+    
+
+  @{
+     int idfirstcard1 = 0;
+        <section class="ptb-50">
+            <div class="container">
+                <div class="row mt-50 align-items-center">
+                    <h1 class="color-brand-2 mt-15 mb-20 text-center">@cardheader2.Value("partialViewClassName")</h1>
+                </div>
+                <div class="row mt-50 align-items-center">
+                    @foreach (var item in cards)
+                    {
+                        if (idfirstcard1 >= 5 && idfirstcard1 < 9) {
+                            var cardTitle = item.Value<string>("nCcardTitle");
+                            var cardIcon = item.Value<IPublishedContent>("nCcardIcon")?.Url;
+                            var description = item.Value<string>("mediumDescription");
+                            <div class="col-lg-6">
+                                <div class="card-offer-small card-we-do">
+                                    <div class="card-image">
+                                       <img class="d-block" src="@cardIcon" alt="fraud-awareness"> 
+                                    </div>
+                                    <div class="card-info">
+                                        <h4 class="color-brand-1">@cardTitle</h4>
+                                    </div>
+                                    
+                                </div>
+                            </div>        
+                        }
+                        idfirstcard1 += 1;
+                    }
+                    
+                </div>
+            </div>
+        </section>
+   }
+
+   @{
+    int idIterator2 = 0;
+        foreach (var item in headers){
+         var cardIcon = item.Value<IPublishedContent>("nCcardIcon")?.Url;
+         var title = item.Value<string>("nCcardTitle");
+         var description = item.Value<string>("mediumDescription");
+            if (idIterator2 == 2)
+            {
+                <section class="section pb-40 pt-40 bg-grey-60">
+                    <div class="container">
+                        <div class="row d-flex align-items-center row-change md-text-center">
+                            <div class="col-xl-6 col-lg-6 col-md-6">
+                                <img class="d-block" src="@cardIcon" alt="fraud-awareness">
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-6">
+                                <h1 class="color-brand-2 mt-15 mb-20">@title</h1>
+                                 @Html.Raw(description)
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            }
+         idIterator2 += 1;    
+        }
+    }
+    
+@*<section class="section-800 bg-grey-60">
+    <div class="container">
+        <div class="row d-flex align-items-center row-change md-text-center">
+            <div class="col-xl-6 col-lg-6 col-md-6">
+                <img class="d-block" src="/media/hljlafha/beaware_dig2410_004_fraudpage_images3.png" alt="fraud-awareness">
+            </div>
+            <div class="col-xl-6 col-lg-6 col-md-6">
+                <h1 class="color-brand-2 mt-15 mb-20">Be aware of ATM fraud!</h1>
+                <div class="mt-30 mb-30 inline-checklist">
+                    <ul class="list-ticks list-ticks-2 ">
+                        <li class="font-lg-bold">Check the ATM before use it.</li>
+                        <li class="font-lg-bold">Cover the keypad when entering your pin.</li>
+                        <li class="font-lg-bold">Check your bank statement after.</li>
+                        <li class="font-lg-bold">Don't allow people to stand too close to you.</li>
+                    </ul>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>*@
+
+  @{
+      int idfirstcard2 = 0;
+        <section class="ptb-50">
+            <div class="container">
+                <div class="row mt-50 align-items-center">
+                  <h1 class="color-brand-2 mt-15 mb-20 text-center">@header.Value("partialViewName")</h1>
+                </div>
+                <div class="row mt-50 align-items-center">
+                    @foreach (var item in cards)
+                    {
+                        if (idfirstcard2 >= 9 && idfirstcard2 < 13) {
+                            var cardTitle = item.Value<string>("nCcardTitle");
+                            var cardIcon = item.Value<IPublishedContent>("nCcardIcon")?.Url;
+                            var description = item.Value<string>("mediumDescription");
+                                <div class="col-lg-6">
+                                    <div class="card-offer-small card-we-do">
+                                        <div class="card-image">
+                                           <img class="d-block" src="@cardIcon" alt="fraud-awareness"> 
+                                        </div>
+                                        <div class="card-info">
+                                            <h4 class="color-brand-1">@cardTitle</h4>
+                                        </div>
+                                    </div>
+                                </div>        
+                        }
+                        idfirstcard2 += 1;
+                    }
+                    
+                </div>
+            </div>
+        </section>
+    }
+    
+@*
+<section class="ptb-50">
+    <div class="container">
+        <div class="row mt-50 align-items-center">
+            <h1 class="color-brand-2 mt-15 mb-20 text-center">Signs it's a scam</h1>
+        </div>
+        <div class="row mt-50 align-items-center">
+            <div class="col-lg-6">
+                <div class="card-offer-small card-we-do">
+                    <div class="card-image">
+                       <img class="d-block" src="/media/iygpnqoh/dig2410_004_fraudpage_icons-08.svg" alt="fraud-awareness"> 
+                    </div>
+                    <div class="card-info">
+                       <h4 class="color-brand-1">
+                        Malicious Attachments.
+                       </h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card-offer-small card-we-do">
+                    <div class="card-image">
+                       <img class="d-block" src="/media/3qwhc4ye/dig2410_004_fraudpage_icons-06.svg" alt="fraud-awareness"> 
+                    </div>
+                    <div class="card-info">
+                       <h4 class="color-brand-1">
+                        "Urgent" subject line.
+                       </h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card-offer-small card-we-do">
+                    <div class="card-image">
+                       <img class="d-block" src="/media/pn5dpwjr/dig2410_004_fraudpage_icons-05.svg" alt="fraud-awareness"> 
+                    </div>
+                    <div class="card-info">
+                       <h4 class="color-brand-1">
+                        Malicious weblinks.
+                       </h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card-offer-small card-we-do">
+                    <div class="card-image">
+                       <img class="d-block" src="/media/ornb3ony/dig2410_004_fraudpage_icons-09.svg" alt="fraud-awareness"> 
+                    </div>
+                    <div class="card-info">
+                       <h4 class="color-brand-1">
+                        Impersonal greetings.
+                       </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>*@
+<section class="section pb-40 pt-40 bg-grey-60">
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-12 col-lg-12 col-md-12">
+                <img src="@headerImage_large" alt="iori">
+            </div>
+        </div>
+    </div>
+</section>
+
+    <section class="ptb-50">
+        <div class="container ">
+            <div class="row align-items-center d-flex row-change md-text-center">
+                <div class="col-xl-12 col-lg-12 col-md-12">
+                    <h1 class="color-brand-1 mt-15 mb-20 text-center faqHeader">@createOwnWorldOfBankingfaq.Value("partialViewClassName")</h1>
+                    <div class="accordion accordionStyle2" id="accordionFAQ">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                @foreach (var item in faqs)
+                                {
+                                    var cardTitle = item.Value<string>("nCcardTitle");
+                                    <div class="col-lg-12">
+                                        <div class="accordion-item">
+                                            <h5 class="accordion-header">
+                                                <button class="accordion-button text-heading-5">@cardTitle</button>
+                                            </h5><div id="accordion-body" class="accordion-collapse collapse">
+                                                <div class="accordion-body">@Html.Raw(item.Value<string>("mediumDescription"))</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    noCampx1 += 1;
+                                }
+                            </div>
+                        </div>
+                   </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+@*<section class="ptb-50">
+<div class="container ">
+    <div class="row align-items-center d-flex row-change md-text-center">
+        <div class="col-xl-12 col-lg-12 col-md-12">
+              <h1 class="color-brand-1 mt-15 mb-20 text-center faqHeader">Ethics and Fraud hotline</h1>
+               <div class="accordion accordionStyle2" id="accordionFAQ">
+                    <div class="row">
+                         <div class="col-lg-12">
+                            <div class="accordion-item">
+                                <h5 class="accordion-header">
+                                    <button class="accordion-button text-heading-5">Ethics and Fraud hotline</button>
+                                </h5><div id="accordion-body" class="accordion-collapse collapse">
+                                    <div class="accordion-body">
+<div class="mt-30 mb-30 inline-checklist">
+<ul class="list-ticks list-ticks-2">
+<li><strong>Email address:</strong> africanbank@tip-offs.com</li>
+<li><strong>Telephone number:</strong> 0800 633 633</li>
+<li><strong>Fax number:</strong> 0800 00 77 88</li>
+</ul>
+</div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+        
+    </div>
+</div>
+</section>*@
+   
+  @{
+        <section class="ptb-50 bg-grey-60">
+            <div class="container">
+                <div class="mt-20 mb-50">
+                  <h1 class="color-brand-2">@blogheader.Value("partialViewName")</h1>
+                  
+                </div>
+                <!-- blog section -->
+                <div class="row list-ticks">
+                    @foreach(var item in blogs){
+                      var tabSubItemImage = item.Value<IPublishedContent>("tabSubItemImage")?.Url;
+                      var tabSubItemIcon = item.Value<IPublishedContent>("tabSubItemIcon")?.Url;
+                      var title = item.Value<string>("tabSubItemTitle");
+                      var description = item.Value<string>("genericCardContent");
+                      List<Umbraco.Web.Models.Link> itemLink = new List<Umbraco.Web.Models.Link>();
+
+                            foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)item.Value("tabSubItemLinks"))
+                            {
+                               itemLink.Add(link);
+                
+                            }
+                        <div class="col-lg-4 col-md-6 mb-30 item-article featured">
+                            <div class="card-blog-grid card-blog-grid-3">
+                              <div class="card-image">
+                                <a href="@itemLink[0].Url"><img src="@tabSubItemImage" alt="iori"></a>
+                                <a href="@itemLink[0].Url"><label class="lbl-border">@title</label></a>
+                              </div>
+                              @item.Value("tabSubItemTextContent")
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>   
+        </section>
+    }
+
+@{
+        int youtubeid = 0;
+        <section class="ptb-50">
+            <div class="container">
+                <div class="mt-20 mb-50">
+                  <h1 class="color-brand-2">@youtubeheader.Value("partialViewName")</h1>
+                </div>
+                <!-- video blog section -->
+                <div class="row">
+                    @foreach (var item in youtube)
+                    {
+                        var cardTitle = item.Value<string>("nCcardTitle");
+                       @* if(youtubeid == 0 || youtubeid == 1){*@
+                          <div class="col-lg-3 col-md-6 mb-30 video-card">
+                            <iframe class="video-card" width="100%" height="200" src="@cardTitle" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                          </div>
+                       @* }*@
+                      @*  else
+                        {
+                            <div class="col-lg-3 col-md-6 mb-30">
+                                <video width="100%" height="200" controls class="video-card">
+                                  <source src="movie.mp4" type="video/mp4">
+                                  <source src="movie.ogg" type="video/ogg">
+                                   @cardTitle
+                                </video>
+                            </div>
+                        }
+                        
+                         youtubeid += 1;*@
+                    }
+                 
+                 @* <div class="col-lg-3 col-md-6 mb-30">
+                    <video width="100%" height="200" controls class="video-card">
+              <source src="movie.mp4" type="video/mp4">
+              <source src="movie.ogg" type="video/ogg">
+              Your browser does not support the video tag.
+            </video>
+                  </div>
+                  <div class="col-lg-3 col-md-6 mb-30">
+                    <video width="100%" height="200" controls class="video-card">
+              <source src="movie.mp4" type="video/mp4">
+              <source src="movie.ogg" type="video/ogg">
+              Your browser does not support the video tag.
+            </video>
+                  </div>
+                  <div class="col-lg-3 col-md-6 mb-30">
+                    <video width="100%" height="200" controls class="video-card">
+              <source src="movie.mp4" type="video/mp4">
+              <source src="movie.ogg" type="video/ogg">
+              Your browser does not support the video tag.
+            </video>
+                  </div>*@
+                </div>
+            </div>   
+        </section>
+    }
+
+<script>
+    $(document).ready(function(){
+        $(".accordion-button").click(function(){
+           var isCollapsed = $(this).hasClass('collapsed');
+           $(".accordion-button").removeClass('collapsed');
+           if(isCollapsed == false) {
+            $(this).toggleClass("collapsed");
+           }
+           
+           var isCollapsedContent = $(this).parent().next(".accordion-collapse").hasClass('collapse');
+            $(".accordion-collapse").addClass('collapse');
+            if(isCollapsedContent == true) {
+                $(this).parent().next(".accordion-collapse").toggleClass('collapse');
+            }
+       });
+    });
+</script>

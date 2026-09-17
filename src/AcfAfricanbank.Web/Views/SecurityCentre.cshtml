@@ -11,6 +11,38 @@
     // All Current Page Children
     var children = Model.Children;
     ContainerViewModel containerViewModel = new ContainerViewModel();
+    @*search code start*@
+    IExamineManager examineManager = ExamineManager.Instance;
+    var searcher = examineManager.TryGetIndex("ExternalIndex", out var externalIndex) ? externalIndex.GetSearcher() : null;
+    var searchCriteria = searcher.CreateQuery("nodes", Examine.Search.BooleanOperation.Or);
+    var indexString = "";
+    int foundResults = 0;
+    var indexStringAlt = "";
+    if (!string.IsNullOrEmpty(Request.QueryString["searchstring"]))
+    {
+        indexString = Request.QueryString["searchstring"];
+        indexStringAlt = "searchstring";
+
+        searchCriteria.Field("nodeName", "blog-detail").And().Field("nodeName", indexString.Boost(5));
+    }
+    else if (!string.IsNullOrEmpty(Request.QueryString["category"]))
+    {
+        indexString = Request.QueryString["category"];
+
+        searchCriteria.Field("nodeName", "blog-detail").And().Field("blogCategory", indexString.Boost(5));
+    }
+    else if (!string.IsNullOrEmpty(Request.QueryString["blogstartdate"]) && !string.IsNullOrEmpty(Request.QueryString["blogenddate"]))
+    {
+        indexString = Request.QueryString["blogstartdate"];
+        indexStringAlt = Request.QueryString["blogenddate"];
+    }
+
+    Examine.ISearchResults searchQuery = null;
+    if (indexString != "")
+    {
+        searchQuery = searchCriteria.Field("nodeName", indexString.Boost(8)).Or().Field("nodeName", indexString.Fuzzy()).Execute();
+    }
+    var searchResults = searchQuery;
 
     // Get specific Children
     var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
@@ -18,16 +50,14 @@
     var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
     var heroBodyTabGroup = heroBody.Children?.Where(c => c.ContentType.Alias.ToLower() == "tabgroup").FirstOrDefault();
 
-    var x = 1;
     //Get specific properties
-    var headerImage = heroHeader?.Value<IPublishedContent>
-        ("image")?.Url;
+    var headerImage = heroHeader?.Value<IPublishedContent>("image")?.Url;
     var heroShoulderTitle = heroShoulder?.Value("shoulderTitle").ToString();
     var heroShoulderDescription = heroShoulder?.Value("shouderDescription").ToString();
+    
     //Get blog elements
     var TupleBlogs = new List<Tuple<int, string, string, string, string, DateTime, string>>();
     var TupleVideos = new List<Tuple<int, string, string, string, string, DateTime, string>>();
-    // var BlogLanding = (IEnumerable<IPublishedContent>)children?.Where(c => c.DocumentTypeAlias.ToLower() == "blogdetail").FirstOrDefault();
     foreach (var item in children)
     {
         if (item.Id == 41927)
@@ -40,65 +70,151 @@
             var blogBody = item.Children.FirstOrDefault().Children.Where(c => c is HeroBodyBlogDetail).FirstOrDefault();
             var image = blogHeader.Value<int>("image");
             var videoItems = blogHeader.Value<int>("HeroHeaderVideo");
-            //if (videoItems == 0)
-            //{
-            TupleBlogs.Add(new Tuple<int, string, string, string, string, DateTime, string>(
-                    item.Id,
-                    ((IPublishedContent)blogHeader.Value("image")).Url?.ToString() ?? "",
-                    (blogBody.Value("title"))?.ToString() ?? "",
-                    (blogBody.Value("introductionDescription"))?.ToString() ?? "",
-                    ((IPublishedContent)blogHeader.Value("HeroHeaderVideo")).Url?.ToString() ?? "",
-                    Convert.ToDateTime(blogBody.Value("blogDate")),
-                    (blogBody.Value("blogBody"))?.ToString() ?? ""
-                    ));
-            //}
-            //else
-            //{
-            //    TupleVideos.Add(new Tuple<int, string, string, string, string, DateTime, string>(
-            //            item.Id,
-            //            ((IPublishedContent)blogHeader.GetPropertyValue("image")).Url?.ToString() ?? "",
-            //            (blogBody.GetPropertyValue("title"))?.ToString() ?? "",
-            //            (blogBody.GetPropertyValue("introductionDescription"))?.ToString() ?? "",
-            //            ((IPublishedContent)item).Url,
-            //            Convert.ToDateTime(blogBody.GetPropertyValue("blogDate")),
-            //            (blogBody.GetPropertyValue("blogBody"))?.ToString() ?? ""
-            //            ));
-            //}
+
+            if (searchResults != null)
+            {
+                if (searchResults.Count() != 0 && indexString != "")
+                {
+                    foreach (var result in searchResults)
+                    {
+                        try
+                        {
+                            var node = Umbraco.Content(result.Id);
+
+                            if (node == null)
+                            {
+                                continue;
+                            }
+
+                            var nodeParentId = node.Parent.Id;
+                            if (indexStringAlt == "searchstring")
+                            {
+                                nodeParentId = node.Id;
+                            }
+
+                            if (item.Id == nodeParentId)
+                            {
+                                TupleBlogs.Add(new Tuple<int, string, string, string, string, DateTime, string>(
+                                    item.Id,
+                                    ((IPublishedContent)blogHeader.Value("image")).Url?.ToString() ?? "",
+                                    (blogBody.Value("title"))?.ToString() ?? "",
+                                    (blogBody.Value("introductionDescription"))?.ToString() ?? "",
+                                    ((IPublishedContent)blogHeader.Value("HeroHeaderVideo")).Url?.ToString() ?? "",
+                                    Convert.ToDateTime(blogBody.Value("blogDate")),
+                                    (blogBody.Value("blogBody"))?.ToString() ?? ""
+                                    ));
+                            }
+                        }
+                        catch
+                        {
+                            Console.WriteLine("Error: ");
+                        }
+                    }
+
+                }
+                else
+                {
+                    if (indexStringAlt != "searchstring" && indexString != "" && indexStringAlt != "")
+                    {
+                        DateTime testdate = Convert.ToDateTime(blogBody.Value("publishedAt"));
+                        if (testdate == null || testdate == Convert.ToDateTime("01/01/0001 00:00:00"))
+                        {
+                            testdate = Convert.ToDateTime(blogBody.Value("blogDate"));
+                        }
+                        DateTime startdate = Convert.ToDateTime(indexString);
+                        DateTime enddate = Convert.ToDateTime(indexStringAlt);
+
+                        if (testdate <= startdate || testdate >= enddate)
+                        {
+                            continue;
+                        }
+                    }
+
+                    TupleBlogs.Add(new Tuple<int, string, string, string, string, DateTime, string>(
+                                    item.Id,
+                                    ((IPublishedContent)blogHeader.Value("image")).Url?.ToString() ?? "",
+                                    (blogBody.Value("title"))?.ToString() ?? "",
+                                    (blogBody.Value("introductionDescription"))?.ToString() ?? "",
+                                    ((IPublishedContent)blogHeader.Value("HeroHeaderVideo")).Url?.ToString() ?? "",
+                                    Convert.ToDateTime(blogBody.Value("blogDate")),
+                                    (blogBody.Value("blogBody"))?.ToString() ?? ""
+                                    ));
+                }
+            }
+            else
+            {
+                
+                if (indexStringAlt != "searchstring" && indexString != "" && indexStringAlt != "")
+                {
+                    DateTime testdate = Convert.ToDateTime(blogBody.Value("publishedAt"));
+                    if (testdate == null || testdate == Convert.ToDateTime("01/01/0001 00:00:00"))
+                    {
+                        testdate = Convert.ToDateTime(blogBody.Value("blogDate"));
+                    }
+                    DateTime startdate = Convert.ToDateTime(indexString);
+                    DateTime enddate = Convert.ToDateTime(indexStringAlt);
+
+                    if (testdate <= startdate || testdate >= enddate)
+                    {
+                        continue;
+                    }
+                }
+
+                TupleBlogs.Add(new Tuple<int, string, string, string, string, DateTime, string>(
+                                item.Id,
+                                ((IPublishedContent)blogHeader.Value("image")).Url?.ToString() ?? "",
+                                (blogBody.Value("title"))?.ToString() ?? "",
+                                (blogBody.Value("introductionDescription"))?.ToString() ?? "",
+                                ((IPublishedContent)blogHeader.Value("HeroHeaderVideo")).Url?.ToString() ?? "",
+                                Convert.ToDateTime(blogBody.Value("blogDate")),
+                                (blogBody.Value("blogBody"))?.ToString() ?? ""
+                                ));
+                
+
+            }
+
 
         }
 
     }
-    //Video section
-    //var domainDirectory = System.Web.HttpContext.Current.Request.Url.AbsoluteUri.Replace(System.Web.HttpContext.Current.Request.Url.AbsolutePath, "");
-    //string currentDirectory = domainDirectory;
-    //var videoLanding = heroBodyTabGroup.Children?.Where(c => c.DocumentTypeAlias.ToLower() == "tabheader").FirstOrDefault();
-    //var pageBlurp = videoLanding.GetPropertyValue("ebankITIconContent");
-    //var _schemaDescriptionBody = System.Text.RegularExpressions.Regex.Replace(pageBlurp.ToString(), "<.*?>", String.Empty);
-    //var videoItem = videoLanding.Children.Where(c => c.DocumentTypeAlias.ToLower() == "tabbody").FirstOrDefault();
+    ViewBag.searchstring = indexString;
+    ViewBag.searresult = TupleBlogs;
+    TempData["Blogs"] = TupleBlogs;
 
-    //var video_card = heroBody.Children?.Where(c => c.Name == "Video card").FirstOrDefault();
-    //var styleAtt = "";
-    // if (video_card != null)
-    //{
-    //    styleAtt = video_card.Children.Where(c => c.Name == "Style").FirstOrDefault().GetPropertyValue("text").ToString();
-    //}
-    //var content = videoItem.GetPropertyValue<IEnumerable<IPublishedContent>>("tabBodyContent");
-    //var videos = content.Where(c => c.DocumentTypeAlias == "nCTabGenericContent").FirstOrDefault().GetPropertyValue<IEnumerable<IPublishedContent>>("sectionContent");
-    // Take 1 vid and send it to Schema
-    //var _schemaCarddescription = videos.FirstOrDefault().GetPropertyValue("cardDescription");
-    //var _schemaCardDescriptionFriendly = System.Text.RegularExpressions.Regex.Replace(_schemaCarddescription.ToString(), "<.*?>", String.Empty);
-    //var _schemaDescription = videos.FirstOrDefault().GetPropertyValue("cardDescription");
-    //var _schemaIimg = videos.FirstOrDefault().GetPropertyValue<IPublishedContent>("cardIcon").Url;
-    //String _schemaImgString = currentDirectory + _schemaIimg.ToString();
-    //var _schemaMetaData = videos.FirstOrDefault().GetPropertyValue("cardMetaData");
-    //var _schemaVideoUrl = currentDirectory + videos.FirstOrDefault().GetPropertyValue("cardTitle").ToString();
-    //String videoUrl = "";
+    var showNoContent = "none;";
+    TupleBlogs = TupleBlogs.OrderByDescending(b => b.Item6).ThenBy(x => x.Item6.ToShortDateString() == "01/01/0001").ToList();
+    if (TupleBlogs.Count() == 0)
+    {
+        showNoContent = "";
+    }
+
+    /*Press Release*/
+    var latestPrs = new List<NcArchieve>();
+    var prContent = Model.Parent.Children(x => x.Name == "Press Releases").FirstOrDefault().Children(x => x.Name == "Hero Body").FirstOrDefault();
+    var tabBody = (TabBody)prContent.Children(x => x is TabBody).FirstOrDefault();
+    var prs = (IEnumerable<IPublishedElement>)tabBody.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+    var count = 0;
+    for (int x = prs.Count() - 1; x > 0; x--)
+    {
+        var lprs = ((List<NcArchieve>)(prs.ToList()[x].Properties.ToList()[1].Value("nCdocuments")));
+        foreach (var p in lprs)
+        {
+            if (count > 3)
+            {
+                break;
+            }
+            var a = (NcArchieve)p;
+            latestPrs.Add(a);
+            count += 1;
+        }
+    }
 
 }
 <link rel="stylesheet" href="../../css/style-customer-engagement.css">
 
 <link href="~/css/Blog.css" rel="stylesheet" />
 <style>
+    
     #heroHeader {
         top: -16px;
         background-repeat: no-repeat;
@@ -110,7 +226,21 @@
     .para-secure {
         font-size: 18px;
     }
-
+    hr.pr-line
+    {
+        width:0%;
+        margin-top: 2px;
+        margin-bottom: 2px;
+    }
+    .article-card .article-title {
+       font-size: 14px;
+    } 
+    #divNextblogs .article-card .article-title {
+       font-size: 13px;
+    } 
+    #divNextblogs .body-content {
+       font-size: 12px;
+    }
     @@media (max-width: 1400px) and (min-width: 1024px) {
         .hero-static-banner {
             margin-top: 110px;
@@ -142,19 +272,14 @@
         height: 200px;
         margin-bottom: 120px;
     }
-
-    /*.welcome-text p {
-            padding: 10px 20px 0px;
-        }*/
-
     .ab-videos-grid {
         margin-top: 25px;
     }
 
-        .ab-videos-grid > div {
-            padding-left: 15px;
-            padding-right: 15px;
-        }
+    .ab-videos-grid > div {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
 
     .ab-video {
         box-shadow: 0px 7px 20px rgba(0,0,0,0.16);
@@ -267,30 +392,6 @@
         background-color: #fff;
     }
 
-    /*.share-listed-blogs {
-        font-size: 32px;
-        float: right;
-        margin-top: -35px;
-        position: relative;
-        color: #a39d9d;
-        bottom: 187px;
-        background-color: #100f0f;
-        width: 32px;
-        padding: 5px;
-    }*/
-
-    /*.share-listed-main-blog {
-        font-size: 32px;
-        float: right;
-        position: relative;
-        color: #dfdcdc;
-        bottom: 1px;
-        z-index: 2;
-        background-color: #100f0f;
-        width: 32px;
-        padding: 5px;
-        margin-right: -1px;
-    }*/
     #divMainBlog .sharethis-inline-share-buttons {
         position: absolute;
         top: 15px;
@@ -346,12 +447,7 @@
             z-index: 2 !important;
         }
     }
-    /*@@media (max-width: 480px) {
-        .sharethis-inline-share-buttons {
-            right: unset;
-        }
-    }*/
-
+    
     .padding-to-right {
         padding-right: 15px;
     }
@@ -372,9 +468,9 @@
         overflow: hidden;
     }
 
-        .blog-image > .image {
-            transition: 0.5s;
-        }
+    .blog-image > .image {
+        transition: 0.5s;
+    }
 
     .video_list_item:hover > .blog-image > .image {
         transition: 0.5s;
@@ -405,9 +501,9 @@
         background-color: #002b60;
     }
 
-        .video_list_item:hover .article-title, .video_list_item:hover .body-content {
-            color: #fff;
-        }
+    .video_list_item:hover .article-title, .video_list_item:hover .body-content {
+        color: #fff;
+    }
 
     .pr-card:hover {
         color: #fff;
@@ -424,9 +520,10 @@
         border-right: none;
         padding: 5px;
         height: 40px;
-        border-radius: 2px 0 0 2px;
+        border-radius: 10px 0 0 10px;
         outline: none;
         padding-left: 20px;
+        margin-top:25px;
     }
 
     .searchButton {
@@ -436,10 +533,11 @@
         background: #cbcbcb;
         text-align: center;
         color: #fff;
-        border-radius: 0 2px 2px 0;
+        border-radius: 0 10px 10px 0;
         cursor: pointer;
         font-size: 20px;
         outline: none;
+        margin-top:25px;
     }
 
     .date-range-search {
@@ -475,9 +573,9 @@
         list-style-type: none;
     }
 
-        .navbar-submenu ul > li {
-            margin: 0 1em;
-        }
+    .navbar-submenu ul > li {
+        margin: 0 1em;
+    }
 
     .navbar-submenu .li-css:hover {
         background-color: #f1ecec00;
@@ -523,25 +621,20 @@
         transition: none;
     }
 
-        .topics-li:hover {
-            content: '';
-            border-bottom: none !important;
-            /* left: 50%; */
-            /* position: absolute; */
-            /* top: 0px; */
-            /* transition: none; */
-            /* width: 0; */
-        }
+    .topics-li:hover {
+        content: '';
+        border-bottom: none !important;
+    }
 
-            .topics-li:hover:after {
-                content: '';
-                border-bottom: none !important;
-                left: 50%;
-                position: absolute;
-                top: 50px;
-                transition: all .2s ease-in-out;
-                width: 0;
-            }
+    .topics-li:hover:after {
+        content: '';
+        border-bottom: none !important;
+        left: 50%;
+        position: absolute;
+        top: 50px;
+        transition: all .2s ease-in-out;
+        width: 0;
+    }
 
     .icons:hover {
         color: #88bc47 !important;
@@ -602,21 +695,260 @@
         .navbar-submenu ul > li {
             margin: 0 .2em;
         }
-    }
+        .mobi-items {
+           display: none;
+        }
 
+        .desktop-items {
+           display: block !important;
+        }
+    }
+    @@media(min-width:300px) and (max-width:320px){
+       #divNextblogs .sharethis-inline-share-buttons {
+            left: 28.5% !important;
+            margin-left: 11px;
+        }
+        .mobi-items .st-inline-share-buttons{
+            left: 26.5% !important;
+            margin-left: 11px;
+        }
+        
+        .mobi-items .sharethis-inline-share-buttons {
+            position: absolute;
+            top: 15px;
+            margin-bottom: 10px;
+            left: 26.5% !important;
+            z-index: 2 !important;
+        }
+        .article-card .article-title {
+            font-size: 13px;
+            font-weight: 600;
+            line-height: normal;
+            margin-bottom: 14px;
+            color: #002b60;
+            padding-top: 1px;
+            margin-left: 16px !important;
+        }
+        .article-card .article-body-content {
+           margin-left: 16px !important;
+        }
+        .welcome-text h2{
+           font-size: 23px !important;
+        }
+        p.para-secure {
+           margin-top: -533px !important;
+        }
+        h4.pageTitle{
+          font-size: 19px;
+        }
+        #divMainBlog .st-inline-share-buttons{
+          left: 85.5% !important;
+       }
+    }
+    @@media(max-width: 280px){
+       #divMainBlog .st-inline-share-buttons {
+          left: 72.5% !important;
+       }
+       #divRemainingblogs{
+          padding-left: 0px;
+       }
+       #divNextblogs .sharethis-inline-share-buttons {
+            position: absolute;
+            top: 15px;
+            margin-bottom: 10px;
+            left: 28.5% !important;
+            z-index: 2 !important;
+        }
+        #divRemainingblogs .mobi-items .sharethis-inline-share-buttons {
+            position: absolute;
+            top: 15px;
+            margin-bottom: 10px;
+            left: 34.2%;
+            z-index: 2 !important;
+        }
+        .st-inline-share-buttons {
+            margin-left: 30px;
+        }
+        .article-card .article-title {
+            font-size: 13px !important;
+            margin-left: 35px !important;
+        }
+        .article-card .article-body-content {
+           font-size: 12px !important;
+           margin-left: 35px !important;
+        }
+        .welcome-text{
+           height:278px !important;
+           margin-bottom: 44px;
+        }
+        .welcome-text h2{
+           font-size: 18px !important;
+           margin-top: -18px;
+           height:278px !important;
+           margin-bottom: 44px;
+        }
+        p.para-secure {
+           margin-top: -269px;
+           font-size:12px;
+        }
+        h4.pageTitle{
+          font-size: 18px;
+        }
+        .publish-date{
+           font-size: 12px;
+           margin-right: -6px;
+        }
+    }
+    @@media(max-width: 360px) {
+       #divMainBlog .sharethis-inline-share-buttons{
+          left: 86.5% !important;
+       }
+       #divNextblogs .sharethis-inline-share-buttons {
+            position: absolute;
+            top: 15px;
+            margin-bottom: 10px;
+            left: 25.5% !important;
+            z-index: 2 !important;
+        }
+        .mobi-items .sharethis-inline-share-buttons {
+            position: absolute;
+            top: 15px;
+            margin-bottom: 10px;
+            left: 23.5% !important;
+            z-index: 2 !important;
+        }
+        #searchstring{
+           margin-top: 10px !important;
+        }
+        .searchButton{
+           margin-top: 10px !important;
+        }   
+    }
+    @@media(min-width: 390px) and (max-width: 393px){
+       #divNextblogs .sharethis-inline-share-buttons {
+          left: 23.5% !important;
+       }
+       .mobi-items .sharethis-inline-share-buttons {
+          left: 21.5% !important;
+       }
+       #divMainBlog .sharethis-inline-share-buttons{
+          left: 87.5% !important;
+       }
+    }
+    @@media(min-width: 375px) and (max-width: 390px) {
+       #divMainBlog .sharethis-inline-share-buttons{
+          left: 87.5% !important;
+       }
+       #divNextblogs .sharethis-inline-share-buttons {
+            position: absolute;
+            top: 15px;
+            margin-bottom: 10px;
+            left: 24.5% !important;
+            z-index: 2 !important;
+        }
+        .mobi-items .sharethis-inline-share-buttons {
+            position: absolute;
+            top: 15px;
+            margin-bottom: 10px;
+            left: 22.5% !important;
+            z-index: 2 !important;
+        }
+        #searchstring{
+           margin-top: 20px !important;
+        }
+        .searchButton{
+           margin-top: 20px !important;
+        }    
+    }
+    @@media(max-width: 425px) {
+       #divMainBlog .sharethis-inline-share-buttons{
+          left: 88.5%;
+       }
+        #divMainBlog {
+          padding-left: 12px !important;
+          padding-right: 12px !important;
+       }
+       #divNextblogs .sharethis-inline-share-buttons {
+            position: absolute;
+            top: 15px;
+            margin-bottom: 10px;
+            left: 22.5%;
+            z-index: 2 !important;
+        }
+        .mobi-items .sharethis-inline-share-buttons {
+            position: absolute;
+            top: 15px;
+            margin-bottom: 10px;
+            left: 20.5%;
+            z-index: 2 !important;
+        }
+        #searchstring{
+           margin-top: 45px;
+        }
+        .searchButton{
+           margin-top: 45px;
+        }  
+        hr.pr-line
+        {
+            width:100%;
+            margin-top: 2px;
+            margin-bottom: 2px;
+        }
+        .latest-read{
+           display:none;
+        }
+        #divNextblogs .body-content {
+           font-size: 13px;
+        }
+        #divNextblogs .article-card .article-title {
+           font-size: 14px;
+        } 
+        #divRemainingblogs .body-content .article-body-content{
+          margin-left: 17px;
+        }
+        #divRemainingblogs .body-content{
+          margin-left: 0px;
+        }
+        .article-card .article-title {
+           margin-left: 16px;
+        }
+    }
+    @@media(min-width: 428px) and (max-width:540px){
+       #searchstring{
+           margin-top: 71px;
+        }
+        .searchButton{
+           margin-top: 71px;
+        }
+        p.para-secure {
+           margin-top: -416px !important;
+        }
+        .welcome-text h2{
+           height:452px;
+        }
+        #divMainBlog .sharethis-inline-share-buttons{
+          left: 88.5%;
+       }
+        #divMainBlog {
+          padding-left: 24px !important;
+          padding-right: 12px !important;
+       }
+    }
+    @@media (min-width: 1200px) and (max-width: 1440px) {
+        #divNextblogs {
+            display: block !important;
+        }
+    }
+    @@media (min-width: 1023px) and (max-width: 1440px) {
+        #divNextblogs {
+            display: none;
+        }
+    }
+    	
     @@media (min-width:320px) and (max-width: 425px) {
         #divNextblogs {
             display: block;
         }
-
-            #divNextblogs .sharethis-inline-share-buttons {
-                position: absolute;
-                top: 15px;
-                margin-bottom: 10px;
-                left: 24.8%;
-                z-index: 2 !important;
-            }
-
         .li-disabled {
             opacity: 1.6;
         }
@@ -669,8 +1001,8 @@
         }
 
         .mobi-items {
-            display: block;
-            padding-left: 20px;
+           
+            padding-left: 0px;
         }
 
         #searchstring {
@@ -737,7 +1069,7 @@
             background-color: #fff;
         }
 
-        #divMainBlog .sharethis-inline-share-buttons {
+        @*#divMainBlog .sharethis-inline-share-buttons {
             position: absolute;
             /*top: 51px!important;*/
             margin-bottom: 10px;
@@ -745,13 +1077,13 @@
             z-index: 2 !important;
         }
 
-        .sharethis-inline-share-buttons {
+        .mobi-items .sharethis-inline-share-buttons {
             position: absolute;
             top: 15px;
             margin-bottom: 10px;
-            left: 24.8%;
+            left: 23.5%;
             z-index: 2 !important;
-        }
+        }*@
     }
 
     #divRemainingblogs {
@@ -767,11 +1099,18 @@
             z-index: 2 !important;
         }
 
-        .sharethis-inline-share-buttons {
+        #divNextblogs .sharethis-inline-share-buttons {
             position: absolute;
             top: 15px;
             margin-bottom: 10px;
-            left: 86.7%;
+            left: 86.7% !important;
+            z-index: 2 !important;
+        }
+        #divRemainingblogs .sharethis-inline-share-buttons {
+            position: absolute;
+            top: 15px;
+            margin-bottom: 10px;
+            left: 86.7% !important;
             z-index: 2 !important;
         }
     }
@@ -919,7 +1258,7 @@
         }
 
         .article-card .article-title {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             line-height: normal;
             margin-bottom: 14px;
@@ -930,16 +1269,6 @@
     }
 </style>
 <div class="hero-static-banner" id="heroHeader" style="background-image: url('@headerImage');">
-    @*<ol class="breadcrumb">
-            @if (breadcrumbItems != null)
-            {
-                foreach (string breadcrumItem in breadcrumbItems)
-                {
-                    var cssClass = breadcrumItem == breadcrumbItems.Last() ? "active" : string.Empty;
-                    <li class="@cssClass">@breadcrumItem</li>
-                }
-            }
-        </ol>*@
 </div>
 <div class="container main-content">
     <div class="welcome-text">
@@ -947,107 +1276,212 @@
 
     </div>
     <p class="para-secure" style="padding: 10px 20px 0px;">@heroShoulderDescription</p>
+    <div class="col-md-8 hidden-xs" style="padding-right: 0px;margin-left: -18px;">
+        <form id="lg-md-show-search" class="navbar-form  content-padding-10" style="display: flex;" action="?">
+            <input type="text" class="searchTerm" placeholder="Search for Info..." id="searchstring" name="searchstring">
+            <button type="submit" id="btnSubmit" class="searchButton">
+                <i class="fa fa-search"></i>
+            </button>
+        </form>
+    </div>
+    <div class="col-xs-12 hidden-sm hidden-md hidden-lg search-main">
+        <form id="lg-md-show-search" class="navbar-form  content-padding-10 ng-pristine ng-valid ng-submitted" style="display: flex;" action="?">
+            <input type="text" class="searchTerm" placeholder="Search for Info..." id="searchstring" name="searchstring">
+            <button type="submit" id="btnSubmit" class="searchButton">
+                <i class="fa fa-search"></i>
+            </button>
+        </form>
+    </div>
+    <div id="notFoundDiv" class="col-xs-12 col-sm-12 col-md-12" style="color: red; font-weight: bold; font-size: 24px; text-align-last: center; margin-top: 10px; display:@showNoContent">No Blogs Found</div>
     <div class="row">
-        @if (TupleBlogs.Count() != 0)
+        @{
+            if (!string.IsNullOrEmpty(Request.QueryString["searchstring"]))
+            {
+                @Html.Partial("_securityCenterSearchResult");
+            }
+        }
+
+        @if ((indexString == "") || (!string.IsNullOrEmpty(Request.QueryString["category"])))
         {
-            <div id="divMainBlog" class="col-lg-8 col-xs-12 ">
-                <div class="article-card">
-                    <div class="video-item video_list_item" style="margin-top: 0px !important;height:100%;">
-                        <div class="blog-image">
-                            <a class="blogHeaderLink" href="" data-pdf="@TupleBlogs.First().Item5">
-                                <div id="imgMain" class="image" style="background-image: url('@TupleBlogs.First().Item2');"></div>
-                                <div style="height: 0px !important;">
-                                    <div id="titleMain" class="article-title">
-                                        @TupleBlogs.First().Item3
-                                    </div>
-                                    <div id="descriptionMain" class="body-content">
-                                        @TupleBlogs.First().Item4
-                                    </div>
-                                    <div id="divMainReadMore">
-                                        <div class="readMoreLink">
-                                            <a href="@TupleBlogs.First().Item5"></a>
+            foundResults = TupleBlogs.Count();
+            if (indexString != "")
+            {
+                <div class="col-xs-12 col-sm-12 col-md-12" style="margin-top:20px">
+                    Showing (<span>@foundResults</span>) results for: <i class="resulting-span">@indexString</i>
+                </div>
+            }
+            if (TupleBlogs.Count() != 0)
+            {
+                <div id="divMainBlog" class="col-lg-8 col-xs-12 ">
+                    <div class="article-card">
+                        <div class="video-item video_list_item" style="margin-top: 0px !important;height:100%;">
+                            <div class="blog-image">
+                                @if (indexString == "")
+                                {
+                                    <a class="blogHeaderLink" href="" data-pdf="@TupleBlogs.First().Item5">
+                                        <div id="imgMain" class="image" style="background-image: url('@TupleBlogs.First().Item2');"></div>
+                                        <div style="height: 0px !important;">
+                                            <div id="titleMain" class="article-title">
+                                                @TupleBlogs.First().Item3
+                                            </div>
+                                            <div id="descriptionMain" class="body-content">
+                                                @TupleBlogs.First().Item4
+                                            </div>
+                                            <div id="divMainReadMore">
+                                                <div class="readMoreLink">
+                                                    <a href="@TupleBlogs.First().Item5"></a>
+                                                </div>
+                                                <div class="publishDate">
+                                                    <span class="date-output"><i>Publish Date: @TupleBlogs.First().Item6.ToShortDateString()</i></span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="publishDate">
-                                            <span class="date-output"><i>Publish Date: @TupleBlogs.First().Item6.ToShortDateString()</i></span>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a class="blogHeaderLink" href="" data-pdf="@TupleBlogs.First().Item5?category=@indexString">
+                                        <div id="imgMain" class="image" style="background-image: url('@TupleBlogs.First().Item2');"></div>
+                                        <div style="height: 0px !important;">
+                                            <div id="titleMain" class="article-title">
+                                                @TupleBlogs.First().Item3
+                                            </div>
+                                            <div id="descriptionMain" class="body-content">
+                                                @TupleBlogs.First().Item4
+                                            </div>
+                                            <div id="divMainReadMore">
+                                                <div class="readMoreLink">
+                                                    <a href="@TupleBlogs.First().Item5"></a>
+                                                </div>
+                                                <div class="publishDate">
+                                                    <span class="date-output"><i>Publish Date: @TupleBlogs.First().Item6.ToShortDateString()</i></span>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </a>
+                                    </a>
+                                }
+                            </div>
                         </div>
                     </div>
+                    <div class="sharethis-inline-share-buttons" data-url="@TupleBlogs.First().Item5"></div>
                 </div>
-                <div class="sharethis-inline-share-buttons" data-url="@TupleBlogs.First().Item5"></div>
-            </div>
-            <div id="divNextblogs" class="col-md-4 col-lg-4 col-xs-12">
-                <h6 style="color:#002b60; font-weight: bold">Latest reads</h6>
-                <div class="row">
-                    @foreach (var blog in TupleBlogs.Skip(1).Take(2))
-                    {
-                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-12">
-                            <a class="blogHeaderLink" data-pdf="@blog.Item5">
-                                <div class="article-card video-item video_list_item" style="cursor:pointer;">
-                                    <div style="display:flex;" class="row">
-                                        <div class="col-md-4 hidden-md hidden-sm hidden-xs" style="padding-right: 1px;">
-                                            <div class="image" style="background-image: url('@blog.Item2')"></div>
-                                        </div>
-                                        <div class="col-xs-12 col-lg-8">
-                                            <div class="row">
-                                                <div class="col-xs-4 hidden-lg hidden-sm hidden-md">
-                                                    <div class="image remainingBlogImage hidden-lg " style=" height:220px; position: relative; background-image: url('@blog.Item2')"></div>
+                <div id="divNextblogs" class="col-md-4 col-lg-4 col-xs-12">
+                    <h6 style="color:#002b60; font-weight: bold" class="latest-read">Latest reads</h6>
+                    <div class="row">
+                        @foreach (var blog in TupleBlogs.Skip(1).Take(2))
+                        {
+                            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-12">
+                                @if (indexString == "")
+                                {
+                                    <a class="blogHeaderLink" data-pdf="@blog.Item5">
+                                        <div class="article-card video-item video_list_item" style="cursor:pointer;">
+                                            <div style="display:flex;" class="row">
+                                                <div class="col-md-4 hidden-md hidden-sm hidden-xs" style="padding-right: 1px;">
+                                                    <div class="image" style="background-image: url('@blog.Item2')"></div>
                                                 </div>
-                                                <div class="col-xs-8 hidden-sm hidden-md hidden-lg">
-                                                    <div class="article-content">
+                                                <div class="col-xs-12 col-lg-8">
+                                                    <div class="row">
+                                                        <div class="col-xs-4 hidden-lg hidden-sm hidden-md">
+                                                            <div class="image remainingBlogImage hidden-lg " style=" height:220px; position: relative; background-image: url('@blog.Item2')"></div>
+                                                        </div>
+                                                        <div class="col-xs-8 hidden-sm hidden-md hidden-lg">
+                                                            <div class="article-content">
+                                                                <div class="article-title ">@blog.Item3</div>
+                                                                <div class="body-content article-body-content">
+                                                                    @blog.Item4
+                                                                </div>
+                                                            </div>
+                                                            <div class="article-content">
+                                                                <div class="pull-right hidden-lg"><i>Publish Date: @blog.Item6.ToShortDateString()</i></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="image remainingBlogImage hidden-lg hidden-xs " style=" height:220px; position: relative; background-image: url('@blog.Item2')"></div>
+                                                    <div class="article-content hidden-xs">
                                                         <div class="article-title ">@blog.Item3</div>
                                                         <div class="body-content article-body-content">
                                                             @blog.Item4
                                                         </div>
+                                                        <div class="article-content hidden-xs">
+                                                            <div class="date-lg"><i>Publish Date: @blog.Item6.ToShortDateString()</i></div>
+                                                        </div>
                                                     </div>
-                                                    <div class="article-content">
-                                                        <div class="pull-right hidden-lg"><i>Publish Date: @blog.Item6.ToShortDateString()</i></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="image remainingBlogImage hidden-lg hidden-xs " style=" height:220px; position: relative; background-image: url('@blog.Item2')"></div>
-                                            <div class="article-content hidden-xs">
-                                                <div class="article-title ">@blog.Item3</div>
-                                                <div class="body-content article-body-content">
-                                                    @blog.Item4
-                                                </div>
-                                                <div class="article-content hidden-xs">
-                                                    <div class="date-lg"><i>Publish Date: @blog.Item6.ToShortDateString()</i></div>
-                                                </div>
-                                            </div>
 
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </a>
-                            <div class="sharethis-inline-share-buttons" data-url="@blog.Item5"></div>
-                        </div>
-                    }
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a class="blogHeaderLink" data-pdf="@blog.Item5?category=@indexString">
+                                        <div class="article-card video-item video_list_item" style="cursor:pointer;">
+                                            <div style="display:flex;" class="row">
+                                                <div class="col-md-4 hidden-md hidden-sm hidden-xs" style="padding-right: 1px;">
+                                                    <div class="image" style="background-image: url('@blog.Item2')"></div>
+                                                </div>
+                                                <div class="col-xs-12 col-lg-8">
+                                                    <div class="row">
+                                                        <div class="col-xs-4 hidden-lg hidden-sm hidden-md">
+                                                            <div class="image remainingBlogImage hidden-lg " style=" height:220px; position: relative; background-image: url('@blog.Item2')"></div>
+                                                        </div>
+                                                        <div class="col-xs-8 hidden-sm hidden-md hidden-lg">
+                                                            <div class="article-content">
+                                                                <div class="article-title ">@blog.Item3</div>
+                                                                <div class="body-content article-body-content">
+                                                                    @blog.Item4
+                                                                </div>
+                                                            </div>
+                                                            <div class="article-content">
+                                                                <div class="pull-right hidden-lg"><i>Publish Date: @blog.Item6.ToShortDateString()</i></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="image remainingBlogImage hidden-lg hidden-xs " style=" height:220px; position: relative; background-image: url('@blog.Item2')"></div>
+                                                    <div class="article-content hidden-xs">
+                                                        <div class="article-title ">@blog.Item3</div>
+                                                        <div class="body-content article-body-content">
+                                                            @blog.Item4
+                                                        </div>
+                                                        <div class="article-content hidden-xs">
+                                                            <div class="date-lg"><i>Publish Date: @blog.Item6.ToShortDateString()</i></div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                }
+                                <div class="sharethis-inline-share-buttons" data-url="@blog.Item5"></div>
+                            </div>
+                        }
+                    </div>
                 </div>
-            </div>
+            }
         }
     </div>
     <div id="divRemainingblogs" class="col-sm-12 responsiveMove" style="margin-top:9px">
         <div class="row">
             @if (TupleBlogs.Count() != 0)
             {
-                //var pageSize = 6;
-                //var page = 1; int.TryParse(Request.QueryString["page"], out page);
-                //var totalPages = (int)Math.Ceiling((double)(TupleBlogs.Count - 4) / (double)pageSize);
-                //if (page > totalPages)
-                //{
-                //    page = totalPages;
-                //}
-                //else if (page < 1)
-                //{
-                //    page = 1;
-                //}
+                var pageSize = 6;
+                var page = 1; int.TryParse(Request.QueryString["page"], out page);
+                var totalPages = (int)Math.Ceiling((double)(TupleBlogs.Count - 4) / (double)pageSize);
+                if (page > totalPages)
+                {
+                    page = totalPages;
+                }
+                else if (page < 1)
+                {
+                    page = 1;
+                }
                 foreach (var blog in TupleBlogs.Skip(3))
                 {
                     <div class="col-xs-12 col-sm-6 col-md-4 desktop-items margin-bottom-10">
-                        <a class="blogHeaderLink" id="blogHeaderLink" data-pdf="@blog.Item5">
+                        @if (indexString == "")
+                        {
+                         <a class="blogHeaderLink" id="blogHeaderLink" data-pdf="@blog.Item5">
                             <div class="article-card remainingBlogItem video-item video_list_item" style="cursor:pointer;">
                                 <div class="blog-image">
                                     <div class="image remainingBlogImage" style=" height:220px; position: relative; background-image: url('@blog.Item2')"></div>
@@ -1064,41 +1498,96 @@
                                     </div>
                                 </div>
                             </div>
-                        </a>
+                         </a>
+                       }
+                       else
+                       {
+                         <a class="blogHeaderLink" id="blogHeaderLink" data-pdf="@blog.Item5?category=@indexString">
+                            <div class="article-card remainingBlogItem video-item video_list_item" style="cursor:pointer;">
+                                <div class="blog-image">
+                                    <div class="image remainingBlogImage" style=" height:220px; position: relative; background-image: url('@blog.Item2')"></div>
+                                </div>
+                                <div class="article-content" style="padding:10px">
+                                    <div class="article-title">@blog.Item3</div>
+                                    <div class="body-content article-body-content">
+                                        @blog.Item4
+                                        <br />
+                                        <br />
+                                    </div>
+                                    <div class="article-content margin-top-10" style="font-size:11px;color: #cacaca">
+                                        <div class="pull-left"><i>Publish Date: @blog.Item6.ToShortDateString()</i></div>
+                                    </div>
+                                </div>
+                            </div>
+                         </a>
+                       }
                         <div class="sharethis-inline-share-buttons" data-url="@blog.Item5"></div>
                     </div>
                     <div class="col-xs-12 col-sm-6 col-md-4 col-lg-12 mobi-items">
-                        <a class="blogHeaderLink" href="@blog.Item5">
-                            <div class="article-card video-item video_list_item" style="cursor:pointer;">
-                                <div style="display:flex;" class="row">
-                                    <div class="col-md-4 hidden-md hidden-sm hidden-xs hidden-lg">
-                                        <div class="image" style="background-image: url('@blog.Item2')"></div>
-                                    </div>
-                                    <div class="col-xs-12 col-lg-8">
-                                        <div class="row">
-                                            <div class="col-xs-4 hidden-lg hidden-sm hidden-md hidden-lg">
-                                                <div class="image remainingBlogImage hidden-lg " style=" height:220px; position: relative; background-image: url('@blog.Item2')"></div>
-                                            </div>
-                                            <div class="col-xs-8 hidden-sm hidden-md hidden-lg">
-                                                <div class="article-content">
-                                                    <div class="article-title ">@blog.Item3</div>
-                                                    <div class="body-content article-body-content">
-                                                        @blog.Item4
-                                                    </div>
+                        @if (indexString == "")
+                        {
+                            <a class="blogHeaderLink" href="@blog.Item5">
+                                <div class="article-card video-item video_list_item" style="cursor:pointer;">
+                                    <div style="display:flex;" class="row">
+                                        <div class="col-md-4 hidden-md hidden-sm hidden-xs hidden-lg">
+                                            <div class="image" style="background-image: url('@blog.Item2')"></div>
+                                        </div>
+                                        <div class="col-xs-12 col-lg-8">
+                                            <div class="row">
+                                                <div class="col-xs-4 hidden-lg hidden-sm hidden-md hidden-lg">
+                                                    <div class="image remainingBlogImage hidden-lg " style=" height:220px; position: relative; background-image: url('@blog.Item2')"></div>
                                                 </div>
-                                                <div class="article-content">
-                                                    <div class="pull-right hidden-lg"><i>Publish Date: @blog.Item6.ToShortDateString()</i></div>
+                                                <div class="col-xs-8 hidden-sm hidden-md hidden-lg">
+                                                    <div class="article-content">
+                                                        <div class="article-title ">@blog.Item3</div>
+                                                        <div class="body-content article-body-content">
+                                                            @blog.Item4
+                                                        </div>
+                                                    </div>
+                                                    <div class="article-content">
+                                                        <div class="pull-right hidden-lg publish-date"><i>Publish Date: @blog.Item6.ToShortDateString()</i></div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </a>
+                            </a>
+                        }
+                        else
+                        {
+                            <a class="blogHeaderLink" href="@blog.Item5?category=@indexString">
+                                <div class="article-card video-item video_list_item" style="cursor:pointer;">
+                                    <div style="display:flex;" class="row">
+                                        <div class="col-md-4 hidden-md hidden-sm hidden-xs hidden-lg">
+                                            <div class="image" style="background-image: url('@blog.Item2')"></div>
+                                        </div>
+                                        <div class="col-xs-12 col-lg-8">
+                                            <div class="row">
+                                                <div class="col-xs-4 hidden-lg hidden-sm hidden-md hidden-lg">
+                                                    <div class="image remainingBlogImage hidden-lg " style=" height:220px; position: relative; background-image: url('@blog.Item2')"></div>
+                                                </div>
+                                                <div class="col-xs-8 hidden-sm hidden-md hidden-lg">
+                                                    <div class="article-content">
+                                                        <div class="article-title ">@blog.Item3</div>
+                                                        <div class="body-content article-body-content">
+                                                            @blog.Item4
+                                                        </div>
+                                                    </div>
+                                                    <div class="article-content">
+                                                        <div class="pull-right hidden-lg publish-date"><i>Publish Date: @blog.Item6.ToShortDateString()</i></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        }
                         <div class="sharethis-inline-share-buttons" data-url="@blog.Item5"></div>
                     </div>
                 }
-                @*if (totalPages > 1)
+                if (totalPages > 1)
                     {
                         <div class="col-xs-12 col-sm-12 col-md-12">
                             <div class="container hr-line">
@@ -1141,7 +1630,7 @@
                                 </ul>
                             </div>
                         </div>
-                    }*@
+                    }
             }
         </div>
     </div>
@@ -1171,6 +1660,40 @@
             }
 
         </div>*@
+        <br/>
+    <div class="container-fluid press-release-container margin-bottom-20">
+        <div class="row">
+            <div class="container">
+                <div id="divPRs">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <hr class="pr-line">
+                            <h4 class="pageTitle">Latest Press Releases</h4>
+                            <hr>
+                        </div>
+                        @foreach (var pr in latestPrs)
+                        {
+                            <div class="col-lg-6" style="margin-top:10px">
+                                <a href="@pr.File.Url" target="_blank">
+                                    <div class="pr-card video_list_item">
+                                        <div class="row" style="padding:10px">
+                                            <div class="col-xs-12">
+                                                <img style="height:50px; vertical-align:center;" src="~/images/pdf.png" alt="Alternate Text" />
+                                                <span style="font-size: 12px">@pr.Title</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                        <div class="col-xs-12">
+                            <a href="/en/home/press-releases"><h4 class="pageLink" style="float:right;">Read More</h4></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @Html.Partial("_renderPopUpContent", new ContainerViewModel()
     {
@@ -1253,3 +1776,4 @@
     <script src="~/javascripts/reuse/form_validation.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.5/validator.min.js"></script>
 }
+

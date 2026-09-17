@@ -142,9 +142,9 @@
     // Mobile App Modal Data
     var popupAppTitle = "#Quick Tip";
     var popQRCode = "/media/ylalxyxb/image001.png";
-    var popAndroidApp = "/media/pt2b4b3q/GooglePlayStoreDownloadImageLink.png";
-    var popIOsApp = "/media/pejn1h1x/appstoredownloadimagelink.png";
-    var popHuaweiApp = "/media/yespuwk0/huaweiappgallery.png";
+    var popAndroidApp = "/media/mtjfxi5f/googleplaystoredownloadimagelink.png";
+    var popIOsApp = "/media/5pdkgij3/appstoredownloadimagelink.png";
+    var popHuaweiApp = "/media/l2dls1tu/huaweiappgallery.png";
 
     var imageUrl = heroHeader.Value<IPublishedContent>
         ("image")?.Url;
@@ -157,6 +157,8 @@
         ("imageSmall")?.Url;
 
 }
+
+
 
 <style>
     .registerLogin {
@@ -172,6 +174,33 @@
         display: block;
     }
 
+@@media (min-width: 360px) and (max-width: 416px) {
+        .hero-static-banner {
+            height: 530px;
+        }
+    }
+
+    @@media (min-width: 428px) and (max-width: 540px) {
+        .hero-static-banner {
+            height: 550px;
+        }
+    }
+
+    @@media (min-width: 540px) and (max-width: 720px) {
+        .hero-static-banner {
+            height: 200px;
+        }
+    }
+
+    @@media (min-width: 768px) and (max-width: 1024px) {
+        .hero-static-banner {
+            height: 285px;
+        }
+
+        .hero-static-caption {
+            top: -40px;
+        }
+    }
 
     @@media (min-width: 1000px) and (max-width: 10000px) {
         #popUpHuawei {
@@ -211,8 +240,8 @@
                 <div class="hero-static-banner" id="heroHeader" style="background-image: url('@imageUrl');background-position: bottom;">
                     <ol class="breadcrumb">
                         @{
-                            var breadcrumbItems = heroHeader.Value<IPublishedContent>("breadcrumb")?.ToString()?.Split(',')?.ToList();
-                            if (heroHeader.Value<IPublishedContent>("breadcrumb")?.ToString()?.Split(',')?.ToList() != null)
+                            var breadcrumbItems = heroHeader.Value@*<IPublishedContent>*@("breadcrumb")?.ToString()?.Split(',')?.ToList();
+                            if (heroHeader.Value@*<IPublishedContent>*@("breadcrumb")?.ToString()?.Split(',')?.ToList() != null)
                             {
                                 foreach (string breadcrumItem in breadcrumbItems)
                                 {
@@ -290,7 +319,7 @@
 
 @*Blue Background Start*@
 
-<div class="campaign-myworld-container" style="background-image: url('/media/edkc04ez/african-banking-1935x255.png');">
+<div class="campaign-myworld-container" style="background-image: url('/media/ptkpputz/african-banking-1935x255.png');">
     <div class="container payments-section full blue-button">
         <div class="margin-top-20 visible-xs"></div>
         <div class="row myworld-campaign-section-container">
@@ -408,6 +437,8 @@
 </div>
 
 
+
+
 <!-- NUMBER TO CALL -->
 <div class="number-to-call">
     <p style="text-align: center;">1 <span>Number to call</span></p>
@@ -468,6 +499,9 @@ HTMLContent2 = @<text>
 </text>
 })
 
+
+<link rel="stylesheet" href="/css/projectmagic.css" /> 
+
 @section scripts
                                             {
     <script type="text/javascript">
@@ -503,7 +537,7 @@ HTMLContent2 = @<text>
                                                             // window.location.href = $("#iOSUrl").attr('href');
                                                             //break;
                                                             default:
-                                                              
+                                                                 console.log("click");
                                                         }
                                                     }
 

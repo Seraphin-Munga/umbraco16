@@ -276,8 +276,8 @@
         var buttonLinkData = campaignFooter.Value("sectionLink");
         var campaignFooterLink = campaignFooter.Value<IEnumerable<Umbraco.Web.Models.Link>>("sectionLink");
 
-
-        <div class="top_extend item" style="background-size: cover;background: url('/media/2jcjw4xu/landing2.jpg')no-repeat;background-position: 40% 25%;">
+        @*<div class="top_extend item" style="background-size: cover;background: url('/media/2jcjw4xu/landing2.jpg')no-repeat;background-position: 40% 25%;">*@
+        <div class="top_extend item" style="background-size: cover;background: url('https://www.africanbank.co.za/media/54605/landing-page_myworld.jpg')no-repeat;background-position: 40% 25%;">
             <div class="container">
                 <div class="col-md-8"></div>
                 <div class="col-md-4" style="padding-top: 83px;padding-bottom: 133px;">
@@ -296,7 +296,7 @@
                                 var buttonText = links.Name;
                                 var btnId = viewName + "_" + buttonText.ToString().Replace(" ", "") + "_" + "SowetanLiveCampaign";
                                 <div class="switch-mobi-view">
-                                    <a class="button primary clearfix"   target="_blank" href="@links.Url" id="@btnId">
+                                    <a class="button primary clearfix" href="@links.Url" id="@btnId">
                                        @buttonText
                                     </a>
                                 </div>
@@ -329,6 +329,32 @@
         }
     }
 </div>
+
+<style>
+    .hero-title,.switch-mobi-view 
+    {
+        margin-left: 120px !important;
+        
+    }
+    .cap-title{
+        font-size:44px;
+    }
+    @@media (max-width: 375px)
+    {
+        .hero-title,.switch-mobi-view 
+        {
+            margin-left: 0px !important;
+            
+        }
+        .cap-title{
+            font-size:30px;
+        }
+    }
+    @@media screen and (max-width: 850px)
+    {
+        
+    }
+</style>
 <!--1 Number to call end-->
 <!--bottom MyWORLD upsell end-->
 @Html.Partial("_renderPopUpContent", new ContainerViewModel()

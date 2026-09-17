@@ -1,8 +1,8 @@
-﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+﻿  @inherits Umbraco.Web.Mvc.UmbracoViewPage
 
 
 @{
-  Layout = "Master.cshtml";
+  Layout = "MasterHeaderOnly.cshtml";
     var Children = Model.Children;
      var heroBody = Children?.Where(c => c is HeroBody).FirstOrDefault(); 
      var quickTitle = heroBody.Value("bodyTitle");
@@ -534,7 +534,7 @@
     <div id="step3" class="step">
         <div id="personaloanoffers">
             <h1 id="loanOfferTitle" class="color-brand-1 mt-15 mb-20  text-center">Great News! You Qualify - view your <span class="offer-title-heading">personalised loan quick quotes</span> below.</h1>
-            <p class="font-md color-brand-1 mb-20 text-center">Please note: These are quick, estimated quotes based on the information provided. The final amount and rates may vary upon a detailed assessment of your profile needs and requirements.</p>
+            <p id="qqtitle" class="font-md color-brand-1 mb-20 text-center">Please note: These are quick, estimated quotes based on the information provided. The final amount and rates may vary upon a detailed assessment of your profile needs and requirements.</p>
             <!-- Filter Cards -->
             <div id="filterData" class="filter-row">
 
@@ -550,7 +550,7 @@
             
              
             </div>
-            <div id="newCustomer" class="register-section">
+            <div id="newCustomer" class="register-section" hidden>
                   @* <label class="custom-checkbox">
                     <input type="checkbox" id="consentCheckbox">
                     <span class="slider-qa font-md color-brand-1">I give African Bank Limited consent to create my online banking profile</span>
@@ -780,14 +780,14 @@
             </div>
             <div class="modal_body">
                 <h2 class="color-brand-1 mt-15 mb-20">Confirmation</h2>
-                 <p class="font-md color-brand-1 mb-20">Are you sure you want to cacel?</p>
+                 <p class="font-md color-brand-1 mb-20">Are you sure you want to cancel?</p>
                
             </div>
 
 
             <div class="modal_footer">
               <button class="btn btn-primary" onclick="closeDialog('cancelModal')">No, Continue</button>
-                <button class="btn btn-tertiary" onclick="window.location.href='https://publishing.v5.stg.africanbankdmz.net/en/home/get-a-quote-1/'">Yes, Continue</button>
+                <button class="btn btn-tertiary" onclick="window.location.href='http://cmsdev.africanbank.net/en/home/new-get-a-quote-1/'">Yes, Cancel</button>
             </div>
         </div>
     </div>

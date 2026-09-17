@@ -55,7 +55,7 @@
     var searchResults = searchQuery; //  searcher.Search(searchQuery.Compile());
     // var searchResults = searcher.Search(searchQuery.Compile());
 
-    foreach (var item in contents)
+    foreach (var item in contents) //.Skip(100).Take(10)
     {
         if (item.Id == 41927)
         {
@@ -137,8 +137,8 @@
         }
         else
         {
-            if (TupleBlogs.Count <= 30) // remove this limit when deploying
-            {
+            @*if (TupleBlogs.Count <= 30) // remove this limit when deploying
+            {*@
                 // Else we are loading the blog items
                 if (indexStringAlt != "searchstring" && indexString != "" && indexStringAlt != "")
                 {
@@ -165,7 +165,7 @@
                     Convert.ToDateTime(blogBody.Value("blogDate")),
                     (blogBody.Value("blogBody"))?.ToString() ?? ""
                     ));
-            }
+            @*}*@
 
         }
 
@@ -216,7 +216,29 @@
 <link href="~/css/Blog.css" rel="stylesheet" />
 
 <style type="text/css">
-
+    @@media (min-width:320px) and (max-width: 425px) {
+        #divNextblogs {
+            display: block;
+        }
+        #divNextblogs .body-content {
+            margin-left: 15px;
+        }
+        #divNextblogs .next-blogs {
+           left: 26% !important;
+        }
+    }
+    @@media (min-width:426px) and (max-width: 428px) {
+        #divNextblogs {
+            display: block;
+        }
+        #divNextblogs .next-blogs {
+            margin-left: -56px;
+            left: 143px !important;
+        }
+    }
+    #divNextblogs .article-card .article-title {
+       font-size: 13px;
+    } 
     .blog-padding {
         margin-top: 40px;
     }
@@ -665,8 +687,6 @@
         }
     }
 </style>
-
-
 <div class="blog-padding">
     <div class="container-fluid sub-menu-shadow fixed-sub-menu-bar">
         <div class="row">
@@ -725,7 +745,7 @@
                 <div class="row">
                     <div class="col-xs-12 hidden-sm hidden-md hidden-lg search-main">
                         <form id="lg-md-show-search" class="navbar-form  content-padding-10 ng-pristine ng-valid ng-submitted" style="display: flex;" action="?">
-                            <input type="text" class="searchTerm" placeholder="Search for blog..." id="searchstring" name="searchstring">
+                            <input type="text" class="searchTerm" placeholder="Search for bloggg..." id="searchstring" name="searchstring">
                             <button type="submit" id="btnSubmit" class="searchButton">
                                 <i class="fa fa-search"></i>
                             </button>
@@ -1084,7 +1104,6 @@
                 {
                     var cardIcon = @vid.Value("nCcardIcon");
                     var imgUrl = ((IPublishedContent)cardIcon).Url;
-                    var videoUrl = ((DescribedCard)vid).NCcardTitle.ToString();
                     <div class="col-sm-6">
                         <div class="article-card">
                             <div style="display:flex;">
@@ -1097,7 +1116,7 @@
                                     </div>
                                 </div>
                                 <div style="display:none; width:100%;">
-                                    <iframe class="videoHeight" src="@videoUrl?autoplay=0" style="width:100%;"></iframe>
+                                    <iframe class="videoHeight" src="@vid.Value("Name")?autoplay=0" style="width:100%;"></iframe>
                                 </div>
                             </div>
                         </div>

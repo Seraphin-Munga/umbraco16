@@ -1,5 +1,569 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCampaign>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models;
+@using Web.Helpers
+@using Umbraco.Web.Models
+@using System.Text.RegularExpressions
+
 @{
-	Layout = null;
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var children = Model.Children;
+
+    // Get specific Children
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+
+    var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
+
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+
+    string presentation = heroBody.Value("bodyTitle").ToString();
+    //IPublishedContent CurrentPage = UmbracoContext.Current.PublishedContentRequest.PublishedContent;
+    var CurrentPage = Umbraco.AssignedContentItem;
+    var webPageName = CurrentPage.Name;
+
+    var isDebiCheck = false;
+    if (webPageName == "DebiCheck")
+    {
+        isDebiCheck = true;
+    }
+
+    // Get the (generic Open Now that will be used throughout the page) button from the Hero Shoulder
+    IEnumerable<IPublishedContent>
+        bodyButtons = (IEnumerable<IPublishedContent>
+            )heroBody.Children.Where(c => c is ContentModels.EbankItabstractButton);
+    ContentModels.EbankItabstractButton openNowButton = null;
+    ContentModels.EbankItabstractButton registerNowButton = null;
+    ContentModels.EbankItabstractButton androidDownloadNow = null;
+    ContentModels.EbankItabstractButton iosDownloadNow = null;
+    ContentModels.EbankItabstractButton huaweiDownloadNow = null;
+    ContentModels.EbankItabstractButton downloadNow = null;
+
+    foreach (var button in bodyButtons)
+    {
+        if (button.Value("EbankItbuttonText").ToString().Contains("Register / Login"))
+        {
+            openNowButton = (ContentModels.EbankItabstractButton)button;
+        }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("Register Now"))
+        {
+            registerNowButton = (ContentModels.EbankItabstractButton)button;
+
+        }
+
+        else if (button.Value("EbankItbuttonText").ToString().Contains("Android"))
+        {
+            androidDownloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("iOS"))
+        {
+            iosDownloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+        else if (button.Value("EbankItbuttonText").ToString().Contains("Huawei"))
+        {
+            huaweiDownloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+        else
+        {
+            downloadNow = (ContentModels.EbankItabstractButton)button;
+        }
+    }
+
+    var openNowButtonLink = "#";
+    openNowButtonLink = string.IsNullOrEmpty(openNowButton?.EbankItbuttonInternalLink?.Url) ?
+    openNowButton?.EbankItbuttonExternalLink :
+    openNowButton.EbankItbuttonInternalLink?.Url;
+    openNowButtonLink = (string.IsNullOrEmpty(openNowButtonLink)) ? "#" : openNowButtonLink;
+
+    var registerNowButtonLink = "#";
+    registerNowButtonLink = string.IsNullOrEmpty(registerNowButton?.EbankItbuttonInternalLink?.Url) ?
+    registerNowButton?.EbankItbuttonExternalLink :
+    registerNowButton.EbankItbuttonInternalLink?.Url;
+    registerNowButtonLink = (string.IsNullOrEmpty(registerNowButtonLink)) ? "#" : registerNowButtonLink;
+
+    // End get generic shoulder button
+
+    var chestTitle = heroChest?.Value("chestTitle").ToString();
+    var chestDescription = heroChest?.Value("chestDescription").ToString();
+    var chestCards = heroChest?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+
+    var campaignBankingItemsModel = new CustomModels.Benefits
+    {
+        Header = chestTitle,
+        Description = chestDescription,
+        BenefitCards = chestCards.Select(c => c as Card).ToList()
+
+    };
+
+    //Create your won world of banking
+
+    var tabs = (IEnumerable<IPublishedContent>
+        )heroBody?.Children.Where(c => c.ContentType.Alias.ToLower() == "tabbody").ToList();
+
+    ContentModels.TabBody newWaysOfBanking = null;
+    ContentModels.TabBody createOwnWorldOfBanking = null;
+    ContentModels.TabBody myWorldTermsAndConditions = null;
+
+    tabs.ToList().ForEach(x =>
+    {
+        var partialName = x.Value("PartialViewName");
+
+        if (partialName.ToString() == "_cardRenderDescribedCards")
+        {
+            newWaysOfBanking = (TabBody)x;
+        }
+        else if (partialName.ToString() == "_renderPDFData")
+        {
+            myWorldTermsAndConditions = (TabBody)x;
+        }
+        else
+        {
+            createOwnWorldOfBanking = (TabBody)x;
+        }
+    });
+
+
+    var ownWorldItems = (IEnumerable<IPublishedElement>
+        )createOwnWorldOfBanking.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+    var newWaysItems = (IEnumerable<IPublishedElement>
+        )newWaysOfBanking.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+    var myWorldTAndCs = (IEnumerable<IPublishedElement>
+        )myWorldTermsAndConditions.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+
+    var viewName = Path.GetFileNameWithoutExtension(Server.MapPath(VirtualPath)); //used mainly to identify the page
+    var buttonText = openNowButton.EbankItbuttonText;
+    var onlineButtonText = registerNowButton.EbankItbuttonText;
+    var btnId = viewName + "_" + buttonText.ToString().Replace(" ", "") + "_" + "banking-campaign";
+
+    var btnregisterNowId = viewName + "_" + onlineButtonText.ToString().Replace(" ", "") + "_" + "banking-campaign";
+
+    // Mobile App Modal Data
+    var popupAppTitle = "#Quick Tip";
+    var popQRCode = "/media/ylalxyxb/image001.png";
+    var popAndroidApp = "/media/mtjfxi5f/googleplaystoredownloadimagelink.png";
+    var popIOsApp = "/media/5pdkgij3/appstoredownloadimagelink.png";
+    var popHuaweiApp = "/media/l2dls1tu/huaweiappgallery.png";
+
+    var imageUrl = heroHeader.Value<IPublishedContent>
+        ("image")?.Url;
+
+    var headerImage_large = heroHeader?.Value<IPublishedContent>
+        ("image")?.Url;
+    var headerImage_medium = heroHeader?.Value<IPublishedContent>
+        ("imageMedium")?.Url;
+    var headerImage_small = heroHeader?.Value<IPublishedContent>
+        ("imageSmall")?.Url;
+
+}
+
+<style>
+    .registerLogin {
+        width: unset;
+        text-align: right;
+    }
+
+    .onenumbercall {
+        text-align: center;
+        margin-top: 0;
+        margin-bottom: 10px;
+        line-height: 1.1;
+        display: block;
+    }
+    .download-brochure{
+        
+        float: right;
+    }
+    
+    .view{
+        float:left;
+    }
+
+
+@@media (min-width: 360px) and (max-width: 416px) {
+        .hero-static-banner {
+            height: 530px;
+        }
+    }
+
+    @@media (min-width: 428px) and (max-width: 540px) {
+        .hero-static-banner {
+            height: 550px;
+        }
+    }
+
+    @@media (min-width: 540px) and (max-width: 720px) {
+        .hero-static-banner {
+            height: 200px;
+        }
+    }
+
+    @@media (min-width: 768px) and (max-width: 1024px) {
+        .hero-static-banner {
+            height: 285px;
+        }
+
+        .hero-static-caption {
+            top: -40px;
+        }
+        
+
+    }
+
+    @@media (min-width: 1000px) and (max-width: 10000px) {
+        #popUpHuawei {
+            margin-right: -45rem;
+            margin-top: -82px;
+        }
+
+
+        .modal-dialog {
+            width: 900px !important;
+        }
+    }
+
+    @@media (min-width: 768px) and (max-width: 1024px) {
+        #popUpHuawei {
+            margin-right: -35rem;
+            margin-top: -68px;
+        }
+
+        .col-sm-6 img {
+            width: 160px;
+        }
+        
+            .download-brochure{
+        
+        float: unset !important;
+    }
+    
+    .view{
+        float:unset !important;
+    }
+
+        .modal-dialog {
+            width: 790px !important;
+            padding-left: 30px;
+            padding-right: 50px;
+        }
+    }
+    
+    
+    @@media (max-width: 768px) {
+     
+        
+         .download-brochure{
+        
+        float: unset !important;
+    }
+    
+    .view{
+        float:unset !important;
+    }
+
+     
+    }
+</style>
+
+<!-- HERO BANNER -->
+<div class="hero-static-container">
+    <div class="container-fluid">
+        <div class="row no-gutter">
+            <div class="col-sm-12">
+                <div class="hero-static-banner" id="heroHeader" style="background-image: url('@imageUrl');background-position: bottom;">
+                    <ol class="breadcrumb">
+                        @{
+                            var breadcrumbItems = heroHeader.Value@*<IPublishedContent>*@("breadcrumb")?.ToString()?.Split(',')?.ToList();
+                            if (heroHeader.Value@*<IPublishedContent>*@("breadcrumb")?.ToString()?.Split(',')?.ToList() != null)
+                            {
+                                foreach (string breadcrumItem in breadcrumbItems)
+                                {
+                                    var cssClass = breadcrumItem == breadcrumbItems.Last() ? "active" : string.Empty;
+                                    <li class="@cssClass">@breadcrumItem</li>
+                                }
+                            }
+                        }
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+<br />
+
+@{
+    if (isDebiCheck)
+    {
+        <div class="container infographic">
+            <div class="row">
+                <div class="col-md-4">
+                    <img loading="lazy" class="info-img" src="~/media/dv2e0wdp/lr_in1811_003_fixed-deposit_infographic2.jpg" alt="African Bank Fixed deposit infograhpic">
+                </div>
+                <div class="col-md-8 info-button">
+                    @heroShoulder.Value("richTextEditor")
+                    <a class="button primary" href="~/media/2x3bzlvo/lr_in1811_003_fixed-deposit_infographic.pdf">Download infographic</a>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+<div class="container">
+    <div class="internet-banking-container full image-full">
+
+        @if (campaignBankingItemsModel.BenefitCards != null && campaignBankingItemsModel.BenefitCards.Any())
+        {
+            int iterator = 0;
+
+            <div class="row eq-height @(campaignBankingItemsModel.BenefitCards.Count > 3 ? " card-slider" : "" ) ">
+                @{
+                    int imgIterator = 0;
+                    foreach (Card benefit in campaignBankingItemsModel.BenefitCards)
+                    {
+                        String cardIdTag = " card" + iterator.ToString();
+                        String cardId = benefit.Name.Replace(" ", " ").ToString() + imgIterator.ToString();
+                        <div class="col-sm-12">
+                            <div class="image center-align">
+                                @if (benefit.CardIcon != null)
+                                {
+                                    <a href="#@cardId">
+                                        <img loading="lazy" class="myWorld-campaign-images" style="width:72%;" src="@benefit.CardIcon.Url" alt="@benefit.Value("altTag")" />
+                                    </a>
+                                }
+                            </div>
+                            <div class="title text-uppercase">@benefit.CardTitle</div>
+                            <p class="descr">@benefit.CardDescription</p>
+                        </div>
+                        ++iterator;
+                        ++imgIterator;
+                    }
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<br />
+
+@*Blue Background Start*@
+
+<div class="campaign-myworld-container" style="background-image: url('/media/ptkpputz/african-banking-1935x255.png');">
+    <div class="container payments-section full blue-button">
+        <div class="margin-top-20 visible-xs"></div>
+        <div class="row myworld-campaign-section-container">
+            @{
+                int idIterator = 0;
+                foreach (var item in newWaysItems)
+                {
+                    var cardTitle = item.Value< string>
+                        ("NCcardTitle");
+                    var cardTitleId = cardTitle.Trim().ToString().Replace(" ", "").ToString() + idIterator.ToString();
+                    var cardDesc = item.Value<string>
+                        ("NCcardDescription");
+                    var icon = item.Value<IPublishedContent>
+                        ("NCcardIcon");
+                    <div class="col-sm-12 margin-bottom-20 hero-title">
+                        <div class="text-left white-link-color richtextbox-blue-bg">
+                            <p id="@cardTitleId" class="title green-color font-size-30">@cardTitle</p>
+                            <p>@cardDesc</p>
+                        </div>
+                    </div>
+                
+                    
+                    
+                    @*
+                          <div class="row">
+                        <div class="col-sm-12 col-md-3 col-md-offset-9 registerLogin margin-bottom-20">
+                            <a href="@openNowButtonLink" class="button green-button" id="">
+                                @buttonText
+                            </a>
+                        </div>
+                    </div>
+                    *@
+                    <div class="col-sm-12">
+                        @Html.Raw(@item.Value("mainDescription"))
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <hr style="border-color: #82754e;">
+                        </div>
+                    </div>
+                    idIterator += 1;
+                }
+            }
+        </div>
+    </div>
+</div>
+@*Blue Background End*@
+<div class="green-pointer-banking-campaign"></div>
+<div class="hover-block"></div>
+<div class="container">
+    <div class="mega-tabs" style="margin-top:-42px">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs eq-height" role="tablist">
+            <li role="presentation" class="online-banking-li">
+                @{
+                    if (isDebiCheck)
+                    {
+                        @presentation
+                    }
+                    else
+                    {
+                        <span>Get your FREE credit report now</span>
+                    }
+                }
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="container payments-section full margin-bottom-30">
+    <div class="margin-top-20 visible-xs"></div>
+    <div class="row">
+        <h4 class="container margin-bottom-20 align-center">@createOwnWorldOfBanking.Value("partialViewClassName")</h4>
+        @{
+            int cardIterator = 0;
+            bool increaseCardHeight = false;
+
+            foreach (var item in ownWorldItems)
+            {
+
+                if (cardIterator == (int)ownWorldItems.Count() - 1)
+                {
+                    increaseCardHeight = true;
+                }
+                var cardTitle = item.Value<string>
+                    ("NCcardTitle");
+                var cardDesc = item.Value<string>
+                    ("NCcardDescription");
+                var icon = item.Value<IPublishedContent>
+                    ("NCcardIcon");
+                <div class="col-sm-4 margin-bottom-20">
+                    <div class="@(increaseCardHeight ? " cellphone-button-banking-campaign" : "" )">
+                        <div class="text-left center-align white-link-color richtextbox-blue-bg">
+                            <img loading="lazy" src="@icon.Url" alt="@icon.Value(" altTag")" class="image-center-resizer" />
+                            <p class="title blue-color font-size-20">@cardTitle</p>
+                            <p>@cardDesc</p>
+                        </div>
+                    </div>
+                    @{
+                        if (!cardTitle.Contains("App"))
+                        {
+                            <div class="col-md-4 center-align margin-bottom-20 margin-right-50 banking-options-buttons">
+                                <a href="@registerNowButtonLink" class="button span-buttons green-button" id="">
+                                    @onlineButtonText
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-md-4 center-align margin-bottom-20 margin-left-50 banking-options-buttons">
+                        
+                         <a href="@downloadNow.EbankItbuttonExternalLink" class="button span-buttons green-button view_OnlineApps downloadNow" id="">
+                                    @downloadNow.EbankItbuttonText
+                                </a>
+                            
+                            
+                                
+                            </div>
+                        }
+                    }
+                </div>
+                cardIterator += 1;
+            }
+        }
+    </div>
+</div>
+
+
+<!-- NUMBER TO CALL -->
+<div class="number-to-call">
+    <div class="container">
+        <div class="row justify-content-center align-items-center text-center">
+            <div class="col-sm-8">
+                <!-- Added Code Macro end date on keyVisual -->
+                <div class="bttn download-brochure">
+                    <a style="width: 100%;" tabindex="0" href="/media/ve1ft04f/codi-digital-brochure.pdf" target="_self" class="button span-buttons green-button view_OnlineApps downloadNow">Download Brochure</a>
+                    <!-- To support js event ECS:12342 -->
+                </div>
+            </div>
+            <div style="display:none;" class="col-sm-6">
+                <div class="bttn view">
+                    <a href="/media/gltpynwf/codi-faq-s-002.pdf" class="button primary button-styler">View FAQs</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts
+                                            {
+    <script type="text/javascript">
+                                                function getMobileOperatingSystem() {
+                                                    var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+                                                    if (/windows phone/i.test(userAgent)) {
+                                                        return "Windows Phone";
+                                                    }
+
+                                                    if (/android/i.test(userAgent)) {
+                                                        return "Android";
+                                                    }
+
+                                                    if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                                                        return "iOS";
+                                                    }
+
+                                                    return "unknown";
+                                                }
+                                                $(document).ready(function () {
+                                                    var isDebi = false;
+                                                    if ("@webPageName" == "DebiCheck") {
+                                                        isDebi = true;
+                                                    }
+                                                    if (!isDebi) {
+                                                        var downloadPath = window.location.href;
+                                                        switch (getMobileOperatingSystem()) {
+                                                            case "Android":
+                                                            // window.location.href = $("#AndroidUrl").attr('href');
+                                                            //break;
+                                                            case "iOS":
+                                                            // window.location.href = $("#iOSUrl").attr('href');
+                                                            //break;
+                                                            default:
+                                                                 console.log("click");
+                                                        }
+                                                    }
+
+                                                    var imageBgCss = "url('" + "@headerImage_large" + "')";
+                                                    var imageMdCss = "url('" + "@headerImage_medium" + "')";
+                                                    var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_medium : headerImage_small)" + "')";
+                                                    var CheckScreenSize;
+                                                    (CheckScreenSize = function () {
+                                                        var _width = $(window).outerWidth();
+                                                        var _height = $(window).outerHeight();
+                                                        if (_width <= 511) {
+                                                            $("#heroHeader").css("background-image", imageSmCss);
+                                                        }
+                                                        else {
+                                                            $("#heroHeader").css("background-image", imageBgCss);
+                                                        }
+                                                    })();
+                                                    $(window).resize(CheckScreenSize);
+
+                                                });
+
+                                                $(".btn_ok_modal").click(function () {
+                                                    $('#generic').modal('hide');
+                                                });
+
+    </script>
 }

@@ -1,5 +1,291 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using AcfAfricanbank.Core.Models.Forms
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers;
+@using System.Configuration;
+@using CustomModels = Web.Models;
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
+	
+	 var children = Model.Children;
+	 
+	 var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+     
+      var Moneycard= heroBody.Children.Where(c => c.Name == "MoneyCards").FirstOrDefault();
+      var Moneycardshare = Moneycard.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var Moneycards = Moneycardshare.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+    
+      var sharecard= heroBody.Children.Where(c => c.Name == "ShareMoney").FirstOrDefault();
+      var sharemoneycards = sharecard.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var sharecards = sharemoneycards.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+
+      ContentModels.TabBody createOwnWorldOfBanking = null;
+      var partialName = sharecard.Value("PartialViewName");
+      createOwnWorldOfBanking = (TabBody)sharecard;
+      
+      
+      
+    var bodyCards = heroBody?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+    var applyDocs = bodyCards?.Select(c => c as Card).FirstOrDefault();
+    var cardImage = applyDocs.Value("cardIcon");
+      String cardUrl = ((IPublishedContent)cardImage).Url.ToString();
+    var cardLink= applyDocs.Value("buttonLink");
+   
+    var navigate = applyDocs.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").FirstOrDefault();
 }
+
+<link rel="stylesheet" href="/css/projectmagic.css" /> 
+
+@* the fun starts here *@
+
+  @{
+         int idIterator = 0;
+           foreach (var item in Moneycards){
+               var tabSubItemImage = item.Value<IPublishedContent>("tabSubItemImage")?.Url;
+               var tabSubItemIcon = item.Value<IPublishedContent>("tabSubItemIcon")?.Url;
+    var title = item.Value<string>("tabSubItemTitle");
+    var description = item.Value<string>("genericCardContent");
+    
+    
+                
+                
+                 if (idIterator%2 == 0)
+                    {
+                        <section class="section-800 bg-grey-60">
+                            <div class="container">
+                                <div class="row align-items-center d-flex row-change">
+                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                        <h1 class="color-brand-1 mt-15 mb-20">@title</h1>
+                                        <p class="font-md color-brand-1"> @item.Value("tabSubItemTextContent")</p>
+                                       
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                        <img Class="d-block"
+                                             src="@tabSubItemImage"
+                                             alt="" />
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        }
+                        else{
+                        
+                             <section class="section-800">
+                                <div class="container">
+                                    <div class="row align-items-center row-change d-flex flex-row-reverse">
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                            <h1 class="color-brand-1 mb-20">@title</h1>
+                                            <p class="font-md color-grey-500">@item.Value("tabSubItemTextContent")</p>
+                                       
+                
+                                        </div>
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                             <img
+                                              Class="d-block"
+                                              src="@tabSubItemImage"
+                                             alt="" />
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        }
+          idIterator += 1;
+            }
+        }
+
+@*<section class="section-800 bg-grey-60">
+          <div class="container">
+            <div class="row d-flex align-items-center row-change">
+              <div class="col-xl-6 col-lg-6 col-md-6">
+                <h1 class="color-brand-1 mt-15 mb-20">
+                Introducing ShareMoney – Send Cash to any Cellphone
+                </h1>
+
+                <p class="font-md color-brand-1 mt-20">
+                placerat orci nulla. Tincidunt ornare massa eget egestas purus viverra accumsan in nisl. Tempor id eu nisl nunc mi ipsum faucibus. Fusce id velit ut tortor pretium. Massa ultricies mi quis hendrerit dolor magna eget. Nullam eget felis eget nunc lobortis. Faucibus ornare suspendisse sed nisi. Sagittis eu volutpat odio facilisis mauris sit amet massa. Erat velit scelerisque in dictum non consectetur a
+                </p>
+              </div>
+              <div class="col-xl-6 col-lg-6 col-md-6">
+                {/* <img
+                  class="d-block"
+                  src="assets\imgs\new-site\best-bank.png"
+                  alt="iori"
+                />
+              </div>
+            </div>
+          </div>
+</section>*@
+
+@*<section class="section-800">
+          <div class="container">
+            <div class="row d-flex align-items-center row-change flex-row-reverse">
+              <div class="col-xl-6 col-lg-6 col-md-6">
+                <h1 class="color-brand-1 mt-15 mb-20">
+                What is ShareMoney?
+                </h1>
+                <p class="font-md color-brand-1">
+                ShareMoney is a service that allows customers to send money to any recipient, using the recipient’s cellphone number.  
+                </p>
+                <p class="font-md color-brand-1 mt-20">
+                Customers can ShareMoney from their MyWORLD bank account or from their Credit Card using the African Bank App or Online Banking.   
+                </p>
+                <p class="font-md color-brand-1 mt-20">
+                Customers can send any amount from R10 to R3 000 per transaction. No cents are allowed. 
+                </p>
+                <p class="font-md color-brand-1 mt-20">
+                A daily limit of R5 000 is applied and a monthly limit of R24 999 is applied. 
+                </p>
+                <p class="font-md color-brand-1 mt-20">
+                The fee to use ShareMoney is R7,50 and is charged to the sender.  
+                </p>
+              </div>
+              <div class="col-xl-6 col-lg-6 col-md-6">
+                <img
+                  class="d-block"
+                  src="assets\imgs\new-site\best-bank.png"
+                  alt="iori"
+                />
+              </div>
+            </div>
+          </div>
+    </section>*@
+    
+@*<section class="section-800 bg-grey-60">
+          <div class="container">
+            <div class="row d-flex align-items-center row-change">
+              <div class="col-xl-6 col-lg-6 col-md-6">
+                <h1 class="color-brand-1 mt-15 mb-20">
+                How Do I Use Sharemoney ?
+                </h1>
+                <p class="font-md color-brand-1">
+                Log into the African Bank App.  
+                </p>
+                <p class="font-md color-brand-1 mt-20">
+                Select the Transact tab.   
+                </p>
+                <p class="font-md color-brand-1 mt-20">
+                Select MoneySend. 
+                </p>
+                <p class="font-md color-brand-1 mt-20">
+                You can select to do a once-off ShareMoney or select a contact from your Phonebook 
+                </p>
+                <p class="font-md color-brand-1 mt-20">
+                If you select to do a once-oof ShareMoney, you can select from which account you would like to do the ShareMoeny.  
+                </p>
+                <p class="font-md color-brand-1 mt-20">
+                Select the amount that you would like to send
+                </p>
+                <p class="font-md color-brand-1 mt-20">
+                Enter the recipient contact number and press continue 
+                </p>
+                <p class="font-md color-brand-1 mt-20">
+                A voucher number and a secret code will be generated and will be sent via sms to the recipient. Voucher numbers are valid for 4 days. If not redeemed in 4 days, the voucher will expire and the funds will be returned to the sender’s account.
+                </p>
+                <p class="font-md color-brand-1 mt-20">
+                The recipient can then proceed to the selected retailer to withdraw the money.
+                </p>
+              </div>
+              <div class="col-xl-6 col-lg-6 col-md-6">
+                <img
+                  class="d-block"
+                  src="assets\imgs\new-site\best-bank.png"
+                  alt="iori"
+                />
+            </div>
+          </div>
+          </div>
+</section>*@
+
+<div class="section-800">
+                    <div class="container">
+                        <div class="row align-items-center row-change">
+                            <div class="col-12">
+                            <h1 class="color-brand-1 mt-15 mb-20">
+                           @createOwnWorldOfBanking.Value("partialViewClassName") @*Which retailer can I use to withdraw the<br /> ShareMoney cash?*@
+                    </h1>
+                            </div>
+                            <div class="col-12">
+                            <div class="mt-80">
+                            <ul class="list-partners">
+                                <li>
+                                    <img src="assets/imgs/page/homepage1/" alt="logo" />
+                                </li>
+                                <li>
+                                    <img src="assets/imgs/page/homepage1/" alt="logo" />
+                                </li>
+                                <li>
+                                    <img src="assets/imgs/page/homepage1/" alt="logo" />
+                                </li>
+                                <li>
+                                    <img src="assets/imgs/page/homepage1/" alt="logo" />
+                                </li>
+                                <li>
+                                    <img src="assets/imgs/page/homepage1/" alt="logo" /> 
+                                </li>
+                                <li>
+                                    <img src="assets/imgs/page/homepage1/" alt="logo" />
+                                </li>
+                            </ul>
+                        </div>
+                            </div>
+                        </div>
+                    
+                        
+                    </div>
+        </div>
+        
+        
+          <section class="section-800 bg-grey-60">
+          <div class="container">
+            <div class="row d-flex align-items-center row-change">
+              <div class="col-xl-6 col-lg-6 col-md-6">
+                <h1 class="color-brand-1 mb-20">@applyDocs.Value("cardTitle")</h1>
+                <p class="font-md color-grey-500">
+                  @applyDocs.Value("cardDescriptionLongText")
+                </p>
+                <div class="mt-50 text-start"><a class="btn btn-brand-1 hover-up" href="@navigate.Name">@navigate.Name
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="right-icon"
+                height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke-linecap="round" 
+                stroke-linejoin="round" stroke-width="32" 
+                d="M320 336h76c55 0 100-21.21 100-75.6s-53-73.47-96-75.6C391.11 99.74 329 48 256 48c-69 0-113.44 45.79-128 91.2-60 5.7-112 35.88-112 98.4S70 336 136 336h56m0 64.1 64 63.9 64-63.9M256 224v224.03">
+                </path></svg></a></div>
+             
+              </div>
+              <div class="col-xl-6 col-lg-6 col-md-6">
+                <img
+                  class="d-block"
+                  src="@cardUrl"
+                  alt=""
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+        @*<section class="section-800">
+          <div class="container">
+            <div class="row align-items-center row-change">
+              <div class="col-xl-6 col-lg-6 col-md-6">
+                <h1 class="color-brand-1 mb-20">Get the app now</h1>
+                <p class="font-md color-grey-500">
+                  or register for online banking, and open your investment
+                  account today.
+                </p>
+                <div class="mt-50 text-start">
+                  <a class="btn btn-brand-1 hover-up" href="#">
+                    Download Now
+                  </a>
+                </div>
+              </div>
+              <div class="col-xl-6 col-lg-6 col-md-6">
+                <img
+                  class="d-block"
+                  src="assets\imgs\new-site\get app.png"
+                  alt="iori"
+                />
+              </div>
+            </div>
+          </div>
+        </section>*@
+    
+    

@@ -1,4 +1,5 @@
 ﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCredit>
+@using AcfAfricanbank.Core.Models.Forms
 @using ContentModels = Umbraco.Web.PublishedModels;
 @using CustomModels = Web.Models;
 
@@ -14,6 +15,24 @@
     var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
     var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
     var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    
+    // Get AR Card body content
+    TabBody tabInfoGraphicData = (Umbraco.Web.PublishedModels.TabBody) heroBody.Children.Where(c => c is TabBody).FirstOrDefault();
+    // get linkdata for Meta and Instagram
+    
+    var fBookData = tabInfoGraphicData.Children(x => x is Card).First();
+    var fBookIconUrl = ((ContentModels.Image)((IPublishedContent)fBookData.Value("cardIcon"))).Url;
+    var navigateFB = fBookData.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").FirstOrDefault();
+    
+    var instaData = tabInfoGraphicData.Children(x => x is Card).Last();
+    var instaUrl = ((ContentModels.Image)((IPublishedContent)instaData.Value("cardIcon"))).Url;
+    var navigateInsta = instaData.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").FirstOrDefault();
+    
+    var buttonLinkData = tabInfoGraphicData.Children.Where(x => x.ContentType.Alias.ToString().ToLower() == "ebankititem2").FirstOrDefault();
+    var imageUrlString = ((ContentModels.Image)((IPublishedContent)buttonLinkData.Value("ebankITImage"))).Url;
+    var altTagImageUrl = ((ContentModels.Image)((IPublishedContent)buttonLinkData.Value("ebankITImage"))).AltTag;
+    
+    
     var heroKnees = children?.Where(c => c.ContentType.Alias.ToLower() == "heroknees").FirstOrDefault();
 
     var testimonialTab = children?.Where(c => c.ContentType.Alias.ToLower() == "testimonials").FirstOrDefault();
@@ -33,6 +52,7 @@
 
 
     // Get Specific Grandchildren
+    
     var bodyCards = heroBody?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
     var bodyButton = heroBody?.Children?
          .Where(c => c.ContentType.Alias == "ebankITAbstractButton").FirstOrDefault();
@@ -57,13 +77,205 @@
 
 }
 
+<style>
+    .mega-tabs .nav-tabs>li.active:after {
+        top: unset !important;
+        bottom: -18px;
+    }
+    
+         /*AR CARDS STYLING*/
+     
+   .card-block {
+    position: relative;
+    margin: 3.7% 0px;
+    padding: 1em;
+    }
+    
+.card {
+    overflow: hidden;
+    padding: 5;
+    border: none;
+    border-radius: 20px;
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 15px 25px, rgba(0, 0, 0, 0.05) 0px 5px 10px;
+    margin: 30px auto;
+    width: 80%;
+}
 
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.card-title p{
+    font-size: 32px;
+    font-weight: 900;
+    line-height: 1.2;
+    color: #002B60; 
+}
+
+.card-description{
+    font-size: 21px;
+}
+
+.description-span {
+    color:#6B6F81;
+    font-weight: bold;
+}
+
+.footer-content {
+    color:#6B6F81;
+    font-weight: bold;
+}
+
+img{
+    width:100%;
+    height:auto;
+    object-fit:cover;
+}
+
+.modal-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-wrapper {
+    display: flex;
+}
+
+.campaign-product-container {
+    top: 0px !important;
+}
+
+/*updated*/
+
+
+    @@media only screen and (max-width: 280px){
+      .margin-top-40{
+           margin-left: 12%;
+           margin-bottom: 50px;
+       }
+    }
+    @@media only screen and (max-width: 320px){
+      .margin-top-40{
+           margin-left: 20%;
+           margin-bottom: 50px;
+       }
+    }
+    @@media (min-width: 320px) and (max-width: 767px){
+        .card {
+        width: 100%;
+        }
+        
+      .margin-top-40{
+            margin-bottom: 50px;
+            margin-left: 24%;
+        }
+    }
+    @@media (min-width: 540px) and (max-width: 720px){
+    .card {
+    width: 100%;
+    }
+      .margin-top-40{
+          margin-left: 32%;
+          margin-bottom: 50px;
+       }
+    }
+    
+</style>
 
 <!-- HERO BANNER -->
 @Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
 
 <!-- HERO CONTINUED-->
 @Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+
+<!-- INFOGRAPHIC SECTION/AR CARD-->
+<div class="container">
+    <div class="card">
+         <div class="row d-flex justify-content-center">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-5">
+                    <img class="img-fluid" src="@imageUrlString" alt="@altTagImageUrl" > 
+                </div>
+                <div class="col-md-7">
+                    <div class="card-block">
+                        @buttonLinkData.Value("ebankItContent")
+                
+                            @{
+                                if (buttonLinkData != null)
+                                {
+                                    Umbraco.Web.Models.Link buttonDocumentLink = null;
+                                    if (buttonLinkData.Value("sectionLink") != null)
+                                    {
+                                        foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)buttonLinkData.Value("sectionLink"))
+                                        {
+                                            buttonDocumentLink = link;
+                                            break;
+                                        }
+                                        if (buttonDocumentLink != null)
+                                        {
+                                            var _buttonText = buttonDocumentLink.Name;
+                                            var viewName = Path.GetFileNameWithoutExtension(Server.MapPath(VirtualPath));
+                                            var btnId = viewName + "_" + _buttonText.ToString().Replace(" ", "") + "_" + "AR_VR";
+                                            @*<!--link to button-->
+                                            <a class="col-xs-12 col-sm-12 hidden-md hidden-lg span-buttons button primary clearfix text-center" href="@buttonDocumentLink.Url" target="_blank" id="@btnId">
+                                                @_buttonText
+                                            </a>
+                                            *@
+                                            
+                                            @* bootstrap button modal *@
+                                            <button type="button" class="btn-mobile btn hidden-lg span-buttons button primary clearfix text-center" data-toggle="modal" data-target="#exampleModalCenter" id="@btnId" >
+                                                        @_buttonText
+                                            </button>
+            
+                                            @*<!-- Modal -->*@
+                                            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                              <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLongTitle">Choose your social connect</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                  <span aria-hidden="true">&times;</span>
+                                                </button>
+                                              </div>
+                                              <div class="modal-body">
+                                              @*social Media icons to be added with links *@
+                                                <div class="modal-container">
+                                                    <div class="modal-wrapper">
+                                                        <div class="col-md-6">
+                                                            <a class="social-links" href="@navigateFB.Url" target="_blank" id="@btnId">
+                                                                <img src="@fBookIconUrl" alt="View AR on meta" />
+                                                            </a>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <a class="social-links" href="@navigateInsta.Url" target="_blank" id="@btnId">
+                                                            <img src="@instaUrl" alt="View AR on meta" />
+                                                        </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        }
+                                    }
+                                }
+                            }   
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+
+<!-- END INFOGRAPHIC SECTION-->
 
 <!-- PRODUCT INFORMATION-->
 <div class="container">
@@ -116,10 +328,11 @@
     @Html.Partial("_creditBenefitsAndFreeServices", featureList as ContentModels.FeaturesAndFreeServices)
 }
 
-<div class="margin-top-40 hidden-xs"></div>
+<div class="margin-top-40 hidden-xs">
+                        </div>
 
 <!-- HOW TO APPLY-->
-@Html.Partial("_howToApplySection", new CustomModels.HowToApplyDataContainer(bodyTitle, bodyDescription, bodyButton as IEbankItabstractButton, applyDocs))
+@Html.Partial("_howToApplySection1", new CustomModels.HowToApplyDataContainer(bodyTitle, bodyDescription, bodyButton as IEbankItabstractButton, applyDocs))
 
 <!-- PRICING -->
 
@@ -135,12 +348,13 @@
 @Html.Partial("_testimonials", testimonialTab as Testimonials)
 
 <!-- CALL BACK FORM -->
-@{
+<!-- CALL BACK FORM 20240215-->
+@*@{
     var _floatingFormViewModel = homePageElements.Children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
 
     @Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)
 
-}
+}*@
 
 @section scripts{
 

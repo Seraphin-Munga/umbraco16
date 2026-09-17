@@ -1,5 +1,4017 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.BaseModernUI>
+@using CustomModels = Web.Models;
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using AcfAfricanbank.Core.Models.Forms
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
+	 var Children = Model.Children;
+	
+
+	 
+	 
+	  var heroShoulder = (HeroShoulderHome)Children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulderhome").FirstOrDefault();
+     
+  @*	 
+	 
+   	 var heroBody = Children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+     
+   
+     
+      var FirstCard= heroBody.Children.Where(c => c.Name == "First Card").FirstOrDefault();
+      var FirstCards = FirstCard.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var Firstcard = FirstCards.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+    
+    *@
+    bool isFirstTab = true;
+
+}
+
+<link rel="stylesheet" href="/css/Business-And-Commercial-Banking.css" />
+
+
+
+<style>
+
+    .mb--25{
+      margin-top:-25px !important;  
+    }
+
+.mtb-200{
+  margin: -5px 0 !important;  
+}
+
+.mega-tabs .nav-tabs>li.loan-summary {
+    width: 50%;
+    font-size: 16px;
+}
+
+.xs-display{
+    display:none;
+}
+.floating-btn {
+  position: fixed;
+  top: 40%;
+  right: -54px;
+  transform: translateY(-50%) rotate(-90deg);
+  z-index: 9999;
+  width: 148px;
+  height: 38px;
+  display: flex; /* ✅ Make it a flex container */
+  justify-content: center; /* ✅ Center horizontally */
+  align-items: center; /* ✅ Center vertically */
+  text-decoration: none;
+  cursor: pointer;
+  padding: 12px 16px;
+
+  color: var(--text-primary-blue, #002B60);
+  font-family: Montserrat;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 20px;
+
+  border-radius: var(--border-radius-md, 2px) var(--border-radius-md, 2px) var(--border-radius-none, 0px) var(--border-radius-none, 0px);
+  border-top: 1px solid var(--border-primary, #002B60);
+  border-right: 1px solid var(--border-primary, #002B60);
+  border-left: 1px solid var(--border-primary, #002B60);
+  background: var(--surface-primary, #FFF);
+  box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.11);
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+
+
+a:hover svg path {
+    fill: #FFFFFF;
+}
+
+    .back-set-button {
+        cursor: pointer;
+        transition: opacity 0.3s ease;
+    }
+
+    .back-set-button:hover {
+        opacity: 0.7;
+    }
+
+.faqHeader1 {
+    font: normal normal bold 30px / 52px Montserrat;
+    letter-spacing: 0px;
+    color: #F9F9F9;
+    opacity: 1;
+    margin: 0 auto;
+    padding: 0px 0px 20px 0px;
+}
+.section-bg-white2{
+    background:white;
+    height:112px;
+}
+
+.section-477 {
+    min-height: 477px;
+    display: flex;
+    align-items: center;
+}
+
+    .indicator1-row {
+      display: none;
+    }
+    
+    .indicator2-row {
+      display: none;
+    }
+
+    .apply-button:hover,
+    .contact-us:hover,
+    .btn-green-class:hover,
+    .cal-btn-green-class:hover{
+        border-radius: var(--border-radius-md, 2px) !important;
+        background: var(--surface-action-hover, #005700) !important;
+        color: white !important;
+    }
+    
+    
+    .highlight-text h5 {
+        font-weight:500;
+        line-height: 20px;
+    }
+
+
+#iframe-karaboChat-speechBubble {
+    display:none;
+}
+#chatIconImg{
+    display:none;
+}
+
+
+.nav-tabs>li>a {
+    color: var(--Brand-AB-Blue, #012B60);
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 20px;
+    margin-right: 2px;
+    line-height: 1.42857;
+    border: 1px solid transparent;
+    border-radius: 4px 4px 0 0;
+}
+
+.mt-16{
+    margin-top:16px;
+}
+.tap2header{
+   color: var(--Brand-AB-Blue, #012B60);
+    /* Heading/H3/Semibold */
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 38px; /* 126.667% */ 
+}
+
+.tap2header-p{
+    color: var(--Brand-AB-Blue, #012B60);
+    /* Body/Medium/Regular */
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 150% */
+    margin-bottom:32px;
+}
+
+.btn-green-class-sm:hover {
+    border-radius: var(--border-radius-md, 2px);
+    background: var(--surface-action-hover, #005700);
+
+    color: white !important;
+}
+
+.carousel-inner {
+    position: relative;
+    overflow: visible;
+    width: 100%;
+}
+
+.btn-default:hover {
+    color: white;
+    border-radius: var(--border-radius-md, 2px);
+    border: 1px solid var(--border-primary, #002B60);
+    background: var(--surface-primary, #002B60);
+    box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.11);
+}
+
+
+.btn{
+    border-radius: 0px !important;
+}
+.mb-56{
+margin-bottom: 56px;
+}
+.mb-36{
+    margin-bottom:36px;
+}
+.mtb-40{
+   margin-top:40px;
+   margin-bottom:40px;
+}
+.mt-30{
+    margin-top:30px;
+}
+.mt-45{
+   margin-top:45px; 
+}
+.mb-16{
+    margin-bottom:16px;
+}
+
+ body {
+    margin: 0;
+    overflow-x: hidden; /* Hides horizontal scrolling */
+  }
+  
+  form {
+  overflow: hidden; /* Prevents any content from overflowing */
+  max-width: 100%;   /* Ensures the form stays within its container's width */
+  max-height: 100%;  /* Ensures the form stays within its container's height */
+}
+
+.bg-nothing-white {
+    min-height: 60px;
+}
+
+.mtb-24{
+    margin-top:24px;
+    margin-bottom:24px;
+}
+.ml--17{
+    margin-left: -16px;
+}
+
+.mt-15{
+    margin-top:16px !important;
+}
+
+.mtb-30{
+    margin:30px 0px;
+}
+
+.loan-summary {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center; /* ensures multiline text is centered */
+}
+
+.mega-tabs .nav-tabs>li.loan-summary.active>a {
+    color: #5DC303 !important;
+}
+
+.my-sm-dots{
+    display:none !important;
+}
+
+    /* Hide all slides by default */
+    .item {
+      display: none;
+    }
+    /* Show only the active slide */
+    .item.active {
+      display: block;
+    }
+  
+  /* Remove default styles for radio buttons */
+input[type="radio"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #000;
+  border-radius: 50%; /* Makes the radio button circular */
+  outline: none;
+  cursor: pointer;
+  position: relative;
+}
+
+/* Style when the radio button is checked */
+input[type="radio"]:checked::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 12px;
+  height: 12px;
+  background-color: #000;
+  border-radius: 50%;
+}
+  
+  .contact-us{
+    width: 128px;
+    color: var(--text-primary, #FFF);
+    /* Body/Small/Semibold */
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 20px; /* 142.857% */
+    display: flex;F
+    max-width:128px;
+    min-width: 128px;
+    height: 40px;
+    padding: 12px 16px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    border-radius: var(--border-radius-md, 2px);
+    background-color: var(--surface-action, #5DC400);
+    margin-top:16px;
+    /* Shadows Light Mode/SM */
+    box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.11);
+  }
+  
+  
+.my-slide {
+    display: block; /* Hide all slides initially */
+}
+
+.my-slide.active {
+    display: block; /* Show only the active slide */
+}
+  
+.my-slider-container {
+    height:538px;
+   
+}
+        
+.my-slider-highlight-section {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+     top: 35px; 
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #FFF;
+    padding: 30px;
+    margin-top: 20px;
+    border-radius: 8px;
+}
+        
+        
+
+/*slide start*/
+
+    /* Slider container */
+    .my-slideshow-container {
+      overflow: hidden;
+      position: relative;
+      width: 100%;
+      margin: auto;
+    }
+    /* Slides wrapper set to flex, width adjusted dynamically via JS */
+    .my-slides {
+      display: flex;
+      transition: transform 0.5s ease;
+    }
+    .my-slides-1 {
+      display: flex;
+      transition: transform 0.5s ease;
+    }
+    .my-slides-2 {
+      display: flex;
+      transition: transform 0.5s ease;
+    }
+    /* Each slide takes full container width */
+    .my-slide ,
+    .my-slide-1 ,
+    .my-slide-2 {
+      
+      box-sizing: border-box;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    /* Indicator container styling */
+    .slider-indicators ,
+    .slider-indicators-1 ,
+    .slider-indicators-2 {
+      text-align: center;
+      margin-top: 15px;
+    }
+    /* Dot styling */
+    .slider-indicators .dot {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      background: #ccc;
+      border-radius: 50%;
+      margin: 0 5px;
+      cursor: pointer;
+    }
+    .slider-indicators .dot.active {
+      background: #5dc300;
+    }
+
+/*slide end*/
+
+.section-who-can-apply
+{
+   margin: 40px 0px !important;
+}
+
+
+.back-section{
+    display: flex;
+    background: white;
+    min-height: 112px;
+    align-items: center;
+}
+
+.back-section button{
+    background:none !important;
+    border:none !important;
+}
+
+
+.btn-green-class:hover,
+.btn-green-class{
+    color: var(--text-primary, #FFF);
+
+    /* Body/Small/Semibold */
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 20px; /* 142.857% */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border:none !important;
+    text-decoration: none;
+    padding: 8px 12px;
+    background-color: #5dc300;
+    color: white;
+    border-radius: 4px;
+    width: 170px;
+    text-align: center;
+    height:48px;
+}
+.btn-green-class-sm{
+    color: var(--text-primary, #FFF);
+
+    /* Body/Small/Semibold */
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 20px; /* 142.857% */
+    height:40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border:none !important;
+    text-decoration: none;
+    padding: 8px 12px;
+    background-color: #5dc300;
+    color: white;
+    border-radius: 4px;
+    width: 136px;
+    text-align: center;
+   
+}
+
+  .rotated-button {
+    position: absolute;
+    right: -20px;
+    top: 81%;
+    transform: rotate(90deg) translateY(-50%);
+    background: transparent; /* Transparent background */
+    color: #5DC303;
+    border: solid 1px #5DC303;
+    border-radius: 0px 0px 8px 8px;
+    padding: 10px 15px;
+    cursor: pointer;
+  }
+  
+  .carousel-control.left{
+      display:none;
+  }
+  
+    .carousel-control.right{
+      display:none;
+  }
+/* Individual List Item Styling */
+.btn-default {
+    border-radius: var(--border-radius-md, 2px);
+    border: 1px solid var(--border-primary, #002B60);
+    background: var(--surface-primary, #FFF);
+    
+    /* Shadows Light Mode/SM */
+    box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.11);
+    color: var(--text-primary-blue, #002B60);
+    /* Body/Small/Semibold */
+
+    font-size: 14px;
+    margin-right:16px;
+    font-weight: 600;
+    line-height: 20px; /* 142.857% */
+    height : 40px;
+    text-align: center; 
+    justify-content: center;
+    color: #002B60;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.carousel-btn-default {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px; /* Space between text and icon */
+    height:48px;
+    
+}
+
+ .carousel-btn-default svg {
+    display: block;
+  }
+  
+   .btn-default svg {
+    display: block;
+  }
+
+.mb-21{
+    margin-bottom: 21.5px !important
+
+}
+
+.mtb-32 {
+    margin: 32px 0px;
+}
+
+.section-800{
+    height: 800px;
+    display: flex;
+    align-items: center;
+
+}
+
+.font-weight-600{
+    font-weight : 600;
+}
+
+  .normal-wrap {
+    line-height:20px;
+    margin-top: -13px;
+    margin-left: 16px;
+    max-width: 350px; /* Set a maximum width for better readability */
+    color: var(--Brand-AB-Blue, #012B60);
+
+    /* Body/Small/Regular */
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px; /* 142.857% */
+  }
+  
+.normal-wrap-2 {
+    top: 19px;
+    position: relative;
+    max-width: 351px;
+    margin-bottom: 50px;
+    margin-top: -5px;
+    /* max-width: 345px; */
+    max-width: 350px;
+    color: var(--Brand-AB-Blue, #012B60);
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+}
+
+  .nav-tabs li {
+    list-style: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .btn-font-color{
+      color : #012B60 !important;
+  }
+  
+  .btn-font-color-white{
+     color : #fff !important; 
+  }
+  
+  
+  .tap-text-color{
+      color:#000000;
+  }
+  
+  .section-bg-grey {
+    background: #F5F5F5 !important;
+    margin-left: -20px;
+    margin-right: -20px;
+}
+  
+ 
+  /* Remove border for the last item */
+  .nav-tabs li:last-child::after {
+    display: none;
+  }
+
+      /* Individual List Item Styling */
+  .nav-tabs li {
+    list-style: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    position: relative;
+  }
+
+  /* Separator Border */
+  
+  
+   .nav-tabs li {
+    list-style: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+    border-right: solid 1px #002b60; /* Border between tabs */
+  }
+
+
+
+
+  /* Remove border for the last item */
+  .nav-tabs li:last-child::after {
+    display: none;
+  }
+
+    .section-bg-white{
+        height:70px;
+        background-color: white; 
+    }
+
+    .top-section {
+      background-color: white;
+      padding: 0.5px;
+    } 
+    .bottom-section-margin {
+      margin-bottom: 36px;
+    }
+    .bottom-section {
+    
+      background-color: #5dc300 !important;
+      height: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .bottom-section-1 {
+    
+      background-color: #5dc300 !important;
+      height: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .section-bg-blue {
+        background: #002b60 !important;
+    }
+    
+    .section-bg-black {
+        background: #000000 !important;
+    }
+
+    .carousel {
+        max-width: 100%;
+    }
+    
+    .loan-summary-container {
+        display: flex;
+        max-height: 750px;
+        position: relative;
+        top: -30px;
+        align-content: center;
+        justify-content: center;
+    }
+
+    .carousel-inner {
+        min-height: 400px;
+    }
+
+    .carousel-content {
+        margin-top: 16px;
+        padding: 13px;
+        color: #fff;
+        line-height: 2 !important;
+    }
+
+    .carousel-content h1 {
+        font-size: 2.5em;
+        font-weight: bold;
+       
+    }
+
+    .carousel-content p {
+    font-size: 15px;
+    margin: 5px 0px !important;
+       
+    }
+    .carousel-content svg {
+        margin-right:10px;
+       
+    }
+    .carousel-content .btn {
+        margin: 50px 10px 60px 2px ;
+    }
+    
+    
+    .carousel-btns {
+        margin-top: 40px;
+        height:48px !important;
+    }
+
+
+
+     .carousel-content {
+        margin-top : 16px;
+        line-height : 3;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: start;
+        text-align: start;
+        height: 100%;
+        color: #fff;
+    }
+
+    .carousel-content h1 {
+        font-size: 2.5em;
+        font-weight: bold;
+        margin-bottom: 50px;
+    }
+
+    .carousel-content p {
+        font-size: 1.1em;
+        margin: 5px 0;
+    }
+
+
+    .carousel-image img {
+        margin-top: 15%;
+        object-fit: cover;
+    }
+
+    .carousel-inner {
+        min-height: 400px;
+    }
+
+
+/* carousel css end her*/
+
+/*Tabs Css start here*/
+
+.nav-tabs {
+  position: relative;
+  display: flex;
+  border-bottom: 1px solid #ddd;
+}
+
+.nav-tabs li {
+  position: relative;
+  list-style: none;
+  padding-right: 10px;
+}
+
+.nav-tabs li:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 28%;
+    width: 1.997px;
+    height: 48px;
+    background-color: #D5D7DA;
+}
+
+/*.nav-tabs li:not(:last-child)::after {*/
+/*  content: '';*/
+/*  position: absolute;*/
+/*  right: 0;*/
+/*  top: 10%;*/
+/*  height: 80%;*/
+/*  width: 1px;*/
+/*  background-color: #002b60;*/
+/*}*/
+
+
+        .tab-content {
+            padding: 20px 20px;
+            /*margin-top:-19px;*/
+            border-top: none;
+            background: #fff;
+        }
+
+        .tab-pane h2 {
+            color: #333;
+            font-weight: bold;
+        }
+        
+        
+
+ .content-box {
+    max-height:360px;
+    display: flex;
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 25px;
+    text-align: start;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+    flex-direction: column;
+    border-radius: 8px;
+    min-height: 270px;
+    
+}
+.content-box-Investment-Banking{
+    border-radius: 8px;
+    background: var(--Base-White, #FDFDFD);
+    height: 352px;
+    /* Shadows Light Mode/MD */
+    box-shadow: 0px 9px 18px 0px rgba(0, 0, 0, 0.15);
+    max-height:320px;
+    display: flex;
+    border: 1px solid #ddd;
+    padding: 25px;
+    text-align: start;
+    margin-bottom: 20px;
+    transition: transform 0.2s;
+    flex-direction: column;
+    border-radius: 8px;
+    min-height: 270px;
+}
+ .content-box-Commercial-Property-Finance{
+    display: flex;
+    border: 1px solid #ddd;
+    padding: 25px;
+    text-align: start;
+    margin-bottom: 20px;
+ 
+    transition: transform 0.2s;
+    flex-direction: column;
+    border-radius: 8px;
+    min-height: 270px;
+    max-height: 290px;
+    border-radius: 8px;
+    background: var(--Base-White, #FDFDFD);
+    
+    /* Shadows Light Mode/MD */
+    box-shadow: 0px 9px 18px 0px rgba(0, 0, 0, 0.15);
+
+}
+
+ .content-box-Capital-equity{
+    display: flex;
+    border: 1px solid #ddd;
+    padding: 25px;
+    text-align: start;
+    margin-bottom: 20px;
+    transition: transform 0.2s;
+    flex-direction: column;
+    border-radius: 8px;
+    min-height: 270px;
+    max-height: 290px;
+    border-radius: 8px;
+    background: var(--Base-White, #FDFDFD);
+    
+    /* Shadows Light Mode/MD */
+    box-shadow: 0px 9px 18px 0px rgba(0, 0, 0, 0.15);
+
+}
+
+.text-wrap{
+    text-wrap-mode: nowrap;
+}
+
+
+
+.content-box-Commercial-Property-Finance-cards-p {
+    height: 7vh;
+    color: var(--Brand-AB-Blue, #012B60);
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+    margin-left: 16px;
+    margin-right: 16px;
+    
+}
+.content-box-Commercial-Property-Finance-cards-h1{
+    color: var(--Brand-AB-Blue, #012B60);
+
+    /* Heading/H4/Semibold */
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 32px; /* 133.333% */
+}
+
+.content-box-Commercial-Property-Finance-cards-hr{
+      background: #D5D7DA;
+      height:1px;
+      margin-bottom:32px;
+      width:100%;
+}
+
+.f-20{
+        font-size: 18px;
+}
+.m-16{
+    margin: 32px 16px;
+}
+
+.mt-18-mlr-16{
+    margin-top: 18px;
+    margin-left:16px;
+    margin-right:16px;
+    
+}
+
+
+    
+.content-box-Commercial-Property-Finance {
+     transform: translateY(-5px);
+}
+    .content-box:hover {
+      transform: translateY(-5px);
+    }
+    
+
+.highlight-section {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #FFF;
+    padding: 32px;
+    top: 10vh;
+    margin-top: -53px;
+    border-radius: 8px;
+}
+
+    .highlight-text {
+      flex: 1;
+    }
+
+    .highlight-section img {
+        margin-right: 10px;
+        max-width: 100%;
+        height: auto;
+        max-height: 400px;
+    }
+
+    .btn-custom {
+      margin-top: 10px;
+      background-color: #007bff;
+      color: white;
+      text-transform: uppercase;
+      padding: 10px 15px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-custom:hover {
+      background-color: #0056b3;
+    }
+    
+    /*section-6 Accordion start here*/
+.section-600 {
+
+    height: 600px;
+    display: flex;
+    align-items: center;
+
+}
+  .section-327 {
+    min-height: 0px;
+    display: flex;
+    align-items: center;
+    }
+    .accordion {
+                 font-weight: bold; /* Explicitly setting font-weight */
+                 font-family: Montserrat, sans-serif; /* Specifying the font family */
+                 background-color: #fff;
+                 color: #012B60;
+                 cursor: pointer;
+                 padding: 18px;
+                 width: 100%;
+                 text-align: left;
+                 font-size: 16px;
+                 transition: 0.4s;
+                 border-radius: 0px;
+                 border: solid 1px #efefef;
+              /*    margin-bottom: 10px; Space between inactive accordion buttons */
+                 position: relative; /* Needed for absolute positioning of the arrow */
+               }
+               
+.accordion::after {
+    content: '\276F';
+    display: inline-block;
+    font-size: 12px;
+    color: #012B60;
+    font-family: Arial, sans-serif;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    transition: transform 0.4s;
+}
+               
+
+               
+              button.accordion.active{
+                 color: #012B60 !important; 
+              }
+
+               .active::after {
+                 transform: translateY(-50%) rotate(-90deg);
+               }
+               
+               .myPanel {
+                    border: solid 1px #efefef;
+                    font-family: Montserrat, sans-serif;
+                    padding: 37px 50px 25px 22px;
+                    background-color: #fff;
+                    color: #012B60;
+                    display: none;
+                    overflow: hidden;
+                    border-top: none;
+                    margin-top: -20px !important;
+               }
+               
+               .myPanel p {
+                       font-weight: 400;
+               }
+               
+                 .faqHeader {
+                   font: normal normal bold 30px/52px Montserrat;
+                   letter-spacing: 0px;
+                   color: #F9F9F9;
+                   opacity: 1;
+                   margin: 0 auto; /* This ensures that the margin is auto on both sides for block-level centering */
+                   padding: 20px 0; /* Adds some padding above and below the text */
+                 }
+    /*section-6 Accordion End here*/
+
+
+/* Mega Taps Css start here*/
+.mega-tabs {
+    border: solid 1px #B4BBD2;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 6px 0 rgba(69, 73, 91, 0.08);
+    margin-bottom: 0px;
+    text-align: center;
+    font-size: 16px;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 10;
+}
+
+.mega-tabs .nav-tabs>li.active:after {
+    bottom: 0px;
+    left: 0%;
+    border: none;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    border-color: none;
+    /* border-top-color: #88bc47; */
+    border-width: 0px;
+    margin-left: 0px;
+}
+  
+  
+  
+  
+  /* Mega Taps Css End here*/
+  
+  .mega-tabs .nav-tabs>li {
+    color: #002b60;
+    padding: 30px 44px;
+    border: none;
+ 
+    font-size: 24px;
+    font-weight: 300;
+}
+
+          /* Custom styles for the cards */
+.card {
+    display: grid;
+    height: 242px;
+    border-radius: 8px;
+    width: 242px;
+    padding: 20px;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 9px 18px 0px rgba(0, 0, 0, 0.15);
+    }
+    
+    
+ .card-body {
+    /*margin-top: 50px;*/
+    line-height: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    align-content: flex-end;
+    flex-direction: column;
+    flex-wrap: nowrap;
+  }
+        
+        /*.card-body {*/
+        /*    display: flex;*/
+        /*    flex-direction: column;*/
+        /*    align-items: center;*/
+        /*    justify-content: center;*/
+        /*    text-align: center;*/
+        /*    padding: 20px;*/
+        /*}*/
+        
+        .card img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+        .header-section {
+            line-height: 2;
+            text-align: start;
+            margin-bottom: 40px;
+            margin-top: 0px;
+
+        }
+        .header-section-2 {
+            line-height: 2;
+            text-align: start;
+            margin-bottom: 40px;
+            margin-top: 50px;
+
+        }
+        .cards-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-top: -24px;
+            margin-bottom: 60px;
+        }
+        .card-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .card-text {
+            font-size: 16px;
+        }
+        .card-title {
+            color: var(--Brand-AB-Blue, #012B60);
+            text-align: center;
+            
+            /* Body/Small/Semibold */
+            font-family: Montserrat;
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 20px; /* 142.857% */
+        }
+/* calculator css*/
+
+.image-wrapper img {
+      max-width: 100%;
+      border-radius: 12px;
+    }
+
+    .form-section h2 {
+      color: #012B60;
+      margin-bottom: 15px;
+    }
+
+    input[type="text"] {
+        width: 100%;
+        padding: 12px;
+        margin: 0px 0px 15px 0;
+        border: 1px solid #B4BBD2;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+
+    .section-600 {
+
+    height: 600px;
+    display: flex;
+    align-items: center;
+
+}
+  .section-327 {
+    min-height: 327px;
+    display: flex;
+    align-items: center;
+        }
+
+
+    .disclaimer {
+      line-height:2;
+      font-size: 12px;
+      color: #777;
+      margin-top: 10px;
+    }
+
+    .right-section {
+      line-height: 2;
+    }
+
+    .repayment-details p {
+      font-weight: 600;
+      margin: 8px 0;
+    }
+    
+    .custom-bullets b {
+        display: contents;
+    }
+    
+    .custom-bullets2 b {
+        display: contents;
+    }
+
+    .apply-button {
+   background:#5DC400;
+    color:white !important;
+    /* Body/Small/Semibold */
+    display: flex;
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 20px; /* 142.857% */
+    width: 200px;
+    height: 48px;
+    padding: 12px 16px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    }
+    
+    .margin-top-bottom-50 {
+        margin: 50px 0px;
+}
+
+    .margin-top-50{
+        margin-top: 50px ;
+}
+
+.custom-bullets {
+    margin-bottom: 30px;
+    list-style-type: none;
+    padding-left: 0px;
+  }
+  
+.custom-bullets li {
+    /*display: flex;*/
+    margin: 8px 0;
+    color: var(--Brand-AB-Blue, #012B60);
+    align-items: flex-start !important;
+    /* Body/Medium/Regular */
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: 1.8; /* 150% */
+  }
+  
+.custom-bullets li svg {
+    position: relative;
+    margin-top: 0px;
+    margin-right: 10px;
+    height: 16px;
+    top: 0px;
+}
+
+.custom-bullets li p {
+    position: relative;
+    top: 5px;
+}
+
+.custom-bullets li h5{
+    line-height:0;
+}
+
+
+  .custom-bullets2 {
+    list-style-type: none;
+    padding-left: 0px;
+  }
+  
+.custom-bullets2 li {
+    display: flex;
+    margin: 8px 0;
+    color: var(--Brand-AB-Blue, #012B60);
+    align-items: flex-start !important;
+    /* Body/Medium/Regular */
+    font-family: Montserrat;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: 1.8; /* 150% */
+  }
+  
+.custom-bullets2 li svg {
+    position: relative;
+    margin-top: 0px;
+    margin-right: 10px;
+    height: 16px;
+    top: 3px;
+}
+
+.custom-bullets2 li p {
+    position: relative;
+    top: 5px;
+}
+
+.custom-bullets2 li h5{
+    line-height:0;
+}
+  /*calculator css*/
+  
+  
+  
+  /*Modal css*/
+  .modal-rating {
+    display: flex;
+    flex-direction: column;
+    align-content: flex-start;
+    align-items: flex-start;
+  }
+  
+  .modal .modal-dialog .modal-content .modal-header h4 {
+    font-weight: 600;
+    font-size: 40px;
+    text-align: left;
+    color: #fff;
+}
+
+
+
+
+.form-group {
+    margin-bottom: 30px;
+}
+
+.form-control {
+    border: solid 1px #B4BBD2;
+}
+
+.font-color-grey{
+   color: #A4A7AE;
+}
+
+label {
+    font-size: smaller;
+}
+
+  .custom-img {
+    max-width: 100%;
+    height: auto;
+    width: 80%; /* Adjust size as needed */
+    margin: 0px auto;
+  }
+  
+  
+  
+
+  /* Responsive handling */
+    /* Container that enables horizontal scrolling */
+    .mobile-scroll-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
+      padding: 10px;
+    }
+    /* Flex container for horizontal scrolling on mobile */
+    .horizontal-scroll {
+      display: flex;
+      flex-wrap: nowrap;
+    }
+/* Slider Wrapper */
+.slider-2-container {
+  position: relative;
+  width: 100%;
+  overflow: scroll;
+  text-align: center;
+  color:#012B60 ;
+  background:white;
+}
+
+.slider-2-wrapper {
+    display: flex;
+    transition: transform 0.3s ease-in-out;
+    width: 200%;
+    justify-content: center;
+    flex-wrap: nowrap;
+    margin: 10px;
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+  -ms-overflow-style: none; /* Hide scrollbar for IE/Edge */
+}
+
+/* Hide scrollbar for Webkit (Chrome, Safari, etc.) */
+.slider-2-wrapper::-webkit-scrollbar {
+  display: none;
+}
+/* Buttons inside slider */
+.btn-slider-2 {
+    color:#012B60;
+  padding: 15px;
+  border: none;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-slider-2 img {
+  display: block;
+  margin: 0 auto;
+}
+
+.btn-slider-2.active {
+  background: white;
+  color: #5DC303;
+}
+
+/* Dots (Indicators) */
+.slider-2-dots {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.dot-2 {
+  height: 10px;
+  width: 10px;
+  margin: 5px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.dot-2.active {
+  background-color: #007bff;
+}
+
+    .carousel-indicators li {
+      border: 1px solid #007bff;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #007bff;
+      margin: 5px;
+    }
+    .carousel-indicators .active {
+      background-color: #065BAB;
+    }
+
+
+.btn-font-color-blue-h1{
+    color: var(--Brand-AB-Blue, #012B60);
+
+/* Heading/H3/Semibold */
+font-family: Montserrat;
+font-size: 30px;
+font-style: normal;
+font-weight: 600;
+line-height: 38px; /* 126.667% */
+}
+.btn-font-color-blue-p{
+    color: var(--Brand-AB-Blue, #012B60);
+
+/* Body/Medium/Regular */
+font-family: Montserrat;
+font-size: 16px;
+font-style: normal;
+font-weight: 400;
+line-height: 24px; /* 150% */
+}
+
+.carousel-sub-content p svg{
+    margin-right:10px;
+    margin-right: 22px;
+    position: relative;
+}
+.carousel-sub-content p {
+    margin-right:10px;
+    display: flex;
+    margin-right: 10px;
+    align-items: baseline;
+    }
+   
+.center-btn-sm {
+    top: 8px;
+    position: relative;
+    margin: 16px;
+}
+
+.not-business-loan-center-btn-sm {
+    top: 25px;
+    position: relative;
+    margin: 5px;
+}
+.mt--20{
+    margin-top: 20px;
+}
+   
+   
+.btn:hover, .btn:focus, .btn.focus {
+  
+    text-decoration: none;
+} 
+
+
+.floating-btn {
+  position: fixed;
+  top: 50%;
+  right: -54px;
+  transform: translateY(-50%) rotate(-90deg);
+  z-index: 9999;
+  width: 148px;
+  height: 40px;
+  display: flex; /* ✅ Make it a flex container */
+  justify-content: center; /* ✅ Center horizontally */
+  align-items: center; /* ✅ Center vertically */
+  text-decoration: none;
+  cursor: pointer;
+  padding: 12px 16px;
+
+  color: var(--text-primary-blue, #002B60);
+  font-family: Montserrat;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 20px;
+
+  border-radius: var(--border-radius-md, 2px) var(--border-radius-md, 2px) var(--border-radius-none, 0px) var(--border-radius-none, 0px);
+  border-top: 1px solid var(--border-primary, #002B60);
+  border-right: 1px solid var(--border-primary, #002B60);
+  border-left: 1px solid var(--border-primary, #002B60);
+  background: var(--surface-primary, #FFF);
+  box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.11);
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+
+.floating-btn:hover {
+
+}
+
+/*.content-box-Commercial-Property-Finance-cards-hr {*/
+/*    margin-top: 15px !important;*/
+/*}*/
+.content-box-Commercial-Property-Finance-cards-hr {
+    margin-top: 4px !important;
+}
+
+/* Responsive: Show as a row on larger screens */
+
+@@media (max-width: 760px) {
+
+
+
+.img-responsive {
+    left: 7%;
+    position: relative;
+    display: block;
+    max-width: 85%;
+    height: auto;
+}
+
+.image-wrapper img {
+    left: 5%;
+    position: relative;
+    max-width: 70%;
+    border-radius: 12px;
+}
+
+.content-box-Commercial-Property-Finance-cards-hr {
+    background: #D5D7DA;
+    height: 1px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+    .custom-bullets li {
+      display: flex;
+      align-items: flex-start;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .custom-bullets li img {
+      margin-right: 8px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .custom-bullets li span {
+      display: inline;
+    }
+
+
+.xs-display{
+display:none;
+}
+
+.center-btn-sm {
+    display:flex;
+}
+.xs-cards{
+display: flex;
+    overflow: scroll;
+    gap: 10px;
+  
+}
+    .horizontal-scroll-container {
+        margin-left: 0;
+        padding: 0 10px;
+    }
+
+    .horizontal-scroll-container .loan-box {
+        width: 80%; /* or 100% if you prefer full swipe */
+    }
+
+    .highlight-section {
+        display: block;
+        margin-top: 32px;
+    }
+
+    .highlight-section .col-md-8,
+    .highlight-section .col-md-4 {
+        width: 100%;
+        padding: 0;
+    }
+
+    .highlight-section img.custom-img {
+        margin: 20px auto;
+        display: block;
+    }
+}
+
+@@media (min-width: 768px) {
+
+.tablet-flex {
+    display: flex
+}
+
+  .go_to_tab_content {
+    overflow-x: auto;
+    white-space: nowrap;
+    display: flex;
+  }
+
+  .go_to_tab_content li {
+    float: none;
+    display: inline-block;
+  }
+
+.carousel-sub-content p {
+    margin-right: 10px !important;
+    display: flex !important;
+    align-items: baseline !important;
+}
+
+.carousel-sub-content p svg {
+    width: 32px;
+    margin-right: 10px;
+    position: relative;
+}
+
+  .slider-2-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .btn-slider-2 {
+    flex: 1;
+    margin: 5px;
+  }
+
+  .slider-2-container {
+    max-width: 800px;
+    margin: auto;
+  }
+}
+
+@@media (max-width: 320px) {
+
+.carousel-sub-content p {
+    margin-right: 10px ;
+    display: flex !important;
+    align-items: baseline !important;
+}
+
+.cards-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.header-section {
+    margin-right: 0px;
+    margin-left: 0px;
+    line-height: 2;
+    text-align: start;
+    margin-bottom: 40px;
+    margin-top: 50px;
+}
+
+.header-section-2 {
+    margin-right: 0px;
+    margin-left: 0px;
+    line-height: 2;
+    text-align: start;
+    margin-bottom: 40px;
+    margin-top: 50px;
+}
+
+}
+
+@@media (min-width: 800px) and (max-width: 1199px) {
+
+.content-box-Commercial-Property-Finance-cards-hr {
+    margin-top: 10px !important;
+}
+
+    .carousel-content .btn-default {
+        width: 190px;
+    }
+    
+    .loan-box > .content-box {
+        min-height: 280px;
+    }
+    
+    .highlight-section {
+        top:6vh;
+    }
+
+    .content-box {
+        min-width: 240px;
+        display: flex;
+        background: #fff;
+        border: 1px solid #ddd;
+        padding: 15px;
+        text-align: start;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+        flex-direction: column;
+        border-radius: 8px;
+        min-height: 360px;
+        max-height: 400px;
+        flex-wrap: wrap;
+    }
+    
+    .normal-wrap {
+        max-width: 200px;
+        margin: 1px 20px 22px 15px !important;
+    }
+    
+    .normal-wrap-2 {
+        margin-left: 15px;
+        margin-bottom: 66px;
+    }
+    
+    .btn-green-class-sm {
+        height: 29px !important;
+        width: 79px !important;
+    }
+    
+    .not-business-loan-center-btn-sm {
+        left: 10px;
+        top: 45px;
+        position: relative;
+        margin: 5px;
+    }
+}
+
+@@media (min-width: 762px) and (max-width: 800px) {
+hr {
+    margin-top: 0px;
+    }
+    
+.content-box-Commercial-Property-Finance-cards-hr {
+    background: #D5D7DA;
+    height: 1px;
+    margin-bottom: 23px;
+    width: 100%;
+}
+    
+    .card {
+        display: grid;
+        height: 160px;
+        border-radius: 8px;
+        width: 172px;
+        padding: 20px;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0px 9px 18px 0px rgba(0, 0, 0, 0.15);
+    }
+    
+    .carousel-content h1 {
+        font-size: 2em;
+    }
+    
+    .btn-default {
+        font-size: 12px;
+    }
+    
+    .apply-button {
+        font-size: 12px;
+    }
+    
+    .mortgage-container h4 {
+        font-size: 16px;
+    }
+    
+    .normal-wrap-2 {
+        margin-right: 12px;
+        margin-left: 15px;
+        margin-top: -14px;
+    }
+    
+    .content-box {
+        min-width: 226px;
+        padding: 19px;
+    }
+    
+    .btn-green-class-sm {
+        width: 80px;
+        height: 30px;
+        font-size:12px;
+        
+    }
+    
+    .btn-default {
+        gap: 0px;
+        height: 35px;
+        width: 84px;
+    }
+    
+    .term-buttons {
+        display: flex
+    }
+    
+    .term-buttons button {
+        font-size: 14px;
+        height: 50px;
+        width: 50px;
+        background: transparent;
+        padding: 8px 15px;
+        cursor: pointer;
+        color: #012B60;
+        font-weight: 700;
+        margin-right: 10px;
+        border-radius: 4px;
+        border: 0.5px solid var(--Brand-AB-Blue, #012B60);
+    }
+    
+    .cal-btn-green-class:hover, .cal-btn-green-class{
+        width: 164px;
+    }
+    
+    .calculator-container{
+        top: 47px;
+        position: relative;
+    }
+    
+    .calculator-section {
+        height: 500px;
+    }
+    
+    .highlight-section {
+        top:55px;
+    }
+    
+    .not-business-loan-center-btn-sm {
+        left: 10px;
+        top: 65px;
+        position: relative;
+        margin: 5px;
+    }
+    
+    .custom-img {
+        width: 100%;
+    }
+    
+    .carousel-content .btn-default {
+        width: 190px;
+    }
+    
+}
+
+@@media (min-width: 762px) and (max-width: 1199px) {
+    .btn-default {
+        height: 28px;
+    }
+    .section-bg-white {
+    height: 38px;
+    }
+}
+
+@@media (max-width: 770px) {
+
+    width: '90%',
+    height: 'auto',
+    maxWidth: '600px', // Adjust as needed
+  }
+  
+@@media (min-width: 770px) and (max-width: 1199px) { 
+
+
+
+.center-btn-sm{
+    position: relative;
+    left: 0px;
+}
+.mega-tabs .nav-tabs>li.loan-summary {
+    width: 50% !important;
+    font-size: 12px;
+}
+
+
+h4 {
+    font-size: 17px;
+    font-weight: 200;
+    color: #464855;
+    margin-top: 0;
+}
+
+
+.btn {
+        padding: 5px 2px;
+        font-size: 10px;
+    }
+    
+
+
+    .cards-container {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+    }
+  .card {
+        height: 150px;
+        width: 150px;
+        padding: 10px;
+    }
+    
+.card-icon svg {
+    width: 32px;
+    height: 32px;
+  }
+ .card-icons-1 svg {
+  margin:0px 0px 0px -10px;
+}
+
+}
+
+@@media (min-width: 768px) {
+    .carousel-sub-content p img {
+        width: 25px;
+        margin-right: 10px;
+        position: relative;
+        top: 7px
+    }
+}
+  
+@@media (min-width: 992px) and (max-width: 1199px) {
+
+.carousel-btns {
+    
+    min-width: 200px;
+    min-width: 150px;
+    margin-top: 0px;
+    min-height: 35px;
+    font-size: 10px;
+}
+
+.hidden-xs {
+        display: block !important;
+}
+
+.visible-xs {
+        display: none !important;
+}
+
+
+
+.center-btn-sm{
+    position: relative;
+    left: 0px;
+}
+
+
+h4 {
+    font-size: 17px;
+    font-weight: 200;
+    color: #464855;
+    margin-top: 0;
+}
+
+.btn-green-class-sm
+{
+    height:24px;
+    padding: 3px 3px !important;
+    font-size: 12px;
+    width: fit-content;
+}
+.btn {
+    padding: 5px 3px;
+    font-size: 12px;
+   
+}
+
+    .content-box {
+         padding: 15px;
+          width: 100%;
+          max-width: 1200px; /* Adjust based on your layout */
+          margin: 0 auto; /* Center the container */
+          box-sizing: border-box;
+    }
+    
+    .cards-container {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+    }
+
+  .card-icon svg {
+    width: 32px;
+    height: 32px;
+  
+  }
+  
+   .card-icons-1 svg {
+      margin:0px 0px 0px -10px;
+    }
+  
+    .card {
+        height: 200px;
+        width: 200px;
+        padding: 10px;
+    }
+
+
+}
+
+/* Mobile responsiveness */
+@@media (max-width: 760px) {
+
+.normal-wrap-2 {
+        text-wrap-mode: wrap;
+        margin-right: 30px;
+        margin-bottom: 31px;
+        margin-top: -27px;
+        margin-left: 16px;
+        max-width: 250px;
+    }
+.mortgage-container{
+    text-wrap-mode: wrap;
+}
+
+.section-bg-white {
+    height: 32px;
+    }
+
+.content-box-Commercial-Property-Finance-cards-p {
+    text-wrap: auto;
+}
+
+
+  .card-two-btn {
+    display: flex;                /* establish flex context */  
+    flex-direction: row;          /* horizontal axis */  
+    flex-wrap: nowrap;            /* prevent stacking */  
+    align-items: center;          /* vertical centering if buttons differ in height */  
+    justify-content: flex-start;  /* line up at the left */  
+    gap: 0.5rem;                  /* spacing between buttons */  
+    overflow-x: auto;             /* allow scroll if too wide */  
+    -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */  
+  }
+
+  /* 2) Ensure each link/button keeps its intrinsic size */
+  .card-two-btn a {
+    white-space: nowrap;          /* prevent text wrapping inside button */  
+  }
+
+    h4 {
+    font-size: 23px;
+    }
+
+  /* 1) Make the row a no-wrap flex container */
+  .row.scrollable {
+    display: flex;              /* flex formatting context */  
+    flex-wrap: nowrap;          /* prevent wrapping to new lines */  
+    overflow-x: auto;           /* allow horizontal scroll */  
+    overflow-y: hidden;         /* hide vertical scrollbars */  
+    -webkit-overflow-scrolling: touch; /* momentum on iOS */ */
+  }
+
+  /* 2) Lock each column/card at its intrinsic width */
+  .row.scrollable .col-md-4 {
+    flex: 0 0 auto;             /* don’t grow or shrink */  
+    width: 100%;                 /* or whatever width you prefer */  
+    max-width: 350px;           /* optional cap per card */  
+  }
+
+.content-box-Investment-Banking{
+
+    max-height:312px;
+
+}
+
+.content-box-Capital-equity{
+    max-height: 312px;
+}
+ .content-box-Commercial-Property-Finance{
+
+        max-height: 312px;
+    }
+
+
+    .custom-bullets li svg {
+        position: relative;
+        margin-top: 0px;
+        margin-right: 10px;
+        height: 16px;
+        top: 10px;
+    }
+
+    .custom-bullets li h5 {
+        line-height: 1;
+    }
+    .custom-bullets li {
+        font-size: 12px;
+    }
+
+.list-item-flex {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Space between icon and text */
+}
+
+.list-item-flex svg {
+  flex-shrink: 0; /* Prevents the SVG from shrinking */
+}
+
+
+.custom-bullets li h5 {
+    line-height: 1;
+}
+
+
+    .back-section {
+        min-height: 50px;
+    }
+
+  .calculator-section {
+        height: 240vh !important;
+    }
+
+  .custom-img {
+        margin-bottom: -33px;
+        margin-top: 26px;
+        width: 100%; /* Adjust size as needed */
+  }
+
+.horizontal-scroll-container {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.row.flex-nowrap {
+  display: flex;
+}
+
+.loan-box {
+  scroll-snap-align: center;
+ 
+}
+
+  p.mt--20 {
+    margin-top: 0 !important; /* Remove extra margin on mobile */
+  }
+
+    .indicator1-row {
+    
+        <!--display: flex;-->
+        justify-content: center;
+        margin: 20px;
+        gap: 12px;
+    }
+
+    .indicator1 {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #ccc;
+      transition: background-color 0.3s;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .indicator1.active {
+      background-color: #337ab7; /* matches .btn-primary in BS3 */
+    }
+    
+    
+    .indicator2-row {
+        display: flex;
+        justify-content: center;
+        margin: 20px;
+        gap: 12px;
+    }
+
+    .indicator2 {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #ccc;
+      transition: background-color 0.3s;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .indicator2.active {
+      background-color: #337ab7; /* matches .btn-primary in BS3 */
+    }
+
+.mega-tabs {
+
+  border: solid 1px #B4BBD2 !important;
+  border-radius: 8px !important;
+  background-color: #fff !important;
+  box-shadow: 0 2px 6px 0 rgba(69, 73, 91, 0.08) !important;
+  margin-bottom: 0px !important;
+  text-align: center !important;
+  font-size: 16px !important;
+  text-transform: uppercase !important;
+  position: relative !important;
+  z-index: 10 !important;
+  /* Make scrollable */
+  overflow-x: auto !important; /* Enables horizontal scrolling */
+  white-space: nowrap !important; /* Prevents child elements from wrapping */
+}
+
+.mega-tabs > * {
+  display: inline-block; /* Keeps tabs in a single line */
+}
+
+
+.content-box {
+        min-width: 357px;
+        display: flex;
+        background: #fff;
+        border: 1px solid #ddd;
+        padding: 25px;
+        text-align: start;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+        flex-direction: column;
+        border-radius: 8px;
+        min-height: 305px;
+        max-height: 400px;
+        flex-wrap: wrap;
+    }    
+
+.normal-wrap {
+    font-size:12px;
+    max-width: 240px;
+    white-space: normal;  /* Allows text to wrap */
+    word-wrap: break-word; /* Ensures long words break properly */
+    overflow-wrap: break-word; /* Alternative for better browser support */
+}
+.btn-green-class {
+        margin-left: 10px !important;
+        border-radius: 5px;
+        width: 100px;
+        height: 35px;
+        font-size: 12px;
+}
+
+
+
+.carousel-content .btn {
+
+        color: var(--text-primary-blue, #002B60);
+        
+        /* Body/Small/Semibold */
+        font-family: Montserrat;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 20px; /* 142.857% */
+        margin: 20px 10px 20px 2px ;
+        display: inline-flex;
+        height: 40px !important;
+        padding: 0px 7px;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+}
+
+.apply-button {
+
+display: flex;
+width: 148px;
+height: 40px;
+padding: 8px 16px;
+justify-content: center;
+align-items: center;
+gap: 8px;
+flex-shrink: 0;
+border-radius: var(--border-radius-md, 2px);
+background: var(--surface-action, #5DC400);
+
+/* Shadows Light Mode/SM */
+box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.11);
+
+}
+.carousel-btns {
+    
+    min-width: 226px;
+    min-width: 150px;
+    margin-top: 0px;
+    min-height: 35px;
+    font-size: 10px;
+    height: 36px !important;
+}
+
+
+.mobile-slider-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+    -ms-overflow-style: none; /* Hide scrollbar for IE */
+    position: relative;
+    width: 100%;
+}
+
+/* Hide scrollbar for WebKit (Chrome, Safari) */
+.mobile-slider-container::-webkit-scrollbar {
+    display: none;
+}
+
+
+.mobile-slider {
+    display: grid;
+    grid-template-columns: 1fr; /* Ensures a single-column layout */
+    gap: 10px;
+    padding: 10px 0;
+    justify-content: center;
+}
+
+.mobile-slider li {
+    display: block; /* Forces list items to be block elements */
+    width: 100%; /* Ensures they take full width */
+}
+
+
+
+.mobile-slider a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    padding: 10px;
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+.mobile-slider a:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    font-size: 12px;
+  
+}
+
+.carousel-content h1 {
+    font-size: 2em;
+}
+
+
+   .loan-summary-container {
+        max-height: 993px;
+        top: 0px;
+    }
+
+    /* Hide scrollbar */
+    .loan-scroll-container::-webkit-scrollbar {
+        display: none;
+    }
+
+
+    .calculator-container {
+        flex-direction: column;
+        align-items: start;
+        text-align: start;
+    }
+    .left-section, .form-section, .right-section {
+        width: 100%;
+    }
+    .term-buttons {
+        justify-content: center;
+    }
+
+
+.cal-sub-section-3{
+
+    display: grid;
+    align-items: baseline;
+    justify-content: start;
+
+}
+
+
+    .highlight-section {
+        z-index: 9;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        top: 80px;
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        background: #FFF;
+        padding: 13px;
+        margin-top: 20px;
+        margin-left: 0px;
+        border-radius: 8px;
+    }
+
+}
+ 
+
+/* Ensure smooth scrolling on touch */
+@@media (max-width: 760px) {
+
+.row.scrollable {
+  /* Hide scrollbar in Firefox */
+  scrollbar-width: none;            /* Firefox 64+ */ :contentReference[oaicite:0]{index=0}
+  /* Hide scrollbar in IE 10+ */
+  -ms-overflow-style: none;         /* IE and Edge */ :contentReference[oaicite:1]{index=1}
+}
+
+/* Hide scrollbar in WebKit-based browsers (Chrome, Safari, Opera) */
+.row.scrollable::-webkit-scrollbar {
+  display: none;                    /* Chrome, Safari and Opera */ :contentReference[oaicite:2]{index=2}
+}
+
+
+.kb-carousel { position: relative; padding-bottom: 2rem; }
+
+  .kb-item {
+    flex: 0 0 auto;                               /* no shrink/grow */ :contentReference[oaicite:8]{index=8}
+    scroll-snap-align: start;                     /* snap point */ :contentReference[oaicite:9]{index=9}
+    width: 80%; max-width: 300px; margin-right: 1rem;
+  }
+  .kb-dots {
+    position: absolute; bottom: .5rem; left: 50%;
+    transform: translateX(-50%); display: flex; gap: .5rem;
+  }
+  .kb-dot {
+    width:10px; height:10px; border-radius:50%;
+    background:#ccc; cursor:pointer;
+    transition: background-color .3s;
+  }
+  .kb-dot.active { background: #5DC303; }        /* active state */ :contentReference[oaicite:10]{index=10}
+
+
+
+.highlight-section {
+            flex-direction: column-reverse !important; 
+        }
+.text-wrap {
+  margin-left:-15px;
+  white-space: normal !important; /* Allow text to wrap */
+  word-wrap: break-word; /* Ensure long words break properly */
+  overflow: visible !important; /* Ensure text is fully visible */
+}
+
+
+.two-buttton-sm-magin-30{
+margin-top: 30px;
+}
+.content-box {
+        min-width: 357px;
+        display: flex;
+        background: #fff;
+        border: 1px solid #ddd;
+        padding: 25px;
+        text-align: start;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+        flex-direction: column;
+        border-radius: 8px;
+        min-height: 305px;
+        max-height: 400px;
+        flex-wrap: wrap;
+    }
+
+ 
+ 
+ .horizontal-scroll-container {
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Hide scrollbar in Firefox */
+}
+
+.horizontal-scroll-container::-webkit-scrollbar {
+  display: none; /* Hide scrollbar in Chrome, Safari */
+}
+
+.horizontal-scroll-container .row {
+  flex-wrap: nowrap;
+  display: flex;
+}
+
+
+
+
+
+  .horizontal-scroll-container {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 10px;
+    padding-bottom: 10px;
+  }
+
+  .loan-box {
+    scroll-snap-align: start;
+  }
+}
+   
+
+
+
+}
+    @@media (max-width: 760px) {
+    .hidden-xs {
+        font-size: 4px;
+        display: none !important;
+    }
+    
+    .mega-tabs{    
+        margin-top: 33px;
+    }
+    
+    .tab-content {
+        padding: none;
+        margin-top: 13px;
+        border-top: none;
+        background: #fff;
+    }
+    
+    .mega-tabs .nav-tabs>li.loan-summary {
+        width: 50% !important;
+        font-size: 0px;
+    }
+}
+    
+
+  
+  @@media (max-width: 760px) {
+  
+  .mega-tabs .nav-tabs>li.loan-summary {
+    width: 50% !important;
+    font-size: 1px !important;
+}
+
+  .card {
+    height: 160px;
+  }
+
+  .card-container {
+    margin-bottom: 20px;
+    width: calc(50% - 10px); /* Adjust width as needed */
+    height: auto; /* Adjust height as needed */
+    /* Or use padding/margin adjustments */
+  }
+}
+  
+  
+    @@media (max-width: 760px) {
+    
+    .mega-tabs.hidden-lg.hidden-md.hidden-sm {
+    
+        margin-bottom: 60px;
+        text-align: center;
+        font-size: 16px;
+        position: relative;
+        z-index: 10;
+        margin-left: -20px;
+        margin-right: -20px;
+        overflow-y: scroll;
+     }
+}
+    
+      
+    @@media (max-width: 760px) {
+      .highlight-row {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .highlight-image img {
+        margin-top: 20px;
+      }
+    }
+
+    @@media (max-width: 760px) {
+      .highlight-section {
+        flex-direction: column;
+        text-align: start;
+      }
+
+      .highlight-section img {
+        max-width: 90%;
+      }
+    }
+
+
+    @@media (max-width: 760px) {
+    .custom-bullets li svg {
+        position: relative;
+        margin-top: 0px;
+        margin-right: 10px;
+        height: 16px;
+        top: 10px;
+    }
+
+    .custom-bullets2 li svg {
+        position: relative;
+        margin-top: 0px;
+        margin-right: 10px;
+        height: 16px;
+        top: 3px;
+    }
+    
+        .mega-tabs .nav-tabs {
+          overflow-x: auto;
+          white-space: nowrap;
+          -ms-overflow-style: none;     /* IE and Edge */
+          scrollbar-width: none;        /* Firefox */
+        }
+        
+        .mega-tabs .nav-tabs::-webkit-scrollbar {
+          display: none;                /* Chrome, Safari, Opera */
+        }
+        
+        .not-business-loan-center-btn-sm {
+            top: 50px;
+        }
+        
+        .carousel-sub-content p img{
+        
+            top: 6px;
+            position: relative;
+            margin-right: 10px;
+        }
+
+        .carousel-image {
+            margin-top: 15px;
+        }
+        
+        .faqHeader {
+            font: normal normal bold 17px / 52px Montserrat;
+        
+        }
+        .accordion {
+            padding: 18px 18px 18px 7px;
+            font-size: 15px;
+            
+        }
+        .custom-bullets li {
+        display: flex;
+        font-size: 12px;
+    }
+    
+   } 
+/* Responsive Adjustments */
+@@media (max-width: 1024px) {
+  .cards-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@@media (max-width: 760px) {
+.f-12{
+    font-size:12px;
+}
+.header-section {
+    margin-top: 0px;
+}
+
+    .header-section-2 {
+    line-height: 2;
+    text-align: start;
+    margin-bottom: 46px;
+    margin-top: 100px;
+}
+
+    .btn-app1{
+        display: none !important;
+    }
+
+    .mega-tabs{
+        width: 100vw;
+        border: solid 1px #B4BBD2 !important;
+        border-radius: 0px !important;
+    }
+    
+    .nav-tabs li:not(:last-child)::before {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 28%;
+        width: 1.997px;
+        height: 25px;
+        background-color: #D5D7DA;
+    }
+
+    .mega-tabs .nav-tabs>li.loan-summary {
+        width: 70%;
+    }
+
+    .center-btn-sm {
+        margin: 7px !important;
+    }
+    
+  .header-section h1 {
+    color: var(--Brand-AB-Blue, #012B60);
+    font-family: Montserrat;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 36px; /* 40% */
+  }
+  
+  .header-section p {
+    color: var(--Brand-AB-Blue, #012B60);
+
+    /* Body/Medium/Regular */
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 150% */
+  }
+  
+    .header-section-2 h1 {
+  
+    color: var(--Brand-AB-Blue, #012B60);
+font-family: Montserrat;
+font-size: 20px !important;
+font-style: normal;
+font-weight: 600;
+line-height: 26px; /* 40% */
+  }
+  
+  .header-section-2 p {
+    color: var(--Brand-AB-Blue, #012B60);
+
+    /* Body/Medium/Regular */
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 150% */
+      
+  }
+
+
+  .cards-container {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+  }
+
+  .card {
+    min-height: 180px;
+  }
+
+  .card-icon svg {
+    width: 56px;
+    height: 56px;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+  }
+}
+
+@@media (max-width: 380px) {
+    .custom-img {
+        margin-bottom: -33px;
+        margin-top: 26px;
+    }
+  
+    .loan-summary-container {
+        max-height: 1027px;
+    }
+        
+    .calculator-section {
+        height: 165vh !important;
+    }
+}
+
+
+@@media (max-width: 480px) {
+
+.backbtn{
+    display: contents;
+    justify-items: center;
+}
+
+.img-xs{
+    left: 0% !important;
+}
+
+    .custom-bullets li {
+      display: flex;
+      align-items: flex-start;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .custom-bullets li img {
+      margin-right: 8px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .custom-bullets li span {
+      display: inline;
+    }
+
+
+.tab-content {
+    padding: 20px 20px 20px 20px;
+    margin-top: 0px;
+    border-top: none;
+    background: #fff;
+}
+
+    .horizontal-scroll-container {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        /* gap: 0px; */
+        padding-bottom: 10px;
+        margin-left: 10px;
+    }
+    
+    .highlight-section {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        top: 80px;
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        background: #FFF;
+        padding: 20px;
+        margin-top: 20px;
+        margin-left: 0px;
+        border-radius: 8px;
+    }
+
+        .header-section-2 {
+            margin-left: 10px;
+            line-height: 2;
+            text-align: start;
+            margin-bottom: 46px;
+            margin-top: 50px;
+        }
+
+  .header-section h1 {
+    color: var(--Brand-AB-Blue, #012B60);
+    font-family: Montserrat;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 36px; /* 40% */
+  }
+  
+    .header-section-2 h1 {
+    font-size: 1.5rem;
+  }
+
+  .card {
+    padding: 15px;
+    min-height: 160px;
+  }
+
+  .card-icon svg {
+    width: 48px;
+    height: 48px;
+  }
+}
+</style>
+<style>
+
+
+ .scroll-indicator,
+    .scroll-indicator1 {
+      display: none;
+    }
+
+    @@media (max-width: 760px) {
+      .scroll-container {
+        position: relative;
+        overflow-x: auto;
+        white-space: nowrap;
+        scroll-behavior: smooth;
+        padding-bottom: 40px;
+      }
+
+      .scroll-section {
+        box-sizing: border-box;
+      }
+
+      .scroll-indicator {
+        display: flex;
+        justify-content: center;
+        position: relative;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        gap: 6px;
+        z-index: 10;
+      }
+      .scroll-indicator1 {
+        display: flex;
+        justify-content: center;
+        position: relative;
+        bottom: -11px;
+        left: 50%;
+        transform: translateX(-50%);
+        gap: 6px;
+        z-index: 10;
+        display: none;
+      }
+
+      .dot,
+      .dot1 {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #888;
+        opacity: 0.4;
+        transition: background-color 0.3s, opacity 0.3s;
+        cursor: pointer;
+      }
+
+      .dot.active,
+      .dot1.active {
+        background-color: #002B60;
+        opacity: 1;
+      }
+
+      #go_to_tab_content {
+        overflow-x: auto;
+        white-space: nowrap;
+        display: flex;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+
+      #go_to_tab_content::-webkit-scrollbar {
+        display: none;
+      }
+
+      #go_to_tab_content > li {
+        display: inline-block;
+        flex: 0 0 auto;
+        padding: 10px;
+        min-width: 60vw;
+      }
+
+      .section-bg-white {
+        position: relative;
+        padding-bottom: 40px;
+        background: #fff;
+        border-top: 1px solid #ccc;
+      }
+    }
+    
+
+</style>
+
+
+
+
+@{
+    var activeTab = ViewBag.ActiveTab as string ?? "InvestmentBanking"; // Default fallback
+    var activeTab1 = ViewBag.ActiveTab as string ?? "BusinessLoans"; // Default fallback
+    var activeTab4Cal = Request.QueryString["tab-id"];
+}
+
+
+<!--learn more start here-->
+@{
+
+ string getTabName(string TabId) {
+            string tabName = "";
+            switch(TabId) {
+                case "1" :
+                tabName = "BusinessLoans";
+                break;
+                case "2" :
+                tabName = "CommercialPropertyFinance";
+                break;
+                case "3" :
+                tabName = "CapitalEquipmentFinance";
+                break;
+                 case "4" :
+                tabName = "InvestmentBanking";
+                break;
+            }
+        
+            return tabName;
+            
+        }
+}
+
+
+
+
+
+@{
+    var currentUrl = Request.Url.AbsolutePath.ToLower(); // e.g., "/business-loans"
+    var activeTab55 = "BusinessLoans"; // default
+
+    var businessUrls = new[] { "/business-funding", "/business-loans", "/apply-now" };
+    var propertyUrls = new[] { "/mortgage-financing", "/real-estate", "/commercial" };
+    var assetUrls = new[] { "/asset-leasing", "/equipment-finance", "/capital" };
+    var investmentUrls = new[] { "/investment", "/advisory", "/banking" };
+
+    if (businessUrls.Contains(currentUrl))
+    {
+        activeTab55 = "BusinessLoans";
+    }
+    else if (propertyUrls.Contains(currentUrl))
+    {
+        activeTab55 = "CommercialPropertyFinance";
+    }
+    else if (assetUrls.Contains(currentUrl))
+    {
+        activeTab55 = "CapitalEquipmentFinance";
+    }
+    else if (investmentUrls.Contains(currentUrl))
+    {
+        activeTab55 = "InvestmentBanking";
+    }
+}
+
+@{
+    Func<string, string> generateIdFromUrl = url =>
+    {
+        if (string.IsNullOrEmpty(url)) return "btn-default-id";
+
+        // Take everything after # or ? (anchor/querystring part)
+        var uniquePart = url.Contains("#")
+            ? url.Substring(url.IndexOf("#") + 1)
+            : url.Contains("?")
+                ? url.Substring(url.IndexOf("?") + 1)
+                : url;
+
+        // Replace invalid HTML id characters with hyphen
+        return "btn-" + System.Text.RegularExpressions.Regex.Replace(uniquePart, @"[^A-Za-z0-9\-_]", "-");
+    };
+}
+
+<a href="http://cmsdev.africanbank.net/en/home/contact-us#Sales-enquiry" class="floating-btn">Get in touch</a>
+
+
+
+<section class="back-section" id="business-loans-btn-back" aria-label="Back navigation">
+        <div class="container backbtn">
+            <button id="goBackBtn" aria-label="Go back to previous page">
+                <svg  width="68" height="24" viewBox="0 0 68 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4.25 12.2744L19.25 12.2744" stroke="#012B60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M10.2998 18.299L4.2498 12.275L10.2998 6.25" stroke="#012B60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M33.47 17V7.2H37.866C38.9953 7.2 39.8633 7.42867 40.47 7.886C41.0767 8.334 41.38 8.95 41.38 9.734C41.38 10.266 41.2587 10.714 41.016 11.078C40.7827 11.442 40.4653 11.722 40.064 11.918C39.6627 12.114 39.2287 12.212 38.762 12.212L39.014 11.792C39.574 11.792 40.0687 11.89 40.498 12.086C40.9273 12.282 41.268 12.5713 41.52 12.954C41.772 13.3273 41.898 13.794 41.898 14.354C41.898 15.194 41.5807 15.8473 40.946 16.314C40.3207 16.7713 39.3873 17 38.146 17H33.47ZM34.87 15.866H38.09C38.8647 15.866 39.4573 15.7353 39.868 15.474C40.2787 15.2127 40.484 14.802 40.484 14.242C40.484 13.6727 40.2787 13.2573 39.868 12.996C39.4573 12.7347 38.8647 12.604 38.09 12.604H34.744V11.47H37.74C38.4493 11.47 39 11.3393 39.392 11.078C39.784 10.8167 39.98 10.4247 39.98 9.902C39.98 9.37933 39.784 8.98733 39.392 8.726C39 8.46467 38.4493 8.334 37.74 8.334H34.87V15.866ZM48.4757 17V15.432L48.4057 15.138V12.464C48.4057 11.8947 48.2377 11.456 47.9017 11.148C47.575 10.8307 47.0804 10.672 46.4177 10.672C45.979 10.672 45.5497 10.7467 45.1297 10.896C44.7097 11.036 44.355 11.2273 44.0657 11.47L43.5057 10.462C43.8884 10.154 44.3457 9.92067 44.8777 9.762C45.419 9.594 45.9837 9.51 46.5717 9.51C47.589 9.51 48.373 9.75733 48.9237 10.252C49.4744 10.7467 49.7497 11.5027 49.7497 12.52V17H48.4757ZM46.0397 17.084C45.489 17.084 45.0037 16.9907 44.5837 16.804C44.173 16.6173 43.8557 16.3607 43.6317 16.034C43.4077 15.698 43.2957 15.32 43.2957 14.9C43.2957 14.4987 43.389 14.1347 43.5757 13.808C43.7717 13.4813 44.0844 13.22 44.5137 13.024C44.9524 12.828 45.5404 12.73 46.2777 12.73H48.6297V13.696H46.3337C45.6617 13.696 45.209 13.808 44.9757 14.032C44.7424 14.256 44.6257 14.5267 44.6257 14.844C44.6257 15.208 44.7704 15.502 45.0597 15.726C45.349 15.9407 45.7504 16.048 46.2637 16.048C46.7677 16.048 47.2064 15.936 47.5797 15.712C47.9624 15.488 48.2377 15.1613 48.4057 14.732L48.6717 15.656C48.4944 16.0947 48.1817 16.4447 47.7337 16.706C47.2857 16.958 46.721 17.084 46.0397 17.084ZM55.4709 17.084C54.7149 17.084 54.0382 16.9207 53.4409 16.594C52.8529 16.2673 52.3909 15.8193 52.0549 15.25C51.7189 14.6807 51.5509 14.0273 51.5509 13.29C51.5509 12.5527 51.7189 11.8993 52.0549 11.33C52.3909 10.7607 52.8529 10.3173 53.4409 10C54.0382 9.67333 54.7149 9.51 55.4709 9.51C56.1429 9.51 56.7402 9.64533 57.2629 9.916C57.7949 10.1773 58.2056 10.5693 58.4949 11.092L57.4729 11.75C57.2302 11.386 56.9316 11.12 56.5769 10.952C56.2316 10.7747 55.8582 10.686 55.4569 10.686C54.9716 10.686 54.5376 10.7933 54.1549 11.008C53.7722 11.2227 53.4689 11.526 53.2449 11.918C53.0209 12.3007 52.9089 12.758 52.9089 13.29C52.9089 13.822 53.0209 14.284 53.2449 14.676C53.4689 15.068 53.7722 15.3713 54.1549 15.586C54.5376 15.8007 54.9716 15.908 55.4569 15.908C55.8582 15.908 56.2316 15.824 56.5769 15.656C56.9316 15.4787 57.2302 15.208 57.4729 14.844L58.4949 15.488C58.2056 16.0013 57.7949 16.398 57.2629 16.678C56.7402 16.9487 56.1429 17.084 55.4709 17.084ZM61.2312 15.208L61.2592 13.486L65.5292 9.58H67.1532L63.8772 12.8L63.1492 13.416L61.2312 15.208ZM60.1392 17V6.612H61.4832V17H60.1392ZM65.8092 17L62.8972 13.388L63.7652 12.31L67.4612 17H65.8092Z" fill="#012B60"></path>
+                </svg>
+    
+            </button>
+    
+        </div>
+</section>
+    
+    
+   
+    
+    
+<div class="tab-content tab-content-1 section-bg-blue">
+    
+@{
+           
+             if (heroShoulder != null)
+    {
+                       
+        
+           foreach (var name in heroShoulder.Items)
+                            {  
+                             var tab = (HomeShoulderItem)name;
+
+                var mycardnumber = 0;
+                 var mycardnumber1 = 0;
+                  var tabId = getTabName(tab.TabId.Replace(" ", "").Replace(",", "").Replace("%", ""));
+            <div role="tabpanel" class="tab-pane @(isFirstTab ? "active" : "")" id="tab-@tabId">
+                   
+                   @{
+                    var item2 = name.Value<IEnumerable<IPublishedElement>>("tabBodyContent").FirstOrDefault();
+                    } 
+                    @if (item2 != null)
+                    {
+                        var data = item2.Value<IEnumerable<IPublishedElement>>("sectionContent");
+                        int cardnumber = 0;
+                        foreach (var item in data)
+                        {
+                            var title = item.Value<string>("tabSubItemTitle");
+                            var tabSubItemImage = item.Value<IPublishedContent>("tabSubItemImage")?.Url;
+                            List<Umbraco.Web.Models.Link> itemLink = new List<Umbraco.Web.Models.Link>();
+                            foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)item.Value("tabSubItemLinks"))
+                            {
+                                itemLink.Add(link);
+                            }
+                            if(cardnumber == 2)
+                           {
+                             <section class="section-bg-blue">
+                                 <div class="container">
+                                        <div class="row tablet-flex">
+                                            <!-- Image on top for mobile -->
+                                            <div class="col-md-4 col-xs-12 visible-xs">
+                                                <img src="@tabSubItemImage" alt="Slide 1" class="img-responsive">
+                                            </div>
+                                            <div class="col-md-8 carousel-content">
+                                                <h1>@title</h1>
+                                                 @item.Value("tabSubItemTextContent")
+                                                <div class="row">
+                                               
+                                                   @if (itemLink != null)
+{
+    if (itemLink.Count() == 1)
+    {
+        <div class="col-xs-6">
+            <a href="@itemLink[0].Url" class="btn apply-button" id="@generateIdFromUrl(itemLink[0].Url)">
+                @itemLink[0].Name
+            </a>
+        </div>
+    }
+    else if (itemLink.Count() > 1)
+    {
+        <div class="col-xs-6">
+            <a href="@itemLink[0].Url" class="btn btn-default carousel-btns" id="@generateIdFromUrl(itemLink[0].Url)">
+                @itemLink[0].Name
+            </a>
+        </div>
+
+        <div class="col-xs-6">
+            <a href="@itemLink[1].Url" class="btn apply-button" id="@generateIdFromUrl(itemLink[0].Url)">
+                @itemLink[1].Name
+            </a>
+        </div>
+    }
+}
+
+
+                                                </div>
+                            
+                                           
+                                            </div>
+                                            <div class="col-md-4 col-xs-12 hidden-xs carousel-image">
+                                                <img class="img-fit" src="@tabSubItemImage">
+                                            </div>
+                                        </div>
+                                    </div>
+                            </section>  
+                              
+                               
+                            }
+                           
+                            cardnumber += 1;
+                        }
+                    }
+                </div>
+                 isFirstTab = false;
+            }
+            isFirstTab = true;
+            }
+        }
+        
+    </div>
+    <div class="bottom-section"></div>
+
+    <section class="section-bg-white" id="mega-tabs">
+        <div class="loan-summary-container">
+            <div class="container">
+                <div class="mega-tabs" style="margin-top:0px;">
+                    <!-- Nav tabs -->
+                  <ul id="go_to_tab_content" class="nav nav-tabs eq-height" role="tablist">
+    @{
+        var isFirstRow = true;
+        foreach (var item in heroShoulder.Items)
+        {
+          var tab = (HomeShoulderItem)item;
+            var tabId = getTabName(tab.TabId.Replace(" ", "").Replace(",", "").Replace("%", ""));
+            <li role="presentation" class="@(isFirstRow ? "active" : "") loan-summary" data-tab-id="@tabId" data-tab="General-enquiry">
+               <a href="#@getTabName(tab.TabId.Replace(" ", ""))" role="tab" aria-controls="tab-@tab.TabId" data-tab-id="@tab.TabId" id="@tab.TabId" class="tab-switcher">
+                    <span>@tab.TabName</span>
+                </a>
+            </li>
+            isFirstRow = false;
+        }
+    }
+</ul>
+                </div>
+            </div>
+        </div>
+            <div class="scroll-indicator1" id="scrollIndicator1">
+              <span class="dot1 active"></span>
+              <span class="dot1"></span>
+              <span class="dot1"></span>
+              <span class="dot1"></span>
+            </div>
+   </section>
+    <!-- Tab panes -->
+    <div class="tab-content tab-content-2">
+      @{
+          
+            foreach (HomeShoulderItem tab in heroShoulder.Items)
+            {
+                var mycardnumber = 0;
+                var mycardnumber1 = 0;
+                var scrollContainerClass = "scroll-container";
+                 var tabId = getTabName(tab.TabId.Replace(" ", "").Replace(",", "").Replace("%", ""));
+                <div role="tabpanel" class="tab-pane @(isFirstTab ? "active" : "")" id="tab-@tabId">
+                   
+                   @{
+                    var item2 = tab.Value<IEnumerable<IPublishedElement>>("tabBodyContent").FirstOrDefault();
+                    } 
+                    @if (item2 != null)
+                    {
+                        var data = item2.Value<IEnumerable<IPublishedElement>>("sectionContent");
+                        int cardnumber = 0;
+                        foreach (var item in data)
+                        {
+                            var title = item.Value<string>("tabSubItemTitle");
+                            var tabSubItemImage = item.Value<IPublishedContent>("tabSubItemImage")?.Url;
+                            var cards = item.Value<IEnumerable<NCcard>>("genericCardContent");
+                            if(cardnumber == 0)
+                           {
+                                <section>
+                                   <div class="container">
+                                        <div class="header-section btn-font-color">
+                                            <h1 class="mb-16">@title</h1>
+                                             @item.Value("tabSubItemTextContent")
+                                        </div>
+                                    </div>
+                                </section>
+                                if(getTabName(tab.TabId.Replace(" ", "").Replace(",", "").Replace("%", "")) == "BusinessLoans")
+                                {
+                                    <section>
+                                        <div class="container">
+                                        
+                                            @*
+                                                <div class="cards-container">
+                                                    @foreach (var subI in tab.Items)
+                                                    {
+                                                       var subItem = (StructureBeCardDescription)subI;
+                                                        <div class="card-container">
+                                                            <div class="card">
+                                                                <div class="card-body">
+                                                                    <div class="card-icon">
+                                                                       <img src="@subItem.BenefitCardIcon.Url" alt="Icon" />
+                                                                    </div>
+                                                                    <div class="card-title">@subItem.BenefitCardTitle</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }           
+                                                </div>
+                                            *@
+                                        
+                                            <div class="cards-container">
+                                                <!-- Card 1 -->
+                                                <div class="card-container">
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <div class="card-icon">
+                                                                <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                    <path d="M22.6641 45.2666V56.1466" stroke="#012B60" stroke-width="2.5" stroke-linecap="round"/>
+                                                                    <path d="M12 53.333V56.0738" stroke="#012B60" stroke-width="2.5" stroke-linecap="round"/>
+                                                                    <path d="M33.3359 36V56.0952" stroke="#012B60" stroke-width="2.5" stroke-linecap="round"/>
+                                                                    <path d="M44 25.2822V56.1174" stroke="#012B60" stroke-width="2.5" stroke-linecap="round"/>
+                                                                    <path d="M54.6641 14.6279V56.1114" stroke="#012B60" stroke-width="2.5" stroke-linecap="round"/>
+                                                                    <path d="M9.33594 44L45.3359 8" stroke="#5DC303" stroke-width="2.5" stroke-linecap="round"/>
+                                                                    <path d="M31.3359 8H45.3359" stroke="#5DC303" stroke-width="2.5" stroke-linecap="round"/>
+                                                                </svg>
+                                        
+                                                            </div>
+                                                            <div class="card-title">Grow your business</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+        
+                                                <!-- Card 2 -->
+                                                <div class="card-container">
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <div class="card-icon">
+                                                               <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M6.24184 31.4185C5.76989 28.9527 7.65988 26.6667 10.1705 26.6667H53.8276C56.3383 26.6667 58.2283 28.9527 57.7563 31.4185L53.6733 52.7519C53.3125 54.6369 51.6639 56 49.7447 56H14.2535C12.3343 56 10.6855 54.6369 10.3248 52.7519L6.24184 31.4185Z" stroke="#012B60" stroke-width="2.5" stroke-linejoin="round"/>
+                                                                <path d="M32 8L20 26.6667H44L32 8Z" stroke="#012B60" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                <path d="M32 45.3333C34.2091 45.3333 36 43.5425 36 41.3333C36 39.1242 34.2091 37.3333 32 37.3333C29.7909 37.3333 28 39.1242 28 41.3333C28 43.5425 29.7909 45.3333 32 45.3333Z" stroke="#5DC303" stroke-width="2.5"/>
+                                                                </svg>
+                                                            </div>
+                                                            <div class="card-title">Buy stock</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                        
+                                                <!-- Card 3 -->
+                                                <div class="card-container">
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <div class="card-icon">
+                                                                <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M52.6369 16.4097C52.6369 9.07402 47.6217 6.13333 40.401 6.13333H23.444C16.4451 6.13333 11.2 8.87352 11.2 15.9205V55.184C11.2 57.1195 13.2826 58.3385 14.9694 57.3921L31.988 47.8456L48.8595 57.3761C50.549 58.3278 52.6369 57.1088 52.6369 55.1706V16.4097Z" stroke="#012B60" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                <path d="M22.0565 24.0747H41.5719" stroke="#5DC303" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                </svg>
+                                        
+                                                            </div>
+                                                            <div class="card-title">Settle bills</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+        
+                                                <!-- Card 4 -->
+                                                <div class="card-container">
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <div class="card-icon">
+                                                                <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                    <path d="M18.6666 20C26.0304 20 32 17.0152 32 13.3333C32 9.65142 26.0304 6.66666 18.6666 6.66666C11.3028 6.66666 5.33331 9.65142 5.33331 13.3333C5.33331 17.0152 11.3028 20 18.6666 20Z" stroke="#012B60" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                    <path d="M5.33331 13.3333C5.33331 13.3333 5.33331 18.9848 5.33331 22.6667C5.33331 26.3485 11.3028 29.3333 18.6666 29.3333C26.0304 29.3333 32 26.3485 32 22.6667C32 20.4859 32 13.3333 32 13.3333" stroke="#012B60" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                    <path d="M5.33331 22.6667C5.33331 22.6667 5.33331 28.3181 5.33331 32C5.33331 35.6819 11.3028 38.6667 18.6666 38.6667C26.0304 38.6667 32 35.6819 32 32C32 29.8192 32 22.6667 32 22.6667" stroke="#012B60" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                    <path d="M5.33331 32C5.33331 32 5.33331 37.6515 5.33331 41.3333C5.33331 45.0152 11.3028 48 18.6666 48C26.0304 48 32 45.0152 32 41.3333C32 39.1525 32 32 32 32" stroke="#012B60" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                    <path d="M5.33331 41.3333C5.33331 41.3333 5.33331 46.9848 5.33331 50.6667C5.33331 54.3485 11.3028 57.3333 18.6666 57.3333C26.0304 57.3333 32 54.3485 32 50.6667C32 48.4859 32 41.3333 32 41.3333" stroke="#012B60" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                    <path d="M45.3333 38.6667C52.6971 38.6667 58.6667 35.6819 58.6667 32C58.6667 28.3181 52.6971 25.3333 45.3333 25.3333C37.9695 25.3333 32 28.3181 32 32C32 35.6819 37.9695 38.6667 45.3333 38.6667Z" stroke="#5DC303" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                    <path d="M32 32C32 32 32 37.6515 32 41.3333C32 45.0152 37.9696 48 45.3333 48C52.6971 48 58.6667 45.0152 58.6667 41.3333C58.6667 39.1525 58.6667 32 58.6667 32" stroke="#5DC303" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                    <path d="M32 41.3333C32 41.3333 32 46.9848 32 50.6667C32 54.3485 37.9696 57.3333 45.3333 57.3333C52.6971 57.3333 58.6667 54.3485 58.6667 50.6667C58.6667 48.4859 58.6667 41.3333 58.6667 41.3333" stroke="#5DC303" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                </svg>
+                                        
+                                                            </div>
+                                                            <div class="card-title">Pay salaries</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        
+                                        </div>
+                                    </section>
+                                     
+                                }
+                               
+                            }
+                            if(cardnumber == 1)
+                            {
+                                <section class="section-bg-grey" id="loan">
+                                    <div class="container">
+                                        <div class="header-section-2 btn-font-color-blue">
+                                            <h1 class="btn-font-color-blue-h1">@title</h1>
+                                            <p class="btn-font-color-blue-p">@item.Value("tabSubItemTextContent")</p>
+                                        </div>
+                                        <div class="">
+                                                   
+
+                                                        @{// Assign class suffix based on tab name
+                                                        if (getTabName(tab.TabId.Replace(" ", "").Replace(",", "").Replace("%", "")) == "BusinessLoans") {
+                                                            scrollContainerClass = "scroll-container0";
+                                                        } else if (getTabName(tab.TabId.Replace(" ", "").Replace(",", "").Replace("%", "")) == "CommercialPropertyFinance") {
+                                                            scrollContainerClass = "scroll-container2";
+                                                        } else if (getTabName(tab.TabId.Replace(" ", "").Replace(",", "").Replace("%", "")) == "InvestmentBanking") {
+                                                            scrollContainerClass = "scroll-container3";
+                                                        } else if (getTabName(tab.TabId.Replace(" ", "").Replace(",", "").Replace("%", "")) == "CapitalEquipmentFinance") {
+                                                            scrollContainerClass = "scroll-container4";
+                                                        }
+                                                        }
+                                            <div class="row xs-cards scroll-container" id="@scrollContainerClass">
+                                                @foreach (var mycard in cards)
+                                                {
+                                                   var cardTitle = mycard.Value<string>("nCcardTitle");
+                                                   var icon = mycard.Value<IPublishedContent>("nCcardIcon");
+                                                   List<Umbraco.Web.Models.Link> itemLink = new List<Umbraco.Web.Models.Link>();
+                                                    foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)mycard.Value("nccardUrl"))
+                                                    {
+                                                        itemLink.Add(link);
+                                                    }
+                                                    if(mycardnumber == 0 || mycardnumber == 1 || mycardnumber == 2)
+                                                    {
+                                                    
+                                                        <div class="col-md-4 col-sm-4 loan-box scroll-section">
+                                                            <div class="content-box">
+                                                                <div class="row ">
+                                                                
+                                                                    <div class="mortgage-container col-xs-9 col-md-12 col-sm-12">
+                                                                        @if (@cardTitle == "Fixed Term Business Loan")
+                                                                        {
+                                                                            <h4 class="font-weight-600 btn-font-color">@cardTitle</h4>
+                                                                        }else{
+                                                                            <h4 class="font-weight-600 btn-font-color text-wrap">@cardTitle</h4>
+                                                                        }
+                                                                    </div>
+                                                                    
+                                                                        
+                                                                    @if (icon != null)
+                                                                    {
+                                                                       <div class="col-md-3 col-sm-3 card-icons-1">
+                                                                            <img src="@icon.Url" alt="icon" />
+                                                                        </div>
+                                                                    }
+                                                                </div>
+                                                                @if(getTabName(tab.TabId.Replace(" ", "").Replace(",", "").Replace("%", "")) != "BusinessLoans")
+                                                                {
+                                                                   <hr class="content-box-Commercial-Property-Finance-cards-hr">
+                                                                }
+                                                                @Html.Raw(mycard.Value<string>("mediumDescription"))
+                                                                <div class="row">
+                                                                
+                                                                @if(getTabName(tab.TabId.Replace(" ", "").Replace(",", "").Replace("%", "")) == "BusinessLoans")
+                                                                {
+                                                                   <div class="center-btn-sm  ">
+                                                                        <a href="@itemLink[0].Url" class="btn btn-default" id="fix-term-Business-loan-learn-more-btn">@itemLink[0].Name
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="16" viewBox="0 0 17 16" fill="none">
+                                                                              <g clip-path="url(#clip0_4649_4406)">
+                                                                                <path d="M8.5013 2.6665L7.5613 3.6065L11.2813 7.33317H3.16797V8.6665H11.2813L7.5613 12.3932L8.5013 13.3332L13.8346 7.99984L8.5013 2.6665Z" fill="#002B60"></path>
+                                                                              </g>
+                                                                              <defs>
+                                                                                <clipPath id="clip0_4649_4406">
+                                                                                  <rect width="16" height="16" fill="white" transform="translate(0.5)"></rect>
+                                                                                </clipPath>
+                                                                              </defs>
+                                                                            </svg>
+                                                                        </a>
+                                                                        <a href="@itemLink[1].Url" class="btn btn-primary btn-green-class-sm">
+                                                                           @itemLink[1].Name
+                                                                        </a>
+                                                                    </div>
+                                                                    
+                                                                    }else{
+                                                                        <div class="not-business-loan-center-btn-sm">
+                                                                            <a href="@itemLink[0].Url" class="btn btn-default" id="fix-term-Business-loan-learn-more-btn">@itemLink[0].Name
+                                                                                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="16" viewBox="0 0 17 16" fill="none">
+                                                                                  <g clip-path="url(#clip0_4649_4406)">
+                                                                                    <path d="M8.5013 2.6665L7.5613 3.6065L11.2813 7.33317H3.16797V8.6665H11.2813L7.5613 12.3932L8.5013 13.3332L13.8346 7.99984L8.5013 2.6665Z" fill="#002B60"></path>
+                                                                                  </g>
+                                                                                  <defs>
+                                                                                    <clipPath id="clip0_4649_4406">
+                                                                                      <rect width="16" height="16" fill="white" transform="translate(0.5)"></rect>
+                                                                                    </clipPath>
+                                                                                  </defs>
+                                                                                </svg>
+                                                                            </a>
+                                                                            <a href="@itemLink[1].Url" class="btn btn-primary btn-green-class-sm">
+                                                                               @itemLink[1].Name
+                                                                            </a>
+                                                                        </div>                                                                   
+                                                                    
+                                                                    }
+                                                                </div>
+                                                                
+                                                            </div>
+                                                        </div>
+                                                    
+                                                    }
+                                                    
+                                                             @*   else{
+                                                                 if(mycardnumber == 3)
+                                                                {
+                                                                
+                                                                    <div class="col-md-12">
+                                                                        <div class="col-xs-12 col-md-4 col-sm-4 visible-xs">
+                                                                                  <img src="@icon.Url" alt="Finance Image" class="img-responsive custom-img">
+                                                                        </div>
+                                                                        <div class="highlight-section mtb-32">
+                                                                          
+                                                                          <div class="col-xs-12  col-md-8 col-sm-8">
+                                                                             @Html.Raw(mycard.Value<string>("mediumDescription"))
+                                                                           </div>
+                                                                           <div class="col-xs-12  col-md-4 hidden-xs col-sm-4">
+                                                                                  <img src="@icon.Url" alt="Finance Image" class="img-responsive custom-img">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                }*@
+                                                                mycardnumber += 1;   
+                                                }
+                            
+                                            </div>
+                                             @if(getTabName(tab.TabId.Replace(" ", "").Replace(",", "").Replace("%", "")) == "BusinessLoans")
+                                                {
+                                                <div class="scroll-indicator" id="scrollIndicator">
+                                                        <span class="dot active"></span>
+                                                        <span class="dot"></span>
+                                                        <span class="dot"></span>
+                                                </div>
+                                                }
+                                             @if(getTabName(tab.TabId.Replace(" ", "").Replace(",", "").Replace("%", "")) == "CommercialPropertyFinance")
+                                                {
+                                                <div class="scroll-indicator" id="scrollIndicator2">
+                                                        <span class="dot active"></span>
+                                                        <span class="dot"></span>
+                                                        <span class="dot"></span>
+                                                </div>
+                                                }
+                                                 @if(getTabName(tab.TabId.Replace(" ", "").Replace(",", "").Replace("%", "")) == "InvestmentBanking")
+                                                {
+                                                <div class="scroll-indicator" id="scrollIndicator3">
+                                                        <span class="dot active"></span>
+                                                        <span class="dot"></span>
+                                                        <span class="dot"></span>
+                                                </div>
+                                                }
+                                                 @if(getTabName(tab.TabId.Replace(" ", "").Replace(",", "").Replace("%", "")) == "CapitalEquipmentFinance")
+                                                {
+                                                <div class="scroll-indicator" id="scrollIndicator4">
+                                                        <span class="dot active"></span>
+                                                        <span class="dot"></span>
+                                                        <span class="dot"></span>
+                                                </div>
+                                                }
+                                        
+                                                                                
+                                             @foreach (var mycard1 in cards)
+                                                {
+                                                   var cardTitle = mycard1.Value<string>("nCcardTitle");
+                                                   var icon = mycard1.Value<IPublishedContent>("nCcardIcon");
+                                                   List<Umbraco.Web.Models.Link> itemLink = new List<Umbraco.Web.Models.Link>();
+                                                    foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)mycard1.Value("nccardUrl"))
+                                                    {
+                                                        itemLink.Add(link);
+                                                    }
+                                                    
+                                                   
+                                                  
+                                                   
+                                                    
+                                                    if(mycardnumber1 == 3)
+                                                    {
+                                                        <div class="">
+                                                            <div class="col-xs-12 col-md-4 col-sm-4 visible-xs">
+                                                                      <img src="@icon.Url" alt="Finance Image" class="img-xs img-responsive custom-img">
+                                                            </div>
+                                                            <div class="highlight-section mtb-32">
+                                                              
+                                                              <div class="col-xs-12  col-md-8 col-sm-8">
+                                                                 @Html.Raw(mycard1.Value<string>("mediumDescription"))
+                                                               </div>
+                                                               <div class="col-xs-12  col-md-4 hidden-xs col-sm-4">
+                                                                      <img src="@icon.Url" alt="Finance Image" class="img-responsive custom-img">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    mycardnumber1 += 1;
+                                                }
+                                        </div> 
+                                        
+                                    </div>
+                                </section>
+                                
+                                
+                                 if(getTabName(tab.TabId.Replace(" ", "").Replace(",", "").Replace("%", "")) == "BusinessLoans")
+                                {
+                                 
+                                    <section id="main-cal">
+                                    
+                                        @Html.Partial("_BusinessCalculator", "businessLoansCalculator")
+                                    </section> 
+                                }
+                            }
+                            
+                            if(cardnumber == 3)
+                            {
+                                                    
+                                <section class="section-bg-white2 xs-display"></section>
+                                if(getTabName(tab.TabId.Replace(" ", "").Replace(",", "").Replace("%", "")) != "BusinessLoans")
+                                {
+                                    <section class="section-bg-white2"></section>
+                                }
+                                
+                                <section class="section-bg-grey">
+                                    <section class="section-6 section-327 section4-img-bg-image" id="faq1" aria-labelledby="faq-tab" role="tabmyPanel">
+                                        <div class="container">
+                                            <h5 class="faqHeader btn-font-color">FAQ's</h5>
+                                            @foreach (var mycardfaq in cards)
+                                            {
+                                               var cardTitlefaq = mycardfaq.Value<string>("nCcardTitle");
+                                               var cardMediumDescription = mycardfaq.Value<string>("mediumDescription");
+                                                                <button class="accordion" aria-expanded="false"  aria-controls=@cardTitlefaq >
+                                                                @cardTitlefaq
+                                                                </button>
+                                                                <div class="myPanel" id=@cardTitlefaq style="display: none;">
+                                                                   @Html.Raw(@cardMediumDescription)
+                                                                </div>
+                                            }
+                                                                
+                                        </div>
+                                    </section>
+                                    <div class="container" id="faq1">
+                                        <div class="row">
+                                            <div class="col-xs-12 text-center" style="padding: 40px 0;">
+                                              <a href="http://cmsdev.africanbank.net/en/home/business-banking-faq/" class="btn btn-green-class" id="view-more-faq">
+                                                View more
+                                              </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                                    
+                                </section>
+                            }       
+                            cardnumber += 1;
+                        }
+                    }
+                </div>
+                isFirstTab = false;
+            }
+        }
+    </div>
+
+</section>
+
+
+@section scripts
+{
+
+@*
+
+<script>
+
+        // Accordion Script (if applicable)
+    $(".accordion").click(function() {
+        $(this).toggleClass("active");
+        var myPanel = $(this).next(".myPanel");
+        var wasOpen = myPanel.css("display") === "block";
+
+        $(".myPanel").css("display", "none");
+        $(".accordion").removeClass("active");
+
+        if (!wasOpen) {
+            myPanel.css("display", "block");
+            $(this).addClass("active");
+        }
+    });
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Get all tab links
+    var tabLinks = document.querySelectorAll('#go_to_tab_content li');
+
+    // Function to activate the correct tab content
+    function switchTabs(tabId) {
+        // Remove 'active' from all tab panes
+        document.querySelectorAll('.tab-content-1 .tab-pane, .tab-content-2 .tab-pane').forEach(function (el) {
+            el.classList.remove('active');
+        });
+
+        // Add 'active' to matching tab pane
+        var activeTab1 = document.querySelector('.tab-content-1 #tab-' + tabId);
+        var activeTab2 = document.querySelector('.tab-content-2 #tab-' + tabId);
+
+        if (activeTab1) activeTab1.classList.add('active');
+        if (activeTab2) activeTab2.classList.add('active');
+
+        // 🔥 Add this part: toggle active tab in nav
+        tabLinks.forEach(function (li) {
+            li.classList.remove('active');
+        });
+
+        const currentActive = document.querySelector(`#go_to_tab_content li[data-tab-id="${tabId}"]`);
+        if (currentActive) currentActive.classList.add('active');
+    }
+
+    // Add click event to each <li>
+    tabLinks.forEach(function (tabLink) {
+        tabLink.addEventListener('click', function () {
+            var tabId = tabLink.getAttribute('data-tab-id');
+            switchTabs(tabId);
+        });
+    });
+});
+
+
+
+
+$(document).ready(function() {
+
+    function updateMortgageContainer(activeTab) {
+        var container = $('.mortgage-container');
+
+        if (activeTab === "BusinessLoans") {
+            container.removeClass('col-md-12 col-sm-12').addClass('col-md-9 col-sm-9');
+        } else {
+            container.removeClass('col-md-9 col-sm-9').addClass('col-md-12 col-sm-12');
+        }
+    }
+
+    // On page load: check for active tab
+    var initialActiveTab = $('li.loan-summary.active').data('tab-id');
+    updateMortgageContainer(initialActiveTab);
+
+    // On tab click: update dynamically
+    $('.tab-switcher').on('click', function(e) {
+        e.preventDefault();
+
+        $('.loan-summary').removeClass('active');
+        $(this).closest('li').addClass('active');
+
+        var activeTab = $(this).closest('li').data('tab-id');
+        
+       //  if (activeTab != "BusinessLoans"){
+             
+        //     $('#main-cal').hide();
+       //  }
+        
+        updateMortgageContainer(activeTab);
+    });
+    
+    
+});
+
+
+    $(document).ready(function(){
+        $('#goBackBtn').click(function(e){
+            e.preventDefault();
+
+            if (document.referrer) {
+                // Use the referrer URL if available
+                window.location.href = document.referrer;
+            } else {
+                // If no referrer, fallback to homepage or a specific URL
+                window.location.href = '/';
+            }
+        });
+    });
+    
+    
+</script>
+
+
+ <script>
+        document.addEventListener("DOMContentLoaded", function () {
+      // Section 1 Scroll
+  function setupScrollIndicator(containerId, indicatorId) {
+  const container = document.getElementById(containerId);
+  const dots = document.querySelectorAll(`#${indicatorId} .dot`);
+  const sections = container.querySelectorAll(".scroll-section");
+
+  function updateActiveDot() {
+    const scrollLeft = container.scrollLeft;
+    const width = container.clientWidth;
+    const index = Math.round(scrollLeft / width);
+    dots.forEach((dot, i) => dot.classList.toggle("active", i === index));
+  }
+
+  dots.forEach((dot, i) => {
+    dot.addEventListener("click", () => {
+      container.scrollTo({ left: i * container.clientWidth, behavior: "smooth" });
+    });
+  });
+
+  container.addEventListener("scroll", () => {
+    requestAnimationFrame(updateActiveDot);
+  });
+}
+
+// Set up scroll indicators by ID now
+setupScrollIndicator("scroll-container0", "scrollIndicator");
+setupScrollIndicator("scroll-container2", "scrollIndicator2");
+setupScrollIndicator("scroll-container3", "scrollIndicator3");
+setupScrollIndicator("scroll-container4", "scrollIndicator4");
+
+      // Mega Tabs Scroll
+      const tabContainer = document.getElementById("go_to_tab_content");
+      const tabDots = document.querySelectorAll("#scrollIndicator1 .dot1");
+
+      function updateTabDot() {
+        const scrollLeft = tabContainer.scrollLeft;
+        const tabWidth = tabContainer.scrollWidth / tabDots.length;
+        const index = Math.round(scrollLeft / tabWidth);
+        tabDots.forEach((dot, i) => dot.classList.toggle("active", i === index));
+      }
+
+      tabDots.forEach((dot, i) => {
+        dot.addEventListener("click", () => {
+          const scrollAmount = (tabContainer.scrollWidth / tabDots.length) * i;
+          tabContainer.scrollTo({ left: scrollAmount, behavior: "smooth" });
+        });
+      });
+
+      tabContainer.addEventListener("scroll", () => {
+        requestAnimationFrame(updateTabDot);
+      });
+
+      window.addEventListener("resize", () => {
+        updateActiveDot();
+        updateTabDot();
+      });
+    });
+  </script>
+  
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    function activateTab(hash) {
+        if (!hash) return;
+
+        const tabLink = document.querySelector(`#go_to_tab_content a[href="${hash}"]`);
+        if (tabLink) {
+            // Remove active classes
+            document.querySelectorAll('#go_to_tab_content li').forEach(li => li.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+
+            // Add active to matching tab
+            tabLink.parentElement.classList.add('active');
+            const tabContent = document.querySelector(hash);
+            if (tabContent) tabContent.classList.add('active');
+        }
+    }
+
+    // On page load
+    activateTab(window.location.hash);
+
+    // On tab click
+    document.querySelectorAll('#go_to_tab_content a').forEach(link => {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = this.getAttribute('href');
+            activateTab(target);
+            history.replaceState(null, null, target); // Update URL without scroll
+        });
+    });
+
+    // On back/forward navigation
+    window.addEventListener('hashchange', function () {
+        activateTab(window.location.hash);
+    });
+});
+</script>
+*@
+
+
+<script>
+(function () {
+  'use strict';
+
+  function onReady(fn) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fn, { once: true });
+    } else {
+      fn();
+    }
+  }
+
+  // Convert "#CommercialPropertyFinance" or "#tab-CommercialPropertyFinance" → "CommercialPropertyFinance"
+  function keyFromHash(hash) {
+    if (!hash) return null;
+    let k = hash.replace(/^#/, '');
+    k = k.replace(/^tab-/, '');
+    return k || null;
+  }
+
+  // Find panes across both containers matching this key
+  function findMatchingPanes(key) {
+    const sel = [
+      `.tab-content-1 #tab-${key}`,
+      `.tab-content-2 #tab-${key}`,
+      `.tab-content-1 #${key}`,
+      `.tab-content-2 #${key}`
+    ].join(', ');
+    return Array.from(document.querySelectorAll(sel));
+  }
+
+  function clearAll() {
+    // Clear nav active
+    document.querySelectorAll('#go_to_tab_content li').forEach(li => li.classList.remove('active'));
+    // Clear all panes
+    document.querySelectorAll('.tab-content-1 .tab-pane, .tab-content-2 .tab-pane').forEach(p => {
+      p.classList.remove('active', 'show');
+      p.setAttribute('aria-hidden', 'true');
+    });
+  }
+
+  function setActiveNavByKey(key) {
+    const li = document.querySelector(`#go_to_tab_content li[data-tab-id="${key}"]`);
+    if (li) li.classList.add('active');
+  }
+
+  function updateMortgageContainer(key) {
+    const container = document.querySelector('.mortgage-container');
+    if (!container) return;
+    container.classList.remove('col-md-12', 'col-sm-12', 'col-md-9', 'col-sm-9');
+    if (key === 'BusinessLoans') {
+      container.classList.add('col-md-9', 'col-sm-9');
+    } else {
+      container.classList.add('col-md-12', 'col-sm-12');
+    }
+  }
+
+  function showByKey(key, updateUrl) {
+    if (!key) return;
+
+    const panes = findMatchingPanes(key);
+    if (!panes.length) return;
+
+    clearAll();
+
+    // Activate nav
+    setActiveNavByKey(key);
+
+    // Activate matching panes
+    panes.forEach(p => {
+      p.classList.add('active', 'show');
+      p.setAttribute('aria-hidden', 'false');
+    });
+
+    // Update URL hash to canonical form
+    if (updateUrl) {
+      const canonical = `#${panes[0].id}`;
+      if (location.hash !== canonical) {
+        history.replaceState(null, '', canonical);
+      }
+    }
+
+    // Update mortgage container column classes
+    updateMortgageContainer(key);
+  }
+
+  onReady(function () {
+    // Initial activation from hash or fallback to first active li
+    const initialKey =
+      keyFromHash(location.hash) ||
+      document.querySelector('#go_to_tab_content li.active')?.getAttribute('data-tab-id') ||
+      document.querySelector('#go_to_tab_content li')?.getAttribute('data-tab-id');
+
+    if (initialKey) {
+      showByKey(initialKey, !!location.hash);
+    }
+
+    // Click handler for nav tabs
+    document.querySelectorAll('#go_to_tab_content a.tab-switcher').forEach(a => {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        const key =
+          this.closest('li')?.getAttribute('data-tab-id') ||
+          keyFromHash(this.getAttribute('href'));
+        showByKey(key, true);
+      });
+    });
+
+    // Browser back/forward handler
+    window.addEventListener('hashchange', function () {
+      const key = keyFromHash(location.hash);
+      showByKey(key, false);
+    });
+  });
+})();
+</script>
+
+
+
+
 }

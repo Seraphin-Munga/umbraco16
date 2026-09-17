@@ -30,7 +30,9 @@
 	ContentModels.EbankItabstractButton registerNowButton = null;
 	ContentModels.EbankItabstractButton androidDownloadNow = null;
 	ContentModels.EbankItabstractButton iosDownloadNow = null;
+	ContentModels.EbankItabstractButton huaweiDownloadNow = null;
 	ContentModels.EbankItabstractButton downloadNow = null;
+	
 
 	foreach (var button in bodyButtons)
 	{
@@ -51,6 +53,10 @@
 		else if (button.Value("EbankItbuttonText").ToString().Contains("iOS"))
 		{
 			iosDownloadNow = (ContentModels.EbankItabstractButton)button;
+		}
+		else if (button.Value("EbankItbuttonText").ToString().Contains("Huawei"))
+		{
+			huaweiDownloadNow = (ContentModels.EbankItabstractButton)button;
 		}
 		else
 		{
@@ -128,6 +134,7 @@
 	var popQRCode = "/media/ylalxyxb/image001.png";
 	var popAndroidApp = "/media/pt2b4b3q/GooglePlayStoreDownloadImageLink.png";
 	var popIOsApp = "/media/pejn1h1x/appstoredownloadimagelink.png";
+    var popHuaweiApp = "/media/l2dls1tu/huaweiappgallery.png";
 
 	var imageUrl = heroHeader.Value<IPublishedContent>("image")?.Url;
 
@@ -148,6 +155,29 @@
 	}
 </style>
 <style>
+ @@media (min-width: 1000px) and (max-width: 10000px) {
+
+        .left-col {
+            border-right: none !important;
+            margin-left: 210px;
+        }
+
+        #popUpHuawei {
+            margin-right: -45rem;
+            margin-top: -82px;
+        }
+        @@supports (-moz-appearance:none) {
+
+            #popUpHuawei {
+                margin-right: 0px;
+                margin-left: 329px;
+            }
+        }
+
+        .modal-dialog {
+            width: 900px !important;
+        }
+    }
     @@media (max-width: 767px)
     {
         .hero-static-caption .hero-static-title, .hero-static-caption h1 
@@ -240,8 +270,6 @@
 					}
 				}
 			}
-
-			@*<a class="button primary" href="~/media/52918/0_debicheck_vertical-infographic-pdf_e_final3_170425.pdf">Download infographic</a>*@
 		</div>
 	</div>
 </div>
@@ -283,9 +311,7 @@
 
 <br />
 
-@*Blue Background Start*@
-
-<div class="campaign-myworld-container">
+<div class="campaign-myworld-container" style="background-image: url('/media/ptkpputz/african-banking-1935x255.png');">
 	<div class="container payments-section full blue-button">
 		<div class="margin-top-20 visible-xs"></div>
 		<div class="row myworld-campaign-section-container">
@@ -319,7 +345,7 @@
 		</div>
 	</div>
 </div>
-@*Blue Background End*@
+
 <div class="green-pointer-banking-campaign"></div>
 <div class="hover-block"></div>
 <div class="container">
@@ -371,7 +397,7 @@
 						else
 						{
 							<div class="col-md-4 center-align margin-bottom-20 margin-left-50 banking-options-buttons">
-								<span class="button span-buttons green-button view_OnlineApps downloadNow" data-item="@popupAppTitle*@popQRCode*@popAndroidApp*@popIOsApp" target="_blank">@downloadNow.EbankItbuttonText</span>
+								<span class="button span-buttons green-button view_OnlineApps downloadNow" data-item="@popupAppTitle*popQRCode*@popAndroidApp*@popIOsApp*@popHuaweiApp" target="_blank">@downloadNow.EbankItbuttonText</span>
 							</div>
 						}
 					}
@@ -381,7 +407,7 @@
 		}
 	</div>
 </div>
-
+@* *@
 
 <!-- NUMBER TO CALL -->
 <div class="number-to-call">
@@ -408,24 +434,39 @@
 	HTMLContent2 = @<text>
 		<div class="modal-body">
 			<div class="row">
-				<div class="col-xs-12 col-sm-12 col-lg-12">
+				<div class="col-xs-12 col-sm-15 col-lg-12">
 					<h5>Download the African Bank App or Register and login to internet banking to get your free credit report</h5>
 				</div>
 			</div>
-			<br><br>
-			<div class="row">
-				<div class="col-sm-6">
+			<br>
+            <div class="row">
+                <div class="col-sm-15">
+                    <br />
+                </div>
+                
+				<div class="col-xs-12 col-sm-6">
 					<a href="@androidDownloadNow.Value("ebankITButtonExternalLink")" target="_blank">
 						<img width="200" id="popUpAndroid" alt="google-play-store-african-bank-android-app" />
 					</a>
 
 				</div>
-				<div class="col-sm-6">
+                <div class="col-xs-12 hidden-sm hidden-md hidden-lg"><br></div>
+
+                <div class="col-xs-12 col-sm-6">
 					<a href="@iosDownloadNow.Value("ebankITButtonExternalLink")" target="_blank">
 						<img width="200" id="popUpIOS" alt="ios-african-bank-app" />
 					</a>
-				</div>
-			</div>
+                </div>
+                <div class="col-xs-12 hidden-sm hidden-md hidden-lg"><br></div>
+
+                <div class="col-xs-12 col-sm-6">
+					<a href="@huaweiDownloadNow.Value("ebankITButtonExternalLink")" target="_blank">
+						<img width="200" id="popUpHuawei" alt="ios-african-bank-app" />
+					</a>
+                </div>
+
+            </div>
+			
 			<br>
 			<div class="row">
 				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">

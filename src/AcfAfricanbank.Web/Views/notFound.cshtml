@@ -1,5 +1,12 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
 }
+
+@* the fun starts here *@
+
+<div class="error-page">
+    <h1>404 - Page Not Found</h1>
+    <p>Sorry, the page you requested could not be found.</p>
+    <a href="/">Go back to homepage</a>
+</div>

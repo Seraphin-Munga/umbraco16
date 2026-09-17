@@ -1,5 +1,363 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
-	Layout = null;
+    Layout = "Master.cshtml";
+    
+   // Response.AppendHeader("Access-Control-Allow-Origin", "*"); // Replace * with the specific domains you want to allow
+   // Response.AppendHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+//   Response.AppendHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+// https://api.locationbank.net/storelocator/StoreLocatorAPI/locationDetails?LocationID=0a0fc3ad-6be7-48d3-916a-67f650ba278b&ClientID=6ef8638f-af8c-409d-ad24-cf3422269370
+    
 }
+
+ <link rel="stylesheet" href="/css/Storelocatordetails.css" />
+
+<style>
+
+    body {
+        background-color: #fff;
+        font-family: Montserrat,Helvetica Neue,Arial,sans-serif !important;
+    }
+
+    .btn-info {
+        border-color: #002b60 !important;
+        color: #002b60;
+        font-weight: 600;
+        border-radius: 20px;
+        background-color: transparent;
+        width: 15%;
+    }
+
+    @@media (min-width: 768px) and (max-width: 1024px) {
+
+        .LB_BODY-iso #LB_Details_Address .arrow-wrap {
+            right: 50px !important;
+        }
+    }
+
+    @@media (min-width: 300px) and (max-width: 320px) {
+
+
+        .LB_BODY-iso #LB_Details_Address .arrow-wrap {
+            right: 80px;
+            left: 80%;
+        }
+    }
+
+
+    .bt {
+        margin: 10px;
+        margin-left: 1px;
+        border-radius: 10px;
+        border: 1px solid;
+        padding: 10px;
+        border-color: #EBEBEB;
+        margin-top: 30px;
+    }
+
+    
+   
+
+    
+   
+    #store-location-details .LB_buttons > a:first-child {
+        background-color: #fff;
+        border: #002B60 1px solid;
+        color: #002B60 !important;
+        border-radius: 24px;
+        width: 250px;
+    }
+
+    #store-location-details .site-width-slot {
+        margin-left: -10px
+    }
+
+    #store-location-details .LB_BODY-iso #LB_Details_Address .arrow-wrap {
+        right: 80px;
+    }
+
+     #store-location-details .LB_buttons > a:last-child {
+        background-color: #88BC47 !important;
+        margin-top: 10px;
+        border-radius: 24px;
+        width: 250px;
+        border-color: #88BC47 !important;
+    }
+
+    #cta-buttons {
+        display: grid;
+    }
+
+    #location-name {
+        font-size: 20px;
+        color: #002B60;
+        font-weight: bold;
+    }
+
+    #store-location-details .LB_BODY-iso #LB_Details_Address h3 {
+        font-size: 20px;
+        color: #002B60 !important;
+        font-weight: bold;
+    }
+
+     #store-location-details #LB_Details_Address span {
+        color: #192432;
+        font: normal normal normal 12px Montserrat;
+    }
+
+    #store-location-details .mt0 {
+        color: #192432;
+        font: normal normal normal 12px Montserrat;
+    }
+
+    #store-location-details .pb-sm .col-lg-1 {
+        display: none;
+    }
+
+    #store-location-details .opening-time-select {
+    }
+
+    #store-location-details .text-success {
+        color: #002B60;
+    }
+
+    #store-location-details .section-title {
+        color: #192432;
+    }
+
+    #store-location-details .amenity-group {
+        display: inline-grid !important;
+        text-align: inherit;
+        padding: 0px;
+        color: #707070;
+        font-size: 12px;
+    }
+
+    #store-location-details .slick-slider {
+        margin-bottom: 2%;
+      @*  margin-left: 0%;*@
+    }
+
+    #find-more-locations-button {
+        background-color: #002B60;
+    }
+
+    #store-location-details #the-day > span {
+        color: #002B60 !important;
+        font-weight: bold;
+        font-size: 10px;
+    }
+
+    #store-location-details #the-time > span {
+        color: #002B60 !important;
+        font-weight: bold;
+        font-size: 10px;
+    }
+
+    #location-name {
+        text-align: left;
+    }
+
+    #store-location-details .template_block #LB_Details_description {
+        margin-left: -12px;
+    }
+
+    #store-location-details #LB_Details_wrap  .section-title {
+        margin-left: -10px;
+        display: block !important;
+    text-align: left;
+    }
+
+
+
+    @@media (min-width: 256px) and (max-width: 768px) {
+
+        #store-location-details .LB_BODY-iso #LB_Details_Address h3 {
+            margin-left: -75%;
+        }
+
+        #the-day {
+            width: 50%;
+        }
+
+        #the-time {
+            width: 50%;
+        }
+
+        #the-day > span {
+            padding-left: 10px;
+        }
+
+        #the-time > span {
+            margin-left: -30px;
+        }
+
+        #store-location-details .LB_BODY-iso #LB_Details_Address  .arrow-wrap {
+            right: 50px;
+        }
+    }
+
+    @@media (min-width: 1200px) {
+
+        #store-location-details .map-wrap {
+            margin-top: -43%;
+        }
+
+        #myMap {
+            height: 500px !important;
+            width: 135% !important;
+            margin-left: -30%;
+        }
+    }
+
+    
+</style>
+@*<button onclick="history.back()"navigateBack()>Go Back</button>*@
+    <div class="container" id="store-location-details">
+     <div><button class="bt navigateback">Back</button></div>
+     <div><span class="branch" style="font-size: 18px;color: currentColor;font-weight: bolder;">Branch Details</span></div> 
+        
+        @*<store-locator id="6ef8638f-af8c-409d-ad24-cf3422269370" location="0a0fc3ad-6be7-48d3-916a-67f650ba278b" template="Template1Standard">
+            <script type="text/javascript" src="https://storelocatorcdn.places.digital/_next/static/widgets/DetailsPage/index.js"></script>
+        </store-locator>*@
+
+        <store-locator ID="6ef8638f-af8c-409d-ad24-cf3422269370" LocationID="0a0fc3ad-6be7-48d3-916a-67f650ba278b" template="Template1Standard">
+         <script src=https://storelocatorcdn.places.digital/_next/static/widgets/DetailsPage/index.js></script>
+        </store-locator>
+  
+    
+    </div>
+
+
+
+ @*  <div id="295c65c2-affb-44f8-b365-3f19f53a2581" class="LB_LocationDetails"></div>
+   
+    <div class="locator-bank-main" ></div>*@
+    
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+@section scripts {
+    <script type="text/javascript">
+    
+     //  const firstLink = document.querySelectorAll("link");
+    setTimeout(function() {
+        
+         const firstLink = document.querySelectorAll('link[rel="stylesheet"][href="https://storelocatorcdn.places.digital/css/style.css"]');
+       
+             //document.styleSheets[0].disabled = true;
+            //console.log( document.styleSheet);
+            
+            
+            // Remove the <link> element if it exists
+           if (firstLink && firstLink.length > 0) {
+             // firstLink.parentNode.removeChild(firstLink);
+             
+           firstLink[0].remove();
+            }
+            
+           document.querySelectorAll(".arrow-wrap").forEach(el => { 
+             const timeText = $("#the-time").children(1).text();
+             if (timeText === "CLOSED") {
+                 
+                  el.remove();
+                  const ss=el;
+                  $("#the-time").append(ss);
+                  $(".arrow-wrap").css("margin-right", "50px");
+                 // $("#the-time").prepend(el);
+                  
+              }
+            });
+            
+         
+            
+           
+        
+    }, 3000);
+       
+      
+        
+        $(document).ready(function() {
+            // need to add code in live site//
+           setTimeout(function() {
+               //mycode//
+                
+                var $elementToStore = $("#LB_Details_wrap"); 
+            var $parent = $elementToStore.parent();  
+                
+                  $parent.appendTo("#LB_Nearby_locations");
+                
+              var elements = document.getElementsByClassName("nearby_location");
+           
+           var domainname = window.location.origin;
+           
+           var replacename = "https://publishing.v5.stg.africanbankdmz.net";
+           
+           for(var i=0; i < elements.length; i++)
+           {
+              var url = elements[i].querySelector('a').href;
+              
+            url =  url.replaceAll(replacename, domainname);
+            
+            elements[i].querySelector('a').setAttribute("href" , url);
+           } 
+           var findmoreurl = document.getElementById("find-more-locations-button") 
+           
+            var findmorelink = findmoreurl.href;
+             
+             findmorelink = findmorelink.replaceAll(replacename, domainname);
+             
+              findmoreurl.setAttribute("href" , findmorelink);
+              
+           },4000);
+           
+                
+            
+            
+           // document.styleSheets[0].disabled = true;
+           // console.log( document.styleSheet);
+           
+          // link:first-child
+            
+      @*      const params = new Proxy(new URLSearchParams(window.location.search), {
+              get: (searchParams, prop) => searchParams.get(prop),
+            });
+            let value = params.locationid; // "some_value"
+            
+            let devId = ""
+            
+            if(value) {
+                devId = value;
+            } else {
+                 devId = localStorage.getItem("store-id");
+            }
+            var divId = "a926c40a-d986-4737-914e-70c24b13ff63";  // "295c65c2-affb-44f8-b365-3f19f53a2581";
+            $(".locator-bank-main").attr('id', devId.toString());
+            
+         var scriptUrl = "https://storelocatorcdn.places.digital/_next/static/widgets/DetailsPage/index.js?id=6ef8638f-af8c-409d-ad24-cf3422269370 ID=" + devId.toString() +&template=Template1Standard";
+        @*  var scriptUrl = "https://storelocatorcdn.places.digital/_next/static/widgets/DetailsPage/index.js?ID=" + devId.toString() + "&template=Template1Standard";*@
+     
+          @*  var script = document.createElement("script");
+            script.type = "text/javascript";
+           script.src = scriptUrl;
+            document.getElementById(devId.toString()).appendChild(script);*@
+            
+        $(".navigateback").click(function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                if (history.back()) {
+                    history.back();
+                } else {
+                    window.location.href = "/en/home/branch-locator/";
+                }
+                
+                
+                
+            }); 
+        
+            
+        });
+        
+    </script>
+ }
+
+

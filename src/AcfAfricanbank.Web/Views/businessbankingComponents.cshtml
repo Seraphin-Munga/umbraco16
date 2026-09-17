@@ -1,5 +1,441 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
 }
+
+@* the fun starts here *@
+
+<style>
+
+/*Contact us styles start here*/
+.floating-btn {
+    position: fixed;
+    top: 40%;
+    right: -54px;
+    transform: translateY(-50%) rotate(-90deg);
+    z-index: 999;
+    width: 148px;
+    height: 38px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 12px 16px;
+    color: var(--text-primary-blue, #002B60);
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 20px;
+    border-radius: var(--border-radius-md, 2px) var(--border-radius-md, 2px) var(--border-radius-none, 0px) var(--border-radius-none, 0px);
+    border-top: 1px solid var(--border-primary, #002B60);
+    border-right: 1px solid var(--border-primary, #002B60);
+    border-left: 1px solid var(--border-primary, #002B60);
+    background: var(--surface-primary, #FFF);
+    box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.11);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+.floating-btn:focus {
+    outline: 3px solid #ffbf47;
+    background-color: #0056b3;
+}
+
+/*Contact us styles end here*/
+
+
+/*Back button styes section start here*/
+
+.back-section button {
+    height:112px;
+    background: none !important;
+    border: none !important;
+}
+
+
+@@media only screen and (max-width: 600px) {
+    .back-section button {
+        margin-bottom: 3vh;
+        margin-top: 3vh;
+        height:0px;
+    }
+}
+
+
+/*Back button styes section end here*/
+
+</style>
+
+<!--styles for cards section with image on top start here-->
+
+<style>
+:root{
+  --cardCustomListitem-width:320px;
+  --cardCustomListitem-bg:#ffffff;
+  --cardCustomListitem-shadow: 0 6px 18px rgba(11,31,54,0.08);
+  --primary:#063e6b;
+  --muted:#8aa3bf;
+  --dot-inactive:#dfe9ef;
+  --dot-active:#26bf41;
+  font-family: "Montserrat", Arial, sans-serif;
+}
+
+/* carousel wrapper */
+.cardCustomListitems-wrapper{ max-width:100%; margin:0 auto; position:relative; }
+
+.cardCustomListitems-viewport{
+  padding-top:10px;
+  width:100%;
+  overflow-x: auto;             /* allow horizontal scroll */
+  scroll-snap-type: x mandatory;/* snap to cards */
+  -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
+  padding-bottom: 8px;
+}
+
+.cardCustomListitems-track {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.cardCustomListitem{
+  flex: 0 0 auto;               /* necessary for horizontal scroll */
+  scroll-snap-align: start;
+  min-width: var(--cardCustomListitem-width);
+  max-width: var(--cardCustomListitem-width);
+  background:var(--cardCustomListitem-bg);
+  border-radius:10px;
+  box-shadow:var(--cardCustomListitem-shadow);
+  overflow:hidden;
+  color:var(--primary);
+  display:flex;
+  flex-direction:column;
+  text-decoration:none;
+}
+
+.cardCustomListitem-image{
+  width:100%;
+  height:160px;
+  background:#eef3f8;
+  display:block;
+  overflow:hidden;
+}
+.cardCustomListitem-image img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+.cardCustomListitem-body{ padding:16px; display:flex; flex-direction:column; gap:12px; flex:1 1 auto; }
+.cardCustomListitem-title{ font-size:18px; font-weight:700; margin:0; color:#072948;text-align: left; }
+.cardCustomListitem-excerpt{ font-size:14px; color:#4b6b86; line-height:1.45; min-height:70px; }
+.cardCustomListitem-meta{ display:flex; flex-direction: column; gap:12px;  }
+
+
+.read-time{ font-size:12px; color:var(--muted); }
+
+.btn-learn{
+  display:inline-block;
+  padding:8px 14px;
+  border-radius:6px;
+  border:1px solid var(--primary);
+  background: #fff;
+  color:var(--primary);
+  font-weight:600;
+  text-decoration:none;
+  font-size:13px;
+  width: 112px;
+}
+.btn-learn:focus, .btn-learn:hover{ background:var(--primary); color:#fff; outline:none; box-shadow:0 6px 12px rgba(6,62,107,0.18); }
+
+/* dots */
+.cardCustomListitems-dots{ display:none; justify-content:center; gap:0px; padding-top:12px; padding-top: 10px; padding-bottom: 10px; margin-top:10px;}
+.cardCustomListitems-dots button{
+  width:10px; height:10px; border-radius:50%; border:0; background:var(--dot-inactive); padding:0; cursor:pointer;
+}
+.cardCustomListitems-dots button[aria-pressed="true"]{ background:var(--dot-active); box-shadow:0 2px 6px rgba(38,191,65,0.25); }
+
+/* responsive */
+@@media (max-width:420px){
+  :root{ --cardCustomListitem-width:92%; }
+  .cardCustomListitems-track{ gap:12px; }
+  .cardCustomListitems-dots{ display:flex; gap:10px;}
+  .cardCustomListitems-track { justify-content: flex-start; }
+
+/* focus ring for accessibility */
+.cardCustomListitem:focus-within{ outline: 3px solid #ffbf47; border-radius:10px; }
+
+/* hide scrollbar on webkit */
+.cardCustomListitems-viewport::-webkit-scrollbar { display: none; }
+</style>
+
+<!--styles for cards section with image on top end here-->
+
+<!--styles for cards section without image on top end here-->
+
+<style>
+
+  .steps-container {
+    display: flex;
+    flex-direction: column; /* mobile default */
+    gap: 20px;
+    width: 100%;
+  }
+
+  .step-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: transform 0.2s;
+  }
+
+  .step-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .step-icon {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 12px;
+  }
+
+  .step-number {
+    color: #26bf41;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .step-title {
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 6px;
+    color: #002B60;
+  }
+
+  .step-desc {
+    font-size: 14px;
+    color: #002B60;
+    line-height: 1.5;
+  }
+
+  /* Desktop view */
+  @@media screen and (min-width: 600px) {
+    .steps-container {
+      flex-direction: row;
+      justify-content: center;
+    }
+
+    .step-card {
+      width: 30%;
+    }
+  }
+</style>
+
+<!--styles for cards section without image on top end here-->
+
+<!-- Get in touch section start here -->
+<section aria-label="Contact Us" role="region">
+    <a href="/en/home/contact-us" class="floating-btn" role="link" aria-label="Go to contact page">
+        Get in touch
+    </a>
+</section>
+
+<!-- Get In touch section end here-->
+
+<!--Back button section start here-->
+<section aria-label="Back button" role="region">
+    @functions {
+    public string GetPartAfterBorrow()
+    {
+        var currentUrl = Request.Url.AbsoluteUri ?? "";
+        var marker = "/borrow/";
+
+        if (currentUrl.Contains(marker))
+        {
+            var part = currentUrl.Substring(currentUrl.IndexOf(marker) + marker.Length);
+            return part.TrimEnd('/'); // remove trailing slash if any
+        }
+
+        return "";
+    }
+}
+
+
+@{
+    Func<string, string> generateIdFromUrl = url =>
+    {
+        if (string.IsNullOrEmpty(url)) return "btn-default-id";
+
+        // Take everything after # or ? (anchor/querystring part)
+        var uniquePart = url.Contains("#")
+            ? url.Substring(url.IndexOf("#") + 1)
+            : url.Contains("?")
+                ? url.Substring(url.IndexOf("?") + 1)
+                : url;
+
+        // Replace invalid HTML id characters with hyphen
+        return "btn-" + System.Text.RegularExpressions.Regex.Replace(uniquePart, @"[^A-Za-z0-9\-_]", "-");
+    };
+}
+
+<section class="back-section" id="btnRefresh" arial-label="Back to previus page button @GetPartAfterBorrow()">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12"><button class="back-set-button">
+            <svg width="68" height="24" viewBox="0 0 68 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4.25 12.2744L19.25 12.2744" stroke="#012B60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M10.2998 18.299L4.2498 12.275L10.2998 6.25" stroke="#012B60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M33.47 17V7.2H37.866C38.9953 7.2 39.8633 7.42867 40.47 7.886C41.0767 8.334 41.38 8.95 41.38 9.734C41.38 10.266 41.2587 10.714 41.016 11.078C40.7827 11.442 40.4653 11.722 40.064 11.918C39.6627 12.114 39.2287 12.212 38.762 12.212L39.014 11.792C39.574 11.792 40.0687 11.89 40.498 12.086C40.9273 12.282 41.268 12.5713 41.52 12.954C41.772 13.3273 41.898 13.794 41.898 14.354C41.898 15.194 41.5807 15.8473 40.946 16.314C40.3207 16.7713 39.3873 17 38.146 17H33.47ZM34.87 15.866H38.09C38.8647 15.866 39.4573 15.7353 39.868 15.474C40.2787 15.2127 40.484 14.802 40.484 14.242C40.484 13.6727 40.2787 13.2573 39.868 12.996C39.4573 12.7347 38.8647 12.604 38.09 12.604H34.744V11.47H37.74C38.4493 11.47 39 11.3393 39.392 11.078C39.784 10.8167 39.98 10.4247 39.98 9.902C39.98 9.37933 39.784 8.98733 39.392 8.726C39 8.46467 38.4493 8.334 37.74 8.334H34.87V15.866ZM48.4757 17V15.432L48.4057 15.138V12.464C48.4057 11.8947 48.2377 11.456 47.9017 11.148C47.575 10.8307 47.0804 10.672 46.4177 10.672C45.979 10.672 45.5497 10.7467 45.1297 10.896C44.7097 11.036 44.355 11.2273 44.0657 11.47L43.5057 10.462C43.8884 10.154 44.3457 9.92067 44.8777 9.762C45.419 9.594 45.9837 9.51 46.5717 9.51C47.589 9.51 48.373 9.75733 48.9237 10.252C49.4744 10.7467 49.7497 11.5027 49.7497 12.52V17H48.4757ZM46.0397 17.084C45.489 17.084 45.0037 16.9907 44.5837 16.804C44.173 16.6173 43.8557 16.3607 43.6317 16.034C43.4077 15.698 43.2957 15.32 43.2957 14.9C43.2957 14.4987 43.389 14.1347 43.5757 13.808C43.7717 13.4813 44.0844 13.22 44.5137 13.024C44.9524 12.828 45.5404 12.73 46.2777 12.73H48.6297V13.696H46.3337C45.6617 13.696 45.209 13.808 44.9757 14.032C44.7424 14.256 44.6257 14.5267 44.6257 14.844C44.6257 15.208 44.7704 15.502 45.0597 15.726C45.349 15.9407 45.7504 16.048 46.2637 16.048C46.7677 16.048 47.2064 15.936 47.5797 15.712C47.9624 15.488 48.2377 15.1613 48.4057 14.732L48.6717 15.656C48.4944 16.0947 48.1817 16.4447 47.7337 16.706C47.2857 16.958 46.721 17.084 46.0397 17.084ZM55.4709 17.084C54.7149 17.084 54.0382 16.9207 53.4409 16.594C52.8529 16.2673 52.3909 15.8193 52.0549 15.25C51.7189 14.6807 51.5509 14.0273 51.5509 13.29C51.5509 12.5527 51.7189 11.8993 52.0549 11.33C52.3909 10.7607 52.8529 10.3173 53.4409 10C54.0382 9.67333 54.7149 9.51 55.4709 9.51C56.1429 9.51 56.7402 9.64533 57.2629 9.916C57.7949 10.1773 58.2056 10.5693 58.4949 11.092L57.4729 11.75C57.2302 11.386 56.9316 11.12 56.5769 10.952C56.2316 10.7747 55.8582 10.686 55.4569 10.686C54.9716 10.686 54.5376 10.7933 54.1549 11.008C53.7722 11.2227 53.4689 11.526 53.2449 11.918C53.0209 12.3007 52.9089 12.758 52.9089 13.29C52.9089 13.822 53.0209 14.284 53.2449 14.676C53.4689 15.068 53.7722 15.3713 54.1549 15.586C54.5376 15.8007 54.9716 15.908 55.4569 15.908C55.8582 15.908 56.2316 15.824 56.5769 15.656C56.9316 15.4787 57.2302 15.208 57.4729 14.844L58.4949 15.488C58.2056 16.0013 57.7949 16.398 57.2629 16.678C56.7402 16.9487 56.1429 17.084 55.4709 17.084ZM61.2312 15.208L61.2592 13.486L65.5292 9.58H67.1532L63.8772 12.8L63.1492 13.416L61.2312 15.208ZM60.1392 17V6.612H61.4832V17H60.1392ZM65.8092 17L62.8972 13.388L63.7652 12.31L67.4612 17H65.8092Z" fill="#012B60"></path>
+            </svg>
+
+        </button></div>
+        </div>
+    </div>
+</section>
+</section>
+
+
+<!--Back button section end here-->
+
+<!--cards with image section start here-->
+
+<section aria-label="Cards" role="region">
+    <div class="cardCustomListitems-wrapper" aria-label="Featured articles carousel">
+  <div class="cardCustomListitems-viewport" id="carouselViewport">
+    <div class="cardCustomListitems-track" id="cardCustomListitemsTrack" role="list">
+      <!-- Card 1 -->
+      <article class="cardCustomListitem" role="listitem" tabindex="0">
+        <a href="#" class="cardCustomListitem-link" aria-label="Open Understanding funding">
+          <div class="cardCustomListitem-image" role="img">
+            <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=900&q=60" alt="Laptop open showing charts"/>
+          </div>
+          <div class="cardCustomListitem-body">
+            <h3 class="cardCustomListitem-title">Understanding funding</h3>
+            <div class="cardCustomListitem-excerpt">Learn how to create accurate financial forecasts and understand what funders look for.</div>
+            <div class="cardCustomListitem-meta">
+              <div class="read-time">35 minutes read</div>
+              <a class="btn-learn" href="#">Learn more</a>
+            </div>
+          </div>
+        </a>
+      </article>
+
+      <!-- Card 2 -->
+      <article class="cardCustomListitem" role="listitem" tabindex="0">
+        <a href="#" class="cardCustomListitem-link" aria-label="Open Building your budget">
+          <div class="cardCustomListitem-image" role="img">
+            <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=900&q=60" alt="Notebook and charts"/>
+          </div>
+          <div class="cardCustomListitem-body">
+            <h3 class="cardCustomListitem-title">Building your budget</h3>
+            <div class="cardCustomListitem-excerpt">Step-by-step guidance for building a realistic project budget that donors trust.</div>
+            <div class="cardCustomListitem-meta">
+              <div class="read-time">22 minutes read</div>
+              <a class="btn-learn" href="#">Learn more</a>
+            </div>
+          </div>
+        </a>
+      </article>
+
+      <!-- Card 3 -->
+      <article class="cardCustomListitem" role="listitem" tabindex="0">
+        <a href="#" class="cardCustomListitem-link" aria-label="Open Reporting for impact">
+          <div class="cardCustomListitem-image" role="img">
+            <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=900&q=60" alt="Charts and reports"/>
+          </div>
+          <div class="cardCustomListitem-body">
+            <h3 class="cardCustomListitem-title">Reporting for impact</h3>
+            <div class="cardCustomListitem-excerpt">Best practice reporting frameworks to show impact and keep funders engaged.</div>
+            <div class="cardCustomListitem-meta">
+              <div class="read-time">18 minutes read</div>
+              <a class="btn-learn" href="#">Learn more</a>
+            </div>
+          </div>
+        </a>
+      </article>
+    </div>
+  </div>
+
+  <div class="cardCustomListitems-dots" id="cardCustomListitemsDots" role="tablist" aria-label="Carousel pagination"></div>
+</div>
+</section>
+
+<!-- Cards logic -->
+<script>
+(function($){
+  $(function(){
+    var $viewport = $('#carouselViewport');
+    var $cards = $('#cardCustomListitemsTrack').children('.cardCustomListitem');
+    var $dots = $('#cardCustomListitemsDots');
+
+    // create dots
+    $cards.each(function(i){
+      var $btn = $('<button type="button" role="tab" aria-pressed="'+(i===0)+'"></button>');
+      $btn.on('click', function(){
+        $cards.eq(i)[0].scrollIntoView({ behavior: 'smooth', inline: 'start' });
+        $dots.children().attr('aria-pressed','false').eq(i).attr('aria-pressed','true');
+      });
+      $dots.append($btn);
+    });
+
+    // update dots on scroll
+    $viewport.on('scroll', function(){
+      var viewportLeft = $viewport.scrollLeft();
+      var closestIndex = 0;
+      var minDiff = Infinity;
+
+      $cards.each(function(i){
+        var cardLeft = $(this).position().left + viewportLeft;
+        var diff = Math.abs(cardLeft - viewportLeft);
+        if(diff < minDiff){ minDiff = diff; closestIndex = i; }
+      });
+
+      $dots.children().attr('aria-pressed','false').eq(closestIndex).attr('aria-pressed','true');
+    });
+  });
+})(jQuery);
+</script>
+
+<!--cards with image section end here-->
+
+<!--cards without image section start here-->
+<section aria-label="CardsNoImage" role="region">
+<div class="container">
+    <div class="steps-container">
+
+  <div class="step-card">
+    <img src="https://img.icons8.com/ios/50/000000/id-card.png" alt="Step 1" class="step-icon">
+    <div class="step-number">Step 1</div>
+    <div class="step-title">Get registered</div>
+    <div class="step-desc">Provide basic info to start your funding journey.</div>
+  </div>
+
+  <div class="step-card">
+    <img src="https://img.icons8.com/ios/50/000000/search.png" alt="Step 2" class="step-icon">
+    <div class="step-number">Step 2</div>
+    <div class="step-title">Funder search</div>
+    <div class="step-desc">Get analysed based on your profile and needs.</div>
+  </div>
+
+  <div class="step-card">
+    <img src="https://img.icons8.com/ios/50/000000/checklist.png" alt="Step 3" class="step-icon">
+    <div class="step-number">Step 3</div>
+    <div class="step-title">Get matched</div>
+    <div class="step-desc">Receive tailored funding matches and apply seamlessly.</div>
+  </div>
+
+</div>
+</div>
+
+</section>
+<!--cards without image section end here-->
+
+
+
+
+
+
+
+
+

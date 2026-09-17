@@ -1,5 +1,3993 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+
+
 @{
 	Layout = null;
+	
+	    var baseUrl = "https://api.stg.africanbank.net";
+ 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+@* the fun starts here
+ <link rel="stylesheet" href="/css/projectmagic.css" /> 
+  *@
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>
+
+ <style>
+ 
+ .child-claim-container {
+    min-height: 335px;
+    margin-top: 27px;
+    margin-right: 42px;
+    margin-left: 9%;
+    margin-bottom: 30px;
+}
+
+
+ 
+ .adult-child-claim-container {
+    min-height: 335px;
+    margin-top: 27px;
+    margin-right: 63px;
+    margin-left: 15%;
+    margin-bottom: 30px;
+}
+ 
+
+.funeral-main-claim-container {
+    min-height: 335px;
+    margin-top: 33px;
+    margin-right: 50px;
+    margin-left: 11%;
+    margin-bottom: 30px;
+}
+ .funeral-next-button {
+    height: 35px !important;
+    font-size: 0.8rem !important;
+     
+ }
+ 
+ .custom-file-label2 {
+    top: 8px;
+    position: relative;
+     
+ }
+ 
+ 
+ .funeral-form-group {
+    margin-top: 10px !important;
+}
+ 
+ .input-btn-claim-container {
+    margin-top: -20px;
+    margin-right: 63px;
+    margin-left: 15%;
+}
+ 
+.funeral-claim-container {
+    min-height: 335px;
+    margin-top: 16px;
+    margin-right: 7px;
+    margin-left: -1%;
+    margin-bottom: 6px;
+}
+
+
+.list-group li{
+  font-size: small !important;
+}
+.funeral-list-group li{
+  font-size: xx-small !important;
+}
+.bulk-custom-file-label {
+    bottom: 10px;
+    position: relative;
+    background-color: #5bcffa;
+    color: white;
+    padding: 5px 8px;
+    border-radius: 30px;
+    cursor: pointer;
+    margin-right: 8px;
+    margin-left: 2px;
+    font: normal normal normal 12px / 15px Montserrat;
+    letter-spacing: 0px;
+    opacity: 1;
+}
+
+      body {
+        font: normal normal normal 16px/19px Montserrat;
+      }
+
+/* snackbar */
+.toastBox {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        .toast {
+            width: 400px;
+            height: 80px;
+            background: #fff;
+            font-weight: 500;
+            margin: 15px 0;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            position: relative;
+            transform: translateX(100%);
+            animation: moveleft 0.5s linear forwards;
+        }
+
+        @@keyframes moveleft {
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        .toast i {
+            margin: 0 20px;
+            font-size: 35px;
+        }
+
+        .toast.success i {
+            color: green;
+        }
+
+        .toast.error i {
+            color: red;
+        }
+
+        .toast::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 5px;
+            animation: anim 5s linear forwards;
+        }
+
+        .toast.success::after {
+            background: green;
+        }
+
+        .toast.error::after {
+            background: red;
+        }
+
+        @@keyframes anim {
+            100% {
+                width: 0;
+            }
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 5px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .close-btn i {
+            color: #666;
+        }
+/* snackbar  */
+
+      .loader-1{
+        display: none;
+      }
+
+      .hidden {
+        display: none;
+      }
+      .show {
+        display: block;
+      }
+      /* Combined styles.css */
+
+      .d-flex {
+        display: block;
+      }
+
+      .claim-container-step2 {
+        display: none;
+      }
+
+      .progress {
+        margin-top: -10px;
+        left: 311px;
+        position: absolute;
+      }
+
+      .input_form {
+        border-color: #cccccc;
+      }
+
+      .input_form:focus {
+        border-color: #00285a;
+      }
+      .input_form.is-valid {
+        border-color: #88bc47;
+      }
+      .input_form.is-invalid {
+        border-color: #ff0347;
+      }
+      .btn.btn-brand-1 {
+        width: 105% !important;
+      }
+      .docUploadFooter-flex-container {
+        display: flex;
+        flex-direction: column;
+      }
+      .input_form .text-white {
+        color: white;
+      }
+
+      .footer-text {
+        margin-top: 14px;
+      }
+
+      .grid-flow {
+        width: 100%;
+        position: relative;
+        display: grid;
+        grid-auto-flow: row;
+        grid-template-columns: 1fr 50% 1fr;
+        padding: 0 20px;
+      }
+
+      .active {
+        text-decoration: none;
+        color: #00285a !important;
+      }
+
+      .step.active {
+        font-size: 20px !important;
+        text-decoration: underline !important;
+        text-decoration-color: #00285a !important;
+        text-underline-offset: 5px !important;
+        font-weight: bold !important;
+      }
+
+      .footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background-color: #00285a;
+        color: white;
+      }
+
+      .it .btn-orange {
+        background-color: transparent;
+        border-color: #777 !important;
+        color: #777;
+        text-align: left;
+        width: 100%;
+      }
+
+      .it input.form-control {
+        height: 54px;
+        border: none;
+        margin-bottom: 0px;
+        border-radius: 0px;
+        border-bottom: 1px solid #ddd;
+        box-shadow: none;
+      }
+
+      .it .form-control:focus {
+        border-color: #ff4d0d;
+        box-shadow: none;
+        outline: none;
+      }
+
+      .fileUpload {
+        position: relative;
+        overflow: hidden;
+        margin: 10px;
+      }
+
+      .fileUpload input.upload {
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin: 0;
+        padding: 0;
+        font-size: 20px;
+        cursor: pointer;
+        opacity: 0;
+        filter: alpha(opacity=0);
+      }
+
+      .it .btn-new,
+      .it .btn-next {
+        margin: 30px 0px;
+        border-radius: 0px;
+        background-color: #333;
+        color: #f5f5f5;
+        font-size: 16px;
+        width: 155px;
+      }
+
+      .it .btn-next {
+        background-color: #ff4d0d;
+        color: #fff;
+      }
+
+      .it .btn-check {
+        cursor: pointer;
+        line-height: 54px;
+        color: red;
+      }
+
+      .it .uploadDoc {
+        margin-bottom: 20px;
+      }
+
+      p {
+        font-size: 16px;
+        text-align: center;
+        margin: 30px 0px;
+      }
+
+      .it #uploader .docErr {
+        position: absolute;
+        right: auto;
+        left: 10px;
+        top: -56px;
+        padding: 10px;
+        font-size: 15px;
+        background-color: #fff;
+        color: red;
+        box-shadow: 0px 0px 7px 2px rgba(0, 0, 0, 0.2);
+        display: none;
+      }
+
+      .it #uploader .docErr:after {
+        content: "\f0d7";
+        display: inline-block;
+        font-family: FontAwesome;
+        font-size: 50px;
+        color: #fff;
+        position: absolute;
+        left: 30px;
+        bottom: -40px;
+        text-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
+      }
+
+      /* General styles */
+
+      .application-type-dropdown {
+        width: 105%;
+        padding: 10px;
+        border-radius: 30px !important;
+        border: none; /* Remove the border */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow effect */
+        transition: box-shadow 0.3s ease-in-out; /* Smooth transition for shadow */
+      }
+
+      .application-type-dropdown-type2 {
+        display: none;
+        width: 110%;
+        padding: 10px;
+        border-radius: 30px !important;
+        border: none; /* Remove the border */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow effect */
+        transition: box-shadow 0.3s ease-in-out; /* Smooth transition for shadow */
+      }
+
+      .claim-flex-item1-white-bg-p {
+        text-align: right;
+        font: normal normal medium 32px/39px Montserrat !important;
+        letter-spacing: 0px;
+        color: #eeeeee;
+      }
+
+      .claim-flex-item1-green-bg-p {
+        margin: 20px 0px !important;
+        text-align: right;
+        font: italic normal 800 62px / 39px Montserrat;
+        letter-spacing: 0px;
+        color: #c4d82e !important;
+      }
+
+      .claim-flex-item1-bg {
+        background-color: #00285a !important;
+      }
+
+      .has-success .form-control {
+        border-color: #c4d82e !important;
+      }
+
+      .stepper-text-header {
+        font: normal normal 600 14px/15px Montserrat;
+        letter-spacing: 0px;
+        color: #00132a;
+        opacity: 1;
+      }
+
+      .main-stepper-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 70%;
+        background-color: transparent;
+      }
+
+      .stepper-container {
+        display: block !important;
+        width: 60%;
+        padding: 0;
+        background: transparent;
+      }
+
+      .stepper-header {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        background-color: transparent;
+        border: none;
+        margin-bottom: 20px;
+      }
+
+      .step {
+        flex: 1;
+        text-align: center;
+        padding: 10px 0;
+        cursor: pointer;
+        position: relative;
+        font-size: 1rem;
+        color: #6c757d;
+        font-weight: 500;
+      }
+
+      .step:not(:last-child)::after {
+        content: "\203A";
+        display: inline-block;
+        margin-left: 10px;
+        margin-right: 10px;
+        color: #6c757d;
+      }
+
+      .claim-step-content {
+        display: none;
+      }
+
+      .claim-step-content.active {
+        display: block;
+      }
+
+      p {
+        margin: 0px 0px;
+      }
+
+      h2 {
+        color: #007bff;
+        margin-bottom: 10px;
+      }
+
+      .stepper-p {
+        margin-bottom: 20px;
+        color: #666;
+      }
+
+      .stepper-label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #000000;
+      }
+
+      .stepper-input {
+        margin-top: 15px;
+        width: 50%;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 1rem;
+      }
+
+      .stepper-button {
+        padding: 10px 20px;
+        margin: 10px 5px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+        font-size: 0.6rem;
+      }
+
+      button.claim-prev-button {
+        background-color: #6c757d00;
+      }
+
+      button:hover {
+        opacity: 0.9;
+      }
+
+      .next-button {
+        border: none;
+        width: 100%;
+        background: #c4d82e;
+        box-shadow: 2px 5px 10px #00000029;
+        border-radius: 50px;
+        height: 45px;
+        color: white;
+        cursor: pointer;
+        font-size: 1rem;
+      }
+
+      .claim-prev-button {
+        background: transparent;
+        float: left;
+        gap: 5px;
+        display: flex;
+        align-items: center;
+        border: none;
+        padding: 10px;
+        color: white !important;
+        cursor: pointer;
+      }
+
+      .claim-prev-button svg {
+        transition: all 0.3s ease;
+        fill: transparent;
+      }
+
+      .claim-prev-button p {
+        margin: 0;
+        font-size: 16px;
+      }
+
+      .claim-prev-button:hover svg {
+        width: 25px;
+        height: 25px;
+      }
+
+      .form-title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #001b47;
+        color: white;
+        padding: 20px;
+        font-size: 1.5rem;
+        border-radius: 10px 10px 0 0;
+      }
+
+      .form-title strong {
+        color: #ffd700;
+      }
+
+      .form-content {
+        height: 450px;
+        width: 800px;
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        margin-bottom: 50px;
+      }
+
+      .claim-flex-container {
+        display: flex;
+        width: 100%;
+      }
+
+      .claim-flex-item-content {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .claim-flex-item {
+        border-radius: 15px 0 0 15px;
+        min-height: 449px;
+        max-height: 449px;
+        flex: 1;
+        position: relative;
+        background: transparent;
+      }
+
+      .border-radius img {
+        max-width: 100%;
+      }
+
+      /* Additional styles */
+      .control-label {
+        text-transform: capitalize !important;
+      }
+
+      .has-success .form-control {
+        border-color: #c4d82e;
+      }
+
+      .alert {
+        padding: 5px !important;
+        margin-bottom: 0px !important;
+      }
+
+      .form-control:focus {
+        border-color: #00285a !important;
+      }
+
+      .col-md-12 {
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      .textarea_input {
+        margin-bottom: 25px;
+        max-height: 70px !important;
+        min-height: 70px !important;
+      }
+
+      .form-control {
+        height: 45px;
+      }
+
+      .claim-container {
+        min-height: 335px;
+        margin-top: 40px;
+        margin-right: 63px;
+        margin-left: 15%;
+        margin-bottom: 30px;
+      }
+
+      .form-group {
+        margin-top: 25px !important;
+      }
+
+      .input_form {
+        padding: 0px 0px 0px 10px;
+        margin-top: 5px;
+        background: #ffffff;
+        border: 1px solid #dbdbdb;
+        border-radius: 30px;
+        opacity: 1;
+        width: 100%;
+      }
+
+      .text-centered {
+        position: relative;
+        right: 30px;
+        display: flex;
+        flex-direction: column !important;
+        justify-content: center;
+        align-items: end;
+        height: 100%;
+        text-align: center;
+        color: white;
+      }
+
+      .text-centered p {
+        margin: 0;
+        color: white;
+        text-align: center;
+      }
+
+      /* Add this to your existing CSS */
+      .mY-footer {
+        background-color: #00285a;
+        color: white;
+        padding: 1rem 0;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+      }
+      .error {
+        color: red;
+        display: none;
+      }
+      .mY-footer .container {
+        display: grid;
+        grid-template-columns: 20% 60% 20%;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .mY-footer .navbar-brand {
+        display: flex;
+        justify-content: center;
+      }
+
+      .mY-footer .navbar-brand img {
+        height: 40px;
+        width: auto;
+      }
+
+      .mY-footer .footer-text {
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .mY-footer .footer-text a {
+        color: white;
+        text-decoration: none;
+      }
+
+      .mY-footer .footer-text a:hover {
+        text-decoration: underline;
+      }
+
+      .mY-footer .flex-container {
+        display: flex;
+        flex-direction: row; /* Ensure elements are inline */
+        align-items: center; /* Center items vertically */
+        justify-content: center; /* Center items horizontally */
+      }
+
+      .svg {
+        margin: 13px 0px 10px 210px;
+      }
+
+      .custom-file-input-container {
+        display: flex;
+        align-items: center;
+        border: 1px solid #dbdbdb; /* Adds a 1px solid black border */
+        border-radius: 30px;
+        padding: 1px;
+        height: 30px;
+        width: 80%;
+      }
+
+      .custom-file-input {
+        display: none;
+      }
+
+      .custom-file-label {
+        background-color: #5bcffa;
+        color: white;
+        padding: 5px 8px;
+        border-radius: 30px;
+        cursor: pointer;
+        margin-right: 8px;
+        margin-left: 2px;
+        font: normal normal normal 12px/15px Montserrat;
+        letter-spacing: 0px;
+        opacity: 1;
+      }
+
+      .custom-file-label:hover {
+        background-color: #0056b3;
+      }
+
+      .replay-button {
+        background-color: #ff4d0d;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .replay-button:hover {
+        background-color: #e0440c;
+      }
+
+      .file-info {
+        margin-top: 10px;
+      }
+
+      .file-info p {
+        margin: 0;
+      }
+
+      /* Responsive styles */
+      @@media (max-width: 992px) {
+        .mY-footer .container {
+          line-height: 1.5;
+          grid-template-columns: 100%;
+        }
+        .svg {
+          margin: 0px 0px 0px 15px;
+        }
+        .mY-footer {
+          position: relative;
+          bottom: 0;
+        }
+
+        .claim-container {
+          flex: auto;
+          margin-left: 8%;
+          margin-right: 8%;
+        }
+
+        .claim-flex-item {
+          border-radius: 30px 30px 0px 0px;
+          min-height: 221px;
+          max-height: 449px;
+          flex: 1;
+          position: relative;
+          background: transparent;
+        }
+
+        .main-stepper-container {
+          display: flex;
+          background-color: transparent;
+          align-content: stretch;
+          flex-direction: column;
+          justify-content: space-evenly;
+        }
+
+        .form-content {
+          height: 100%;
+          width: 100%;
+          background-color: white;
+          border-radius: 42px;
+          box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .stepper-container {
+          width: 80%;
+        }
+
+        .input {
+          width: 70%;
+        }
+
+        .claim-flex-container {
+          flex-direction: column;
+        }
+      }
+
+      @@media (max-width: 768px) {
+        .claim-flex-item1-bg {
+          border-radius: 15px 15px 0px 0px !important;
+          min-height: 0px !important;
+          background-color: #00285a !important;
+        }
+
+        .form-content {
+          width: 100%;
+          height: auto;
+        }
+
+        .stepper-container {
+          width: 90%;
+        }
+
+        .input {
+          width: 100%;
+        }
+
+        .claim-flex-container {
+          flex-direction: column;
+        }
+      }
+
+      @@media (max-width: 576px) {
+        .form-content {
+          width: 100%;
+          height: auto;
+        }
+
+        .stepper-container {
+          width: 100%;
+        }
+
+        .step {
+          font-size: 0.875rem;
+        }
+
+        .next-button {
+          font-size: 0.875rem;
+        }
+
+        .claim-flex-container {
+          flex-direction: column;
+        }
+      }
+    </style>
+ <div class="toastBox"></div>
+    <nav class="navbar navbar-default">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="~/en/home/">
+            <svg
+              id="Layer"
+              class="svg"
+              height="40px"
+              data-name="Layer"
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              viewBox="0 0 396.81 127.43"
+            >
+              <defs>
+                <style>
+                  .cls-1 {
+                    fill: url(#linear-gradient);
+                  }
+
+                  .cls-1,
+                  .cls-2,
+                  .cls-3,
+                  .cls-4 {
+                    stroke-width: 0px;
+                  }
+
+                  .cls-2 {
+                    fill: #00285a;
+                  }
+
+                  .cls-3 {
+                    fill: url(#linear-gradient-2);
+                  }
+
+                  .cls-4 {
+                    fill: url(#linear-gradient-3);
+                  }
+                </style>
+                <linearGradient
+                  id="linear-gradient"
+                  x1="-3003.03"
+                  y1="2372.22"
+                  x2="-2944.19"
+                  y2="2286.57"
+                  gradientTransform="translate(554.55 -3686.67) rotate(-45)"
+                  gradientUnits="userSpaceOnUse"
+                >
+                  <stop offset="0" stop-color="#84d3ec" />
+                  <stop offset=".75" stop-color="#00a6d5" />
+                  <stop offset=".8" stop-color="#019fd0" />
+                  <stop offset=".88" stop-color="#038bc5" />
+                  <stop offset=".96" stop-color="#086cb2" />
+                  <stop offset="1" stop-color="#0b5ca9" />
+                </linearGradient>
+                <linearGradient
+                  id="linear-gradient-2"
+                  x1="-3063.26"
+                  y1="2262.81"
+                  x2="-2935.17"
+                  y2="2262.81"
+                  gradientTransform="translate(554.55 -3686.67) rotate(-45)"
+                  gradientUnits="userSpaceOnUse"
+                >
+                  <stop offset=".1" stop-color="#1e582c" />
+                  <stop offset=".18" stop-color="#357934" />
+                  <stop offset=".26" stop-color="#48963c" />
+                  <stop offset=".34" stop-color="#56ab41" />
+                  <stop offset=".42" stop-color="#5fb744" />
+                  <stop offset=".5" stop-color="#62bc46" />
+                  <stop offset=".75" stop-color="#c4d92f" />
+                  <stop offset=".83" stop-color="#a8d035" />
+                  <stop offset="1" stop-color="#63bc45" />
+                  <stop offset="1" stop-color="#62bc46" />
+                </linearGradient>
+                <linearGradient
+                  id="linear-gradient-3"
+                  x1="-3019.54"
+                  y1="2354.65"
+                  x2="-3054.6"
+                  y2="2287.56"
+                  gradientTransform="translate(554.55 -3686.67) rotate(-45)"
+                  gradientUnits="userSpaceOnUse"
+                >
+                  <stop offset="0" stop-color="#1d2f5e" />
+                  <stop offset=".36" stop-color="#0b5ca9" />
+                  <stop offset=".5" stop-color="#1864af" />
+                  <stop offset=".68" stop-color="#2069b3" />
+                  <stop offset="1" stop-color="#236bb5" />
+                  <stop offset="1" stop-color="#fff" />
+                </linearGradient>
+              </defs>
+              <g id="Layer" data-name="Layer">
+                <g>
+                  <g>
+                    <path
+                      class="cls-1"
+                      d="m88.65,88.65c0,.84-.03,1.67-.05,2.5-.23,9.21-3.86,18.35-10.89,25.37l38.82-38.82c14.54-14.54,14.54-38.11,0-52.65-5.03-5.03-11.13-8.31-17.57-9.87-8.62-2.08-17.84-1.04-25.86,3.11l-2.91,1.59c12.57,21.1,18.73,44.95,18.46,68.75Z"
+                    />
+                    <path
+                      class="cls-3"
+                      d="m15.19,98.96c-2.08-8.62-1.04-17.84,3.12-25.86,0,0,1.05-1.95,1.59-2.91,5.76-10.24,12.99-19.87,21.71-28.58,8.71-8.71,18.35-15.95,28.58-21.71.97-.54,2.91-1.59,2.91-1.59,8.02-4.15,17.24-5.19,25.86-3.11L47.83,1.53c-12.66-3.75-26.93-.62-36.92,9.37C1.03,20.78-2.14,34.83,1.4,47.38l13.78,51.58Z"
+                    />
+                    <path
+                      class="cls-4"
+                      d="m15.19,98.96c-2.08-8.62-1.04-17.84,3.12-25.86,0,0,1.05-1.95,1.59-2.91,21.1,12.57,44.95,18.73,68.75,18.46,0,0-.03,1.67-.05,2.5-.23,9.21-3.86,18.35-10.89,25.37-14.54,14.54-38.11,14.54-52.65,0-5.03-5.03-8.31-11.13-9.87-17.57Z"
+                    />
+                  </g>
+                  <path
+                    class="cls-2"
+                    d="m236.91,75.77v-19.09c0-4.97-4.04-9-9-9s-9,4.04-9,9v19.09h-7.69v-19.09c0-9.21,7.49-16.7,16.7-16.7s16.7,7.49,16.7,16.7v19.09h-7.69Zm-163.5-26.93c-1.57-2.7-3.71-4.87-6.38-6.44-1.59-.93-3.31-1.59-5.15-1.97h0s0,0,0,0c-7.87-1.59-13.12,3-13.59,7.89,2.97-1.29,11.22-2.64,15.46.6h0s0,0,0,0c1.27.9,2.3,2.07,3.07,3.49.88,1.63,1.33,3.52,1.33,5.61s-.45,3.92-1.33,5.55c-.88,1.63-2.1,2.93-3.63,3.86-1.52.93-3.28,1.4-5.24,1.4s-3.67-.47-5.21-1.41c-1.27-.77-2.34-1.79-3.17-3.03h0s0,0,0,0c-3.69-5.39-2.57-12.29-1.28-16.09-6.9,1.26-9.29,8.82-7.53,15.03h0c.36,1.34.85,2.62,1.49,3.81,1.44,2.69,3.44,4.85,5.94,6.42,2.51,1.58,5.38,2.38,8.52,2.38s6.02-.8,8.52-2.38c.96-.61,1.85-1.3,2.66-2.08v4.27h7.86v-18.25h0c-.08-3.19-.87-6.1-2.36-8.68Zm23.53-23.04c-2.67.08-5.07.72-7.15,1.92-2.22,1.29-3.98,3.11-5.22,5.41-1.23,2.29-1.86,5.02-1.86,8.11v.28h-5.58v6.87h5.58v27.38h7.86v-27.38h9.23v-6.87h-9.23v-.9c0-1.56.29-2.92.87-4.05.57-1.1,1.38-1.98,2.41-2.61,1.03-.62,2.25-.94,3.63-.94,0,0,0,0,.01,0h3.92v-7.24h-4.48v.02Zm107.02,23.04c1.57,2.71,2.37,5.8,2.37,9.18v17.74h-7.86v-4.27c-.81.78-1.7,1.47-2.66,2.08-2.51,1.58-5.38,2.38-8.52,2.38s-6.02-.8-8.52-2.38c-2.5-1.57-4.5-3.73-5.94-6.42-1.44-2.68-2.17-5.75-2.17-9.13s.8-6.48,2.36-9.18c1.57-2.7,3.72-4.87,6.41-6.44,2.69-1.57,5.75-2.37,9.09-2.37s6.39.8,9.06,2.37c2.66,1.57,4.81,3.74,6.38,6.44Zm-5.24,9.18c0-2.09-.45-3.98-1.33-5.61-.88-1.63-2.1-2.92-3.63-3.86-1.52-.93-3.28-1.4-5.24-1.4s-3.66.47-5.21,1.41c-1.55.94-2.79,2.24-3.69,3.86-.9,1.63-1.36,3.52-1.36,5.61s.46,3.91,1.36,5.54c.9,1.63,2.14,2.93,3.69,3.86,1.54.93,3.3,1.41,5.21,1.41s3.71-.47,5.24-1.4c1.53-.94,2.75-2.23,3.63-3.86.88-1.63,1.33-3.5,1.33-5.55Zm175.13,2.45l13.12,15.3h9.84l-16.66-19.43,16.05-16.05h-10.55l-11.79,11.79v-23.73h-7.86v47.42h7.86v-15.3ZM116.78,40.3c-2.67.08-5.07.72-7.15,1.92-2.22,1.29-3.98,3.11-5.22,5.41-1.23,2.29-1.86,5.02-1.86,8.11v20.03h7.86v-20.65c0-1.56.29-2.92.87-4.05.57-1.1,1.38-1.98,2.41-2.61,1.03-.62,2.25-.94,3.63-.94,0,0,0,0,.01,0h3.92v-7.24h-4.48v.02Zm46.63,25.32c-.65.72-1.4,1.34-2.23,1.84-1.52.91-3.31,1.38-5.3,1.38s-3.78-.46-5.3-1.38c-1.53-.92-2.75-2.19-3.62-3.8-.88-1.61-1.33-3.51-1.33-5.64s.45-4.04,1.33-5.67c.88-1.62,2.1-2.91,3.62-3.83,1.52-.91,3.31-1.38,5.3-1.38s3.78.46,5.3,1.38c.83.5,1.58,1.12,2.22,1.85l.54.61,5.3-5.3-.54-.54c-1.07-1.09-2.3-2.03-3.65-2.81-2.67-1.53-5.76-2.3-9.18-2.3s-6.57.77-9.24,2.3c-2.67,1.53-4.8,3.67-6.33,6.36-1.53,2.69-2.3,5.83-2.3,9.33s.77,6.58,2.3,9.27c1.53,2.69,3.66,4.83,6.33,6.36,2.67,1.53,5.77,2.3,9.24,2.3s6.57-.77,9.24-2.3c1.34-.77,2.56-1.7,3.62-2.78l.54-.54-5.32-5.32-.54.61Zm-33.7-39.83c-1.32,0-2.47.48-3.42,1.43-.95.95-1.43,2.1-1.43,3.42s.48,2.47,1.43,3.42c.95.95,2.1,1.43,3.42,1.43s2.47-.48,3.42-1.43c.95-.95,1.43-2.1,1.43-3.42s-.48-2.47-1.43-3.42c-.95-.95-2.1-1.43-3.42-1.43Zm-3.93,18.42s0,0,0,0v27.57s0,0,0,0v3.99h7.86v-7.86h0v-19.77h0v-7.86h-7.86v3.92Zm210,12.47c0-4.97,4.04-9,9-9s9,4.04,9,9v19.09h7.69v-19.09c0-9.21-7.49-16.7-16.7-16.7s-16.7,7.49-16.7,16.7v19.09h7.69v-19.09Zm-59.12,11.06c-2.97,1.29-11.22,2.64-15.46-.6h0c-1.27-.9-2.3-2.07-3.07-3.49-.88-1.63-1.33-3.52-1.33-5.61s.45-3.92,1.33-5.55c.88-1.63,2.1-2.93,3.63-3.86,1.52-.93,3.28-1.4,5.24-1.4s3.67.47,5.21,1.41c1.27.77,2.34,1.79,3.17,3.03h0s0,0,0,0c3.69,5.39,2.57,12.29,1.28,16.09,6.9-1.26,9.29-8.82,7.53-15.03h0c-.36-1.34-.85-2.62-1.49-3.81-1.44-2.69-3.44-4.85-5.94-6.42-2.51-1.58-5.38-2.38-8.52-2.38s-6.02.8-8.52,2.38c-.96.61-1.85,1.3-2.66,2.08v-16.21h-7.86v30.19h0c.08,3.19.87,6.1,2.36,8.68,1.57,2.7,3.71,4.87,6.38,6.44,1.59.93,3.31,1.59,5.14,1.97h0c7.87,1.6,13.12-2.99,13.59-7.88Zm44.55-18.9c1.57,2.71,2.37,5.8,2.37,9.18v17.74h-7.86v-4.27c-.81.78-1.7,1.47-2.66,2.08-2.51,1.58-5.38,2.38-8.52,2.38s-6.02-.8-8.52-2.38c-2.5-1.57-4.5-3.73-5.94-6.42-1.44-2.68-2.17-5.75-2.17-9.13s.8-6.48,2.36-9.18c1.57-2.7,3.72-4.87,6.41-6.44,2.69-1.57,5.75-2.37,9.09-2.37s6.39.8,9.06,2.37c2.66,1.57,4.81,3.74,6.38,6.44Zm-5.24,9.18c0-2.09-.45-3.98-1.33-5.61-.88-1.63-2.1-2.92-3.63-3.86-1.52-.93-3.28-1.4-5.24-1.4s-3.66.47-5.21,1.41c-1.55.94-2.79,2.24-3.69,3.86-.9,1.63-1.36,3.52-1.36,5.61s.46,3.91,1.36,5.54c.9,1.63,2.14,2.93,3.69,3.86,1.54.93,3.3,1.41,5.21,1.41s3.71-.47,5.24-1.4c1.53-.94,2.75-2.23,3.63-3.86.88-1.63,1.33-3.5,1.33-5.55Z"
+                  />
+                </g>
+              </g>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </nav>
+
+
+    <section class="main-stepper-container">
+      <div class="stepper-container">
+        <div class="stepper-header">
+          <div class="step active" data-step="1">Personal Details</div>
+          <div class="step" data-step="2">Documents Uploads</div>
+        </div>
+      </div>
+
+      <div id="loanForm" class="needs-validation" novalidate>
+       
+        <div class="form-content">
+          <div class="claim-step-content active" data-step="1">
+            <div class="claim-flex-container">
+              <div class="claim-flex-item claim-flex-item1-bg">
+                <div class="text-centered">
+                  <p class="claim-flex-item1-white-bg-p">Fill your</p>
+                  <p class="claim-flex-item1-green-bg-p">Personal</p>
+                  <p class="claim-flex-item1-white-bg-p">Information</p>
+                </div>
+              </div>
+              <div class="claim-flex-item claim-flex-item-content">
+                <div class="claim-container">
+                  <p
+                    style="color: #000000"
+                    class="stepper-p stepper-text-header"
+                  >
+                    Please fill in your details to get started with your
+                    application.
+                  </p>
+                  <div class="form-group">
+                    <label
+                      for="CellPhoneInput"
+                      class="col-md-12 control-label stepper-label"
+                      >Cellphone Number:</label
+                    >
+                    <div class="col-md-12">
+                      <input
+                        class="form-control input_form"
+                        id="CellPhoneInput"
+                        maxlength="11"
+                        name="FormFields.CellPhone"
+                        placeholder="Mobile Number"
+                        type="text"
+                        value=""
+                        pattern="\d*"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label
+                      for="SAIDInput"
+                      class="col-md-12 control-label stepper-label"
+                      >ID/Passport Number:</label
+                    >
+                    <div class="col-md-12">
+                      <input
+                        class="form-control input_form stepper-input"
+                        id="SAIDInput"
+                        maxlength="13"
+                        name="FormFields.IdNumber"
+                        placeholder="ID / Passport Number"
+                        type="text"
+                        value=""
+                        pattern="\d*"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label
+                      for="ApplicationType"
+                      class="col-md-12 control-label stepper-label"
+                      >Application Type:</label
+                    >
+                    <div class="col-md-12 d-flex">
+                      <div class="col-md-6" style="padding-right: 15px">
+                        <select
+                          class="form-control application-type-dropdown"
+                          id="ApplicationType"
+                          name="Loan"
+                          required
+                        >
+                          <option value="" selected disabled>
+                            Choose Application
+                          </option>
+                          <option value="MyWORLD">MyWORLD</option>
+                          <option value="LoanApplications">
+                            Loan applications
+                          </option>
+                          <option value="Investments">Investments</option>
+                          <option value="CreditCard">Credit Card</option>
+                          <option value="CreditLifeClaims">
+                            Credit Life Claims
+                          </option>
+                          <option value="FuneralClaims">Funeral Claims</option>
+                          <option value="DeceasedEstate">
+                            Deceased Estate
+                          </option>
+                          <option value="ThirdPartyRequest">
+                            Third Party Request
+                          </option>
+                        </select>
+                      </div>
+                      <div class="col-md-6" style="padding-left: 15px">
+                        <select
+                          class="form-control application-type-dropdown-type2 hidden"
+                          id="ApplicationType2"
+                          name="Loan"
+                        >
+                          <option value="" selected disabled>
+                            Choose Credit Life Claim Conditions
+                          </option>
+                          <option value="MyWORLD">MyWORLD</option>
+                          <option value="LoanApplications">
+                            Loan applications
+                          </option>
+                          <option value="Investments">Investments</option>
+                          <option value="CreditCard">Credit Card</option>
+                          <option value="CreditLifeClaims">
+                            Credit Life Claims
+                          </option>
+                          <option value="FuneralClaims">Funeral Claims</option>
+                          <option value="DeceasedEstate">
+                            Deceased Estate
+                          </option>
+                          <option value="ThirdPartyRequest">
+                            Third Party Request
+                          </option>
+                        </select>
+
+                        <select
+                          class="form-control application-type-dropdown-type2 hidden"
+                          id="CreditLifeClaims"
+                          name="Loan"
+                        >
+                          <option value="" selected disabled>
+                            Choose Credit Life Claim Conditions
+                          </option>
+                          <option value="RetrenchmentInstalmentClaim">
+                            Retrenchment Instalment Claim
+                          </option>
+                          <option value="RetrenchmentRe-employmentClaim">
+                            Retrenchment Re-employment Claim
+                          </option>
+                          <option value="Death">Death</option>
+                          <option value="CompulsoryUnpaidLeave">
+                            Compulsory Unpaid Leave
+                          </option>
+                          <option value="LayOff">Lay Off</option>
+                          <option value="ShortTime">Short Time</option>
+                          <option value="LossofIncome">Loss of Income</option>
+                          <option value="RetrenchmentBalanceClaim">
+                            Retrenchment Balance Claim
+                          </option>
+                          <option value="TemporaryDisability">
+                            Temporary Disability
+                          </option>
+                          <option value="PermanentDisablity">
+                            Permanent Disablity
+                          </option>
+                        </select>
+                        <select
+                          class="form-control application-type-dropdown-type2 hidden"
+                          id="FuneralClaims"
+                          name="Loan"
+                        >
+                          <option value="" selected disabled>
+                            Choose Funeral Claims
+                          </option>
+                          <option value="MainMemberClaim">
+                            Main Member Claim
+                          </option>
+                          <option value="AdultMemberClaim">
+                            Adult Member Claim
+                          </option>
+                          <option value="ChildMemberClaim">
+                            Child Member Claim
+                          </option>
+                        </select>
+                        <select
+                          class="form-control application-type-dropdown-type2 hidden"
+                          id="DeceasedEstate"
+                          name="Loan"
+                        >
+                          <option value="" selected disabled>
+                            Choose Deceased Estates Claims
+                          </option>
+                          <option value="DeceasedEstatesClaims">
+                            Deceased Estates Claims
+                          </option>
+                        </select>
+                        <select
+                          class="form-control application-type-dropdown-type2 hidden"
+                          id="ThirdPartyRequest"
+                          name="Loan"
+                        >
+                          <option value="" selected disabled>
+                            Choose Third Party Request Claims
+                          </option>
+                          <option value="ThirdPartyRequestClaims">
+                            Third Party Request Claims
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <p class="combo-btn-text primary stepper-p">
+                        <button
+                          class="btn-brand-1 btn next-button button hover-up"
+                        >
+                          Next
+                        </button>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="claim-step-content" data-step="2">
+            <div class="claim-flex-container">
+              <div class="claim-flex-item claim-flex-item1-bg">
+                <button
+                  type="button"
+                  class="claim-prev-button"
+                  style="color: transparent"
+                >
+                  <svg
+                    class="claim-pre-chevron"
+                    width="20px"
+                    height="20px"
+                    viewBox="0 0 24 24"
+                    fill="transparent"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                    <g
+                      id="SVGRepo_tracerCarrier"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    ></g>
+                    <g id="SVGRepo_iconCarrier">
+                      <rect width="24" height="24" fill="transparent"></rect>
+                      <path
+                        d="M14.5 17L9.5 12L14.5 7"
+                        stroke="#FFFFFF"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      ></path>
+                    </g>
+                  </svg>
+                  Back
+                </button>
+                <div class="text-centered">
+                  <p class="claim-flex-item1-white-bg-p">Please upload your</p>
+                  <p class="claim-flex-item1-green-bg-p">Documents</p>
+                  <!-- <p class="claim-flex-item1-white-bg-p">Transactional Account</p> -->
+                </div>
+              </div>
+              <div class="claim-flex-item claim-flex-item-content">
+                <div class="claim-container claim-container-step2" id="MyWORLD">
+                  <p
+                    style="color: #000000"
+                    class="stepper-p stepper-text-header"
+                  >
+                    Your file should be less than 2mb. PDF, PNG, JPEG and TIFF
+                  </p>
+                  <div class="form-group">
+                    <div class="row-md-12">
+                      <div class="custom-file-input-container">
+                        <input
+                          type="file"
+                          id="idCopy"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        />
+                        <label for="idCopy" class="custom-file-label"
+                          >Upload</label
+                        >
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          ID/Copy
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <div class="custom-file-input-container">
+                        <input
+                          type="file"
+                          id="latestPayslip"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        />
+                        <label for="latestPayslip" class="custom-file-label"
+                          >Upload</label
+                        >
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          Latest Payslip
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <div class="custom-file-input-container">
+                        <input
+                          type="file"
+                          id="BankStatement1"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        />
+                        <label for="BankStatement1" class="custom-file-label"
+                          >Upload</label
+                        >
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          Bank Statement 1
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <div class="custom-file-input-container">
+                        <input
+                          type="file"
+                          id="BankStatement2"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        />
+                        <label for="BankStatement2" class="custom-file-label"
+                          >Upload</label
+                        >
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          Bank Statement 2
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <div class="custom-file-input-container">
+                        <input
+                          type="file"
+                          id="BankStatement3"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        />
+                        <label for="BankStatement3" class="custom-file-label"
+                          >Upload</label
+                        >
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          Bank Statement 3
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <p class="combo-btn-text primary stepper-p">
+                        <button class="btn-brand-1 submitDocument btn next-button button hover-up">
+                          <i class="fa fa-spinner fa-spin loader-1"></i>
+                          Submit
+                      </button>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="claim-container claim-container-step2"
+                  id="LoanApplications"
+                >
+                  <p
+                    style="color: #000000"
+                    class="stepper-p stepper-text-header"
+                  >
+                    Your file should be less than 2mb. PDF, PNG, JPEG and TIFF
+                  </p>
+                  <div class="form-group">
+                    <div class="row-md-12">
+                      <div class="custom-file-input-container">
+                        <input
+                          type="file"
+                          id="idCopy"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        />
+                        <label for="idCopy" class="custom-file-label"
+                          >Upload</label
+                        >
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          ID/Copy
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <div class="custom-file-input-container">
+                        <input
+                          type="file"
+                          id="latestPayslip"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        />
+                        <label for="latestPayslip" class="custom-file-label"
+                          >Upload</label
+                        >
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          Latest Payslip
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <div class="custom-file-input-container">
+                        <input
+                          type="file"
+                          id="BankStatement1"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        />
+                        <label for="BankStatement1" class="custom-file-label"
+                          >Upload</label
+                        >
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          Bank Statement 1
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <div class="custom-file-input-container">
+                        <input
+                          type="file"
+                          id="BankStatement2"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        />
+                        <label for="BankStatement2" class="custom-file-label"
+                          >Upload</label
+                        >
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          Bank Statement 2
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <div class="custom-file-input-container">
+                        <input
+                          type="file"
+                          id="BankStatement3"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        />
+                        <label for="BankStatement3" class="custom-file-label"
+                          >Upload</label
+                        >
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          Bank Statement 3
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <p class="combo-btn-text primary stepper-p">
+                        <button
+                          class="btn-brand-1 submitDocument btn next-button button hover-up"
+                        >
+                        <i class="fa fa-spinner loader-1 fa-spin"></i>
+                          Submit
+                        </button>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="claim-container claim-container-step2"
+                  id="Investments"
+                >
+                  <p
+                    style="color: #000000"
+                    class="stepper-p stepper-text-header"
+                  >
+                    Your file should be less than 2mb. PDF, PNG, JPEG and TIFF
+                  </p>
+                  <div class="form-group">
+                    <div class="row-md-12">
+                      <div class="custom-file-input-container">
+                        <input
+                          type="file"
+                          id="idCopy"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        />
+                        <label for="idCopy" class="custom-file-label"
+                          >Upload</label
+                        >
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          ID/Copy
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <div class="custom-file-input-container">
+                        <input
+                          type="file"
+                          id="latestPayslip"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        />
+                        <label for="latestPayslip" class="custom-file-label"
+                          >Upload</label
+                        >
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          Latest Payslip
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <div class="custom-file-input-container">
+                        <input
+                          type="file"
+                          id="BankStatement1"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        />
+                        <label for="BankStatement1" class="custom-file-label"
+                          >Upload</label
+                        >
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          Bank Statement 1
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <div class="custom-file-input-container">
+                        <input
+                          type="file"
+                          id="BankStatement2"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        />
+                        <label for="BankStatement2" class="custom-file-label"
+                          >Upload</label
+                        >
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          Bank Statement 2
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <div class="custom-file-input-container">
+                        <input
+                          type="file"
+                          id="BankStatement3"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        />
+                        <label for="BankStatement3" class="custom-file-label"
+                          >Upload</label
+                        >
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          Bank Statement 3
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <p class="combo-btn-text primary stepper-p">
+                        <button
+                          class="btn-brand-1 submitDocument btn next-button button hover-up"
+                        >
+                        <i class="fa fa-spinner loader-1 fa-spin"></i>
+                          Submit
+                        </button>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="claim-container claim-container-step2"
+                  id="CreditCard"
+                >
+                  <p
+                    style="color: #000000"
+                    class="stepper-p stepper-text-header"
+                  >
+                    Your file should be less than 2mb. PDF, PNG, JPEG and TIFF
+                  </p>
+                  <div class="form-group">
+                    <div class="row-md-12">
+                      <div class="custom-file-input-container">
+                        <input
+                          type="file"
+                          id="idCopy"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        />
+                        <label for="idCopy" class="custom-file-label"
+                          >Upload</label
+                        >
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          ID/Copy
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <div class="custom-file-input-container">
+                        <input
+                          type="file"
+                          id="latestPayslip"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        />
+                        <label for="latestPayslip" class="custom-file-label"
+                          >Upload</label
+                        >
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          Latest Payslip
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <div class="custom-file-input-container">
+                        <input
+                          type="file"
+                          id="BankStatement1"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        />
+                        <label for="BankStatement1" class="custom-file-label"
+                          >Upload</label
+                        >
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          Bank Statement 1
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <div class="custom-file-input-container">
+                        <input
+                          type="file"
+                          id="BankStatement2"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        />
+                        <label for="BankStatement2" class="custom-file-label"
+                          >Upload</label
+                        >
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          Bank Statement 2
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <div class="custom-file-input-container">
+                        <input
+                          type="file"
+                          id="BankStatement3"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        />
+                        <label for="BankStatement3" class="custom-file-label"
+                          >Upload</label
+                        >
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          Bank Statement 3
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <p class="combo-btn-text primary stepper-p">
+                        <button
+                          class="btn-brand-1 submitDocument btn next-button button hover-up"
+                        >
+                        <i class="fa fa-spinner loader-1 fa-spin"></i>
+                          Submit
+                        </button>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <!-- First 4 end here  -->
+                <!-- Credit Life Claims step 2 views start here  -->
+
+                <div
+                  class="claim-container claim-container-step2"
+                  id="CreditLifeClaimsRetrenchmentInstalmentClaim"
+                >
+                  <p
+                    style="color: #000000"
+                    class="stepper-p stepper-text-header"
+                  >
+                    Mandatory Documents Required for Retrenchment Instalment
+                    Claims
+                  </p>
+
+
+                  <ul class="list-group list-group-flush ml-3">
+                        <li>Completed Claim Form Section A</li>
+                        <li> Completed Claim Form Section B</li>
+                        <li> Certified Copy of Retrenchment Letter</li>
+                        <li> Or a Certified Copy of The UI-19 Document</li>
+                        <li> Latest Bank Statements Reflecting Latest Salary Deposit</li>
+                  </ul>
+
+                  <div class="form-group">
+                    <div class="row-md-12">
+                      <div class="custom-file-input-container">
+                      
+                        <form id="myForm" method="post"   enctype="multipart/form-data">
+
+                        <input type="file" id="files" class="custom-file-input " name="files" multiple accept="*">
+                        <label for="files" class="custom-file-label custom-file-label2"
+                        >Upload</label>
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                      
+                          
+                  
+                          
+                    
+                        <!-- <input type="file"  class="custom-file-input" id="idCopy" name="filename" multiple  required> -->
+                        
+                        
+                      </div>
+                    </div>
+                  </div>
+             
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <p class="combo-btn-text primary stepper-p">
+                        <button
+                          class="btn-brand-1 btn submitDocument next-button button hover-up"
+                        >
+                        <i class="fa fa-spinner loader-1 fa-spin"></i>
+                          Submit
+                        </button>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="claim-container claim-container-step2"
+                  id="CreditLifeClaimsRetrenchmentRe-employmentClaim"
+                >
+                  <p
+                    style="color: #000000"
+                    class="stepper-p stepper-text-header"
+                  >
+                    Mandatory Documents Required For Retrenchment Re-employment
+                  </p>
+                
+
+                  <ul class="list-group list-group-flush ml-3">
+                    <li>Completed Claim Form Section A</li>
+                    <li> Completed Claim Form Section B</li>
+                    <li> Employment Confirmation</li>
+              
+              </ul>
+
+              <div class="form-group">
+                <div class="row-md-12">
+                  <div class="custom-file-input-container">
+                    <!-- <input
+                      type="file"
+                      id="idCopy"
+                      name="filename"
+                      class="custom-file-input"
+                      required
+                    /> -->
+                    <form id="myForm" method="post"   enctype="multipart/form-data">
+
+                    <input type="file" id="files" class="custom-file-input " name="files" multiple accept="*">
+                    <label for="files" class="custom-file-label custom-file-label2"
+                    >Upload</label>
+                    <div class="invalid-feedback">
+                      <p class="file-name"></p>
+                      
+                    </div>
+                    <div class="progress-container">
+                      <div class="progress">
+                        <div
+                          class="progress-bar"
+                          role="progressbar"
+                          style="width: 0%"
+                          aria-valuenow="0"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        >
+                          0%
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                  
+                      
+              
+                      
+                
+                    <!-- <input type="file"  class="custom-file-input" id="idCopy" name="filename" multiple  required> -->
+                    
+                    
+                  </div>
+                </div>
+              </div>
+         
+              <div class="form-group">
+                <div class="col-md-12">
+                  <p class="combo-btn-text primary stepper-p">
+                    <button
+                      class="btn-brand-1 btn submitDocument next-button button hover-up"
+                    >
+                    <i class="fa fa-spinner loader-1 fa-spin"></i>
+                      Submit
+                    </button>
+                  </p>
+                </div>
+              </div>
+                </div>
+                <div
+                  class="claim-container claim-container-step2"
+                  id="CreditLifeClaimsDeath"
+                >
+                  <p
+                    style="color: #000000"
+                    class="stepper-p stepper-text-header"
+                  >
+                    Mandatory Documents Required For Death Claims
+                  </p>
+                  <ul class="list-group list-group-flush ml-3">
+                    <li>Completed Claim Form Section A</li>
+                    <li>Certified Copy of Death Certificate</li>              
+                  </ul>
+
+              <div class="form-group">
+                <div class="row-md-12">
+                  <div class="custom-file-input-container">
+                    <!-- <input
+                      type="file"
+                      id="idCopy"
+                      name="filename"
+                      class="custom-file-input"
+                      required
+                    /> -->
+                    <form id="myForm" method="post"   enctype="multipart/form-data">
+
+                    <input type="file" id="files" class="custom-file-input " name="files" multiple accept="*">
+                    <label for="files" class="custom-file-label custom-file-label2"
+                    >Upload</label>
+                    <div class="invalid-feedback">
+                      <p class="file-name"></p>
+                      
+                    </div>
+                    <div class="progress-container">
+                      <div class="progress">
+                        <div
+                          class="progress-bar"
+                          role="progressbar"
+                          style="width: 0%"
+                          aria-valuenow="0"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        >
+                          0%
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                  
+                      
+              
+                      
+                
+                    <!-- <input type="file"  class="custom-file-input" id="idCopy" name="filename" multiple  required> -->
+                    
+                    
+                  </div>
+                </div>
+              </div>
+         
+              <div class="form-group">
+                <div class="col-md-12">
+                  <p class="combo-btn-text primary stepper-p">
+                    <button
+                      class="btn-brand-1 btn submitDocument next-button button hover-up"
+                    >
+                    <i class="fa fa-spinner loader-1 fa-spin"></i>
+                      Submit
+                    </button>
+                  </p>
+                </div>
+              </div>
+                </div>
+                <div
+                  class="claim-container claim-container-step2"
+                  id="CreditLifeClaimsCompulsoryUnpaidLeave"
+                >
+                  <p
+                    style="color: #000000"
+                    class="stepper-p stepper-text-header"
+                  >
+                    Mandatory Documents Required For Loss of Income
+                  </p>
+                  <ul class="list-group list-group-flush ml-3">
+                    <li>Completed Claim Form Section A</li>
+                    <li> Completed Claim Form Section C</li>
+                    <li> Letter From Employer</li>
+                    <li> Pay Slip Prior to Event</li>
+                    <li> Pay Slip/s During Event</li>
+                    <li> Latest Bank Statements Reflecting the Latest Salary Deposit</li>
+                  </ul>
+                    <div class="form-group">
+                      <div class="row-md-12">
+                        <div class="custom-file-input-container">
+                          <!-- <input
+                            type="file"
+                            id="idCopy"
+                            name="filename"
+                            class="custom-file-input"
+                            required
+                          /> -->
+                          <form id="myForm" method="post"   enctype="multipart/form-data">
+      
+                          <input type="file" id="files" class="custom-file-input " name="files" multiple accept="*">
+                          <label for="files" class="custom-file-label custom-file-label2"
+                          >Upload</label>
+                          <div class="invalid-feedback">
+                            <p class="file-name"></p>
+                            
+                          </div>
+                          <div class="progress-container">
+                            <div class="progress">
+                              <div
+                                class="progress-bar"
+                                role="progressbar"
+                                style="width: 0%"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                              >
+                                0%
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                          <!-- <input type="file"  class="custom-file-input" id="idCopy" name="filename" multiple  required> -->
+                        </div>
+                      </div>
+                    </div>
+               
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <p class="combo-btn-text primary stepper-p">
+                          <button
+                            class="btn-brand-1 btn submitDocument next-button button hover-up"
+                          >
+                          <i class="fa fa-spinner loader-1 fa-spin"></i>
+                            Submit
+                          </button>
+                        </p>
+                      </div>
+                    </div>
+                </div>
+                <div
+                  class="claim-container claim-container-step2"
+                  id="CreditLifeClaimsLayOff"
+                >
+                  <p
+                    style="color: #000000"
+                    class="stepper-p stepper-text-header"
+                  >
+                    Mandatory Documents Required For Loss of Income
+                  </p>
+                  <ul class="list-group list-group-flush ml-3">
+                    <li>Completed Claim Form Section A</li>
+                    <li> Completed Claim Form Section C</li>
+                    <li> Letter From Employer</li>
+                    <li> Pay Slip Prior to Event</li>
+                    <li> Pay Slip/s During Event</li>
+                    <li> Latest Bank Statements Reflecting the Latest Salary Deposit</li>
+                  </ul>
+                    <div class="form-group">
+                      <div class="row-md-12">
+                        <div class="custom-file-input-container">
+                          <!-- <input
+                            type="file"
+                            id="idCopy"
+                            name="filename"
+                            class="custom-file-input"
+                            required
+                          /> -->
+                          <form id="myForm" method="post"   enctype="multipart/form-data">
+      
+                          <input type="file" id="files" class="custom-file-input " name="files" multiple accept="*">
+                          <label for="files" class="custom-file-label custom-file-label2"
+                          >Upload</label>
+                          <div class="invalid-feedback">
+                            <p class="file-name"></p>
+                            
+                          </div>
+                          <div class="progress-container">
+                            <div class="progress">
+                              <div
+                                class="progress-bar"
+                                role="progressbar"
+                                style="width: 0%"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                              >
+                                0%
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                          <!-- <input type="file"  class="custom-file-input" id="idCopy" name="filename" multiple  required> -->
+                        </div>
+                      </div>
+                    </div>
+               
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <p class="combo-btn-text primary stepper-p">
+                          <button
+                            class="btn-brand-1 btn submitDocument next-button button hover-up"
+                          >
+                          <i class="fa fa-spinner loader-1 fa-spin"></i>
+                            Submit
+                          </button>
+                        </p>
+                      </div>
+                    </div>
+                </div>
+                <div
+                  class="claim-container claim-container-step2"
+                  id="CreditLifeClaimsShortTime"
+                >
+                  <p
+                    style="color: #000000"
+                    class="stepper-p stepper-text-header"
+                  >
+                    Mandatory Documents Required For Loss of Income
+                  </p>
+                  <ul class="list-group list-group-flush ml-3">
+                    <li>Completed Claim Form Section A</li>
+                    <li> Completed Claim Form Section C</li>
+                    <li> Letter From Employer</li>
+                    <li> Pay Slip Prior to Event</li>
+                    <li> Pay Slip/s During Event</li>
+                    <li> Latest Bank Statements Reflecting the Latest Salary Deposit</li>
+                  </ul>
+                    <div class="form-group">
+                      <div class="row-md-12">
+                        <div class="custom-file-input-container">
+                          <!-- <input
+                            type="file"
+                            id="idCopy"
+                            name="filename"
+                            class="custom-file-input"
+                            required
+                          /> -->
+                          <form id="myForm" method="post"   enctype="multipart/form-data">
+      
+                          <input type="file" id="files" class="custom-file-input " name="files" multiple accept="*">
+                          <label for="files" class="custom-file-label custom-file-label2"
+                          >Upload</label>
+                          <div class="invalid-feedback">
+                            <p class="file-name"></p>
+                            
+                          </div>
+                          <div class="progress-container">
+                            <div class="progress">
+                              <div
+                                class="progress-bar"
+                                role="progressbar"
+                                style="width: 0%"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                              >
+                                0%
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                          <!-- <input type="file"  class="custom-file-input" id="idCopy" name="filename" multiple  required> -->
+                        </div>
+                      </div>
+                    </div>
+               
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <p class="combo-btn-text primary stepper-p">
+                          <button
+                            class="btn-brand-1 btn submitDocument next-button button hover-up"
+                          >
+                          <i class="fa fa-spinner loader-1 fa-spin"></i>
+                            Submit
+                          </button>
+                        </p>
+                      </div>
+                    </div>
+                </div>
+                <div
+                  class="claim-container claim-container-step2"
+                  id="CreditLifeClaimsLossofIncome"
+                >
+                  <p
+                    style="color: #000000"
+                    class="stepper-p stepper-text-header"
+                  >
+                    Mandatory Documents Required For Loss of Income
+                  </p>
+                  <ul class="list-group list-group-flush ml-3">
+                    <li>Completed Claim Form Section A</li>
+                    <li> Completed Claim Form Section C</li>
+                    <li> Letter From Employer</li>
+                    <li> Pay Slip Prior to Event</li>
+                    <li> Pay Slip/s During Event</li>
+                    <li> Latest Bank Statements Reflecting the Latest Salary Deposit</li>
+                  </ul>
+                    <div class="form-group">
+                      <div class="row-md-12">
+                        <div class="custom-file-input-container">
+                          <!-- <input
+                            type="file"
+                            id="idCopy"
+                            name="filename"
+                            class="custom-file-input"
+                            required
+                          /> -->
+                          <form id="myForm" method="post"   enctype="multipart/form-data">
+      
+                          <input type="file" id="files" class="custom-file-input " name="files" multiple accept="*">
+                          <label for="files" class="custom-file-label custom-file-label2"
+                          >Upload</label>
+                          <div class="invalid-feedback">
+                            <p class="file-name"></p>
+                            
+                          </div>
+                          <div class="progress-container">
+                            <div class="progress">
+                              <div
+                                class="progress-bar"
+                                role="progressbar"
+                                style="width: 0%"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                              >
+                                0%
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                          <!-- <input type="file"  class="custom-file-input" id="idCopy" name="filename" multiple  required> -->
+                        </div>
+                      </div>
+                    </div>
+               
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <p class="combo-btn-text primary stepper-p">
+                          <button
+                            class="btn-brand-1 btn submitDocument next-button button hover-up"
+                          >
+                          <i class="fa fa-spinner loader-1 fa-spin"></i>
+                            Submit
+                          </button>
+                        </p>
+                      </div>
+                    </div>
+                </div>
+                <div
+                  class="claim-container claim-container-step2"
+                  id="CreditLifeClaimsRetrenchmentBalanceClaim"
+                >
+                  <p
+                    style="color: #000000"
+                    class="stepper-p stepper-text-header"
+                  >
+                    Mandatory Documents Required For Loss of Income
+                  </p>
+                  <ul class="list-group list-group-flush ml-3">
+                    <li>Completed Claim Form Section A</li><li> Completed Claim Form Section B</li><li> Affidavit (declaring current employment status - 6 months from retrenchment)</li><li> Bank Statements (6 months from retrenchment)</li></ul>
+                    <div class="form-group">
+                      <div class="row-md-12">
+                        <div class="custom-file-input-container">
+                          <!-- <input
+                            type="file"
+                            id="idCopy"
+                            name="filename"
+                            class="custom-file-input"
+                            required
+                          /> -->
+                          <form id="myForm" method="post"   enctype="multipart/form-data">
+      
+                          <input type="file" id="files" class="custom-file-input" name="files" multiple accept="*">
+                          <label for="files" class="custom-file-label custom-file-label2"
+                          >Upload</label>
+                          <div class="invalid-feedback">
+                            <p class="file-name"></p>
+                            
+                          </div>
+                          <div class="progress-container">
+                            <div class="progress">
+                              <div
+                                class="progress-bar"
+                                role="progressbar"
+                                style="width: 0%"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                              >
+                                0%
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                          <!-- <input type="file"  class="custom-file-input" id="idCopy" name="filename" multiple  required> -->
+                        </div>
+                      </div>
+                    </div>
+               
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <p class="combo-btn-text primary stepper-p">
+                          <button
+                            class="btn-brand-1 btn submitDocument next-button button hover-up"
+                          >
+                          <i class="fa fa-spinner loader-1 fa-spin"></i>
+                            Submit
+                          </button>
+                        </p>
+                      </div>
+                    </div>
+                </div>
+                <div
+                  class="claim-container claim-container-step2"
+                  id="CreditLifeClaimsTemporaryDisability"
+                >
+                  <p
+                    style="color: #000000"
+                    class="stepper-p stepper-text-header"
+                  >
+                    Mandatory Documents Required For Retrenchment Settlement
+                    Claims
+                  </p>
+                  <ul class="list-group list-group-flush ml-3">
+                    <li>Completed Claim Form Section A</li><li> Completed Claim Form Section D</li><li> Completed Claim Form Section E</li><li> A Copy of a Medical Report With The Doctors Stamp</li></ul>
+                    <div class="form-group">
+                      <div class="row-md-12">
+                        <div class="custom-file-input-container">
+                          <!-- <input
+                            type="file"
+                            id="idCopy"
+                            name="filename"
+                            class="custom-file-input"
+                            required
+                          /> -->
+                          <form id="myForm" method="post"   enctype="multipart/form-data">
+      
+                          <input type="file" id="files" class="custom-file-input" name="files" multiple accept="*">
+                          <label for="files" class="custom-file-label custom-file-label2"
+                          >Upload</label>
+                          <div class="invalid-feedback">
+                            <p class="file-name"></p>
+                            
+                          </div>
+                          <div class="progress-container">
+                            <div class="progress">
+                              <div
+                                class="progress-bar"
+                                role="progressbar"
+                                style="width: 0%"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                              >
+                                0%
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                          <!-- <input type="file"  class="custom-file-input" id="idCopy" name="filename" multiple  required> -->
+                        </div>
+                      </div>
+                    </div>
+               
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <p class="combo-btn-text primary stepper-p">
+                          <button
+                            class="btn-brand-1 btn submitDocument next-button button hover-up"
+                          >
+                          <i class="fa fa-spinner loader-1 fa-spin"></i>
+                            Submit
+                          </button>
+                        </p>
+                      </div>
+                    </div>
+                </div>
+                <div
+                  class="claim-container claim-container-step2"
+                  id="CreditLifeClaimsPermanentDisablity"
+                >
+                  <p
+                    style="color: #000000"
+                    class="stepper-p stepper-text-header"
+                  >
+                    Your file should be less than 2mb. PDF, PNG, JPEG and TIFF
+                  </p>
+                  <ul class="list-group list-group-flush ml-3">
+                    <li>Completed Claim Form Section A</li>
+                    <li> Completed Claim Form Section D</li><li> Completed Claim Form Section E</li><li> Certified Copy of Termination Letter</li><li> A Copy of a Medical Report With The Doctors Stamp</li></ul>
+                    <div class="form-group">
+                      <div class="row-md-12">
+                        <div class="custom-file-input-container">
+                          <!-- <input
+                            type="file"
+                            id="idCopy"
+                            name="filename"
+                            class="custom-file-input"
+                            required
+                          /> -->
+                          <form id="myForm" method="post"   enctype="multipart/form-data">
+      
+                          <input type="file" id="files" class="custom-file-input" name="files" multiple accept="*">
+                          <label for="files" class="custom-file-label custom-file-label2"
+                          >Upload</label>
+                          <div class="invalid-feedback">
+                            <p class="file-name"></p>
+                            
+                          </div>
+                          <div class="progress-container">
+                            <div class="progress">
+                              <div
+                                class="progress-bar"
+                                role="progressbar"
+                                style="width: 0%"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                              >
+                                0%
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                          <!-- <input type="file"  class="custom-file-input" id="idCopy" name="filename" multiple  required> -->
+                        </div>
+                      </div>
+                    </div>
+               
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <p class="combo-btn-text primary stepper-p">
+                          <button
+                            class="btn-brand-1 btn submitDocument next-button button hover-up"
+                          >
+                          <i class="fa fa-spinner loader-1 fa-spin"></i>
+                            Submit
+                          </button>
+                        </p>
+                      </div>
+                    </div>
+                </div>
+
+                <!-- Credit Life Claims end step 2 views here  -->
+                <!-- *********************************************************************************************************************************************************************** -->
+
+                <!-- Funeral Claims start step 2 views here  -->
+
+                <div
+                  class="funeral-main-claim-container claim-container-step2"
+                  id="FuneralClaimsMainMemberClaim"
+                >
+                  <p
+                    style="color: #000000"
+                    class="stepper-p stepper-text-header"
+                  >
+                    Mandatory Documents Required for Main Member Claims
+                  </p>
+
+                  <ul class="list-group list-group-flush ml-3">
+                    <li>Completed <b>Claim Form<b></b></b></li><li> Certified Copy of <b>Deceased's ID</b></li><li> Certified Copy of <b>Deceased's Death Certificate</b></li><li> Certified Copy of The <b>Beneficiary's ID</b></li><li> Copy of <b>The Beneficiary's Bank Statement</b> (must show the physical address of the beneficiary)</li><li> <b>DHA1663 Registration for Death</b> Form Issued By Department of Home Affairs AND/OR</li><li> <b>Police Report</b> For Unnatural Cause of Death</li>
+                  </ul>
+                  <div class="form-group">
+                    <div class="row-md-12">
+                      <div class="custom-file-input-container">
+                        <!-- <input
+                          type="file"
+                          id="idCopy"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        /> -->
+                        <form id="myForm" method="post"   enctype="multipart/form-data">
+    
+                        <input type="file" id="files" class="custom-file-input" name="files" multiple accept="*">
+                        <label for="files" class="custom-file-label custom-file-label2"
+                        >Upload</label>
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                        <!-- <input type="file"  class="custom-file-input" id="idCopy" name="filename" multiple  required> -->
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <p class="combo-btn-text primary stepper-p">
+                        <button
+                          class="btn-brand-1 btn submitDocument next-button button hover-up"
+                        >
+                        <i class="fa fa-spinner loader-1 fa-spin"></i>
+                          Submit
+                        </button>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="adult-child-claim-container claim-container-step2"
+                  id="FuneralClaimsAdultMemberClaim"
+                >
+                  <p
+                    style="color: #000000"
+                    class="stepper-p stepper-text-header"
+                  >
+                    Mandatory documents required for adult member claims
+                  </p>
+                  <ul class="list-group list-group-flush ml-3">
+                    <li><b>Completed Claim Form</b></li><li> Certified Copy of The <b>Main Members ID</b></li><li> Certified Copy of <b>Deceased's ID</b></li><li> Certified Copy of <b>Deceased's Death Certificate</b></li><li> Copy of The <b>Main Members Bank Statement (must show the physical address of the beneficiary)</b></li><li> <b>DHA1663 Registration for Death Form</b> Issued By Department of Home Affairs <b>AND/OR</b></li><li> <b>Police Report</b> For Unnatural Cause of Death</li></ul>
+                  <div class="form-group">
+                      <div class="row-md-12">
+                        <div class="custom-file-input-container">
+                          <!-- <input
+                            type="file"
+                            id="idCopy"
+                            name="filename"
+                            class="custom-file-input"
+                            required
+                          /> -->
+                          <form id="myForm" method="post"   enctype="multipart/form-data">
+      
+                          <input type="file" id="files" class="custom-file-input" name="files" multiple accept="*">
+                          <label for="files" class="custom-file-label custom-file-label2"
+                          >Upload</label>
+                          <div class="invalid-feedback">
+                            <p class="file-name"></p>
+                            
+                          </div>
+                          <div class="progress-container">
+                            <div class="progress">
+                              <div
+                                class="progress-bar"
+                                role="progressbar"
+                                style="width: 0%"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                              >
+                                0%
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                          <!-- <input type="file"  class="custom-file-input" id="idCopy" name="filename" multiple  required> -->
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <p class="combo-btn-text primary stepper-p">
+                          <button
+                            class="btn-brand-1 btn submitDocument next-button button hover-up"
+                          >
+                          <i class="fa fa-spinner loader-1 fa-spin"></i>
+                            Submit
+                          </button>
+                        </p>
+                      </div>
+                    </div>
+                </div>
+
+                <div
+                  class="child-claim-container  claim-container-step2"
+                  id="FuneralClaimsChildMemberClaim"
+                >
+                  <p
+                    style="color: #000000"
+                    class="stepper-p stepper-text-header"
+                  >
+                    Mandatory documents required for Child member claims
+                  </p>
+                  <ul class="list-group list-group-flush ml-3">
+                    <li><b>Completed Claim Form<b></b></b></li><li> Certified Copy of The <b>Main Members ID</b></li><li> For Child Members Over 18 a Certified Copy of <b>Deceased's ID</b></li><li> For Child Members Under 18 or a Still Birth The <b>Child's Birth Certificate</b></li><li> Certified Copy of <b>Deceased's Death Certificate</b></li><li> Copy of The <b>Main Members Bank Statement</b> (must show the physical address of the beneficiary)</li><li> <b>DHA1663</b> Registration for Death Form Issued by Department of Home Affairs AND/OR</li><li> <b>Police Report</b> For Unnatural Cause of Death</li></ul>
+                  <div class="form-group">
+                    <div class="row-md-12">
+                      <div class="custom-file-input-container">
+                        <!-- <input
+                          type="file"
+                          id="idCopy"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        /> -->
+                        <form id="myForm" method="post"   enctype="multipart/form-data">
+    
+                        <input type="file" id="files" class="custom-file-input" name="files" multiple accept="*">
+                        <label for="files" class="custom-file-label custom-file-label2"
+                        >Upload</label>
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                        <!-- <input type="file"  class="custom-file-input" id="idCopy" name="filename" multiple  required> -->
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <p class="combo-btn-text primary stepper-p">
+                        <button
+                          class="btn-brand-1 btn submitDocument next-button button hover-up"
+                        >
+                        <i class="fa fa-spinner loader-1 fa-spin"></i>
+                          Submit
+                        </button>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <!-- Funeral Claims end step 2 views here  -->
+                <div
+                  class="funeral-claim-container claim-container-step2"
+                  id="DeceasedEstateDeceasedEstatesClaims"
+                >
+                  <p
+                    style="color: #000000"
+                    class="stepper-p stepper-text-header"
+                  >
+                    Claimant to submit the following required documents for
+                    deceased estates
+                  </p>
+                  <ul class="funeral-list-group list-group-flush ml-3">
+                    <li>Request for balances (from the Master of High Court)</li><li> Original or certified copy of the identification document of the deceased</li><li> Original or certified copy of the Death <b>Certificate/Abridged Certificate</b></li><li> Original or certified Power of Attorney (where an attorney/third party acts on behalf of the holder of a Letters of Authority/Executorship)</li><li> Original or certified copy of Letters of Appointment as Executor (where applicable) issued by a South African Master of the High Court</li><li> Original or certified copy of Letters of Authority from the Master of High Court (where applicable) issued by a South African Master of the High Court</li><li> Original Identity Document or Passport of the Executor or person nominated in the Letters of Authority</li><li> Proof of address of the Executor or person nominated in the Letters of Authority</li><li> Proof of banking details to be used for the transfer of the deceased estate funds</li><li> Where applicable</li><li> Special power of attorney and certified ID of Special Power of Attorney Agent</li><li> Proof of address of Special Power of attorney agent</li></ul>
+                 
+                 <div class="input-btn-claim-container">
+                     <div class="funeral-form-group">
+                    <div class="row-md-12">
+                      <div class="custom-file-input-container">
+                        <!-- <input
+                          type="file"
+                          id="idCopy"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        /> -->
+                        <form id="myForm" method="post"   enctype="multipart/form-data">
+    
+                        <input type="file" id="files" class="custom-file-input" name="files" multiple accept="*">
+                        <label for="files" class="custom-file-label custom-file-label2"
+                        >Upload</label>
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                        <!-- <input type="file"  class="custom-file-input" id="idCopy" name="filename" multiple  required> -->
+                      </div>
+                    </div>
+                  </div>
+                  <div class="funeral-form-group">
+                    <div class="col-md-12">
+                      <p class="combo-btn-text primary stepper-p">
+                        <button
+                          class="btn-brand-1 btn submitDocument funeral-next-button next-button button hover-up"
+                        >
+                        <i class="fa fa-spinner loader-1 fa-spin"></i>
+                          Submit
+                        </button>
+                      </p>
+                    </div>
+                  </div></div>
+                  
+                </div>
+
+                <div
+                  class="claim-container claim-container-step2"
+                  id="ThirdPartyRequestThirdPartyRequestClaims"
+                >
+                  <p
+                    style="color: #000000"
+                    class="stepper-p stepper-text-header"
+                  >
+                    Documents required for Third Party Requests
+                  </p>
+                  <ul class="list-group list-group-flush ml-3">
+                    <li> PAIA document</li><li> Power of Attorney</li>
+                  </ul>
+                  <div class="form-group">
+                    <div class="row-md-12">
+                      <div class="custom-file-input-container">
+                        <!-- <input
+                          type="file"
+                          id="idCopy"
+                          name="filename"
+                          class="custom-file-input"
+                          required
+                        /> -->
+                        <form id="myForm" method="post"   enctype="multipart/form-data">
+    
+                        <input type="file" id="files" class="custom-file-input" name="files" multiple accept="*">
+                        <label for="files" class="custom-file-label custom-file-label2"
+                        >Upload</label>
+                        <div class="invalid-feedback">
+                          <p class="file-name"></p>
+                          
+                        </div>
+                        <div class="progress-container">
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              style="width: 0%"
+                              aria-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                        <!-- <input type="file"  class="custom-file-input" id="idCopy" name="filename" multiple  required> -->
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <p class="combo-btn-text primary stepper-p">
+                        <button
+                          class="btn-brand-1 btn submitDocument next-button button hover-up"
+                        >
+                        <i class="fa fa-spinner loader-1 fa-spin"></i>
+                          Submit
+                        </button>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="claim-step-content" data-step="3">
+            <div class="claim-flex-container">
+              <div class="claim-flex-item claim-flex-item1-bg">
+                <div class="text-centered">
+                  <p class="claim-flex-item1-white-bg-p">Open your</p>
+                  <p class="claim-flex-item1-green-bg-p">MyWorld</p>
+                  <p class="claim-flex-item1-white-bg-p">
+                    Transactional Account
+                  </p>
+                </div>
+              </div>
+              <div class="claim-flex-item claim-flex-item-content">
+                <div class="claim-container">
+                  <div class="claim-flex-item">
+                    <div class="text-centered">
+                      <p class="claim-flex-item1-green-bg-p">Thank You</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <footer class="mY-footer mt-auto py-3">
+      <div class="container">
+        <div>
+          <a class="navbar-brand" href="~/en/home/">
+            <img
+              src="https://publishing.v5.stg.africanbankdmz.net/media/h50duhhg/asset-5.svg"
+              height="40px"
+              alt="Brand Logo"
+            />
+          </a>
+        </div>
+        <div class="footer-text">
+          Copyright 2024 African Bank. An authorised financial services and
+          registered credit provider Reg No. 2014/176899/06 (NCRCP7638)
+        </div>
+        <div class="footer-text" style="margin-top: -5px">
+          <a
+            href="/doc/TermsAndConditions.PDF"
+            class="text-white"
+            target="_blank"
+          >
+            <div class="flex-container">
+              <p class="text-white">Terms</p>
+              <p class="text-white">&amp; Conditions</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </footer>
+ <script>
+
+
+var globalDropdownId2 = "";
+
+$(document).ready(function() {
+            function addLoader(buttonClass, loaderClass) {
+                $(buttonClass).on('click', function() {
+                    $(this).find(loaderClass).css({'display': 'block'});
+                    $(this).prop('disabled', true); // Disable the button to prevent multiple clicks
+                });
+            }
+
+            function removeLoader(buttonClass, loaderClass) {
+                $(buttonClass).on('click', function() {
+                    $(this).find(loaderClass).css({'display': 'none'});
+                    $(this).prop('disabled', false); // Disable the button to prevent multiple clicks
+                });
+            }
+        });
+
+
+        const toastBox = document.querySelector('.toastBox');
+        let toastTimeout;
+        let existingToast;
+
+        function showSnackbar(message, type) {
+            // If a toast is already present, remove it before creating a new one
+            if (existingToast) {
+                clearTimeout(toastTimeout);
+                existingToast.remove();
+            }
+
+            const toast = document.createElement('div');
+            toast.classList.add('toast', type);
+            toast.innerHTML = `<button class="close-btn"><i class="fas fa-times"></i></button><i class="fas fa-check-circle"></i> ${message}`;
+            toastBox.appendChild(toast);
+            existingToast = toast;
+
+            const closeButton = toast.querySelector('.close-btn');
+            closeButton.addEventListener('click', () => {
+                toast.remove();
+                clearTimeout(toastTimeout);
+                existingToast = null;
+            });
+
+            toastTimeout = setTimeout(() => {
+                toast.remove();
+                existingToast = null;
+            }, 5000);
+        }
+
+      // $(document).ready(function() {
+      //             $('#ApplicationType').change(function() {
+      //                 const selectedValue = $(this).val();
+      //                 if (selectedValue === 'CreditLifeClaims' || selectedValue === 'FuneralClaims' || selectedValue === 'DeceasedEstate' || selectedValue === 'ThirdPartyRequest') {
+      //                     $('#ApplicationType').parent().addClass('hidden');
+      //                     $('#additionalDropdowns').removeClass('hidden');
+      //                 } else {
+      //                     $('#ApplicationType').parent().removeClass('hidden');
+      //                     $('#additionalDropdowns').addClass('hidden');
+      //                 }
+      //             });
+      // });
+
+      // $(document).ready(function() {
+      //             $('#ApplicationType').change(function() {
+      //                 const selectedValue = $(this).val();
+      //                 if (selectedValue === 'CreditLifeClaims' || selectedValue === 'FuneralClaims' || selectedValue === 'DeceasedEstate' || selectedValue === 'ThirdPartyRequest') {
+      //                     $('.application-type-dropdown-type2').css({'display': 'block'});
+      //                     $('.d-flex').css({'display': 'flex'});
+      //                 } else if (selectedValue != 'CreditLifeClaims' || selectedValue != 'FuneralClaims' || selectedValue != 'DeceasedEstate' || selectedValue != 'ThirdPartyRequest') {
+      //                     $('.application-type-dropdown-type2').css({'display': 'none'});
+      //                     $('.d-flex').css({'display': 'block'});
+      //                 } else{
+      //                     $('#ApplicationType').closest('.col-md-12').removeClass('hidden');
+      //                     $('#additionalDropdowns').addClass('hidden');
+      //                 }
+      //             });
+      //         });
+
+      // The Function to To display the other dropdown if the first four are not selected
+      $(document).ready(function () {
+        $("#ApplicationType, #ApplicationType2").change(function () {
+          const selectedValue = $(this).val();
+          $(".application-type-dropdown-type2").hide(); // Hide all additional dropdowns
+          if (
+            selectedValue === "CreditLifeClaims" ||
+            selectedValue === "FuneralClaims" ||
+            selectedValue === "DeceasedEstate" ||
+            selectedValue === "ThirdPartyRequest"
+          ) {
+            $("#" + selectedValue).show(); // Show the selected additional dropdown
+            $(".d-flex").css({ display: "flex" });
+          } else {
+            $(".d-flex").css({ display: "block" });
+          }
+        });
+      });
+
+var globalDropdownId2 = ""
+      $(document).ready(function () {
+    // Watch for changes in any of the dropdowns with the class 'application-type-dropdown-type2'
+    $('.application-type-dropdown-type2').change(function () {
+      // Get the selected value
+      var selectedValue = $(this).val();
+      globalDropdownId2 = $(this).val();
+      console.log("globalDropdownId2 : ",globalDropdownId2);
+      var dropdownId = $(this).attr('id'); 
+    });
+  });
+
+
+
+      // This Function Display certain block depending on which option was selected in dropdown
+      // document.addEventListener('DOMContentLoaded', function() {
+
+      //     const dropdown = document.getElementById('ApplicationType');
+      //     const containers = document.querySelectorAll('.claim-container-step2');
+
+      //     dropdown.addEventListener('change', function() {
+      //         const selectedValue = dropdown.value;
+
+      //         containers.forEach(container => {
+      //             if (container.id === selectedValue) {
+      //                 container.style.display = 'block';
+      //             } else {
+      //                 container.style.display = 'none';
+      //             }
+      //         });
+      //     });
+      // });
+      $(document).ready(function () {
+    // Watch for changes in any of the dropdowns with the class 'application-type-dropdown-type2'
+    $('.application-type-dropdown-type2').change(function () {
+      // Update the global variable with the selected value
+      globalDropdownId2 = $(this).val();
+      console.log("globalDropdownId2 : ", globalDropdownId2);
+
+      // Trigger the change event for ApplicationType to re-evaluate the combined ID
+      $('#ApplicationType').trigger('change');
+    });
+
+    // Watch for changes in the main dropdown
+    $('#ApplicationType').change(function () {
+      const selectedValue = $(this).val();
+      const idToBeCalled = selectedValue + globalDropdownId2;
+
+      console.log("idToBeCalled : ", idToBeCalled);
+      console.log("selectedValue : ", selectedValue);
+      console.log("globalDropdownId2 : ", globalDropdownId2);
+
+      // Get all claim containers
+      $(".claim-container-step2").each(function() {
+        if ($(this).attr('id') === idToBeCalled) {
+          $(this).show();
+        } else {
+          $(this).hide();
+        }
+      });
+    });
+  });
+   
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const baseUrl = "https://api.stg.africanbank.net/";
+        let myClientNumber = "";
+        let applicationId = "";
+
+        function validateSAID(idNumber) {
+          if (idNumber.length !== 13 || !/^\d+$/.test(idNumber)) {
+            return false;
+          }
+          const birthDate = idNumber.substring(0, 6);
+          if (!isValidDate(birthDate)) {
+            return false;
+          }
+          const checksum = calculateLuhnChecksum(idNumber);
+          return checksum === parseInt(idNumber[12]);
+        }
+
+        function validateCellphone(cellphone) {
+          const regex = /^0\d{9}$|^\+27\d{9}$/;
+          return regex.test(cellphone);
+        }
+
+        function isValidDate(date) {
+          const year = parseInt(date.substring(0, 2), 10);
+          const month = parseInt(date.substring(2, 4), 10);
+          const day = parseInt(date.substring(4, 6), 10);
+          if (month < 1 || month > 12) {
+            return false;
+          }
+          const maxDays = [
+            31,
+            isLeapYear(year) ? 29 : 28,
+            31,
+            30,
+            31,
+            30,
+            31,
+            31,
+            30,
+            31,
+            30,
+            31,
+          ];
+          return day > 0 && day <= maxDays[month - 1];
+        }
+
+        function isLeapYear(year) {
+          year += 2000; // Adjusting for YY format
+          return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+        }
+
+        function calculateLuhnChecksum(idNumber) {
+          let sum = 0;
+          for (let i = 0; i < 12; i++) {
+            const digit = parseInt(idNumber[i]);
+            if (i % 2 === 0) {
+              sum += digit;
+            } else {
+              const doubled = digit * 2;
+              sum += doubled > 9 ? doubled - 9 : doubled;
+            }
+          }
+          return (10 - (sum % 10)) % 10;
+        }
+
+        function validateStep(step) {
+          let isValid = true;
+          step.querySelectorAll("input, select").forEach((input) => {
+            if (!input.checkValidity()) {
+              isValid = false;
+              input.classList.add("is-invalid");
+            } else {
+              input.classList.remove("is-invalid");
+            }
+
+            // Additional validation for SA ID
+            if (input.id === "SAIDInput" && !validateSAID(input.value)) {
+              isValid = false;
+              input.classList.add("is-invalid");
+            }
+
+            // Additional validation for Cellphone
+            if (
+              input.id === "CellPhoneInput" &&
+              !validateCellphone(input.value)
+            ) {
+              isValid = false;
+              input.classList.add("is-invalid");
+            }
+          });
+          return isValid;
+        }
+
+        function updateButtonState() {
+          const activeStep = document.querySelector(
+            ".claim-step-content.active"
+          );
+          const isValid = validateStep(activeStep);
+          const nextButton = activeStep.querySelector(".next-button");
+          const submitButton = activeStep.querySelector(".submitDocument");
+
+          if (nextButton) {
+             nextButton.disabled = !isValid;
+          }
+          if (submitButton) {
+            submitButton.disabled = !isValid;
+          }
+        }
+
+        document.querySelectorAll("input, select").forEach((input) => {
+          input.addEventListener("input", updateButtonState);
+        });
+
+        document.querySelectorAll(".next-button").forEach((button) => {
+          button.addEventListener("click", function () {
+            const currentStep = this.closest(".claim-step-content");
+            const nextStep = currentStep.nextElementSibling;
+            if (validateStep(currentStep)) {
+              if (nextStep) {
+                currentStep.classList.remove("active");
+                nextStep.classList.add("active");
+                updateStepper(nextStep.dataset.step);
+                updateButtonState(); // Update button state for the next step
+                submitClientSearch();
+              }
+            } else {
+              validateStep(currentStep);
+            }
+          });
+        });
+
+        document.querySelectorAll(".claim-prev-button").forEach((button) => {
+          button.addEventListener("click", function () {
+            const currentStep = this.closest(".claim-step-content");
+            const prevStep = currentStep.previousElementSibling;
+            if (prevStep) {
+              currentStep.classList.remove("active");
+              prevStep.classList.add("active");
+              updateStepper(prevStep.dataset.step);
+              updateButtonState(); // Update button state for the previous step
+            }
+          });
+        });
+
+        function updateStepper(step) {
+          document.querySelectorAll(".step").forEach((stepElement) => {
+            stepElement.classList.remove("active");
+          });
+          document
+            .querySelector(`.step[data-step="${step}"]`)
+            .classList.add("active");
+        }
+
+        updateButtonState(); // Initial check to set the button state
+
+        // Additional code for file upload progress and other functionalities
+        const fileTypes = [
+          "pdf",
+          "docx",
+          "rtf",
+          "jpg",
+          "jpeg",
+          "png",
+          "txt",
+          "heic",
+        ];
+
+        function readURL(input) {
+          if (input.files && input.files[0]) {
+            const extension = input.files[0].name
+              .split(".")
+              .pop()
+              .toLowerCase();
+            const isSuccess = fileTypes.includes(extension);
+
+            if (isSuccess) {
+              const reader = new FileReader();
+              reader.onload = function (e) {
+                const icon = input
+                  .closest(".fileUpload")
+                  .querySelector(".icon");
+                switch (extension) {
+                  case "pdf":
+                    icon.src =
+                      "https://image.flaticon.com/icons/svg/179/179483.svg";
+                    break;
+                  case "docx":
+                    icon.src =
+                      "https://image.flaticon.com/icons/svg/281/281760.svg";
+                    break;
+                  case "rtf":
+                    icon.src =
+                      "https://image.flaticon.com/icons/svg/136/136539.svg";
+                    break;
+                  case "png":
+                    icon.src =
+                      "https://image.flaticon.com/icons/svg/136/136523.svg";
+                    break;
+                  case "jpg":
+                  case "jpeg":
+                    icon.src =
+                      "https://image.flaticon.com/icons/svg/136/136524.svg";
+                    break;
+                  case "txt":
+                    icon.src =
+                      "https://image.flaticon.com/icons/svg/136/136538.svg";
+                    break;
+                  default:
+                    input
+                      .closest(".uploadDoc")
+                      .querySelector(".docErr").style.display = "none";
+                }
+              };
+              reader.readAsDataURL(input.files[0]);
+            } else {
+              const docErr = input
+                .closest(".uploadDoc")
+                .querySelector(".docErr");
+              docErr.style.display = "block";
+              setTimeout(() => {
+                docErr.style.display = "none";
+              }, 5000);
+            }
+          }
+        }
+
+        document.querySelectorAll(".up").forEach((input) => {
+          input.addEventListener("change", function () {
+            const profilePicValue = this.value
+              .split("\\")
+              .pop()
+              .substring(0, 20);
+            if (profilePicValue) {
+              this.closest(".fileUpload").querySelector(".upl").textContent =
+                profilePicValue;
+              const replaceButton = document.createElement("button");
+              replaceButton.classList.add(
+                "btn",
+                "btn-warning",
+                "replace-file-button"
+              );
+              replaceButton.textContent = "Upload";
+              replaceButton.addEventListener("click", function () {
+                input.click();
+              });
+              this.closest(".fileUpload").appendChild(replaceButton);
+              input.style.display = "none";
+            }
+          });
+        });
+
+        document.querySelectorAll(".btn-new").forEach((btn) => {
+          btn.addEventListener("click", function () {
+            const uploader = document.getElementById("uploader");
+            const newUploadDoc = document.createElement("div");
+            newUploadDoc.classList.add("row", "uploadDoc");
+            newUploadDoc.innerHTML = `
+                <div class="col-sm-3">
+                    <div class="docErr">Please upload valid file</div>
+                    <div class="fileUpload btn btn-orange">
+                        <img src="https://image.flaticon.com/icons/svg/136/136549.svg" class="icon">
+                        <span class="upl" id="upload">Upload document</span>
+                        <input type="file" class="upload up" id="up" onchange="readURL(this);" />
+                    </div>
+                </div>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" name="" placeholder="Note">
+                </div>
+                <div class="col-sm-1">
+                    <a class="btn-check"><i class="fa fa-times"></i></a>
+                </div>`;
+            uploader.appendChild(newUploadDoc);
+          });
+        });
+
+        document.addEventListener("click", function (event) {
+          if (event.target.closest(".btn-check")) {
+            const uploadDoc = event.target.closest(".uploadDoc");
+            if (document.querySelectorAll(".uploadDoc").length > 1) {
+              uploadDoc.remove();
+            } else {
+              showSnackbar('You have to upload at least one document.', 'error');
+            }
+          }
+        });
+        
+
+      function submitClientSearch() {
+    const saIDElmn = document.getElementById("SAIDInput");
+ const json =   [
+    {
+        "fieldName": "idnumber",
+        "operator": "=",
+        "value": "6502035451086"
+    }
+]
+
+    fetch(
+        `${baseUrl}v2/clients/search`,
+        {
+            method: "POST",
+       
+            headers: {
+                "Authorization": "Basic ZWJhbmtpdDoxNW0xNGkxNmExOXMyM28xOGQ=",
+                "Content-Type": "application/json", 
+                "X-User" : "test",
+                "X-System" : "ebankit",
+                "X-Channel" : 'web',
+                "X-Service-Operation" : "payments",
+                "X-Session-Id": "reiorepropeprier",
+                "X-Client-Number": "13801541"
+            },
+            body: JSON.stringify(json) // Convert data to JSON string
+        }
+    )
+    .then((response) => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json(); // Parse JSON response
+    })
+    .then((data) => {
+        const clientNumber = data.data[0]?.personalDetails?.clientNumber;
+        if (!clientNumber) {
+            throw new Error('Client number not found in response');
+        }
+        myClientNumber = clientNumber;
+        submitApplication(clientNumber); // Assuming submitApplication is defined elsewhere
+    })
+    .catch((error) => {
+        console.error("Error:", error);
+        showSnackbar(error.message, 'error'); // Show error message in snackbar
+    });
+}
+
+
+        function submitApplication(clientNumber) {
+
+          addLoader('.submitDocument', '.loader-1');
+
+          fetch(
+            `${baseUrl}DocumentUpload/search/Applications?clientNumber=${clientNumber}`,
+            {
+              method: "POST",
+            }
+          )
+            .then((response) => {response.json(); removeLoader('.submitDocument', '.loader-1');  })
+            .then((data) => {
+              applicationId = data.data[0]?.applicationId;
+              showSnackbar("Successfuly uploaded document", 'success');
+              removeLoader('.submitDocument', '.loader-1');
+            })
+            .catch((error) => {console.error("Error:", error)
+            showSnackbar(error, 'error');
+        });
+        }
+
+        // const customFileInput = document.getElementById('Excel');
+        const fileLabel = document.querySelector(".custom-file-label");
+        // const replayButton = document.querySelector('.replay-button');
+        const fileInfo = document.querySelector(".file-info");
+        const fileNameElem = document.querySelector(".file-name");
+        const fileSizeElem = document.querySelector(".file-size");
+
+        document.querySelectorAll(".custom-file-input").forEach((input) => {
+          input.addEventListener("change", function () {
+            const file = this.files[0];
+            const progressBar = this.closest(
+              ".custom-file-input-container"
+            ).querySelector(".progress-bar");
+            if (file) {
+              uploadFileWithProgress(file, progressBar, this);
+            }
+          });
+        });
+
+        function hasFileInputs() {
+          return Array.from(
+            document.querySelectorAll(".custom-file-input")
+          ).some((input) => input.files.length > 0);
+        }
+
+        function updateButtonState() {
+          const activeStep = document.querySelector(
+            ".claim-step-content.active"
+          );
+          const isValid = validateStep(activeStep);
+          const nextButton = activeStep.querySelector(".next-button");
+          const submitButton = activeStep.querySelector(".submitDocument");
+
+          // if (nextButton) {
+          //   nextButton.disabled = !isValid;
+          // }
+          // if (submitButton) {
+          //   submitButton.disabled = !isValid || !hasFileInputs();
+          // }
+        }
+
+        document.querySelectorAll(".up").forEach((input) => {
+          input.addEventListener("change", function () {
+            updateButtonState();
+          });
+        });
+
+        document.querySelectorAll(".btn-new").forEach((btn) => {
+          btn.addEventListener("click", function () {
+            const uploader = document.getElementById("uploader");
+            const newUploadDoc = document.createElement("div");
+            newUploadDoc.classList.add("row", "uploadDoc");
+            newUploadDoc.innerHTML = `
+                <div class="col-sm-3">
+                    <div class="docErr">Please upload valid file</div>
+                    <div class="fileUpload btn btn-orange">
+                        <img src="https://image.flaticon.com/icons/svg/136/136549.svg" class="icon">
+                        <span class="upl" id="upload">Upload document</span>
+                        <input type="file" class="upload up" id="up" onchange="readURL(this);" />
+                    </div>
+                </div>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" name="" placeholder="Note">
+                </div>
+                <div class="col-sm-1">
+                    <a class="btn-check"><i class="fa fa-times"></i></a>
+                </div>`;
+            uploader.appendChild(newUploadDoc);
+            updateButtonState();
+          });
+        });
+
+        document.addEventListener("click", function (event) {
+          if (event.target.closest(".btn-check")) {
+            const uploadDoc = event.target.closest(".uploadDoc");
+            if (document.querySelectorAll(".uploadDoc").length > 1) {
+              uploadDoc.remove();
+              updateButtonState();
+            } else {
+              showSnackbar("You have to upload at least one document.", 'error');
+            }
+          }
+        });
+
+        $(".submitDocument").click(function () {
+          event.preventDefault(); // Prevent form submission
+          if (!hasFileInputs()) {
+            showSnackbar("You have to upload at least one document.", 'error');
+            return;
+          }
+          combineFilesToBase64().then((base64Batch) => {
+            // console.log('Combined Base64 Batch:', base64Batch);  "myClientNumber"
+
+            base64Batch.forEach((element) => {
+              const documentObject = {
+                type: "BANKSTM",
+                subDocumentType: "BS01",
+                clientNumber: myClientNumber,
+                contentType: "application/pdf",
+                content: element,
+              };
+
+              $.ajax({
+                type: "POST",
+                url: `${baseUrl}DocumentUpload/Applications/documents/Upload?applicationId=${applicationId}`,
+                data: documentObject,
+                success: function (response) {
+                  // Handle success response
+                  console.log(response);
+                 
+                  showSnackbar("Data submitted successfully!", 'success');
+                  removeLoader('.submitDocument', '.loader-1');
+                },
+                error: function (xhr, status, error) {
+                  // Handle error
+                  console.error(xhr.responseText);
+                  removeLoader('.submitDocument', '.loader-1');
+                  showSnackbar(xhr.responseText, 'error');
+              
+                },
+              });
+            });
+          });
+        });
+
+        // document.getElementsByClassName("submitDocument").addEventListener('click', function(event) {
+
+        //     });
+
+        // async function combineFilesToBase64() {
+        //     const fileInputs = document.querySelectorAll('.custom-file-input');
+        //     const base64Files = await Promise.all(Array.from(fileInputs).map(input => {
+        //         if (input.files.length > 0) {
+        //             return new Promise(resolve => {
+        //                 const reader = new FileReader();
+        //                 reader.onload = function(event) {
+        //                     resolve(event.target.result.split(',')[1]); // Get base64 string without the prefix
+        //                 };
+        //                 reader.readAsDataURL(input.files[0]);
+        //             });
+        //         }
+        //         return Promise.resolve(null);
+        //     }));
+
+        //     return base64Files.filter(Boolean).join(','); // Combine all base64 strings
+        // }
+
+        async function combineFilesToBase64() {
+          const fileInputs = document.querySelectorAll(".custom-file-input");
+          const base64Files = await Promise.all(
+            Array.from(fileInputs).map((input) => {
+              if (input.files.length > 0) {
+                return new Promise((resolve) => {
+                  const reader = new FileReader();
+                  reader.onload = function (event) {
+                    resolve(event.target.result.split(",")[1]); // Get base64 string without the prefix
+                  };
+                  reader.readAsDataURL(input.files[0]);
+                });
+              }
+              return Promise.resolve(null);
+            })
+          );
+
+          return base64Files.filter(Boolean); // Return an array of base64 strings
+        }
+
+        function uploadFileWithProgress(file, progressBar, inputElement) {
+          const formData = new FormData();
+          formData.append("file", file);
+
+          function simulateProgress(e) {
+            if (e.lengthComputable) {
+              const percentComplete = (e.loaded / e.total) * 100;
+              progressBar.style.width = percentComplete + "%";
+              progressBar.textContent = Math.round(percentComplete) + "%";
+              progressBar.closest(".progress-container").style.display =
+                "block";
+
+              if (percentComplete === 100) {
+                progressBar.classList.add("complete");
+                $(inputElement)
+                  .closest(".custom-file-input-container")
+                  .css("border", "1px solid #88BC47");
+              } else {
+                progressBar.classList.remove("complete");
+                $(inputElement)
+                  .closest(".custom-file-input-container")
+                  .css("border", "");
+              }
+            }
+          }
+
+          // Simulating progress
+          let simulatedProgress = 0;
+          const progressInterval = setInterval(function () {
+            if (simulatedProgress < 100) {
+              simulatedProgress += 50; // Simulate progress increment
+              simulateProgress({
+                lengthComputable: true,
+                loaded: simulatedProgress,
+                total: 100,
+              });
+            } else {
+              clearInterval(progressInterval);
+              console.log("File upload simulation completed");
+            }
+          }, 500);
+        }
+
+        document.querySelectorAll(".custom-file-input").forEach((input) => {
+          input.addEventListener("change", function () {
+            const file = this.files[0];
+            const progressBar = this.closest(
+              ".custom-file-input-container"
+            ).querySelector(".progress-bar");
+            if (file) {
+              updateFileName(this, file.name);
+              uploadFileWithProgress(file, progressBar, this);
+            }
+          });
+        });
+
+        function updateFileName(inputElement, fileName) {
+          const truncatedFileName =
+            fileName.length > 12 ? fileName.substring(0, 9) + "..." : fileName;
+          const fileNameElement = inputElement
+            .closest(".custom-file-input-container")
+            .querySelector(".file-name");
+          fileNameElement.textContent = truncatedFileName;
+          fileNameElement.style.display = "inline";
+          inputElement
+            .closest(".custom-file-input-container")
+            .querySelector(".custom-file-label").textContent = "Replace";
+        }
+      });
+
+      function allowOnlyDigits(event) {
+        event.target.value = event.target.value.replace(/[^0-9]/g, "");
+      }
+
+      document
+        .getElementById("CellPhoneInput")
+        .addEventListener("input", allowOnlyDigits);
+      document
+        .getElementById("SAIDInput")
+        .addEventListener("input", allowOnlyDigits);
+
+      document
+        .getElementById("SAIDInput")
+        .addEventListener("blur", function (e) {
+          validateField(e.target, 13);
+        });
+
+      document
+        .getElementById("CellPhoneInput")
+        .addEventListener("blur", function (e) {
+          validateField(e.target, 10);
+        });
+
+      function validateField(inputField, expectedLength) {
+        if (
+          inputField.value.length !== expectedLength ||
+          !/^\d+$/.test(inputField.value)
+        ) {
+          inputField.classList.add("is-invalid");
+          inputField.classList.remove("is-valid");
+        } else {
+          inputField.classList.add("is-valid");
+          inputField.classList.remove("is-invalid");
+        }
+      }
+    </script>
+    
+    <script>
+	var selDiv = "";
+		
+	document.addEventListener("DOMContentLoaded", init, false);
+	
+	function init() {
+		document.querySelector('#files').addEventListener('change', handleBulkFileSelect, false);
+		selDiv = document.querySelector("#selectedFiles");
+	}
+		
+	function handleBulkFileSelect(e) {
+		
+		if(!e.target.files || !window.FileReader) return;
+
+		selDiv.innerHTML = "";
+		
+		var files = e.target.files;
+		var filesArr = Array.prototype.slice.call(files);
+		filesArr.forEach(function(f) {
+			var f = files[i];
+			if(!f.type.match("image.*")) {
+				return;
+			}
+
+			var reader = new FileReader();
+			reader.onload = function (e) {
+				var html = "<img src=\"" + e.target.result + "\">" + f.name + "<br clear=\"left\"/>";
+				selDiv.innerHTML += html;				
+			}
+			reader.readAsDataURL(f); 
+		});
+		
+	}
+	</script>

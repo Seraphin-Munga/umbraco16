@@ -1,5 +1,794 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCredit>
+@using AcfAfricanbank.Core.Models.Forms
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models;
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
+	 var children = Model.Children;
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+     
+    var TabBody = heroBody.Children.Where(c => c.Name == "Tab Body").FirstOrDefault();
+    var TabBodycontent = TabBody.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+    var content = TabBodycontent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+int idIterator = 0;
 }
+
+    
+    
+<link rel="stylesheet" href="/css/projectmagic.css" />
+
+<style>
+
+/*hero section*/
+#videoContainer {
+    position: relative;
+    width: 100%;
+    height: 80vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    }
+
+#placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("/media/obhfxzoj/headers-4.jpg"),  center center;
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s;
+    }
+
+.gala-title {
+   font-weight: 200; 
+   font-size: 42px;
+    line-height: 1.2; 
+    margin-bottom: 20px;
+    }
+    
+.gala-span {
+    font-weight: 700; 
+    font-style: italic;
+    }
+
+#myButton {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    text-transform: uppercase;
+    padding: 10px 24px;
+    background-color: #5dc300;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: width 0.3s;
+    }
+
+.button-icon {
+        height: 28px;
+        width: 28px;
+        border: 1.5px solid #fff;
+        border-radius: 50%;
+        margin-left: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+#myButton.expanded {
+    min-width: 140px;
+    padding: 13px 24px;
+}
+
+.image-rounded {
+    border-radius: 10px;
+}
+
+/*the timeline styling*/
+    .full-height {
+      height: 600px;
+    }
+
+    .left, .right {
+      height: 100%;
+      padding: 2rem;
+    }
+
+    .left {
+      position: relative;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .text-content {
+        width: 80%;
+    }
+
+    .timeline-bar {
+      position: absolute;
+      bottom: 10px;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 3rem;
+      overflow-x: auto;
+    }
+
+    .timeline-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      position: relative;
+      margin: 0 5px;
+      padding: 3px;
+    }
+
+    .dot {
+      width: 14px;
+      height: 14px;
+      background: #002B5B;
+      border: 3px solid white;
+      border-radius: 50%;
+      box-shadow: 0 0 5px #3b5998;
+    }
+
+    .dot.active {
+      background-color: #002B5B;
+    }
+
+    .segment {
+      width: 40px;
+      height: 2px;
+      background-color: #ccc;
+    }
+
+    .segment.active {
+      background-color: #002B5B;
+    }
+
+    .thumbnail-img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .year-label {
+      font-size: 0.75rem;
+      color: #002B5B;
+      margin-top: 0.5rem;
+    }
+
+    .cta-button {
+      width: 36px;
+      height: 36px;
+      background: #6C0;
+      color: white;
+      font-size: 1.25rem;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    .right {
+      background: #002B5B;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .image-wrapper {
+      width: 100%;
+      height: 400px;
+      max-width: 600px;
+      border-radius: 2rem 0 0 2rem;
+      overflow: hidden;
+    }
+
+    .image-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+/*end of timeline styling*/
+
+.section-brown {
+    background: #f1f2ec;
+}
+
+.video-container {
+    position: relative;
+    width: 535px;
+    height: 535px;
+}
+
+
+
+#placeholderText h1 {
+    color: #fff !important;
+}
+
+
+
+
+.bg-gradient {
+ background: transparent linear-gradient(247deg, #031F4E 0%, #02214D 21%, #053975 44%, #074D92 60%, #2EAEDC 100%) 0% 0% no-repeat padding-box;
+}
+
+.heading-text {
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  text-align: center;
+}
+
+.heading-text span {
+  font-weight: 100;
+}
+
+ul {
+  list-style: none;
+}
+
+.color-brand-white {
+        color:#FFFFFF !important;
+    }
+    
+.color-brand-green{
+        color: #C4D82E !important;
+    }
+    
+h3{
+    color:#FFFFFF !important;
+}
+
+.cta-text {
+    font-size: 11px !important;
+    line-height: 1.5;
+    color:#FFFFFF !important;
+}
+
+.video {
+  position: relative;
+  height: 650px;
+  width: 100%;
+  background: #73AF96;
+}
+
+.video img {
+  opacity: .65;
+}
+
+.play {
+  height: 80px;
+  width: 80px;
+  position: absolute;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 100px;
+  /*Centering*/
+  
+  margin: -40px 0 0 -60px;
+  left: 50%;
+  top: 50%;
+  display: block;
+  background: #112768;
+  transition: background-color 0.5s ease;
+  color: white;
+}
+
+.play:hover {
+  background: #C31A1F;
+}
+
+.icon-play {
+  line-height: 80px;
+}
+
+.icon-play:before {
+  cursor: pointer;
+}
+
+/* Responsive image gallery rules begin*/
+
+.image-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.image-gallery > li {
+  flex-basis: 350px; /*width: 350px;*/
+  position: relative;
+}
+
+.image-gallery::after {
+  content: "";
+  flex-basis: 350px;
+}
+
+.image-gallery li img {
+  object-fit: cover;
+  max-width: 100%;
+  height: auto;
+  vertical-align: middle;
+  border-radius: 5px;
+}
+
+
+
+    /*cta styling*/
+        .section-cta {
+        display: flex;
+        align-items: center;
+        padding-top: 40px;
+        padding-bottom: 40px;
+        width: 100%;
+        min-height: 250px;
+        background:#222222;
+    }
+    
+    .image-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #fff !important;
+    }
+    
+ @@media (max-width: 767px){
+     #placeholder {
+        background-position: inherit !important;
+        }
+       
+        .timeline-bar {
+        justify-content: flex-start !important;
+        }
+        .full-height {
+            height: auto !important;
+        }
+        .text-content {
+            width: 100%;
+            margin-bottom: 62px !important;
+        }
+ }
+
+    @@media (max-width: 896px) {
+    
+    .video-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    }
+    
+    #myButton {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    text-transform: uppercase;
+    top: 70%;
+    padding: 10px 24px;
+    background-color: #B6D133;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: width 0.3s;
+    z-index: 10;
+    }
+    
+    .section-800 img {
+         max-width: 100% !important;
+        }
+    }
+    
+
+</style>
+@{
+        
+        foreach (var item in content){
+           var tabSubItemImage = item.Value<IPublishedContent>("tabSubItemImage")?.Url;
+           var title = item.Value<string>("tabSubItemTitle");
+           var description = item.Value<string>("genericCardContent");
+           List<Umbraco.Web.Models.Link> itemLink = new List<Umbraco.Web.Models.Link>();
+
+            foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)item.Value("tabSubItemLinks"))
+            {
+               itemLink.Add(link);
+
+            }
+            if (idIterator == 0)
+            {
+   <div id="videoContainer" class="md-text-center">
+                    <div id="placeholder">
+                        <div id="placeholderText" class="container">
+                            <div class="row d-flex align-items-center md-text-center">
+                                <div class="col-md-7">
+                                    <h1 class="color-brand-1 mt-15 mb-20">@title</h1>
+                                    <div>
+                                    @item.Value("tabSubItemTextContent")
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    </div>
+break;
+        }
+        idIterator += 1;
+        }
+        }
+     
+@*who we are section*@
+@{
+        
+        foreach (var item in content){
+           var tabSubItemImage = item.Value<IPublishedContent>("tabSubItemImage")?.Url;
+           var title = item.Value<string>("tabSubItemTitle");
+           var description = item.Value<string>("genericCardContent");
+           List<Umbraco.Web.Models.Link> itemLink = new List<Umbraco.Web.Models.Link>();
+
+            foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)item.Value("tabSubItemLinks"))
+            {
+               itemLink.Add(link);
+
+            }
+            if (idIterator == 1)
+            {
+            <section class="section pb-40 pt-40">
+                        <div class="container">
+                            <div class="row align-items-center row-change md-text-center">
+                                
+                                <div class="col-xl-12 col-lg-12 col-md-12">
+                                    <h1 class=" text-center color-brand-1 mt-15 mb-20">
+                                        @title
+                                    </h1>
+                                    @item.Value("tabSubItemTextContent")
+                                </div>
+                               
+                            </div>
+                       </div>
+            </section>
+            break;
+            }
+           idIterator += 1;
+        }
+    }
+
+                       @*timeline section*@
+  <div class="container-fluid sm:mb-40 mb-40">
+    <div class="row full-height">
+      <div class="col-sm-8 left">
+        <div class="text-content md-text-center">
+         <div style="color: #002B5B; margin-bottom: 1rem;">Our Journey over the years</div>
+        <h1 id="main-heading" class="color-brand-1 mt-15 mb-20 "></h1>
+        <h3 id="sub-heading" class="font-md color-brand-1 mt-20"></h3>
+        </div>
+        <div class="timeline-bar" id="timeline-bar"></div>
+      </div>
+      <div class="col-sm-4 right">
+        <div class="image-wrapper" id="image-display">
+          <img src="" alt="Default" />
+        </div>
+      </div>
+    </div>
+  </div>          
+
+<!-- Item slider end-->
+@{
+int iditerator1 = 0;
+        
+        foreach (var item in content){
+           var tabSubItemImage = item.Value<IPublishedContent>("tabSubItemImage")?.Url;
+           var title = item.Value<string>("tabSubItemTitle");
+           var description = item.Value<string>("genericCardContent");
+           List<Umbraco.Web.Models.Link> itemLink = new List<Umbraco.Web.Models.Link>();
+
+            foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)item.Value("tabSubItemLinks"))
+            {
+               itemLink.Add(link);
+                 
+            }
+            if (iditerator1 == 2)
+            {
+             <section class="section bg-grey-60 pb-40 pt-40">
+                       <div class="container">
+                            <div class="row d-flex flex-row-reverse align-items-center row-change md-text-center">
+                                <div class="col-xl-6 col-lg-6 col-md-6">
+                                    <h1 class="color-brand-1 mt-15 mb-20">
+                                        @title
+                                    </h1>
+                                   @item.Value("tabSubItemTextContent")
+                                   
+                                  @if (itemLink != null && itemLink.Any())
+                                   {
+                                    <div class="combo-btn">
+                                        <div class="mt-20 mb-20 text-start">
+                                             <p class="combo-btn-text primary"><a href="@itemLink[0].Url" class="btn  btn-brand-1 hover-up">@itemLink[0].Name</a></p>
+                                        </div>
+                                       
+                                    </div>
+                                    }
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6">
+                                    <img class="d-block image-rounded" src="/media/ciamxske/audacious-rewards.png" alt="image to be provided" />
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                   break; 
+            }
+            iditerator1 += 1; 
+        }
+    }
+
+       @{
+int iditerator2 = 0;
+        
+        foreach (var item in content){
+           var tabSubItemImage = item.Value<IPublishedContent>("tabSubItemImage")?.Url;
+           var title = item.Value<string>("tabSubItemTitle");
+           var description = item.Value<string>("genericCardContent");
+           List<Umbraco.Web.Models.Link> itemLink = new List<Umbraco.Web.Models.Link>();
+
+            foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)item.Value("tabSubItemLinks"))
+            {
+               itemLink.Add(link);
+                 
+            }
+            if (iditerator2 == 0 || iditerator2 == 1 || iditerator2 == 2)
+            {
+            
+            }
+            else if(iditerator2 == 3 || iditerator2 == 5){
+            <section class="section pb-40 pt-40">
+                        <div class="container">
+                            <div class="row d-flex align-items-center row-change md-text-center">
+                               
+                                
+                                <div class="col-xl-6 col-lg-6 col-md-6">
+                                    <h1 class="color-brand-1  mt-15 mb-20">
+                                      @title
+                                    </h1>
+                                   @item.Value("tabSubItemTextContent")
+                                   @if (itemLink != null && itemLink.Any())
+                                   {
+                                    <div class="combo-btn">
+                                        <div class="mt-50 text-start">
+                                             <p class="combo-btn-text primary"><a href="@itemLink[0].Url" class="btn  btn-brand-1 hover-up">@itemLink[0].Name</a></p>
+                                        </div>
+                                       
+                                    </div>
+                                    }
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6">
+                                    <img class="d-block image-rounded" src="@tabSubItemImage" alt="image to be provided" />
+                                </div>
+                            </div>
+                       </div>
+ </section>
+            }
+             else if(iditerator2 == 4 || iditerator2 == 6){
+              <section class="section bg-grey-60 pb-40 pt-40">
+                       <div class="container">
+                             <div class="row d-flex flex-row-reverse align-items-center row-change md-text-center">
+                                <div class="col-xl-6 col-lg-6 col-md-6">
+                                    <h1 class="color-brand-1 mt-15 mb-20">
+                                        @title
+                                    </h1>
+                                   @item.Value("tabSubItemTextContent")
+                                    @if (itemLink != null && itemLink.Any())
+                                   {
+                                    <div class="combo-btn">
+                                        <div class="mt-50 text-start">
+                                             <p class="combo-btn-text primary"><a href="@itemLink[0].Url" class="btn  btn-brand-1 hover-up">@itemLink[0].Name</a></p>
+                                        </div>
+                                       
+                                    </div>
+                                    }
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6">
+                                    <img class="d-block image-rounded" src="@tabSubItemImage" alt="image to be provided" />
+                                </div>
+                            </div>
+                        </div>
+                  </section>    
+             }
+             iditerator2 += 1; 
+        }
+            
+    }
+    
+<script>
+const years = ["1964", "1975", "1987/9", "1990/5", "1999/2014", "2017", "2017/19", "2022/23", "2024/5"];
+@{
+    int idtimeline = 0;
+    foreach (var item in content)
+    {
+        var cards = item.Value<IEnumerable<NCcard>>("genericCardContent");
+        if (idtimeline == 1)
+        {
+            <text>const images = [</text>
+            
+                int ir = 0;
+                foreach (var mycard in cards)
+                {
+                    var iconImage = mycard.Value<IPublishedContent>("nCcardIcon")?.Url;
+                    if (!string.IsNullOrEmpty(iconImage))
+                    {
+                        // Add comma after the first item
+                        if (ir > 0)
+                        {
+                            <text>,</text>
+                        }
+                        <text>
+  "@iconImage"</text>
+                        ir++;
+                    }
+                }
+            
+            <text>
+];</text>
+        }
+        idtimeline++;
+    }
+}
+
+
+           const content = [
+@{
+    int idtimeline1 = 0;
+    foreach (var item in content)
+    {
+        var cards = item.Value<IEnumerable<NCcard>>("genericCardContent");
+        if (idtimeline1 == 1)
+        {
+              foreach (var mycard in cards)
+{
+    var optiontitle = mycard.Value<string>("nCcardTitle");
+    var optiondesc = mycard.Value<string>("nCcardDescription");
+    <text>
+      { heading: '@optiontitle', subheading: '@optiondesc' }@(mycard != cards.Last() ? "," : "")
+    </text>
+}
+            
+        
+              }
+        idtimeline1++;
+    }
+}
+];
+      
+            
+@*const images = [
+  "/media/52qiio5k/newspaper.jpg",
+  "/media/55kg0gmk/unnamed-1.jpg",
+  "/media/snmprjfz/be193c7d-sp-raises-capitec-african-banks-national-rating.jpeg",
+  "/media/g5ipi3hl/south-african-reserve-bank-logo-png_seeklogo-347076.png",
+  "/media/g5ipi3hl/south-african-reserve-bank-logo-png_seeklogo-347076.png",
+  "/media/v0tjvlo2/ab-logo_stacked_png_transparent-1024x519.png",
+  "/media/x24hm2h1/it-pays-to-bank-with-african-bank-myworld_desktop.jpg",
+  "/media/dzfnvbja/unnamed.jpg",
+  "/media/ir1lvjya/screenshot_2024-10-28-14-58-31-426_com-brave_-browser-edit.jpg"
+];
+
+const content = [
+  {
+    heading: "YEAR 1964",
+    subheading: "An audacious idea is born.The bank's pioneers start a National Fund and encouraged Black people nationwide to contribute R100 a year. At the first meeting, only R70 was raise as seed.",
+  },
+  {
+    heading: "YEAR 1975",
+    subheading: "A decade-long R1 mil fundraising campaign culminated in AB being registered and the first branch opened in Garankuwa on the 31st of July.",
+  },
+  {
+    heading: "YEAR 1987/9",
+    subheading: "Bank experiences challenges resulting in curatorship and new CEO to replace Mr Maubane.",
+  },
+  {
+    heading: "YEAR 1990/5",
+    subheading: "The bank faces a second curatorship. The NBS and the NAI raised R100 mil to save the bank which they subsequently listed.",
+
+  },
+  {
+    heading: "YEAR 1999/2014",
+    subheading: "It’s BAU with a major acquisition of Ellerines. The acquisition creates a full-year loss of R6.8 billion on the JSE. SARB places the bank under curatorship.",
+  },
+  {
+    heading: "YEAR 2017",
+    subheading: "CEO Brian Riley announces a change in focus, transitioning from being a loan bank to a transactional bank.He steps down and Basani Maluleke takes over the baton in 2018.",
+  },
+  {
+    heading: "YEAR 2019/21",
+    subheading: "MyWorld hits the market, SARB announces the selling of its stake in AB but Basani resigns suddenly.KGB joins and launches Excelerate 25.",
+  },
+  {
+    heading: "YEAR 2022/23",
+    subheading: "KGB leadership strengthens the core through the acquisitions of Grindrod, Ubank, and later SasFin. Brand repositions from We Are You to Audacity to Believe. Launched sponsorships strategy. ATMs went live.",
+  },
+  {
+    heading: "YEAR 2024/5",
+    subheading: "MSection 55 received a green light from the Min of Finance - AB is back in business, the original mandate. The Employee Share Ownership Scheme is approved by shareholders in an extraordinary general meeting as AB continues its preparations for an Initial Public Offering (IPO). Gearing up to celebrate 50 years of audacity!",
+  }
+];
+*@
+let currentIndex = 0;
+
+function renderTimeline() {
+  const container = document.getElementById('timeline-bar');
+  container.innerHTML = '';
+
+  years.forEach((year, index) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'timeline-item';
+    wrapper.onclick = () => setActive(index);
+
+    const isActive = index === currentIndex;
+
+    if (isActive) {
+      const img = document.createElement('img');
+      img.src = images[index];
+      img.className = 'thumbnail-img';
+      wrapper.appendChild(img);
+    } else {
+      const dot = document.createElement('div');
+      dot.className = 'dot' + (index < currentIndex ? ' active' : '');
+      wrapper.appendChild(dot);
+
+      const label = document.createElement('div');
+      label.className = 'year-label';
+      label.textContent = year;
+      wrapper.appendChild(label);
+    }
+
+    container.appendChild(wrapper);
+
+    if (index < years.length - 1) {
+      const seg = document.createElement('div');
+      seg.className = 'segment' + (index < currentIndex ? ' active' : '');
+      container.appendChild(seg);
+    }
+  });
+
+  const nextWrapper = document.createElement('div');
+  nextWrapper.className = 'next-wrapper';
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'cta-button';
+  nextBtn.textContent = '➤';
+  nextBtn.onclick = () => goNext();
+  nextWrapper.appendChild(nextBtn);
+  container.appendChild(nextWrapper);
+}
+
+function setActive(index) {
+  currentIndex = index;
+  const data = content[index];
+  document.getElementById("main-heading").innerHTML = data.heading;
+  document.getElementById("sub-heading").textContent = data.subheading;
+  document.getElementById("image-display").innerHTML =
+    '<img src="' + images[currentIndex] + '" alt="Slide" />';
+  renderTimeline();
+}
+
+function goNext() {
+  currentIndex = (currentIndex + 1) % years.length;
+  setActive(currentIndex);
+}
+
+setActive(0);
+</script>            

@@ -1,5 +1,1010 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.BaseModernUI>
+@using CustomModels = Web.Models;
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using AcfAfricanbank.Core.Models.Forms
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
+	 var Children = Model.Children;
+	
+	 var heroShoulder = (HeroShoulderHome)Children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulderhome").FirstOrDefault();
+
+	  var herobody = Children?.Where(c => c is HeroBody).FirstOrDefault();
+	   var heroheader = Children?.Where(c => c is HeroHeader).FirstOrDefault();
+	 
+	 var headerImage_large = heroheader?.Value<IPublishedContent>("image")?.Url;
+	 var headerImage_Medium = heroheader?.Value<IPublishedContent>("imageMedium")?.Url;
+	 var headerImage_Small = heroheader?.Value<IPublishedContent>("imageSmall")?.Url;
+	  var headerImage_Last = heroheader?.Value<IPublishedContent>("video")?.Url;
+
+	  
+	  var sectioncard = herobody.Children.Where(c => c.Name == "FAQ").FirstOrDefault();
+      var sectioncardAfricanBank = sectioncard.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var sectioncards = sectioncardAfricanBank.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+      
+      var card = herobody.Children.Where(c => c.Name == "Benefits").FirstOrDefault();
+      var threecards = card.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var benefitscards = threecards.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+
+      
+      var homecard = sectioncard?.Children?.Where(c => c.Name == "First Card");
+      var homecards = homecard.Select(c => c as Card).ToList();
+      
+       var applyDocs = homecards?.Select(c => c as Card).FirstOrDefault();
+       var navigate = applyDocs.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").FirstOrDefault();
+      
+         
+         var navigate2 = applyDocs.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").Last();
+      
+      
+       ContentModels.TabBody createOwnWorldOfBanking = null;
+      var partialName = sectioncard.Value("PartialViewName");
+      createOwnWorldOfBanking = (TabBody)sectioncard;
+      
+       
+      
 }
+
+    <link rel="stylesheet" href="/css/projectmagic.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+            :root {
+        --color-dark: #000000;
+        --color-primary: #5DC300;
+        --color-secondary: #fff;
+        --font-color: #DDDDDD;
+        --font-light: #EEEEEE;
+        --font-paragraph-dark:#707070;
+        --card-bg: #222222;
+        --light-bg :#f2f2f2;
+        --font-blue:#5dc300;
+        --bg-color-dark:#0c0b0b;
+        
+    }
+        body{
+    overflow-x: hidden;
+}
+    .breadcrumb1 li {
+        color: #fff !important;
+    }
+       .tap2glassImage {
+            margin-top: -56px;
+       }
+       
+    .contact-us {
+        padding: 0px 12px;
+    }
+    
+    .mb-ticks {
+        margin-bottom: 12px;
+        color: #112768 !important;
+    }
+    .list-ticks li {
+    
+        color: #112768;
+        
+    }
+    .color-brand-1-2 {
+        color: #112768 !important;
+    }
+        
+          .stats-container {
+            display: flex;
+            margin-bottom:50px;
+            gap: 98px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .loan-summary-container{
+            margin-bottom: -60px;
+        }
+        .section6 {
+            padding-bottom: 4%;
+            padding-top: 4%;
+            background: #3BBCE2 !important;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .section8 {
+                display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .stats-card {
+            background-color: #000;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            width: 313px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .stats-card2 {
+                box-shadow: 0px 0px 15px 0px rgb(236 235 243 / 32%);
+                cursor: not-allowed;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-evenly;
+                align-items: center;
+                height: 200px;
+                width: 275px;
+                background-color: var(--card-bg);
+                border-radius: 21px;
+                margin: 1.5%;
+        }
+        
+        
+
+        .stats-card:hover {
+            transform: translateY(-10px);
+        }
+
+ .stats-card2:hover {
+            transform: translateY(-10px);
+        }
+        .parag {
+           color : white !important;
+        }
+
+        .breadcrumb1 li a {
+           color: #fff !important;
+        }
+        .breadcrumb1 li::after {
+            color: #fff !important;
+        }
+    
+    
+    
+    .section-bg-black{
+        background-color: var(--bg-color-dark);
+    }
+    .section-bg-white{
+        background-color: var(--color-secondary);
+    }
+    .section-bg-gray {
+       background-color: var(--card-bg); 
+    }
+    
+
+.section1-img-bg-image {
+    background-image: url('@headerImage_large');
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 100px 0; /* Adjust padding as needed */
+}
+.section2-img-bg-image {
+    background-image: url('@headerImage_Medium');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+     height: 194%;
+    padding: 100px 0; 
+}
+.section3-img-bg-image {
+    display:flex;
+    background-image: url('@headerImage_Small');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 240%;
+    padding: 100px 0;
+    justify-content: flex-start;
+    align-content: space-between;
+    flex-wrap: wrap;
+}
+.section4-img-bg-image {
+    display:flex;
+    background-image: url('@headerImage_Last');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 60%;
+    padding: 30px 0;
+    justify-content: flex-start;
+    align-content: space-between;
+    flex-wrap: wrap;
+    margin-bottom: -150px;
+    margin-top: -70px;
+}
+
+.ptb-60 {
+    padding: 60px 0px 0px 0px;
+}
+
+.stats-card3 {
+    box-shadow: 0px 0px 15px 0px rgb(236 235 243 / 32%);
+    cursor: not-allowed;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 150px;
+    width: 300px;
+    background-color: var(--card-bg);
+    border-radius: 21px;
+    margin: 1.5%;
+}
+
+.loan-summary-container {
+    position: relative;
+    top: 0px;
+}
+
+
+
+.stats-container2 {
+    display: flex;
+    justify-content: space-between;
+}
+
+footer .footer-social {
+    width: 48px;
+    height: 48px;
+    border-radius: 4px;
+    background-color: #000000;
+    border: solid 1px #ffffff;
+    box-shadow: 0 2px 1px 0 rgba(0, 0, 0, 0.03);
+    color: #ffffff;
+    padding: 15px;
+    margin-left: 10px;
+    text-align: center;
+    font-size: 18px;
+}
+
+footer .footer-copyright {
+    border-top: 1px solid #fff;
+    font-size: 9px;
+    margin-top: 60px;
+    padding-top: 30px;
+}
+
+
+footer{
+    background-color: black !important;
+}
+
+.color-brand-1{
+    color: #fff !important;
+}
+
+.color-brand-2{
+    font-size: 20px !important;
+}
+
+.color-brand-3{
+    font-size: 17px; !important;
+}
+
+.tab-category{
+   font-weight:bold;
+   text-align:left;
+}
+
+.tab-category {
+
+    margin: 20px 0px !important;
+
+}
+
+.ab-business-cards {
+    min-height: 180;
+    color: #002963;
+    margin-bottom: 10px;
+    width: 215px;
+    padding: 8px;
+    left: 3%;
+    background: #222222;
+    border-radius: 25px;
+    padding: 25px;
+    color: #fff;
+    cursor: pointer;
+    text-align: center;
+}
+
+.ab-cards {
+    margin-top: 4%;
+    width: 30%;
+}
+
+
+
+
+.ab-cards {
+    margin-bottom: 20px; /* Adjust as needed for vertical spacing */
+}
+
+.ab-business-cards {
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ab-business-cards .title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.ab-business-cards .descr {
+    font-size: 15px;
+    margin-top: 10px;
+}
+
+.ab-business-cards .button {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 20px;
+    color: #fff;
+    background-color: #5dc300;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.active {
+    text-decoration: underline;
+    color: #3BBCE2 !important;
+}
+
+.ab-business-cards .button:hover {
+    background-color: #4ba000;
+}
+
+.button {
+    background-color: #002b60;
+}
+
+
+.2section{
+    margin-left:20px !important;
+}
+
+/* Section-5/Accordion style start here*/
+               .accordion {
+                 font-weight: bold; /* Explicitly setting font-weight */
+                 font-family: Montserrat, sans-serif; /* Specifying the font family */
+                 background-color: #222222;
+                 color: #9b9b9b;
+                 cursor: pointer;
+                 padding: 18px;
+                 width: 100%;
+                 text-align: left;
+                 font-size: 15px;
+                 transition: 0.4s;
+                 border-radius: 50px;
+                 border: none;
+                 margin-bottom: 10px; /* Space between inactive accordion buttons */
+                 position: relative; /* Needed for absolute positioning of the arrow */
+               }
+               
+               .accordion::after {
+                 content: '\276F'; /* Heavy Chevron Unicode character */
+                 font-size: 15px; /* Adjust as needed */
+                 color: #F9F9F9;
+                 position: absolute;
+                 right: 20px;
+                 top: 50%;
+                 transform: translateY(-50%);
+                 transition: transform 0.4s;
+               }
+               
+              
+               
+               .active {
+                 color: #F9F9F9;
+                 border-radius: 30px 30px 0 0; /* Rounded corners on the top when active */
+                 margin-bottom: 0; /* Remove space between button and panel for active accordion */
+               }
+               
+               .active::after {
+                 transform: translateY(-50%) rotate(90deg);
+               }
+               
+               .panel {
+                 font-family: Montserrat, sans-serif; /* Specifying the font family */
+                 padding:  18px 18px 25px 18px;
+                 background-color: #222222;
+                 color : #F9F9F9;
+                 display: none;
+                 overflow: hidden;
+                 border-radius: 0 0 30px 30px;; /* Round the bottom corners */
+                 border-top: none; /* Remove the border top to make it seamless with the button */
+                 margin-top: -1px; /* This ensures that the panel sits flush with the button */
+                 box-shadow: inset 0 3px 6px #222222; /* Optional: inner shadow to mimic the button's inset */
+               }
+               
+                 .faqHeader {
+                   font: normal normal bold 42px/52px Montserrat;
+                   letter-spacing: 0px;
+                   color: #F9F9F9;
+                   opacity: 1;
+                   margin: 0 auto; /* This ensures that the margin is auto on both sides for block-level centering */
+                   padding: 20px 0; /* Adds some padding above and below the text */
+                 }
+               /*
+               Accordion style end here
+               */
+               
+               
+               .font-black{
+      color: #000 !important;
+}
+
+.font-white {
+    color:var(--color-secondary) !important;
+    font-weight: 400 !important;
+    font-family: "Montserrat", sans-serif !important;
+    line-height: 1.3;
+    font-size: 16px !important;
+}
+
+.section5 {
+   
+    padding-bottom: 1%; 
+    background: #181c20 !important;
+    text-align: center;
+    line-height: 0.2;
+}
+
+.section5 .combo-btn {
+    display: flex !important;
+    gap: 30px;
+    justify-content: flex-start;
+    align-content: flex-start;
+    align-items: flex-start;
+    margin-left: 200px;
+}
+
+.section6 .combo-btn{
+    text-align: center;
+}
+
+#doneRight .combo-btn {
+    display: flex !important;
+    align-items: center;
+    gap: 30px;
+    justify-content: center;
+}
+
+.ab-business-cards .combo-btn .column1 .btn.btn-brand-1 {
+    min-width: 150px !important;
+    height: 40px !important;
+    padding: 10px 0 !important;
+    font-size: 12px !important;
+    left: 14px;
+    position: relative;
+             
+}
+
+.btn.btn-brand-1{
+    background:#00A7D6 0% 0% !important;
+}
+
+
+.ab-business-cards .combo-btn .column1 .combo-btn-text::after {
+    font-size: 14px !important;
+    right: 6px !important;
+}  
+
+.mega-tabs .nav-tabs > li.active > a, .mega-tabs .nav-tabs > li.active > a:hover, .mega-tabs .nav-tabs > li.active > a:focus {
+    color: #3BBCE2;
+    border: none;
+}
+.mega-tabs .nav-tabs > li.loan-summary > a {
+    display: flex;
+    flex-direction: column;
+    color: #002b60;
+}
+.btn-app1 {
+    height: 25px;
+    <!--filter: brightness(0) saturate(100%) invert(73%) sepia(18%) saturate(747%) hue-rotate(150deg) brightness(94%) contrast(98%);-->
+    <!--transform: scale(1.2);-->
+}
+
+@@media (max-width: 890px) and (min-width: 320px) {
+    .tap2glassImageCenter {
+      display: flex;
+      justify-content: center; /* Horizontally centers the image */
+      align-items: center;    /* Vertically centers the image */
+      height: 100%; /* Ensure the parent div has a height to center vertically */
+}
+    
+    .combo-btn {
+        flex-direction: column !important;
+        gap: 0px;
+    }
+    .section4-img-bg-image {
+        height: auto !important;
+        margin-bottom: 0px !important;
+        margin-top: 0px !important;
+    }
+    .section5 .combo-btn {
+        display: flex !important;
+        justify-content: center;
+        align-items: center;
+        margin-left: 0px;
+    }
+}
+
+
+
+@@media (min-width: 992px) {
+    
+    
+    .ab-cards {
+        margin-right: 20px; /* Adjust as needed for horizontal spacing */
+    }
+    .ab-cards:last-child {
+        margin-right: 0; /* Remove margin from the last card */
+    }
+}
+@@media (max-width: 740px) {
+
+
+    p {
+        font-size: 12px;
+    }
+
+    .stats-container2 {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content:center;
+    }
+
+    .contact-us {
+        padding: 0px 12px 60px 12px;
+    }
+    
+    .tick-subheader{
+        margin-top: 20px;
+    }
+    .section4-img-bg-image {
+        height: auto !important;
+        margin-bottom: 0px !important;
+        margin-top: 0px !important;
+    }
+    .section5 .combo-btn {
+        display: flex !important;
+        gap: 0px;
+        align-items: center;
+        margin-left: 0px;
+    }
+    .stats-container {
+        gap: 0px;
+    }
+    footer ul li {
+        margin-top: 0px; 
+    }
+    footer {
+    font-size: 12px;
+    background-color: #002b60;
+    color: #fff;
+    padding: 0px 0 50px 0;
+    height: auto;
+    font-weight: 200;
+    overflow: hidden;
+}
+}
+
+
+
+@*new styles*@
+.mega-tabs .nav-tabs > li.loan-summary {
+    width: 50%;
+    }
+    .mega-tabs .nav-tabs>li.active:after{
+        transform:none;
+    }
+    
+    .mega-tabs .nav-tabs>li.active{
+      border-radius: 0px 0px 0 0;
+    }
+    
+    @@media (max-width: 767px) {
+    
+    .mega-tabs.hidden-lg.hidden-md.hidden-sm {
+    
+    margin-bottom: 60px;
+    text-align: center;
+    font-size: 16px;
+    position: relative;
+    z-index: 10;
+    margin-left: -20px;
+    margin-right: -20px;
+    overflow-y: scroll;
+     }
+}
+
+  @@media (min-width: 768px) and (max-width: 1121px) {
+    .stats-container {
+        display: flex;
+        margin-bottom: 50px;
+        gap: 0px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+        @@media (max-width: 768px) {
+            .stats-card {
+                width: 150px;
+            }
+
+            .icon {
+                font-size: 30px;
+            }
+
+            h3 {
+                font-size: 16px;
+            }
+
+            p {
+                font-size: 20px;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .stats-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .stats-card {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+        
+@*new end styles*@
+
+
+    </style>
+
+@* the fun starts here 
+
+ @Html.Partial("_pageModernHeaderv2", heroheader as ContentModels.HeroHeader)
+        <!--banner section-->
+  *@
+  
+<section class="section-500 ptb-150 section-bg-black section1-img-bg-image">
+    <div class="container">
+        <div class="row align-items-center flex-row-reverse d-flex row-change md-text-center">
+              @if (homecards!= null && homecards.Any())
+            {
+                
+           
+                foreach (Card benefit in homecards)
+                {
+                <div class="col-xl-6 col-lg-6 col-md-6">
+                    <div>@benefit.CardDescriptionLongText</div>
+                    <p class="mt-20 font-white">@benefit.CardTitle</p>
+                                        
+                </div>
+                 <div class="col-xl-6 col-lg-6 col-md-6">
+                    <img class="d-block" src="/media/ykmdrrme/bb2412_002_tap2glass_imagery1.png" alt="">
+                </div>
+                }
+            }
+        </div>
+    </div>
+</section>
+
+@{
+
+ string getTabName(string TabId) {
+            string tabName = "";
+            switch(TabId) {
+                case "1" :
+                tabName = "BusinessTransactionalAccount";
+                break;
+                case "2" :
+                tabName = "Tap2Glass";
+                break;
+              
+            }
+        
+            return tabName;
+            
+        }
+}
+
+@{
+    
+    if (heroShoulder != null)
+    {
+ <div class="loan-summary-container">
+            <div class="container">
+                <div class="mega-tabs" style="margin-top:0px;">
+                    <!-- Nav tabs -->
+                    <ul id="go_to_tab_content" class="nav nav-tabs eq-height" role="tablist">
+                        @{
+                            var isFirstRow = true;
+                            foreach (var item in heroShoulder.Items)
+                            {
+                                var tab = (HomeShoulderItem)item;
+                                <li role="presentation" class="@(isFirstRow ? "active" : "") loan-summary ">
+                                    <a href="#@getTabName(tab.TabId.Replace(" ", ""))" aria-controls="profile " role="tab" data-toggle="tab">
+                                        <img loading="lazy" src="@tab.TabIcon.Url" class="btn-app1"  alt="@tab.TabIcon.Value("altTag")" /> <span class="hidden-xs color-brand-1-2" style="font-weight:300" >@tab.TabName</span>
+                                    </a>
+                                </li>
+                                isFirstRow = false;
+                            }
+                        }
+                    </ul>
+                </div>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                             @{
+                                        bool isFirstTab = true;
+                                        foreach (HomeShoulderItem tab in heroShoulder.Items)
+                                        {
+                                           
+                                                    var item2 = tab.Value<IEnumerable<IPublishedElement>>("tabBodyContent").FirstOrDefault();
+                                                    var tabNamenew = getTabName(tab.TabId.Replace(" ", "").Replace(",", "").Replace("%", ""));
+                                            <div role="tabpanel" class="tab-pane @(isFirstTab ? "active" : "")" id="@getTabName(tab.TabId.Replace(" ", "").Replace(",", "").Replace("%",""))">
+                                                    @if (item2 != null)
+                                                    {
+                                                    
+                                                     var data = item2.Value<IEnumerable<IPublishedElement>>("sectionContent");
+                                                            
+                                                                foreach (var item in data)
+                                                                {
+                                                                  var title = item.Value<string>("tabSubItemTitle");
+                                        <div class="tab-category color-brand-1-2" style="display:block">
+                                          @title
+                                        </div>
+                                       
+                                       
+                                         @Html.Raw(item.Value<string>("tabSubItemTextContent"))
+                                        <div class="margin-top-80 hidden-xs color-brand-1-2"></div>
+								}
+								}
+							
+                            </div>
+                            isFirstTab = false;
+							}
+							}
+                           
+                            
+                          
+                </div>
+            </div>
+        </div>
+        }
+        }
+    
+<section  class="section-600" style="background:white" class="tab-pane" id="fees" display="none">
+            
+    <div class="row">
+        @foreach (var item in benefitscards)
+            {
+                @Html.Raw(item.Value<string>("mediumDescription"))    
+            }
+       
+    </div>
+
+</section>
+
+
+
+<section class="section-6 section-800 section-bg-black section4-img-bg-image" class="tab-pane" id="faq" display="none">
+        
+            <div class="container ">
+                 <h5 class="faqHeader">@createOwnWorldOfBanking.Value("partialViewClassName")</h5>
+                 
+           @foreach (var item in sectioncards)
+
+                    {
+                        var cardTitle = item.Value<string>("nCcardTitle");
+                       
+           
+                                 <button class="accordion">
+                                   @cardTitle
+                                 </button>
+                                 <div class="panel" style="display: none;">
+                                  @Html.Raw(item.Value<string>("mediumDescription"))
+                                 </div>
+                                 }
+           
+         
+             </div>
+    </section>
+								 
+								     
+
+
+<section class="section5 row" id="combo2btn" display="none">
+    <div class="combo-btn">
+    <div class="mt-50 text-start column1">
+    <p class="combo-btn-text primary"><a href="@navigate.Url" class="btn  btn-brand-1 hover-up">@navigate.Name</a></p>
+    </div>
+    <div class="mt-50 text-start column2">
+    <p class="combo-btn-text primary"><a href="@navigate2.Url" class="btn  btn-brand-1 hover-up" style="min-width: 260px;">@navigate2.Name</a></p>
+    </div>
+    </div>
+</section>
+@*
+<section id="doneRight">
+    <div class="section6 row">
+
+                    <div class="subsection5 col-lg-12 col-md-12 col-sm-12 col-xs-12">
+<div class="descr">
+<p style="font-size: 25px; color: #ffff;">BUSINESS BANKING <span style="font-weight: bold;">DONE RIGHT!</span></p>
+<p style="color: #ffff; margin-left: 14%; margin-right: 14%; font-weight: bold;">Get Business Banking that works with African Bank. We’re dedicated to supporting entrepreneurs, providing audacious, user-friendly banking solutions that foster growth and financial stability.</p>
+</div>                                <div class="image">
+                                </div>
+                    <div class="combo-btn">
+                    
+                        <div class="mt-50 text-start column2">
+                            <p class="combo-btn-text secondary"><a href="https://business-onboarding.africanbank.co.za/onboardingui" class="btn btn-brand-secondary hover-up">OPEN NOW</a></p>
+                        </div>
+                    </div>
+                          <a href="https://onboarding.grindrodbank.co.za/onboardingui/#/onboardingui/sign-in?redirectURL=%2Fclient%2Fportfolio" class="button primary section5-btn"> Open Now</a>
+                   </div>
+                
+    </div>
+</section >
+*@
+<section class="section-7 section-bg-black" id="tnc" >
+    <div class="section8">
+        <div class="row">
+            <div class=" terms col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <p style="color: #dddddd; font-size: 14px; font-weight: bold; margin-top: 50px; margin-bottom: 50px;">
+                <a style="color: #dddddd;" href="https://publishing.v5.stg.africanbankdmz.net/media/afaeomcm/african-bank-privacy-policy-final-19092018-pdf-1.pdf "</a>
+                    
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+    
+    @*
+<section class="section-7 section-bg-black">
+        <div class="section6">
+                 
+            <div class="row">
+                <div class=" terms col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    
+                     @Html.Raw(@herobody.Value("richTextBox")) 
+                </div>
+            </div>
+            
+    
+        </div>
+    </section>
+
+    *@
+    
+    
+<script>
+
+$(document).ready(function() {
+    // Accordion Functionality
+    $(".accordion").click(function() {
+        // Toggle the active class for the clicked accordion button
+        $(this).toggleClass("active");
+        
+        // Get the next panel related to this accordion
+        var panel = $(this).next(".panel");
+
+        // Check if the clicked panel is already open
+        var wasOpen = panel.is(":visible");
+
+        // Close all panels and remove the active class
+        $(".panel").slideUp();
+        $(".accordion").removeClass("active");
+
+        // If the clicked panel was not open, open it and add the active class
+        if (!wasOpen) {
+            panel.slideDown();
+            $(this).addClass("active");
+        }
+    });
+});
+
+
+
+  // Accordion Script end here
+
+    // tapscards
+$(document).ready(function() {
+            $('.tabcard').on('click', function() {
+                var target = $(this).data('target');
+                
+                if ($(target).hasClass('active')) {
+                    $(target).removeClass('active').slideUp();
+                } else {
+                    $('.tabcontent').removeClass('active').slideUp();
+                    $(target).addClass('active').slideDown();
+                }
+            });
+        });
+
+    // Accordion 4 active tsbs Script start here
+
+    $(document).ready(function () {
+                 
+                  var imageBgCss = "url('" + "/media/vnolspcn/pl_email_bb_op.png" + "')";
+                  var imageMdCss = "url('" + "/media/vnolspcn/pl_email_bb_op_med.gen.png" + "')";
+                  var imageSmCss = "url('" + "/media/vnolspcn/pl_email_bb_op.png" + "')";
+                  var CheckScreenSize;
+                  (CheckScreenSize = function () {
+                      
+                      var _width = $(window).outerWidth();
+                      var _height = $(window).outerHeight();
+                      if (_width <= 414) {
+                          $("#heroHeader").css("background-image", imageSmCss);
+                      }
+                      else {
+                          $("#heroHeader").css("background-image", imageBgCss);
+                      }
+                  })();
+                  $(window).resize(CheckScreenSize);
+              });
+              
+              
+$(document).ready(function () {
+    // Function to get the currently active tab
+    function getActiveTab() {
+        const activeTab = $('#go_to_tab_content li.active a');
+
+        if (activeTab.length) {
+            const activeTabId = activeTab.attr('href'); // The ID of the active tab content
+            const activeTabText = activeTab.find('span').text().trim(); // The text of the active tab
+            
+            return {
+                tabId: activeTabId,
+                tabText: activeTabText,
+            };
+        } else {
+            return null;
+        }
+    }
+
+    // Event listener for tab click
+    $('#go_to_tab_content a').on('click', function () {
+        // Wait for Bootstrap to process the tab change
+        setTimeout(() => {
+            const currentTab = getActiveTab();
+            if (currentTab) {
+                console.log('Tab Clicked!');
+                console.log('Active Tab ID:', currentTab.tabId);
+                console.log('Active Tab Text:', currentTab.tabText);
+                
+                // Example action based on the active tab
+                if (currentTab.tabId === '#Tap2Glass') {
+                    $("#fees, #faq, #combo2btn").show();
+                } else {
+                    $("#fees, #faq, #combo2btn").hide();
+                }
+            } else {
+                console.log('No active tab found');
+            }
+        }, 100); // Slight delay to ensure the active class updates
+    });
+
+    // Initial load: log the currently active tab
+    const initialTab = getActiveTab();
+    if (initialTab) {
+        console.log('Initial Active Tab ID:', initialTab.tabId);
+        console.log('Initial Active Tab Text:', initialTab.tabText);
+
+        // Example initial action based on the active tab
+        if (initialTab.tabId === '#BusinessTransactionalAccount') {
+            $("#fees, #faq, #combo2btn").hide();
+        }
+    } else {
+        console.log('No active tab found on load');
+    }
+});
+
+</script>
+
+
+
+

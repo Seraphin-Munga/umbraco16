@@ -1,5 +1,19 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.HeroFeet>
+@using ContentModels = Umbraco.Web.PublishedModels;
 @{
 	Layout = null;
+	// var childItems = Model.Children().Where(s => s is Testimonials).FirstOrDefault();
+	var childItems = (Testimonials)Model?.Children.Where(c => c is Testimonials).FirstOrDefault();
+	// var itemHeading = childItems.First().Value("testimonialHeading"); // childItems.Value("Testimonials");
+	
+	
 }
+
+
+@{
+    foreach (var testimonyItem in childItems.TestimonialItems)
+    {
+        <div> Hero Feet </div>
+    }
+}
+

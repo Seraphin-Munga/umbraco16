@@ -1,23 +1,56 @@
-﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
-@inject Umbraco.Cms.Core.Models.PublishedContent.IVariationContextAccessor VariationContextAccessor
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageHome>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Umbraco.Web.Models
 @{
     Layout = "Master.cshtml";
-    // Same approach as master.cshtml/Navigation.cshtml: untyped
-    // IPublishedContent/IPublishedElement API (IsDocumentType, Value<T>)
-    // instead of ModelsBuilder-generated classes (HomePageElements,
-    // HeroFeetHome, HomeShoulderItem, ...), since those types don't
-    // reliably exist depending on ModelsBuilder state.
-    var homePageElements = Model.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault();
-    var heroFeet = homePageElements?.Children(VariationContextAccessor).Where(c => c.IsDocumentType("heroFeet")).FirstOrDefault();
-    var bottomNavigation = homePageElements.Children(VariationContextAccessor).Where(c => c.IsDocumentType("bottomNavigation")).FirstOrDefault();
-    var testimonials = heroFeet?.Children(VariationContextAccessor).Where(c => c.IsDocumentType("testimonials")).FirstOrDefault();
+    
+// Fetch the content node with ID 18275 and its children
+var homePage = Umbraco.Content("18275");
 
-    var heroBodyBlog = homePageElements.Children(VariationContextAccessor).Where(x => x.IsDocumentType("heroBody")).FirstOrDefault();
-    var heroBodyBlogLink = heroBodyBlog.Children(VariationContextAccessor).Where(x => x.ContentType.Alias.ToLower() == "link").FirstOrDefault();
-    var lightbox = heroBodyBlog.Value("richTextBox").ToString();
+// Fetch specific child elements using Umbraco API
+var heroFeet = homePage.Children.FirstOrDefault(c => c.ContentType.Alias == "heroFeet") as HeroFeet;
+var bottomNavigation = homePage.Children.FirstOrDefault(c => c.ContentType.Alias == "bottomNavigation") as BottomNavigation;
+var testimonials = heroFeet?.Children.FirstOrDefault(c => c.ContentType.Alias == "testimonials") as Testimonials;
+var heroBodyBlog = homePage.Children.FirstOrDefault(c => c.ContentType.Alias == "heroBody") as HeroBody;
 
-    var tabs = heroBodyBlog?.Children(VariationContextAccessor).Where(c => c.ContentType.Alias.ToLower() == "tabbody").ToList();
-    IPublishedContent panelWarning = null;
+// Fetching specific content from the heroBodyBlog
+var heroBodyBlogLink = heroBodyBlog?.Children.FirstOrDefault(c => c.ContentType.Alias.ToLower() == "link");
+var lightbox = heroBodyBlog?.Value<string>("richTextBox");
+
+// Fetching content from specific children under heroBodyBlog
+var contentnew = heroBodyBlog?.Children.FirstOrDefault(c => c.Name == "TabContentNew");
+var nocontentnew = contentnew?.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+var nocontentnewsection = nocontentnew?.FirstOrDefault(c => c.ContentType.Alias == "nCTabGenericContent")?.Value<IEnumerable<IPublishedElement>>("sectionContent");
+
+// Fetching sliders under heroBodyBlog
+var slider = heroBodyBlog?.Children.FirstOrDefault(c => c.Name == "Home Sliders");
+var sliderBlog = slider?.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+var sliders = sliderBlog?.FirstOrDefault(c => c.ContentType.Alias == "nCTabGenericContent")?.Value<IEnumerable<IPublishedElement>>("sectionContent");
+
+// Fetching bankMenu content
+var bankMenus = slider?.Children.Where(c => c.ContentType.Alias.ToLower() == "card").OfType<Card>().ToList();
+
+// Fetching menu documents
+var menudocs = bankMenus?.Select(c => c as Card).FirstOrDefault();
+var bankmenulink = menudocs?.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink");
+
+
+    var tabs = (IEnumerable<IPublishedContent>)heroBodyBlog?.Children.Where(c => c.ContentType.Alias.ToLower() == "tabbody").ToList();
+
+        
+   int i = 0;
+    
+        
+    var connectcards = contentnew?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+    var connectcaards = connectcards.Select(c => c as Card).ToList();
+    
+   @*var bodyCards = heroBody.Children.Where(c => c.ContentType.Alias.ToLower() == "card");*@
+    var applyDocs = connectcards ?.Select(c => c as Card).FirstOrDefault();
+    var navigate = applyDocs.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink").FirstOrDefault();
+    var counter = 0;
+    
+       @*new code end*@ 
+    ContentModels.TabBody panelWarning = null;
     tabs.ToList().ForEach(x =>
     {
         var partialName = x.Value("partialViewName");
@@ -25,780 +58,2219 @@
         switch (partialName.ToString())
         {
             case "panelWarning":
-                panelWarning = x;
+                panelWarning = (TabBody)x;
                 break;
         }
     });
-    var panelItemWarning = panelWarning?.Value<IEnumerable<IPublishedElement>>("tabBodyContent").Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
-
-    var whatsNew = homePageElements.Children(VariationContextAccessor).Where(x => x.ContentType.Alias.ToString().ToLower() == "ebankititem2").FirstOrDefault();
-
-    Umbraco.Cms.Core.Models.Link itemLink = null;
-    foreach (var link in heroBodyBlogLink.Value<IEnumerable<Umbraco.Cms.Core.Models.Link>>("UrlLink"))
+    
+    IEnumerable<IPublishedElement> _panelItemWarning = null;;
+    if (_panelItemWarning != null)
     {
-        itemLink = link;
-        break;
+        foreach(var panelItem in tabs) 
+        {
+            if (panelItem.Value("partialViewName") == "panelWarning") 
+            {
+                panelWarning = (TabBody)panelItem;
+            }
+        }
+    }
+    if (panelWarning != null) 
+    {
+        _panelItemWarning = (IEnumerable<IPublishedElement>)panelWarning.TabBodyContent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value("sectionContent");
+    }
+    
+
+    Umbraco.Web.Models.Link itemLink = null;
+    if (heroBodyBlogLink != null)
+    {
+        foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)heroBodyBlogLink.Value("UrlLink"))
+        {
+            itemLink = link;
+            break;
+        }
     }
 
-    var heroFeetHome = heroFeet?.Children(VariationContextAccessor).Where(c => c.IsDocumentType("heroFeetHome")).FirstOrDefault();
 
-    // var disclaimersData = homePageElements.Children.Where(o => o.ContentType.Alias == "ebankITListSectionText").ToList();
+    var heroFeetHome = (HeroFeetHome)heroFeet?.Children.Where(c => c is HeroFeetHome).FirstOrDefault();
 
-    // var disclaimers = disclaimersData.FirstOrDefault().Children;
-    //IPublishedContent disclaimerValue = null;
-    //foreach (var content in disclaimers)
-    //{
-    //    if (HttpContext.Current.Request.Path.ToString().Contains("/banking"))
-    //    {
-    //        if (content.Value("ebankITTitle").ToString().Contains("Banking"))
-    //        {
-    //            disclaimerValue = content;
-    //        }
-    //    }
-    //    else
-    //    {
-    //        disclaimerValue = content;
-    //        break;
-    //    }
-    //}
+    @*
+    var disclaimersData = homePageElements.Children.Where(o => o.ContentType.Alias == "ebankITListSectionText").ToList();
+    var disclaimers = disclaimersData.FirstOrDefault().Children;
+    IPublishedContent disclaimerValue = null;
+    foreach (var content in disclaimers)
+    {
+        if (HttpContext.Current.Request.Path.ToString().Contains("/banking"))
+        {
+            if (content.Value("ebankITTitle").ToString().Contains("Banking"))
+            {
+                disclaimerValue = content;
+            }
+        }
+        else
+        {
+            disclaimerValue = content;
+            break;
+        }
+    }
+    *@
 
-    var viewName = "home"; //used mainly to identify the page (this view's own name - Server.MapPath/VirtualPath don't exist in ASP.NET Core)
+    var viewName = Path.GetFileNameWithoutExtension(Server.MapPath(VirtualPath)); //used mainly to identify the page
 }
 
-<style type="text/css">
+<link rel="stylesheet" href="/css/projectmagic.css" /> 
+<link href="~/css/loan-calculator.css" rel="stylesheet" />
+<link href="~/css/font-awesome.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css"/>
 
-
-    .center {
-        display: flex !important;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-    }
-
-    #lightbox {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: #00000095;
-        text-align: center;
-        display: none;
-        z-index: 2147483648;
-    }
-
-    #lb-content {
-        color: #222;
-        background-color: #fff;
-        position: relative;
-        text-align: center;
-        display: none;
-    }
-
-    #lb-close {
-        transition: 0.5s;
-        display: block;
-        background: rgba(34, 34, 34, 0.582);
-        color: #fff;
-        position: absolute;
-        top: 0px;
-        right: -15px;
-        cursor: pointer;
-        text-align: center;
-        padding: 9px;
-    }
-
-        #lb-close:hover {
-            transition: 0.5s;
-            background: #222;
-        }
-
-    .lightBox-image {
-        padding-left: 0px !important;
-        padding-right: 0px !important;
-    }
-
-    .lightBox-copy > h1 {
-        font-size: 26px;
-        font-weight: 900;
-        color: #002b60;
-    }
-
-    .lightBox-copy {
-        background: #fafafa;
-        padding-top: 15px;
-        padding-bottom: 25px;
-    }
-
-    #lb-content {
-        width: 80%;
-    }
-
-    .i_image {
-        width: 100%;
-        height: 203px;
-    }
-
-    .whatsnew-sibling {
-        display: block;
-    }
-
-    .bank-story-caption {
-        margin-left: 0px;
-    }
-
-    .whatsnew-title {
-        font-size: 30px;
-        font-weight: 200;
-        line-height: 1.18;
-        letter-spacing: -.7px;
-        margin-top: 10px;
-    }
-
-    .whatsnew-copy {
-        color: white;
-    }
-
-    .whatsnew {
-        text-align: center;
-        width: unset;
-        background: none;
-        margin-left: unset !important;
-        width: 50%;
-    }
-
-    @@media (min-width: 768px) {
-        #lb-content {
-            width: 500px;
-        }
-
-        .i_image {
-            height: 300px;
-        }
-    }
-    /* 1440 update */
-    @@media (min-width:768px) and (max-width:1025px) {
-        .whatsnew-sibling {
-            display: none !important;
-        }
-
-        .whatsnew {
-            width: 100%;
-        }
-    }
-
-    @@media only screen and (max-width: 767px) {
-        .top_extend {
-            background: linear-gradient(to top right, #555658, #939498) !important;
-        }
-
-        .whatsnew {
-            width: 100%
-        }
-
-        .bank-story-img {
-            position: absolute;
-            height: 450px;
-            background-size: cover;
-        }
-
-        .bank-story-caption {
-            margin-left: 0px;
-        }
-    }
-
-    @@media (max-width:900px) and (min-width:768px) {
-        .hero-container .carousel .item {
-            background-position: 100% 0%;
-        }
-    }
-
-    @@media (min-width: 1025px) and (max-width: 1239px) {
-        .bank-story-caption {
-            width: 50% !important;
-        }
-
-        .whatsnew {
-            width: 50%;
-        }
-    }
-
-    @@media (max-width: 1439px) and (min-width: 768px) {
-        .hero-caption {
-            width: 329px;
-        }
-
-        .top-header {
-            height: 400px;
-        }
-
-        .hero-caption {
-            margin-top: 92px;
-        }
-
-        .cap-title {
-            font-size: 25px;
-            line-height: normal;
-        }
-
-        .hero-caption .hero-title {
-            font-size: 17px;
-        }
-    }
-
-    @@media (max-width: 1400px) and (min-width: 530px) {
-        .hero-container .carousel .item {
-            height: 100%;
-            background-position: 80% 57%;
-        }
-    }
-
-    @@media (max-width: 1442px) and (min-width: 1440px) {
-        .hero-caption {
-            right: 119px;
-            width: 416px;
-        }
-
-        .hero-container .carousel .item {
-            background-size: contain;
-        }
-
-        .top-header {
-            height: 500px;
-        }
-
-        .hero-caption {
-            margin-top: 160px;
-        }
-
-        .cap-title {
-            font-size: 39px;
-        }
-    }
-
-    @@media (min-width: 768px) and (max-width: 1000px) {
-
-        .covidheader {
-            margin-top: 0px;
-        }
-    }
-
-    @@media (min-width: 1000px) and (max-width: 1200px) {
-
-        .covidheader {
-            margin-top: 0px;
-        }
-    }
-
-    @@media (min-width: 1200px) and (max-width: 1700px) {
-
-        .covidheader {
-            margin-top: 0px;
-        }
-    }
-
-    @@media only screen and (min-width: 1824px) {
-
-        .hero-caption {
-            padding-top: 34px;
-            margin-top: 236px;
-            padding: 36px;
-            color: #fff;
-            height: 565px;
-            position: absolute;
-            width: 489px;
-            right: 88px;
-        }
-    }
-    /* 1440 update */
-    @@media (max-width: 767px) {
-        .whatsnew-copy {
-            color: white;
-        }
-
-        .whatsnew {
-            width: unset;
-        }
-    }
-
-    @@media (min-width: 413px) and (max-width: 767px) {
-        background: grey !important;
-    }
-
-    @@media only screen and (max-width: 768px) {
-        .whatsnew {
-            width: unset;
-        }
-    }
-
-    @@media (max-width: 412px) {
-        .whatsnew-copy {
-            color: unset;
-        }
-
-        .whatsnew {
-            width: unset;
-        }
-    }
-
-    @@media (max-width: 360px) {
-        .whatsnew-copy {
-            color: white;
-        }
-
-        .whatsnew {
-            width: unset;
-        }
-    }
-</style>
 @*<input type="checkbox" class="theme-switch" id="theme-switch" />*@
+
+
+@*
+
 <input type="radio" class="theme-switch" name="theme-switch" id="theme-switch1">
 <label for="theme-switch1" class="switch-label">Light</label>
 <input type="radio" class="theme-switch" name="theme-switch" id="theme-switch2">
 <label for="theme-switch2" class="switch-label">Dark</label>
 
-<div id="myLittleForm">
-    <form action="#" method="post">
-        <input id="ename" type="text" />
-        <input id="submitInfo" type="submit" value="Submit" />
-    </form>
-</div>
+*@
+<style>
 
 
-<div id="page">
-    <div id="content">
-        <main>
-            <div>
-                @{
-                    @Html.Raw(panelItemWarning.First().Value("nCbodyDescription"))
+    
+
+
+.nav-modal-container .active {
+     text-decoration: none; 
+    color: #5dc300 0% 0%; !important;
+    text-wrap: nowrap;
+}
+.swiper {
+      width: 100%;
+      height: 100%;
+    }
+    .home-loan-calculator{
+        margin-top:-150px;
+    } 
+  @*  body{
+         background: #F2F2F2;
+    }
+
+   .white-backround{
+       background: #fff !important;
+   }*@
+
+    .swiper-slide {
+      font-size: 18px;
+      background: #fff;
+      width: 100% !important;
+
+      /* Center slide text vertically */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    
+.container-slider-title{
+        margin-left: 59px;
+}
+
+    .swiper-wrapper {
+      height: 85vh;
+      background: #000;
+    }
+    .swiper-pagination, .my-pagination {
+   position: absolute !important;
+    top: 71% !important;
+    transform: translateY(-50%) !important;
+    z-index: 10 !important;
+    display: inline-grid;
+    left: 3% !important;
+     width: 30px !important;
+    
+    justify-content: end;
+}
+    }
+    
+
+
+    .bank {
+      width: 550px;
+    }
+
+    .bank {
+      animation: slideLeft 2s linear;
+    }
+    
+     .my-container {
+      display:inline-block;
+      height: 95vh !important;
+      width: 100% !important;
+      overflow: hidden;
+    }
+
+    .banner-box-one {
+     position: absolute;
+    top: 44%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    width: 38%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    }
+
+    .line-sep {
+        border: 1px solid #808080;
+        opacity: 1;
+        margin-top: -100px;
+ 
+    }
+
+    select {
+        text-align-last: center;
+        padding-right: 30px;
+    }
+    
+    select > option {
+        background: #fff !important;
+    }
+    
+    .calculator-wrap {
+        background: #fff;
+
+    }
+
+    .page-title {
+        text-align: left;
+        @*padding: 10px;
+        width: 90%;*@
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        z-index: 1;
+    }
+    
+    .i-container {
+       margin-left: auto;
+       margin-right: auto;
+       margin-top: 0px;
+       height: 150px;
+ 
+    }
+
+    .page-title h1 {
+      font-weight: 800;
+      color: #002B60;
+      margin-top: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .page-title h1 > span {
+        color: #1E9FF2;
+    }
+    
+    .page-title h3 {
+        font-size: 14px;
+        font-weight: bold;
+        line-height: 16px;
+        color: #011420;
+        padding: 0px 20px;
+    }
+    
+    .page-title h3 > span {
+        border-bottom: solid 3px #1E9FF2;
+    }
+    
+    .calculator-form > label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #011420;
+        margin-bottom: 0px;
+        width: 300px;
+        text-align: left;
+    }
+    
+    .calculator-form > input, .calculator-form > select {
+        padding: 0px 20px;
+        border-radius: 25px;
+        border: none;
+        outline: none;
+        -webkit-outline: none;
+        width: 100%;
+        height: 50px;
+        margin-top: 10px;
+        margin-bottom: 30px;
+        font-size: 24px;
+        
+    }
+    
+    .calculator-form input {
+        font-size: 24px;
+        font-weight: 300;
+        color: #000000;
+    }
+    
+    @*.calculator-form select {
+        font-size: 24px;
+        font-weight: 600;
+        color: #000000;
+        background: #fff;
+    }*@
+    
+.calculator-form > select {	
+	transition:0.35s;
+	background: #fff url("/media/1pzbuq4v/dropdown-select.svg") center;
+	background-position:93% 50%;
+	background-repeat: no-repeat;
+	-webkit-appearance: none;
+	color: #000000;
+	}
+
+.calculator-form > select.active{
+	transition:0.35s;
+	background: #fff url("/media/kw5nb3e2/dropdown-select-up.svg") center;
+	background-position:93% 50%;
+	background-repeat: no-repeat;
+	-webkit-appearance: none;
+}
+
+.calculator-form > select:hover {
+	cursor:pointer;
+	box-shadow: 0px 5px 5px #0000000a;
+}
+  
+
+.artwork {
+	text-align: center;
+	vertical-align: middle;
+	left:0;
+}
+
+.i-loader {
+	width: 100%;
+	text-align: center;
+	padding: 50px;
+	display: none;
+}
+
+.artwork  img{
+	width:260px
+}
+
+.calculator-form {
+	text-align:center;
+}
+
+.calculator-form > label {
+	font-family: 'Montserrat', sans-serif;
+	font-size: 14px;
+    font-weight: 900;
+    color: #002B60; 
+    margin-bottom: 0px;
+    width: 300px;
+    text-align: left;
+
+}
+.calculator-form input {
+	font-size:24px;
+	font-weight:900;
+	font-family: 'Montserrat', sans-serif;
+}
+
+.calculator-form > input::placeholder {
+	font-size:14px;
+	font-weight:500;
+}
+
+.calculator-form > input:focus {
+	transition:0.5s;
+	border: 2px solid #259CD8;
+	background: #fff;
+}
+
+
+button { cursor: pointer; text-transform:uppercase; }
+
+.primary-btn {
+
+	width: 220px;
+	transition: 0.5s;
+	background: #C4D82E;
+	padding: 15px 25px;
+	height: 50px;
+	border-radius: 25px;
+	text-align: center;
+	font-size: 14px;
+	font-weight: 500;
+cursor:pointer}
+
+.primary-btn a {
+		text-decoration: none;
+	color:#fff;
+}
+.primary-btn:hover{
+	transition: 0.5s;
+	background: #C4D82E;
+}
+
+.primary-ghost-btn {
+transition: 0.5s;
+    padding: 9px 14px;
+    width: 220px;
+    height: 50px;
+    border-radius: 25px;
+    margin: 10px auto;
+    font-size: 14px;
+    font-weight: 600;
+    outline: none;
+    -webkit-outline: none;
+    background: #C4D82E;
+    color: #fff;
+    text-transform: uppercase;
+	cursor: pointer;
+	
+}
+
+.primary-ghost-btn:hover {
+	transition: 0.5s;
+	background: #00285B;
+	color: #fff;
+	box-shadow: 0px 10px 20px #0000045;
+}
+
+.investment-results {margin-bottom: 35px;box-shadow: 0px 10px 14px #00000045; border-radius:10px; overflow: hidden; 
+position: absolute; left:-5000px}
+
+.your-return-chosen {
+	background: #fff;
+	padding:20px;
+	padding-bottom: 45px;
+}
+
+.your-return-chosen > h2 {
+	font-size: 18px;
+	font-weight: 900;
+	color: #23273C; 
+	margin-top: 20px;
+}
+
+.big-return {
+	font-size: 42px;
+	font-weight: 900;
+	color: #C4D82E;
+	    margin: 0px;
+    padding: 0;
+    line-height: 1;
+}
+
+.return-inv-term {
+	font-size: 16px;
+	font-weight: 500;
+	color: #23273C !important;
+}
+
+.other-returns {
+	padding:20px;
+	background: #F8F8F8;
+}
+
+.other-returns > h3 {
+	font-size: 16px;
+	font-weight: 700;
+	color: #000E16;
+	margin: 15px auto 20px;
+}
+.other-inv-title {
+	font-size: 14px;
+	font-weight: bold;
+	margin: 0px;
+	color: #000000 !important;
+}
+
+.big-return-other {
+	color: #C4D82E !important;
+	font-size:20px;
+	font-weight: bold;
+	margin: 0px;
+}
+.other-inv-term {
+	font-size: 12px;
+	font-weight: normal;
+	margin: 0px;
+	color: #011420 !important;
+	
+}
+
+.inv-other-ico {
+    float: left;
+    width: 62px;
+    margin-right: 10px;
+}
+
+.other-inv {
+	transition: 0.5s;
+	margin-bottom: 20px;cursor: pointer;
+}
+
+.other-inv:hover {
+	background: #00000009;
+	box-shadow: 0px 5px 10px #00000009;
+	padding: 2px;
+	transition: 0.5s;
+}
+
+.investment-calculator h3 {
+    color: #000000;
+}
+
+.big-return {
+    color: #C4D82E !important;
+ 
+}
+
+.loan-disclaimer {
+    text-align: left;
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+.terms-con > a {
+    float: left;
+    color: #000000;
+    font-size: 14px;
+}
+
+.col-xs-1 {
+    width: 10%;
+    margin-left: 15px;
+}
+
+.col-1 {
+    margin-top: -15px;
+    margin-bottom: 15px;
+    color: #000000;
+}
+
+.col-2 {
+    margin-top: -34px;
+    margin-bottom: 15px;
+    color: #000000;
+}
+
+.loan-range {
+    background: #002B60;
+}
+
+.loan-range:hover {
+    background-color: #002B60;
+}
+
+#input-Amount1 {
+    color: #0D1622;
+}
+
+#installment_calc1 {
+     color: #002B60;
+}
+
+@*//*@
+
+.investment-calculator p {
+    color: #212529 !important; 
+    font-size: 2.1rem;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+.hheader{
+	background: #EFEFEF url("investment -banner.svg");
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-attachment: fixed;
+	    height: 240px;
+    padding-top: 120px;
+}
+
+.loan-calc-wrap {	
+	text-align: center;
+	background: #FAFAFA;
+	padding: 15px;
+	border-radius: 10px;
+	box-shadow: 0px 10px 14px #0000000;
+}
+
+.flex-center-all{
+	display:flex;
+	align-items: center;
+}
+
+.page-title{
+	@*padding:25px;*@
+}
+
+.page-title h1 > span {
+	color:#1E9FF2;
+}
+
+.page-title h3 {
+	font-size: 14px;
+	font-weight: bold;
+	line-height: 16px;
+	color:#011420;
+	padding: 0px 20px;
+}
+
+.page-title h3 > span {
+	border-bottom: solid 3px #1E9FF2;
+	
+}
+
+.arrow-right {
+    color: #5dc300 !important;
+}
+
+.card-offer:hover .box-button-offer .arrow-right {
+    color: #fff !important;
+}
+
+.calculator-wrap {
+	background: #EFEFEF url("/media/txqc2lob/money-icons-desktop-bg.svg");
+	background-size: contain;
+	background-attachment: scroll;
+	background-repeat: no-repeat;
+	background-position: 20% 50%;
+	z-index: -1;
+    @*position: absolute;*@
+    width: 100%;
+    margin-top: -500px;
+    padding-top: 360px;
+}
+
+.investment-calculator{
+	margin:100px auto;
+	background: none;
+	padding-left: 0px;
+    padding-right: 0px;
+}
+
+.artwork {
+	text-align: center;
+	vertical-align: middle;
+	left:0;
+}
+
+.loader {
+	width: 100%;
+	text-align: center;
+	padding: 50px;
+	display: none;
+}
+
+.artwork  img{
+	width:260px
+}
+
+
+.calculator-form > label {
+	
+	font-size: 18px;
+    font-weight: bold;
+    color: #002b60;
+    margin-bottom: 0px;
+    width: 100%;
+    text-align: left;
+
+}
+.calculator-form input {
+	font-size:21px;
+	font-weight:bold;
+}
+
+.calculator-form > input::placeholder {
+	font-size:14px;
+	font-weight:600;
+	color: #696969;
+}
+
+
+.calculator-form > input:focus {
+	transition:0.5s;
+	border: 2px solid #259CD8;
+}
+
+
+button { cursor: pointer;}
+
+.primary-btn {
+
+	width: 220px;
+	transition: 0.5s;
+	background: #88BC47;
+	padding: 15px 25px;
+	height: 50px;
+	border-radius: 25px;
+	text-align: center;
+	font-size: 14px;
+	font-weight: 500;
+    cursor:pointer
+}
+
+.primary-btn a {
+		text-decoration: none;
+	color:#fff;
+}
+.primary-btn:hover{
+	transition: 0.5s;
+	background: #65922B;
+}
+
+.primary-ghost-btn {
+transition: 0.5s;
+    border: solid 2px #88bc47;
+    padding: 9px 14px;
+    width: 220px;
+    height: 50px;
+    border-radius: 25px;
+    margin: 10px auto;
+    font-size: 14px;
+    font-weight: 600;
+    outline: none;
+    -webkit-outline: none;
+    background: #88bc47;
+    color: #fff;
+	cursor: pointer;
+}
+
+.primary-ghost-btn:hover {
+	transition: 0.5s;
+	background: #88bc47;
+	color: #fff;
+	box-shadow: 0px 10px 20px #0000045;
+}
+
+.investment-results {margin-bottom: 35px;box-shadow: 0px 10px 14px #00000045; border-radius:10px; overflow: hidden; 
+position: absolute; left:-5000px}
+
+.your-return-chosen {
+	background: #fff;
+	padding:20px;
+	padding-bottom: 45px;
+}
+
+.your-return-chosen > h2 {
+	font-size: 18px;
+	font-weight: 900;
+	color: #23273C; 
+	margin-top: 20px;
+}
+
+.big-return {
+	font-size: 42px;
+	font-weight: 900;
+	color: #C4D82E;
+	    margin: 0px;
+    padding: 0;
+    line-height: 1;
+}
+
+.return-inv-term {
+	font-size: 16px;
+	font-weight: 500;
+	color: #23273C;
+}
+
+.other-returns {
+	padding:20px;
+	background: #F8F8F8;
+}
+
+.other-returns > h3 {
+	font-size: 16px;
+	font-weight: 700;
+	color: #000E16;
+	margin: 15px auto 20px;
+}
+.other-inv-title {
+	font-size: 14px;
+	font-weight: bold;
+	margin: 0px;	
+}
+
+.big-return-other {
+	color: #C4D82E;
+	font-size:20px;
+	font-weight: bolder;
+	margin: 0px;
+}
+.other-inv-term {
+	font-size: 12px;
+	font-weight: normal;
+	margin: 0px;
+	
+}
+
+.inv-other-ico {
+    float: left;
+    width: 62px;
+    margin-right: 10px;
+}
+
+.other-inv {
+	transition: 0.5s;
+	margin-bottom: 20px;cursor: pointer;
+}
+
+.other-inv:hover {
+	background: #00000009;
+	box-shadow: 0px 5px 10px #00000009;
+	padding: 2px;
+	transition: 0.5s;
+}
+
+.your-return-chosen {
+	background: #fff;
+	padding:20px;
+	padding-bottom: 45px;
+}
+
+.your-return-chosen > h2 {
+	font-size: 18px;
+	font-weight: 900;
+	color: #23273C; 
+	margin-top: 20px;
+}
+
+.big-return {
+	font-size: 42px;
+	font-weight: 900;
+	color: #C4D82E;
+	margin: 0px;
+    padding: 0;
+    line-height: 1;
+}
+
+.return-inv-term {
+	font-size: 16px;
+	font-weight: 500;
+	color: #23273C !important;
+}
+
+.other-returns {
+	padding:20px;
+	background: #F8F8F8;
+}
+
+.other-returns > h3 {
+	font-size: 16px;
+	font-weight: 700;
+	color: #000E16;
+	margin: 15px auto 20px;
+}
+.other-inv-title {
+	font-size: 14px;
+	font-weight: bold;
+	margin: 0px;
+	color: #000000 !important;
+}
+
+.big-return-other {
+	color: #C4D82E !important;
+	font-size:20px;
+	font-weight: bold;
+	margin: 0px;
+}
+.other-inv-term {
+	font-size: 12px;
+	font-weight: normal;
+	margin: 0px;
+	color: #011420 !important;
+	
+}
+
+    .cta-button {
+        text-align: center;
+    }
+    
+
+.inv-other-ico {
+    float: left;
+    width: 62px;
+    margin-right: 10px;
+}
+
+.other-inv {
+	transition: 0.5s;
+	margin-bottom: 20px;cursor: pointer;
+}
+
+.other-inv:hover {
+	background: #00000009;
+	box-shadow: 0px 5px 10px #00000009;
+	padding: 2px;
+	transition: 0.5s;
+}
+
+.investment-calculator h3 {
+    color: #000000;
+}
+
+.big-return {
+    color: #C4D82E !important;
+ 
+}
+
+.loan-disclaimer {
+    text-align: left;
+    font-size: 14px !important;
+    color: 	#808080 !important;
+    margin-top: 15px;
+}
+
+.terms-con > a {
+    float: left;
+    color: #000000;
+    font-size: 14px;
+    margin-top: -10px;
+}
+
+
+#input-Amount1 {
+    text-align: center;
+    color: #000000;
+    background: #fff;
+}
+
+#installment_calc1 {
+     color: #002B60;
+     background: #fff;
+     text-align: center;
+}
+
+
+
+.line-sep {
+    border: 1px solid #808080;
+    opacity: 1;
+    margin-top: 0px;
+
+}
+
+.loan-range {
+    background: #002B60;
+}
+
+.loan-range:hover {
+    background-color: #002B60;
+}
+
+.bank-title {
+     font-size: 44px;
+    letter-spacing: 0px;
+    font-weight: 400;
+    color: #112768;
+    }
+
+    .bant-subtitle {
+      font: italic normal 600 46px / 57px Montserrat;
+      letter-spacing: 0px;
+      color: #5dc300 !important;
+    }
+
+    .swiper-pagination-bullet {
+      width: 8px !important;
+      height: 24px !important;
+      background: #666666 0% 0% no-repeat padding-box !important;
+      border-radius: 20px !important;
+      opacity: 0.3;
+    }
+
+    .swiper-pagination-bullet-active {
+      width: 8px !important;
+      height: 48px !important;
+      background: #5dc300 0% 0% no-repeat padding-box !important;
+      border-radius: 20px !important;
+      opacity: 1;
+    }
+
+    .swiper-pagination-horizontal {
+    height: 100px !important;
+    margin-top: -51px !important;
+    }
+
+    .bank-menu {
+  
+         height: 142px;
+    background: #002a60 0% 0% no-repeat padding-box;
+    border-radius: 0px 100px 100px 0px;
+    position: relative;
+    z-index: 10;
+      bottom: 12em;
+
+    }
+    .bank-menu::before {
+    content: "";
+    position: absolute;
+    width: 100%; /* Adjust width as needed */
+    height: 100%; /* Adjust height as needed */
+    background-color: #002a60; /* Change color as needed */
+  
+       left: -1169px !important;
+    top: 0;
+    z-index: -1;
+}
+
+    
+    .bank-sub-menu {
+      width: 550px;
+      height: inherit; /* Inherit the height from bank-menu */
+    }
+    .bank-menu-icons {
+      padding: 21px;
+    }
+    
+    .bank-menu-icons a {
+      text-decoration: none!important;  
+    }
+
+
+
+    .slider-image {
+  
+      transform: translate(-50%, -50%);
+      z-index: 10;
+   
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+          margin-top: 46em;
+    margin-left: 41em;
+    }
+    
+    
+
+
+             /*modal css start here*/
+     
+.lineUp {
+  animation: 1s anim-lineUp ease-in ;
+}
+@@keyframes anim-lineUp {
+  0% {
+    opacity: 0;
+    transform: translateY(80%);
+  }
+  20% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(0%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0%);
+  }
+}
+
+
+     .nav-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 20;
+    }
+
+
+    .nav-modal {
+      display: none;
+      flex-direction: column;
+      width: 500px;
+      height:220px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+      z-index: 3;
+      border-radius: 30px 30px 30px 30px;
+      position: relative;
+    }
+    
+    .nav-modal-container {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav-modal-header {
+      display: flex;
+      background-color: white;
+      color: #128C7E;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      border-radius: 25px;
+    }
+
+    .nav-modal-tab {
+      flex: 1;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      font-weight: normal;
+      font-size: 14px;
+      color: grey;
+      background: white;
+      padding: 10px;
+    }
+
+    .nav-modal-tab.active {
+      background-color: #fff;
+      color: #0D0D0D;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .nav-modal-tab.active::after {
+      content: '';
+      display: block;
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 50%;
+      height: 2px;
+      background-color: #88BC47;
+      transform: translateX(-50%);
+    }
+
+    .nav-modal-tab-content {
+      display: none;
+      padding: 67px;
+      border-radius: 0 0 30px 30px;
+    }
+    
+     .nav-modal-tab-content1 {
+      padding: 67px;
+    }
+
+
+    .nav-modal-tab-content.active {
+      display: block;
+    }
+   
+    .text-with-icon {
+      display: flex;
+      align-items: center;
+    }
+
+  
+    .redirect-Text  {
+        transition: transform .2s; 
+        font-weight:bold;
+        color:#021A44;
+      
+    }
+    
+    .redirect-Text:hover { 
+  -ms-transform: scale(1.2); /* Adjust the scale value as needed */
+  -webkit-transform: scale(1.2); /* Adjust the scale value as needed */
+  transform: scale(1.2); /* Adjust the scale value as needed */
+		} 
+    
+    .long-Text{
+        margin-bottom: 16px;
+         font-size: 13px;
+         color:#010101;
+         margin-top: -16%;
+    }
+        .long-Text2{
+        margin-bottom: 16px;
+        font-size: 20px !important;
+        color: #112768 !important ;
+        margin-top: -16%;
+        font-weight: 700;
+        font-size: 29px;
+        line-height: 1.2;
+
+    }
+    
+    .grid-container-element { 
+        padding-top:2%;
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    width: 100%; 
+    } 
+    .grid-child-element {
+        margin-top: -9px;
+    }
+
+
+.modal-Icon{
+    padding-left: 35px;
+    padding-top:3.5%;
+}
+
+    .close-button 
+    {
+    -top: -22px;
+    right: -21px;
+
+  
+        
+    }
+
+
+.close-btn-bg-dot {
+  height: 25px;
+  width: 25px;
+  background-color: #fff;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+
+.nav-modal-close-btn{
+  height: 0px;
+  line-height: 0px;  
+  width: 0px;  
+  font-size: 2em;
+  font-weight: bold;
+  color:white;
+  border-radius: 50%;
+  background-color: white;
+  text-align: center;
+  cursor: pointer;
+}
+
+.nav-modal-flex-container {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.circle-background {
+   top: -18px;
+    cursor: pointer;
+    position: absolute;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 32px;
+    font-size: 40px;
+   }
+
+
+@@media only screen and (max-width: 530px) {
+    
+    .nav-modal-tab.active::after {
+      content: '';
+      display: block;
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 85%;
+      height: 2px;
+      background-color: #88BC47;
+      transform: translateX(-50%);
+    }
+    
+    .nav-modal {
+      width: 90%;
+      max-width: 400px; /* You can adjust this value as needed for the modal width */
+      height: auto;
+      padding: 20px;
+    }
+
+    .nav-modal-header {
+      padding: 10px;
+    }
+
+    .nav-modal-tab {
+      padding: 8px;
+      font-size: 14px;
+    }
+
+    .nav-modal-tab-content {
+      padding: 20px;
+    }
+
+    .grid-container-element {
+      grid-template-columns: 1fr 1fr;
+       cursor: pointer;
+    }
+
+    .modal-Icon {
+      padding-top: 5%;
+      padding-left: 100%;
+    }
+
+    .close-button 
+    {
+    
+    right: -17px;
+    top: -12px;
+    }
+
+    .nav-modal-close-btn{
+      color:black;
+      cursor: pointer;
+    }
+.circle-background {
+top: -26px;
+    cursor: pointer;
+    position: absolute;
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    background-color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    font-size: 33px;
+     
+    }
+    .redirect-Text {
+        font-size: 15px;
+    }
+    .long-Text{
+         
+         font-size: 13px;
+         color:#010101;
+         margin-top: -8%;
+    }
+  }
+
+
+@@media (min-width: 768px) and (max-width: 1199px){
+.dropdown-container.navbar-default .navbar-nav>li:first-child>a {
+    padding-left: 30px !important;
+}
+   } 
+    /*modal css end here*/
+  
+    
+    @@media (min-width: 768px) and (max-width: 1024px) {
+    .slider-image {
+  
+        position: absolute;
+        top: 73%;
+        
+              margin-top: 0 !important;
+    margin-left: 0 !important;
+    }
+    
+ 
+}
+
+@@media (max-width: 768px) {
+   .slider-image {
+  
+        position: absolute;
+        top: 80%;
+        
+              margin-top: 0 !important;
+    margin-left: 0 !important;
+    }
+    
+  
+
+}
+
+
+.bank-menu-icons {
+    padding: 16px !important;
+}
+
+
+    
+ @@keyframes slideLeft {
+      0% {
+        transform: translateX(-90%);
+      }
+    }
+
+
+/****Media Query For Loans****/
+
+@@media (max-width: 768px){
+
+
+      
+        .banner-box-one {
+        left: 24%;
+        top: 26%;
+        display: flex !important;
+    }
+    
+    .swiper-wrapper {
+    height: 95vh !important;
+
+     }
+     
+        .swiper-pagination, .my-pagination {
+
+    top: 50% !important;
+
+    
+    justify-content: end;
+}
+
+      
+      .bank-menu {
+        height: 91px !important;
+        bottom: 96px !important;
+        width: 90%;
+            margin-left: 0px;
+      }
+      
+      .bank-sub-menu {
+        display: none !important;
+      }
+
+        .btn-app img {
+        width: 26px !important;
+        height: 26px !important;
+    }
+      
+      .swiper-pagination {
+        position: absolute !important;
+      
+        transform: translateY(-50%) !important;
+        z-index: 10 !important;
+        display: inline-grid;
+        left: 3% !important;
+    }
+        
+      .slider-image {
+        left: 55% !important;
+        width: 100% !important;
+      }
+      
+      .bank-title {
+        font: normal normal normal 36px / 57px Montserrat !important;
+        width: 324px;
+      }
+
+   .page-title {
+     margin-top: -85px;
+   }
+   
+    .loan-select-term {
+        text-align: center;
+    }
+    
+
+    #input-Amount1 {
+        width: 100%;
+    }
+    
+    #installment_calc1 {
+         width: 100%;
+    }
+
+    .calculator-form > label {
+        text-align: center;
+        margin-top: 15px;
+    }
+    
+    .calculator-form > select {
+        text-align: center;
+        width: 100%;
+    }
+    
+    .calculator-wrap {
+      margin-top: 0px;
+      padding-top: 40px;
+      
+   }
+   
+   .page-title h1 {
+      text-align: center;
+    }
+   
+   .investment-calculator p {
+      text-align: center;
+   }
+   
+   .loan-disclaimer {
+     padding-left: 40px;
+     padding-right: 30px;
+   }
+}
+
+
+@@media (min-width: 320px) and (max-width: 640px) {
+    
+    .page-title h1 {
+      text-align: center;
+    }
+    
+    .calculator-form > label {
+        margin-top: 15px;
+    }
+    
+   .hheader{
+     background-size: 100% 30%;
+   }
+   
+    .i-container {
+      height: 120px;
+      margin-top: 0px;
+   }
+   
+   .calculator-wrap {
+      margin-top: 0px;
+      padding-top: 40px;
+   }
+   
+   .investment-calculator {
+     margin-top: 30px !important;
+   }
+   
+   .other-inv-term {
+     padding: 20px;
+   }
+   
+    .investment-calculator p {
+      text-align: center;
+   }
+   
+   .loan-disclaimer {
+     padding-left: 40px;
+     padding-right: 30px;
+   }
+
+}
+
+@@media (min-width: 768px) {
+
+    .calculator-form > label {
+        margin-top: 15px;
+    }
+    
+   .big-return {
+        font-size: 30px;
+    }
+    
+    
+
+   
+   .i-container {
+     margin-top: 0px;
+   }
+   
+   
+.investment-calculator{
+	flex-direction: unset;
+	padding-top: 20px;
+}
+
+	.artwork img {
+		margin-top: 100px;
+	}
+
+	.calculator-results {
+		padding:0;
+	}
+	.inv-other-ico {
+		width:45px;
+	}
+	
+
+}
+
+@@media (min-width: 992px) { 
+ 
+    .calculator-form > label {
+        margin-top: 15px;
+    }
+    
+ .hheader{
+    
+   }
+   
+.i-container {
+        margin-top: 0px;
+        height: 150px;
+   }
+   
+.investment-calculator{
+	flex-direction: unset;
+	padding-top: 20px;
+    	display: flex;
+}
+
+
+
+	.calculator-results {
+		padding:10px;
+	}
+	.inv-other-ico {
+		width:64px;
+	}
+}
+
+
+@@media (min-width: 1200px) { 
+
+    .calculator-form > label {
+        margin-top: 15px;
+    }
+    
+ .hheader{
+    
+   }
+   
+    .i-container {
+    margin-bottom: 0px;
+    height: 150px;
+   }
+   
+.investment-calculator{
+	flex-direction: unset;
+	padding-top: 20px;
+}
+	.artwork img {
+		margin-top: 0px;
+	}
+
+	
+	.hheader{
+	height: 640px;
+    padding-top: 470px;
+	}
+	
+.page-title h1{
+	font-size: 40px;
+	line-height: 4rem;}
+	.page-title h3 {
+		font-size:24px;}
+}
+
+
+@@media (min-width: 1400px) { 
+
+   
+    .i-container {
+       margin-bottom: -30px;
+       margin-top: 0px;
+       height: 150px;
+   }
+
+  .hheader{
+	
+	}
+} 
+
+@@media (max-width: 540px) { 
+
+     .banner-box-one {
+        left: 26% !important;
+        top: 26%;
+        display: flex !important;
+    }
+    
+    .slider-image {
+     
+        margin-top: -20px !important;
+
+    }
+} 
+
+
+
+ /* tablet */
+ 
+ 
+
+
+@@media only screen and (min-width: 768px) and (max-width: 1024px) {
+      .banner-box-one {
+        left: 42%;
+        display: block !important;
+        width: 57% !important;
+      }
+      .bank-menu {
+        width: 60% !important;
+        height: 110px !important;
+            margin-left: 0px;
+        margin-top: -40px;
+      }
+      .bank-sub-menu {
+        display: none !important;
+      }
+      
+      
+.swiper-pagination, .my-pagination{
+    top:100% !important;
+}
+
+      .bank-menu-icons img {
+        margin-right: 7px !important;
+      }
+
+         .bank-menu-icons {
+        padding: 20px !important;
+    }
+
+      .slider-image {
+        left: 55% !important;
+        width: 60% !important;
+      }
+      .bank-title {
+        font: normal normal normal 36px / 57px Montserrat !important;
+            width: auto !important;
+      }
+    }
+    
+@@media (max-width: 890px) and (min-width: 320px){
+  .bank-menu-icons {
+        padding: 8px !important;
+        
+        margin-left: -50px !important;
+    }
+    .home-loan-calculator {
+    margin-top: -90px !important;
+}
+
+    .bank-menu {
+        height: 77px !important;
+     margin-left: 0px;
+    }
+}
+    
+
+</style>
+
+<!--Slider section-->
+
+    <section class="section banner-11">
+   
+        <div class="box-banner-home11">
+                  <div class="swiper-container mySwiper">
+                      
+        <div class="swiper-wrapper">
+              
+          @foreach (var item in sliders){
+            var tabSubItemImage = item.Value<IPublishedContent>("tabSubItemImage")?.Url;
+             var mainImage = item.Value<IPublishedContent>("mainImage")?.Url;
+               var tabSubItemIcon = item.Value<IPublishedContent>("tabSubItemIcon")?.Url;
+    var title = item.Value<string>("tabSubItemTitle");
+    var description = item.Value<string>("genericCardContent");
+    
+      <div class="swiper-slide" style="background-image: url('@tabSubItemImage');background-size: cover;">
+    <div class="container container-slider" style="
+    position: absolute;
+    bottom: 0;
+">
+        <div class="row">
+            <div class="col-md-6 pagination-swiper"  >
+             
+             @{
+               if(counter == 0 ){
+              <div hidden class="swiper-pagination"></div>
                 }
-            </div>
-            <div class="top-header">
-                <div class="hero-container top_extend">
-                    <div class="container-fluid top_extend">
-                        <div class="row no-gutter top_extend">
-                            <div class="top_extend">
-                                <div id="hero-banner" class="carousel slide top_extend" data-ride="carousel" data-interval="7000">
-                                    <img class="pattern hidden-xs" src="~/images/footer-pattern.svg" alt="footer-pattern" style="display:none">
-                                    @{
-                                        var heroHeader = homePageElements.Children(VariationContextAccessor).Where(o => o.IsDocumentType("heroHeaderHome")).FirstOrDefault();
-                                        if (heroHeader != null)
-                                        {
-                                            var heroHeaderItems = heroHeader.Value<IEnumerable<IPublishedElement>>("items") ?? Enumerable.Empty<IPublishedElement>();
-                                            <!-- Indicators -->
-                                            <ol class="carousel-indicators">
-                                                @{
-                                                    int counter = 0;
-                                                    foreach (var items in heroHeaderItems)
-                                                    {
-                                                        <li data-target="#hero-banner" data-slide-to="@counter" class="@((counter == 0) ? "active" : "")"></li>
-                                                        counter++;
-                                                    }
-                                                }
-                                            </ol>
-                                            <!-- Wrapper for slides -->
-                                            <div class="carousel-inner top_extend">
-                                                @{
-                                                    int myCounter = 0;
-                                                    foreach (var heroItem in heroHeaderItems)
-                                                    {
-                                                        var Avatar = heroItem.Value<IPublishedContent>("heroImage")?.Url();
-                                                        <div class="top_extend item @((myCounter == 0) ? "active" : "") lazyimage" style="background-image: url(@Avatar);" data-image-path="background-image: url(@Avatar);">
-
-                                                            <div class="hero-caption">
-                                                                @if (myCounter == 0)
-                                                                {
-                                                                    <h1 class="hero-title"><span class="cap-title">@heroItem.Value("heroProductDescription")</span><br>@heroItem.Value("heroTitle")</h1>
-                                                                }
-                                                                else
-                                                                {
-                                                                    <h2 class="hero-title"><span class="cap-title">@heroItem.Value("heroProductDescription")</span><br>@heroItem.Value("heroTitle")</h2>
-                                                                }
-                                                                <p class="hero-description">@heroItem.Value("heroTitleDescription")</p>
-                                                                <br />
-                                                                @{
-                                                                    var redirect_links = heroItem.Value<IEnumerable<Umbraco.Cms.Core.Models.Link>>("heroRedirectAction");
-
-                                                                    if (redirect_links.Any())
-                                                                    {
-                                                                        foreach (var links in redirect_links)
-                                                                        {
-                                                                            var buttonText = heroItem.Value("heroButtonLabel");
-                                                                            var btnId = viewName + "_" + buttonText.ToString().Replace(" ", "") + "_" + "HeroHeader";
-                                                                            <a class="button primary clearfix" style="@heroItem.Value("buttonStyler")" href="@links.Url" id="@btnId">
-                                                                                @buttonText
-                                                                            </a>
-                                                                        }
-                                                                    }
-                                                                }
-                                                            </div>
-                                                        </div>
-                                                        myCounter++;
-                                                    }
-                                                }
-
-                                            </div>
-                                        }
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- HERO SHOULDER -->
-            @{
-                var heroShoulder = homePageElements.Children(VariationContextAccessor).Where(o => o.IsDocumentType("heroShoulderHome")).FirstOrDefault();
-                if (heroShoulder != null)
-                {
-                    var heroShoulderItems = heroShoulder.Value<IEnumerable<IPublishedElement>>("items") ?? Enumerable.Empty<IPublishedElement>();
-                    <div class="loan-summary-container">
-                        <div class="container">
-                            <div class="mega-tabs">
-                                <!-- Nav tabs -->
-                                <ul id="go_to_tab_content" class="nav nav-tabs eq-height" role="tablist">
-                                    @{
-                                        var isFirstRow = true;
-                                        foreach (var tab in heroShoulderItems)
-                                        {
-                                            var tabIcon = tab.Value<IPublishedContent>("tabIcon");
-                                            <li role="presentation" class="@(isFirstRow ? "active" : "") loan-summary ">
-                                                <a href="#@tab.Value<string>("tabId")?.Replace(" ", "")" aria-controls="profile " role="tab" data-toggle="tab">
-                                                    <img loading="lazy" src="@tabIcon?.Url()" width="36" alt="@tabIcon?.Value("altTag")" /> <span class="hidden-xs">@tab.Value("tabName")</span>
-                                                </a>
-                                            </li>
-                                            isFirstRow = false;
-                                        }
-                                    }
-                                </ul>
-                            </div>
-                            <!-- Tab panes -->
-                            <div class="tab-content">
-                                @{
-                                    bool isFirstTab = true;
-                                    int tabCount = 0;
-                                    foreach (var tab in heroShoulderItems)
-                                    {
-                                        string linkValue = null;
-                                        var tabItems = tab.Value<IEnumerable<IPublishedElement>>("items") ?? Enumerable.Empty<IPublishedElement>();
-                                        <div role="tabpanel" class="tab-pane @(isFirstTab ? "active" : "")" id="@tab.Value<string>("tabId")?.Replace(" ", "")">
-                                            <div class="tab-category">
-                                                @tab.Value("tabName")
-                                            </div>
-                                            <h2 class="text-center">
-                                                @tab.Value("tabHeading")
-                                            </h2>
-                                            <div class="row">
-                                                @{
-                                                    if (tabItems.Count() == 2)
-                                                    {
-                                                        <div class="col-md-3"></div>
-                                                    }
-                                                }
-                                                @foreach (var subItem in tabItems)
-                                                {
-                                                    var subItemLink = subItem.Value<Umbraco.Cms.Core.Models.Link>("link");
-                                                    var benefitCardIcon = subItem.Value<IPublishedContent>("benefitCardIcon");
-                                                    <div class="col-sm-6 col-md-3">
-                                                        <div class="loan-summary">
-                                                            <div class="image">
-                                                                @if ((subItem.Value<bool>("formatIcon")) && (subItemLink != null))
-                                                                {
-                                                                    <a href="@subItemLink.Url">
-                                                                        <div class="img-bg" style="background-image: url(@benefitCardIcon?.Url());"></div>
-                                                                    </a>
-                                                                }
-                                                                else
-                                                                {
-                                                                    <a href="@subItemLink?.Url">
-                                                                        <div class="img-bg" style="background-image: url(@benefitCardIcon?.Url());"></div>
-                                                                    </a>
-                                                                }
-                                                            </div>
-                                                            <div class="title">
-                                                                @if (tabCount == 1)
-                                                                {
-                                                                    string bookMarkValue = subItem.Value("benefitCardTitle").ToString();
-                                                                    bookMarkValue = bookMarkValue.Replace(" ", "");
-                                                                    linkValue = subItemLink?.Url + "#" + bookMarkValue;
-                                                                }
-                                                                else
-                                                                {
-                                                                    linkValue = subItemLink?.Url;
-                                                                }
-                                                                @if (subItemLink != null)
-                                                                {
-                                                                    <a href="@linkValue">
-                                                                        @subItem.Value("benefitCardTitle")
-                                                                    </a>
-                                                                }
-                                                                else
-                                                                {
-                                                                    <a href="@subItemLink?.Url">
-                                                                        @subItem.Value("benefitCardTitle")
-                                                                    </a>
-                                                                }
-
-                                                            </div>
-                                                            <div class="loan-desc">@subItem.Value("benefitCardDescription")</div>
-                                                        </div>
-                                                    </div>
-                                                }
-                                            </div>
-                                            <div class="margin-top-80 hidden-xs"></div>
-                                        </div>
-                                        isFirstTab = false;
-                                        tabCount += 1;
-                                    }
-                                }
-                            </div>
-                        </div>
-                    </div>
-                }
-            }
-            <!-- AFRICAN BANK STORIES -->
-            <div class="bank-story-container">
-                <div class="pull-up">
-                    <div class="bank-story-carousel">
-                        <div id="bank-story" class="carousel slide" data-ride="carousel" data-interval="false">
-                            <!-- Wrapper for slides -->
-                            <div class="carousel-inner">
-                                @{
-                                    var blogParent = Umbraco.Content(2855); //Umbraco.TypedContentSingleAtXPath("//blogLanding");
-
-                                    if (blogParent != null)
-                                    {
-                                        int myCounter = 0;
-
-
-                                        foreach (var blog in blogParent.Children(VariationContextAccessor).OrderByDescending(x => x.Children(VariationContextAccessor).First().Children(VariationContextAccessor).Where(c => c.ContentType.Alias == "heroBodyBlogDetail").First().Value("blogdate")))
-                                        {
-                                            if (blog.Children(VariationContextAccessor).Any())
-                                            {
-                                                foreach (var blogElement in blog.Children(VariationContextAccessor).FirstOrDefault().Children(VariationContextAccessor))
-                                                {
-                                                    if (blogElement.Value("title") != null)
-                                                    {
-                                                        <div class="item @((myCounter == 0) ? "active" : "")">
-
-                                                            @{
-
-                                                                if ((whatsNew != null) && (myCounter == 0))
-                                                                {
-                                                                    Umbraco.Cms.Core.Models.Link whatsNewLink = null;
-                                                                    foreach (var link in whatsNew.Value<IEnumerable<Umbraco.Cms.Core.Models.Link>>("sectionLink"))
-                                                                    {
-                                                                        whatsNewLink = link;
-                                                                        break;
-                                                                    }
-                                                                    //var whatsNewImageUrl = ((ContentModels.Image)((IPublishedContent)whatsNew.Value("ebankITImage"))).Url;
-                                                                    <div class="bank-story-img" style="background-image: url('/Media/ymiaoysk/backgroundnew.jpg');"></div>//@PlaceImageBackground("background.jpg")
-                                                                    <div class="bank-story-caption whatsnew col-md-6">
-                                                                        <a href="@whatsNewLink.Url">
-                                                                            <div class="whatsnew-title whatsnew-copy">
-                                                                                <p>@whatsNew.Value("ebankITTitle")</p>
-                                                                            </div>
-
-
-                                                                            <div class="bank-story-description whatsnew-copy">
-                                                                                @whatsNew.Value("ebankITContent")
-                                                                            </div>
-                                                                        </a>
-                                                                        <div class="bank-story-read-more" style="margin-top:5%">
-                                                                            <a href="@whatsNewLink.Url"></a>
-                                                                            <a class="button primary clearfix" style="background-color:#88bc47" href="@whatsNewLink.Url">
-                                                                                @whatsNewLink.Name
-                                                                            </a>
-                                                                        </div>
-                                                                    </div>
-                                                                    <br />
-                                                                    <div class="bank-story-caption col-md-6 whatsnew-sibling" style="margin-left: unset !important;">
-                                                                        <span class="bank-story-tag">The Blog</span>
-                                                                        <div class="bank-story-title">
-                                                                            @blogElement.Value("title")
-                                                                        </div>
-                                                                        <div class="bank-story-description">
-                                                                            @blogElement.Value("introductionDescription")
-                                                                        </div>
-                                                                        <div class="bank-story-read-more">
-                                                                            <a class="button primary clearfix" href="@blog.Url">
-                                                                                Read more
-                                                                            </a>
-                                                                        </div>
-                                                                        <div class="bank-story-author">
-                                                                            @(blogElement.Value<DateTime>("blogDate").ToShortDateString())
-                                                                        </div>
-                                                                    </div>
-                                                                }
-                                                                else
-                                                                {
-                                                                    <div class="bank-story-img" style="background-image:url(/media/xmlmnwsy/blog_patterns_1.jpg)"></div>
-                                                                    <a href="~/en/home/blog-landing/">
-                                                                        <div class="bank-story-caption">
-                                                                            <span class="bank-story-tag">The Blog</span>
-                                                                            <div class="bank-story-title">
-                                                                                @blogElement.Value("title")
-                                                                            </div>
-                                                                            <div class="bank-story-description">
-                                                                                @blogElement.Value("introductionDescription")
-                                                                            </div>
-                                                                            <div class="bank-story-read-more">
-                                                                                <a class="button primary clearfix" href="@blog.Url">Read more</a>
-                                                                            </div>
-                                                                            <div class="bank-story-author">@(blogElement.Value<DateTime>("blogDate").ToShortDateString())</div>
-                                                                        </div>
-                                                                    </a>
-                                                                }
-
-
-
-                                                            }
-
-
-                                                        </div>
-                                                        myCounter++;
-                                                    }
-                                                }
-
-                                            }
-
-
-                                        }
-                                    }
-                                }
-                            </div>
-                            <!-- Controls -->
-                            <a class="left carousel-control" href="#bank-story" role="button" data-slide="prev">
-                                <span class="icon-arrow-left"></span>
-                            </a>
-                            <a class="right carousel-control" href="#bank-story" role="button" data-slide="next">
-                                <span class="icon-arrow-right"></span>
+             
+              }
+              
+              <div class=" my-pagination swiper-pagination-bullets swiper-pagination-horizontal">
+                  
+                  
+              </div>
+          
+                  
+                <!-- Content for the left column -->
+                <div >
+                    <div class="container-slider-title" >
+                        @Html.Raw(item.Value<string>("tabSubItemTextContent"))
+                        <div class="box-button-offer swiper-cta">
+                            <span class="swipper-cta-title">Learn more</span>
+                            <a class="btn btn-default font-sm-bold pl-0 color-brand-1">
+                                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M271.653 1023.192c-8.685 0-17.573-3.432-24.238-10.097-13.33-13.33-13.33-35.144 0-48.474L703.67 508.163 254.08 58.573c-13.33-13.331-13.33-35.145 0-48.475 13.33-13.33 35.143-13.33 48.473 0L776.38 483.925c13.33 13.33 13.33 35.143 0 48.473l-480.492 480.694c-6.665 6.665-15.551 10.099-24.236 10.099z"></path>
+                                </svg>
                             </a>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="margin-top-40 visible-xs"></div>
-
-            <!-- HERO BODY -->
-            <div class="testimonials-container">
-                <div class="container">
-                    <div class="testimonials-carousel">
-                        <div id="testimonials" class="carousel slide" data-ride="carousel" data-interval="false">
-                            <!-- Indicators -->
-                            @{
-                                if (testimonials != null)
-                                {
-                                    var testimonialItems = testimonials.Value<IEnumerable<IPublishedElement>>("testimonialItems") ?? Enumerable.Empty<IPublishedElement>();
-                                    <ol class="carousel-indicators">
-                                        @{
-                                            int counter = 0;
-                                            foreach (var testimonyItem in testimonialItems)
-                                            {
-                                                <li data-target="#hero-banner" data-slide-to="@counter" class="@((counter == 0) ? "active" : "")"></li>
-                                                counter++;
-                                            }
-                                        }
-                                    </ol>
-                                    <!-- Wrapper for slides -->
-                                    <div class="carousel-inner">
-                                        @{
-                                            int newCounter = 0;
-                                            foreach (var testimonyItem in testimonialItems)
-                                            {
-                                                var Avatar = testimonyItem.Value<IPublishedContent>("testimonialAvatar");
-                                                <div class="item @((newCounter == 0) ? "active" : "")">
-                                                    <div class="testimonial">
-                                                        <div class="avatar"><img src="@Avatar?.Url()" alt="@Avatar?.Value("altTag")"></div>
-                                                        <div class="descr">@testimonyItem.Value("testimonialStory")</div>
-                                                        <div class="name">@testimonyItem.Value("testimonialName")</div>
-                                                    </div>
-                                                </div>
-                                                newCounter++;
-                                            }
-                                        }
-                                    </div>
-                                }
-                                <!-- Controls -->
-                                <a class="left carousel-control" href="#testimonials" role="button" data-slide="prev"><span class="icon-arrow-left"></span></a>
-                                <a class="right carousel-control" href="#testimonials" role="button" data-slide="next"><span class="icon-arrow-right"></span></a>
-                            }
-                        </div>
-                    </div>
+            <div class="col-md-6" style="background-image: url('@mainImage');background-position: center;background-repeat: no-repeat;background-size: contain;">
+                <!-- Content for the right column -->
+                <div  >
+                    <img style="
+    width: -webkit-fill-available;
+" src="@tabSubItemIcon" alt="" />
                 </div>
             </div>
-        </main>
-
-        <!-- HERO FEET -->
-        @{
-            if (heroFeetHome != null)
-            {
-                var isFirstRow = true;
-                <div class="help-container" id="find-us">
-                    <div class="container">
-                        <h2 class="text-center">@heroFeetHome.Value("heading")</h2>
-                        @{
-                            var heroFeetHomeLinks = heroFeetHome.Value<IEnumerable<IPublishedElement>>("links") ?? Enumerable.Empty<IPublishedElement>();
-                        }
-                        <div class="mega-tabs margin-top-40">
-                            <!-- Nav tabs -->
-                            <ul class="nav nav-tabs" role="tablist">
-                                @foreach (var tab in heroFeetHomeLinks)
-                                {
-                                    var tabIcon = tab.Value<IPublishedContent>("tabIcon");
-                                    <li role="presentation" class="@(isFirstRow ? "active" : "") branch-tab" style="width:100%">
-                                        <a href="#@tab.Value("Id")" aria-controls="faq" role="tab" data-toggle="tab"><img loading="lazy" src="@tabIcon?.Url()" alt="@tabIcon?.Value("altTag")" width="30" />@tab.Value("tabName")</a>
-                                    </li>
-                                    isFirstRow = false;
-                                }
-                            </ul>
-                        </div>
-                        <!-- Tab panes -->
-                        <div class="tab-content">
-                            @{
-                                bool isFirstTab = true;
-                                foreach (var tab in heroFeetHomeLinks)
-                                {
-                                    var tabItems = tab.Value<IEnumerable<IPublishedElement>>("items") ?? Enumerable.Empty<IPublishedElement>();
-                                    <div role="tabpanel" class="tab-pane @(isFirstTab ? "active" : "")" id="@tab.Value<string>("tabId")?.Replace(" ", "")">
-                                        <div class="row">
-                                            <div class="col-sm-10 col-sm-offset-1">
-                                                <div class="campaign-list">
-                                                    <ul>
-                                                        @foreach (var linkItem in tabItems)
-                                                        {
-                                                            var internalLink = linkItem.Value<IPublishedContent>("internalLink");
-                                                            <li>
-                                                                <div class="row no-gutter download-item">
-                                                                    <div class="col-sm-9"><div class="download-descr">@linkItem.Value("text")</div></div>
-                                                                    <div class="col-sm-3">
-                                                                        <a href="@internalLink?.Url()?#@linkItem.Value("anchorLink")" class="download-btn">@linkItem.Value("buttonText")</a>
-                                                                    </div>
-                                                                </div>
-                                                            </li>
-                                                        }
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                }
-                                isFirstTab = false;
-                            }
-                        </div>
-                    </div>
-                </div>
-            }
-        }
+        </div>
     </div>
 </div>
+counter++;
+        
+        }
+        </div>
+        
+        
 
-<!-- CALL BACK FORM -->
-@{
-    @*Used for popup START*@
-    var _floatingFormViewModel = homePageElements.Children(VariationContextAccessor).Where(c => c.IsDocumentType("callMeBack")).FirstOrDefault();
-    // @Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)
+      </div>
+        </div>
+        
+        
+       <div class="container bank-menu">
+              
+               
+              <div class="row d-flex align-items-center justify-content-center">
+                  <div class="col-md-6">
+                     <div class="bank-sub-menu">
+                       
+             <div style="
+    float: left;
+" class="modal-pop">
+              <h5 class="modal-title">
+                I Would Like
+                <br /> To Apply For…
+              </h5>
+              <div class="d-none d-sm-inline-block modal-btn">
+                <div>
+                  <a class="btn btn-brand-1 newBtn"  onclick="openModal()">
+                    <span>PLEASE SELECT</span>
+                    <BsChevronRight className="right-icon"/>
+                  </a>
+                </div>
+              </div>
+            </div>
+        </div> 
+        <!--end of Modal section-->
+                  
+</div>
+        <div class="col-md-6 ">
+                    <div class="bank-menu-icons">
+            
+            @*
+                 <a class="btn-app" href="http://cmsdev.africanbank.net/en/home/banking/#MyWorld">
+               <img src="/media/00qjtejr/component_140.svg" alt="" />
+              <span class="btn-title">Bank</span>
+                 </a>
+                 <a class="btn-app" href="http://cmsdev.africanbank.net/en/home/product-personal-loan/">
+               <img src="/media/2bfpu5gq/borrow-ico.svg" alt="" />
+              <span class="btn-title">Borrow</span>
+                 </a>
+                 <a class="btn-app" href="http://cmsdev.africanbank.net/en/home/product-fixed-deposit-investment/">
+               <img src="/media/sm5eyeco/mask-group-9.svg" alt="" />
+              <span class="btn-title">Invest</span>
+                 </a>
+                 <a class="btn-app" href="http://cmsdev.africanbank.net/en/home/product-funeral-cover/">
+               <img src="/media/y4qhagxe/mask-group-8.svg" alt="" />
+              <span class="btn-title">Insure</span>
+                 </a>
+                 <a class="btn-app" href="http://cmsdev.africanbank.net/en/home/audacious-reward/">
+               <img src="/media/sixoyll2/snicon6.svg" alt="" />
+              <span class="btn-title">Rewards</span>
+                 </a>*@
+      @foreach(var item in bankMenus)
+{
+    var CardIcon = item.Value<IPublishedContent>("CardIcon")?.Url;
+    var title = item.Value<string>("CardTitle");
+    var links = item.Value<IEnumerable<Umbraco.Web.Models.Link>>("buttonLink");
+ 
+    foreach(var link in links)
+    {
+        <a class="btn-app" href="@link.Url"> <!-- Accessing URL of each link -->
+        <img src="@CardIcon" alt="" />
+        <span class="btn-title">@title</span>
+        </a>
+    }
 }
+
+        </div>
+    </div>
+              
+</div>
+
+
+
+<!--end of container-->
+
+        </div>
+        
+        
+
+<!--sub-section-->
+    
+<!--End Slider section-->
+
+
+        <!-- modal Start here-->
+     <div class="nav-modal-overlay" id="nav-modal-overlay">
+       
+            <div class="nav-modal" id="nav-modal">
+                
+                <div class="nav-modal-flex-container">
+                    <div class="close-button" id="closeModalBtn">
+                        <div class="x-class">
+                            <div class="circle-background">&times;</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="nav-modal-container">
+                    
+                    <div class="nav-modal-header">
+                        <div class="nav-modal-tab active" onclick="toggleTab(0)">Personal</div>
+                        <!--<div class="nav-modal-tab" onclick="toggleTab(1)">Business</div>-->
+                          <div class="nav-modal-tab" ></div>
+                    </div>
+                    
+                    
+                    <div class="nav-modal-tab-content active">
+                
+                        <p class="long-Text lineUp">I would like to apply for</p>
+
+                        <div class="grid-container-element lineUp">
+                            
+                            <div class="grid-child-element lineUp ">
+                                <h5 class="redirect-Text lineUp"><a href="http://cmsdev.africanbank.net/en/home/banking/#MyWorld" target="_blank" style="white-space: nowrap;"><span>Credit</span></a></h5>
+                            </div>
+
+                            <div class="grid-child-element modal-Icon lineUp">
+                                <i class"modal-Icon lineUp" >
+                                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66.91 122.88"
+                                         style="enable-background: new 0 0 66.91 122.88; width: 12px; height: 12px; color: #021A44" xml:space="preserve"><g><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z" /></g></svg>
+
+                                </i>
+                            </div>
+                        </div>
+                        
+                        <div class="lineUp grid-container-element">
+                            <div class="lineUp grid-child-element ">
+                                <h5 class="lineUp redirect-Text"><a href="https://ib.africanbank.co.za/SignIn.aspx" target="_blank"><span>MyWORLD bank account</span></a></h5>
+                            </div>
+                            <div class="lineUp grid-child-element modal-Icon" href="https://ib.africanbank.co.za/modules/Registration/Public/Register.aspx" target="_blank" >
+                                <i class"modal-Icon">
+                                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66.91 122.88"
+                                         style="enable-background: new 0 0 66.91 122.88; width: 12px; height: 12px; color: #021A44" xml:space="preserve"><g><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z" /></g></svg>
+
+                                </i>
+                            </div>
+                        </div>
+
+                        <div class="grid-container-element lineUp">
+                            
+                            <div class="grid-child-element lineUp ">
+                                <h5 class="redirect-Text lineUp"><a href="https://ib.africanbank.co.za/SignIn.aspx" target="_blank" style="white-space: nowrap;"><span>Investment</span></a></h5>
+                            </div>
+
+                            <div class="grid-child-element modal-Icon lineUp">
+                                <i class"modal-Icon lineUp" >
+                                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66.91 122.88"
+                                         style="enable-background: new 0 0 66.91 122.88; width: 12px; height: 12px; color: #021A44" xml:space="preserve"><g><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z" /></g></svg>
+
+                                </i>
+                            </div>
+                        </div>
+                        
+                        <div class="lineUp grid-container-element">
+                            <div class="lineUp grid-child-element ">
+                                <h5 class="lineUp redirect-Text"><a href="https://ib.africanbank.co.za/SignIn.aspx" target="_blank"><span>Funeral</span></a></h5>
+                            </div>
+                            <div class="lineUp grid-child-element modal-Icon" href="https://ib.africanbank.co.za/modules/Registration/Public/Register.aspx" target="_blank" >
+                                <i class"modal-Icon">
+                                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66.91 122.88"
+                                         style="enable-background: new 0 0 66.91 122.88; width: 12px; height: 12px; color: #021A44" xml:space="preserve"><g><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z" /></g></svg>
+
+                                </i>
+                            </div>
+                        </div>
+                    </div>
+                   
+                   @* 
+                    
+                    <div class="nav-modal-tab-content">
+            
+                        <p class="long-Text2 lineUp">I would like to apply for</p>
+
+                        <div class="grid-container-element lineUp">
+                            
+                            <div class="grid-child-element lineUp ">
+                                <h5 class="redirect-Text lineUp"><a href="https://africanbank.co.za/en/home/banking/#MyWorld" target="_blank" style="white-space: nowrap;"><span>Credit</span></a></h5>
+                            </div>
+
+                            <div class="grid-child-element modal-Icon lineUp">
+                                <i class"modal-Icon lineUp" >
+                                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66.91 122.88"
+                                         style="enable-background: new 0 0 66.91 122.88; width: 12px; height: 12px; color: #021A44" xml:space="preserve"><g><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z" /></g></svg>
+
+                                </i>
+                            </div>
+                        </div>
+                        
+                        <div class="lineUp grid-container-element">
+                            <div class="lineUp grid-child-element ">
+
+                                <h5 class="lineUp redirect-Text"><a href="https://business-ibank.africanbank.co.za/" target="_blank"><span>MyWORLD bank account</span></a></h5>
+                            </div>
+                            <div class="lineUp grid-child-element modal-Icon" href="https://ib.africanbank.co.za/modules/Registration/Public/Register.aspx" target="_blank" >
+                                <i class"modal-Icon">
+                                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66.91 122.88"
+                                         style="enable-background: new 0 0 66.91 122.88; width: 12px; height: 12px; color: #021A44" xml:space="preserve"><g><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z" /></g></svg>
+
+                                </i>
+                            </div>
+                        </div>
+                        
+                        <div class="grid-container-element lineUp">
+                            
+                            <div class="grid-child-element lineUp ">
+                                <h5 class="redirect-Text lineUp"><a href="https://ib.africanbank.co.za/SignIn.aspx" target="_blank" style="white-space: nowrap;"><span>Investment</span></a></h5>
+                            </div>
+
+                            <div class="grid-child-element modal-Icon lineUp">
+                                <i class"modal-Icon lineUp" >
+                                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66.91 122.88"
+                                         style="enable-background: new 0 0 66.91 122.88; width: 12px; height: 12px; color: #021A44" xml:space="preserve"><g><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z" /></g></svg>
+
+                                </i>
+                            </div>
+                        </div>
+                        
+                        <div class="lineUp grid-container-element">
+                            <div class="lineUp grid-child-element ">
+
+                                <h5 class="lineUp redirect-Text"><a href="https://ib.africanbank.co.za/SignIn.aspx" target="_blank"><span>Funeral</span></a></h5>
+                            </div>
+                            <div class="lineUp grid-child-element modal-Icon" href="https://ib.africanbank.co.za/modules/Registration/Public/Register.aspx" target="_blank" >
+                                <i class"modal-Icon">
+                                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66.91 122.88"
+                                         style="enable-background: new 0 0 66.91 122.88; width: 12px; height: 12px; color: #021A44" xml:space="preserve"><g><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z" /></g></svg>
+
+                                </i>
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                    *@
+
+                </div>
+            </div>
+        </div>
+        <!-- modal End here-->
+
+        <!-- loan calculator -->
+        <section class="section-800 pt-50 pb-40 home-loan-calculator bg-grey-60">
+          <div class="container">
+            <div class="row d-flex align-items-center row-change md-text-center">
+              <div class="col-md-6">
+                  <h1 class="color-brand-1 mt-15 mb-20">Loan Calculator</h1>
+                <!--Calculator -->
+                 <div class="calculator-form ">
+						<p class="loan-disclaimer" id="" style="padding:5px 0px" >Please enter Loan amount between R2 000 to R250 000</p>
+						<label>Amount</label>
+						@*<span id="error-loanamount1" style="color:red; position:absolute; font-size: 15px"></span>*@
+						<input id="input-Amount1" class="loan-inpt" type="text" value="2000" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57">
+                             
+						@*<input id="input-Amount1" type="text" value="2000" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 5" >*@
+						
+						<div class="range-wrap">
+                            <div class="range-value" id="rangeV1"></div>
+                            <input id="slide-range1" type="range" class="loan-range" min="2000" max="250000" step="500" value="2000">
+                        </div>
+                    
+                        
+                        <div class="loans" style="margin-bottom: -7px">
+                            <div class="col-1" style="text-align: left; font-size:14px">R2 000</div>
+                            <div></div>
+                            <div class="col-2" style="text-align: right; font-size:14px">R250 000</div>
+                        </div>
+						
+						<label>Repayment Term</label>
+                        <select class="loan-select-term" id="term1">
+                            <option value="7">7 Months</option>
+                            <option value="9">9 Months</option>
+                            <option value="12">12 Months</option>
+                            <option value="18">18 Months</option>
+                            <option value="24">24 Months</option>
+                            <option value="30">30 Months</option>
+                            <option value="36">36 Months</option>
+                            <option value="42">42 Months</option>
+                            <option value="48">48 Months</option>
+                            <option value="60">60 Months</option>
+                            <option value="72">72 Months</option>
+                        </select>
+                 
+                        
+						
+						<div class="range-wrap">
+                            <div class="range-value" id="rangeV2"></div>
+                            <input id="input-month1" type="range" class="loan-range" min="7" max="72" value="7">
+                        </div>
+                    
+                        
+                        <div class="Months" style="margin-bottom: -7px">
+                            <div class="col-1" style="text-align: left; font-size:14px">7 Months</div>
+                            <div></div>
+                            <div class="col-2" style="text-align: right; font-size:14px">72 Months</div>
+                        </div>
+                    
+					    <label>Monthly Repayment will be</label>
+    		        
+    		              <input id="installment_calc1"  class="loan-inpt-return" type="text" value="879.53" readonly>
+    		        
+						<div class="combo-btn">
+<div class="mt-50 text-start column1">
+<p class="combo-btn-text primary"><a href="https://www.africanbank.co.za/en/home/get-a-quote?utm_source=Website&amp;utm_medium=Productpage&amp;utm_campaign=WebLead" class="btn  btn-brand-1 hover-up">APPLY NOW</a></p>
+</div>
+</div>
+        
+            
+              </div>
+              
+            </div>
+            <div class="col-md-6">
+                <img
+                  class="d-block"
+                  src="/media/zcdl2xa3/loan-calc.png"
+                  alt=""
+                />
+              </div>
+          </div>
+        </section>
+     
+        
+       @if (connectcaards!= null && connectcaards.Any())
+            {
+            int cardIChestterator = 0;
+            int navIChestterator = 0;
+
+            
+                foreach (Card benefit in connectcaards)
+                {
+                String cardIdTag = "card" + cardIChestterator.ToString();
+               
+                 <section class="section-800 mb-20">
+          <div class="container">
+            <div class="row d-flex align-items-center flex-row-reverse row-change md-text-center">
+            
+
+              <div class="col-md-6">
+                <h1 class="color-brand-1 mt-15 mb-20">
+                  @benefit.CardTitle
+                </h1>
+                @benefit.CardDescriptionLongText
+              </div>
+              <div class="col-md-6">
+                <img
+                  class="d-block"
+                  src="@benefit.CardIcon.Url"
+                  alt=""
+                /> 
+
+              </div>
+            </div>
+          </div>
+        </section>
+                              
+                ++cardIChestterator;
+                navIChestterator++;
+                }
+                }
+
+
+          @{
+         int idIterator = 0;
+           foreach (var item in  nocontentnewsection){
+                var cardTitle = item.Value<string>("nCcardTitle");
+                
+                var cardDesc = item.Value<string>("nClongDescription");
+                var cardDescmedium = item.Value<string>("mediumDescription");
+                var icon = item.Value<IPublishedContent>("nCcardIcon");
+                 var id = item.Value<string>("abstractbutton");
+                var link = item.Value<string>("abstractIt");
+                
+                 if (idIterator%2 == 0)
+                    {
+                         <section class="section-800 bg-grey-60">
+          <div class="container">
+            <div class="row d-flex align-items-center row-change md-text-center">
+             
+               
+              <div class="col-md-6">
+                <h1 class="color-brand-1 mb-20">@cardTitle</h1>
+                @Html.Raw(item.Value<string>("mediumDescription"))
+                
+                @if(i == 0)
+                {
+               <div class="mt-50 text-start"><a class="btn btn-brand-1 hover-up" href="@link">@id
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="right-icon"
+                height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke-linecap="round" 
+                stroke-linejoin="round" stroke-width="32" 
+                d="M320 336h76c55 0 100-21.21 100-75.6s-53-73.47-96-75.6C391.11 99.74 329 48 256 48c-69 0-113.44 45.79-128 91.2-60 5.7-112 35.88-112 98.4S70 336 136 336h56m0 64.1 64 63.9 64-63.9M256 224v224.03">
+                </path></svg></a></div>
+                }
+               else{
+                <div class="mt-50 text-start">
+                  @Html.Raw(item.Value<string>("nClongDescription"))
+                </div>
+                }
+             
+             </div>
+             <div class="col-md-6">
+                <img
+                  class="d-block"
+                  src="@icon.Url"
+                  alt="@icon.Value("altTag")" 
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+                        }
+                        else{
+                        
+                             <section class="section-800">
+          <div class="container">
+          
+            <div class="row d-flex align-items-center row-change md-text-center experience-section">
+             <div class="col-md-6">
+               <img
+                  class="d-block"
+                  src="@icon.Url"
+                  alt="@icon.Value("altTag")"
+                /> 
+      
+              </div>
+            <div class="col-md-6">
+                <h1 class="color-brand-1 mt-15 mb-20">
+                  @cardTitle
+                </h1>
+                @Html.Raw(item.Value<string>("mediumDescription"))
+                <div class="mt-50 text-start">
+                  @Html.Raw(item.Value<string>("nClongDescription"))
+                </div>
+              </div>
+             
+            
+              
+              
+            </div>
+          </div>
+        </section>
+                        }
+          idIterator += 1;
+           i++;
+            }
+        }
+        
+        
+       
+
 @section scripts
     {
     <script type="text/javascript">
@@ -832,28 +2304,543 @@
                 }
             }
         }; $(window).load(lazyImages.init);</script>
+    <!-- Swiper JS -->
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+        <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!--modal script-->
+    <script>
+
+   function openModal() {
+            $('#nav-modal-overlay').css('display', 'flex');
+            $("body").css("overflow", "hidden");
+            $('#nav-modal').css('display', 'flex');
+        }
+
+        $(document).ready(function () {
+
+            // Close modal
+            $("#closeModalBtn").click(function () {
+                $("#nav-modal").fadeOut();
+                $("body").css("overflow", "auto");
+                $('#nav-modal-overlay').css('display', 'none');
+            });
+        });
+
+
+        function toggleTab(tabIndex) {
+            $('.nav-modal-tab').removeClass('active');
+            $('.nav-modal-tab-content').removeClass('active');
+
+            $('.nav-modal-tab').eq(tabIndex).addClass('active');
+            $('.nav-modal-tab-content').eq(tabIndex).addClass('active');
+        }
+
+
+   
+</script>
+<!--Calculator Script-->
+
+    <script>
+           jQuery(document).ready(function () {
+            //$('#input-Amount1').autoNumeric('init', { aSep: ' ', aDec: '.', aSign: 'R '});
+        
+            var curVal = $("#input-Amount1").val(); 
+            var view = formatter.format(curVal);
+            view = view.replace("ZAR",'R');
+            view = view.replace(","," ");
+       
+            
+            $("#input-Amount1").val(view);
+            
+            var loan = $("#input-Amount1").val().slice(0,-3);
+            var nloan = loan.replace(" ","");
+            nloan = nloan.substring(1);
+            nnloan = nloan.replace(/\s/g,'');
+            
+            //nloan.replace(" ","");
+            /******set color for range slider********************/
+            var valPercent = (nnloan - parseInt($('#slide-range1').attr('min'))) /
+                (parseInt($('#slide-range1').attr('max')) - parseInt($('#slide-range1').attr('min')));
+            $('#slide-range1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #88BC47), color-stop(' + valPercent + ', #002B60))');
+
+            var loanterm = $('.li-hover').attr('data-value');
+            var loanspan = $('#term1').val();
+            
+            if (loanterm === ""){
+                loanterm = loanspan;
+            } 
+            
+            var valPercent = (loanspan - parseInt($('#input-month1').attr('min'))) /
+                (parseInt($('#input-month1').attr('max')) - parseInt($('#input-month1').attr('min')));
+            $('#input-month1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #88BC47), color-stop(' + valPercent + ', #002B60))');
+            /***************** End of set color**********************/
+            $('#error-loanamount1').css('display', 'none');
+            installmentEstimator(nnloan, loanspan);
+            
+            /**************** value bubble show hide on mouse hover*************************/
+            $("#slide-range1").on("mouseup", function () {
+                $("#rangeV1").css("display", "none");
+           
+            });
+            $("#slide-range1").on("mousedown", function () {
+                $("#rangeV1").css("display", "block");
+            });
+            $("#slide-range2").on("mouseup", function () {
+                $("#rangeV2").css("display", "none");
+            });
+            $("#slide-range2").on("mousedown", function () {
+                $("#rangeV2").css("display", "block");
+            });
+            /**************** end of bubble show hide on mouse hover*************************/
+            
+            
+            /**** Dropdown styler/functionality ******/
+            
+            function DropDown(el) {
+                this.dd = el;
+                this.placeholder = this.dd.children('span');
+                this.opts = this.dd.find('ul.dropdown > li');
+                this.val = '';
+                this.index = -1;
+                this.initEvents();
+            }
+            
+            DropDown.prototype = {
+                initEvents: function () {
+                    var obj = this;
+    
+                    obj.dd.on('click', function (event) {
+                        $(this).toggleClass('active');
+                        $(this).children('input')[0].innerText = $(this)[0].children[1].innerText;
+                        // loop through this: $(this)[0].children[1].children and find a innerHTML = $(this)[0].children[0].innerText + grab i item > $(this)[0].children[1].children[i].dataset.value from there
+                        for (var i = 0; i < $(this)[0].children[2].children.length; ++i) {
+                            if ($(this)[0].children[1].innerText === $(this)[0].children[2].children[i].innerText) {
+                                $("#period")[0].value = $(this)[0].children[2].children[i].dataset.value;
+                            }
+                        }
+
+                        return false;
+                    });
+
+                    obj.opts.on('click', function () {
+                        var monthValue = 0;
+                        var opt = $(this);
+                        obj.val = opt.text();
+                        obj.index = opt.index();
+                        monthValue = obj.val;
+                        obj.placeholder.text(obj.val);
+                    });
+                },
+                getValue: function () {
+                    return this.val;
+                },
+                getIndex: function () {
+                    return this.index;
+                }
+            }
+    
+            $(function () {
+    
+                var dd = new DropDown($('#dd'));
+    
+                $(document).click(function () {
+                    // all dropdowns
+                    $('.wrapper-dropdown-3').removeClass('active');
+                });
+    
+            });
+            /********* dropdwon style end *******/
+            
+        });
+
+
+        $('#slide-range1').on('input', function () {
+            var newVal = $(this).val();
+            var view = formatter.format(newVal);
+            view = view.replace("ZAR",'R');
+            view = view.replace(","," ");
+            $("#input-Amount1").val(view);
+            
+            /**************display value bubble*********************/
+            var newValue = Number((newVal - $('#slide-range1').attr('min')) * 100 / ($('#slide-range1').attr('max') - $('#slide-range1').attr('min')));
+            var newPosition = 10 - (newValue * 0.2);
+          //  $('#rangeV1').append('<span>' + newVal + '</span>');
+            $('#rangeV1').css('left', 'calc(' + newValue + '% + (' + newPosition + 'px))');
+            /******************End of dispaly value bubble********************/
+            /********************Set color for range slider**********************/
+            var valPercent = (newVal - parseInt($('#slide-range1').attr('min'))) /
+                (parseInt($('#slide-range1').attr('max')) - parseInt($('#slide-range1').attr('min')));
+            $('#slide-range1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #88BC47), color-stop(' + valPercent + ', #002B60))');
+            /****************End of set color**************************************/
+            var loanterm = $('#term1').val();
+            var loanspan = $('#period').val();
+           
+            if (loanterm === ""){
+                loanterm = loanspan;
+            } 
+            installmentEstimator(newVal, loanterm);
+        });
+        
+        $("#input-Amount1").keydown(function (e) {
+          if (e.keyCode == 13) {
+            var loan;
+            var valid_value = $('#input-Amount1').val();
+            var dot_check = valid_value.includes(".");
+            valid_value = valid_value.replace(/\s/g,'');
+            
+            if(dot_check === true){
+                loan = valid_value.slice(0,-3);
+                loan = loan.substring(1);
+            } else {
+                loan = valid_value.substring(1);
+            }
+            
+            if (parseInt(loan) < 2000 ) {
+                $('#input-Amount1').val("R 2 000.00");
+            }
+          }
+        });
+        
+        $('#input-Amount1').blur(function () {
+            var loan;
+            var valid_value = $('#input-Amount1').val();
+            var dot_check = valid_value.includes(".");
+            valid_value = valid_value.replace(/\s/g,'');
+            
+            if(dot_check === true){
+                loan = valid_value.slice(0,-3);
+                loan = loan.substring(1);
+            } else {
+                loan = valid_value.substring(1);
+            }
+            
+            if (parseInt(loan) < 2000 ) {
+                $('#input-Amount1').val("R 2 000.00");
+                $('#btnApply').addClass('disabled');
+            }
+        }); 
+        
+        $('#input-Amount1').on('input', function () {
+            var valid_value = $(this).val();
+            var dot_check = valid_value.includes(".");
+            valid_value = valid_value.replace(/\s/g,'');
+            
+            if(dot_check === true){
+                valid_value = valid_value.slice(0,-3);
+                valid_value = valid_value.substring(1);
+                
+                if(parseInt(valid_value) > 250000){
+                    $('#input-Amount1').val("R 250 000.00");
+                    valid_value = $('#input-Amount1').val().substring(1);
+                }
+            } 
+            else {
+                
+                if(valid_value.length > 2){
+                   valid_value = valid_value.substring(1);
+                
+                    if(parseInt(valid_value) > 250000){
+                        $('#input-Amount1').val("R 250 000.00");
+                        valid_value = $('#input-Amount1').val().substring(1);
+                    } 
+                }
+                
+            }
+           
+            var rresult = valid_value.includes(".");
+            
+            if(rresult === true) {
+               var ni = valid_value.indexOf(".");     
+               var len_check = valid_value.substring(ni,valid_value.length); 
+               
+               if(len_check.length > 3){
+                   $('#input-Amount1').val("R 2 000.00");
+               }
+            }
+            
+            var loan_amount = "R "+valid_value; 
+            
+            var test_value1;
+            
+            if (valid_value !== "")
+            {
+                var test_value = loan_amount.toString();
+                
+                test_value = test_value.replace(/\s/g,''); 
+    
+                test_value1 = test_value[test_value.length-3]+test_value[test_value.length-2]+test_value[test_value.length-1]; 
+                
+                if (test_value1 === ".00"){
+                    
+                    var loan = loan_amount.slice(0,-3);
+                    var nloan = loan.replace(" ","");
+                    nloan = nloan.substring(1);
+                    nloan = nloan.replace(/\s/g,'');
+                    var Test_v = nloan.toString();
+                
+                    if (Test_v.charAt(0) === "0" ){
+                        $("#input-Amount1").val("R 2 000.00");
+                        return;
+                    }   
+                    
+                    if (Test_v.charAt(0) === "R" ){
+                        $("#input-Amount1").val("R 2 000.00");
+                        return;
+                    }   
+                    
+                }
+                
+                if (test_value.charAt(0) === "R" && test_value.length >= 5){
+                    
+                    var result = test_value.includes(".");
+                    //var test_value1 = "";
+                    
+                    if(result === true) {
+                        if(test_value1 === ".00"){
+                             var ni = test_value.indexOf(".");     
+                             test_value1 = test_value.substring(0,ni);
+                        } else {
+                               $("#input-Amount1").val("R 250 000.00");
+                               test_value1 = "R250000";
+                        }
+                    
+                    } else {
+                        test_value1 = test_value;
+                    }
+                    
+                    var loan = test_value1;
+                    var nloan = loan.replace(" ","");
+                    nloan = nloan.substring(1);
+                    nloan = nloan.replace(/\s/g,'');
+                    var Test_v = nloan.toString();
+                
+                    if (Test_v.charAt(0) === "0" ){
+                        $("#input-Amount1").val("R 2 000.00");
+                        return;
+                    }   
+                    
+                    if (Test_v.charAt(0) === "R" ){
+                        $("#input-Amount1").val("R 2 000.00");
+                        return;
+                    }   
+                }
+                
+                else {
+                    nloan = test_value.substring(1);
+                }
+               
+            } else {
+                $("#input-Amount1").val("R 2 000.00");
+            }
+           
+            
+            @*if (valid_value === ""){
+                $("#input-Amount1").val("R 2 000.00");
+            }
+            
+           
+            
+            if (nloan < 2000 ){
+                $("#input-Amount1").val("R 2 000.00");
+                var loan = $("#input-Amount1").val().slice(0,-3);
+                var nloan = loan.replace(" ","");
+                nloan = nloan.substring(1);
+                nloan = nloan.replace(/\s/g,'');
+            }*@
+            
+            if (nloan === undefined){
+                $('#error-loanamount1').css('display', 'block');
+                $('#error-loanamount1').text('Please enter loan amount in between R2000 to R250000');
+                $('#btnApply').addClass('disabled');
+                return;
+            }
+            
+            if (parseInt(nloan) < 2000 || parseInt(nloan) > 250000 || nloan == "") {
+                $('#error-loanamount1').css('display', 'block');
+                $('#error-loanamount1').text('Please enter loan amount in between R2000 to R250000');
+                $('#btnApply').addClass('disabled');
+            }
+            else {
+                $('#slide-range1').val(nloan);
+                var loanterm = $('#term1').val();
+                installmentEstimator(nloan, loanterm);
+                $('#error-loanamount1').text('');
+                $('#error-loanamount1').css('display', 'none');
+                $('#btnApply').removeClass('disabled');
+            }
+            /********************Set color for range slider**********************/
+            
+            if(parseInt(nloan) >= 2000 && parseInt(nloan) <= 250000){
+                
+                var valPercent = (nloan - parseInt($('#slide-range1').attr('min'))) /
+                (parseInt($('#slide-range1').attr('max')) - parseInt($('#slide-range1').attr('min')));
+                $('#slide-range1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #88BC47), color-stop(' + valPercent + ', #002B60))'); 
+            } 
+             else 
+            {
+                installmentEstimator(2000, 7);
+                $('#slide-range1').val(parseInt(2000));    
+                var valPercent = (2000 - parseInt($('#slide-range1').attr('min'))) /
+                (parseInt($('#slide-range1').attr('max')) - parseInt($('#slide-range1').attr('min')));
+                $('#slide-range1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #88BC47), color-stop(' + valPercent + ', #002B60))'); 
+            } 
+            
+            /****************End of set color**************************************/
+        });
+
+        $('.li-hover').click(function(){
+        	var newVal = $(this).attr('data-value'); // $("#period").val(); // $(this).val();
+            $("#input-month1").val(newVal);
+            //var loan = $("#input-Amount1").val();
+            
+            var loan = $("#input-Amount1").val().slice(0,-3);
+            var nloan = loan.replace(" ","");
+            nloan = nloan.substring(1);
+            nloan = nloan.replace(" ","");
+            
+            installmentEstimator(nloan, newVal);
+            /******set color for range slider********************/
+            var valPercent = (newVal - parseInt($('#input-month1').attr('min'))) /
+                (parseInt($('#input-month1').attr('max')) - parseInt($('#input-month1').attr('min')));
+            $('#input-month1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #88BC47), color-stop(' + valPercent + ', #002B60))');
+            /***************** End of set color**********************/
+         });
+
+        $('#term1').on('input', function () {
+            var newVal = $(this).val();
+            $("#input-month1").val(newVal);
+            
+            var nloan;
+            var dot_check = $("#input-Amount1").val().includes(".");
+            var valid_value = $("#input-Amount1").val(); 
+            valid_value = valid_value.replace(/\s/g,'');
+            
+            
+            if(dot_check === true){
+                nloan = valid_value.slice(0,-3);
+                nloan = nloan.substring(1);
+            }
+            
+            else {
+                nloan = valid_value.substring(1);
+            }
+            
+            //var loan = $("#input-Amount1").val();
+            installmentEstimator(nloan, newVal);
+            /******set color for range slider********************/
+            var valPercent = (newVal - parseInt($('#input-month1').attr('min'))) /
+                (parseInt($('#input-month1').attr('max')) - parseInt($('#input-month1').attr('min')));
+            $('#input-month1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #88BC47), color-stop(' + valPercent + ', #002B60))');
+            /***************** End of set color**********************/
+        });
+        
+        $('#input-month1').on('input', function () {
+            var loanterm = $(this).val();
+            var newloanterm;
+            if (loanterm >= 3 && loanterm <= 7)
+                newloanterm = 7;
+            else if (loanterm >= 8 && loanterm <= 9)
+                newloanterm = 9;
+            else if (loanterm >= 10 && loanterm <= 12)
+                newloanterm = 12;
+            else if (loanterm >= 13 && loanterm <= 18)
+                newloanterm = 18;
+            else if (loanterm >= 19 && loanterm <= 24)
+                newloanterm = 24;
+            else  if (loanterm >= 25 && loanterm <= 30)
+                newloanterm = 30;
+            else  if (loanterm >= 31 && loanterm <= 36)
+                newloanterm = 36;
+            else  if (loanterm >= 37 && loanterm <= 42)
+                newloanterm = 42;    
+            else  if (loanterm >= 43 && loanterm <= 48)
+                newloanterm = 48;    
+            else  if (loanterm >= 49 && loanterm <= 60)
+                newloanterm = 60;        
+            else
+                newloanterm = 72
+                
+            $('#term1').val(newloanterm);
+            $('#ddSpanner').text(newloanterm+' months');
+            
+            var nloan;
+            var dot_check = $("#input-Amount1").val().includes(".");
+            var valid_value = $("#input-Amount1").val(); 
+            valid_value = valid_value.replace(/\s/g,'');
+            
+            
+            if(dot_check === true){
+                nloan = valid_value.slice(0,-3);
+                nloan = nloan.substring(1);
+            }
+            
+            else {
+                nloan = valid_value.substring(1);
+            }
+            
+            installmentEstimator(nloan, newloanterm);
+            /******set color for range slider********************/
+            var valPercent = (loanterm - parseInt($('#input-month1').attr('min'))) /
+                (parseInt($('#input-month1').attr('max')) - parseInt($('#input-month1').attr('min')));
+            $('#input-month1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #88BC47), color-stop(' + valPercent + ', #002B60))');
+            /***************** End of set color**********************/
+        });
+        
+        function resetCalc(){
+            var valPercent = (7 - parseInt($('#input-month1').attr('min'))) /
+                (parseInt($('#input-month1').attr('max')) - parseInt($('#input-month1').attr('min')));
+            $('#input-month1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #88BC47), color-stop(' + valPercent + ', #002B60))');
+            
+            installmentEstimator(2000, 7);
+            $('#slide-range1').val(parseInt(2000));    
+            var valPercent = (2000 - parseInt($('#slide-range1').attr('min'))) /
+            (parseInt($('#slide-range1').attr('max')) - parseInt($('#slide-range1').attr('min')));
+            $('#slide-range1').css('background-image', '-webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(' + valPercent + ', #88BC47), color-stop(' + valPercent + ', #002B60))'); 
+        }
+
+        function installmentEstimator(loan, loanterm) {
+            var loan_amount = parseInt(loan);
+            var term = loanterm;
+            var initiation_fee = 0;
+            var principal_debt = 0;
+            var installment = 0;
+            //var loan_amount = 50000.00;
+            //var term = 72;
+            var vat = 0.15;
+            var repo = 3.75;
+            var interest_rate = 0.2475;
+            var insurance_premium = 0.0045;
+            initiation_fee = Math.max(Math.min(Math.min(165 + (loan_amount - 1000) * 0.1, 1050), loan_amount * 0.15), 0);
+            principal_debt = loan_amount + initiation_fee * 1.15;
+            var service_fee = 60 * 1.15;
+            installment = ((principal_debt * interest_rate / 12) / (1 - 1 / Math.pow((1 + interest_rate / 12), term)) + insurance_premium * principal_debt + service_fee).toFixed(2);
+            var view = formatter.format(installment);
+            view = view.replace("ZAR",'R');
+            view = view.replace(","," ");
+            
+            $('#installment_calc1').val(view);
+        }
+        /********************************************* Loan Size Estimator *******************************************************************************************/
+     
+      
+        
+        function myFunction() {
+            document.getElementById("term").classList.toggle("show");
+        }
+      
+    
+        var formatter = new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'ZAR',
+
+        });   
+    </script>
 
     <script>
         $(document).ready(function () {
-
-
-            $('#submitInfo').click(function () {
-                //var ename = $('#ename').val();
-                //alert(ename);
-                $.ajax({
-                    type: "POST",
-                    url: '@Url.Action("CreateSupplierInfo", "Enterprise")',
-                    data: '{EnterpriseName: ' + JSON.stringify("Value") + '}',
-                    dataType: "json",
-                    contentType: "application/json; charset=utf-8",
-                    success: function () {
-                        alert("success");
-                    },
-                    error: function (request, status, error) {
-                        alert("failed");
-                    }
-                });
-            });
 
 
 
@@ -883,21 +2870,66 @@
             lightBox.fadeOut(1000);
             lightBoxContent.fadeOut(1000);
         });</script>
+        
+    <script>
+    
+      $(document).ready(function () {
+          
+       
+
+   var mySwiper = new Swiper(".mySwiper", {
+  pagination: {
+    el: ".swiper-pagination",
+  },
+  autoplay: {
+    delay: 10000, // Delay between slides in milliseconds
+    disableOnInteraction: false, // Disable autoplay when user interacts with the slider
+  }
+});
+
+  
+   $(".swiper-slide.swiper-slide-active .pagination-swiper").append("<div class='swiper-pagination'></div>");
+  
+mySwiper.on('slideChange', function () {
+    // Remove any existing pagination items
+    $('.my-pagination .swiper-pagination-bullet').remove();
+
+    // Get the pagination item
+    var paginationItem = $('.swiper-pagination-bullet').clone();
+
+    // Iterate through each slide
+    $('.swiper-slide').each(function () {
+        // Clone the pagination item for each slide
+        var clonedPaginationItem = paginationItem.clone();
+
+        // Append the cloned pagination item to the pagination container of the current slide
+        $(this).find('.my-pagination').append(clonedPaginationItem);
+    });
+});
+
+
+
+
+      });
+    </script>
 }
 
 @functions
     {
-    // Server-side browser sniffing (HttpContext.Current/HttpBrowserCapabilities)
-    // doesn't exist in ASP.NET Core. The original check only allowlisted
-    // Chrome/Opera/Android anyway (didn't even cover Firefox/Safari/Edge,
-    // which also support WebP) - virtually every current browser supports
-    // WebP now, so this just always serves the .webp variant.
     private static bool CanBrowserHandleWebPImages()
     {
-        return true;
+        HttpRequest httpRequest = HttpContext.Current.Request;
+        HttpBrowserCapabilities browser = httpRequest.Browser;
+
+        if (browser.Type.Contains("Chrome") || browser.Type.Contains("Opera") || browser.Type.Contains("Android"))
+        {
+            return true;
+        }
+
+        return false;
     }
 
-    public static Microsoft.AspNetCore.Html.HtmlString PlaceImageBackground(string imageUrl)
+    public static MvcHtmlString PlaceImageBackground(string imageUrl)
     {
         if (CanBrowserHandleWebPImages())
         {
@@ -908,13 +2940,13 @@
                 imageUrl = imageUrl.Replace(fileType, ".webp");
             }
 
-            return new Microsoft.AspNetCore.Html.HtmlString(String.Format("url('{0}') ", imageUrl));
+            return new MvcHtmlString(String.Format("url('{0}') ", imageUrl));
         }
 
-        return new Microsoft.AspNetCore.Html.HtmlString(String.Format("url('{0}') ", imageUrl));
+        return new MvcHtmlString(String.Format("url('{0}') ", imageUrl));
     }
 
-    public static Microsoft.AspNetCore.Html.HtmlString PlaceImage(string imageUrl, string alt, string cssStyle)
+    public static MvcHtmlString PlaceImage(string imageUrl, string alt, string cssStyle)
     {
         if (CanBrowserHandleWebPImages())
         {
@@ -925,9 +2957,9 @@
                 imageUrl = imageUrl.Replace(fileType, ".webp");
             }
 
-            return new Microsoft.AspNetCore.Html.HtmlString(String.Format("<img src=\"{0}\" " + "alt=\"{1}\" " + "style=\"{2}\"  />", imageUrl, alt, cssStyle));
+            return new MvcHtmlString(String.Format("<img src=\"{0}\" " + "alt=\"{1}\" " + "style=\"{2}\"  />", imageUrl, alt, cssStyle));
         }
 
-        return new Microsoft.AspNetCore.Html.HtmlString(String.Format("<img src=\"{0}\" " + "alt=\"{1}\" " + "style=\"{2}\"/>", imageUrl, alt, cssStyle));
+        return new MvcHtmlString(String.Format("<img src=\"{0}\" " + "alt=\"{1}\" " + "style=\"{2}\"/>", imageUrl, alt, cssStyle));
     }
 }

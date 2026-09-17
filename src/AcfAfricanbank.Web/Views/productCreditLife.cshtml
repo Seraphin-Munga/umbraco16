@@ -40,44 +40,595 @@
     BenefitCards = heroChest?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card")?.Select(c => c as Card).ToList()
     };
 
-    var headerImage_large = heroHeader?.Value<IPublishedContent>
-        ("image")?.Url;
-        var headerImage_medium = heroHeader?.Value<IPublishedContent>
-            ("imageMedium")?.Url;
-            var headerImage_small = heroHeader?.Value<IPublishedContent>
-                ("imageSmall")?.Url;
+    var headerImage_large = heroHeader?.Value<IPublishedContent>("image")?.Url;
+    var headerImage_medium = heroHeader?.Value<IPublishedContent>("imageMedium")?.Url;
+    var headerImage_small = heroHeader?.Value<IPublishedContent>("imageSmall")?.Url;
+}
 
-                }
+  <link rel="stylesheet" href="/css/projectmagic.css" /> 
+<style>
 
-                <!-- HERO BANNER -->
-                @Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+.section {
+    margin-top: -5px !important;
+    display: inline-block;
+    width: 100%;
+    
+}
+    .mega-tabs .nav-tabs>li.active:after {
+        top: unset !important;
+        bottom: -18px;
+    }
+    
+ 
+    
+   @@media (min-width: 540px) and (max-width: 720px) {
+            .hero-static-banner {
+                height: 200px;
+            }
+        }
+         @@media (min-width: 768px) and (max-width: 1024px) {
+            .hero-static-banner {
+                height: 285px;
+            }
+            .hero-static-caption {
+                top: -40px;
+            }
+        }
+        
+@@media (max-width : 999px){
 
-                <!-- HERO CONTINUED-->
-                @Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+        .claim-flex-item2 {
+            padding: 20px
+    }
+}
+        
+ 
+   
+</style>
 
-                <!-- PRODUCT INFORMATION-->
+
+<section class="section-800  bg-grey-60">
                 <div class="container">
-                    <div class="campaign-product-container full">
-                        @Html.Partial("_benefitsSection", benefitsModel)
+                  <div class="row d-flex align-items-center row-change">
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                       <h1 class="color-brand-1 mt-15 mb-20">
+                        Credit Life Insurance
+                      </h1>
+                      <p class="font-md color-brand-1 mt-20">
+                        Peace of mind that your credit obligation will be covered during the term of your loan, should you be affected by any of these loss of income events.
+                      </p>
+                      <div class="mt-50 text-start"><a href="#submit-claim" class="btn btn-brand-1 arrow-right"> Submit Claim </a></div>
+                      
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                      <img
+                        class="d-block"
+                        src="/media/iitf2tc4/best-bank.png"
+                        alt="iori"
+                        
+                      /> 
+                       
+                    </div>
+                  </div>
+                </div>
+</section>
+
+<section class="section pt-50">
+    <div class="container">
+        <div class="row mt-50 align-items-center ">
+            <div class="col-lg-6 mb-30">
+                <h2 class="color-brand-1">Credit customers who are formally employed will be covered for:</h2>
+            </div>
+            <div class="col-lg-6">
+                <div class="card-offer-small card-we-do hover-up">
+                    <div class="card-image">
+                        <img
+                        class="d-block"
+                        src="/media/iitf2tc4/best-bank.png"
+                        alt="iori"
+                        
+                      /> 
+                    </div>
+                    <div class="card-info">
+                        <h4 class="color-brand-1 mb-10">
+                            <a class="color-brand-1" href="#">Retrenchment Instalment</a>
+                        </h4>
+                        <p class="font-md color-grey-500 mb-5">We cover your credit repayment, while you are unemployed, for up to 12 months.</p>
                     </div>
                 </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card-offer-small card-we-do hover-up">
+                    <div class="card-image">
+                         <img
+                        class="d-block"
+                        src="/media/iitf2tc4/best-bank.png"
+                        alt="iori"
+                        
+                      /> 
+                    </div>
+                    <div class="card-info">
+                        <h4 class="color-brand-1 mb-10">
+                            <a class="color-brand-1" href="#">Retrenchment Settlement</a>
+                        </h4>
+                        <p class="font-md color-grey-500 mb-5">We settle your outstanding credit balance if you are unemployed for longer than 6 months.
 
-                <!-- SUBMIT YOU CLAIM -->
-                @Html.Partial("_claimForm")
+                                            Note this is only on credit life policies taken out before 09/2018</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card-offer-small card-we-do hover-up">
+                    <div class="card-image">
+                         <img
+                        class="d-block"
+                        src="/media/iitf2tc4/best-bank.png"
+                        alt="iori"
+                        
+                      /> 
+                    </div>
+                    <div class="card-info">
+                        <h4 class="color-brand-1 mb-10">
+                            <a class="color-brand-1" href="#">Death</a>
+                        </h4>
+                        <p class="font-md color-grey-500 mb-5">We settle your outstanding credit balance so your family will not be burdened by your debt.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="section pt-50 pb-40 bg-grey-60">
+    <div class="container">
+        <div class="row mt-50 align-items-center row-change ">
+            <div class="col-lg-6 mb-30">
+                <h2 class="color-brand-1">Credit customers who are formally employed will be covered for:</h2>
+            </div>
+            <div class="col-lg-6">
+                <div class="card-offer-small card-we-do hover-up">
+                    <div class="card-image">
+                        <img
+                        class="d-block"
+                        src="/media/iitf2tc4/best-bank.png"
+                        alt="iori"
+                        
+                      /> 
+                    </div>
+                    <div class="card-info">
+                        <h4 class="color-brand-1 mb-10">
+                            <a class="color-brand-1" href="#">Compulsory Unpaid Leave or Lay-off or Short Time</a>
+                        </h4>
+                        <p class="font-md color-grey-500 mb-5">We cover your credit repayment while your income is affected, for up to 12 months.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card-offer-small card-we-do hover-up">
+                    <div class="card-image">
+                         <img
+                        class="d-block"
+                        src="/media/iitf2tc4/best-bank.png"
+                        alt="iori"
+                        
+                      /> 
+                    </div>
+                    <div class="card-info">
+                        <h4 class="color-brand-1 mb-10">
+                            <a class="color-brand-1" href="#">Temporary Disability</a>
+                        </h4>
+                        <p class="font-md color-grey-500 mb-5">We cover your credit repayment while you are disabled and unable to work or earn an income for up to 12 months.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card-offer-small card-we-do hover-up">
+                    <div class="card-image">
+                         <img
+                        class="d-block"
+                        src="/media/iitf2tc4/best-bank.png"
+                        alt="iori"
+                        
+                      /> 
+                    </div>
+                    <div class="card-info">
+                        <h4 class="color-brand-1 mb-10">
+                            <a class="color-brand-1" href="#">PERMANENT DISABLITY</a>
+                        </h4>
+                        <p class="font-md color-grey-500 mb-5">We settle your outstanding credit balance.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-                <!-- NOT COVERED -->
-                @if (uncoveredItemList != null)
-                {
-                var title = uncoveredItemList.Value("listAreaHeader");
-                var desc = uncoveredItemList.Value("listAreaDescription");
-                var ContentLists = uncoveredItemList.Value<IEnumerable<IPublishedElement>>("contentLists") ?? new List<IPublishedContent>();
+ 
+<section class="section-800" id="submit-claim">
+                <div class="container">
+                  <div class="row d-flex align-items-center row-change">
+                      <div class="col-xl-6 col-lg-6 col-md-6">
+                    <h1 class="color-brand-1 mt-15 mb-20">
+                            Submit your claim.
+                     </h1>
+                      <img
+                        class="d-block"
+                        src="/media/iitf2tc4/best-bank.png"
+                        alt="iori"
+                        
+                      /> 
+                       
+                    </div>
+                        <div class="col-xl-1 col-lg-1 col-md-1"></div>
+                        <div class="col-xl-4 col-lg-4 col-md-4">
+                                 @Html.Partial("_ClaimFormV2")
+                            </div>
+                        <div class="col-xl-1 col-lg-1 col-md-1"></div>
+                    
+                  </div>
+                </div>
+</section>
 
+<section class="section-800 bg-grey-60">
+                <div class="container">
+                  <div class="row d-flex align-items-center row-change ">
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                       <h1 class="color-brand-1 mt-15 mb-20">
+                        Credit is available for self-employed or pensioner customers.
+                      </h1>
+
+                      <h4 class="color-brand-1 mt-30">Death:</h4>
+                      <p class="font-md color-brand-1 mt-20">
+                         We settle your outstanding credit balance so that your family will not be burdened with your debt. 
+                      </p>
+                      
+                      <h4 class="color-brand-1 mt-30">Temporary Disability:</h4>
+                      <p class="font-md color-brand-1 mt-20">We cover your credit repayment while you are disabled and unable to work or earn an income for up to 12 months. </p>
+                      
+                      <h4 class="color-brand-1 mt-30">Permanent Disability:</h4>
+                      <p class="font-md color-brand-1 mt-20">We settle your outstanding credit balance.</p>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                      <img
+                        class="d-block"
+                        src="/media/iitf2tc4/best-bank.png"
+                        alt="iori"
+                        
+                      /> 
+                       
+                    </div>
+                  </div>
+                </div>
+</section>
+
+
+<section class="section-800">
+                <div class="container">
+                  <div class="row d-flex align-items-center row-change">
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                       <h1 class="color-brand-1 mt-15 mb-20">
+                        Ensure coverage by keeping credit repayments current, maintaining an active credit life policy for potential claims.
+                      </h1>
+
+                      
+                      <p class="font-md color-brand-1 mt-20">
+                         Death We settle your outstanding credit balance so that your family will not be burdened with your debt. 
+                         Temporary Disability: We cover your credit repayment while you are disabled and unable to work or earn an income for up to 12 months. 
+                         Permanent Disability: We settle your outstanding credit balance.
+                      </p>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                      <img
+                        class="d-block"
+                        src="/media/iitf2tc4/best-bank.png"
+                        alt="iori"
+                        
+                      /> 
+                       
+                    </div>
+                  </div>
+                </div>
+</section>
+
+@*
+<section class="section-800">
+    <div class="container">
+        <div class="row d-flex align-items-center row-change flex-row-reverse">
+            <div class="col-xl-6 col-lg-6 col-md-6">
+                <h1 class="color-brand-1 mt-15 mb-20">Funeral Plan</h1>
+                <p class="font-md color-brand-1">African Bank’s Funeral Plan will cover unexpected costs of a funeral. Give your loved ones the send-off they deserve. Choose an affordable cover option for you and your loved ones. Or anyone important to you. We cover 8 out of 10 customers with our funeral plan.</p>
+                <h4 class="color-brand-1 mt-20">Key Benefits</h4>
+                <div class="mt-30 mb-30">
+                    <ul class="list-ticks list-ticks-2 inline-checklist">
+                        <li>
+                            <svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>Funeral cover with 24-hours promise pay out</li>
+                        <li>
+                            <svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Cover up to R100,000</li>
+                        <li><svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>No waiting period for accidental death</li>
+                        <li><svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>No need to have a Bank account with African Bank to get the African Bank funeral plan</li>
+                        <li><svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>Quick and easy online application - simply register and login</li>
+                        <li><svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>No medical examinations</li>
+                        <li><svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>From as little as R22</li>
+                        <li><svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>Limited waiting period of 4 months for natural death for immediate family</li>
+                        <li><svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>Limited waiting period of 6 months for natural death for extended family members</li>
+                        <li><svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>Stillborn cover after 28 weeks of pregnancy</li>
+                        <li><svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>Newborn premium waver and new born cover for the first 30 days from date of birth</li>
+                        <li><svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>Child premiums for full-time students up to the age of 25</li>
+                        <li><svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>Lifelong child premiums for permanently disabled or mentally ill children if we add them to the policy before the age of 25</li>
+                        <li><svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>A grace period of 60 days from the premium due date if the premium was not paid before the policy lapsed and cover ceased</li>
+                    </ul>
+                </div>
+                <div class="mt-50 text-start">
+                    <a class="btn btn-brand-1 hover-up" href="/insure#">open account <span style="display:inline-block; transform: scaleX(-1);">→</span></a>
+                </div>
+            </div>
+            <div class="col-xl-6 col-lg-6 col-md-6">
+                <img
+                        class="d-block"
+                        src="/media/iitf2tc4/best-bank.png"
+                        alt="iori"
+                        
+                      /> 
+            </div
+                   
+                  </div>
+                </div>
+</section>
+
+*@
+
+<section class="section-800 bg-grey-60">
+    <div class="container">
+        <div class="d-flex row align-items-center row-change">
+            <div class="col-xl-6 col-lg-6 col-md-6">
+                <h1 class="color-brand-1 mt-15 mb-20">Retrenchment or Compulsory Unpaid Leave or Lay-off or Short Time are not covered for:</h1>
+ 
+                <div class="mt-30 mb-30">
+                    <ul class="list-ticks list-ticks-2 inline-checklist">
+                        <li>
+                            <svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>90 day waiting period</li>
+                        <li>
+                            <svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Dismissals / misconduct</li>
+                        <li><svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>Suspensions</li>
+                        <li><svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg> Participation in unprotected strikes</li>
+                        <li><svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg> Employment contracts ended</li>
+                        <li><svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>Voluntary retrenchment</li>
+                        <li><svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>Voluntary retirement</li>
+                        <li><svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>Resignation</li>
+                        <li><svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>You were aware of retrenchment before taking out the credit life policy</li>
+                       
+                    </ul>
+                </div>
+               
+            </div>
+            <div class="col-xl-6 col-lg-6 col-md-6">
+                <img
+                        class="d-block"
+                        src="/media/iitf2tc4/best-bank.png"
+                        alt="iori"
+                        
+                      /> 
+            </div
+                   
+                  </div>
+                </div>
+</section>
+
+<section class="section-800">
+    <div class="container">
+        <div class="d-flex row align-items-center row-change ">
+            <div class="col-xl-6 col-lg-6 col-md-6">
+                <h1 class="color-brand-1 mt-15 mb-20">Death or Disability are not covered for:</h1>
+              
+                <div class="mt-30 mb-30">
+                    <ul class="list-ticks list-ticks-2 inline-checklist">
+                        <li>
+                            <svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>Pre-existing medical conditions 12 months before commencement of credit life policy</li>
+                        <li>
+                            <svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Participation in crime</li>
+                        <li><svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>Wilful self-inflicted injury or suicide / alcohol abuse / drugs or narcotics</li>
+                        <li><svg class="w-6 h-6 icon-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg> Participation in hazardous activities</li>
+                   
+                       
+                    </ul>
+                </div>
+               
+            </div>
+            <div class="col-xl-6 col-lg-6 col-md-6">
+                <img
+                        class="d-block"
+                        src="/media/iitf2tc4/best-bank.png"
+                        alt="iori"
+                        
+                      /> 
+            </div
+                   
+        </div>
+    </div>
+</section>
+
+
+<section class="section-800">
+    <div class="container">
+        <div class="">
+         
+            <div class="row">
+                
+    <div class="col-sm-10 col-sm-offset-1">
+         <div class="col-lg-12 col-md-12 col-12 mb-30">
+                <h2 class="color-brand-1">Credit Life Claim Form</h2>
+            </div>
+        <div class="campaign-list">
+            <ul>
+                        <li>
+                            <div class="row no-gutter download-item first">
+                                <div class="col-sm-9">
+                                    <div class="download-descr">Credit Life Claim Form</div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <a href="/media/krzhhvpy/inf2103_002_creditlife_claimform.pdf" target="_blank" class="download-btn">
+                                        Download
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="row no-gutter download-item first">
+                                <div class="col-sm-9">
+                                    <div class="download-descr">Credit Life - Required documents for claims</div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <a href="/media/a5fdyymy/lr_incl2102_001_credit-life-claims_benefits-conditions.pdf" target="_blank" class="download-btn">
+                                        Download
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="row no-gutter download-item first">
+                                <div class="col-sm-9">
+                                    <div class="download-descr">Money Matters</div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <a href="/media/ocxlyxjc/new_marketing_update_moneymatters_brochure_eng.pdf" target="_blank" class="download-btn">
+                                        Download
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="row no-gutter download-item first">
+                                <div class="col-sm-9">
+                                    <div class="download-descr">Brochure</div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <a href="/media/k0mcsy0f/c5_cex2105_001_branch_combo-flyer_print.pdf" target="_blank" class="download-btn">
+                                        Download
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="row no-gutter download-item first">
+                                <div class="col-sm-9">
+                                    <div class="download-descr">Claims Management Framework</div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <a href="/media/01lftqtf/ppr_claimsmanagementframework_v12_nosign.pdf" target="_blank" class="download-btn">
+                                        Download
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="row no-gutter download-item first">
+                                <div class="col-sm-9">
+                                    <div class="download-descr">CLI Master Insurance Policy</div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <a href="/media/ijce1y4q/african_bank_credit_life_policy_individual_-_final_clean_version_24_july.pdf" target="_blank" class="download-btn">
+                                        Download
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+            </ul>
+        </div>
+    </div>
+</div>
+        </div>
+    </div>
+</section>
+
+
+
+@*
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+<!-- HERO CONTINUED-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+
+<!-- PRODUCT INFORMATION-->
+<div class="container">
+    <div class="campaign-product-container full">
+        @Html.Partial("_benefitsSection", benefitsModel)
+    </div>
+</div>
+
+
+
+
+<!-- NOT COVERED -->
+@if (uncoveredItemList != null)
+{
+    var title = uncoveredItemList.Value("listAreaHeader");
+    var desc = uncoveredItemList.Value("listAreaDescription");
+    var ContentLists = uncoveredItemList.Value<IEnumerable<IPublishedElement>>("contentLists") ?? new List<IPublishedContent>();
+    var Counter = 0;
+                
     <div class="container">
         <div class="padded-white">
             <div class="row">
 
                 <div class="col-sm-6">
-                    <h2>@title</h2>
+                    <h3>@title</h3>
                     <p class="body-content margin-top-20">
                         @desc
                     </p>
@@ -86,9 +637,17 @@
                     @foreach (var listHolder in ContentLists)
                     {
                         var header = listHolder.Value("listHeader");
+                        var description = listHolder.Value("listDescription");
+                        var footer = listHolder.Value("listFooterText");
                         var items = listHolder.Value<IEnumerable<IPublishedElement>>("listItems") ?? new List<IPublishedContent>();
 
                         <h4>@header</h4>
+                        if(Counter == 0){
+                            <br />
+                            <p style="font-size:25px"><b>@description</b></p>
+                            <br />
+                            <p style="font-size:25px"><b>@footer</b></p>
+                         }
                         <ul class="checklist margin-top-20">
                             @foreach (var item in items)
                             {
@@ -98,6 +657,7 @@
                                 </li>
                             }
                         </ul>
+                        Counter++;
                     }
                 </div>
             </div>
@@ -111,10 +671,204 @@
 <!-- TESTIMONIALS -->
 @Html.Partial("_testimonials", testimonialTab as Testimonials)
 
+
+<!-- CAMPAIGN MORE INFO -->
+@Html.Partial("_heroKneeTabs", heroKnees as ContentModels.HeroKnees)
+
+*@
+
+
+        <!-- modal Start here-->
+     <div class="nav-modal-overlay" id="nav-modal-overlay">
+       
+            <div class="nav-modal" id="nav-modal">
+                
+                <div class="nav-modal-flex-container">
+                    <div class="close-button" id="closeModalBtn">
+                        <div class="x-class">
+                            <div class="circle-background">&times;</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="nav-modal-container">
+                    
+                    <div class="nav-modal-header">
+                        <div class="nav-modal-tab active" onclick="toggleTab(0)">Personal</div>
+                        <!--<div class="nav-modal-tab" onclick="toggleTab(1)">Business</div>-->
+                          <div class="nav-modal-tab" ></div>
+                    </div>
+                    
+                    
+                    <div class="nav-modal-tab-content active">
+                
+                        <p class="long-Text lineUp">I would like to apply for</p>
+
+                        <div class="grid-container-element lineUp">
+                            
+                            <div class="grid-child-element lineUp ">
+                                <h5 class="redirect-Text lineUp"><a href="http://cmsdev.africanbank.net/en/home/banking/#MyWorld" target="_blank" style="white-space: nowrap;"><span>Credit</span></a></h5>
+                            </div>
+
+                            <div class="grid-child-element modal-Icon lineUp">
+                                <i class"modal-Icon lineUp" >
+                                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66.91 122.88"
+                                         style="enable-background: new 0 0 66.91 122.88; width: 12px; height: 12px; color: #021A44" xml:space="preserve"><g><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z" /></g></svg>
+
+                                </i>
+                            </div>
+                        </div>
+                        
+                        <div class="lineUp grid-container-element">
+                            <div class="lineUp grid-child-element ">
+                                <h5 class="lineUp redirect-Text"><a href="https://ib.africanbank.co.za/SignIn.aspx" target="_blank"><span>MyWORLD bank account</span></a></h5>
+                            </div>
+                            <div class="lineUp grid-child-element modal-Icon" href="https://ib.africanbank.co.za/modules/Registration/Public/Register.aspx" target="_blank" >
+                                <i class"modal-Icon">
+                                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66.91 122.88"
+                                         style="enable-background: new 0 0 66.91 122.88; width: 12px; height: 12px; color: #021A44" xml:space="preserve"><g><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z" /></g></svg>
+
+                                </i>
+                            </div>
+                        </div>
+
+                        <div class="grid-container-element lineUp">
+                            
+                            <div class="grid-child-element lineUp ">
+                                <h5 class="redirect-Text lineUp"><a href="https://ib.africanbank.co.za/SignIn.aspx" target="_blank" style="white-space: nowrap;"><span>Investment</span></a></h5>
+                            </div>
+
+                            <div class="grid-child-element modal-Icon lineUp">
+                                <i class"modal-Icon lineUp" >
+                                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66.91 122.88"
+                                         style="enable-background: new 0 0 66.91 122.88; width: 12px; height: 12px; color: #021A44" xml:space="preserve"><g><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z" /></g></svg>
+
+                                </i>
+                            </div>
+                        </div>
+                        
+                        <div class="lineUp grid-container-element">
+                            <div class="lineUp grid-child-element ">
+                                <h5 class="lineUp redirect-Text"><a href="https://ib.africanbank.co.za/SignIn.aspx" target="_blank"><span>Funeral</span></a></h5>
+                            </div>
+                            <div class="lineUp grid-child-element modal-Icon" href="https://ib.africanbank.co.za/modules/Registration/Public/Register.aspx" target="_blank" >
+                                <i class"modal-Icon">
+                                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66.91 122.88"
+                                         style="enable-background: new 0 0 66.91 122.88; width: 12px; height: 12px; color: #021A44" xml:space="preserve"><g><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z" /></g></svg>
+
+                                </i>
+                            </div>
+                        </div>
+                    </div>
+                   
+                   @* 
+                    
+                    <div class="nav-modal-tab-content">
+            
+                        <p class="long-Text2 lineUp">I would like to apply for</p>
+
+                        <div class="grid-container-element lineUp">
+                            
+                            <div class="grid-child-element lineUp ">
+                                <h5 class="redirect-Text lineUp"><a href="https://africanbank.co.za/en/home/banking/#MyWorld" target="_blank" style="white-space: nowrap;"><span>Credit</span></a></h5>
+                            </div>
+
+                            <div class="grid-child-element modal-Icon lineUp">
+                                <i class"modal-Icon lineUp" >
+                                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66.91 122.88"
+                                         style="enable-background: new 0 0 66.91 122.88; width: 12px; height: 12px; color: #021A44" xml:space="preserve"><g><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z" /></g></svg>
+
+                                </i>
+                            </div>
+                        </div>
+                        
+                        <div class="lineUp grid-container-element">
+                            <div class="lineUp grid-child-element ">
+
+                                <h5 class="lineUp redirect-Text"><a href="https://business-ibank.africanbank.co.za/" target="_blank"><span>MyWORLD bank account</span></a></h5>
+                            </div>
+                            <div class="lineUp grid-child-element modal-Icon" href="https://ib.africanbank.co.za/modules/Registration/Public/Register.aspx" target="_blank" >
+                                <i class"modal-Icon">
+                                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66.91 122.88"
+                                         style="enable-background: new 0 0 66.91 122.88; width: 12px; height: 12px; color: #021A44" xml:space="preserve"><g><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z" /></g></svg>
+
+                                </i>
+                            </div>
+                        </div>
+                        
+                        <div class="grid-container-element lineUp">
+                            
+                            <div class="grid-child-element lineUp ">
+                                <h5 class="redirect-Text lineUp"><a href="https://ib.africanbank.co.za/SignIn.aspx" target="_blank" style="white-space: nowrap;"><span>Investment</span></a></h5>
+                            </div>
+
+                            <div class="grid-child-element modal-Icon lineUp">
+                                <i class"modal-Icon lineUp" >
+                                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66.91 122.88"
+                                         style="enable-background: new 0 0 66.91 122.88; width: 12px; height: 12px; color: #021A44" xml:space="preserve"><g><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z" /></g></svg>
+
+                                </i>
+                            </div>
+                        </div>
+                        
+                        <div class="lineUp grid-container-element">
+                            <div class="lineUp grid-child-element ">
+
+                                <h5 class="lineUp redirect-Text"><a href="https://ib.africanbank.co.za/SignIn.aspx" target="_blank"><span>Funeral</span></a></h5>
+                            </div>
+                            <div class="lineUp grid-child-element modal-Icon" href="https://ib.africanbank.co.za/modules/Registration/Public/Register.aspx" target="_blank" >
+                                <i class"modal-Icon">
+                                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66.91 122.88"
+                                         style="enable-background: new 0 0 66.91 122.88; width: 12px; height: 12px; color: #021A44" xml:space="preserve"><g><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z" /></g></svg>
+
+                                </i>
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                    *@
+
+                </div>
+            </div>
+        </div>
+        <!-- modal End here-->
+
 @section scripts
 {
 
-    <script defer id="customcare-webchat" src="https://africanbank-webchat.gotbot.co.za/js/customcare-webchat.js"></script
+<script>
+
+   function openModal() {
+            $('#nav-modal-overlay').css('display', 'flex');
+            $("body").css("overflow", "hidden");
+            $('#nav-modal').css('display', 'flex');
+        }
+
+        $(document).ready(function () {
+
+            // Close modal
+            $("#closeModalBtn").click(function () {
+                $("#nav-modal").fadeOut();
+                $("body").css("overflow", "auto");
+                $('#nav-modal-overlay').css('display', 'none');
+            });
+        });
+
+
+        function toggleTab(tabIndex) {
+            $('.nav-modal-tab').removeClass('active');
+            $('.nav-modal-tab-content').removeClass('active');
+
+            $('.nav-modal-tab').eq(tabIndex).addClass('active');
+            $('.nav-modal-tab-content').eq(tabIndex).addClass('active');
+        }
+
+
+   
+</script>
+
+   @* <script defer id="customcare-webchat" src="https://africanbank-webchat.gotbot.co.za/js/customcare-webchat.js"></script*@
     <script type="text/javascript" src="@Url.Content("~/Scripts/handlebars-v4.0.5.min.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/jquery.xdomainrequest.min.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculator.js?ver=1")"></script>
@@ -379,3 +1133,4 @@ function SubmitFuneralForm( /*hasSubmit*/) {
 </script>
 
 }
+

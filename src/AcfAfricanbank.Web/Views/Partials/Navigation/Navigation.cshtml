@@ -1,52 +1,33 @@
-﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
-@inject Umbraco.Cms.Core.Models.PublishedContent.IVariationContextAccessor VariationContextAccessor
-@inject Umbraco.Cms.Core.Models.PublishedContent.IPublishedValueFallback PublishedValueFallback
-@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using Umbraco.Web
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers;
+@using Web.Entities;
 @using System.Linq;
 @{
-    // Same approach as master.cshtml: untyped IPublishedContent API
-    // (IsDocumentType/Value<T>) instead of ModelsBuilder-generated model
-    // classes, so this view compiles regardless of ModelsBuilder state.
-    IPublishedContent menu = null;
 
-    IPublishedContent homePageElements = null; 
+    TopNavigation menu = null;
 
+    HomePageElements homePageElements = null;
+    
+    var modelNav = Umbraco.Content("18201");
 
-    if (Model.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault() != null)
+    if (Model.Children.Where(o => o is HomePageElements).FirstOrDefault() != null)
     {
-        homePageElements = Model.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault();
+        homePageElements = (HomePageElements)Model.Children.Where(o => o is HomePageElements).FirstOrDefault();
     }
-    else if (Model.Parent.Parent.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault() != null)
+    else if (Model.Parent.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault() != null)
     {
-        homePageElements = Model.Parent.Parent.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault();
+        homePageElements = (HomePageElements)Model.Parent.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
     }
     else
     {
-        homePageElements = Model.Parent.Children(VariationContextAccessor).Where(o => o.IsDocumentType("homePageElements")).FirstOrDefault();
+        homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
     }
-
-    menu = homePageElements?.Children(VariationContextAccessor).Where(o => o.IsDocumentType("topNavigation")).FirstOrDefault();
+    menu = (TopNavigation)modelNav;
 }
 
-<!-- TEMP DEBUG - remove once the richTextboxItem/homePageElements issues are resolved -->
-<script>
-    $(function () {
-        [
-            { alias: 'richTextboxItem', withChildren: false },
-            { alias: 'homePageElements', withChildren: true }
-        ].forEach(function (check) {
-            var url = '/diagnostics/contenttype/' + check.alias;
-            if (check.withChildren) {
-                url += '?withChildren=true';
-            }
-            $.getJSON(url, function (data) {
-                console.log(check.alias + ' diagnostic:', data);
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                console.log(check.alias + ' diagnostic failed:', textStatus, errorThrown);
-            });
-        });
-    });
-</script>
+
 
 <style>
 .active {
@@ -631,9 +612,9 @@ top: -26px;
                     @{
                         if (menu != null)
                         {
-                            foreach (var menuData in menu.Value<IEnumerable<IPublishedElement>>(PublishedValueFallback, "MenuInfo") ?? Enumerable.Empty<IPublishedElement>())
+                            foreach (var menuData in (IEnumerable<NCmenuCategory>)menu.Value("MenuInfo"))
                             {
-                                foreach (var relatedLink in menuData.Value<IEnumerable<Umbraco.Cms.Core.Models.Link>>(PublishedValueFallback, "menuName") ?? Enumerable.Empty<Umbraco.Cms.Core.Models.Link>())
+                                foreach (var relatedLink in (IEnumerable<Umbraco.Web.Models.Link>)menuData.Value("menuName"))
                                 {
                                     if (relatedLink.Url != "#")
                                     {
@@ -645,12 +626,12 @@ top: -26px;
                                             <a href="~/en/home/" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                                                 @relatedLink.Name
 
-                                                @if (menuData.Value(PublishedValueFallback, "menus") != null)
+                                                @if (menuData.Value("menus") != null)
                                                 {
                                                     <i class="fa fa-angle-down"></i>
                                                 }
                                             </a>
-                                            @if (menuData.Value(PublishedValueFallback, "menus") != null)
+                                            @if (menuData.Value("menus") != null)
                                             {
 
                                                 <div class="dropdown-menu">
@@ -658,31 +639,31 @@ top: -26px;
                                                         <div class="row eq-height">
                                                             @{
 
-                                                                var categoryItems = menuData.Value<IEnumerable<IPublishedElement>>(PublishedValueFallback, "menus")?.ToList();
+                                                                List<NCmenuContent> categoryItems = (List<NCmenuContent>)menuData.Value("menus");
                                                                 string cssStyleLastCat = null;
                                                                @* var lastItem = categoryItems.Last();*@
-                                                                foreach (var categoryItem in categoryItems ?? Enumerable.Empty<IPublishedElement>())
+                                                                foreach (var categoryItem in categoryItems)
                                                                 {
                                                                  @*   if (categoryItem != lastItem) { cssStyleLastCat = ""; }
                                                                     else { cssStyleLastCat = "border-right: 0px !important; "; }*@
 
-                                                                    var categoryName = categoryItem.Value(PublishedValueFallback, "categoryName");
-                                                                    var linkData = categoryItem.Value<IEnumerable<IPublishedElement>>(PublishedValueFallback, "link");
+                                                                    var categoryName = categoryItem.Value("categoryName");
+                                                                    var linkData = categoryItem.Value("link");
                                                                     <div class="col-sm-3">
                                                                         <div class="mega-menu-product" style="@cssStyleLastCat">
-                                                                            <div class="product-category">@categoryItem.Value(PublishedValueFallback, "categoryName")</div>
+                                                                            <div class="product-category">@categoryItem.Value("categoryName")</div>
 
-                                                                            @foreach (var linkValue in linkData ?? Enumerable.Empty<IPublishedElement>())
+                                                                            @foreach (var linkValue in (IEnumerable<NCmenuList>)linkData)
                                                                             {
                                                                                 string pageSection = "";
-                                                                                if (linkValue.Value(PublishedValueFallback, "pageSection") != null)
+                                                                                if (linkValue.Value("pageSection") != null)
                                                                                 {
-                                                                                    pageSection = linkValue.Value(PublishedValueFallback, "pageSection").ToString();
+                                                                                    pageSection = linkValue.Value("pageSection").ToString();
                                                                                 }
                                                                                 string _linkString = null;
-                                                                                if (linkValue.Value(PublishedValueFallback, "menuList") != null)
+                                                                                if (linkValue.Value("menuList") != null)
                                                                                 {
-                                                                                    foreach (var link in linkValue.Value<IEnumerable<Umbraco.Cms.Core.Models.Link>>(PublishedValueFallback, "menuList") ?? Enumerable.Empty<Umbraco.Cms.Core.Models.Link>())
+                                                                                    foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)linkValue.Value<IEnumerable<Umbraco.Web.Models.Link>>("menuList"))
                                                                                     {
                                                                                         if (pageSection != "")
                                                                                         {
@@ -695,7 +676,7 @@ top: -26px;
 
                                                                                         <div class="product">
                                                                                             <a class="title" href=@_linkString>@link.Name</a>
-                                                                                            <p class="descr">@linkValue.Value(PublishedValueFallback, "menuDescription")</p>
+                                                                                            <p class="descr">@linkValue.Value("menuDescription")</p>
                                                                                         </div>
                                                                                     }
                                                                                 }
@@ -712,7 +693,7 @@ top: -26px;
                                     }
                                     else
                                     {
-                                        <li><a href="@Configuration["online_upload"]" target="_blank">Upload documents</a></li>
+                                        <li><a href="@System.Configuration.ConfigurationManager.AppSettings["online_upload"]" target="_blank">Upload documents</a></li>
                                     }
                                 }
                             }

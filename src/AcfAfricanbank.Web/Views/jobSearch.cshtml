@@ -7,8 +7,97 @@
 }
 
 <style>
+.active {
+    color: #fff !important;
+}
     .job-search {
         width: 100% !important;
+    }
+    .hero-static-caption {
+        top: 0px;
+    }    
+    .infoGraphic-container {
+        width: 88%;
+        margin: auto;
+        margin-bottom: 45px;
+        margin-top: 55px;
+        /*background-color: #e5ebf0 !important; #00346A*/
+    }
+    .desktop-video{
+        margin: auto;
+        display: block !important; 
+        border-width: 0px;
+    }
+
+     .mobile-video {
+        display: none;
+        border-width: 0px;
+    }
+    @@media(max-width:767px) {
+        .desktop-video{
+           display: none !important; 
+        }
+
+        .mobile-video {
+           display: block  !important;
+        }
+        
+    }
+    
+    @@media (min-width: 280px) and (max-width: 767px) {
+        .hero-static-caption {
+           top: -60px;
+        } 
+        .infoGraphic-container {
+            width: 100%;
+            margin: 0px;
+            margin-bottom: 30px;
+            margin-top: -16px;
+        }
+    }
+     @@media (min-width: 1024px) and (max-width: 1025px) {
+        .hero-static-caption {
+           top: -60px;
+        } 
+        .infoGraphic-container {
+            width: 111%;
+            margin: 0px -54px;
+            margin-bottom: 30px;
+            margin-top: -16px;
+        }
+    }
+    @@media (min-width: 768px) and (max-width: 769px) {
+        .hero-static-caption {
+           top: -60px;
+        } 
+        .infoGraphic-container {
+            width: 119%;
+            margin: 0px -70px;
+            margin-bottom: 30px;
+            margin-top: -16px;
+        }
+    }
+    @@media (min-width: 800px) and (max-width: 840px) {
+        .hero-static-caption {
+           top: -60px;
+        } 
+        .infoGraphic-container {
+            width: 110%;
+            margin: 0px -44px;
+            margin-bottom: 30px;
+            margin-top: -16px;
+        }
+    }
+    @@media (min-width: 1280px) and (max-width: 1280px) {
+        .hero-static-caption {
+           top: -60px;
+        }
+       .infoGraphic-container {
+            width: 104%;
+            margin: 0px -29px;
+            margin-bottom: 30px;
+            margin-top: -16px;
+        }
     }
 </style>
 
@@ -16,8 +105,8 @@
 <div class="hero-static-container">
     <div class="container-fluid">
         <div class="row no-gutter">
-            <div class="col-sm-12">
-                <div class="hero-static-banner" style="background-image: url('/images/hero/ABW1802_001_New_Web_Image_Update_028.jpg');">
+            <div class="col-sm-12"> @* /images/hero/ABW1802_001_New_Web_Image_Update_028.jpg  /media/s30h4qxv/top-employee-banner_update.jpg*@
+                <div class="hero-static-banner" style="background-image: url('/media/qfmlaia5/website-comms-banner_1442x658-44.jpg');">
                     <ol class="breadcrumb">
                         <li class="active">More > Others > Job search</li>
                     </ol>
@@ -30,24 +119,75 @@
 <div class="container">
     <div class="hero-static-caption">
         <h1 class="hero-static-title margin-bottom-0">African Bank Careers</h1>
+        <div class="hero-static-description" style="margin-top:15px;">
+            <p style="width:100%">
+                African Bank is made up of people who make a difference in everyday life. We offer extensive possibilities for talented and innovative people to enjoy career paths filled with success and personal growth. 
+            </p>
+        </div>
     </div>
 </div>
-
+<div class="infoGraphic-container">
+    @*<video class="desktop-video" style="padding: 10px 0px 10px 0px" width="100%" height="540" loop muted autoplay="autoplay">
+      <source src="/media/u0jp0t4b/african-bank-animation-1.mp4" type="video/mp4">
+      <source src="/media/u0jp0t4b/african-bank-animation-1.mp4" muted type="video/mp4">
+    </video>
+    <video class="mobile-video" style="padding: 20px 0px 10px 0px" width="100%" height="540" loop muted autoplay="autoplay">
+      <source src="/media/mnukqjsi/01-african-bank-animation-mobile.mp4" type="video/mp4">
+      <source src="/media/mnukqjsi/01-african-bank-animation-mobile.mp4" type="video/mp4">
+    </video>
+    https://www.youtube.com/embed/92dlWV9UfWg?autoplay=1&mute=1
+    *@
+    
+    <iframe class="desktop-video" style="padding: 10px 100px 10px 100px" width="100%" height="540" src="https://www.youtube.com/embed/WN2QChN9vqQ">
+    </iframe>
+    
+    <iframe class="mobile-video" width="100%" height="360" src="https://www.youtube.com/embed/WN2QChN9vqQ">
+    </iframe>
+   
+</div>
 <div class="investment-calculator">
     <div class="container">
         <div class="row">
             <div class="col-sm-8 col-sm-offset-2 text-center">
                 <h2>Job Search</h2>
                 <p class="body-content margin-top-30">
-                    African Bank is made up of people who make a difference in everyday life. We offer extensive possibilities for talented and innovative people to enjoy career paths filled with success and personal growth. Professionals in fields of administration, finance & accounting, project management, legal collections, call centre, sales, information technology, human resources, marketing, auditing, risk management, credit analysis, economics and many more are the core of our excellence.
+                    Professionals in fields of administration, finance & accounting, project management, legal collections, call centre, sales, information technology, human resources, marketing, auditing, risk management, credit analysis, economics and many more are the core of our excellence.
                 </p>
             </div>
         </div>
     </div>
 </div>
+
 <div class="margin-top-40 hidden-xs"></div>
 <div class="container margin-top-10">
     <div class="job-search">
         <iframe src="https://afb.outsourcefocus.co.za/Careers/" width="100%" height="1100" frameborder="0" style="border:0" allowfullscreen=""></iframe>
     </div>
 </div>
+@*
+@section Scripts {
+<script>
+    $(document).ready(function () {
+
+        var imageBgCss = "url('/media/qfmlaia5/website-comms-banner_1442x658-44.jpg')";
+       var imageMdCss = "url('/media/fo5fleiw/abw2310_ar_landingpage_banner_mobile.jpg')";
+        var imageSmCss = "url('/media/fo5fleiw/abw2310_ar_landingpage_banner_mobile.jpg')";
+
+        var CheckScreenSize;
+
+        (CheckScreenSize = function () {
+            var _width = $(window).outerWidth();
+            var _height = $(window).outerHeight();
+
+            if (_width < 414) {
+                $(".hero-static-banner").css("background-image", imageSmCss);
+            }
+            else {
+                $(".hero-static-banner").css("background-image", imageBgCss);
+            }
+        })();
+
+        $(window).resize(CheckScreenSize);
+    });
+</script>
+}*@

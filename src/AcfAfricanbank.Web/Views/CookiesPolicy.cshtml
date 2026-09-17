@@ -13,10 +13,9 @@
     var Children = Model.Children;
 
     // Get specific Children
-    var heroHeader = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroHeader   = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
     var heroShoulder = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
-
-    var _heroBody = Children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    var _heroBody    = Children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
 
     var bodyBlurpDescription = _heroBody.Value("richTextBox");
     var footBlurpDescription = _heroBody.Value("bodyFooterTitle");
@@ -211,3 +210,5 @@
         })
     </script>
 }
+
+

@@ -1,5 +1,477 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCredit>
+@using AcfAfricanbank.Core.Models.Forms
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using CustomModels = Web.Models;
+
 @{
-	Layout = null;
+    Layout = "Master.cshtml";
+    
+
+    // All Current Page Children
+    var children = Model.Children;
+
+    // Get specific Children
+   @* var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();*@
+    var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    
+    @*new code*@
+    
+      var firstcard = heroBody.Children.Where(c => c.Name == "FirstSection").FirstOrDefault();
+      var firstcardAfricanBank = firstcard.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var Firstcards = firstcardAfricanBank.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+      
+      var creditcard = heroBody.Children.Where(c => c.Name == "Credit Cards").FirstOrDefault();
+      var creditcardAfricanBank = creditcard.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var creditcards = creditcardAfricanBank.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+      
+      
+      ContentModels.TabBody createOwnWorldOfBanking = null;
+      var partialName = creditcard.Value("PartialViewName");
+      createOwnWorldOfBanking = (TabBody)creditcard;
+      
+      var secondsection = heroBody.Children.Where(c => c.Name == "SecondSection").FirstOrDefault();
+      var secondsectioncontent = secondsection.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var secondsections = secondsectioncontent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+     
+       
+      
+       var creditcardfaq = heroBody.Children.Where(c => c.Name == "FAQ").FirstOrDefault();
+      var faqcontent = creditcardfaq.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var faqcontentqa = faqcontent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+       var noCampx1 = 1;
+      
+        
+       ContentModels.TabBody createOwnWorldOfBankingfaq = null;
+      var partialName1 = creditcardfaq.Value("PartialViewName");
+      createOwnWorldOfBankingfaq = (TabBody)creditcardfaq;
+      
+       @*end new code*@
+   
+    
+    
+    var heroKnees = children?.Where(c => c.ContentType.Alias.ToLower() == "heroknees").FirstOrDefault();
+
+    var testimonialTab = children?.Where(c => c.ContentType.Alias.ToLower() == "testimonials").FirstOrDefault();
+    var priceStructure = children?.Where(c => c.ContentType.Alias == "priceStructure").FirstOrDefault();
+    var contentLists = children?.Where(c => c.ContentType.Alias == "featuresAndFreeServices").ToList();
+    var homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+
+    var cardInforhomePageElements = homePageElements.Children.Where(c => c.ContentType.Alias == "ebankITListSectionText" && c.Name == "Credit Card Info").Last();
+    
+    var featureList = contentLists?.Where(c =>
+    {
+        var val = c.Value("contentListType")?.ToString() ?? string.Empty;
+        var type = (!string.IsNullOrEmpty(val)) ? val : string.Empty;
+
+        return type.ToLower() == "features and free services";
+    }).FirstOrDefault();
+
+
+    // Get Specific Grandchildren
+    
+    var bodyCards = heroBody?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+    var bodyButton = heroBody?.Children?
+         .Where(c => c.ContentType.Alias == "ebankITAbstractButton").FirstOrDefault();
+
+
+    // Get Properties
+    var bodyTitle = heroBody?.Value("bodyTitle").ToString();
+    var bodyDescription = heroBody?.Value("bodyDescription").ToString();
+    var applyDocs = bodyCards?.Select(c => c as Card).ToList();
+
+    var benefitsModel = new CustomModels.Benefits
+    {
+        Header = heroChest?.Value("chestTitle").ToString(),
+        Description = heroChest?.Value("chestDescription").ToString(),
+        BenefitCards = heroChest?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card")?.Select(c => c as Card).ToList()
+    };
+    
+  
+    
+
+}
+
+<style>
+    .mega-tabs .nav-tabs>li.active:after {
+        top: unset !important;
+        bottom: -18px;
+    }
+    
+      
+.campaign-product-container {
+    top: 0px !important;
+}
+</style>
+
+<link rel="stylesheet" href="/css/projectmagic.css" />
+
+ @{
+         int idIterator = 0;
+           foreach (var item in Firstcards){
+               var tabSubItemImage = item.Value<IPublishedContent>
+    ("tabSubItemImage")?.Url;
+    var tabSubItemIcon = item.Value<IPublishedContent>
+        ("tabSubItemIcon")?.Url;
+        var title = item.Value<string>
+            ("tabSubItemTitle");
+            var description = item.Value<string>
+                ("genericCardContent");
+
+
+                List<Umbraco.Web.Models.Link>
+                    itemLink = new List<Umbraco.Web.Models.Link>
+                        ();
+
+                        foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>
+                            )item.Value("tabSubItemLinks"))
+                            {
+                            itemLink.Add(link);
+
+                            }
+
+
+
+                            if (idIterator%2 == 0)
+                            {
+                            <section class="section-800 bg-grey-60">
+                                <div class="container">
+                                    <div class="row d-flex align-items-center row-change">
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                            <h1 class="color-brand-1 mt-15 mb-20">
+                                                @title
+                                            </h1>
+                                            <p class="font-md color-brand-1 mt-20">
+                                                @item.Value("tabSubItemTextContent")
+                                            </p>
+
+                                           @if (itemLink.Any(link => link.Name.Contains("DOWNLOAD NOW")))
+                                            {
+                                                    <div class="mt-50 text-start">
+                                                        <a class="btn btn-brand-1 hover-up" href="@itemLink[0].Url">
+                                                            @itemLink[0].Name
+                                                              <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="right-icon"
+                                                    height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke-linecap="round" 
+                                                    stroke-linejoin="round" stroke-width="32" 
+                                                    d="M320 336h76c55 0 100-21.21 100-75.6s-53-73.47-96-75.6C391.11 99.74 329 48 256 48c-69 0-113.44 45.79-128 91.2-60 5.7-112 35.88-112 98.4S70 336 136 336h56m0 64.1 64 63.9 64-63.9M256 224v224.03">
+                                                    </path></svg>
+                                                        </a>
+                                                    </div>
+
+                                            }
+                                            else{
+                                            
+                                            <div class="mt-50 text-start">
+                                                        <a class="btn btn-brand-1 hover-up" href="@itemLink[0].Url">
+                                                            @itemLink[0].Name
+                                                             
+                                                        </a>
+                                                    </div>
+                                            }
+
+                                        </div>
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                            <img class="d-block"
+                                                 src="@tabSubItemImage"
+                                                 alt="iori" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            }
+                            else{
+
+                            <section class="section-800">
+                                <div class="container">
+                                    <div class="row d-flex align-items-center row-change flex-row-reverse">
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                            <h1 class="color-brand-1 mt-15 mb-20">@title</h1>
+                                            <p class="font-md color-brand-1">@item.Value("tabSubItemTextContent")</p>
+@if (itemLink.Any(link => link.Name.Contains("DOWNLOAD NOW")))
+                                            {
+                                                    <div class="mt-50 text-start">
+                                                        <a class="btn btn-brand-1 hover-up" href="@itemLink[0].Url">
+                                                            @itemLink[0].Name
+                                                              <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="right-icon"
+                                                    height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke-linecap="round" 
+                                                    stroke-linejoin="round" stroke-width="32" 
+                                                    d="M320 336h76c55 0 100-21.21 100-75.6s-53-73.47-96-75.6C391.11 99.74 329 48 256 48c-69 0-113.44 45.79-128 91.2-60 5.7-112 35.88-112 98.4S70 336 136 336h56m0 64.1 64 63.9 64-63.9M256 224v224.03">
+                                                    </path></svg>
+                                                        </a>
+                                                    </div>
+
+                                            }
+                                            else{
+                                            
+                                            <div class="mt-50 text-start">
+                                                        <a class="btn btn-brand-1 hover-up" href="@itemLink[0].Url">
+                                                            @itemLink[0].Name
+                                                             
+                                                        </a>
+                                                    </div>
+                                            }
+                                          
+                                        </div>
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+
+                                            <img class="d-block"
+                                                 src="@tabSubItemImage"
+                                                 alt="iori" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            }
+                            idIterator += 1;
+                            }
+                            }
+
+@*end first*@
+<section class="section-800 bg-grey-60">
+    <div class="container">
+        <div class="row mt-50 align-items-center">
+            <div class="col-lg-6 mb-30">
+                <h2 class="color-brand-1">@createOwnWorldOfBanking.Value("partialViewClassName")</h2></div>
+                @{
+                   int insu = 0;
+                   foreach (var item in creditcards){
+                        var cardTitle = item.Value<string>("nCcardTitle");
+                        var cardTitleId = cardTitle.Trim().ToString().Replace(" ", "").ToString() + idIterator.ToString();
+                        var cardDesc = item.Value<string>("nClongDescription");
+                        var cardDescmedium = item.Value<string>("mediumDescription");
+                        var icon = item.Value<IPublishedContent>("nCcardIcon");
+                        
+                        <div class="col-lg-6">
+                            <div class="card-offer-large card-we-do hover-up">
+                                <div class="card-image"><img alt="iori" loading="lazy" width="500" height="300" decoding="async" data-nimg="1" sizes="100vw" srcset=""
+                                    src="@icon.Url" style="color: transparent; width: 100%; height: auto;"></div>
+                                <div class="card-info">
+                                    <h4 class="color-brand-1 mb-10"><a class="color-brand-1" href="What makes us different from others? We give holistic solutions with strategy, design &amp; technology.">@cardTitle</a></h4>
+                                    <p class="font-md color-grey-500 mb-5">@Html.Raw(item.Value<string>("mediumDescription"))</p>
+                                </div>
+                            </div>
+                        </div>
+                   }
+                   insu++;
+                }
+        </div>
+    </div>
+</section>
+@*second section*@
+ @{
+         int idIterator1 = 0;
+           foreach (var item in secondsections){
+               var tabSubItemImage = item.Value<IPublishedContent>("tabSubItemImage")?.Url;
+               var tabSubItemIcon = item.Value<IPublishedContent>("tabSubItemIcon")?.Url;
+               var title = item.Value<string>("tabSubItemTitle");
+               var description = item.Value<string>("genericCardContent");
+
+
+                List<Umbraco.Web.Models.Link>
+                  itemLink = new List<Umbraco.Web.Models.Link>
+                        ();
+
+                        foreach (var link in (IEnumerable<Umbraco.Web.Models.Link> )item.Value("tabSubItemLinks"))
+                            {
+                            itemLink.Add(link);
+
+                            }
+
+                            if (idIterator1%2 == 0)
+                            {
+                            <section class="section-800">
+                                <div class="container">
+                                    <div class="row d-flex align-items-center row-change">
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                            <h1 class="color-brand-1 mt-15 mb-20">
+                                                @title
+                                            </h1>
+                                            <p class="font-md color-brand-1 mt-20">
+                                                @item.Value("tabSubItemTextContent")
+                                            </p>
+
+                                          @if(itemLink != null && itemLink.Count() > 0) {
+                                                    <div class="mt-50 text-start">
+                                                        <a class="btn btn-brand-1 hover-up" href="@itemLink[0].Url">
+                                                            @itemLink[0].Name
+                                                              
+                                                        </a>
+                                                    </div>
+
+                                            }
+
+                                        </div>
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                            <img class="d-block"
+                                                 src="@tabSubItemImage"
+                                                 alt="iori" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            }
+                            else{
+
+                            <section class="section-800 bg-grey-60">
+                                <div class="container">
+                                    <div class="row d-flex align-items-center row-change flex-row-reverse">
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                            <h1 class="color-brand-1 mt-15 mb-20">@title</h1>
+                                            <p class="font-md color-brand-1">@item.Value("tabSubItemTextContent")</p>
+
+                                           @if(itemLink != null && itemLink.Count() > 0) {
+                                                    <div class="mt-50 text-start">
+                                                        <a class="btn btn-brand-1 hover-up" href="@itemLink[0].Url">
+                                                            @itemLink[0].Name
+                                                              
+                                                        </a>
+                                                    </div>
+
+                                            }
+                                        </div>
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+
+                                            <img class="d-block"
+                                                 src="@tabSubItemImage"
+                                                 alt="iori" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            }
+                            idIterator1 += 1;
+                            }
+                            }
+
+@*faq*@
+<section class="section-800 bg-grey-60">
+<div class="container " >
+    <div class="row align-items-center d-flex row-change">
+        <div class="col-xl-12 col-lg-12 col-md-12">
+              <h1 class="color-brand-1 mt-15 mb-20 text-center faqHeader">@createOwnWorldOfBankingfaq.Value("partialViewClassName")</h1>
+             
+               <div class="accordion accordionStyle2" id="accordionFAQ">
+                    <div class="row">
+                   @foreach (var item in faqcontentqa)
+
+                    {
+                        var cardTitle = item.Value<string>("nCcardTitle");
+                        <div class="col-lg-12">
+                            <div class="accordion-item">
+                                <h5 class="accordion-header">
+                                    <button class="accordion-button text-heading-5">@cardTitle</button>
+                                </h5><div id="accordion-body" class="accordion-collapse collapse">
+                                    <div class="accordion-body">@Html.Raw(item.Value<string>("mediumDescription"))</div>
+                                </div>
+                            </div>
+                        </div>
+                                                    
+                        noCampx1 += 1;
+
+                    }
+                    </div>
+                </div>
+        </div>
+        
+    </div>
+</div>
+</section>   
+
+@*exaample*@
+    <section class="section-800" style="background-color:#002B60">
+        <div class="container">
+            <div class="row align-items-center ">
+                        <div class="col-xl-12 col-lg-12 col-md-12">
+                            <h1 class="mt-15 mb-20" style="color:#FFFFFF;font-size: 32px;font-weight: normal;">
+                         His legacy is one of steward leadership and selfless dedication to the service of others.
+                        </h1>
+                        </div>
+            </div>
+            <div class="row align-items-center">
+           
+                <div class="col-xl-4 col-lg-4 col-md-4">
+                    <img class="d-block" src="/media/j25noleg/credit-card.png" alt="iori">
+                </div>
+                <div class="col-xl-8 col-lg-8 col-md-8">
+                    <p class="font-md mt-30" style="color:#FFFFFF;font-size:14px!important;line-height: 25px;">
+                         Dr Sam Motsuenyane’s involvement in African Bank started in 1964,
+                   when the seeds of the idea for a bank for the people by the people were first sown at the very first conference of the National African Federated Chamber of Commerce (Nafcoc), 
+                   then known as the National African Chamber of Commerce (Nacoc).
+                    </p>
+                    
+                   <p class="font-md  mt-30" style="color:#FFFFFF;font-size:14px!important;line-height: 25px;">It would take another 10 years for that seed to take root, 
+                   and it was largely thanks to the perseverance and steady guiding hand of Dr Motsuenyane that it eventually bore fruit. </p>
+                   
+                    <p class="font-md mt-30" style="color:#FFFFFF;font-size:14px!important;line-height: 25px;" >The idea was born out of the realisation that a Black bank was needed to promote and finance Black economic 
+                   development. It was an audacious idea at that time – the apartheid regime was at its most 
+                   oppressive and the rights of Black people were summarily being stripped away. In fact, Nacoc’s first conference was
+                   held only one month before the Rivonia Trial, which found Nelson Mandela and seven ANC comrades guilty of treason and 
+                   sentenced them to life in prison. </p>
+                   
+                   
+                </div>
+            </div>
+            <div class="row align-items-center">
+                <div class="col-xl-12 col-lg-12 col-md-12">
+                     <p class="font-md" style="color:#FFFFFF;font-size:14px!important;line-height: 25px;">Virtually all black anti-apartheid organisations were banned. Many of their leaders were either in jail or fled 
+                       into exile to escape prosecution. The grim menace of death in detention became a new ominous feature in the suppression
+                       of resistance against apartheid. In addition to the draconian pass laws restricting their movement, Black people 
+                       were not allowed to own property in urban areas, and it was illegal for them to run businesses in townships, 
+                       unless they provided essential goods and services. Those who ran shops could only sell 
+                       a pre-approved list of 26 items. </p>
+                    <p class="font-md  mt-20" style="color:#FFFFFF; font-size:14px!important;line-height: 25px;">While Black people could bank their money in traditional banks, it was impossible to access loans. Loans required collateral, which Black people simply did not have. “Interestingly though, financial institutions were always happy to take our money whenever we brought it in for banking. They just did not bother recycling the money back into our communities,” Dr Motsuenyane recalled. Having attended university in the US, Dr Motsuenyane had witnessed firsthand how Black communities there had set up their own banks to solve the same problem of access to capital. He used his experiences in the American South to help convince Nacoc that a Black bank was a necessity for the economic development of Black people in South Africa</p>
+                    <p class="font-md  mt-20" style="color:#FFFFFF;font-size:14px!important;line-height: 25px;">He also played a major role in raising capital for the venture. It proved to be slow going. In 1964, a call had gone out to Nacoc members to donate R100 a year. At that first meeting the princely sum of R70 was raised. The chief obstacle to fundraising was the belief that any Black venture on this scale was doomed to failure. “People need to have a history of successes to believe things can be done. Where people or communities have a history of failures, or of restricted progress and development, they come to believe that everything is impossible. This is quite sad and true about many African communities who have not seen themselves achieve anything and succeed. They wrongly believe that nothing can be done,” Dr Motsuenyane would write later.</p>
+                    <p class="font-md mt-20" style="color:#FFFFFF;font-size:14px!important;line-height: 25px;">There was nothing for it, but to roll up his sleeves. Following his election in 1968 as Nafcoc’s third president, it was up to Dr Motsuenyane to cultivate support for the idea of an African Bank. An account was opened at the Church Square branch of Barclays Bank in Pretoria, where those who wanted to buy shares in the new bank could deposit their contribution of at least R100. </p>
+                    <p class="font-md mt-20" style="color:#FFFFFF;font-size:14px!important;line-height: 25px;">Dr Motsuenyane traversed the globe to drum up support for the bank – his journey taking him from the US to Europe and the UK, to the Ivory Coast and Kenya.</p>
+                    <p class="font-md mt-20" style="color:#FFFFFF;font-size:14px!important;line-height: 25px;">Despite setbacks he persevered. He engineered a meeting with the South African finance minister, Nico Diederichs, on the sidelines of a World Bank gathering in Kenya and managed to convince him that by registering the African Bank, the government would be able to soften increasingly hostile attitudes towards the country. Back home, the government agreed to allow the registration of African Bank – with several provisos, including that the first branch of the bank be in a homeland and that at least six of the homelands had to support the idea of the African Bank.</p>
+                    <p class="font-md mt-20" style="color:#FFFFFF;font-size:14px!important;line-height: 25px;">That meant Dr Motsuenyane had to pack his bags again. In a marathon trip, he and his Nafcoc colleagues travelled the length and breadth of South Africa to get support. In the end, they managed to secure the backing of six homeland governments, bar Bophuthatswana. The next hurdle was to get buy-in from Bophuthatswana to locate the first branch in Ga-Rankuwa near Pretoria. There was such massive support from the people of the homeland that the South African government could no longer hold back its approval. When African Bank was finally registered in 1975, Dr Motsuenyane was elected as its first chairman, a post he held for almost 20 years. “On that day when we inaugurated the first branch of the African Bank, there was a tremendous downpour of rain. Just after we said ‘Amen’, the rain came down in torrents. We sang ‘Glory hallelujah” when our long-cherished dream was transformed into reality,” Dr Motsuenyane recalled. </p>
+                    <p class="font-md  mt-20" style="color:#FFFFFF;font-size:14px!important;line-height: 25px;">Dr Motsuenyane resigned from the board in 1995 when he was posted as South Africa’s ambassador to Saudi Arabia. In the intervening years, Dr Motsuenyane remained a true friend to African Bank, through all its ups and downs – championing its cause to remain a bank for the people by the people, just as he had envisioned it. An audacious feat, indeed.</p>
+               
+                </div>
+                
+            </div>
+                
+        </div>
+   </section>
+<!-- PRICING -->
+
+@if (priceStructure != null)
+{
+   @Html.Partial("_priceStructure", priceStructure as ContentModels.PriceStructure)
+}
+
+<!-- CAMPAIGN MORE INFO -->
+@Html.Partial("_heroKneeTabs", heroKnees as ContentModels.HeroKnees)
+
+
+@section scripts{
+  <script>
+  
+  $(document).ready(function(){
+
+        $(".accordion-button").click(function(){
+            
+         
+                var isCollapsed = $(this).hasClass('collapsed');
+        
+               $(".accordion-button").removeClass('collapsed');
+               
+               if(isCollapsed == false) {
+                $(this).toggleClass("collapsed");
+               }
+
+           
+                  var isCollapsedContent = $(this).parent().next(".accordion-collapse").hasClass('collapse');
+                $(".accordion-collapse").addClass('collapse');
+                if(isCollapsedContent == true) {
+                    $(this).parent().next(".accordion-collapse").toggleClass('collapse');
+               }
+
+           });
+
+    });
+</script>
 }

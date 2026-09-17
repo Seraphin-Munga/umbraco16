@@ -1,5 +1,1709 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.BaseModernUI>
+@using CustomModels = Web.Models;
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using AcfAfricanbank.Core.Models.Forms
 @{
-	Layout = null;
+         	Layout = "Master.cshtml";
+    	 var Children = Model.Children;
+    	 var heroBody = Children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    	 var sectioncard = heroBody.Children.Where(c => c.Name == "Tab Body").FirstOrDefault();
+         var sectioncardAfricanBank = sectioncard.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+         var sectioncards = sectioncardAfricanBank.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+         
+         var tabcards = heroBody.Children.Where(c => c.Name == "Cards").FirstOrDefault();
+         var tabcardsAfricanBank = tabcards.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+         var cards = tabcardsAfricanBank.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+    
+         ContentModels.TabBody createOwnWorldOfBanking = null;
+         var partialName = tabcards.Value("PartialViewName");
+         createOwnWorldOfBanking = (TabBody)tabcards;
+         
+         var lastcard = heroBody.Children.Where(c => c.Name == "Last section").FirstOrDefault();
+         var lastcardAfricanBank = lastcard.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+         var lastcards = lastcardAfricanBank.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+         
+         
+         var firstcard = heroBody.Children.Where(c => c.Name == "First section").FirstOrDefault();
+         var firstcardAfricanBank = firstcard.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+         var firstcards = firstcardAfricanBank.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+      
 }
+
+@* the fun starts here *@
+
+<style>
+
+.customer-container3 {
+    padding-bottom: 95px;
+}
+
+.stepSlide3 .btn-download {
+    top: 20px;
+    position: relative;
+    background-color: #5dc400;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 2px;
+    color: white;
+    font-weight: bold;
+}
+.floating-btn {
+    position: fixed;
+    top: 40%;
+    right: -54px;
+    transform: translateY(-50%) rotate(-90deg);
+    z-index: 9999;
+    width: 148px;
+    height: 38px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 12px 16px;
+    color: var(--text-primary-blue, #002B60);
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 20px;
+    border-radius: var(--border-radius-md, 2px) var(--border-radius-md, 2px) var(--border-radius-none, 0px) var(--border-radius-none, 0px);
+    border-top: 1px solid var(--border-primary, #002B60);
+    border-right: 1px solid var(--border-primary, #002B60);
+    border-left: 1px solid var(--border-primary, #002B60);
+    background: var(--surface-primary, #FFF);
+    box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.11);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.image-section-22 {
+    margin-bottom: -250px !important;
+}
+
+.image-position10 {
+    left: 150px;
+    position: relative;
+}
+
+.btn-Explore10{
+    position: relative;
+    top: -71px;
+}
+
+.carousel-indicators {
+    left: 13% !important;
+}
+ #iframe-karaboChat-speechBubble{
+     display:none !important;
+}
+#chatIconImg {
+    display: none;
+}
+
+.center-cards-class{
+     display: flex;
+    justify-content: center;
+}
+.nav-menu {
+    position: static;
+}
+  .mtb-100 {
+    padding-top: 32px;
+    margin-bottom: 100px;
+  }
+
+  .btn-primary:hover {
+    color: #fff;
+    background-color: #5dc400;
+    border-color: none;
+  }
+
+  .section-1-heading {
+
+    font-size: 38px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 52px;
+    letter-spacing: -1.44px;
+    margin-top: 50px;
+
+  }
+
+  .btn-Explore {
+    display: flex;
+    width: 200px;
+    height: 48px;
+    padding: 12px 16px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .btn-Explore svg {
+    margin-top: 0; /* Remove the negative margin */
+  }
+
+  #section-1 {
+    min-height: 60%;
+  }
+  #section-3 {
+    height: 266px;
+  }
+  .customer-container {
+    padding-bottom: 12px;
+  }
+  .customer-container2 {
+    padding-bottom: 215px;
+}
+
+  .three-cards {
+    top: 40px;
+    position: relative;
+  }
+
+  .flex-container__cta-2 {
+    display: flex;
+    gap: 34px;
+  }
+
+  .icon-box {
+    display: flex;
+  }
+
+  .icon-box__icon {
+    margin-right: 24px;
+  }
+
+  .mt-64 {
+    margin-top: 64px;
+  }
+
+  .welcome-section {
+    border-radius: 8px;
+    background: #fff;
+    padding: 45px 32px;
+    box-shadow: 0px 9px 18px 0px rgba(0, 0, 0, 0.15);
+    margin-bottom:40px;
+  }
+
+  .text-style {
+    color: var(--Brand-AB-Blue, #012b60);
+    font-size: 30px;
+    margin-bottom: 32px;
+    font-weight: 600;
+    line-height: 38px; /* 126.667% */
+  }
+
+  .bottom-section {
+    background-color: #5dc300 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 5px;
+  }
+  .image-section {
+    margin-bottom: -200px;
+  }
+.image-position {
+    width: 240px;
+    height: 335px;
+    margin-top: 12px;
+    flex-shrink: 0;
+    aspect-ratio: 1/1;
+  }
+  
+  
+  .image-position3 {
+    width: 320px;
+    height: 335px;
+    margin-top: 12px;
+    flex-shrink: 0;
+    aspect-ratio: 1/1;
+  }
+  .image-position2 {
+    width: 100%;
+    height: 100%;
+    margin-top: 12px;
+    flex-shrink: 0;
+    aspect-ratio: 1/1;
+  }
+
+  /*Back button start here*/
+  .back-section {
+    display: flex;
+    background: white;
+    min-height: 50px;
+    align-items: center;
+  }
+
+  .back-section button {
+    background: none !important;
+    border: none !important;
+  }
+
+  /*Back button end here*/
+
+  .custom-card {
+    overflow: none;
+    border-radius: 10px;
+    background-color: white;
+  }
+  .custom-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .custom-row {
+    flex-grow: 1;
+  }
+
+  .bg-nothing-white {
+    min-height: 112px;
+  }
+  .bg-nothing-white-xs {
+    min-height: 50%;
+  }
+
+  .bg-blue {
+    background-color: #002b60;
+    color: white;
+  }
+  .bg-white {
+    background-color: white;
+    color: #012b60;
+    margin-bottom: 100px;
+  }
+  .bg-grey {
+    background: linear-gradient(
+      180deg,
+      rgba(245, 245, 245, 1) 81%,
+      rgba(255, 255, 255, 1) 81%
+    );
+  }
+
+  .content-center {
+    display: flex;
+    align-content: center;
+    align-items: center;
+  }
+  .content-center-2 {
+    display: flex;
+    height: 150px;
+    align-content: center;
+    align-items: flex-end;
+  }
+
+  .content-sub-start {
+    display: grid;
+    align-content: start;
+    align-items: start;
+  }
+  .content-sub-start p {
+    margin-right: 250px !important;
+  }
+
+  .content-sub-start-2 {
+    display: grid;
+    align-content: start;
+    align-items: start;
+  }
+
+  .content-sub-start-3 {
+    display: grid;
+    align-content: start;
+    align-items: start;
+    font-size: 15px;
+  }
+
+  .mtb-40 {
+    margin: 40px 0px !important;
+  }
+  .mt-40 {
+    margin: 40px 0px !important;
+  }
+  .mtb-32 {
+    margin: 32px 0px !important;
+  }
+  /*Cards Css start here*/
+  .business-section {
+    padding: 50px 0;
+    text-align: center;
+  }
+  .business-section h2 {
+    color: #002f6c;
+    font-weight: bold;
+  }
+  .business-section p {
+    font-size: 16px;
+    color: #4f5b66;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .account-card h3 {
+    color: var(--Brand-AB-Blue, #012b60);
+    /* Heading/H4/Semibold */
+    font-family: Montserrat;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 32px; /* 133.333% */
+  }
+
+.flex__container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 32px;
+    width: 344px;
+    height: 314px;
+    padding: 20px;
+    text-align: center;
+    border-radius: 8px;
+    background: var(--Base-White, #fdfdfd);
+    box-shadow: 0px 9px 18px 0px rgba(0, 0, 0, 0.15);
+    justify-content: flex-start;
+    align-items: center;
+}
+  .flex-container-content__title {
+    font-family: Montserrat;
+    font-size: 24px;
+    color: #012b60;
+    font-weight: 600;
+    line-height: 32px; /* 133.333% */
+  }
+  .account-card {
+    width: 344px;
+    height: 314px;
+    padding: 20px;
+    text-align: left;
+    border-radius: 8px;
+    background: var(--Base-White, #fdfdfd);
+    /* Shadows Light Mode/MD */
+    box-shadow: 0px 9px 18px 0px rgba(0, 0, 0, 0.15);
+  }
+  .card-divider {
+    width: 100%;
+    height: 1px;
+    background-color: #5dc303;
+    margin: 10px 0;
+  }
+  .btn-learn {
+    border: 1px solid #002f6c;
+    color: #002f6c;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: 0.3s;
+  }
+  .btn-learn:hover {
+    background-color: #002f6c;
+    color: #fff;
+  }
+  .btn-apply,
+  .btn-download {
+    background-color: #5dc400;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 2px;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .btn-download-coming-soon
+  {
+    height: 35px !important;
+    margin-bottom: 10px;
+    background: var(--surface-primary, #002B60);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 2px;
+    color: white;
+    font-weight: bold;
+  }
+  
+.btn-download-coming-soon:hover {
+    color: white !important;
+}
+  
+
+  .btn-apply:hover,
+  .btn-download:hover {
+    background-color: #5dc400;
+    color: white;
+  }
+
+  .btn-apply,
+  .btn-outline {
+    background-color: #fff;
+    border: 1px solid #002b60;
+    padding: 10px 20px;
+    border-radius: 2px;
+    color: #002b60;
+    font-weight: bold;
+  }
+
+  .btn-apply:hover,
+  .btn-outline:hover {
+    background-color: #fff;
+    color: #002b60;
+  }
+  .card-image {
+    position: absolute;
+    top: -15px;
+    right: 10px;
+    width: 80px;
+  }
+  .get-in-touch {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    background: #002f6c;
+    color: white;
+    padding: 10px;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    border-radius: 8px 0 0 8px;
+    cursor: pointer;
+  }
+  /*Cards Css end here*/
+
+  .content-sub-heading {
+    font-weight: 500;
+    font-size: 68px !important;
+    line-height: 90px;
+    margin-bottom: 72px; /* Paragraph spacing */
+    letter-spacing: -2%;
+  }
+
+  .section-1-subheading {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 22px;
+    margin-top: 24px;
+    margin-bottom: 0px;
+
+  }
+  .card-p-text {
+    color: var(--Brand-AB-Blue, #012b60);
+    /* Body/Medium/Regular */
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 150% */
+  }
+  
+
+
+  .center-element{
+    display: flex;
+    justify-content: center;
+}
+
+
+
+  /* Existing CSS remains the same */
+
+</style>
+
+
+<style>
+    /* Extra Small Mobile (Portrait): 320px–480px */
+    
+
+ @@media only screen and (min-width: 0px) and (max-width: 320px) {
+  
+  .image-section {
+    margin-bottom: 80px;
+}
+  
+.image-section100 {
+    margin-bottom: -250px !important;
+}
+  
+  .bg-nothing-white {     min-height: 55px; }
+  
+  .btn-Explore10 {
+
+    top: 45px;
+}
+  
+  .customer-container {
+    padding-bottom: 135px;
+  }
+  
+  .flex-container_content{
+    margin-top: -40px;
+  }
+  
+.customer-container {
+    padding-bottom: 80px;
+}
+
+
+.btn-Explore {
+    height: 43px;
+}
+
+
+.btn-Explore10 {
+    position: relative;
+    top: 18px;
+}
+  
+  
+    .bg-nothing-white-xs {
+        min-height: 40%;
+    }
+
+    .btn-Explore {
+        height: 36px;
+    }
+    
+    .bg-white {
+        margin-bottom: 15%;
+    }
+ 
+    .image-section  {
+
+        text-align: center;
+     
+    }
+    
+    
+    .welcome-section {
+        width: 95%;
+        position: relative;
+    }
+    .customer-container2 {
+        padding-bottom: 119px;
+    }
+    .image-position3 {
+        height: 283px;
+        width: 75%;
+        margin-top: 32px;
+    }
+    .image-position2{
+        width: 80% !important;
+    }
+
+    
+    .image-position {
+        width: 100%;
+        height: 320px !important;
+        margin-bottom: 308px;
+    }
+    
+    
+    .image-position-sm {
+        width: 100%;
+        height: 320px !important;
+        margin-top: 35px;
+    }
+    
+    .image-position-sm-banner {
+        width: 100%;
+        height: 320px !important;
+        margin-top: 35px;
+    }
+    
+    #section-1 {
+        min-height: 125%;
+    }
+    
+    .section-1-heading {
+        font-size: 33px;
+        line-height: 46px;
+    }
+        
+
+    .btn-Explore {
+        font-size: 12px;
+        display: flex;
+        width: 144px;
+    }
+    
+    .flex__container {
+        height: 272px;
+    }
+    
+    .flex-container-content__title {
+        text-align: start;
+        font-family: Montserrat;
+        font-size: 20px;
+    }
+    
+    .section-1-heading {
+        font-size: 24px;
+        line-height: 30px;
+    }
+    
+    .section-1-subheading {
+        font-size: 15px;
+        font-weight: 400;
+        line-height: 20px;
+        margin-top: 24px;
+        margin-bottom: 0px;
+    }
+    
+    
+    .center-element {
+        text-align: center;
+    }
+    
+    
+    .content-center-2 {
+        display: flex;
+        height: 115px;
+        align-content: center;
+        align-items: flex-end;
+    }
+    
+    .text-style {
+        color: var(--Brand-AB-Blue, #012b60);
+        font-size: 24px;
+        margin-bottom: 32px;
+        font-weight: 600;
+        line-height: 38px;
+    }
+ 
+ }  
+ @@media only screen and (min-width: 321px) and (max-width: 376px) { 
+ 
+ .image-section {
+    margin-bottom: 80px;
+}
+ 
+ .image-section100 {
+    margin-bottom: -250px !important;
+}
+ 
+ .bg-nothing-white {     min-height: 55px; }
+    
+    .image-position-sm {
+        width: 70%;
+        height: 320px !important;
+        margin-top: 35px;
+    }
+    
+    .image-position-sm-banner {
+        width: 70%;
+        height: 320px !important;
+        margin-top: 35px;
+    }
+ 
+   .btn-Explore10 {
+        top: 45px;
+    }
+ 
+   .customer-container {
+    padding-bottom: 135px;
+  }
+  
+ 
+   .flex-container_content{
+    margin-top: -40px;
+  }
+  
+ 
+ .btn-Explore {
+    height: 43px;
+}
+ 
+ .btn-Explore10 {
+    position: relative;
+    top: 18px;
+}
+ 
+ .customer-container {
+    padding-bottom: 80px;
+}
+ 
+    .bg-nothing-white-xs {
+        min-height: 45%;
+    }
+    
+    .bg-white {
+        margin-bottom: 15%;
+    }
+    
+    .welcome-section {
+        width: 95%;
+        position: relative;
+    }
+ 
+    .image-section  {
+     
+        text-align: center;
+        
+    }
+    
+    .customer-container2 {
+        padding-bottom: 119px;
+    }
+
+    .image-position3 {
+        height: 283px;
+        width: 75%;
+        margin-top: 32px;
+    }
+    .image-position2 {
+        width: 80%;
+        margin-top: -32px;
+    }
+    .image-position {
+        width: 100%;
+        height: 340px !important;
+        margin-bottom: 308px;
+    }
+ 
+    #section-1 {
+        min-height: 86%;
+    }
+    
+    .section-1-heading {
+        font-size: 33px;
+        line-height: 46px;
+    }
+        
+
+    .btn-Explore {
+        font-size: 12px;
+        display: flex;
+        width: 144px;
+    }
+    
+    .flex__container {
+        height: 272px;
+    }
+    
+    .flex-container-content__title {
+        text-align: start;
+        font-family: Montserrat;
+        font-size: 20px;
+    }
+    
+    .section-1-heading {
+        font-size: 24px;
+        line-height: 30px;
+    }
+    
+    .section-1-subheading {
+        font-size: 15px;
+        font-weight: 400;
+        line-height: 20px;
+        margin-top: 24px;
+        margin-bottom: 0px;
+    }
+    
+    
+    .center-element {
+        text-align: center;
+    }
+    
+    
+    .content-center-2 {
+        display: flex;
+        height: 115px;
+        align-content: center;
+        align-items: flex-end;
+    }
+    
+    .text-style {
+        color: var(--Brand-AB-Blue, #012b60);
+        font-size: 24px;
+        margin-bottom: 32px;
+        font-weight: 600;
+        line-height: 38px;
+    }
+ 
+ }
+@@media only screen and (min-width: 376px) and (max-width: 480px) {     /* :contentReference[oaicite:1]{index=1} */
+
+.image-section {
+    margin-bottom: 80px;
+}
+
+    .image-position-sm {
+        width: 70%;
+        height: 320px !important;
+        margin-top: 35px;
+    }
+    
+    .image-position-sm-banner {
+        width: 70%;
+        height: 320px !important;
+        margin-top: 35px;
+    }
+    
+    .image-section100 {
+    margin-bottom: -250px !important;
+}
+    
+    .bg-nothing-white {     min-height: 55px; }
+    
+    .btn-Explore10 {
+
+    top: 45px;
+}
+    
+.customer-container {
+    padding-bottom: 135px;
+  }
+  
+    
+    .flex-container_content{
+    margin-top: -40px;
+  }
+  
+    
+    .btn-Explore {
+        height: 43px;
+    }
+    
+    .btn-Explore10 {
+        position: relative;
+        top: 18px;
+    }
+    
+    .customer-container {
+        padding-bottom: 80px;
+    }
+    
+    .bg-white {
+        margin-bottom: 15%;
+    }
+ 
+    .welcome-section {
+        width: 95%;
+        position: relative;
+    }
+    .image-section  {
+     
+        text-align: center;
+      
+    }
+    
+    .customer-container2 {
+        padding-bottom: 119px;
+    }
+    .image-position3 {
+        height: 283px;
+        width: 75%;
+        margin-top: 32px;
+    }
+    .image-position2{
+        width: 85%;
+        margin-top: -32px;
+    }
+    .image-position {
+        width: 100%;
+        height: 320px !important;
+        margin-bottom: 308px;
+    }
+
+
+    .section-1-heading {
+        font-size: 33px;
+        line-height: 46px;
+    }
+        
+
+    .btn-Explore {
+        font-size: 12px;
+        display: flex;
+        width: 144px;
+    }
+    
+    .flex__container {
+        height: 272px;
+    }
+    
+    .flex-container-content__title {
+        text-align: start;
+        font-family: Montserrat;
+        font-size: 20px;
+    }
+    
+    .section-1-heading {
+        font-size: 24px;
+        line-height: 30px;
+    }
+    
+    .section-1-subheading {
+        font-size: 15px;
+        font-weight: 400;
+        line-height: 20px;
+        margin-top: 24px;
+        margin-bottom: 0px;
+    }
+    
+    
+    .center-element {
+        text-align: center;
+    }
+    
+    #section-1 {
+        min-height: 85%;
+    }
+    
+    .content-center-2 {
+        display: flex;
+        height: 115px;
+        align-content: center;
+        align-items: flex-end;
+    }
+    
+    .text-style {
+        color: var(--Brand-AB-Blue, #012b60);
+        font-size: 24px;
+        margin-bottom: 32px;
+        font-weight: 600;
+        line-height: 38px;
+    }
+}        
+
+/* Small Mobile (Landscape): 481px–600px */
+@@media only screen and (min-width: 481px) and (max-width: 600px) {      /* :contentReference[oaicite:2]{index=2} */
+.bg-nothing-white {     min-height: 55px; }
+
+.image-section {
+    margin-bottom: 80px;
+}
+    .image-position-sm {
+        width: 70%;
+        height: 320px !important;
+        margin-top: 35px;
+    }
+    
+    .image-position-sm-banner {
+        width: 70%;
+        height: 320px !important;
+        margin-top: 35px;
+    }
+   .image-section100 {
+    margin-bottom: -250px !important;
+} 
+
+  .btn-Explore10 {
+    top: 45px;
+}
+
+  .customer-container {
+    padding-bottom: 135px;
+  }
+  
+
+.flex-container_content{
+    margin-top: -40px;
+  }
+  
+
+    .btn-Explore {
+        height: 43px;
+    }
+
+    .btn-Explore10 {
+        position: relative;
+        top: 18px;
+    }
+
+    .customer-container {
+        padding-bottom: 80px;
+    }
+
+    .welcome-section {
+        width: 95%;
+        position: relative;
+    }
+    .image-section  {
+        text-align: center;
+    }
+    
+    #banner {
+        display:none ;
+    }
+    
+    .section-1-heading {
+        font-size: 33px;
+        line-height: 46px;
+    }
+
+    
+    #section-1 {
+        min-height: 100%;
+    }
+
+    .center-element {
+      text-align: center;
+    }
+
+    .section-1-subheading {
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 24px;
+        margin-top: 24px;
+        margin-bottom: 0px;
+    }
+        
+  
+  .flex-container-content__title {
+        font-family: Montserrat;
+        font-size: 16px;
+        text-align: left;
+    }
+  
+
+    /* Add this to reverse column order */
+    #section-1 .row {
+      display: flex;
+      
+    }
+
+    .image-section {
+      order: -1;
+      margin-bottom: 30px !important;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Previous mobile styles remain */
+
+    .section-1-heading {
+      padding: 0 15px;
+      font-size: 27px !important;
+      line-height: 45px !important;
+      letter-spacing: -0.72px;
+    }
+    
+    #section-1,
+    #section-3 {
+      height: auto !important;
+      padding: 40px 0;
+    }
+
+    .customer-container {
+      height: auto !important;
+    }
+    
+    .customer-container2 {
+        padding-bottom: 119px;
+    }
+    
+    .image-position3 {
+        height: 283px;
+        width: 75%;
+        margin-top: 32px;
+    }
+    .image-position2{
+      width: 90%;
+      max-width: 300px;
+      height: auto;
+    }
+    .image-position {
+      width: 100%;
+      max-width: 300px;
+      height: auto;
+    }
+
+    .three-cards {
+      top: 0 !important;
+      position: relative !important;
+    }
+
+    .account-card {
+      margin-bottom: 30px;
+      min-height: auto;
+    }
+
+    .content-center {
+      height: auto;
+      padding: 30px 0;
+    }
+
+    .text-style {
+      font-size: 24px !important;
+      line-height: 32px !important;
+    }
+
+    .section-1-subheading {
+      font-size: 16px;
+      line-height: 24px;
+      padding: 0 15px;
+    }
+
+    .btn-Explore {
+      width: 100% !important;
+    }
+
+    .content-sub-start p {
+      margin-right: 0 !important;
+    }
+
+    .content-center-2 {
+      height: auto;
+      padding-bottom: 20px;
+    }
+
+    .bottom-section {
+      width: 100%;
+    }
+}       
+
+/* Small Tablets (Portrait): 601px–768px */
+@@media only screen and (min-width: 601px) and (max-width: 768px) {     /* :contentReference[oaicite:3]{index=3} */
+
+.image-position10 {
+     left: 0px; 
+  
+}
+
+.image-position {
+    width: 100%;
+    height: 100%;
+}
+
+.image-section {
+    margin-bottom: 80px;
+}
+
+    .section-1-heading {
+        font-size: 40px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 53px;
+        letter-spacing: -1.44px;
+        margin-top: 49px;
+    }
+    
+    #section-1 {
+        min-height: 38%;
+    }
+    
+    .section-1-subheading {
+        font-size: 14px;
+    }
+    
+    .btn-Explore {
+
+        width: 137px;
+        height: 35px;
+        font-size: 14px;
+    }
+
+}        
+
+/* Large Tablets (Landscape): 769px–1024px */
+@@media only screen and (min-width: 769px) and (max-width: 1124px) {   /* :contentReference[oaicite:4]{index=4} */
+    
+    .image-position10 {
+        left: 0px;
+        width: 100% !important;
+    }
+    
+    .image-position {
+    width: 100%;
+    height: 100%;
+    }
+    
+    .section-1-heading {
+        font-size: 40px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 53px;
+        letter-spacing: -1.44px;
+        margin-top: 49px;
+    }
+    
+    #section-1 {
+        min-height: 30%;
+    }
+
+    .section-1-subheading {
+        font-size: 14px;
+    }
+    
+    .btn-Explore {
+
+        width: 137px;
+        height: 35px;
+        font-size: 14px;
+    }
+}       
+
+/* Laptops & Small Desktops: 1025px–1280px */
+@@media only screen and (min-width: 1025px) and (max-width: 1280px) {   /* :contentReference[oaicite:5]{index=5} */
+
+    .image-position10 {
+        left: 0px;
+        width: 100% !important;
+    }
+    .image-position {
+        width: 100%;
+    }
+}      
+
+/* Large Desktops & High-Resolution Monitors: 1281px–1440px */
+@@media only screen and (min-width: 1281px) and (max-width: 1440px) {   /* :contentReference[oaicite:6]{index=6} */
+    .image-position10 {
+        left: 0px;
+        width: 100% !important;
+    }
+    
+    .image-position {
+        width: 100%;
+    }
+}      
+
+/* Extra-Large / Ultra-Wide Screens: 1441px and up */
+@@media only screen and (min-width: 1441px) {       /* :contentReference[oaicite:7]{index=7} */
+
+    .image-position10 {
+        left: 0px;
+        width: 100% !important;
+    }
+    .image-position {
+        width: 100%;
+    }
+}                             
+
+</style>
+
+
+
+<!-- Carousel Wrapper -->
+
+<a href="/en/home/contact-us" class="floating-btn">Get in touch</a>
+
+<section class="bg-nothing-white" id="section-0"></section>
+
+@*
+<div id="customCarousel" class="carousel slide" data-ride="carousel">
+  <!-- Indicators (Optional) -->
+  
+  
+  <div class="container">
+        <ol class="carousel-indicators">
+            <li data-target="#customCarousel" data-slide-to="0" class="active"></li>
+            <li data-target="#customCarousel" data-slide-to="1"></li>
+            <li data-target="#customCarousel" data-slide-to="2"></li>
+        </ol>
+  </div>
+
+
+  <!-- Wrapper for slides -->
+  <div class="carousel-inner">
+
+
+
+    <!-- Slide 2 -->
+    <div class="item active">
+        <section class="bg-blue" id="section-1">
+  <div class="container customer-container2">
+    <div class="row">
+        
+      <div class="col-xs-12 center-element visible-xs">
+        <img class="image-position3" src="/media/ybheksbz/vector-11.png" alt="">
+      </div>
+      
+      <div class="col-xs-12 col-sm-8 col-lg-8 content-center">
+        <div class="">
+          <h1 class="section-1-heading">Welcome to Business and Commercial</h1>
+          <p class="section-1-subheading">
+            At African Bank Business and Commercial, we are here to help your
+            business grow. We offer simple solutions to support your plans,
+            manage your money, and build a better future. We listen to your
+            needs and find what works best for you.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-xs-12 col-sm-4 col-lg-4 image-section hidden-xs visible-sm visible-md visible-lg">
+        <img class="image-position3" src="/media/ybheksbz/vector-11.png" alt="img">
+      </div>
+      
+    </div>
+  </div>
+</section>
+    </div>
+    
+        <!-- Slide 3 -->
+    <div class="item">
+        <section class="bg-blue" id="section-1">
+  <div class="stepSlide3 container customer-container3 ">
+    <div class="row">
+        
+      <div class="col-xs-12 center-element visible-xs">
+        <img class="image-position3" src="/media/z4bl0uuh/image-1.png" alt="">
+      </div>
+      
+      <div class="col-xs-12 col-sm-8 col-lg-8 content-center">
+        <div class="">
+          <h1 class="section-1-heading">Need R20 000 to R5 million for your business? We will back you. </h1>
+          <p class="section-1-subheading">
+            Qualify for a Digital Business Loan if your business makes R1 million+ in turnover per year. 
+          </p>
+          <p class="section-1-subheading">
+              No queues and no hidden fees with funds paid into your account within 48 hours from approval.
+          </p>
+        </div>
+        
+
+      </div>
+
+      <div class="col-xs-12 col-sm-4 col-lg-4 image-section hidden-xs visible-sm visible-md visible-lg">
+        <img class="image-position3" src="/media/z4bl0uuh/image-1.png" alt="img">
+      </div>
+      
+    </div>
+    <a class="btn btn-download  btn-Explore btn-Explore10" href="http://cmsdev.africanbank.net/en/home/business-and-commercial-banking/">Apply now 
+        <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_3049_4491)">
+                      <path d="M8.50033 2.66666L7.56033 3.60666L11.2803 7.33332H3.16699V8.66666H11.2803L7.56033 12.3933L8.50033 13.3333L13.8337 7.99999L8.50033 2.66666Z" fill="white"></path>
+                    </g>
+                    <defs>
+                      <clipPath id="clip0_3049_4491">
+                        <rect width="16" height="16" fill="white" transform="translate(0.5)"></rect>
+                      </clipPath>
+                    </defs>
+                  </svg>
+    </a>
+  </div>
+</section>
+    </div>
+    
+        <!-- Slide 1 -->
+    <div class="item ">
+      <section class="bg-blue" id="section-1">
+  <div class="container customer-container">
+      <div class="col-xs-12 center-element visible-xs">
+        <img class="image-position-sm " src="/media/5sxeofpq/finfindbanner.png" alt="">
+      </div>
+    <div class="row">
+        
+ @{
+                    int idIterator400 = 0;
+                    foreach (var item in sectioncards)
+                    {
+                        var cardTitle = item.Value<string>("nCcardTitle");
+                        var cardDescmedium = item.Value<string>("mediumDescription");
+                        var icon = item.Value<IPublishedContent>("nCcardIcon");
+      
+      
+      
+      <div class="col-xs-12 col-sm-8 col-lg-8 content-center">
+        <div class="">
+          <h1 class="section-1-heading">@cardTitle</h1>
+            @Html.Raw(item.Value<string>("mediumDescription"))
+          
+        </div>
+      </div>
+
+      <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 visible-sm visible-md visible-lg">
+        <img Class="image-position image-position10 " src="@icon.Url" alt="@icon.Value("altTag")"/>
+      </div>
+}
+}
+    </div>
+    <a class="btn btn-download btn-Explore btn-Explore10" href="https://publishing.v5.stg.africanbankdmz.net/en/home/new-business-banking-v2/access-to-finance-report/">Explore 
+        <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_3049_4491)">
+                      <path d="M8.50033 2.66666L7.56033 3.60666L11.2803 7.33332H3.16699V8.66666H11.2803L7.56033 12.3933L8.50033 13.3333L13.8337 7.99999L8.50033 2.66666Z" fill="white"></path>
+                    </g>
+                    <defs>
+                      <clipPath id="clip0_3049_4491">
+                        <rect width="16" height="16" fill="white" transform="translate(0.5)"></rect>
+                      </clipPath>
+                    </defs>
+                  </svg>
+    </a>
+  </div>
+</section>
+    </div>
+
+  </div>
+
+</div>
+*@
+<section class="bg-blue" id="section-1">
+  <div class="container customer-container">
+      <div class="col-xs-12 center-element visible-xs">
+        <img class="image-position-sm-banner" src="/media/eyrnk5vt/finfindbanner.png" alt="" >
+      </div>
+    <div class="row">
+        
+ @{
+                    int idIterator400 = 0;
+                    foreach (var item in sectioncards)
+                    {
+                        var cardTitle = item.Value<string>("nCcardTitle");
+                        var cardDescmedium = item.Value<string>("mediumDescription");
+                        var icon = item.Value<IPublishedContent>("nCcardIcon");
+      
+      
+      
+      <div class="col-xs-12 col-sm-8 col-lg-8 content-center">
+        <div class="">
+          <h1 class="section-1-heading">@cardTitle</h1>
+            @Html.Raw(item.Value<string>("mediumDescription"))
+          
+        </div>
+      </div>
+
+      <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 visible-sm visible-md visible-lg">
+        <img Class="image-position" src="@icon.Url" alt="@icon.Value("altTag")" style="height: 335px !important;" />
+      </div>
+}
+}
+    </div>
+    <a class="btn btn-download btn-Explore btn-Explore10" href="https://publishing.v5.stg.africanbankdmz.net/en/home/new-business-banking-v2/access-to-finance-report/">Explore 
+        <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_3049_4491)">
+                      <path d="M8.50033 2.66666L7.56033 3.60666L11.2803 7.33332H3.16699V8.66666H11.2803L7.56033 12.3933L8.50033 13.3333L13.8337 7.99999L8.50033 2.66666Z" fill="white"></path>
+                    </g>
+                    <defs>
+                      <clipPath id="clip0_3049_4491">
+                        <rect width="16" height="16" fill="white" transform="translate(0.5)"></rect>
+                      </clipPath>
+                    </defs>
+                  </svg>
+    </a>
+  </div>
+</section>
+<section class="bottom-section"></section>
+
+<section class="bg-white">
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12 content-center-2">
+        <div class="content-sub-start-2">
+           <h1 class="text-style">@createOwnWorldOfBanking.Value("partialViewName")</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="bg-grey">
+    <div class="container">
+        <div class="row">
+            <!--bank card-->
+            @{
+                int idIterator1 = 0;
+                foreach (var item in cards)
+                {
+                    var title = item.Value<string>("tabSubItemTitle");
+                    
+                    List<Umbraco.Web.Models.Link> itemLink = new List<Umbraco.Web.Models.Link>();
+             
+                    foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)item.Value("tabSubItemLinks"))
+                    {
+                        itemLink.Add(link);
+                    }
+                    
+                    <div class="col-xs-12 col-md-4 col-sm-4 col-lg-4 center-cards-class">
+                        <div class="flex__container">
+                            <div class="">
+                                <div class="icon-box">
+                                    <div class="icon-box__icon">
+                                        <img src="/media/4h5m4ptl/group-1000001914.svg" alt="icon" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="flex-container-content__title">
+                                        Step @(1 + idIterator1)
+                                    </h3>
+                                </div>
+                            </div>
+                            
+                            <h3 class="flex-container-content__title">@title</h3>
+                            
+                            @item.Value("tabSubItemTextContent")
+                            
+                            <div class="flex-container__cta">
+                                <div class="d-flex gap-3">
+                                    <a class="btn btn-download btn-Explore" href="@itemLink[0].Url">
+                                        @itemLink[0].Name 
+                                        <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <g clip-path="url(#clip0_3049_4491)">
+                                                <path d="M8.50033 2.66666L7.56033 3.60666L11.2803 7.33332H3.16699V8.66666H11.2803L7.56033 12.3933L8.50033 13.3333L13.8337 7.99999L8.50033 2.66666Z" fill="white" />
+                                            </g>
+                                            <defs>
+                                                <clipPath id="clip0_3049_4491">
+                                                    <rect width="16" height="16" fill="white" transform="translate(0.5)" />
+                                                </clipPath>
+                                            </defs>
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    idIterator1 += 1;
+                }
+            }
+        </div>
+    </div>
+</section>
+  
+</section>
+
+<section class="bg-grey mtb-100">
+     @{
+                   int idIterator3 = 0;
+                   foreach (var item in firstcards){
+                 
+                    var title = item.Value<string>("tabSubItemTitle");
+                    
+                    var tabSubItemImage = item.Value<IPublishedContent>("tabSubItemImage")?.Url;
+                    var tabSubItemicon = item.Value<IPublishedContent>("tabSubItemIcon")?.Url;
+                    List<Umbraco.Web.Models.Link> itemLink = new List<Umbraco.Web.Models.Link>();
+             
+                    foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)item.Value("tabSubItemLinks"))
+                    {
+                        itemLink.Add(link);
+                    }
+  <div class="container welcome-section">
+    <div class="row">
+        <div class="col-xs-12 col-sm-4 col-lg-4 image-section image-section-22 visible-xs">
+            <img
+          class="image-position "
+          src="@tabSubItemImage"
+          alt="img"
+        />
+         </div>
+       
+                          <!--content section-->
+      <div class="col-xs-12 col-sm-8 col-lg-8">
+        <div class="">
+          <div class="flex-container_content">
+            <div class="icon-box">
+              <div>
+                <h3 class="flex-container-content__title">
+                  @title
+                </h3>
+              </div>
+            </div>
+            <div class="card-divider mtb-32"></div>
+
+             @item.Value("tabSubItemTextContent")
+          </div>
+          <div class="flex-container__cta-2 mt-64">
+          <div class="d-flex gap-3">
+             
+                 <a style=""
+                class="btn btn-download btn-Explore"
+                href="https://publishing.v5.stg.africanbankdmz.net/en/home/new-business-banking-v2/access-to-finance-report/"
+                >@itemLink[0].Name
+                
+                <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_3049_4491)">
+                      <path d="M8.50033 2.66666L7.56033 3.60666L11.2803 7.33332H3.16699V8.66666H11.2803L7.56033 12.3933L8.50033 13.3333L13.8337 7.99999L8.50033 2.66666Z" fill="white"></path>
+                    </g>
+                    <defs>
+                      <clipPath id="clip0_3049_4491">
+                        <rect width="16" height="16" fill="white" transform="translate(0.5)"></rect>
+                      </clipPath>
+                    </defs>
+                  </svg>
+                
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--image section-->
+      <div class="col-xs-12 col-sm-4 col-lg-4 image-section  visible-sm visible-md visible-lg">
+        <img
+          class="image-position"
+          src="@tabSubItemImage"
+          alt="img"
+        />
+      </div>
+                  
+
+    </div>
+  </div>
+    }
+                    }
+</section>
+
+<section class="bg-nothing-white-xs visible-xs" id="section-001"></section>
+
+<section class="bg-grey mtb-100">
+     @{
+                   int idIterator2 = 0;
+                   foreach (var item in lastcards){
+                 
+                    var title = item.Value<string>("tabSubItemTitle");
+                    
+                    var tabSubItemImage = item.Value<IPublishedContent>("tabSubItemImage")?.Url;
+                    var tabSubItemicon = item.Value<IPublishedContent>("tabSubItemIcon")?.Url;
+                    List<Umbraco.Web.Models.Link> itemLink = new List<Umbraco.Web.Models.Link>();
+             
+                    foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)item.Value("tabSubItemLinks"))
+                    {
+                        itemLink.Add(link);
+                    }
+  <div class="container welcome-section">
+    <div class="row">
+        <div class="col-xs-12 col-sm-4 col-lg-4 image-section visible-xs">
+                    <img
+              class="image-position2"
+              src="@tabSubItemImage"
+              alt="img"
+            />
+         </div>
+       
+                          <!--content section-->
+      <div class="col-xs-12 col-sm-8 col-lg-8">
+        <div class="">
+          <div class="flex-container_content">
+          <a style="cursor: not-allowed "
+                class="btn btn-Explore btn-download-coming-soon"
+                href=""
+                >Coming soon
+              </a>
+            <div class="icon-box">
+    
+              <div>
+              
+                <h3 class="flex-container-content__title">
+                  @title
+                </h3>
+              </div>
+            </div>
+            <div class="card-divider mtb-32"></div>
+
+             @item.Value("tabSubItemTextContent")
+          </div>
+          <div class="flex-container__cta-2 mt-64">
+          <div class="d-flex gap-3">
+             
+                 <a style="cursor: not-allowed "
+                class="btn btn-download btn-Explore"
+                href=""
+                >@itemLink[0].Name
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--image section-->
+      <div class="col-xs-12 col-sm-4 col-lg-4 image-section  visible-sm visible-md visible-lg">
+        <img
+          class="image-position2"
+          src="@tabSubItemImage"
+          alt="img"
+        />
+      </div>
+                  
+
+    </div>
+  </div>
+    }
+                    }
+</section>
+
+

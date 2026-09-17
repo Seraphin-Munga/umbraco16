@@ -1,5 +1,106 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageCorporateInformation>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Utilities
 @{
-	Layout = null;
+    Layout = "Master.cshtml";
+    // All Current Page Children
+    var Children = Model.Children;
+    // Get specific Children
+    var heroHeader = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = Children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroBody = Children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    //var tabBody = (TabBody)heroBody.Children(x => x.ContentType.Alias.ToLower() == "tabbody").FirstOrDefault();
+    
+    var _heroBodyInvestor = (HeroBodyInvestor)heroBody.Children?.Where(c => c.ContentType.Alias.ToLower() == "herobodyinvestor").FirstOrDefault();
+    var _reportHeaders = _heroBodyInvestor.Cards.ToList().Where(x => x.Value("subTitle").ToString() != "").ToList().Select(xx => xx.Value("subTitle")).Distinct();
 }
+<style>
+    .text-container.reporting .report-files { margin-top: 0px; }
+</style>
+<!-- HERO BANNER -->
+@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+<!-- HERO CONTINUED-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+<!-- HERO BODY -->
+@*@Html.Partial("_pageDocumentView", tabBody as ContentModels.TabBody)*@
+
+@* HERO Body*@
+<div class="container">
+    <div class="campaign-product-container">
+        <div class="margin-top-20 visible-xs"></div>
+        <div class="row text-container reporting">
+            
+            
+            <div class="row report-files">
+                
+                @{
+                    int columnDesign = 0;
+                    string col_offset = "col-md-offset-6";
+                    foreach (var _cardHeader in _reportHeaders)
+                    {
+
+                        <div class="col-xs-12 col-sm-12 col-md-6 @(columnDesign > 1 ? "col-md-offset-6" : "")">
+                            @{
+                                if (_cardHeader.ToString() != "Presentation")
+                                {
+                                    <h3 style="font-size: 15px;color: #88bc47;">@_cardHeader</h3>
+                                }
+                                else
+                                {
+                                    <h3></h3>
+                                }
+                            }
+                            <div class="row">
+                                @{
+                                    var _downloads = (IEnumerable<NCdownload>)_heroBodyInvestor.Cards.Where(x => x.Value("subTitle").ToString() == _cardHeader.ToString()).ToList();
+                                    foreach (var download in _downloads)
+                                    {
+                                        if (download.Value("File") == null)
+                                        {
+                                            <div style="margin-left:4%" class="col-sm-12 margin-bottom-10">
+                                                <div class="row">
+                                                    <a target="_blank" href="@download.Value("Title")">
+                                                        <div class="pull-left">@download.Value("Description")</div>
+                                                    </a>
+                                                </div>
+
+                                                <div class="row" style="font-style: italic; font-size: x-small; display:inline-block">
+
+                                                </div>
+                                            </div>
+
+                                        }
+                                        else
+                                        {
+                                            double umbracoBytes = Convert.ToDouble(download.File.Value("UmbracoBytes"));
+                                            double fileSize = umbracoBytes / 1024000;
+                                            <div class="col-sm-12 margin-bottom-10">
+                                                <a target="_blank" href="@download.File.Url">
+
+                                                    <div class="row">
+                                                        <div class="col-sm-8 col-xs-10">
+                                                            @Html.Raw(download.Title)
+                                                        </div>
+                                                        <div class="col-sm-3 hidden-xs">
+                                                            <i style="font-size:0.8em; float:right;">(@Math.Round(fileSize, 2) MB)</i>
+                                                        </div>
+                                                        <div class="col-sm-1 col-xs-2">
+                                                            <i class="fa fa-download" style="float: right;padding-left: 13px;font-size: 14px;"></i>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        }
+                                    }
+                                }
+                            </div>
+                        </div>
+                        ++columnDesign;
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+

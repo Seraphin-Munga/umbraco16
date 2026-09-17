@@ -1,4 +1,5 @@
 ﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageLoans>
+@using AcfAfricanbank.Core.Models.Forms;
 @using ContentModels = Umbraco.Web.PublishedModels;
 @using CustomModels = Web.Models;
 
@@ -16,6 +17,33 @@
     var heroKnees = children?.Where(c => c.ContentType.Alias.ToLower() == "heroknees").FirstOrDefault();
     var testimonialTab = children?.Where(c => c.ContentType.Alias.ToLower() == "testimonials").FirstOrDefault();
     var homePageElements = (HomePageElements)Model.Parent.Children.Where(o => o is HomePageElements).FirstOrDefault();
+    
+    
+    @*new code*@
+    var bodyFooterTitleold = heroBody?.Value("bodyFooterTitle").ToString();
+    
+     var heroBody1 = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").Last();
+     
+     
+      var loanitem = heroBody1.Children.Where(c => c.ContentType.Alias.ToLower() == "tabbody").FirstOrDefault();
+     var noloanitem = loanitem.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+        var noloanitemcmp = noloanitem.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+        var noinsu = 1;
+        
+             var faq = heroBody1.Children.Where(c => c.ContentType.Alias.ToLower() == "tabbody").Last();
+     var faqcontent = faq.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+        var faqcontentqa = faqcontent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+        var noCampx1 = 1;
+        
+        ContentModels.TabBody createOwnWorldOfBanking = null;
+      var partialName = faq.Value("PartialViewName");
+      createOwnWorldOfBanking = (TabBody)faq;
+         
+                     var bodyFooterTitle = heroBody1?.Value("bodyFooterTitle").ToString();
+       var moreAboutMyWorldRichTxt = heroBody1.Children(c => c.ContentType.Alias.ToLower() == "richtexteditor").FirstOrDefault();
+        
+    @* new code*@
+    
 
     // Get Specific grand children
     var chestCards = heroChest?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
@@ -38,103 +66,574 @@
         BenefitCards = chestCards.Select(c => c as Card).ToList()
     };
 
-    var headerImage_large = heroHeader?.Value<IPublishedContent>("image")?.Url;
-    var headerImage_medium = heroHeader?.Value<IPublishedContent>("imageMedium")?.Url;
-    var headerImage_small = heroHeader?.Value<IPublishedContent>("imageSmall")?.Url;
+}
 
-    var isAmp = Request.QueryString["amp"] != null;
+<link rel="stylesheet" href="/css/projectmagic.css" />
+<style>
+ @* 
+ .accordion-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 1rem 1.25rem;
+    font-size: 1rem;
+    color: #212529;
+    text-align: left;
+    background-color: transparent;
+    border: 1px solid rgba(0, 0, 0, .125);
+    border-radius: 0;
+    overflow-anchor: none;
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out, border-radius .15s ease;
+}
 
+.accordionStyle2 .accordion-button:after {
+   content: '\276F';
+     transition: transform 0.3s ease;
+   
+}
 
-    if (!isAmp)
-    {
+ .inline-checklist ul li::before {
+    color: #112768;
+}
+.accordion-button:not(.collapsed)::after {
+    background-image: unset;
+}
+.accordion-button:not(.collapsed)::after {
+   background-image: unset !important;
+}
 
-    }
-    else
-    {
+.accordion-button.collapsed::after {
+     transform: rotate(90deg);
+   
+}
+      
 
-    }
+.accordion-button:after {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-left: auto;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 1.25rem;
+    transition: transform .2s ease-in-out;
+}
 
+*@
 
+@*
+.accordion-item:first-of-type .accordion-button {
+    border-top-left-radius: .25rem;
+    border-top-right-radius: .25rem;
+}
+.accordion-button:not(.collapsed) {
+    background-color: #ecf1f2;
+}
+.accordion .accordion-button {
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 700;
+    color: #112768;
+    border: 0;
+    padding: 25px 30px 20px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+.accordion-button:not(.collapsed) {
+    color: #0c63e4;
+    background-color: #e7f1ff;
+}*@
+[type=button]:not(:disabled), [type=reset]:not(:disabled), [type=submit]:not(:disabled), button:not(:disabled) {
+    cursor: pointer;
+}
+@*
+.accordion-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 1rem 1.25rem;
+    font-size: 1rem;
+    color: #212529;
+    text-align: left;
+    background-color: transparent;
+    border: 1px solid rgba(0, 0, 0, .125);
+    border-radius: 0;
+    overflow-anchor: none;
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out, border-radius .15s ease;
+}
 
+.accordion-button .arrow {
+    margin-left: 10px;
+    transition: transform 0.3s ease;
+}
+
+.accordion-collapse {
+    display: none;
+    padding: 15px;
+    border: 1px solid #ccc;
+}
+
+.accordion-button:after {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-left: auto;
+    content: "";
+    background-image: url(data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23212529'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e);
+    background-repeat: no-repeat;
+    background-size: 1.25rem;
+    transition: transform .2s ease-in-out;
+}
+
+.accordion-button:not(.collapsed):after {
+    background-image: url(data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23212529'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e);
+}
+.accordion-button:not(.collapsed):after {
+    background-image: url(data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%230c63e4'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e);
+    transform: rotate(180deg);
+}
+    *@
+@*.arrow-right::after {
+    content: '\F285';  /* This is how you use the Unicode character in CSS */
+    font-size: 12px;
+    margin-left:40px;
+  }*@
+</style>
+
+<!--new website -->
+   @{
+         int idIterator = 0;
+           foreach (var item in noloanitemcmp){
+                var cardTitle = item.Value<string>("nCcardTitle");
+                var cardTitleId = cardTitle.Trim().ToString().Replace(" ", "").ToString() + idIterator.ToString();
+                var cardDesc = item.Value<string>("nClongDescription");
+                var cardDescmedium = item.Value<string>("mediumDescription");
+                var icon = item.Value<IPublishedContent>("nCcardIcon");
+                var id = item.Value<string>("abstractbutton");
+                var link = item.Value<string>("abstractIt");
+                
+                
+                 if (idIterator%2 == 0)
+                    {
+                        <section class="section-800 bg-grey-60">
+                            <div class="container">
+                                <div class="row align-items-center d-flex row-change md-text-center">
+                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                        <h1 class="color-brand-1 mt-15 mb-20">@cardTitle</h1>
+                                        <p class="font-md color-brand-1">@Html.Raw(item.Value<string>("mediumDescription"))</p>
+                                        
+                                            @Html.Raw(item.Value<string>("nClongDescription"))
+                                        
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                        <img Class="d-block"
+                                             src="@icon.Url"
+                                             alt="@icon.Value("altTag")" />
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        }
+                        else{
+                        
+                             <section class="section-800">
+                                <div class="container">
+                                    <div class="row align-items-center row-change d-flex flex-row-reverse md-text-center">
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                            <h1 class="color-brand-1 mb-20">@cardTitle</h1>
+                                            <p class="font-md color-grey-500">@Html.Raw(item.Value<string>("mediumDescription"))</p>
+                                            <div class="mt-50 text-start"><a class="btn btn-brand-1 hover-up" href="@link">@id
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="right-icon"
+                height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke-linecap="round" 
+                stroke-linejoin="round" stroke-width="32" 
+                d="M320 336h76c55 0 100-21.21 100-75.6s-53-73.47-96-75.6C391.11 99.74 329 48 256 48c-69 0-113.44 45.79-128 91.2-60 5.7-112 35.88-112 98.4S70 336 136 336h56m0 64.1 64 63.9 64-63.9M256 224v224.03">
+                </path></svg></a></div>
+                                        </div>
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                             <img
+                                              Class="d-block"
+                                              src="@icon.Url"
+                                             alt="@icon.Value("altTag")" />
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        }
+          idIterator += 1;
             }
+        }
 
 
+@*
+ @{
+         int idIterator = 0;
+           foreach (var item in noloanitemcmp){
+                var cardTitle = item.Value<string>("nCcardTitle");
+              
+                var cardDesc = item.Value<string>("nClongDescription");
+                var cardDescmedium = item.Value<string>("mediumDescription");
+                var icon = item.Value<IPublishedContent>("nCcardIcon");
+                var id = item.Value<string>("abstractbutton");
+                var link = item.Value<string>("abstractIt");
+                
+                 if (idIterator%2 == 0)
+                    {
+        <section class="section-800 bg-grey-60">
+          <div class="container">
+            <div class="row d-flex align-items-center row-change">
+              <div class="col-md-6">
+                <h1 class="color-brand-1 mt-15 mb-20">
+               @cardTitle
+                </h1>
+               @Html.Raw(item.Value<string>("mediumDescription"))
+                 @Html.Raw(item.Value<string>("nClongDescription"))
+              </div>
+              <div class="col-md-6">
+                <img
+                  class="d-block"
+                  src="@icon.Url"
+                  alt="@icon.Value("altTag")"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+                       
+                        }
+                        else{
+             <section class="section-800">
+                                <div class="container">
+                                    <div class="row align-items-center row-change d-flex flex-row-reverse">
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                            <h1 class="color-brand-1 mb-20">@cardTitle</h1>
+                                            <p class="font-md color-grey-500">@Html.Raw(item.Value<string>("mediumDescription"))</p>
+                                            <div class="mt-50 text-start"><a class="btn btn-brand-1 hover-up" href="@link">@id
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="right-icon"
+                height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke-linecap="round" 
+                stroke-linejoin="round" stroke-width="32" 
+                d="M320 336h76c55 0 100-21.21 100-75.6s-53-73.47-96-75.6C391.11 99.74 329 48 256 48c-69 0-113.44 45.79-128 91.2-60 5.7-112 35.88-112 98.4S70 336 136 336h56m0 64.1 64 63.9 64-63.9M256 224v224.03">
+                </path></svg></a></div>
+                                        </div>
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                             <img
+                                              Class="d-block"
+                                              src="@icon.Url"
+                                             alt="@icon.Value("altTag")" />
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        }
+                        }
+                        idIterator += 1;
+                }
+ }*@
+        <!--open an account-->
+      @*  <section class="section-800 bg-grey-60">
+          <div class="container">
+            <div class="row d-flex align-items-center row-change">
+              <div class="col-md-6">
+                <h1 class="color-brand-1 mt-15 mb-20">
+                Reach your goals with a Personal Loan from African Bank
+                </h1>
+                <p class="font-md color-brand-1">
+                With a low interest rate fixed at 12% you will always have the peace of mind of knowing that your repayments will stay the same, with a fixed interest rate and fixed monthly repayments. Start your application journey by finding out how much you can possibly qualify for
+                </p>
+                <div class="mt-50 text-start">
+                  <button class="btn btn-brand-1 hover-up arrow-right" href="#">
+                    quote me
+                  </button>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <img
+                  class="d-block"
+                  src="/media/5t0neons/best-bank.png"
+                  alt="iori"
+                />
+              </div>
+            </div>
+          </div>
+        </section>*@
+      <!--download app-->
+     @* <section class="section-800">
+          <div class="container">
+            <div class="row d-flex align-items-center">
+                <div class="col-md-6">
+                <img
+                  class="d-block"
+                  src="/media/5t0neons/best-bank.png"
+                  alt="iori"
+                /> 
+              </div>
+              <div class="col-md-6">
+                <h1 class="color-brand-1 mb-20">Get the app now</h1>
+                <p class="font-md color-grey-500">
+                  or register for online banking, and open your investment
+                  account today.
+                </p>
+                <div class="mt-50 text-start">
+                  <button class="btn btn-brand-1 hover-up" href="#">
+                    Download Now
+                  </button>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+        </section>*@
+        <!--discover the right credit card-->
+      @*  <section class="section-800 bg-grey-60">
+          <div class="container">
+            <div class="row d-flex align-items-center">
+              <div class="col-md-6">
+                <h1 class="color-brand-1 mt-15 mb-20">
+                How The 12% Loan Application Works.
+                </h1>
+                <p class="font-md color-brand-1">
+                Sometimes you want the loan without the endless phone calls and interviews. We can help.
+                </p>
+                <p class="font-md color-brand-1 mt-20">
+                You can apply now for an online loan of up to R250,000 in just 3 minutes!
+                </p>
+                <p class="font-md color-brand-1 mt-20">
+                Simply fill in your contact details and financial information.
+                </p>
+                <p class="font-md color-brand-1 mt-20">
+                For security reasons, you will need to enter an OTP (called a One Time PIN), and we will display an indicative quote to you in seconds if you qualify. Thereafter follow the easy steps to complete your online application.
+                </p>
+                <div class="mt-50 text-start">
+                  <button class="btn btn-brand-1 hover-up arrow-right" href="#">
+                    Open Now
+                  </button>
+                </div>
+                
+              </div>
+              <div class="col-md-6">
+                <img
+                  class="d-block"
+                  src="/media/5t0neons/best-bank.png"
+                  alt="iori"
+                /> 
+              </div>
+            </div>
+          </div>
+        </section>*@
+        <!--faq-->
+          <section class="section-800">
+<div class="container " >
+    <div class="row align-items-center d-flex row-change md-text-center">
+        <div class="col-xl-12 col-lg-12 col-md-12">
+              <h1 class="color-brand-1 mt-15 mb-20 text-center faqHeader">@createOwnWorldOfBanking.Value("partialViewClassName")</h1>
+               <div class="accordion accordionStyle2" id="accordionFAQ">
+                    <div class="row">
+                   @foreach (var item in faqcontentqa)
 
-            <!-- HERO BANNER -->
-            @Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+                    {
+                        var cardTitle = item.Value<string>("nCcardTitle");
+                        <div class="col-lg-12">
+                            <div class="accordion-item">
+                                <h5 class="accordion-header">
+                                    <button class="accordion-button text-heading-5">@cardTitle</button>
+                                </h5><div id="accordion-body" class="accordion-collapse collapse">
+                                    <div class="accordion-body">@Html.Raw(item.Value<string>("mediumDescription"))</div>
+                                </div>
+                            </div>
+                        </div>
+                                                    
+                        noCampx1 += 1;
 
-            <!-- HERO CONTINUED-->
-            @Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
-
-            <!-- PRODUCT INFORMATION-->
-<div class="container">
-    <div class="campaign-product-container full">
-        @Html.Partial("_benefitsSection", benefitsModel)
+                    }
+                    </div>
+                </div>
+        </div>
+        
     </div>
-
-    <amp-img alt="Misty road"
-             fallback
-             width="550"
-             height="368"
-             src="https://apod.nasa.gov/apod/image/2202/AuroraPillars_Correia_960.jpg">
-    </amp-img>
-
 </div>
+</section>   
 
-            <!-- HOW TO APPLY-->
-            @Html.Partial("_howToApplySection", new CustomModels.HowToApplyDataContainer(bodyTitle, bodyDescription, bodyButton as IEbankItabstractButton, applyDocs))
+@*<section class="section-800">
+          <div class="container">
+            <div class="row align-items-center row-change">
+              <div class="col-md-12">
+                <h1 class="color-brand-1 mt-15 mb-20 text-center">
+                Link innovative pockets to your MyWORLD account
+                </h1>
+                <div class="accordion" id="accordionFAQ">
+    <div class="accordion-item">
+        <h5 class="accordion-header">
+        
+            <button class="accordion-button text-heading-5 collapsed">
+    What Is The Maximum Amount I Can Borrow From African Bank?
+   
+</button>
+        </h5>
+        <div class="accordion-collapse collapse">
+            <div class="accordion-body">
+                Vel tenetur officiis ab reiciendis dolor aut quae doloremque est ipsum natus et consequatur animi aut sunt dolores ut quasi rerum. Aut velit velit id quasi velit eum reiciendis laudantium quo galisum incidunt aut velit animi hic temporibus blanditiis sit odit iure. Eum laborum dolores ea molestias fuga qui temporibus accusantium qui soluta aliquid ab vero soluta.
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h5 class="accordion-header">
+            <button class="accordion-button text-heading-5 collapsed">What Happens If I Have A Bad Credit Score? Will I Still Get A Loan?</button>
+        </h5>
+        <div class="accordion-collapse collapse">
+            <div class="accordion-body">
+                Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature Id pro doctus mediocrem erroribus, diam nostro sed cu. Ea pri graeco tritani partiendo. Omittantur No tale choro fastidii his, pri cu epicuri perpetua. Enim dictas omittantur et duo, vocent lucilius quaestio mea ex. Ex illum officiis id.
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h5 class="accordion-header">
+            <button class="accordion-button text-heading-5 collapsed">How Can I Apply For An African Bank Loan?</button>
+        </h5>
+        <div class="accordion-collapse collapse">
+            <div class="accordion-body">
+                Aut architecto consequatur sit error nemo sed dolorum suscipit 33 impedit dignissimos ut velit blanditiis qui quos magni id dolore dignissimos. Sit ipsa consectetur et sint harum et dicta consequuntur id cupiditate perferendis qui quisquam enim. Vel autem illo id error excepturi est dolorum voluptas qui maxime consequatur et culpa quibusdam in iusto vero sit amet Quis.
+            </div>
+        </div>
+    </div>
+</div>
+              </div>
+            </div>
+          </div>
+        </section>*@
+        <!--blog section-->
 
-            <!-- CAMPAIGN MORE INFO -->
-            @Html.Partial("_heroKneeTabs", heroKnees as ContentModels.HeroKnees)
+        <!--end of blog section-->
+        
+        <!--discover the right credit card-->
+        
+     @*   @Html.Raw(moreAboutMyWorldRichTxt.Value("textEditor"))*@
+       <section class="section-800 bg-grey-60">
+         @heroBody1.Value("bodyFooterTitle")   
+       </section>
+      
+    
+      
+        @*<section class="section-800 bg-grey-60">
+          <div class="container">
+            <div class="row d-flex align-items-center row-change flex-row-reverse">
+              <div class="col-md-6">
+                <h1 class="color-brand-1 mt-15 mb-20">
+                Other Types Of Loans That You Can Get From African Bank
+                </h1>
+                <h4 class="color-brand-1 mt-20">
+                Personal Loans
+                </h4>
+                <p class="font-md color-brand-1">
+                You want to apply for a personal loan but have heard mixed opinions on whether this is a wise financial move. Sure, there are ways to get an instant loan quite easily but are you doing the right thing?
+                </p>
+                <p class="font-md color-brand-1 mt-20">
+                African Bank’s Personal Loan lets your best life await you. You can get up to R250 000, customisable terms, and vital cover for life’s unexpected events. And it comes from a brand that you can trust.
+                </p>
+                <div class="mt-20 text-start">
+                    <button class="btn btn-brand-1 hover-up arrow-right " href="#">
+                     TELL ME MORE
+                    </button>
+                </div>
 
-            <!-- TESTIMONIALS -->
-            @Html.Partial("_testimonials", testimonialTab as Testimonials)
+                <h4 class="color-brand-1 mt-20">
+                Consolidation Loans
+                </h4>
+                <p class="font-md color-brand-1">
+                You can reduce the outstanding balance on your total debt and merge your payments for a lower loan instalment with a Debt Consolidation Loan.
+                </p>
+                <p class="font-md color-brand-1 mt-20">
+                You can combine up to 5 loans into 1 easy-to-manage Consolidation Loan to the value of R250 000 and save cash with a lower repayment 
+                </p>
+                <div class="mt-20 text-start">
+                    <button class="btn btn-brand-1 hover-up arrow-right" href="#">
+                     TELL ME MORE
+                    </button>
+                  </div>
+                <h4 class="color-brand-1 mt-20">
+                Other Loan Types
+                </h4>
+                <p class="font-md color-brand-1">
+                Because you have the audacity to believe in yourself, if you require a loan to help you with student life, or starting your side hustle or even renovating your house to make it your dream home, you can still apply for a Personal Loan from African Bank because we believe in you too.
+                </p>
+              </div>
+              <div class="col-md-6">
+                <img
+                  class="d-block"
+                  src="/media/5t0neons/best-bank.png"
+                  alt="iori"
+                />
+              </div>
+            </div>
+          </div>
+        </section>*@
 
-            <!-- CALL BACK FORM -->
-            @{
-                var _floatingFormViewModel = children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
 
-                @Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)
-            }
-            @section scripts
+
+
+<!--end of new website-->
+<!-- HERO BANNER -->
+@*@Html.Partial("_pageHeaderImage", heroHeader as ContentModels.HeroHeader)
+
+<!-- HERO CONTINUED-->
+@Html.Partial("_pageShoulder", heroShoulder as ContentModels.HeroShoulder)
+
+<!-- PRODUCT INFORMATION-->
+<!--<div class="container">-->
+<!--    <div class="campaign-product-container full">-->
+@Html.Partial("_benefitsSection", benefitsModel)
+<!--    </div>-->
+<!--</div>-->
+
+<!-- HOW TO APPLY-->
+@Html.Partial("_howToApplySection", new CustomModels.HowToApplyDataContainer(bodyTitle, bodyDescription, bodyButton as IEbankItabstractButton, applyDocs))
+
+<!-- CAMPAIGN MORE INFO -->
+@Html.Partial("_heroKneeTabs", heroKnees as ContentModels.HeroKnees)
+
+<!-- TESTIMONIALS -->
+@Html.Partial("_testimonials", testimonialTab as Testimonials)
+
+<!-- CALL BACK FORM -->
+<!-- CALL BACK FORM2240214 -->
+*@
+
+@*@{
+    var _floatingFormViewModel = children.Where(c => c is ContentModels.CallMeBack).FirstOrDefault();
+
+    @Html.Partial("_callMeBackForm", _floatingFormViewModel as ContentModels.CallMeBack)
+}*@
+
+@section scripts
 {
-                <script>
-    $(document).ready(function () {
-        var imageBgCss = "url('" + "@headerImage_large" + "')";
-        var imageMdCss = "url('" + "@headerImage_medium" + "')";
-        var imageSmCss = "url('" + "@(string.IsNullOrEmpty(headerImage_small) ? headerImage_medium : headerImage_small)" + "')";
-        var CheckScreenSize;
-        (CheckScreenSize = function () {
-            var _width = $(window).outerWidth();
-            var _height = $(window).outerHeight();
-            if (_width < 511) {
-                $("#heroHeader").css("background-image", imageSmCss);
-            }
-            else {
-                $("#heroHeader").css("background-image", imageBgCss);
-            }
-        })();
-        $(window).resize(CheckScreenSize);
+    <script>
+  
+  $(document).ready(function(){
+
+        $(".accordion-button").click(function(){
+            
+         
+    var isCollapsed = $(this).hasClass('collapsed');
+    
+           $(".accordion-button").removeClass('collapsed');
+           
+           if(isCollapsed == false) {
+            $(this).toggleClass("collapsed");
+           }
+
+           
+ var isCollapsedContent = $(this).parent().next(".accordion-collapse").hasClass('collapse');
+            $(".accordion-collapse").addClass('collapse');
+            if(isCollapsedContent == true) {
+                $(this).parent().next(".accordion-collapse").toggleClass('collapse');
+           }
+
+           
+
+        });
+
     });
-
-                </script>
-                <style>
-                    @@media (min-width: 376px) and (max-width: 414px) {
-                        .mega-tabs .nav-tabs > li.active:after {
-                            top: auto;
-                        }
-                    }
-
-                    @@media only screen and (max-width: 414px) {
-                        .mega-tabs .nav-tabs > li.active:after {
-                            bottom: -18px;
-                        }
-                    }
-
-                    @@media (max-width: 360px) {
-                        .mega-tabs .nav-tabs > li.active:after {
-                            top: auto;
-                        }
-                    }
-                </style>
-            }
+</script>
+}

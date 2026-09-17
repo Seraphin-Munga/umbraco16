@@ -1,5 +1,323 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
-	Layout = null;
+	Layout = "Master.cshtml";
 }
+
+@* the fun starts here *@
+
+  <link rel="stylesheet" href="/css/projectmagic.css" /> 
+  <style>
+
+/* Default styles */
+.flex-row-reverse-mobile {
+    display: block;
+}
+
+
+
+@@media (max-width: 896px) and (min-width: 320px) {
+
+    .flex-row-reverse-mobile {
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: center; /* Adjust as needed */
+    }
+
+    .flex-row-reverse-mobile .content {
+        flex: 1;
+    }
+
+    .flex-row-reverse-mobile .d-block {
+        flex: 1;
+    }
+
+    .submit-claim-row-change {
+        margin-top: 0px;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+}
+
+.section {
+    margin-top: -5px !important;
+    display: inline-block;
+    width: 100%;
+    
+}
+    .mega-tabs .nav-tabs>li.active:after {
+        top: unset !important;
+        bottom: -18px;
+    }
+    
+    
+
+    
+   @@media (min-width: 540px) and (max-width: 720px) {
+            .hero-static-banner {
+                height: 200px;
+            }
+        }
+         @@media (min-width: 768px) and (max-width: 1024px) {
+            .hero-static-banner {
+                height: 285px;
+            }
+            .hero-static-caption {
+                top: -40px;
+            }
+        }
+        
+@@media (max-width : 999px){
+
+
+
+        .claim-flex-item2 {
+
+            padding: 20px
+
+    }
+
+}
+ .card-we-do {
+    display: flow;
+   padding-top: 0px;
+}
+.card-offer-small {
+   
+    height: 180px;
+}
+
+.card-img-text {
+display:flex;
+align-items: center;
+    margin-left: -10px;
+}
+.card-we-do .card-image {
+    max-width: 90px;
+}
+
+</style>
+
+
+  <!--product intro-->
+<section class="section-800 bg-grey-60">
+                <div class="container">
+                  <div class="row d-flex align-items-center row-change">
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                       <h1 class="color-brand-1 mt-15 mb-20">
+                        Deceased Estate
+                      </h1>
+                       <p class="font-md color-brand-1">We understand that managing the affairs of a deceased loved one can be a challenging and emotional process. We are here to provide compassionate guidance and support to help you through this difficult time.</p>
+                       <p class="font-md color-brand-1 mt-20">Our team at African Bank is committed to offering personalized assistance tailored to your unique needs and circumstances. We recognize the importance of handling the affairs of the estate with care and consideration for all involved.</p>
+                       <p class="font-md color-brand-1 mt-20">Our goal is to alleviate the burden of estate administration by providing clear, supportive guidance every step of the way when claiming against any African Bank products.</p>
+                       <p class="font-md color-brand-1 mt-20">The assets or properties of the deceased’s estate must be administered and distributed as instructed in the deceased’s will, or terms of the Intestate Succession Act, 81 of 1987 where there is no valid will.</p>
+                       <div class="mt-50 text-start"><a href="#" class="btn btn-brand-1 arrow-right"> Download Brochure </a></div>
+                    </div>
+                    
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                      <img
+                        class="d-block"
+                        src="/media/rpfd5feh/12-loan_bg.png"
+                        alt="iori"
+                      /> 
+                       
+                    </div>
+                  </div>
+                </div>
+</section>
+
+<!--product card section-->
+<section class="section-800">
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-12 col-lg-12 col-md-12">
+                <h1 class="color-brand-1 mt-15 mb-20 text-center">Steps to follow when claiming:</h1>
+            </div>
+        </div>
+        <div class="row mt-40 mb-40 align-items-center">
+            <div class="col-lg-6">
+                <div class="card-offer-small card-we-do hover-up">
+                    <div class="card-img-text">
+                        <div class="card-image">
+                            <img class="d-block" src="/media/ppjkqzkw/easy-repayments.png" alt="iori"> 
+                        </div>
+                        <div class="card-info">
+                            <h4 class="color-brand-1 mb-10">
+                                <a class="color-brand-1">STEP 1:</a>
+                            </h4>
+                            
+                        </div>
+                    </div>
+                    <p class="font-md color-grey-500 mb-5">Get the Death Certificate</p>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card-offer-small card-we-do hover-up">
+                    <div class="card-img-text">
+                        <div class="card-image">
+                            <img class="d-block" src="/media/ppjkqzkw/easy-repayments.png" alt="iori"> 
+                        </div>
+                        <div class="card-info">
+                            <h4 class="color-brand-1 mb-10">
+                                <a class="color-brand-1">STEP 2:</a>
+                            </h4>
+                            
+                        </div>
+                    </div>
+                    <p class="font-md color-grey-500 mb-5">Report Death to the Master of the High Court</p>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card-offer-small card-we-do hover-up">
+                    <div class="card-img-text">
+                        <div class="card-image">
+                            <img class="d-block" src="/media/ppjkqzkw/easy-repayments.png" alt="iori"> 
+                        </div>
+                        <div class="card-info">
+                            <h4 class="color-brand-1 mb-10">
+                                <a class="color-brand-1">STEP 3:</a>
+                            </h4>
+                            
+                        </div>
+                    </div>
+                    <p class="font-md color-grey-500 mb-5">Appointment of the Executor.</p>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card-offer-small card-we-do hover-up">
+                    <div class="card-img-text">
+                        <div class="card-image">
+                            <img class="d-block" src="/media/ppjkqzkw/easy-repayments.png" alt="iori"> 
+                        </div>
+                        <div class="card-info">
+                            <h4 class="color-brand-1 mb-10">
+                                <a class="color-brand-1">STEP 4:</a>
+                            </h4>
+                            
+                        </div>
+                    </div>
+                    <p class="font-md color-grey-500 mb-5">The bank.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+  <!--documents required by Africanbank-->
+<section class="section-800 bg-grey-60">
+                <div class="container">
+                  <div class="row d-flex align-items-center row-change">
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                      <img
+                        class="d-block"
+                        src="/media/rpfd5feh/12-loan_bg.png"
+                        alt="iori"
+                      /> 
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                       <h1 class="color-brand-1 mt-15 mb-20">
+                        List of documents required by African Bank
+                      </h1>
+                      <div class="mt-30 mb-30 inline-checklist">
+                          <ul class="list-ticks list-ticks-2">
+                            <li>Request for balances letter (from the Master of High Court).</li>
+                            <li>Power of Attorney (where an attorney/third party acts on behalf of the holder of a Letters of Authority/Executorship).</li>
+                            <li>Certified Identity Document or Passport of the Executor or person nominated in the Letters of Authority.</li>
+                            <li>Proof of address of Special Power of attorney agent.</li>
+                            <li>Certified copy of the identification document of the deceased.</li>
+                          </ul>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row align-items-center row-change md-text-center">
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                        <div class="mt-30 mb-30 inline-checklist">
+                           <ul class="list-ticks list-ticks-2">
+                               <li>Certified copy of Letters of Appointment as Executor (where applicable) issued by a South African Master of the High Court.</li>
+                               <li>Proof of address of the Executor or person nominated in the Letters of Authority/Executorship.</li>
+                               <li>Formal closure instruction.</li>
+                           </ul> 
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                        <div class="mt-30 mb-30 inline-checklist">
+                           <ul class="list-ticks list-ticks-2">
+                               <li>Certified copy of the Death Certificate/Abridged Certificate.</li>
+                               <li>Certified copy of Letters of Authority from the Master of High Court (where applicable) issued by a South African Master of the High Court.</li>
+                               <li>Proof of banking details to be used for the transfer of the deceased estate funds.</li>
+                           </ul> 
+                        </div>
+                    </div> 
+                  </div>
+                </div>
+</section>
+
+  <!--documents required by Master of the High Court-->
+<section class="section-800">
+                <div class="container">
+                  <div class="row d-flex align-items-center row-change">
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                       <h1 class="color-brand-1 mt-15 mb-20">
+                        List of documents for the Master of the High Court
+                      </h1>
+                      <div class="mt-30 mb-30 inline-checklist">
+                          <ul class="list-ticks list-ticks-2">
+                            <li>A copy of the deceased’s identity document or back and front copy of the identity card.</li>
+                               <li>The deceased’s original will and any annexures that may apply.</li>
+                               <li>A list of the people or companies the deceased owed money to, e.g. their bank.</li>
+                               <li>An original or a certified copy of the deceased’s marriage certificate (if married) or settlement agreement (if divorced).</li>
+                          </ul>
+                      </div>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                      <img
+                        class="d-block"
+                        src="/media/rpfd5feh/12-loan_bg.png"
+                        alt="iori"
+                      /> 
+                    </div>
+                  </div>
+                  <div class="row align-items-center row-change md-text-center">
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                        <div class="mt-30 mb-30 inline-checklist">
+                           <ul class="list-ticks list-ticks-2">
+                               <li>If there is no will available, an affidavit specifying this from the next of kin.</li>
+                               <li>A declaration form (available at the Master’s Office) to confirm that the estate has not been reported to another Master’s Office.</li>
+                           </ul> 
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                        <div class="mt-30 mb-30 inline-checklist">
+                           <ul class="list-ticks list-ticks-2">
+                               <li>A declaration of the type of marriage by the surviving spouse.</li>
+                               <li>Completed estate inventory forms (available at the Master’s Office).</li>
+                           </ul> 
+                        </div>
+                    </div> 
+                  </div>
+                </div>
+</section>
+
+<!--faq section-->
+<section class="section-800 bg-grey-60"></section>
+  <!--product intro-->
+<section class="section-800">
+                <div class="container">
+                  <div class="row d-flex align-items-center row-change">
+                                          <div class="col-xl-6 col-lg-6 col-md-6">
+                      <img
+                        class="d-block"
+                        src="/media/rpfd5feh/12-loan_bg.png"
+                        alt="iori"
+                      /> 
+                       
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                       <h1 class="color-brand-1 mt-15 mb-20">
+                        At African Bank
+                      </h1>
+                       <p class="font-md color-brand-1">We are dedicated to upholding the dignity and wishes of the deceased. We approach estate management with sensitivity and understanding, honouring the legacy of your loved one.</p>
+                       <div class="mt-50 text-start"><a href="#" class="btn btn-brand-1 arrow-right"> Submit Claim </a></div>
+                    </div>
+                  </div>
+                </div>
+</section>

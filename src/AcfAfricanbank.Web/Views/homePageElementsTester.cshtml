@@ -1,5 +1,322 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Umbraco.Web.Models
+@using AcfAfricanbank.Core.Utilities
+@using AcfAfricanbank.Core.Models.Forms 
 @{
-	Layout = null;
+	var homePageElements = Umbraco.Content(16158); // (HomePageElements)Model.Children.Where(o => o is HomePageElements).FirstOrDefault();
+    // var whatsNew = homePageElements.Children.Where(x => x.ContentType.Alias.ToString().ToLower() == "ebankititem1").FirstOrDefault();
+    
+    	var children = Model.Children;
+	
+    var whatsNew = Umbraco.Content("16171");
+      var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+      var slider = heroBody.Children.Where(c => c.Name == "Home Sliders").FirstOrDefault();
+      var sliderBlog = slider.Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var sliders = sliderBlog.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+
 }
+<div>start</div>
+@* the fun starts here *@
+
+@{ 
+     if (homePageElements != null) {
+        
+         @* <span>Title : whatsNew.Value("ebankITTitle")</span> *@
+     
+         <div>Has something</div>
+       
+    } else {
+        <div>Has nothing</div>
+    }
+
+}
+
+  <style>
+    .swiper {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .container{
+        margin: 0 !important;
+            max-width: 100% !important;
+    }
+
+    .swiper-slide {
+      font-size: 18px;
+      background: #fff;
+
+      /* Center slide text vertically */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .swiper-wrapper {
+      height: 800px !important;
+    }
+    .swiper-pagination {
+      position: absolute !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      z-index: 10 !important;
+
+      display: inline-grid;
+      left: 18% !important;
+    }
+
+    .bank {
+      width: 330px;
+    }
+
+    .bank {
+      animation: slideLeft 2s linear;
+    }
+
+    @@keyframes slideLeft {
+      0% {
+        transform: translateX(-90%);
+      }
+    }
+
+    .my-container {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .banner-box-one {
+      position: absolute;
+      top: 34%;
+      left: 39%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      width: 38%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+    }
+
+    /* mobile  */
+
+    @@media (max-width: 768px) {
+      .banner-box-one {
+        left: 46%;
+        display: block !important;
+      }
+      .bank-menu {
+        width: auto !important;
+        height: 91px !important;
+      }
+      .bank-sub-menu {
+        display: none !important;
+      }
+
+      .bank-menu-icons img {
+        margin-right: 7px !important;
+      }
+
+      .bank-menu-icons {
+        padding: 14px !important;
+      }
+
+      .slider-image {
+        left: 55% !important;
+
+        width: 100% !important;
+      }
+      .bank-title {
+        font: normal normal normal 36px / 57px Montserrat !important;
+      }
+    }
+
+    /* tablet */
+
+    @@media only screen and (min-width: 768px) and (max-width: 1024px) {
+      .banner-box-one {
+        left: 42%;
+        display: block !important;
+      }
+      .bank-menu {
+        width: auto !important;
+        height: 91px !important;
+      }
+      .bank-sub-menu {
+        display: none !important;
+      }
+
+      .bank-menu-icons img {
+        margin-right: 7px !important;
+      }
+
+      .bank-menu-icons {
+        padding: 14px !important;
+      }
+
+      .slider-image {
+        left: 55% !important;
+        width: 60% !important;
+      }
+      .bank-title {
+        font: normal normal normal 36px / 57px Montserrat !important;
+      }
+    }
+    .bank-title {
+      font: normal normal normal 46px / 57px Montserrat;
+      letter-spacing: 0px;
+      color: #112768;
+    }
+
+    .bant-subtitle {
+      font: italic normal 600 46px / 57px Montserrat;
+      letter-spacing: 0px;
+      color: #aac236 !important;
+    }
+
+    .swiper-pagination-bullet {
+      width: 8px !important;
+      height: 24px !important;
+      background: #666666 0% 0% no-repeat padding-box !important;
+      border-radius: 20px !important;
+      opacity: 0.3;
+    }
+
+    .swiper-pagination-bullet-active {
+      width: 8px !important;
+      height: 48px !important;
+      background: #b6d133 0% 0% no-repeat padding-box !important;
+      border-radius: 20px !important;
+      opacity: 1;
+    }
+
+    .swiper-pagination-horizontal {
+      height: 200px !important;
+      margin-top: -70px !important;
+    }
+
+    .bank-menu {
+      width: 990px;
+      height: 142px;
+      background: #002a60 0% 0% no-repeat padding-box;
+      border-radius: 0px 100px 100px 0px;
+      position: absolute;
+      z-index: 10;
+      bottom: 40px;
+    }
+    .bank-sub-menu {
+      width: 420px;
+      height: inherit; /* Inherit the height from bank-menu */
+      background-color: #002554;
+    }
+    .bank-menu-icons {
+      float: right;
+      padding: 41px;
+    }
+
+    .bank-menu-icons img {
+      margin-right: 33px;
+    }
+
+    .banner-box-one {
+      position: absolute;
+      top: 34%;
+      left: 39%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      width: 38%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+    }
+
+    .slider-image {
+      position: absolute;
+      top: 64%;
+      left: 60%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      width: 38%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+    }
+  </style>
+
+    <div class="my-container">
+      <div class="swiper-container mySwiper">
+        <div class="swiper-wrapper">
+            
+        @foreach (var item in sliders){
+            var tabSubItemImage = item.Value<IPublishedContent>("tabSubItemImage")?.Url;
+               var tabSubItemIcon = item.Value<IPublishedContent>("tabSubItemIcon")?.Url;
+    var title = item.Value<string>("tabSubItemTitle");
+    var description = item.Value<string>("genericCardContent");
+    
+            <div class="swiper-slide">
+            <img src="@tabSubItemImage" alt="" />
+            <div
+              
+              class="banner-box-one"
+            >
+              <div class="bank">
+                <h1 class="bank-title">
+                  Banking centered around
+                  <span class="bant-subtitle">you</span>
+                </h1>
+              </div>
+            </div>
+            <div class="slider-image">
+              <img src="@tabSubItemIcon" alt="" />
+            </div>
+          </div>
+           
+        }
+
+            
+        </div>
+        <div class="swiper-pagination"></div>
+      </div>
+
+      <div class="bank-menu">
+        <div class="bank-menu-icons">
+          <img src="/assets/Mask Group 9.png" alt="" />
+          <img src="/assets/Mask Group 9.png" alt="" />
+          <img src="/assets/Mask Group 9.png" alt="" />
+          <img src="/assets/Rewards_icon-01.png" alt="" />
+          <img src="/assets/Rewards_icon-01.png" alt="" />
+          <img src="/assets/Rewards_icon-01.png" alt="" />
+        </div>
+        <div class="bank-sub-menu"></div>
+      </div>
+    </div>
+    
+    
+     <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Swiper CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/swiper/swiper-bundle.min.css"
+    />
+    <!-- Swiper JS -->
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+
+    <script>
+      $(document).ready(function () {
+        var mySwiper = new Swiper(".mySwiper", {
+          pagination: {
+            el: ".swiper-pagination",
+          },
+        });
+      });
+    </script>
+ 

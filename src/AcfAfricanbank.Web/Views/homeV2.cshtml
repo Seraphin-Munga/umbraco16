@@ -1,10 +1,10 @@
-﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageHome>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Umbraco.Web.Models
 @{
-    // Untyped IPublishedContent API instead of ModelsBuilder's generated
-    // PageHome class - see master.cshtml for why.
     var homePage = Umbraco.Content("18275");
 	Layout = "Master.cshtml";
-
+	
 }
 
 @* the fun starts here *@

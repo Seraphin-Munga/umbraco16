@@ -1,5 +1,644 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.PageManageYourAccount>
+@using CustomModels = Web.Models;
+@using ContentModels = Umbraco.Web.PublishedModels;
+@using Web.Helpers
+
+
 @{
-	Layout = null;
+    Layout = "Master.cshtml";
+
+    // All Current Page Children
+    var children = Model.Children;
+
+
+    // Get specific Children
+    var heroHeader = children?.Where(c => c.ContentType.Alias.ToLower() == "heroheader").FirstOrDefault();
+    var heroShoulder = children?.Where(c => c.ContentType.Alias.ToLower() == "heroshoulder").FirstOrDefault();
+    var heroChest = children?.Where(c => c.ContentType.Alias.ToLower() == "herochest").FirstOrDefault();
+    var heroBody = children?.Where(c => c.ContentType.Alias.ToLower() == "herobody").FirstOrDefault();
+    var heroKnees = children?.Where(c => c.ContentType.Alias.ToLower() == "heroknees").FirstOrDefault();
+    var testimonialTab = children?.Where(c => c.ContentType.Alias.ToLower() == "testimonials").FirstOrDefault();
+   var kneesTabHeaders = heroKnees?.Children?.Select(c => c.Value("title")?.ToString()).ToList();
+    var findOutMoreTab = heroKnees?.Children?
+        .Where(c => c.ContentType.Alias.ToLower() == "findoutmore").FirstOrDefault();
+  
+
+@*newcode*@
+      var keybenfits = heroBody.Children.Where(c => c is RichTextEditor).FirstOrDefault();
+      var fisrtsection = heroBody.Children.Where(c => c.Name == "FirstSection").FirstOrDefault();
+      var fisrtsectioncontent = fisrtsection .Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var nofisrtsectioncontent = fisrtsectioncontent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+      
+      var funeralplansection = heroBody.Children.Where(c => c.Name == "Funeral Plan").FirstOrDefault();
+      var funeralplansectioncontent = funeralplansection .Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var nofuneralcontent = funeralplansectioncontent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+
+    var step3 = fisrtsection?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+    var step3caards = step3.Select(c => c as Card).ToList();
+    
+    var step4section = heroBody.Children.Where(c => c.Name == "Step4 Section").FirstOrDefault();
+      var step4sectionsectioncontent = step4section .Value<IEnumerable<IPublishedElement>>("tabBodyContent");
+      var nostep4content = step4sectionsectioncontent.Where(c => c.ContentType.Alias == "nCTabGenericContent").FirstOrDefault().Value<IEnumerable<IPublishedElement>>("sectionContent");
+    
+     
+    
+    
+   
+@*end newcode*@
+
+    var items = heroKnees.Value("items");
+  
+    var keyBenefits = heroBody.Children(x => x.ContentType.Alias.ToLower() == "richtexteditor").FirstOrDefault();
+    var cardImageDescriptions = heroBody.Children(x => x is Card).ToList();
+    var contactUs = heroBody.Children(x => x.ContentType.Alias.ToLower() == "herobodycontactus").FirstOrDefault();
+
+    // Call me back
+    // var callMeBack = children?.Where(c => c.ContentType.Alias.ToLower() == "callmeback").FirstOrDefault();
+
+    // Get Specific Grandchildren
+    var bodyCards = heroBody?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card");
+    var bodyButton = heroBody?.Children?
+    .Where(c => c.ContentType.Alias == "ebankITAbstractButton").FirstOrDefault();
+
+    // Get Properties
+    var bodyTitle = heroBody?.Value("bodyTitle").ToString();
+    // var bodyDescription = heroBody?.Value("bodyDescription").ToString();
+    var bodyRedirects = heroKnees?.Value("title").ToString();
+    var applyDocs = bodyCards?.Select(c => c as Card).ToList();
+
+    var benefitsModel = new CustomModels.Benefits
+    {
+        Header = heroChest?.Value("chestTitle").ToString(),
+        Description = heroChest?.Value("chestDescription").ToString(),
+        BenefitCards = heroChest?.Children?.Where(c => c.ContentType.Alias.ToLower() == "card")?.Select(c => c as Card).ToList()
+    };
+
+
 }
+
+ <link rel="stylesheet" href="/css/projectmagic.css" /> 
+
+<style type="text/css">
+
+.btn.btn-brand-secondary {
+    min-width: 250px !important;
+}
+    h2 {
+        text-align: center;
+    }
+
+    .campaign-more-container {
+       background-color: #E5E5E5 !important;;
+        margin-top: 80px;
+        padding: 27px;
+    }
+
+    .flex-img {
+        display: table-cell;
+        text-align: center;
+    }
+
+    .eq-height {
+        margin-top: 50px;
+        margin: auto
+    }
+
+    .inner-container {
+        text-align: center;
+    }
+
+   .sign {
+        border-radius: 32px;
+        background: #c4d82e !important;
+        color: #002b60;
+        font-family: 'Arial Narrow Bold', sans-serif;
+        font-weight: 900;
+    }
+    
+    .setp-box{
+        width:94px;
+        margin-left: -18px;
+    }
+
+    .h2-color {
+        color: #002b60;
+    }
+    /* Partial Style End */
+    .margin-right-15, .margin-left-15 {
+        margin-right: 15px;
+        margin-left:15px;
+    }
+    #rates-container {
+        margin-top: 50px;
+    }
+
+    .unlisted, .listed {
+        margin: 0;
+        padding: 0;
+    }
+
+    .unlisted {
+        counter-reset: foo;
+        display: table;
+    }
+
+    .listed {
+        list-style: none;
+        counter-increment: foo;
+        display: table-row;
+        width: 100%;
+    }
+
+        .listed::before {
+            content: "";
+            font-family: 'Glyphicons Halflings';
+            font-size: 12px;
+            margin-right: 13px;
+            color: #88bc47;
+            display: table-cell;
+            text-align: right;
+            padding-right: .8em;
+        }
+
+
+    .benefitsHeader {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .hero-static-caption {
+        top: -30px;
+    }
+
+    .keyBenefitsSection {
+        padding-bottom: 4vh;
+    }
+    .hidden-sm, .hidden-md {
+        display: none;
+    }
+
+    @@media (max-width: 768px) {
+ 
+        
+        .hand-helds {
+            text-align: center !important;
+        }
+    }
+
+    .campaign-product-container {
+        padding: 50px;
+        background: #f7f7f7;
+        position: relative;
+        top: -30px;
+        margin-top: 50px;
+    }
+
+    .investment-calculator {
+        margin-top: 100px;
+    }
+
+    .mainHeaderText {
+        background: #f7f7f7;
+        position: relative;
+        padding: 20px;
+        bottom: -47px;
+    }
+
+    .long-description {
+        margin-left: 50px;
+        margin-top: 20px;
+    }
+    
+     .long-des {
+        margin-bottom: -100px !important;
+    }
+
+    .text-step {
+
+        margin-bottom: -20px;
+        position: relative;
+        top: 4px;
+        color: #002b60;
+        font-weight: bold;
+        margin-left: 46px;
+        font-size:18px;
+    }
+
+
+    @@media (max-width: 640px) {
+        .col-sm-12 {
+            margin: 10px;
+        }
+
+        .investment-calculator {
+            margin-top: 20px;
+        }
+        .box-step-text {
+         font-size: 50px;
+         width: 100%;
+        }
+    }
+
+    @@media (min-width: 480px) {
+        .keyBenefitsSection {
+            padding-top: 20px;
+        }
+    }
+
+   @@media (max-width: 767px) {
+        .campaign-product-container.full {
+            margin: 10px -15px;
+        }
+        
+        .sign{
+           display: block !important;
+         }
+         
+         .text-step{
+           margin-left: 0 !important;
+             font-size: 27px;
+           margin-top: 20p
+         }
+        
+         
+         .setp-box{
+         position: relative !important;
+           top: -30px !important;
+               margin-left: 0px;
+          }
+        
+        .box-step-text {
+            width: 100%;
+            margin: auto;
+            margin-top: -30px;
+    
+            font-size: 10px;
+        }
+        
+     .container-step {
+         height: auto !important;
+             padding-bottom: 33px;
+               background: none !important;
+    }
+    
+      .padding-funeral{
+           padding-left: 0;
+           margin-left: -54px;
+
+       }
+       
+      
+        
+  .hero-static-caption .hero-static-description, .hero-static-caption p {
+        font-size: 18px !important;
+        margin-bottom: 32px;
+     }
+        
+    } 
+    
+    
+
+    .step {
+            background: #002b60;
+            background-image: linear-gradient(80DEG, #009ED3 , #002b60 60%);
+            width: 83px;
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+            height: 30px;
+            color: #fff;
+            padding: 4px;
+            font-weight: bold;
+            font-size: 18px;
+    }
+    .step:after {
+        content: "";
+        display: block;
+        position: absolute;
+        top: 0px;
+        left: 97px;
+        border-style: solid;
+        border-color: transparent #002b60;
+        border-width: 16px 0px 14px 32px;
+        width: 0;
+        height: 0px;
+    }
+    .container-step {
+        background: #a9a9a9;
+        height: 30px;
+        margin-top: 30px
+    }
+    
+    .premiums-member{
+        margin-top: 90px;
+    }
+    
+    .member-margin{
+        margin-left: 53px;
+    }
+ 
+     .myWorld-campaign-images{
+         width: 80% !important;
+      }
+      
+      .font-weigh-key-benefits > strong{
+         font-weight: 900;
+       }
+       .font-weigh-key-benefits{
+         font-weight: 600;
+        }
+    .font-children{
+      font-size: 16px !important;
+     }
+     
+    @@media (max-width: 899px ) and (min-width:320px){
+     .step-4-funeral{
+     min-height: 350px !important;
+     }
+     }
+     
+
+</style>
+
+
+ @{
+         int idIterator = 0;
+           foreach (var item in nofisrtsectioncontent ){
+                 var tabSubItemImage = item.Value<IPublishedContent>("tabSubItemImage")?.Url;
+               var tabSubItemIcon = item.Value<IPublishedContent>("tabSubItemIcon")?.Url;
+    var title = item.Value<string>("tabSubItemTitle");
+    var description = item.Value<string>("genericCardContent");
+                
+               List<Umbraco.Web.Models.Link> itemLink = new List<Umbraco.Web.Models.Link>();
+     
+                foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)item.Value("tabSubItemLinks"))
+                {
+                    itemLink.Add(link);
+                    
+                }
+                
+                 if (idIterator%2 == 0)
+                    {
+                        <section class="bg-grey-60 pt-40 pb-40">
+                            <div class="container">
+                                <div class="row align-items-center d-flex row-change md-text-center">
+                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                        <h1 class="color-brand-1 mt-15 mb-20">@title</h1>
+                                        <p class="font-md color-brand-1">@item.Value("tabSubItemTextContent")</p>
+                                         <div class="combo-btn">
+<div class="mt-50 text-start column1">
+<p class="combo-btn-text primary"><a href="@itemLink[0].Url" class="btn  btn-brand-1 hover-up">@itemLink[0].Name</a></p>
+</div>
+<div class="mt-50 text-start column2">
+<p class="combo-btn-text secondary"><a href="@itemLink[1].Url" class="btn btn-brand-secondary hover-up">@itemLink[1].Name</a></p>
+</div>
+</div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                        <img Class="d-block"
+                                             src="@tabSubItemImage"
+                                             alt="" />
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        }
+                    
+          idIterator += 1;
+            }
+            
+                 @Html.Partial("_investmentcalcculatrorv1")
+        }
+   
+       @*  @{
+         int idIterator2 = 0;
+           foreach (var item in nofisrtsectioncontent ){
+                 var tabSubItemImage = item.Value<IPublishedContent>("tabSubItemImage")?.Url;
+               var tabSubItemIcon = item.Value<IPublishedContent>("tabSubItemIcon")?.Url;
+    var title = item.Value<string>("tabSubItemTitle");
+    var description = item.Value<string>("genericCardContent");
+                
+                List<Umbraco.Web.Models.Link> itemLink = new List<Umbraco.Web.Models.Link>();
+     
+                foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)item.Value("tabSubItemLinks"))
+                {
+                    itemLink.Add(link);
+                    
+                }
+                
+                 if (idIterator2%2 == 1)
+                    {
+                        <section class="section-800 bg-grey-60">
+                            <div class="container">
+                                <div class="row align-items-center d-flex row-change md-text-center">
+                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                        <h1 class="color-brand-1 mt-15 mb-20">@title</h1>
+                                        <p class="font-md color-brand-1">@item.Value("tabSubItemTextContent")</p>
+                                                 
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                        <img Class="d-block"
+                                             src="@tabSubItemImage"
+                                             alt="" />
+                                    </div>
+                                </div>
+                                @Html.Raw(@keybenfits.Value("textEditor"))
+                            </div>
+                             
+                        </section>
+                        }
+                     
+          idIterator2 += 1;
+            }
+        }
+    
+@Html.Partial("_keyBenefits1", new CustomModels.HowToApplyDataContainer(bodyTitle, bodyRedirects, bodyButton as IEbankItabstractButton, applyDocs))
+
+
+ @{
+         int idIterator1 = 0;
+           foreach (var item in nofuneralcontent){
+                 var tabSubItemImage = item.Value<IPublishedContent>("tabSubItemImage")?.Url;
+               var tabSubItemIcon = item.Value<IPublishedContent>("tabSubItemIcon")?.Url;
+    var title = item.Value<string>("tabSubItemTitle");
+    var description = item.Value<string>("genericCardContent");
+                
+                Umbraco.Web.Models.Link itemLink = null;
+                foreach (var link in (IEnumerable<Umbraco.Web.Models.Link>)item.Value("tabSubItemLinks"))
+                {
+                    itemLink = link;
+                    break;
+                }
+                
+                 if (idIterator1%2 == 0)
+                    {
+                        <section class="section-800 bg-grey-60">
+                            <div class="container">
+                                <div class="row align-items-center d-flex row-change md-text-center">
+                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                        <h1 class="color-brand-1 mt-15 mb-20">@title</h1>
+                                        <p class="font-md color-brand-1">@item.Value("tabSubItemTextContent")</p>
+                                        
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                        <img Class="d-block"
+                                             src="@tabSubItemImage"
+                                             alt="" />
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        }
+                        else{
+                        
+                             <section class="section-800">
+                                <div class="container">
+                                    <div class="row align-items-center row-change d-flex flex-row-reverse md-text-center">
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                            <h1 class="color-brand-1 mb-20">@title</h1>
+                                            <p class="font-md color-grey-500">@item.Value("tabSubItemTextContent")</p>
+                                           <div class="combo-btn">
+<div class="mt-50 text-start column1">
+<p class="combo-btn-text primary"><a href="@itemLink.Url" class="btn  btn-brand-1 hover-up">@itemLink.Name</a></p>
+</div>
+</div>
+                                        </div>
+                                        <div class="col-xl-6 col-lg-6 col-md-6">
+                                             <img
+                                              Class="d-block"
+                                              src="@tabSubItemImage"
+                                             alt="" />
+                                            
+                                        </div>
+                                    </div>
+                                     
+                                </div>
+                            </section>
+                        }
+          idIterator1 += 1;
+            }
+        }
+        
+
+@if (step3caards!= null && step3caards.Any())
+            {
+          
+
+            
+                foreach (Card benefit in step3caards)
+                {
+                
+                <section class="section-800 step-4-funeral bg-grey-60">
+  <div class="container">
+    <div class="row align-items-center row-change md-text-center">
+      <div class="col-xl-12 col-lg-12 col-md-12">
+        <h1 class="color-brand-1 text-center mt-15 mb-20">
+          @benefit.CardTitle
+        </h1>
+      </div>
+       
+      <div class="col-xl-12 col-lg-12 col-md-12">
+        <img src="@benefit.CardIcon.Url" alt="" style="width: 110%;">
+      </div>
+    </div>
+  </div>
+</section>
+                
+                }
+    }
+
+@{
+         foreach (var item in nostep4content){
+                 var tabSubItemImage = item.Value<IPublishedContent>("tabSubItemImage")?.Url;
+               var tabSubItemIcon = item.Value<IPublishedContent>("tabSubItemIcon")?.Url;
+    var title = item.Value<string>("tabSubItemTitle");
+    var description = item.Value<string>("genericCardContent");
+                
+            
+              
+                        <section class="section-800">
+                            <div class="container">
+                                <div class="row align-items-center d-flex row-change md-text-center">
+                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                        <h1 class="color-brand-1 mt-15 mb-20">@title</h1>
+                                        <p class="font-md color-brand-1">@item.Value("tabSubItemTextContent")</p>
+                                        
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                             <img
+                                              Class="d-block"
+                                              src="@tabSubItemImage"
+                                             alt="" />
+                                            
+                                        </div>
+                                </div>
+                            </div>
+                        </section>
+      
+            }
+        }
+        
+*@
+
+@if (findOutMoreTab != null)
+            {
+               var tabTitle = findOutMoreTab.Value("title")?.ToString();
+              
+                
+                var downloadItems = findOutMoreTab.Value<IEnumerable<DownloadItem>>("downloadItems");
+                
+                    
+ <section class="section pt-40 pb-40 bg-grey-60">
+     
+                <div class="container">
+                  <div class="col d-flex align-items-center row-change">
+                    <div class="row-xl-6 row-lg-6 col-md-6">
+                       <h1 class="color-brand-1 mt-15 mb-20">
+                        @tabTitle
+                      </h1>
+                    </div>
+                    <div class="-xl-6 col-lg-6 col-md-6">
+                    
+                       
+                    </div>
+                    
+                  </div>
+                   <div class="">
+                    <div class="campaign-list">
+                       
+                        <ul>
+                             @if (downloadItems != null && downloadItems.Any())
+                {
+                             foreach (var link in downloadItems)
+                    {
+                                    <li>
+                                        <div class="row no-gutter download-item first">
+                                            <div class="col-sm-9">
+                                                <div class="download-descr">@link.DownloadTextDescription</div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <a href="@link.DownloadButtonRedirectLink2.Url" target="_blank" class="download-btn">
+                                                    @(string.IsNullOrEmpty(link.DownloadButtonText) ? "Download" : link.DownloadButtonText)
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                   
+                                }   
+                                }
+                        </ul>
+                        
+                    </div>
+                </div>
+                </div>
+</section>
+}
+@section scripts{
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/handlebars-v4.0.5.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/jquery.xdomainrequest.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculator.js?ver=1")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculator1.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Common.JS.Library.Ab/Calculator/calculatorHandler.min.js")"></script>
+   
+}
+

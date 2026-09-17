@@ -20,6 +20,15 @@
    .number-block {
         height: 225px;
     } 
+    @@media (max-width: 767px)
+    {
+      .hero-static-caption{
+         top: -60px;
+      }
+      .campaign-product-container{
+         top: -60px;
+      }
+    }
     @@media (min-width: 162px) and (max-width: 197px) {
         .number-block {
             height: 435px;
@@ -40,7 +49,7 @@
             height: 265px;
         }
     }
-        @bodyStyle
+    @bodyStyle
 </style>
 <!-- HERO CONTINUED-->
 @Html.Partial("_pageShoulder", HeroShoulder as ContentModels.HeroShoulder)
@@ -61,4 +70,5 @@
             }
         </div>
    </div>
- </div>h
+ </div>
+
