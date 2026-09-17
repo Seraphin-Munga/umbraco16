@@ -36,13 +36,6 @@
   border-radius: 30px !important;
 }
 
-/* The search icon sits in the same navbar-right list as .login-btn above,
-   which gets its own margin-top: 33px to center in the fixed-height
-   navbar row - without a matching offset here the two floats end up at
-   different heights even though they're the same row. */
-.navbar-default .navbar-nav > li > a.search-icon {
-  margin-top: 33px;
-}
 
 .active {
   text-decoration: none !important;
