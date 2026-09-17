@@ -1,6 +1,10 @@
-.page-title {
-  font-weight: 200;
-  font-size: 48px;
-  line-height: 1.1;
-  margin-bottom: 20px;
+/* Most classes here (hero-static-*, campaign-*, testimonials-*, st-*) come
+   from the vendor stylesheets loaded globally in index.html
+   (main.min.css/custom_main.min.css/projectmagic.css) - this file only
+   covers the bits that differ because tab/carousel switching here is plain
+   React state instead of Bootstrap's jQuery plugins. */
+.mega-tabs .nav-tabs > li a,
+.testimonials-carousel .carousel-indicators li,
+.testimonials-carousel .carousel-control {
+  cursor: pointer;
 }

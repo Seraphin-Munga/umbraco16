@@ -16,7 +16,9 @@ const initialState: PersonalLoanState = {
   error: null,
 };
 
-export const fetchPersonalLoan = createAsyncThunk('personalLoan/fetchPage', () => fetchPersonalLoanContent());
+export const fetchPersonalLoan = createAsyncThunk('personalLoan/fetchPage', (_: void, { signal }) =>
+  fetchPersonalLoanContent(signal),
+);
 
 const personalLoanSlice = createSlice({
   name: 'personalLoan',
@@ -33,6 +35,7 @@ const personalLoanSlice = createSlice({
         state.data = action.payload;
       })
       .addCase(fetchPersonalLoan.rejected, (state, action) => {
+        if (action.meta.aborted) return;
         state.status = 'failed';
         state.error = action.error.message ?? 'Failed to load page content';
       });

@@ -1,16 +1,11 @@
-// Placeholder content service for the "Personal Loan" page (see
-// src/routes/personalMenuPages.ts). No Umbraco content type has been
-// confirmed yet for this page, so this resolves to a static stand-in
-// shaped like a future API response - swap the body for a real
-// src/api/contentApi.ts call once the CMS content type is confirmed.
-export interface PersonalLoanContent {
-  title: string;
-  description: string;
-}
+import type { ProductPageData } from '../api/contentApi';
+import { fetchProductLoanPage } from '../api/contentApi';
 
-export async function fetchPersonalLoanContent(): Promise<PersonalLoanContent> {
-  return {
-    title: 'Personal Loan',
-    description: 'Get fixed repayments on flexible terms',
-  };
+// /en/home/product-personal-loan/ - see src/routes/personalMenuPages.ts.
+const PERSONAL_LOAN_PATH = '/en/home/product-personal-loan/';
+
+export type PersonalLoanContent = ProductPageData;
+
+export async function fetchPersonalLoanContent(signal?: AbortSignal): Promise<PersonalLoanContent> {
+  return fetchProductLoanPage(PERSONAL_LOAN_PATH, signal);
 }

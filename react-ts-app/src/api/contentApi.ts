@@ -114,6 +114,38 @@ async function fetchOne(query: string, signal?: AbortSignal): Promise<RawContent
   return item;
 }
 
+async function fetchChildren(
+  parentId: string,
+  signal?: AbortSignal,
+  expand = 'properties[$all]',
+): Promise<RawContentItem[]> {
+  return fetchContent(`?fetch=children:${parentId}&expand=${expand}&take=100`, signal);
+}
+
+function findByContentType(items: RawContentItem[], contentType: string): RawContentItem | undefined {
+  return items.find((item) => item.contentType.toLowerCase() === contentType.toLowerCase());
+}
+
+// Umbraco Delivery API's documented "get by route" endpoint - unlike every
+// other fetch in this file, this hits a single-item endpoint (the response
+// is one RawContentItem, not a { total, items } envelope). Needed because
+// many product pages (product-personal-loan, product-consolidation-loan,
+// product-12-loan, ...) all share the same `pageLoans` content type, so
+// `filter=contentType:pageLoans` (the pattern every other fetch* below
+// uses) can't tell them apart - only the route can. NOT verified against a
+// live response (v1 vs v2 path shape, trailing slash handling) the way the
+// rest of this file's endpoints are - wrapped by callers in a try/catch so
+// a wrong guess here degrades to an empty page instead of a crash.
+async function fetchContentByRoute(path: string, signal?: AbortSignal): Promise<RawContentItem | undefined> {
+  const response = await fetch(`${API_BASE}/umbraco/delivery/api/v2/content/item${path}`, {
+    headers: { Accept: 'application/json' },
+    signal,
+  });
+
+  if (!response.ok) return undefined;
+  return (await response.json()) as RawContentItem;
+}
+
 function mapBlocks<T>(
   value: unknown,
   map: (props: Record<string, unknown>) => T,
@@ -592,5 +624,399 @@ export async function fetchLatestBlogPosts(signal?: AbortSignal): Promise<BlogPo
       .sort((a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime());
   } catch {
     return [];
+  }
+}
+
+// ============================================================
+// PRODUCT LOAN PAGES (pageLoans doctype)
+// ============================================================
+//
+// Ported from Views/productPersonalLoan.cshtml + its Partials
+// (_pageHeaderImage, _pageShoulder, _benefitsSection, _howToApplySection,
+// _heroKneeTabs, _testimonials, _campaignTabHeaders, _downloadList).
+// `pageLoans` is shared by every /product-*/ page (consolidation loan, 12%
+// loan, overdraft, ...) - each is one node under a fixed route
+// (src/routes/personalMenuPages.ts has them all), discriminated by that
+// route rather than by content type. fetchProductLoanPage takes that route
+// and walks the same child-lookup chain the Razor view does:
+//   pageLoans (by route)
+//     -> heroHeader / heroShoulder / heroChest / heroBody / heroKnees /
+//        testimonials / callMeBack   (real child content nodes)
+//       -> heroChest/heroBody's own "card" children
+//       -> heroKnees's findOutMore/creditLifeInsurance/creditLifeInsuranceCredit
+//          tab children, each with their own "card" children
+//
+// Every content-type alias and property name below is confirmed against
+// the installed Umbraco.ModelsBuilder-generated models
+// (legacy/Models/*.generated.cs) - solid ground, same as the rest of this
+// file's non-"best effort" sections. What's NOT confirmed is the shape the
+// Delivery API actually serializes deeply-nested children into (this
+// wasn't checked against a live response - the local Umbraco backend
+// wasn't running while this was written), so every section below is
+// wrapped so one wrong guess only empties that section, not the page.
+
+export interface ProductHero {
+  breadcrumb: string[];
+  imageUrl: string;
+  imageMediumUrl: string;
+  imageSmallUrl: string;
+}
+
+export interface ProductShoulder {
+  title: string;
+  description: string;
+  buttonText: string | null;
+  buttonUrl: string | null;
+}
+
+// _benefitsSection.cshtml's card-grid markup (title/icon/description per
+// card) is commented out in the source - the only thing that actually
+// renders live is BenefitCards1's raw mediumDescription HTML, and even
+// that only when BenefitCards1 is populated. productPersonalLoan.cshtml
+// only ever sets BenefitCards (from heroChest's own "card" children, a
+// property this component's Benefits object never fills), so on this page
+// BenefitCards1 is always null and the section renders nothing. Kept as an
+// empty-array type (not removed) since other pageLoans pages may set it
+// differently - fetchProductLoanPage still surfaces it so a page that does
+// populate it isn't silently dropped.
+export interface ProductBenefit {
+  mediumDescriptionHtml: string;
+}
+
+export interface ProductDocumentCard {
+  iconUrl: string;
+  iconAlt: string;
+  text: string;
+}
+
+export interface ProductHowToApply {
+  title: string;
+  description: string;
+  buttonText: string | null;
+  buttonUrl: string | null;
+  documentCards: ProductDocumentCard[];
+}
+
+export interface ProductKneeCard {
+  title: string;
+  description: string;
+  iconUrl: string;
+  iconAlt: string;
+}
+
+export interface ProductKneeTabBase {
+  id: string;
+  title: string;
+}
+
+export interface CreditLifeInsuranceTab extends ProductKneeTabBase {
+  kind: 'creditLifeInsurance';
+  cards: ProductKneeCard[];
+  highlights: string[];
+  disclaimer: string;
+}
+
+export interface CreditLifeInsuranceCreditTab extends ProductKneeTabBase {
+  kind: 'creditLifeInsuranceCredit';
+  description: string;
+  listItems: string[];
+  imageUrl: string;
+  highlights: string[];
+  disclaimer: string;
+}
+
+export interface ProductDownloadItem {
+  description: string;
+  buttonText: string;
+  buttonUrl: string;
+}
+
+export interface FindOutMoreTab extends ProductKneeTabBase {
+  kind: 'findOutMore';
+  description: string;
+  downloadItems: ProductDownloadItem[];
+  highlights: string[];
+  disclaimer: string;
+}
+
+export type ProductKneeTab = CreditLifeInsuranceTab | CreditLifeInsuranceCreditTab | FindOutMoreTab;
+
+// The floating "call me back" panel's read-only content (title, button
+// labels/visibility, success icon). The form itself POSTs to a legacy MVC
+// SurfaceController action (legacy/Controllers/CustomController.cs) rather
+// than the Delivery API - that's a write, not content, so it's out of
+// scope here; ProductCallMeBack only covers what the panel displays.
+export interface ProductCallMeBack {
+  title: string;
+  successIconUrl: string;
+  disclaimerHtml: string;
+  callMeBackButtonText: string | null;
+  callMeBackVisible: boolean;
+  quickLoanButtonText: string | null;
+  quickLoanUrl: string | null;
+  quickLoanVisible: boolean;
+  trackLoanVisible: boolean;
+}
+
+export interface ProductPageData {
+  hero: ProductHero | null;
+  shoulder: ProductShoulder | null;
+  benefits: ProductBenefit[];
+  howToApply: ProductHowToApply | null;
+  kneeTabs: ProductKneeTab[];
+  testimonials: TestimonialItem[];
+  callMeBack: ProductCallMeBack | null;
+}
+
+const EMPTY_PRODUCT_PAGE: ProductPageData = {
+  hero: null,
+  shoulder: null,
+  benefits: [],
+  howToApply: null,
+  kneeTabs: [],
+  testimonials: [],
+  callMeBack: null,
+};
+
+function mapProductHero(item: RawContentItem): ProductHero {
+  const breadcrumb = typeof item.properties.breadcrumb === 'string' ? item.properties.breadcrumb : '';
+
+  return {
+    breadcrumb: breadcrumb
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean),
+    imageUrl: mapMediaUrl(item.properties.image),
+    imageMediumUrl: mapMediaUrl(item.properties.imageMedium),
+    imageSmallUrl: mapMediaUrl(item.properties.imageSmall),
+  };
+}
+
+async function mapProductShoulder(
+  item: RawContentItem,
+  signal?: AbortSignal,
+): Promise<ProductShoulder> {
+  const children = await fetchChildren(item.id, signal);
+  const button = findByContentType(children, 'ebankITAbstractButton');
+  // ebankITButtonInternalLink is a single content-picker (IPublishedContent),
+  // not a Link-picker array - same shape as ShoulderCard's `link` property,
+  // so it uses mapContentPickerUrl, not mapLinks (that one's for
+  // Umbraco.Web.Models.Link arrays like heroRedirectAction/menuList).
+  const buttonInternalUrl = button ? mapContentPickerUrl(button.properties.ebankITButtonInternalLink) : null;
+
+  return {
+    title: typeof item.properties.shoulderTitle === 'string' ? item.properties.shoulderTitle : '',
+    description: typeof item.properties.shouderDescription === 'string' ? item.properties.shouderDescription : '',
+    buttonText:
+      button && typeof button.properties.ebankITButtonText === 'string'
+        ? button.properties.ebankITButtonText
+        : null,
+    buttonUrl:
+      buttonInternalUrl ??
+      (button && typeof button.properties.ebankITButtonExternalLink === 'string'
+        ? button.properties.ebankITButtonExternalLink
+        : null),
+  };
+}
+
+// See ProductBenefit's own comment: only populated for a pageLoans page
+// whose Benefits.BenefitCards1 is actually set (productPersonalLoan.cshtml
+// never sets it, so this resolves to [] there).
+async function mapProductBenefits(item: RawContentItem, signal?: AbortSignal): Promise<ProductBenefit[]> {
+  const cards = await fetchChildren(item.id, signal);
+  return cards
+    .filter((card) => card.contentType.toLowerCase() === 'nccard')
+    .map((card) => ({ mediumDescriptionHtml: mapRichText(card.properties.mediumDescription) }));
+}
+
+function mapProductCard(card: RawContentItem): { title: string; description: string; iconUrl: string; iconAlt: string } {
+  return {
+    title: typeof card.properties.cardTitle === 'string' ? card.properties.cardTitle : '',
+    description: typeof card.properties.cardDescription === 'string' ? card.properties.cardDescription : '',
+    iconUrl: mapMediaUrl(card.properties.cardIcon),
+    iconAlt: typeof card.properties.cardTitle === 'string' ? card.properties.cardTitle : '',
+  };
+}
+
+async function mapProductHowToApply(item: RawContentItem, signal?: AbortSignal): Promise<ProductHowToApply> {
+  const children = await fetchChildren(item.id, signal);
+  const button = findByContentType(children, 'ebankITAbstractButton');
+  const cards = children.filter((child) => child.contentType.toLowerCase() === 'card');
+
+  return {
+    title: typeof item.properties.bodyTitle === 'string' ? item.properties.bodyTitle : '',
+    description: typeof item.properties.bodyDescription === 'string' ? item.properties.bodyDescription : '',
+    buttonText:
+      button && typeof button.properties.ebankITButtonText === 'string'
+        ? button.properties.ebankITButtonText
+        : null,
+    buttonUrl:
+      button && typeof button.properties.ebankITButtonExternalLink === 'string'
+        ? button.properties.ebankITButtonExternalLink
+        : null,
+    documentCards: cards.map((card) => {
+      const mapped = mapProductCard(card);
+      return { iconUrl: mapped.iconUrl, iconAlt: mapped.iconAlt, text: mapped.description || mapped.title };
+    }),
+  };
+}
+
+function mapKneeHighlights(value: unknown): string[] {
+  return mapBlocks(value, (props) =>
+    typeof props.nCcardDescription === 'string' ? props.nCcardDescription : '',
+  ).filter(Boolean);
+}
+
+async function mapCreditLifeInsuranceTab(tab: RawContentItem, signal?: AbortSignal): Promise<CreditLifeInsuranceTab> {
+  const children = await fetchChildren(tab.id, signal);
+  const cards = children.filter((child) => child.contentType.toLowerCase() === 'card');
+
+  return {
+    kind: 'creditLifeInsurance',
+    id: typeof tab.properties.title === 'string' ? tab.properties.title.replace(/[^0-9a-zA-Z]+/g, '') : tab.id,
+    title: typeof tab.properties.title === 'string' ? tab.properties.title : '',
+    cards: cards.map(mapProductCard),
+    highlights: mapKneeHighlights(tab.properties.footerCards),
+    disclaimer: typeof tab.properties.disclaimer === 'string' ? tab.properties.disclaimer : '',
+  };
+}
+
+function mapCreditLifeInsuranceCreditTab(tab: RawContentItem): CreditLifeInsuranceCreditTab {
+  const listItems = Array.isArray(tab.properties.tabListItems)
+    ? (tab.properties.tabListItems as unknown[]).filter((s): s is string => typeof s === 'string')
+    : [];
+
+  return {
+    kind: 'creditLifeInsuranceCredit',
+    id: typeof tab.properties.title === 'string' ? tab.properties.title.replace(/[^0-9a-zA-Z]+/g, '') : tab.id,
+    title: typeof tab.properties.title === 'string' ? tab.properties.title : '',
+    description: typeof tab.properties.description === 'string' ? tab.properties.description : '',
+    listItems,
+    imageUrl: mapMediaUrl(tab.properties.tabImage),
+    highlights: mapKneeHighlights(tab.properties.footerCards),
+    disclaimer: typeof tab.properties.disclaimer === 'string' ? tab.properties.disclaimer : '',
+  };
+}
+
+function mapProductDownloadItem(props: Record<string, unknown>): ProductDownloadItem {
+  return {
+    description: typeof props.downloadTextDescription === 'string' ? props.downloadTextDescription : '',
+    buttonText: typeof props.downloadButtonText === 'string' ? props.downloadButtonText : 'Download',
+    buttonUrl:
+      mapContentPickerUrl(props.downloadButtonRedirectLink2) ??
+      (mapMediaUrl(props.downloadButtonRedirectLink2) || '#'),
+  };
+}
+
+function mapFindOutMoreTab(tab: RawContentItem): FindOutMoreTab {
+  return {
+    kind: 'findOutMore',
+    id: typeof tab.properties.title === 'string' ? tab.properties.title.replace(/[^0-9a-zA-Z]+/g, '') : tab.id,
+    title: typeof tab.properties.title === 'string' ? tab.properties.title : '',
+    description: typeof tab.properties.description === 'string' ? tab.properties.description : '',
+    downloadItems: mapBlocks(tab.properties.downloadItems, mapProductDownloadItem),
+    highlights: mapKneeHighlights(tab.properties.footerCards),
+    disclaimer: typeof tab.properties.disclaimer === 'string' ? tab.properties.disclaimer : '',
+  };
+}
+
+async function mapProductKneeTabs(item: RawContentItem, signal?: AbortSignal): Promise<ProductKneeTab[]> {
+  const tabs = await fetchChildren(item.id, signal);
+
+  return Promise.all(
+    tabs.map((tab): Promise<ProductKneeTab> | ProductKneeTab => {
+      const type = tab.contentType.toLowerCase();
+      if (type === 'creditlifeinsurance') return mapCreditLifeInsuranceTab(tab, signal);
+      if (type === 'creditlifeinsurancecredit') return mapCreditLifeInsuranceCreditTab(tab);
+      return mapFindOutMoreTab(tab);
+    }),
+  );
+}
+
+function mapProductCallMeBack(item: RawContentItem): ProductCallMeBack {
+  const settings = mapBlocks(item.properties.floatingFormSetting, (props) => props)[0];
+  const buttonSettings = settings ? mapBlocks(settings.buttonSettings, (props) => props) : [];
+
+  const findButton = (description: string) =>
+    buttonSettings.find(
+      (props) => typeof props.buttonDescription === 'string' && props.buttonDescription.toLowerCase() === description,
+    );
+
+  const callMeBackButton = findButton('call_me_back');
+  const quickLoanButton = findButton('quick_loan');
+  const trackLoanButton = findButton('track_my_loan');
+  const quickLoanLink = quickLoanButton ? mapLinks(quickLoanButton.internalLink)[0] : undefined;
+
+  // panelWarnings' disclaimer lives under an unrelated, sitewide
+  // homepage-elements node (Model.Root()...HomePageElements...HeroBody...
+  // TabBody), several ancestors away from this callMeBack node itself -
+  // not fetched here since it isn't reachable from this page's own
+  // route/children chain the way everything else in this file is. Callers
+  // render without it; disclaimerHtml is kept as an explicit empty string
+  // rather than guessed at.
+  return {
+    title: typeof settings?.title === 'string' ? (settings.title as string) : '',
+    successIconUrl: mapMediaUrl(item.properties.successIcon),
+    disclaimerHtml: '',
+    callMeBackButtonText:
+      callMeBackButton && typeof callMeBackButton.internalLink === 'object'
+        ? mapLinks(callMeBackButton.internalLink)[0]?.title ?? null
+        : null,
+    callMeBackVisible: callMeBackButton?.isButtonVisible === true,
+    quickLoanButtonText: quickLoanLink?.title ?? null,
+    quickLoanUrl: quickLoanLink && quickLoanLink.url !== '#' ? quickLoanLink.url : null,
+    quickLoanVisible: quickLoanButton?.isButtonVisible === true,
+    trackLoanVisible: trackLoanButton?.isButtonVisible === true,
+  };
+}
+
+/**
+ * Fetches one pageLoans product page (personal loan, consolidation loan,
+ * the 12% loan, ...) by its site route - see src/routes/personalMenuPages.ts
+ * for the full list of routes this can be called with. Every section is
+ * independently best-effort: a missing/misshapen child degrades that one
+ * section to empty rather than failing the whole page (see this section's
+ * top comment for why - no live Delivery API response was available to
+ * confirm the nested-children shape against).
+ */
+export async function fetchProductLoanPage(path: string, signal?: AbortSignal): Promise<ProductPageData> {
+  try {
+    const page = await fetchContentByRoute(path, signal);
+    if (!page) return EMPTY_PRODUCT_PAGE;
+
+    const children = await fetchChildren(page.id, signal);
+    const heroHeader = findByContentType(children, 'heroHeader');
+    const heroShoulder = findByContentType(children, 'heroShoulder');
+    const heroChest = findByContentType(children, 'heroChest');
+    const heroBody = findByContentType(children, 'heroBody');
+    const heroKnees = findByContentType(children, 'heroKnees');
+    const testimonialsNode = findByContentType(children, 'testimonials');
+    const callMeBackNode = findByContentType(children, 'callMeBack');
+
+    const [shoulder, benefits, howToApply, kneeTabs] = await Promise.all([
+      heroShoulder ? mapProductShoulder(heroShoulder, signal).catch(() => null) : Promise.resolve(null),
+      heroChest ? mapProductBenefits(heroChest, signal).catch(() => []) : Promise.resolve([]),
+      heroBody ? mapProductHowToApply(heroBody, signal).catch(() => null) : Promise.resolve(null),
+      heroKnees ? mapProductKneeTabs(heroKnees, signal).catch(() => []) : Promise.resolve([]),
+    ]);
+
+    let callMeBack: ProductCallMeBack | null = null;
+    try {
+      if (callMeBackNode) callMeBack = mapProductCallMeBack(callMeBackNode);
+    } catch {
+      callMeBack = null;
+    }
+
+    return {
+      hero: heroHeader ? mapProductHero(heroHeader) : null,
+      shoulder,
+      benefits,
+      howToApply,
+      kneeTabs,
+      testimonials: testimonialsNode ? mapBlocks(testimonialsNode.properties.testimonialItems, mapTestimonialItem) : [],
+      callMeBack,
+    };
+  } catch {
+    return EMPTY_PRODUCT_PAGE;
   }
 }
