@@ -386,6 +386,31 @@ if (args.Length > 0 &&
     // ELEMENT TYPE / DOCUMENT TYPE HELPER
     // --------------------------------------------------------
 
+    // AddPropertyType(propertyType, "content") on its own only creates a
+    // loose Group nested under an implicit "Generic" tab, not a real Tab -
+    // properties still exist on the content type, but the Design canvas
+    // can render them as if the type were empty. EnsureContentTab creates
+    // a real Tab-type PropertyGroup first so properties actually show up.
+    void EnsureContentTab(IContentType type)
+    {
+        if (type.PropertyGroups.Any(g =>
+                g.Alias.Equals("content", StringComparison.OrdinalIgnoreCase)))
+        {
+            return;
+        }
+
+        type.AddPropertyGroup("content", "Content");
+
+        var tab =
+            type.PropertyGroups.FirstOrDefault(g =>
+                g.Alias.Equals("content", StringComparison.OrdinalIgnoreCase));
+
+        if (tab != null)
+        {
+            tab.Type = PropertyGroupType.Tab;
+        }
+    }
+
     IContentType GetOrCreateType(
         string alias,
         string name,
@@ -398,7 +423,15 @@ if (args.Length > 0 &&
 
         if (existing != null)
         {
-            var added = false;
+            var changed = false;
+
+            if (!existing.PropertyGroups.Any(g =>
+                    g.Alias.Equals("content", StringComparison.OrdinalIgnoreCase) &&
+                    g.Type == PropertyGroupType.Tab))
+            {
+                EnsureContentTab(existing);
+                changed = true;
+            }
 
             foreach (var prop in props)
             {
@@ -416,12 +449,12 @@ if (args.Length > 0 &&
                     };
 
                 existing.AddPropertyType(propertyType, "content");
-                added = true;
+                changed = true;
 
                 Console.WriteLine($"  + ADDED PROPERTY: {alias}.{prop.Alias}");
             }
 
-            if (added)
+            if (changed)
             {
                 contentTypeService.Save(existing);
             }
@@ -440,6 +473,8 @@ if (args.Length > 0 &&
                 IsElement = isElement,
                 AllowedAsRoot = allowedAsRoot
             };
+
+        EnsureContentTab(contentType);
 
         foreach (var prop in props)
         {
