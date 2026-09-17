@@ -1,7 +1,5 @@
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
-import { useAppDispatch } from '../../store/hooks';
-import { fetchHome } from '../../store/slices/homeSlice';
 import { fetchHomePageSections } from '../../api/contentApi';
 import type { HomePageSection } from '../../api/contentApi';
 import { HeroCarousel } from './HeroCarousel';
@@ -21,28 +19,14 @@ import './Home.css';
 // this isn't Platform.Umbraco16/PageHome.cshtml). This is the @RenderBody()
 // content Master.cshtml's layout wraps with Header/Footer - see App.tsx.
 //
-// Every section component below still ships its own DEFAULT_* hardcoded
-// content (see each component's own comment) - that's now the fallback
-// used only when the CMS-managed `homePage` node (contentApi.ts's
-// fetchHomePageSections, backed by Program.cs's create-home-schema) has no
-// sections yet, e.g. straight after running create-home-schema but before
-// anyone has authored a Home Page in the backoffice. Once that node has
-// sections, they render in the exact order/kind an editor set in Umbraco -
-// reordering the page is then a backoffice edit, not a deploy.
-//
-// Still dispatches the (separate, older) home slice's fetch
-// (src/store/slices/homeSlice.ts, backed by src/services/homeService.ts)
-// on mount - that reads a different, not-currently-rendered content shape
-// (heroHeaderHome/heroShoulderHome/...), kept fetching only so its data
-// stays available in the store for whichever section switches over to it.
+// Every section renders only from the CMS-managed `homePage` node
+// (contentApi.ts's fetchHomePageSections, backed by Program.cs's
+// create-home-schema) - no hardcoded fallback content anywhere, so the page
+// is blank until an editor authors a Home Page with sections in the
+// backoffice. Sections render in the exact order/kind an editor set in
+// Umbraco - reordering the page is then a backoffice edit, not a deploy.
 export function Home() {
-  const dispatch = useAppDispatch();
   const [sections, setSections] = useState<HomePageSection[] | null>(null);
-
-  useEffect(() => {
-    const promise = dispatch(fetchHome());
-    return () => promise.abort();
-  }, [dispatch]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -57,26 +41,9 @@ export function Home() {
   return (
     <div id="page">
       <div id="content">
-        <main>{sections && sections.length > 0 ? renderCmsSections(sections) : renderDefaultSections()}</main>
+        <main>{sections ? renderCmsSections(sections) : null}</main>
       </div>
     </div>
-  );
-}
-
-function renderDefaultSections() {
-  return (
-    <>
-      <HeroCarousel />
-      <BankWithAudacity />
-      <LoanCalculator />
-      <MyWorldAccount />
-      <DebitCardShowcase />
-      <RewardsSection />
-      <Tap2GlassSection />
-      <BusinessAudacitySection />
-      <AppDownloadSection />
-      <Testimonials />
-    </>
   );
 }
 
@@ -164,7 +131,7 @@ function renderCmsSections(sections: HomePageSection[]) {
             slides={section.slides}
             videoThumbnailUrl={section.videoThumbnailUrl}
             heading={brandHeading(section.heading)}
-            contactCards={section.contactCards.length > 0 ? section.contactCards : undefined}
+            contactCards={section.contactCards}
           />
         );
 

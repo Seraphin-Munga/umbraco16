@@ -2,53 +2,36 @@ import type { ReactNode } from 'react';
 import { Button } from '../ui/Button/Button';
 
 // Ported from the "MyWORLD bank account" promo section of the current live
-// home page markup. Static content (matches the source exactly) passed as
-// props with defaults so it stays reusable.
-const DEFAULT_FEATURES = [
-  'Link up to 5 free pockets to your account',
-  'Enjoy the lowest banking fees and incredible value',
-  'Competitive rates on any positive balance',
-  'Convenient Overdraft access of up to R100 000',
-  'Easy-to-earn Audacious Rewards points',
-];
-
-const DEFAULT_HEADING = (
-  <>
-    <span className="span-major-title">MyWORLD</span> <br />
-    bank account
-  </>
-);
-
+// home page markup. Content comes from the CMS-managed homePage node (see
+// contentApi.ts's fetchHomePageSections) - no hardcoded fallback content,
+// so the CTA button only renders when the editor has set both a label and
+// a URL for it.
 interface MyWorldAccountProps {
-  features?: string[];
+  features: string[];
   ctaLabel?: string;
   ctaUrl?: string;
   heading?: ReactNode;
   subheading?: ReactNode;
 }
 
-export function MyWorldAccount({
-  features = DEFAULT_FEATURES,
-  ctaLabel = 'FIND OUT MORE',
-  ctaUrl = 'https://africanbank.co.za/en/home/banking/#MyWorld',
-  heading = DEFAULT_HEADING,
-  subheading = 'Why choose MyWORLD',
-}: MyWorldAccountProps) {
+export function MyWorldAccount({ features, ctaLabel, ctaUrl, heading, subheading }: MyWorldAccountProps) {
   return (
     <section className="section-title mtb-120">
       <div className="container">
         <div className="row align-items-end md-text-center">
           <div className="col-md-7">
             <h1 className="color-brand-1 major-title">{heading}</h1>
-            <div className="mt-50 text-start">
-              <div className="mb-50">
-                <div className="combo-btn mt-50 text-start column1">
-                  <p className="combo-btn-text primary">
-                    <Button href={ctaUrl}>{ctaLabel}</Button>
-                  </p>
+            {ctaLabel && ctaUrl && (
+              <div className="mt-50 text-start">
+                <div className="mb-50">
+                  <div className="combo-btn mt-50 text-start column1">
+                    <p className="combo-btn-text primary">
+                      <Button href={ctaUrl}>{ctaLabel}</Button>
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
 
           <div className="col-md-5">

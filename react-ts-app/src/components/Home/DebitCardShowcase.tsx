@@ -1,15 +1,15 @@
 // Ported from the gradient-background debit card showcase section of the
-// current live home page markup - a single skewed product image. Static
-// content passed as props with defaults so it stays reusable.
+// current live home page markup - a single skewed product image. Content
+// comes from the CMS-managed homePage node (see contentApi.ts's
+// fetchHomePageSections) - no hardcoded fallback image.
 interface DebitCardShowcaseProps {
   imageUrl?: string;
   alt?: string;
 }
 
-export function DebitCardShowcase({
-  imageUrl = 'https://www.africanbank.co.za/media/feyntwey/mw_pm_debit.png',
-  alt = '/media/feyntwey/mw_pm_debit.png',
-}: DebitCardShowcaseProps) {
+export function DebitCardShowcase({ imageUrl, alt }: DebitCardShowcaseProps) {
+  if (!imageUrl) return null;
+
   return (
     <section className="section-rounded-edge-2">
       <div className="bg-gradient-container">

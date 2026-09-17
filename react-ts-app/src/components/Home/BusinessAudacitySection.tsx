@@ -10,77 +10,35 @@ import { useState } from 'react';
 // data-target="#videoModal" wiring is dropped since no #videoModal markup
 // exists anywhere in the ported source; an empty leftover <div></div>
 // between the video and card columns is also dropped as clear markup
-// filler, not real content.
+// filler, not real content. Content comes from the CMS-managed homePage
+// node (see contentApi.ts's fetchHomePageSections) - no hardcoded fallback
+// content.
 export interface BusinessAudacitySlide {
   title: string;
   paragraphs: string[];
 }
-
-const DEFAULT_SLIDES: BusinessAudacitySlide[] = [
-  {
-    title: 'Business & Commercial',
-    paragraphs: [
-      'From working capital to structured lending, our team of seasoned experts will tailor lending solutions to suite your needs as an entrepreneur, so you can thrive and succeed.',
-    ],
-  },
-  {
-    title: 'Corporate Finance and M&A Advisory Services',
-    paragraphs: [
-      'Our Corporate Finance and M&A team is the sub-Saharan African member firm of Oaklins, the leading global mid-market M&A advisor.',
-      'We combine firm roots in the local market and collaboration on a global scale with a passion for excellence.',
-    ],
-  },
-  {
-    title: 'Specialised property finance',
-    paragraphs: [
-      'Our specialised property finance division focuses on tailored financial solutions for both development and investment opportunities.',
-      'We focus on traditional commercial and industrial property funding.',
-    ],
-  },
-  {
-    title: 'Coverage, Corporate & investment banking',
-    paragraphs: [
-      'African Bank Business Banking offers products and services designed to assist you in building value, managing business growth, and maximising your company’s potential. We consider tailor-making a solution.',
-    ],
-  },
-];
 
 export interface StackedContactCard {
   title: string;
   subtitle: string;
 }
 
-const DEFAULT_HEADING = (
-  <>
-    <span className="span-major-title">We back your </span>business audacity
-  </>
-);
-
 interface BusinessAudacitySectionProps {
-  slides?: BusinessAudacitySlide[];
+  slides: BusinessAudacitySlide[];
   initialIndex?: number;
   videoThumbnailUrl?: string;
-  contactEmail?: string;
   heading?: ReactNode;
   contactCards?: StackedContactCard[];
 }
 
 export function BusinessAudacitySection({
-  slides = DEFAULT_SLIDES,
-  initialIndex = 3,
-  videoThumbnailUrl = 'https://www.africanbank.co.za/media/jivdojkv/placeholder-thumbnails2.png',
-  contactEmail = 'business@africanbank.co.za',
-  heading = DEFAULT_HEADING,
-  contactCards,
+  slides,
+  initialIndex = 0,
+  videoThumbnailUrl,
+  heading,
+  contactCards = [],
 }: BusinessAudacitySectionProps) {
   const [activeIndex, setActiveIndex] = useState(initialIndex);
-  const cards: StackedContactCard[] =
-    contactCards && contactCards.length > 0
-      ? contactCards
-      : [
-          { title: 'Corporate Finance', subtitle: '' },
-          { title: 'Contact Us', subtitle: contactEmail },
-        ];
 
   return (
     <section className="section-800 bg-grey-60 section-container">
@@ -130,15 +88,17 @@ export function BusinessAudacitySection({
 
           <div className="col-md-6 col-sm-12 col-xs-12">
             <div className="row video-section">
-              <div className="col-md-6 col-sm-12 col-xs-12 mb-20">
-                <div className="video-placeholder">
-                  <img src={videoThumbnailUrl} alt="Video Preview" />
-                  <div className="play-btn" />
+              {videoThumbnailUrl && (
+                <div className="col-md-6 col-sm-12 col-xs-12 mb-20">
+                  <div className="video-placeholder">
+                    <img src={videoThumbnailUrl} alt="Video Preview" />
+                    <div className="play-btn" />
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="col-md-6 col-sm-12 col-xs-12">
-                {cards.map((card, index) => (
+                {contactCards.map((card, index) => (
                   <div className={`card-stack card-stack-bg-${(index % 2) + 1}`} key={card.title}>
                     <div className="centered-text">
                       <h4 className="text-white">{card.title}</h4>

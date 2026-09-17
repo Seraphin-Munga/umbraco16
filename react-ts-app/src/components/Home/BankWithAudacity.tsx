@@ -2,10 +2,9 @@ import type { ReactNode } from 'react';
 import { Button } from '../ui/Button/Button';
 
 // Ported from the "#bank-with-audacity" section of the current live home
-// page markup - a static grid of product upsell cards. Content is hardcoded
-// (matches the source exactly, including its "Apply now for a REWARDS" /
-// "Apply now for a LIFESTYLE" aria-labels even though those two buttons read
-// "JOIN NOW") but passed as props with defaults so it stays reusable.
+// page markup - a static grid of product upsell cards. Content comes from
+// the CMS-managed homePage node (see contentApi.ts's fetchHomePageSections)
+// - no hardcoded fallback content.
 export interface AudacityCard {
   id: string;
   title: string;
@@ -14,65 +13,12 @@ export interface AudacityCard {
   buttonUrl: string;
 }
 
-const DEFAULT_CARDS: AudacityCard[] = [
-  {
-    id: 'borrow',
-    title: 'BORROW',
-    description: 'Access a world of potential in just a few clicks.',
-    buttonLabel: 'APPLY NOW',
-    buttonUrl: '/en/home/product-personal-loan/',
-  },
-  {
-    id: 'saveandinvest',
-    title: 'SAVE AND INVEST',
-    description: 'Grow your wealth with market leading interest rates.',
-    buttonLabel: 'APPLY NOW',
-    buttonUrl: '/en/home/product-fixed-deposit-investment/',
-  },
-  {
-    id: 'bank',
-    title: 'BANK',
-    description: 'Enjoy a unique bank account with SA’s lowest banking fees.',
-    buttonLabel: 'APPLY NOW',
-    buttonUrl: '/en/home/banking/',
-  },
-  {
-    id: 'insure',
-    title: 'INSURE',
-    description: 'Get essential cover for life’s unexpected moments.',
-    buttonLabel: 'APPLY NOW',
-    buttonUrl: '/en/home/product-funeral-cover/',
-  },
-  {
-    id: 'rewards',
-    title: 'REWARDS',
-    description: 'Earn Audacious Rewards for your everyday banking.',
-    buttonLabel: 'JOIN NOW',
-    buttonUrl: '/en/home/audacious-rewards/',
-  },
-  {
-    id: 'lifestyle',
-    title: 'LIFESTYLE',
-    description: 'Solutions that seamlessly combine modern financial tools with your needs.',
-    buttonLabel: 'JOIN NOW',
-    buttonUrl: '/en/home/isiko/',
-  },
-];
-
-const DEFAULT_HEADING = (
-  <>
-    <span className="span-major-title">Bank with</span>
-    <br />
-    audacity
-  </>
-);
-
 interface BankWithAudacityProps {
-  cards?: AudacityCard[];
+  cards: AudacityCard[];
   heading?: ReactNode;
 }
 
-export function BankWithAudacity({ cards = DEFAULT_CARDS, heading = DEFAULT_HEADING }: BankWithAudacityProps) {
+export function BankWithAudacity({ cards, heading }: BankWithAudacityProps) {
   return (
     <section className="mtb-30" aria-labelledby="bank-with-audacity">
       <div className="container">

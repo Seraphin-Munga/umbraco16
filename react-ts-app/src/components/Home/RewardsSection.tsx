@@ -4,10 +4,9 @@ import { Button } from '../ui/Button/Button';
 // Ported from the "borrow-section" / Audacious Rewards block of the current
 // live home page markup (the "borrow-section" class name is a leftover from
 // another section reusing the same background style - the content here is
-// entirely about Rewards). Static content passed as props with defaults so
-// it stays reusable.
-const BASE_URL = 'https://www.africanbank.co.za';
-
+// entirely about Rewards). Content comes from the CMS-managed homePage node
+// (see contentApi.ts's fetchHomePageSections) - no hardcoded fallback
+// content.
 export interface RewardsCard {
   id: string;
   imageUrl: string;
@@ -17,71 +16,14 @@ export interface RewardsCard {
   buttonUrl: string;
 }
 
-const DEFAULT_CARDS: RewardsCard[] = [
-  {
-    id: 'join',
-    imageUrl: `${BASE_URL}/media/ffrbp1wu/screen-assets.png`,
-    imageAlt: 'iori',
-    description: (
-      <>
-        Join with ease on our <strong>mobile App</strong>, online banking, USSD or WhatsApp channel.
-      </>
-    ),
-    buttonLabel: 'JOIN TODAY',
-    buttonUrl: 'https://www.africanbank.co.za/en/home/audacious-rewards/',
-  },
-  {
-    id: 'earn',
-    imageUrl: `${BASE_URL}/media/rxzpfqbj/screen-assets2.png`,
-    imageAlt: 'iori',
-    description:
-      'Simply swipe, tap or transact with your African Bank debit or credit card to earn points. Unlock even more rewards by shopping with our partners.',
-    buttonLabel: 'LEARN MORE',
-    buttonUrl: 'https://www.africanbank.co.za/en/home/audacious-rewards/',
-  },
-  {
-    id: 'redeem',
-    imageUrl: `${BASE_URL}/media/l0ujvwla/screen-assets3.png`,
-    imageAlt: 'iori',
-    description: (
-      <>
-        Redeem your Audacious Rewards points on our <strong>online store</strong> for airtime, data, electricity,
-        groceries vouchers, and much more, or simply convert them to cash.
-      </>
-    ),
-    buttonLabel: 'LEARN MORE',
-    buttonUrl: 'https://www.africanbank.co.za/en/home/audacious-rewards/',
-  },
-];
-
-const DEFAULT_HEADING = (
-  <>
-    <span className="span-major-title">Rewards </span>
-    <br />
-    You can count on
-  </>
-);
-
-const DEFAULT_INTRO = (
-  <>
-    Audacious Rewards is African Bank’s <strong>award winning</strong> rewards programme designed to
-    reward you for your everyday banking and positive financial behaviour.
-  </>
-);
-
 interface RewardsSectionProps {
-  cards?: RewardsCard[];
+  cards: RewardsCard[];
   heading?: ReactNode;
   subheading?: ReactNode;
   intro?: ReactNode;
 }
 
-export function RewardsSection({
-  cards = DEFAULT_CARDS,
-  heading = DEFAULT_HEADING,
-  subheading = 'Audacious Rewards',
-  intro = DEFAULT_INTRO,
-}: RewardsSectionProps) {
+export function RewardsSection({ cards, heading, subheading, intro }: RewardsSectionProps) {
   return (
     <section className="borrow-section">
       <div className="section-title">

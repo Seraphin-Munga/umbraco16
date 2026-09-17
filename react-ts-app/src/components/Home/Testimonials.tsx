@@ -1,36 +1,22 @@
 // Ported from the "testimonial-section" video grid in the current live home
 // page markup - replaces this file's old API-driven avatar/story carousel
-// entirely. Static content passed as props with defaults so it stays
-// reusable. The data-toggle="modal" / data-target="#videoModal" wiring on
-// each placeholder is dropped since no #videoModal markup exists anywhere
-// in the ported source (same reasoning as BusinessAudacitySection.tsx).
-const BASE_URL = 'https://www.africanbank.co.za';
-
+// entirely. Content comes from the CMS-managed homePage node (see
+// contentApi.ts's fetchHomePageSections) - no hardcoded fallback content.
+// The data-toggle="modal" / data-target="#videoModal" wiring on each
+// placeholder is dropped since no #videoModal markup exists anywhere in the
+// ported source (same reasoning as BusinessAudacitySection.tsx).
 export interface VideoTestimonial {
   id: string;
   videoId: string;
   thumbnailUrl: string;
 }
 
-const DEFAULT_VIDEOS: VideoTestimonial[] = [
-  {
-    id: 'video-1',
-    videoId: '9Cbuqa8Gog4',
-    thumbnailUrl: `${BASE_URL}/media/raxb5uwg/placeholder-thumbnails.png`,
-  },
-  {
-    id: 'video-2',
-    videoId: '3DSeauqrIpI',
-    thumbnailUrl: `${BASE_URL}/media/5pnhzvlc/placeholder-thumbnails4.png`,
-  },
-];
-
 interface TestimonialsProps {
-  videos?: VideoTestimonial[];
+  videos: VideoTestimonial[];
   heading?: string;
 }
 
-export function Testimonials({ videos = DEFAULT_VIDEOS, heading = 'Testimonials' }: TestimonialsProps) {
+export function Testimonials({ videos, heading }: TestimonialsProps) {
   return (
     <section className="testimonial-section">
       <div className="container">

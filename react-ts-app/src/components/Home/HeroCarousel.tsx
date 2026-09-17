@@ -3,9 +3,9 @@ import { Button } from '../ui/Button/Button';
 
 // Ported from the "#heroSlider" carousel + "#productGrid" static grid in the
 // current live home page markup - a single <section class="section-rounded-edge-3">
-// block, not the old API-driven "#hero-banner" carousel this file used to
-// render. Content is hardcoded here (matches the source exactly) rather than
-// fetched, but still passed as props with defaults so it stays reusable.
+// block. Content (slides/gridItems) comes from the CMS-managed homePage
+// node (see contentApi.ts's fetchHomePageSections) - no hardcoded fallback
+// content, so an empty CMS section list here just renders nothing.
 export interface HeroCarouselSlide {
   imageUrl: string;
   titleMain: string;
@@ -23,121 +23,19 @@ export interface HeroProductGridItem {
 
 const AUTO_ADVANCE_MS = 7000;
 
-// The live site serves its media library off this origin - relative
-// "/media/..." paths only resolve correctly there, not on this app's own host.
-const BASE_URL = 'https://www.africanbank.co.za';
-
-const DEFAULT_SLIDES: HeroCarouselSlide[] = [
-  {
-    imageUrl: `${BASE_URL}/media/1hej1uzu/dig2510_025_credit-camp_2400x800_carousel_banner-home.jpg`,
-    titleMain: 'We give Credit',
-    titleHighlight: 'where progress is due',
-    description: 'Apply for a Personal Loan of up to R500 000',
-    buttonLabel: 'Apply Now',
-    buttonUrl: '/en/home/credit-campaign/',
-  },
-  {
-    imageUrl: `${BASE_URL}/media/1zqhrrai/ab-banking-online.png`,
-    titleMain: 'Ready to',
-    titleHighlight: 'reach Your Goals?',
-    description: 'Back your audacity with a Personal Loan that works for you',
-    buttonLabel: 'Apply now',
-    buttonUrl: '/en/home/product-personal-loan/',
-  },
-  {
-    imageUrl: `${BASE_URL}/media/2rup4o2i/bannerhome.png`,
-    titleMain: 'Need R20 000',
-    titleHighlight: 'to R5 million?',
-    description: 'Qualify for a Business Loan if you make R1 million+ in turnover per year. ',
-    buttonLabel: 'Explore',
-    buttonUrl: '/en/home/business-and-commercial-banking/',
-  },
-  {
-    imageUrl: `${BASE_URL}/media/camlj2rn/ab-business-banking.png`,
-    titleMain: 'One of a kind',
-    titleHighlight: 'Just like you',
-    description: 'The only bank account made to share, with low fees and incredible value',
-    buttonLabel: 'Apply now',
-    buttonUrl: '/en/home/banking/',
-  },
-  {
-    imageUrl: `${BASE_URL}/media/epojr4lh/ab-consumer-banking.png`,
-    titleMain: 'Your future',
-    titleHighlight: 'Starts now',
-    description: 'Create your tomorrow with competitive interest rates',
-    buttonLabel: 'Apply now',
-    buttonUrl: '/en/home/product-fixed-deposit-investment/',
-  },
-  {
-    imageUrl: `${BASE_URL}/media/ft2h1n54/ab-fashionable-banking.png`,
-    titleMain: 'Backing you,',
-    titleHighlight: 'wherever you are',
-    description: 'Enjoy peace of mind with an African Bank Credit Card',
-    buttonLabel: 'Apply Now',
-    buttonUrl: '/en/home/product-credit-card/',
-  },
-  {
-    imageUrl: `${BASE_URL}/media/d2mlnyiz/dig2603_003_stokvel_carouselhome.jpg`,
-    titleMain: 'African Bank',
-    titleHighlight: 'Stokvel Account',
-    description: 'Strength in saving together.',
-    buttonLabel: 'Apply Now',
-    buttonUrl: '/en/home/stokvel/',
-  },
-];
-
-const DEFAULT_GRID_ITEMS: HeroProductGridItem[] = [
-  {
-    iconUrl: `${BASE_URL}/media/xpxhzci0/lib2501_bank-w.png`,
-    label: 'BANK',
-    url: 'https://www.africanbank.co.za/en/home/banking/#MyWorld',
-  },
-  {
-    iconUrl: `${BASE_URL}/media/o0kiaxk3/lib2501_borrow.png`,
-    label: 'BORROW',
-    url: 'https://www.africanbank.co.za/en/home/product-personal-loan/#',
-  },
-  {
-    iconUrl: `${BASE_URL}/media/3kdpznd3/lib2501_investments-w.png`,
-    label: 'SAVE & INVEST',
-    url: 'https://www.africanbank.co.za/en/home/product-fixed-deposit-investment/',
-  },
-  {
-    iconUrl: `${BASE_URL}/media/q30fidjy/lib2501_insurance-w.png`,
-    label: 'INSURE',
-    url: 'https://africanbank.co.za/en/home/product-funeral-cover/',
-  },
-  {
-    iconUrl: `${BASE_URL}/media/ptje51oz/lib2501_rewards-w.png`,
-    label: 'REWARDS',
-    url: 'https://www.africanbank.co.za/en/home/audacious-rewards/',
-  },
-  {
-    iconUrl: `${BASE_URL}/media/xmnnxd2m/lifestyle.png`,
-    label: 'LIFESTYLE',
-    url: 'https://www.africanbank.co.za/en/home/Isiko',
-  },
-];
-
-const DEFAULT_PRELOAD_IMAGES = [
-  `${BASE_URL}/media/vzujjdpw/woman-sitting-with-notebook-laptop.jpg`,
-  `${BASE_URL}/media/rp4jz4eb/black-business-director-resting-her-high-end-ceo-chair-after-project.jpg`,
-  `${BASE_URL}/media/rf4keoe4/african-business-male-people-shaking-hands.jpg`,
-];
-
 interface HeroCarouselProps {
-  slides?: HeroCarouselSlide[];
-  gridItems?: HeroProductGridItem[];
+  slides: HeroCarouselSlide[];
+  gridItems: HeroProductGridItem[];
   preloadImages?: string[];
   initialIndex?: number;
   autoAdvanceMs?: number;
 }
 
 export function HeroCarousel({
-  slides = DEFAULT_SLIDES,
-  gridItems = DEFAULT_GRID_ITEMS,
-  preloadImages = DEFAULT_PRELOAD_IMAGES,
-  initialIndex = 2,
+  slides,
+  gridItems,
+  preloadImages = [],
+  initialIndex = 0,
   autoAdvanceMs = AUTO_ADVANCE_MS,
 }: HeroCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(initialIndex);
