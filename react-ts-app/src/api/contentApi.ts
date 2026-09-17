@@ -614,7 +614,7 @@ const HOME_PAGE_SECTIONS_EXPAND =
   'features[properties[$all]],' +
   'contactCards[properties[$all]],' +
   'videos[properties[$all]],' +
-  '$all],$all]';
+  '$all]],$all]';
 
 function str(value: unknown, fallback = ''): string {
   return typeof value === 'string' ? value : fallback;
