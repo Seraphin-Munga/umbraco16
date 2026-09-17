@@ -1,0 +1,141 @@
+# Pipeline for react-ts-app (the SPA). Only runs when the app itself, or its
+# Dockerfile/nginx config, changes. See .gitlab-ci.yml for the shared stage
+# list and the CI/CD variables every job below relies on.
+.frontend_changes: &frontend_changes
+  - react-ts-app/**/*
+
+.frontend_docker_login: &frontend_docker_login
+  - docker login $ACR_LOGIN_SERVER -u $ACR_USERNAME -p $ACR_PASSWORD
+
+.frontend_azure_login: &frontend_azure_login
+  - az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+
+# ============================================================
+# DEV pipeline: build + unit tests
+# ============================================================
+frontend:build:
+  stage: build
+  image: node:22-alpine
+  rules:
+    - changes: *frontend_changes
+  cache:
+    key:
+      files: [react-ts-app/package-lock.json]
+    paths: [react-ts-app/node_modules]
+  script:
+    - cd react-ts-app
+    - npm ci
+    - npm run lint
+    - npm run build
+    - npm test --if-present
+
+# ============================================================
+# Docker image (built + pushed to ACR under a "dev-<sha>" tag)
+# ============================================================
+frontend:docker-dev:
+  stage: docker-dev
+  image: docker:24.0.5
+  services: [docker:24.0.5-dind]
+  variables:
+    FRONTEND_IMAGE: $ACR_LOGIN_SERVER/acf-frontend
+  rules:
+    - changes: *frontend_changes
+      if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  script:
+    - *frontend_docker_login
+    - >
+      docker build
+      --build-arg VITE_UMBRACO_API_BASE_URL="$DEV_UMBRACO_API_BASE_URL"
+      --build-arg VITE_ONLINE_UPLOAD_URL="$DEV_ONLINE_UPLOAD_URL"
+      -t $FRONTEND_IMAGE:dev-$CI_COMMIT_SHORT_SHA
+      react-ts-app
+    - docker push $FRONTEND_IMAGE:dev-$CI_COMMIT_SHORT_SHA
+
+# ============================================================
+# DEV environment deploy
+# ============================================================
+frontend:deploy-dev:
+  stage: deploy-dev
+  image: mcr.microsoft.com/azure-cli
+  variables:
+    FRONTEND_IMAGE: $ACR_LOGIN_SERVER/acf-frontend
+  rules:
+    - changes: *frontend_changes
+      if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  environment:
+    name: dev/frontend
+  script:
+    - *frontend_azure_login
+    - >
+      az webapp config container set
+      --name "$AZURE_WEBAPP_FRONTEND_DEV"
+      --resource-group "$AZURE_RESOURCE_GROUP"
+      --docker-custom-image-name "$FRONTEND_IMAGE:dev-$CI_COMMIT_SHORT_SHA"
+      --docker-registry-server-url "https://$ACR_LOGIN_SERVER"
+      --docker-registry-server-user "$ACR_USERNAME"
+      --docker-registry-server-password "$ACR_PASSWORD"
+
+# ============================================================
+# Testing/QA gate - manual sign-off before a release can be cut.
+# Replace the echo with real smoke/e2e tests once they exist.
+# ============================================================
+frontend:qa:
+  stage: qa
+  image: alpine:3.20
+  rules:
+    - changes: *frontend_changes
+      if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: manual
+  script:
+    - echo "QA sign-off recorded for $CI_COMMIT_SHORT_SHA"
+
+# ============================================================
+# PUBLISH pipeline: rebuilt (not promoted) with production env vars, since
+# Vite bakes VITE_* into the bundle at build time - see the Dockerfile.
+# Only runs off a release tag.
+# ============================================================
+frontend:publish:
+  stage: publish
+  image: docker:24.0.5
+  services: [docker:24.0.5-dind]
+  variables:
+    FRONTEND_IMAGE: $ACR_LOGIN_SERVER/acf-frontend
+  rules:
+    - changes: *frontend_changes
+      if: '$CI_COMMIT_TAG'
+  script:
+    - *frontend_docker_login
+    - >
+      docker build
+      --build-arg VITE_UMBRACO_API_BASE_URL="$PROD_UMBRACO_API_BASE_URL"
+      --build-arg VITE_ONLINE_UPLOAD_URL="$PROD_ONLINE_UPLOAD_URL"
+      -t $FRONTEND_IMAGE:$CI_COMMIT_TAG
+      -t $FRONTEND_IMAGE:latest
+      react-ts-app
+    - docker push $FRONTEND_IMAGE:$CI_COMMIT_TAG
+    - docker push $FRONTEND_IMAGE:latest
+
+# ============================================================
+# PRODUCTION deploy - manual trigger on a release tag.
+# ============================================================
+frontend:deploy-production:
+  stage: deploy-production
+  image: mcr.microsoft.com/azure-cli
+  variables:
+    FRONTEND_IMAGE: $ACR_LOGIN_SERVER/acf-frontend
+  rules:
+    - changes: *frontend_changes
+      if: '$CI_COMMIT_TAG'
+      when: manual
+  environment:
+    name: production/frontend
+  script:
+    - *frontend_azure_login
+    - >
+      az webapp config container set
+      --name "$AZURE_WEBAPP_FRONTEND_PROD"
+      --resource-group "$AZURE_RESOURCE_GROUP"
+      --docker-custom-image-name "$FRONTEND_IMAGE:$CI_COMMIT_TAG"
+      --docker-registry-server-url "https://$ACR_LOGIN_SERVER"
+      --docker-registry-server-user "$ACR_USERNAME"
+      --docker-registry-server-password "$ACR_PASSWORD"

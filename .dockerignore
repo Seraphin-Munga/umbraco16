@@ -1,0 +1,10 @@
+**/bin
+**/obj
+**/.vs
+**/.vscode
+.git
+.gitignore
+react-ts-app/node_modules
+react-ts-app/dist
+legacy
+*.md

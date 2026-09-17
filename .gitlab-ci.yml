@@ -1,0 +1,42 @@
+# Two independent pipelines in this one monorepo config - react-ts-app (the
+# SPA) and src/AcfAfricanbank.Web (the Umbraco "Production API" backend,
+# project-referencing src/AcfAfricanbank.Core). Each only runs when its own
+# path changes (see the `rules: changes:` in each included file), and each
+# follows the same six-stage shape:
+#
+#   build -> docker-dev -> deploy-dev -> qa -> publish -> deploy-production
+#
+# Required GitLab CI/CD variables (Settings > CI/CD > Variables), all masked:
+#   ACR_LOGIN_SERVER                 e.g. acfregistry.azurecr.io
+#   ACR_USERNAME / ACR_PASSWORD      ACR admin creds or a pull/push service principal
+#   AZURE_TENANT_ID / AZURE_CLIENT_ID / AZURE_CLIENT_SECRET
+#                                     service principal `az login` uses for deploys
+#   AZURE_RESOURCE_GROUP
+#   AZURE_WEBAPP_FRONTEND_DEV / AZURE_WEBAPP_FRONTEND_PROD
+#   AZURE_WEBAPP_BACKEND_DEV  / AZURE_WEBAPP_BACKEND_PROD
+#                                     Azure Web App for Containers names - swap the
+#                                     `az webapp config container set` calls below for
+#                                     `kubectl set image` / `az containerapp update` if
+#                                     the actual target is AKS / Container Apps instead.
+#   DEV_UMBRACO_API_BASE_URL / PROD_UMBRACO_API_BASE_URL
+#   DEV_ONLINE_UPLOAD_URL    / PROD_ONLINE_UPLOAD_URL
+#                                     baked into the frontend image at build time (Vite
+#                                     inlines VITE_* at build, not at container start -
+#                                     see react-ts-app/Dockerfile's own comment)
+
+stages:
+  - build
+  - docker-dev
+  - deploy-dev
+  - qa
+  - publish
+  - deploy-production
+
+# Required for the docker:dind service every docker-dev/publish job uses -
+# see https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#tls-enabled.
+variables:
+  DOCKER_TLS_CERTDIR: "/certs"
+
+include:
+  - local: '.gitlab/ci/frontend.yml'
+  - local: '.gitlab/ci/backend.yml'
