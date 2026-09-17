@@ -48,8 +48,12 @@ export function Header() {
   }, [dispatch]);
 
   return (
-    <header className="header">
-      <nav className="nav-bar top-nav">
+    <header>
+      {/* Matches MasterNew.cshtml's <header><nav class="navbar navbar-expand-lg
+          navbar-dark custom-nav new-navbar-ab">@Html.Partial(Navigation.cshtml)</nav></header> -
+          Navigation.cshtml's own root (header-container + its own inner navbar-default
+          nav) nests inside this, matching the real @Html.Partial composition. */}
+      <nav className="navbar navbar-expand-lg navbar-dark custom-nav new-navbar-ab">
         <div className="header-container">
           <nav className="navbar navbar-default dropdown-container new-navbar-ab">
             <div className="container">
