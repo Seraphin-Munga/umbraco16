@@ -1,13 +1,22 @@
+import type { ReactNode } from 'react';
 import { Button } from '../ui/Button/Button';
 
 // Ported from the "Tap2Glass App" section of the current live home page
 // markup. Static content passed as props with defaults so it stays reusable.
+const DEFAULT_HEADING = (
+  <>
+    Get The <br />
+    <span className="span-major-title">Tap2Glass</span> App
+  </>
+);
+
 interface Tap2GlassSectionProps {
   downloadUrl?: string;
   downloadLabel?: string;
   imageUrl?: string;
   imageAlt?: string;
   description?: string;
+  heading?: ReactNode;
 }
 
 export function Tap2GlassSection({
@@ -16,16 +25,14 @@ export function Tap2GlassSection({
   imageUrl = 'https://www.africanbank.co.za/media/zlellrbh/ab-mobility-banking.png',
   imageAlt = 'Teenage girl',
   description = 'Revolutionalise the way you manage your business and get paid. Tap2Glass turns your NFC enabled Android device (phone or tablet) into a card machine for easy customer payments. It’s a quick, cost-effective, convenient, and more importantly, a secure way to transact.',
+  heading = DEFAULT_HEADING,
 }: Tap2GlassSectionProps) {
   return (
     <section className="section mtb-120 bg-white">
       <div className="container">
         <div className="row md-text-center">
           <div className="col-md-12">
-            <h1 className="color-brand-1 major-title">
-              Get The <br />
-              <span className="span-major-title">Tap2Glass</span> App
-            </h1>
+            <h1 className="color-brand-1 major-title">{heading}</h1>
             <div className="mt-50 text-start">
               <Button href={downloadUrl}>
                 {downloadLabel}{' '}

@@ -706,7 +706,12 @@ function mapHomeTestimonialVideo(props: Record<string, unknown>, index?: number)
 }
 
 export type HomePageSection =
-  | { kind: 'heroCarouselBlock'; slides: HeroCarouselSlide[]; gridItems: HeroProductGridItem[] }
+  | {
+      kind: 'heroCarouselBlock';
+      slides: HeroCarouselSlide[];
+      gridItems: HeroProductGridItem[];
+      autoAdvanceSeconds: number | null;
+    }
   | { kind: 'bankWithAudacityBlock'; heading: string; cards: AudacityCard[] }
   | { kind: 'loanCalculatorBlock'; props: Partial<LoanCalculatorProps> }
   | {
@@ -764,6 +769,7 @@ function mapHomePageSection(
         kind: 'heroCarouselBlock',
         slides: mapBlocks(props.slides, mapHomeHeroSlide),
         gridItems: mapBlocks(props.gridItems, mapHomeGridItem),
+        autoAdvanceSeconds: num(props.autoAdvanceSeconds),
       };
 
     case 'bankWithAudacityBlock':

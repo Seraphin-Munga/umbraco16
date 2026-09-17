@@ -27,15 +27,16 @@ const DEFAULT_VIDEOS: VideoTestimonial[] = [
 
 interface TestimonialsProps {
   videos?: VideoTestimonial[];
+  heading?: string;
 }
 
-export function Testimonials({ videos = DEFAULT_VIDEOS }: TestimonialsProps) {
+export function Testimonials({ videos = DEFAULT_VIDEOS, heading = 'Testimonials' }: TestimonialsProps) {
   return (
     <section className="testimonial-section">
       <div className="container">
         <div className="row">
           <div className="col-md-12 mb-50">
-            <h1 className="text-white span-major-title">Testimonials</h1>
+            <h1 className="text-white span-major-title">{heading}</h1>
           </div>
         </div>
 

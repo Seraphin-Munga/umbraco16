@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import { useAppDispatch } from '../../store/hooks';
 import { fetchHome } from '../../store/slices/homeSlice';
@@ -79,16 +80,33 @@ function renderDefaultSections() {
   );
 }
 
+// Renders a single-field CMS heading string in the same brand-span style
+// every section's own hardcoded heading uses - `undefined` (not an empty
+// span) when the field is blank, so the component keeps its own default
+// heading instead of rendering nothing.
+function brandHeading(text: string): ReactNode | undefined {
+  return text ? <span className="span-major-title">{text}</span> : undefined;
+}
+
 function renderCmsSections(sections: HomePageSection[]) {
   return sections.map((section, index) => {
     switch (section.kind) {
       case 'heroCarouselBlock':
         return (
-          <HeroCarousel key={index} slides={section.slides} gridItems={section.gridItems} />
+          <HeroCarousel
+            key={index}
+            slides={section.slides}
+            gridItems={section.gridItems}
+            autoAdvanceMs={
+              section.autoAdvanceSeconds ? section.autoAdvanceSeconds * 1000 : undefined
+            }
+          />
         );
 
       case 'bankWithAudacityBlock':
-        return <BankWithAudacity key={index} cards={section.cards} />;
+        return (
+          <BankWithAudacity key={index} cards={section.cards} heading={brandHeading(section.heading)} />
+        );
 
       case 'loanCalculatorBlock':
         return <LoanCalculator key={index} {...section.props} />;
@@ -100,6 +118,15 @@ function renderCmsSections(sections: HomePageSection[]) {
             features={section.features}
             ctaLabel={section.ctaLabel ?? undefined}
             ctaUrl={section.ctaUrl ?? undefined}
+            heading={
+              section.highlightWord || section.heading ? (
+                <>
+                  <span className="span-major-title">{section.highlightWord}</span> <br />
+                  {section.heading}
+                </>
+              ) : undefined
+            }
+            subheading={section.subheading || undefined}
           />
         );
 
@@ -107,7 +134,15 @@ function renderCmsSections(sections: HomePageSection[]) {
         return <DebitCardShowcase key={index} imageUrl={section.imageUrl} alt={section.alt} />;
 
       case 'rewardsSectionBlock':
-        return <RewardsSection key={index} cards={section.cards} />;
+        return (
+          <RewardsSection
+            key={index}
+            cards={section.cards}
+            heading={brandHeading(section.heading)}
+            subheading={section.subheading || undefined}
+            intro={section.intro || undefined}
+          />
+        );
 
       case 'tap2GlassBlock':
         return (
@@ -118,6 +153,7 @@ function renderCmsSections(sections: HomePageSection[]) {
             imageUrl={section.imageUrl}
             imageAlt={section.imageAlt}
             description={section.description}
+            heading={brandHeading(section.heading)}
           />
         );
 
@@ -127,6 +163,8 @@ function renderCmsSections(sections: HomePageSection[]) {
             key={index}
             slides={section.slides}
             videoThumbnailUrl={section.videoThumbnailUrl}
+            heading={brandHeading(section.heading)}
+            contactCards={section.contactCards.length > 0 ? section.contactCards : undefined}
           />
         );
 
@@ -140,11 +178,12 @@ function renderCmsSections(sections: HomePageSection[]) {
             downloadLabel={section.downloadLabel ?? undefined}
             imageUrl={section.imageUrl}
             imageAlt={section.imageAlt}
+            heading={brandHeading(section.heading)}
           />
         );
 
       case 'testimonialsBlock':
-        return <Testimonials key={index} videos={section.videos} />;
+        return <Testimonials key={index} videos={section.videos} heading={section.heading || undefined} />;
 
       default:
         return null;

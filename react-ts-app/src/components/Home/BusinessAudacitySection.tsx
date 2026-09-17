@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { useState } from 'react';
 
 // Ported from the "We back your business audacity" section of the current
@@ -44,11 +45,24 @@ const DEFAULT_SLIDES: BusinessAudacitySlide[] = [
   },
 ];
 
+export interface StackedContactCard {
+  title: string;
+  subtitle: string;
+}
+
+const DEFAULT_HEADING = (
+  <>
+    <span className="span-major-title">We back your </span>business audacity
+  </>
+);
+
 interface BusinessAudacitySectionProps {
   slides?: BusinessAudacitySlide[];
   initialIndex?: number;
   videoThumbnailUrl?: string;
   contactEmail?: string;
+  heading?: ReactNode;
+  contactCards?: StackedContactCard[];
 }
 
 export function BusinessAudacitySection({
@@ -56,17 +70,24 @@ export function BusinessAudacitySection({
   initialIndex = 3,
   videoThumbnailUrl = 'https://www.africanbank.co.za/media/jivdojkv/placeholder-thumbnails2.png',
   contactEmail = 'business@africanbank.co.za',
+  heading = DEFAULT_HEADING,
+  contactCards,
 }: BusinessAudacitySectionProps) {
   const [activeIndex, setActiveIndex] = useState(initialIndex);
+  const cards: StackedContactCard[] =
+    contactCards && contactCards.length > 0
+      ? contactCards
+      : [
+          { title: 'Corporate Finance', subtitle: '' },
+          { title: 'Contact Us', subtitle: contactEmail },
+        ];
 
   return (
     <section className="section-800 bg-grey-60 section-container">
       <div className="container">
         <div className="row md-text-center">
           <div className="col-md-6 col-sm-12 col-xs-12">
-            <h1 className="color-brand-1 major-title mb-20">
-              <span className="span-major-title">We back your </span>business audacity
-            </h1>
+            <h1 className="color-brand-1 major-title mb-20">{heading}</h1>
 
             <div className="container text-slider-carousel">
               <div className="slide-number" id="slideNumber">
@@ -117,17 +138,14 @@ export function BusinessAudacitySection({
               </div>
 
               <div className="col-md-6 col-sm-12 col-xs-12">
-                <div className="card-stack card-stack-bg-1">
-                  <div className="centered-text">
-                    <h4 className="text-white">Corporate Finance</h4>
+                {cards.map((card, index) => (
+                  <div className={`card-stack card-stack-bg-${(index % 2) + 1}`} key={card.title}>
+                    <div className="centered-text">
+                      <h4 className="text-white">{card.title}</h4>
+                      {card.subtitle && <p className="font-xs text-white">{card.subtitle}</p>}
+                    </div>
                   </div>
-                </div>
-                <div className="card-stack card-stack-bg-2">
-                  <div className="centered-text">
-                    <h4 className="text-white">Contact Us</h4>
-                    <p className="font-xs text-white">{contactEmail}</p>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>

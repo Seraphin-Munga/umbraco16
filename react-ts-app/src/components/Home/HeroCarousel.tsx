@@ -130,6 +130,7 @@ interface HeroCarouselProps {
   gridItems?: HeroProductGridItem[];
   preloadImages?: string[];
   initialIndex?: number;
+  autoAdvanceMs?: number;
 }
 
 export function HeroCarousel({
@@ -137,6 +138,7 @@ export function HeroCarousel({
   gridItems = DEFAULT_GRID_ITEMS,
   preloadImages = DEFAULT_PRELOAD_IMAGES,
   initialIndex = 2,
+  autoAdvanceMs = AUTO_ADVANCE_MS,
 }: HeroCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(initialIndex);
 
@@ -144,9 +146,9 @@ export function HeroCarousel({
     if (slides.length < 2) return;
     const timer = setInterval(() => {
       setActiveIndex((current) => (current + 1) % slides.length);
-    }, AUTO_ADVANCE_MS);
+    }, autoAdvanceMs);
     return () => clearInterval(timer);
-  }, [slides.length]);
+  }, [slides.length, autoAdvanceMs]);
 
   if (slides.length === 0) return null;
 

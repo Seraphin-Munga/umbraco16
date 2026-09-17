@@ -54,29 +54,45 @@ const DEFAULT_CARDS: RewardsCard[] = [
   },
 ];
 
+const DEFAULT_HEADING = (
+  <>
+    <span className="span-major-title">Rewards </span>
+    <br />
+    You can count on
+  </>
+);
+
+const DEFAULT_INTRO = (
+  <>
+    Audacious Rewards is African Bank’s <strong>award winning</strong> rewards programme designed to
+    reward you for your everyday banking and positive financial behaviour.
+  </>
+);
+
 interface RewardsSectionProps {
   cards?: RewardsCard[];
+  heading?: ReactNode;
+  subheading?: ReactNode;
+  intro?: ReactNode;
 }
 
-export function RewardsSection({ cards = DEFAULT_CARDS }: RewardsSectionProps) {
+export function RewardsSection({
+  cards = DEFAULT_CARDS,
+  heading = DEFAULT_HEADING,
+  subheading = 'Audacious Rewards',
+  intro = DEFAULT_INTRO,
+}: RewardsSectionProps) {
   return (
     <section className="borrow-section">
       <div className="section-title">
         <div className="container">
           <div className="row align-items-end md-text-center">
             <div className="col-md-6">
-              <h1 className="color-brand-1 major-title">
-                <span className="span-major-title">Rewards </span>
-                <br />
-                You can count on
-              </h1>
+              <h1 className="color-brand-1 major-title">{heading}</h1>
             </div>
             <div className="col-md-6">
-              <h4 className="color-brand-1 mb-20">Audacious Rewards</h4>
-              <p className="font-md color-brand-1">
-                Audacious Rewards is African Bank’s <strong>award winning</strong> rewards programme designed to
-                reward you for your everyday banking and positive financial behaviour.
-              </p>
+              <h4 className="color-brand-1 mb-20">{subheading}</h4>
+              <p className="font-md color-brand-1">{intro}</p>
             </div>
           </div>
 

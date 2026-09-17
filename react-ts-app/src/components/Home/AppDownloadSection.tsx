@@ -1,8 +1,16 @@
+import type { ReactNode } from 'react';
 import { Button } from '../ui/Button/Button';
 
 // Ported from the "Download the African Bank App" section of the current
 // live home page markup. Static content passed as props with defaults so it
 // stays reusable.
+const DEFAULT_HEADING = (
+  <>
+    <span className="span-major-title">Download the </span>
+    African Bank App
+  </>
+);
+
 interface AppDownloadSectionProps {
   downloadUrl?: string;
   downloadLabel?: string;
@@ -10,6 +18,7 @@ interface AppDownloadSectionProps {
   description?: string;
   imageUrl?: string;
   imageAlt?: string;
+  heading?: ReactNode;
 }
 
 export function AppDownloadSection({
@@ -19,16 +28,14 @@ export function AppDownloadSection({
   description = 'It’s like having your own bank in your pocket. Access your accounts 24/7, wherever you are. It’s secure and super convenient.',
   imageUrl = 'https://www.africanbank.co.za/media/ubkllrvb/mockup-device3.png',
   imageAlt = 'iori',
+  heading = DEFAULT_HEADING,
 }: AppDownloadSectionProps) {
   return (
     <section className="mtb-120">
       <div className="container">
         <div className="row d-flex row-change md-text-center">
           <div className="col-xl-6 col-lg-6 col-md-6">
-            <h1 className="color-brand-1 major-title mb-20">
-              <span className="span-major-title">Download the </span>
-              African Bank App
-            </h1>
+            <h1 className="color-brand-1 major-title mb-20">{heading}</h1>
 
             <h4 className="color-brand-1 mb-20">{subheading}</h4>
             <p className="font-md color-brand-1">{description}</p>

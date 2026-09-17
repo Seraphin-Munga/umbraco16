@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Button } from '../ui/Button/Button';
 
 // Ported from the "#bank-with-audacity" section of the current live home
@@ -58,11 +59,20 @@ const DEFAULT_CARDS: AudacityCard[] = [
   },
 ];
 
+const DEFAULT_HEADING = (
+  <>
+    <span className="span-major-title">Bank with</span>
+    <br />
+    audacity
+  </>
+);
+
 interface BankWithAudacityProps {
   cards?: AudacityCard[];
+  heading?: ReactNode;
 }
 
-export function BankWithAudacity({ cards = DEFAULT_CARDS }: BankWithAudacityProps) {
+export function BankWithAudacity({ cards = DEFAULT_CARDS, heading = DEFAULT_HEADING }: BankWithAudacityProps) {
   return (
     <section className="mtb-30" aria-labelledby="bank-with-audacity">
       <div className="container">
@@ -74,9 +84,7 @@ export function BankWithAudacity({ cards = DEFAULT_CARDS }: BankWithAudacityProp
               role="heading"
               aria-level={1}
             >
-              <span className="span-major-title">Bank with</span>
-              <br />
-              audacity
+              {heading}
             </h1>
           </div>
         </div>
