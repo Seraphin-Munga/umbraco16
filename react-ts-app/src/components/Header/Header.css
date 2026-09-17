@@ -51,6 +51,18 @@
   font-size: 12px;
 }
 
+/* Neither bootstrap.min.css nor main.min.css put any horizontal spacing
+   between the top-level nav items (PERSONAL, BUSINESS, ...) - they sit
+   flush against each other, only as far apart as their own text/chevron
+   width. A small gap here just for breathing room between items. */
+.dropdown-container.navbar-default .navbar-nav.left-nav > li {
+  margin-right: 12px;
+}
+
+.dropdown-container.navbar-default .navbar-nav.left-nav > li:last-child {
+  margin-right: 0;
+}
+
 .horizontal-list {
   position: relative;
   right: 0;
