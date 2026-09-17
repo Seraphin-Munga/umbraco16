@@ -1,10 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import './PersonalLoanPage.css';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchPersonalLoan } from '../../store/slices/personalLoanSlice';
-import { Input } from '../../components/ui/Input/Input';
-import { Select } from '../../components/ui/Input/Select';
-import { estimateMonthlyInstallment, formatRand } from '../../utils/loanCalculator';
+import { LoanCalculator } from '../../components/ui/LoanCalculator/LoanCalculator';
 
 // Ported from Views/personalLoanCampaign.cshtml - the template actually
 // live at /en/home/product-personal-loan/ (see
@@ -19,10 +17,6 @@ import { estimateMonthlyInstallment, formatRand } from '../../utils/loanCalculat
 // actually expands on the live site either. That reads as leftover/
 // abandoned markup rather than an intentional double section, so only the
 // working accordion is rendered here.
-const MIN_AMOUNT = 2000;
-const MAX_AMOUNT = 250000;
-const TERM_OPTIONS = [7, 9, 12, 18, 24, 30, 36, 42, 48, 60, 72];
-
 export function PersonalLoanPage() {
   const dispatch = useAppDispatch();
   const { data, status } = useAppSelector((state) => state.personalLoan);
@@ -34,10 +28,6 @@ export function PersonalLoanPage() {
   const introCard = data?.introCard;
   const faqItems = data?.faqItems ?? [];
   const creditLifeItems = data?.creditLifeItems ?? [];
-
-  const [amount, setAmount] = useState(MIN_AMOUNT);
-  const [term, setTerm] = useState(7);
-  const monthlyRepayment = useMemo(() => formatRand(estimateMonthlyInstallment(amount, term)), [amount, term]);
 
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
@@ -69,125 +59,11 @@ export function PersonalLoanPage() {
           </section>
 
           {/* Loan calculator */}
-          <section className="section-800 pt-50 pb-40 home-loan-calculator">
-            <div className="container">
-              <div className="row d-flex align-items-center row-change md-text-center">
-                <div className="col-xl-6 col-lg-6 col-md-6">
-                  <h1 className="color-brand-1 mt-15 mb-20">Apply for a Personal Loan in Minutes</h1>
-                  <p className="font-md color-brand-1">
-                    Experience the convenience of banking, sharing, and saving all in one place with African
-                    Bank&apos;s MyWORLD account!
-                  </p>
-                  <h4 className="color-brand-1 my-3">Disclaimer:</h4>
-                  <p className="font-md color-brand-1 mt-20">
-                    This Loans Calculator provides indicative values only. African Bank provides no guarantees or
-                    warranties on the values displayed. Only a full Loan application, on African Bank's website, the
-                    Banking App or on Online Banking, or in other channels like our Branches and Call Centre, can
-                    provide accurate details pertaining to Loans from African Bank.
-                  </p>
-                </div>
-                <div className="col-md-6">
-                  <h1 className="color-brand-1 mt-15 mb-20">Loan Calculator</h1>
-                  <div className="calculator-form">
-                    <p className="loan-disclaimer" style={{ padding: '5px 0px' }}>
-                      Please enter Loan amount between {formatRand(MIN_AMOUNT)} to {formatRand(MAX_AMOUNT)}
-                    </p>
-                    <label>Amount</label>
-                    <Input
-                      id="input-Amount1"
-                      className="loan-inpt"
-                      type="text"
-                      value={amount}
-                      onChange={(event) => {
-                        const digitsOnly = event.target.value.replace(/\D/g, '');
-                        if (digitsOnly === '') return;
-                        setAmount(Math.min(MAX_AMOUNT, Math.max(MIN_AMOUNT, Number(digitsOnly))));
-                      }}
-                    />
-                    <div className="range-wrap">
-                      <div className="range-value" id="rangeV1" />
-                      <Input
-                        id="slide-range1"
-                        type="range"
-                        className="loan-range"
-                        min={MIN_AMOUNT}
-                        max={MAX_AMOUNT}
-                        step={500}
-                        value={amount}
-                        onChange={(event) => setAmount(Number(event.target.value))}
-                      />
-                    </div>
-                    <div className="loans" style={{ marginBottom: 0 }}>
-                      <div className="col-1" style={{ textAlign: 'left', fontSize: '14px' }}>
-                        {formatRand(MIN_AMOUNT)}
-                      </div>
-                      <div />
-                      <div className="col-2" style={{ textAlign: 'right', fontSize: '14px' }}>
-                        {formatRand(MAX_AMOUNT)}
-                      </div>
-                    </div>
-
-                    <label>Repayment Term</label>
-                    <Select
-                      className="loan-select-term"
-                      id="term1"
-                      value={term}
-                      onChange={(event) => setTerm(Number(event.target.value))}
-                    >
-                      {TERM_OPTIONS.map((months) => (
-                        <option value={months} key={months}>
-                          {months} Months
-                        </option>
-                      ))}
-                    </Select>
-                    <div className="range-wrap">
-                      <div className="range-value" id="rangeV2" />
-                      <Input
-                        id="input-month1"
-                        type="range"
-                        className="loan-range"
-                        min={7}
-                        max={72}
-                        value={term}
-                        onChange={(event) => setTerm(Number(event.target.value))}
-                      />
-                    </div>
-                    <div className="Months" style={{ marginBottom: '-7px' }}>
-                      <div className="col-1" style={{ textAlign: 'left', fontSize: '14px' }}>
-                        7 Months
-                      </div>
-                      <div />
-                      <div className="col-2" style={{ textAlign: 'right', fontSize: '14px' }}>
-                        72 Months
-                      </div>
-                    </div>
-
-                    <label>Monthly Repayment will be</label>
-                    <Input
-                      id="installment_calc1"
-                      className="loan-inpt-return"
-                      type="text"
-                      value={monthlyRepayment}
-                      readOnly
-                    />
-
-                    <div className="combo-btn">
-                      <div className="mt-50 text-start column1">
-                        <p className="combo-btn-text primary">
-                          <a
-                            href="https://www.africanbank.co.za/en/home/get-a-quote?utm_source=Website&utm_medium=Productpage&utm_campaign=WebLead"
-                            className="btn btn-brand-1 hover-up"
-                          >
-                            Apply Now
-                          </a>
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
+          <LoanCalculator
+            minAmount={2000}
+            maxAmount={250000}
+            applyUrl="https://www.africanbank.co.za/en/home/get-a-quote?utm_source=Website&utm_medium=Productpage&utm_campaign=WebLead"
+          />
 
           {/* Credit life insurance cards (heroBodynew's last tabBody) */}
           {creditLifeItems.map((item, index) => (
