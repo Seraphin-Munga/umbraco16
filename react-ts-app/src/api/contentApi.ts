@@ -71,6 +71,9 @@ interface RawRichTextValue {
 interface RawContentItem {
   id: string;
   contentType: string;
+  // The editor-assigned content name (e.g. "HeroBodyNew" vs "HeroBody") -
+  // distinct from contentType, which is the doctype alias shared by both.
+  name?: string;
   properties: Record<string, unknown>;
   // Present on content items (not media); used for blog post links, which
   // read the post's own page URL rather than a Link-picker property.
@@ -1131,7 +1134,17 @@ export async function fetchPersonalLoanCampaign(path: string, signal?: AbortSign
 
     const children = await fetchChildren(page.id, signal);
     const heroBodyNodes = children.filter((child) => child.contentType.toLowerCase() === 'herobody');
-    const heroBodyNew = heroBodyNodes[heroBodyNodes.length - 1];
+    // The source picks this by `.Last()` (fragile - depends on tree sort
+    // order), but the node the editor actually created for this campaign
+    // page is named "HeroBodyNew" in the Umbraco content tree, distinct
+    // from the older "HeroBody" node the retired productPersonalLoan.cshtml
+    // template used - matching on that name directly is more robust than
+    // trusting array order. Falls back to `.Last()` (the source's own
+    // approach) if no node is named that, in case naming differs by
+    // environment or a future edit renames it.
+    const heroBodyNew =
+      heroBodyNodes.find((node) => node.name?.toLowerCase() === 'herobodynew') ??
+      heroBodyNodes[heroBodyNodes.length - 1];
     if (!heroBodyNew) return EMPTY_CAMPAIGN;
 
     const heroBodyChildren = await fetchChildren(heroBodyNew.id, signal);
