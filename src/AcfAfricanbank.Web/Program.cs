@@ -66,11 +66,10 @@ AppDomain.CurrentDomain.SetData(
 
 var sourceConnectionString = new SqlConnectionStringBuilder
 {
-    DataSource = @"MDWSQL2016\SQL01",
+    DataSource = "swomsql",
     InitialCatalog = "Umbraco8_AB_CMS_13Nov",
-    UserID = "UmbracoDev",
-    Password = "mCH^aBp::4Ui;t;TCY*:",
-    TrustServerCertificate = true
+    IntegratedSecurity = true,
+    MultiSubnetFailover = true
 }.ConnectionString;
 
 // ============================================================
