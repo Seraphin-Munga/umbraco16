@@ -1604,6 +1604,68 @@ app.MapGet("/diagnostics/schema/search", (
 });
 
 // ============================================================
+// TEMP DIAGNOSTIC - dumps a property's RAW stored value via IContentService
+// (draft content, no value converter involved) instead of going through the
+// Delivery API/published cache - use this when the Delivery API itself
+// throws while reading a property (e.g. BlockListPropertyValueConverter's
+// "Expected start object" JsonException), since that error happens INSIDE
+// the value converter and never reaches a response body to inspect. Visit
+// /diagnostics/rawproperty/{contentTypeAlias}/{propertyAlias} in the
+// browser, e.g. /diagnostics/rawproperty/topNavigation/menuInfo.
+// ============================================================
+
+app.MapGet("/diagnostics/rawproperty/{alias}/{propertyAlias}", (
+    string alias,
+    string propertyAlias,
+    IContentTypeService contentTypeService,
+    IContentService contentService) =>
+{
+    var contentType = contentTypeService.Get(alias);
+
+    if (contentType == null)
+    {
+        return Results.Ok(new
+        {
+            found = false,
+            message = $"No content type with alias '{alias}' exists."
+        });
+    }
+
+    var items =
+        contentService.GetPagedOfType(
+            contentType.Id,
+            0,
+            10,
+            out var totalRecords,
+            null!);
+
+    return Results.Ok(new
+    {
+        found = true,
+        totalRecords,
+        propertyAlias,
+        items = items.Select(c =>
+        {
+            var property =
+                c.Properties.FirstOrDefault(p =>
+                    p.Alias.Equals(propertyAlias, StringComparison.OrdinalIgnoreCase));
+
+            var rawValue = property?.GetValue();
+
+            return new
+            {
+                id = c.Id,
+                name = c.Name,
+                published = c.Published,
+                propertyFound = property != null,
+                rawValueClrType = rawValue?.GetType().FullName,
+                rawValue = rawValue?.ToString()
+            };
+        })
+    });
+});
+
+// ============================================================
 // NORMAL UMBRACO STARTUP
 // ============================================================
 
