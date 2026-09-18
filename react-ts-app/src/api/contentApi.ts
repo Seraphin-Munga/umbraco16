@@ -925,6 +925,167 @@ export async function fetchHomePageSections(signal?: AbortSignal): Promise<HomeP
 }
 
 // ============================================================
+// PRODUCT LOAN PAGE SECTIONS (productLoanPage doctype - Block List page
+// builder, same shape as the homePage one above)
+// ============================================================
+//
+// Reads the CMS-managed `productLoanPage` content node created by
+// Program.cs's `create-product-loan-schema` command - ported from
+// PersonalLoanPage.tsx, the component actually rendered at
+// /en/home/product-personal-loan/ today (a fully static page - see that
+// file's own comment for why it's not fetchProductLoanPage or
+// fetchPersonalLoanCampaign above, which describe two separate retired
+// Razor templates wired to no component). faqSectionBlock/faqItem are
+// general-purpose Element Types (see create-product-loan-schema's own
+// comment) - nothing here assumes they're exclusive to this page.
+const PRODUCT_LOAN_PAGE_SECTIONS_EXPAND =
+  'properties[sections[properties[' +
+  'checklistOne[properties[$all]],' +
+  'checklistTwo[properties[$all]],' +
+  'items[properties[$all]],' +
+  'cards[properties[$all]],' +
+  '$all]],$all]';
+
+export interface ProductFaqItem {
+  question: string;
+  answerHtml: string;
+}
+
+export interface ProductDownloadLink {
+  label: string;
+  fileUrl: string;
+}
+
+function mapProductFaqItem(props: Record<string, unknown>): ProductFaqItem {
+  return {
+    question: str(props.question),
+    answerHtml: mapRichText(props.answer),
+  };
+}
+
+function mapProductLoanDownloadItem(props: Record<string, unknown>): ProductDownloadLink {
+  return {
+    label: str(props.label),
+    fileUrl: mapMediaUrl(props.file),
+  };
+}
+
+export type ProductLoanPageSection =
+  | {
+      kind: 'heroBannerBlock';
+      heading: string;
+      description: string;
+      primaryCta: { label: string; url: string } | null;
+      secondaryCta: { label: string; url: string } | null;
+    }
+  | { kind: 'loanCalculatorBlock'; props: Partial<LoanCalculatorProps> }
+  | {
+      kind: 'creditLifeInsuranceBlock';
+      heading: string;
+      paragraphOne: string;
+      paragraphTwo: string;
+      checklistOne: string[];
+      checklistTwo: string[];
+      imageUrl: string;
+    }
+  | { kind: 'faqSectionBlock'; heading: string; items: ProductFaqItem[] }
+  | { kind: 'downloadsSectionBlock'; heading: string; items: ProductDownloadLink[] }
+  | { kind: 'crossSellBlock'; heading: string; cards: AudacityCard[]; imageUrl: string };
+
+function mapProductLoanPageSection(
+  contentType: string,
+  props: Record<string, unknown>,
+): ProductLoanPageSection | null {
+  switch (contentType) {
+    case 'heroBannerBlock':
+      return {
+        kind: 'heroBannerBlock',
+        heading: str(props.heading),
+        description: str(props.description),
+        primaryCta: mapButton(props.primaryCta),
+        secondaryCta: mapButton(props.secondaryCta),
+      };
+
+    case 'loanCalculatorBlock': {
+      const applyLink = mapButton(props.applyLink);
+      const loanProps: Partial<LoanCalculatorProps> = {};
+      const minAmount = num(props.minAmount);
+      const maxAmount = num(props.maxAmount);
+      const defaultAmount = num(props.defaultAmount);
+      const minTerm = num(props.minTerm);
+      const maxTerm = num(props.maxTerm);
+      if (minAmount !== null) loanProps.minAmount = minAmount;
+      if (maxAmount !== null) loanProps.maxAmount = maxAmount;
+      if (defaultAmount !== null) loanProps.defaultAmount = defaultAmount;
+      if (minTerm !== null) loanProps.minTerm = minTerm;
+      if (maxTerm !== null) loanProps.maxTerm = maxTerm;
+      if (applyLink) loanProps.applyUrl = applyLink.url;
+      const imageUrl = mapMediaUrl(props.image);
+      if (imageUrl) loanProps.imageUrl = imageUrl;
+      const imageAlt = str(props.imageAlt);
+      if (imageAlt) loanProps.imageAlt = imageAlt;
+      loanProps.imagePosition = props.imageOnRight === true ? 'right' : 'left';
+      return { kind: 'loanCalculatorBlock', props: loanProps };
+    }
+
+    case 'creditLifeInsuranceBlock':
+      return {
+        kind: 'creditLifeInsuranceBlock',
+        heading: str(props.heading),
+        paragraphOne: str(props.paragraphOne),
+        paragraphTwo: str(props.paragraphTwo),
+        checklistOne: mapBlocks(props.checklistOne, (p) => str(p.text)).filter(Boolean),
+        checklistTwo: mapBlocks(props.checklistTwo, (p) => str(p.text)).filter(Boolean),
+        imageUrl: mapMediaUrl(props.image),
+      };
+
+    case 'faqSectionBlock':
+      return {
+        kind: 'faqSectionBlock',
+        heading: str(props.heading),
+        items: mapBlocks(props.items, mapProductFaqItem),
+      };
+
+    case 'downloadsSectionBlock':
+      return {
+        kind: 'downloadsSectionBlock',
+        heading: str(props.heading),
+        items: mapBlocks(props.items, mapProductLoanDownloadItem),
+      };
+
+    case 'crossSellBlock':
+      return {
+        kind: 'crossSellBlock',
+        heading: str(props.heading),
+        cards: mapBlocks(props.cards, mapHomeContentCard),
+        imageUrl: mapMediaUrl(props.image),
+      };
+
+    default:
+      return null;
+  }
+}
+
+/**
+ * Fetches the CMS-managed `productLoanPage` node's `sections` Block List,
+ * mapped and returned in editor-defined order - same pattern as
+ * fetchHomePageSections above. Returns [] if the node doesn't exist yet
+ * (e.g. `create-product-loan-schema` was run but no content was ever
+ * created/published in the backoffice).
+ */
+export async function fetchProductLoanPageSections(
+  signal?: AbortSignal,
+): Promise<ProductLoanPageSection[]> {
+  const productLoanPage = await fetchOne(
+    `?filter=contentType:productLoanPage&expand=${PRODUCT_LOAN_PAGE_SECTIONS_EXPAND}&take=1`,
+    signal,
+  );
+  if (!productLoanPage) return [];
+
+  return mapTypedBlocks(productLoanPage.properties.sections, mapProductLoanPageSection);
+}
+
+// ============================================================
 // BLOG (blogLanding / blog / blogDetailsElements)
 // ============================================================
 
