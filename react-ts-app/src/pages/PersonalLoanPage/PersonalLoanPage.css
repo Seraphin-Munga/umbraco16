@@ -85,7 +85,7 @@
 .contact-content p {
   margin-top: 15px;
 
-  font-size: 19px;
+  font-size: 19px !important;
 
   line-height: 1.5;
 
