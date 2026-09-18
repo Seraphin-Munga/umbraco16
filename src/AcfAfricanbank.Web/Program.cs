@@ -1569,11 +1569,20 @@ if (args.Length > 0 &&
 // there's no real photo/mockup image file available to attach here; add
 // those two via the backoffice's Media Picker once you have them.
 //
-// Placed as a sibling of the existing "Personal Loan" productLoanPage node
-// (matched by name) so it inherits the same URL structure
-// (/en/home/product-consolidation-loan/) without hardcoding a parent node
-// id, which differs per install. Idempotent: finds and updates an existing
-// node by name rather than duplicating it.
+// Placed as a sibling of the existing Personal Loan node (matched by name,
+// productLoanPage or legacy pageLoans) so it lands under the real
+// /en/home/ parent without hardcoding a parent node id, which differs per
+// install. Named "Dynamic Page Demo - Consolidation Loan" rather than
+// "Product Consolidation Loan" - that name's own route
+// (/en/home/product-consolidation-loan/) is already live, owned by an
+// existing legacy pageLoans node with its own real SEO content (confirmed
+// via a live Delivery API response) - two published nodes can't share a
+// route, so the legacy one always wins it regardless of where this
+// command's own node sits. Ends up at /en/home/dynamic-page-demo-
+// consolidation-loan/ instead, a route nothing else could plausibly
+// already own. Idempotent: finds an existing node under either name (self-
+// healing a rename from an earlier run that used the colliding name) and
+// updates it in place rather than duplicating it.
 
 if (args.Length > 0 &&
     args[0].Equals("create-consolidation-loan-content", StringComparison.OrdinalIgnoreCase))
@@ -1740,13 +1749,25 @@ if (args.Length > 0 &&
                 "legacy pageLoans) found to match its parent/URL structure - " +
                 "creating at root instead. You may need to move this node in " +
                 "the content tree afterward so its route matches " +
-                "/en/home/product-consolidation-loan/.");
+                "/en/home/dynamic-page-demo/.");
         }
     }
 
-    const string nodeName = "Product Consolidation Loan";
+    // NOT "Product Consolidation Loan" / product-consolidation-loan - that
+    // URL is already live, owned by an existing legacy "pageLoans" node
+    // with its own real SEO content (confirmed via a live Delivery API
+    // response), same as Personal Loan. Two published nodes can't share a
+    // route - the legacy node always wins it regardless of where this
+    // command's own node sits - so this demo intentionally uses a route
+    // nothing else could plausibly already own instead of fighting a real
+    // page for its URL.
+    const string oldNodeName = "Product Consolidation Loan";
+    const string nodeName = "Dynamic Page Demo - Consolidation Loan";
 
     var existingNode =
+        existingProductLoanPages.FirstOrDefault(n =>
+            n.Name != null &&
+            n.Name.Equals(oldNodeName, StringComparison.OrdinalIgnoreCase)) ??
         existingProductLoanPages.FirstOrDefault(n =>
             n.Name != null &&
             n.Name.Equals(nodeName, StringComparison.OrdinalIgnoreCase));
@@ -1757,7 +1778,18 @@ if (args.Length > 0 &&
     {
         node = existingNode;
 
-        Console.WriteLine($"EXISTS: \"{nodeName}\" (id={node.Id}) - updating its sections.");
+        if (node.Name != nodeName)
+        {
+            Console.WriteLine(
+                $"RENAMED: \"{node.Name}\" (id={node.Id}) -> \"{nodeName}\" - its old " +
+                "name/route collided with an existing live legacy page.");
+
+            node.Name = nodeName;
+        }
+        else
+        {
+            Console.WriteLine($"EXISTS: \"{nodeName}\" (id={node.Id}) - updating its sections.");
+        }
 
         if (node.ParentId != parentId)
         {
@@ -1795,6 +1827,7 @@ if (args.Length > 0 &&
 
     Console.WriteLine();
     Console.WriteLine($"DONE. Published \"{nodeName}\" (id={node.Id}).");
+    Console.WriteLine("View it at /en/home/dynamic-page-demo-consolidation-loan/");
     Console.WriteLine(
         "No images were set (heroBannerBlock.image / appDownloadBlock.image) " +
         "- add those in the backoffice's Media Picker once you have the real " +
