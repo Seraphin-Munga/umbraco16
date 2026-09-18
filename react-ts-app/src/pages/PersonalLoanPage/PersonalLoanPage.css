@@ -1,35 +1,109 @@
-/* Top-of-page hero banner. .combo-btn/.combo-btn-text/button classes are
-   already covered by public/vendor/projectmagic.css - only the banner's
-   own wrapper (background + overlay + centered content) needed adding
-   here, since no equivalent existed anywhere else in the app. */
+.combo-btn-text.secondary {
+  color: #fff !important;
+}
+
+.btn.btn-brand-secondary {
+  background: #fff;
+
+  color: #002b60;
+}
+
+.section-banner {
+  display: flex;
+
+  align-items: center;
+
+  width: 100%;
+}
+
 .contact-banner {
   position: relative;
-  background-color: #002b60;
+
+  width: 100%;
+
+  height: 450px;
+
+  background-image: url("https://www.africanbank.co.za/media/mvqps23e/dig2511_011_personal-loan-upgrade_page_p1-2_1650x500.jpg");
+
   background-size: cover;
+
   background-position: center;
+
+  border-radius: 24px;
+
+  overflow: hidden;
+
+  display: flex;
+
+  width: 100%;
+
+  margin: 14px;
+
+  background-color: #000;
+
+  box-sizing: border-box;
 }
 
 .contact-overlay {
-  background: rgba(0, 43, 96, 0.75);
-  padding: 90px 20px;
+  position: absolute;
+
+  inset: 0;
+
+  background: rgba(0, 40, 80, 0.4); /* blue overlay tint */
+
+  display: flex;
+
+  align-items: flex-end;
+
+  justify-content: flex-start;
+
+  padding: 40px;
+
+  border-radius: 24px;
 }
 
 .contact-content {
-  max-width: 900px;
-  margin: 0 auto;
-  text-align: center;
+  color: #fff;
+
+  max-width: 750px;
 }
 
-.contact-content .combo-btn {
-  justify-content: center;
-  margin-top: 30px;
+.contact-content h2 {
+  font-size: 48px;
+
+  font-weight: 600;
+
+  line-height: 1.2;
 }
 
-/* This heading sits on a plain white section background (no bg-grey-60
-   like the other sections) - the source's .faqHeader also sets
-   `color: #F9F9F9` (near-white), which combined with the .color-brand-1
-   class already on the element would just render illegibly here, so
-   that's dropped. */
-.faqHeader {
-  font: normal normal bold 42px/52px Montserrat;
+.contact-content h2 span {
+  display: block;
+
+  font-weight: 700;
+}
+
+.contact-content p {
+  margin-top: 15px;
+
+  font-size: 19px;
+
+  line-height: 1.5;
+
+  max-width: 750px;
+}
+
+.major-title {
+  font-weight: 200 !important;
+
+  font-size: 52px;
+}
+
+.text-white {
+  color: #fff !important;
+}
+
+@media (max-width: 768px) and (min-width: 256px) {
+  .contact-banner {
+    height: 545px;
+  }
 }

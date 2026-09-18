@@ -84,17 +84,7 @@ export function PersonalLoanPage() {
             </div>
           </section>
 
-          {/* Intro */}
-          <section className="section-800 bg-grey-60">
-            <div className="container">
-              <div className="row d-flex align-items-center row-change md-text-center">
-                <div className="col-xl-6 col-lg-6 col-md-6">
-                  <h1 className="color-brand-1 mt-15 mb-20">Personal Loan</h1>
-                  <p>Get fixed repayments on flexible terms.</p>
-                </div>
-              </div>
-            </div>
-          </section>
+
 
           {/* Loan calculator */}
           <LoanCalculator
@@ -277,7 +267,7 @@ export function PersonalLoanPage() {
                   </div>
                 </div>
                 <div className="col-md-6">
-                  <img className="d-block" src="/media/us2lbjyh/find-loan-sol_lp.png" alt="" />
+                  <img className="d-block" src="https://www.africanbank.co.za/media/us2lbjyh/find-loan-sol_lp.png" alt="" />
                 </div>
               </div>
             </div>
