@@ -38,7 +38,22 @@ export function DynamicPage() {
 
         setSections(result.sections);
       })
-      .catch(() => setNotFound(true));
+      .catch((error: unknown) => {
+        // AbortError fires when this effect's own cleanup cancels an
+        // in-flight request - normal and expected under React 18
+        // StrictMode, which deliberately mounts every effect twice in dev
+        // (mount -> cleanup -> mount again), aborting the first fetch. The
+        // second, non-aborted invocation already has the real fetch in
+        // flight - treating this abort as "not found" would redirect home
+        // before that second fetch ever gets a chance to resolve, which is
+        // exactly why this page kept bouncing to "/en/home/" even when the
+        // Delivery API itself returned correct data.
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return;
+        }
+
+        setNotFound(true);
+      });
 
     return () => controller.abort();
   }, [location.pathname]);

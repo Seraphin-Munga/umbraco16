@@ -28,7 +28,20 @@ export function Home() {
 
     fetchHomePageSections(controller.signal)
       .then(setSections)
-      .catch(() => setSections([]));
+      .catch((error: unknown) => {
+        // AbortError fires from this same effect's own cleanup under React
+        // 18 StrictMode (which mounts every effect twice in dev) - not a
+        // real failure, just the first of two invocations being cancelled
+        // in favor of the second. See DynamicPage.tsx's own comment on
+        // this same pattern for why treating it as a real failure matters
+        // there; harmless here since nothing redirects on empty sections,
+        // but still wrong to treat a cancelled request as "no content".
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return;
+        }
+
+        setSections([]);
+      });
 
     return () => controller.abort();
   }, []);
