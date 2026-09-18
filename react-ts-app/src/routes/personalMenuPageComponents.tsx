@@ -37,7 +37,7 @@ import { AudaciousRewardsPage } from '../pages/AudaciousRewardsPage/AudaciousRew
 export const PERSONAL_MENU_PAGE_COMPONENTS: Record<string, ComponentType> = {
   '/en/home/product-personal-loan/': DynamicPage,
   '/en/home/product-consolidation-loan/': DynamicPage,
-  '/en/home/product-12-loan/': TwelvePercentLoanPage,
+  '/en/home/product-12-loan/': DynamicPage,
   '/en/home/product-credit-card/': CreditCardPage,
   '/en/home/tech-deals/': TechDealsPage,
   '/en/home/credit-report/': CreditReportPage,
