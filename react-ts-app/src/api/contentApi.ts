@@ -781,7 +781,7 @@ export type HomePageSection =
     }
   | { kind: 'testimonialsBlock'; heading: string; videos: VideoTestimonial[] };
 
-function mapHomePageSection(
+export function mapHomePageSection(
   contentType: string,
   props: Record<string, unknown>,
 ): HomePageSection | null {
@@ -1002,7 +1002,7 @@ export type ProductLoanPageSection =
   | { kind: 'downloadsSectionBlock'; heading: string; items: ProductDownloadLink[] }
   | { kind: 'crossSellBlock'; heading: string; cards: AudacityCard[]; imageUrl: string };
 
-function mapProductLoanPageSection(
+export function mapProductLoanPageSection(
   contentType: string,
   props: Record<string, unknown>,
 ): ProductLoanPageSection | null {
@@ -1093,6 +1093,65 @@ export async function fetchProductLoanPageSections(
   if (!productLoanPage) return [];
 
   return mapTypedBlocks(productLoanPage.properties.sections, mapProductLoanPageSection);
+}
+
+// ============================================================
+// DYNAMIC PAGES (any document type with a "sections" Block List)
+// ============================================================
+//
+// Generalizes fetchHomePageSections/fetchProductLoanPageSections above so a
+// brand-new page doesn't need its own dedicated fetch/component/route -
+// any Umbraco document type built the same way create-home-schema/
+// create-product-loan-schema build one (a single "sections" Block List
+// property, using block Element Types this app already knows how to
+// render) gets picked up automatically by DynamicPage.tsx via React
+// Router's catch-all route. Both mappers above are tried in turn - safe,
+// since neither throws on an unrecognised content type (each has its own
+// `default: return null`) and their block aliases never overlap.
+const ANY_PAGE_SECTIONS_EXPAND =
+  'properties[sections[properties[' +
+  'slides[properties[$all]],' +
+  'gridItems[properties[$all]],' +
+  'cards[properties[$all]],' +
+  'features[properties[$all]],' +
+  'contactCards[properties[$all]],' +
+  'videos[properties[$all]],' +
+  'checklistOne[properties[$all]],' +
+  'checklistTwo[properties[$all]],' +
+  'items[properties[$all]],' +
+  '$all]],$all]';
+
+export type AnyPageSection = HomePageSection | ProductLoanPageSection;
+
+export function mapAnySection(
+  contentType: string,
+  props: Record<string, unknown>,
+): AnyPageSection | null {
+  return mapHomePageSection(contentType, props) ?? mapProductLoanPageSection(contentType, props);
+}
+
+export interface DynamicPageResult {
+  contentType: string;
+  sections: AnyPageSection[];
+}
+
+/**
+ * Fetches whatever Umbraco content exists at `path` (any document type),
+ * reads its "sections" Block List with the merged expand tree above, and
+ * maps it through both known section mappers. Returns null if nothing
+ * exists at that route - DynamicPage.tsx treats that as a 404.
+ */
+export async function fetchPageSectionsByRoute(
+  path: string,
+  signal?: AbortSignal,
+): Promise<DynamicPageResult | null> {
+  const page = await fetchContentByRoute(path, signal, ANY_PAGE_SECTIONS_EXPAND);
+  if (!page) return null;
+
+  return {
+    contentType: page.contentType,
+    sections: mapTypedBlocks(page.properties.sections, mapAnySection),
+  };
 }
 
 // ============================================================
