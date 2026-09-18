@@ -145,8 +145,14 @@ function findByContentType(items: RawContentItem[], contentType: string): RawCon
 // live response (v1 vs v2 path shape, trailing slash handling) the way the
 // rest of this file's endpoints are - wrapped by callers in a try/catch so
 // a wrong guess here degrades to an empty page instead of a crash.
-async function fetchContentByRoute(path: string, signal?: AbortSignal): Promise<RawContentItem | undefined> {
-  const response = await fetch(`${API_BASE}/umbraco/delivery/api/v2/content/item${path}`, {
+async function fetchContentByRoute(
+  path: string,
+  signal?: AbortSignal,
+  expand?: string,
+): Promise<RawContentItem | undefined> {
+  const query = expand ? `?expand=${expand}` : '';
+
+  const response = await fetch(`${API_BASE}/umbraco/delivery/api/v2/content/item${path}${query}`, {
     headers: { Accept: 'application/json' },
     signal,
   });
@@ -263,9 +269,13 @@ const TOP_NAVIGATION_EXPAND =
  * PublicAccess (already true in appsettings.json) so no API key is needed.
  */
 export async function fetchTopNavigation(signal?: AbortSignal): Promise<TopNavigation> {
-  const [topNavigation] = await fetchContent(
-    `?filter=contentType:topNavigation&expand=${TOP_NAVIGATION_EXPAND}&take=1`,
+  // Fetched by its exact route rather than `filter=contentType:topNavigation`
+  // - there's more than one topNavigation-typed node in the tree, so a bare
+  // type filter with take=1 isn't guaranteed to land on this specific one.
+  const topNavigation = await fetchContentByRoute(
+    '/en/home/homepagelements/top-navigation/',
     signal,
+    TOP_NAVIGATION_EXPAND,
   );
 
   if (!topNavigation) {
