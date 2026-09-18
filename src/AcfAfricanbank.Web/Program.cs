@@ -1666,6 +1666,60 @@ app.MapGet("/diagnostics/rawproperty/{alias}/{propertyAlias}", (
 });
 
 // ============================================================
+// TEMP DIAGNOSTIC - finds every content type marked IsElement=true that
+// ALSO has a real, standalone content node living in the actual content
+// tree. An Element Type's ModelsBuilder-generated model deliberately does
+// NOT implement IPublishedContent (it's only ever meant to be read as a
+// sub-model inside a Block List/Nested Content property value) - so the
+// moment routing/content-cache code tries to build a full page model for
+// one of these nodes (e.g. ContentFinderByUrlAlias scanning every node in
+// the tree for a URL-alias match), it throws "Factory returned model of
+// type X which does not implement IPublishedContent" and takes down the
+// whole request, not just that one node. Visit /diagnostics/orphaned-
+// elements in the browser - every row it returns needs either its
+// IsElement flag switched off (if it's meant to be a real page) or its
+// content node deleted/moved out of the content tree (if it's migration
+// debris that should only ever exist nested inside a property value).
+// ============================================================
+
+app.MapGet("/diagnostics/orphaned-elements", (
+    IContentTypeService contentTypeService,
+    IContentService contentService) =>
+{
+    var elementTypes =
+        contentTypeService.GetAll().Where(ct => ct.IsElement).ToList();
+
+    var offenders = elementTypes
+        .Select(ct =>
+        {
+            var items =
+                contentService.GetPagedOfType(
+                    ct.Id,
+                    0,
+                    10,
+                    out var totalRecords,
+                    null!);
+
+            return new
+            {
+                alias = ct.Alias,
+                name = ct.Name,
+                liveNodeCount = totalRecords,
+                sampleNodes = items.Select(c => new { id = c.Id, name = c.Name, path = c.Path })
+            };
+        })
+        .Where(x => x.liveNodeCount > 0)
+        .ToList();
+
+    return Results.Ok(new
+    {
+        elementTypesScanned = elementTypes.Count,
+        offendersFound = offenders.Count,
+        offenders
+    });
+});
+
+// ============================================================
 // NORMAL UMBRACO STARTUP
 // ============================================================
 
