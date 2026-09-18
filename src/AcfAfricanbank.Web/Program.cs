@@ -1708,11 +1708,40 @@ if (args.Length > 0 &&
     }
     else
     {
-        Console.WriteLine(
-            "NOTE: no existing 'Personal Loan' productLoanPage node found " +
-            "to match its parent/URL structure - creating at root instead. " +
-            "You may need to move this node in the content tree afterward " +
-            "so its route matches /en/home/product-consolidation-loan/.");
+        // No productLoanPage-typed sibling exists yet (confirmed live: the
+        // real /en/home/product-personal-loan/ node today is still the old
+        // legacy "pageLoans" type, not productLoanPage - deliberately left
+        // untouched rather than migrated as part of this command). Fall
+        // back to that legacy type's own "Personal Loan" node instead, so
+        // this still lands under the real /en/home/ parent rather than at
+        // root.
+        var legacyPageLoansType = contentTypeService.Get("pageLoans");
+
+        var legacyPersonalLoanNode =
+            legacyPageLoansType == null
+                ? null
+                : contentService
+                    .GetPagedOfType(legacyPageLoansType.Id, 0, 200, out _, null!)
+                    .FirstOrDefault(n =>
+                        n.Name != null &&
+                        n.Name.Contains("Personal Loan", StringComparison.OrdinalIgnoreCase));
+
+        if (legacyPersonalLoanNode != null)
+        {
+            parentId = legacyPersonalLoanNode.ParentId;
+            parentDescription =
+                $"same parent as the legacy \"{legacyPersonalLoanNode.Name}\" " +
+                $"(pageLoans, id={parentId})";
+        }
+        else
+        {
+            Console.WriteLine(
+                "NOTE: no existing Personal Loan node (productLoanPage or " +
+                "legacy pageLoans) found to match its parent/URL structure - " +
+                "creating at root instead. You may need to move this node in " +
+                "the content tree afterward so its route matches " +
+                "/en/home/product-consolidation-loan/.");
+        }
     }
 
     const string nodeName = "Product Consolidation Loan";
@@ -1729,6 +1758,13 @@ if (args.Length > 0 &&
         node = existingNode;
 
         Console.WriteLine($"EXISTS: \"{nodeName}\" (id={node.Id}) - updating its sections.");
+
+        if (node.ParentId != parentId)
+        {
+            contentService.Move(node, parentId);
+
+            Console.WriteLine($"MOVED: \"{nodeName}\" to {parentDescription}");
+        }
     }
     else
     {
