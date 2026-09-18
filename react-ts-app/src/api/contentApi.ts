@@ -948,14 +948,6 @@ export async function fetchHomePageSections(signal?: AbortSignal): Promise<HomeP
 // Razor templates wired to no component). faqSectionBlock/faqItem are
 // general-purpose Element Types (see create-product-loan-schema's own
 // comment) - nothing here assumes they're exclusive to this page.
-const PRODUCT_LOAN_PAGE_SECTIONS_EXPAND =
-  'properties[sections[properties[' +
-  'checklistOne[properties[$all]],' +
-  'checklistTwo[properties[$all]],' +
-  'items[properties[$all]],' +
-  'cards[properties[$all]],' +
-  '$all]],$all]';
-
 export interface ProductFaqItem {
   question: string;
   answerHtml: string;
@@ -1076,24 +1068,14 @@ export function mapProductLoanPageSection(
   }
 }
 
-/**
- * Fetches the CMS-managed `productLoanPage` node's `sections` Block List,
- * mapped and returned in editor-defined order - same pattern as
- * fetchHomePageSections above. Returns [] if the node doesn't exist yet
- * (e.g. `create-product-loan-schema` was run but no content was ever
- * created/published in the backoffice).
- */
-export async function fetchProductLoanPageSections(
-  signal?: AbortSignal,
-): Promise<ProductLoanPageSection[]> {
-  const productLoanPage = await fetchOne(
-    `?filter=contentType:productLoanPage&expand=${PRODUCT_LOAN_PAGE_SECTIONS_EXPAND}&take=1`,
-    signal,
-  );
-  if (!productLoanPage) return [];
-
-  return mapTypedBlocks(productLoanPage.properties.sections, mapProductLoanPageSection);
-}
+// There's no fetchProductLoanPageSections() here (unlike
+// fetchHomePageSections above) - `productLoanPage` isn't a singleton the
+// way `homePage` is (Personal Loan, Consolidation Loan, ... are all
+// separate content nodes of this same type), so `filter=
+// contentType:productLoanPage&take=1` can't distinguish between them.
+// Fetch by exact route instead, via fetchPageSectionsByRoute below (see
+// DynamicPage.tsx, which every productLoanPage route uses for exactly
+// this reason).
 
 // ============================================================
 // DYNAMIC PAGES (any document type with a "sections" Block List)

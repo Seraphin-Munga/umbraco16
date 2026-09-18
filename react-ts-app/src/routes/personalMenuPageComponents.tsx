@@ -1,9 +1,20 @@
 // Maps every PERSONAL_MENU_PAGES path (src/routes/personalMenuPages.ts) to
 // its own dedicated page component, so App.tsx can render each route with
 // real content as it's ported instead of the generic PagePlaceholder.
+//
+// product-personal-loan/product-consolidation-loan both point at
+// DynamicPage rather than a bespoke component - both are CMS-managed
+// `productLoanPage` content nodes (see Program.cs's
+// create-product-loan-schema), and DynamicPage already fetches by the
+// current route's exact path (src/pages/DynamicPage/DynamicPage.tsx), so
+// it works correctly with more than one node of that content type. The
+// old PersonalLoanPage/ConsolidationLoanPage components used
+// fetchProductLoanPageSections(), which filtered by content type alone
+// (`take=1`, no route) - fine when only one such node existed, but
+// non-deterministic the moment a second one (Consolidation Loan) was
+// created, since either page could have received either node's content.
 import type { ComponentType } from 'react';
-import { PersonalLoanPage } from '../pages/PersonalLoanPage/PersonalLoanPage';
-import { ConsolidationLoanPage } from '../pages/ConsolidationLoanPage/ConsolidationLoanPage';
+import { DynamicPage } from '../pages/DynamicPage/DynamicPage';
 import { TwelvePercentLoanPage } from '../pages/TwelvePercentLoanPage/TwelvePercentLoanPage';
 import { CreditCardPage } from '../pages/CreditCardPage/CreditCardPage';
 import { TechDealsPage } from '../pages/TechDealsPage/TechDealsPage';
@@ -24,8 +35,8 @@ import { LoanRestructurePage } from '../pages/LoanRestructurePage/LoanRestructur
 import { AudaciousRewardsPage } from '../pages/AudaciousRewardsPage/AudaciousRewardsPage';
 
 export const PERSONAL_MENU_PAGE_COMPONENTS: Record<string, ComponentType> = {
-  '/en/home/product-personal-loan/': PersonalLoanPage,
-  '/en/home/product-consolidation-loan/': ConsolidationLoanPage,
+  '/en/home/product-personal-loan/': DynamicPage,
+  '/en/home/product-consolidation-loan/': DynamicPage,
   '/en/home/product-12-loan/': TwelvePercentLoanPage,
   '/en/home/product-credit-card/': CreditCardPage,
   '/en/home/tech-deals/': TechDealsPage,
