@@ -1469,6 +1469,98 @@ if (args.Length > 0 &&
 }
 
 // ============================================================
+// FIND-ORPHANED-ELEMENTS COMMAND
+// ============================================================
+//
+// Same query as the /diagnostics/orphaned-elements HTTP endpoint below, but
+// run as a CLI command instead - that endpoint (and every other URL on this
+// site right now) is unreachable, because Umbraco's OWN routing
+// (UmbracoRouteValueTransformer -> PublishedRouter -> ContentFinderByUrlAlias)
+// scans the whole content tree for a URL-alias match on EVERY request as
+// part of ASP.NET Core's endpoint selection itself, before any handler
+// (including a custom app.MapGet) runs - so if that scan throws (as it does
+// here: "Factory returned model of type ... Link which does not implement
+// IPublishedContent", meaning some content type marked IsElement=true also
+// has a real, standalone content node in the tree - an Element Type's
+// generated model deliberately doesn't implement IPublishedContent, it's
+// only ever meant to be read as a Block List/Nested Content sub-model),
+// every single URL fails the same way, this app's own diagnostic endpoints
+// included. Running this as a CLI command instead sidesteps HTTP routing
+// entirely - it runs right after BootUmbracoAsync(), before the web server
+// starts accepting requests.
+
+if (args.Length > 0 &&
+    args[0].Equals("find-orphaned-elements", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" FIND ORPHANED ELEMENT TYPES");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService =
+        app.Services.GetRequiredService<IContentTypeService>();
+
+    var contentService =
+        app.Services.GetRequiredService<IContentService>();
+
+    var elementTypes =
+        contentTypeService.GetAll().Where(ct => ct.IsElement).ToList();
+
+    Console.WriteLine($"Scanned {elementTypes.Count} Element Type(s).");
+    Console.WriteLine();
+
+    var offendersFound = 0;
+
+    foreach (var elementType in elementTypes)
+    {
+        var items =
+            contentService.GetPagedOfType(
+                elementType.Id,
+                0,
+                10,
+                out var totalRecords,
+                null!);
+
+        if (totalRecords == 0)
+        {
+            continue;
+        }
+
+        offendersFound++;
+
+        Console.WriteLine(
+            $"OFFENDER: {elementType.Alias} ({elementType.Name}) - " +
+            $"{totalRecords} live content node(s)");
+
+        foreach (var item in items)
+        {
+            Console.WriteLine($"  - id={item.Id} name=\"{item.Name}\" path={item.Path}");
+        }
+    }
+
+    Console.WriteLine();
+
+    if (offendersFound == 0)
+    {
+        Console.WriteLine(
+            "No Element Type has a live content node in the tree - the " +
+            "Link/IPublishedContent crash must be coming from something " +
+            "else (check the exact content type behind that model name).");
+    }
+    else
+    {
+        Console.WriteLine(
+            $"Found {offendersFound} Element Type(s) with a live content " +
+            "node. Each one needs either its IsElement flag switched off " +
+            "(if it should be a real page) or that content node deleted/" +
+            "moved out of the content tree (if it's migration debris).");
+    }
+
+    return;
+}
+
+// ============================================================
 // TEMP DIAGNOSTIC - remove once content-type-level issues (richTextboxItem's
 // IsElement flip, duplicate homePageElements nodes, ...) are resolved.
 // Visit /diagnostics/contenttype/{alias} in the browser, e.g.
