@@ -1561,6 +1561,88 @@ if (args.Length > 0 &&
 }
 
 // ============================================================
+// FIX-ORPHANED-ELEMENTS COMMAND
+// ============================================================
+//
+// Flips IsElement back to false on every content type find-orphaned-
+// elements reports (a real, standalone content node exists for it, so it
+// can't have been meant as an Element Type - those are only ever valid as
+// a Block List/Nested Content sub-model, never as the type of a real node
+// sitting in the content tree). This is exactly the "richTextboxItem's
+// IsElement flip" issue already flagged as a known problem elsewhere in
+// this file's own comments (predates this session) - caused by the now-
+// removed migrate command's STEP 3B unconditionally setting IsElement=true
+// on any content type it ever saw used as a Nested Content item type,
+// without checking whether that same content type ALSO had real,
+// standalone content nodes elsewhere in the v8 source tree.
+//
+// Safe/idempotent: only touches types find-orphaned-elements would report,
+// skips ones already IsElement=false, and does not touch content values -
+// only the content type's own IsElement flag.
+
+if (args.Length > 0 &&
+    args[0].Equals("fix-orphaned-elements", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" FIX ORPHANED ELEMENT TYPES");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService =
+        app.Services.GetRequiredService<IContentTypeService>();
+
+    var contentService =
+        app.Services.GetRequiredService<IContentService>();
+
+    var elementTypes =
+        contentTypeService.GetAll().Where(ct => ct.IsElement).ToList();
+
+    var fixedCount = 0;
+
+    foreach (var elementType in elementTypes)
+    {
+        contentService.GetPagedOfType(
+            elementType.Id,
+            0,
+            1,
+            out var totalRecords,
+            null!);
+
+        if (totalRecords == 0)
+        {
+            continue;
+        }
+
+        elementType.IsElement = false;
+        contentTypeService.Save(elementType);
+
+        fixedCount++;
+
+        Console.WriteLine(
+            $"FIXED: {elementType.Alias} ({elementType.Name}) - " +
+            $"IsElement set to false ({totalRecords} live content node(s))");
+    }
+
+    Console.WriteLine();
+
+    if (fixedCount == 0)
+    {
+        Console.WriteLine(
+            "Nothing to fix - no Element Type has a live content node.");
+    }
+    else
+    {
+        Console.WriteLine(
+            $"Fixed {fixedCount} content type(s). Restart the app so " +
+            "ModelsBuilder regenerates models for them, then re-run " +
+            "find-orphaned-elements to confirm none remain.");
+    }
+
+    return;
+}
+
+// ============================================================
 // TEMP DIAGNOSTIC - remove once content-type-level issues (richTextboxItem's
 // IsElement flip, duplicate homePageElements nodes, ...) are resolved.
 // Visit /diagnostics/contenttype/{alias} in the browser, e.g.
