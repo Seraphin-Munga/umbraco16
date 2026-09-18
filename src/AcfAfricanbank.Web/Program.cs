@@ -936,6 +936,539 @@ if (args.Length > 0 &&
 }
 
 // ============================================================
+// CREATE-PRODUCT-LOAN-SCHEMA COMMAND
+// ============================================================
+//
+// Builds the Document Types / Element Types for the React "Product Loan"
+// page - react-ts-app/src/pages/PersonalLoanPage/PersonalLoanPage.tsx,
+// the component actually rendered at /en/home/product-personal-loan/ today
+// (a fully static page - it does not call fetchProductLoanPage or
+// fetchPersonalLoanCampaign in contentApi.ts; both of those describe two
+// separate RETIRED Razor templates for the same underlying pageLoans
+// content type and are wired to no component). Authored directly from that
+// component's JSX, same approach as create-home-schema above.
+//
+// Same shape as homePage: one "productLoanPage" document type with a
+// single Block List property ("sections") accepting any of the section
+// block Element Types below, in editor-defined order.
+//
+// FAQ items (faqItem/faqSectionBlock) are deliberately modelled as
+// standalone, general-purpose Element Types, not scoped to this page -
+// FAQs show up across many pages on this site (see Views/
+// FrequentlyAskedQuestionsSection.cshtml, frequentlyAskedQuestions*.cshtml,
+// businessBankingFaq.cshtml, ...), so the same faqSectionBlock can be added
+// to any other page's own "sections" Block List later (homePage included)
+// without redefining it - that's what makes it a shared/global Document
+// Type rather than a page-local one.
+//
+// Reuses contentCard, featureItem and loanCalculatorBlock from
+// create-home-schema where the shape matches exactly (GetOrCreateType is
+// idempotent - if create-home-schema already created them, this finds and
+// reuses the same Element Type; if this command runs first instead, it
+// creates them itself and create-home-schema will reuse them later). Each
+// command still gets its own dedicated Block List Data Type per property,
+// since a Block List's allowed-blocks config is specific to one property
+// even when the Element Types it lists are shared.
+//
+// Idempotent: re-running finds already-created types by alias/name and
+// skips them, so interrupting/re-running this is safe.
+
+if (args.Length > 0 &&
+    args[0].Equals("create-product-loan-schema", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" CREATE PRODUCT LOAN PAGE DOCUMENT TYPE STRUCTURE");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService =
+        app.Services.GetRequiredService<IContentTypeService>();
+
+    var dataTypeService =
+        app.Services.GetRequiredService<IDataTypeService>();
+
+    var propertyEditors =
+        app.Services.GetRequiredService<PropertyEditorCollection>();
+
+    var configurationEditorJsonSerializer =
+        app.Services.GetRequiredService<IConfigurationEditorJsonSerializer>();
+
+    var shortStringHelper =
+        app.Services.GetRequiredService<IShortStringHelper>();
+
+    var contentTypeContainerService =
+        app.Services.GetRequiredService<IContentTypeContainerService>();
+
+    // --------------------------------------------------------
+    // FOLDER
+    // --------------------------------------------------------
+
+    var existingFolders =
+        (await contentTypeContainerService.GetAllAsync()).ToList();
+
+    var productLoanFolder =
+        existingFolders.FirstOrDefault(x =>
+            x.Name != null &&
+            x.Name.Equals("React Product Loan Page", StringComparison.OrdinalIgnoreCase) &&
+            x.ParentId == -1);
+
+    if (productLoanFolder == null)
+    {
+        var folderResult =
+            await contentTypeContainerService.CreateAsync(
+                null,
+                "React Product Loan Page",
+                null,
+                Constants.Security.SuperUserKey);
+
+        if (!folderResult.Success || folderResult.Result == null)
+        {
+            Console.WriteLine(
+                $"FAILED FOLDER: React Product Loan Page - {folderResult.Status}");
+
+            return;
+        }
+
+        productLoanFolder = folderResult.Result;
+
+        Console.WriteLine("CREATED FOLDER: React Product Loan Page");
+    }
+    else
+    {
+        Console.WriteLine("EXISTS FOLDER: React Product Loan Page");
+    }
+
+    var folderId = productLoanFolder.Id;
+
+    // --------------------------------------------------------
+    // SHARED SCALAR DATA TYPES (same pattern as create-home-schema - see
+    // its own comment. A fresh cache/lookup here still finds and reuses
+    // the exact same Data Types that command created, since both look
+    // them up by editor alias against the same Umbraco instance.)
+    // --------------------------------------------------------
+
+    var sharedDataTypeCache =
+        new Dictionary<string, IDataType>(StringComparer.OrdinalIgnoreCase);
+
+    async Task<IDataType> GetOrCreateSharedDataTypeAsync(
+        string editorAlias,
+        string editorUiAlias,
+        string name)
+    {
+        if (sharedDataTypeCache.TryGetValue(editorAlias, out var cached))
+        {
+            return cached;
+        }
+
+        var existing =
+            (await dataTypeService.GetAllAsync())
+                .FirstOrDefault(d =>
+                    d.EditorAlias.Equals(
+                        editorAlias,
+                        StringComparison.OrdinalIgnoreCase));
+
+        if (existing != null)
+        {
+            sharedDataTypeCache[editorAlias] = existing;
+
+            Console.WriteLine($"EXISTS DATATYPE: {existing.Name}");
+
+            return existing;
+        }
+
+        if (!propertyEditors.TryGet(editorAlias, out var editor))
+        {
+            throw new InvalidOperationException(
+                $"Property editor '{editorAlias}' is not registered.");
+        }
+
+        var dataType =
+            new DataType(editor, configurationEditorJsonSerializer)
+            {
+                Name = name,
+                EditorUiAlias = editorUiAlias
+            };
+
+        var createResult =
+            await dataTypeService.CreateAsync(
+                dataType,
+                Constants.Security.SuperUserKey);
+
+        if (!createResult.Success)
+        {
+            throw new InvalidOperationException(
+                $"Could not create data type '{name}': {createResult.Status}");
+        }
+
+        sharedDataTypeCache[editorAlias] = createResult.Result;
+
+        Console.WriteLine($"CREATED DATATYPE: {name}");
+
+        return createResult.Result;
+    }
+
+    var txt =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.TextBox", "Umb.PropertyEditorUi.TextBox", "React Migration - Textstring");
+
+    var txtArea =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.TextArea", "Umb.PropertyEditorUi.TextArea", "React Migration - Textarea");
+
+    var rte =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.RichText", "Umb.PropertyEditorUi.Tiptap", "React Migration - Richtext");
+
+    var media =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.MediaPicker3", "Umb.PropertyEditorUi.MediaPicker", "React Migration - Media Picker");
+
+    var link =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.MultiUrlPicker", "Umb.PropertyEditorUi.MultiUrlPicker", "React Migration - Link Picker");
+
+    var num =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.Integer", "Umb.PropertyEditorUi.Integer", "React Migration - Number");
+
+    var boolType =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.TrueFalse", "Umb.PropertyEditorUi.Toggle", "React Migration - Toggle");
+
+    // --------------------------------------------------------
+    // ELEMENT TYPE / DOCUMENT TYPE + BLOCK LIST HELPERS
+    // (identical to create-home-schema's own - see its comments)
+    // --------------------------------------------------------
+
+    void EnsureContentTab(IContentType type)
+    {
+        if (type.PropertyGroups.Any(g =>
+                g.Alias.Equals("content", StringComparison.OrdinalIgnoreCase)))
+        {
+            return;
+        }
+
+        type.AddPropertyGroup("content", "Content");
+
+        var tab =
+            type.PropertyGroups.FirstOrDefault(g =>
+                g.Alias.Equals("content", StringComparison.OrdinalIgnoreCase));
+
+        if (tab != null)
+        {
+            tab.Type = PropertyGroupType.Tab;
+        }
+    }
+
+    IContentType GetOrCreateType(
+        string alias,
+        string name,
+        string icon,
+        bool isElement,
+        bool allowedAsRoot,
+        params PropSpec[] props)
+    {
+        var existing = contentTypeService.Get(alias);
+
+        if (existing != null)
+        {
+            var changed = false;
+
+            if (!existing.PropertyGroups.Any(g =>
+                    g.Alias.Equals("content", StringComparison.OrdinalIgnoreCase) &&
+                    g.Type == PropertyGroupType.Tab))
+            {
+                EnsureContentTab(existing);
+                changed = true;
+            }
+
+            foreach (var prop in props)
+            {
+                if (existing.PropertyTypes.Any(p =>
+                        p.Alias.Equals(prop.Alias, StringComparison.OrdinalIgnoreCase)))
+                {
+                    continue;
+                }
+
+                var propertyType =
+                    new PropertyType(shortStringHelper, prop.Type, prop.Alias)
+                    {
+                        Name = prop.Name,
+                        Mandatory = prop.Mandatory
+                    };
+
+                existing.AddPropertyType(propertyType, "content");
+                changed = true;
+
+                Console.WriteLine($"  + ADDED PROPERTY: {alias}.{prop.Alias}");
+            }
+
+            if (changed)
+            {
+                contentTypeService.Save(existing);
+            }
+
+            Console.WriteLine($"EXISTS TYPE: {alias}");
+
+            return existing;
+        }
+
+        var contentType =
+            new ContentType(shortStringHelper, folderId)
+            {
+                Alias = alias,
+                Name = name,
+                Icon = icon,
+                IsElement = isElement,
+                AllowedAsRoot = allowedAsRoot
+            };
+
+        EnsureContentTab(contentType);
+
+        foreach (var prop in props)
+        {
+            var propertyType =
+                new PropertyType(shortStringHelper, prop.Type, prop.Alias)
+                {
+                    Name = prop.Name,
+                    Mandatory = prop.Mandatory
+                };
+
+            contentType.AddPropertyType(propertyType, "content");
+        }
+
+        contentTypeService.Save(contentType);
+
+        Console.WriteLine($"CREATED TYPE: {alias}");
+
+        return contentType;
+    }
+
+    async Task<IDataType> GetOrCreateBlockListAsync(
+        string name,
+        params IContentType[] allowedElementTypes)
+    {
+        var existing =
+            (await dataTypeService.GetAllAsync())
+                .FirstOrDefault(d =>
+                    d.Name != null &&
+                    d.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+        if (existing != null)
+        {
+            Console.WriteLine($"EXISTS BLOCKLIST DATATYPE: {name}");
+
+            return existing;
+        }
+
+        if (!propertyEditors.TryGet("Umbraco.BlockList", out var editor))
+        {
+            throw new InvalidOperationException(
+                "Umbraco.BlockList editor is not registered.");
+        }
+
+        var blocks =
+            allowedElementTypes
+                .Select(t => new Dictionary<string, object>
+                {
+                    ["contentElementTypeKey"] = t.Key.ToString()
+                })
+                .ToList();
+
+        var dataType =
+            new DataType(editor, configurationEditorJsonSerializer)
+            {
+                Name = name,
+                EditorUiAlias = "Umb.PropertyEditorUi.BlockList",
+                ConfigurationData =
+                    new Dictionary<string, object> { ["blocks"] = blocks }
+            };
+
+        var createResult =
+            await dataTypeService.CreateAsync(
+                dataType,
+                Constants.Security.SuperUserKey);
+
+        if (!createResult.Success)
+        {
+            throw new InvalidOperationException(
+                $"Could not create block list data type '{name}': " +
+                createResult.Status);
+        }
+
+        Console.WriteLine(
+            $"CREATED BLOCKLIST DATATYPE: {name} " +
+            $"({blocks.Count} block type(s))");
+
+        return createResult.Result;
+    }
+
+    // ==========================================================
+    // GLOBAL / SHARED ELEMENT TYPES
+    // ==========================================================
+    // Not scoped to the product loan page - faqItem/faqSectionBlock are
+    // general-purpose and meant to be added to any other page's own
+    // "sections" Block List later without redefining them (see this
+    // command's own top comment). contentCard and featureItem are reused
+    // as-is from create-home-schema (same alias, same shape) rather than
+    // redefined here.
+
+    Console.WriteLine();
+    Console.WriteLine("--- global/shared element types ---");
+
+    var contentCard =
+        GetOrCreateType(
+            "contentCard", "Content Card", "icon-thumbnail-list", true, false,
+            new PropSpec("title", "Title", txt),
+            new PropSpec("description", "Description", txtArea),
+            new PropSpec("cta", "Button", link));
+
+    var featureItem =
+        GetOrCreateType(
+            "featureItem", "Feature Item", "icon-bulleted-list", true, false,
+            new PropSpec("text", "Text", txt));
+
+    var faqItem =
+        GetOrCreateType(
+            "faqItem", "FAQ Item", "icon-help-alt", true, false,
+            new PropSpec("question", "Question", txt),
+            new PropSpec("answer", "Answer", rte));
+
+    var faqItems =
+        await GetOrCreateBlockListAsync(
+            "React Migration - faqSectionBlock.items", faqItem);
+
+    var faqSectionBlock =
+        GetOrCreateType(
+            "faqSectionBlock", "FAQ Section", "icon-help-alt", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("items", "Questions", faqItems));
+
+    var downloadItem =
+        GetOrCreateType(
+            "downloadItem", "Download Item", "icon-download-alt", true, false,
+            new PropSpec("label", "Label", txt),
+            new PropSpec("file", "File", media));
+
+    // --------------------------------------------------------
+    // loanCalculatorBlock - reused verbatim from create-home-schema. If
+    // that command hasn't run yet on this database, this creates it fresh
+    // with the exact same shape, so either command can run first.
+    // --------------------------------------------------------
+
+    var loanCalculatorBlock =
+        GetOrCreateType(
+            "loanCalculatorBlock", "Loan Calculator", "icon-calculator", true, false,
+            new PropSpec("minAmount", "Min Amount", num),
+            new PropSpec("maxAmount", "Max Amount", num),
+            new PropSpec("defaultAmount", "Default Amount", num),
+            new PropSpec("minTerm", "Min Term (months)", num),
+            new PropSpec("maxTerm", "Max Term (months)", num),
+            new PropSpec("applyLink", "Apply Link", link),
+            new PropSpec("image", "Image", media),
+            new PropSpec("imageAlt", "Image Alt Text", txt),
+            new PropSpec("imageOnRight", "Image On Right", boolType));
+
+    // ==========================================================
+    // PRODUCT LOAN PAGE SECTION BLOCKS
+    // ==========================================================
+    // Ported 1:1 from PersonalLoanPage.tsx's own sections, in the order
+    // they're rendered there: hero banner, loan calculator, credit life
+    // insurance, FAQ accordion, downloads list, cross-sell.
+
+    Console.WriteLine();
+    Console.WriteLine("--- product loan page section blocks ---");
+
+    var heroBannerBlock =
+        GetOrCreateType(
+            "heroBannerBlock", "Hero Banner", "icon-banner", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("description", "Description", txtArea),
+            new PropSpec("primaryCta", "Primary Button", link),
+            new PropSpec("secondaryCta", "Secondary Button", link));
+
+    var creditLifeChecklistOne =
+        await GetOrCreateBlockListAsync(
+            "React Migration - creditLifeInsuranceBlock.checklistOne", featureItem);
+
+    var creditLifeChecklistTwo =
+        await GetOrCreateBlockListAsync(
+            "React Migration - creditLifeInsuranceBlock.checklistTwo", featureItem);
+
+    var creditLifeInsuranceBlock =
+        GetOrCreateType(
+            "creditLifeInsuranceBlock", "Credit Life Insurance", "icon-umbrella", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("paragraphOne", "Paragraph One", txtArea),
+            new PropSpec("paragraphTwo", "Paragraph Two", txtArea),
+            new PropSpec("checklistOne", "Checklist One", creditLifeChecklistOne),
+            new PropSpec("checklistTwo", "Checklist Two", creditLifeChecklistTwo),
+            new PropSpec("image", "Image", media));
+
+    var downloadsSectionItems =
+        await GetOrCreateBlockListAsync(
+            "React Migration - downloadsSectionBlock.items", downloadItem);
+
+    var downloadsSectionBlock =
+        GetOrCreateType(
+            "downloadsSectionBlock", "Downloads Section", "icon-download-alt", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("items", "Downloads", downloadsSectionItems));
+
+    var crossSellCards =
+        await GetOrCreateBlockListAsync(
+            "React Migration - crossSellBlock.cards", contentCard);
+
+    var crossSellBlock =
+        GetOrCreateType(
+            "crossSellBlock", "Cross-Sell", "icon-trolley", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("cards", "Cards", crossSellCards),
+            new PropSpec("image", "Image", media));
+
+    // ==========================================================
+    // PRODUCT LOAN PAGE
+    // ==========================================================
+
+    Console.WriteLine();
+    Console.WriteLine("--- product loan page ---");
+
+    var productLoanPageSections =
+        await GetOrCreateBlockListAsync(
+            "React Migration - productLoanPage.sections",
+            heroBannerBlock,
+            loanCalculatorBlock,
+            creditLifeInsuranceBlock,
+            faqSectionBlock,
+            downloadsSectionBlock,
+            crossSellBlock);
+
+    GetOrCreateType(
+        "productLoanPage", "Product Loan Page", "icon-coin-dollar", false, true,
+        new PropSpec("sections", "Page Sections", productLoanPageSections));
+
+    // ==========================================================
+    // RESULT
+    // ==========================================================
+
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine("PRODUCT LOAN PAGE SCHEMA CREATED");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+    Console.WriteLine(
+        "Document types are created empty - no content values were seeded " +
+        "from PersonalLoanPage.tsx. faqItem/faqSectionBlock are general-" +
+        "purpose - add faqSectionBlock to any other page's own sections " +
+        "Block List (e.g. homePage) the same way it's used here, no need " +
+        "to redefine it. Create a Product Loan Page content node in the " +
+        "backoffice and populate it by hand.");
+
+    return;
+}
+
+// ============================================================
 // TEMP DIAGNOSTIC - remove once content-type-level issues (richTextboxItem's
 // IsElement flip, duplicate homePageElements nodes, ...) are resolved.
 // Visit /diagnostics/contenttype/{alias} in the browser, e.g.
