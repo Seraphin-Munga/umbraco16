@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Microsoft.Data.SqlClient;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -1638,6 +1640,390 @@ if (args.Length > 0 &&
             "ModelsBuilder regenerates models for them, then re-run " +
             "find-orphaned-elements to confirm none remain.");
     }
+
+    return;
+}
+
+// ============================================================
+// FIX-MENU-BLOCKLIST COMMAND
+// ============================================================
+//
+// Fixes the specific shape confirmed via /diagnostics/rawproperty/
+// topNavigation/menuInfo: menuInfo's OWN top level was already correctly
+// converted to modern Block List JSON ({"layout":...,"contentData":[...]})
+// by the now-removed migrate command, but its nested sub-properties were
+// carried over "as-is" per that command's own documented limitation -
+// each contentData entry's "menus" property (and, one level deeper, each
+// menus item's own "link" property) is still a JSON-encoded STRING holding
+// the old v8 Nested Content array shape
+// ({"key","name","ncContentTypeAlias",...}), not a real nested Block List
+// object - so Umbraco's BlockListPropertyValueConverter throws "Expected
+// start object" the moment anything expands into them (exactly the crash
+// seen from the Delivery API). "menuList" (nested inside "link") is a
+// plain MultiUrlPicker value already in the correct format and is left
+// untouched, same for "categoryName"/"pageSection"/"menuDescription".
+//
+// Resolves each converted item's real Umbraco 16 content type by the
+// EXACT alias embedded in the legacy JSON's own "ncContentTypeAlias"
+// field (nCMenuContent/nCMenuList) rather than a hardcoded guess, so this
+// only works if those aliases still exist under those names - which they
+// do, since contentApi.ts's own field mappings (categoryName/link/
+// menuList/pageSection/menuDescription) are already confirmed against a
+// live Delivery API response using those same names.
+//
+// Idempotent: skips any "menus"/"link" value that's already a JsonObject
+// (i.e. already converted) rather than a string, so re-running this is
+// safe. Publishes each node it touches so the fix is live immediately.
+
+if (args.Length > 0 &&
+    args[0].Equals("fix-menu-blocklist", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" FIX TOPNAVIGATION MENU NESTED BLOCK LIST DATA");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService =
+        app.Services.GetRequiredService<IContentTypeService>();
+
+    var contentService =
+        app.Services.GetRequiredService<IContentService>();
+
+    var topNavType = contentTypeService.Get("topNavigation");
+
+    if (topNavType == null)
+    {
+        Console.WriteLine("ERROR: no content type with alias 'topNavigation' exists.");
+
+        return;
+    }
+
+    var contentTypeKeyCache =
+        new Dictionary<string, Guid>(StringComparer.OrdinalIgnoreCase);
+
+    Guid? ResolveContentTypeKey(string alias)
+    {
+        if (contentTypeKeyCache.TryGetValue(alias, out var cached))
+        {
+            return cached;
+        }
+
+        var contentType = contentTypeService.Get(alias);
+
+        if (contentType == null)
+        {
+            return null;
+        }
+
+        contentTypeKeyCache[alias] = contentType.Key;
+
+        return contentType.Key;
+    }
+
+    // Converts one leaf-level legacy JSON string (an array of
+    // {"key","name","ncContentTypeAlias",...own properties...} items with
+    // no further nested Block List sub-properties of their own) into
+    // modern Block List JSON. Used for the "link" (nCMenuList) level -
+    // its own "menuList" is copied across unchanged, not recursed into.
+    JsonObject? ConvertLeafLevel(string rawJson, string[] passthroughProps)
+    {
+        JsonNode? parsed;
+
+        try
+        {
+            parsed = JsonNode.Parse(rawJson);
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+
+        if (parsed is not JsonArray array)
+        {
+            return null;
+        }
+
+        var layoutItems = new JsonArray();
+        var contentDataItems = new JsonArray();
+
+        foreach (var itemNode in array)
+        {
+            if (itemNode is not JsonObject item)
+            {
+                continue;
+            }
+
+            var alias = item["ncContentTypeAlias"]?.GetValue<string>();
+            var legacyKey = item["key"]?.GetValue<string>();
+
+            if (string.IsNullOrWhiteSpace(alias) || string.IsNullOrWhiteSpace(legacyKey))
+            {
+                continue;
+            }
+
+            var contentTypeKey = ResolveContentTypeKey(alias);
+
+            if (contentTypeKey == null)
+            {
+                Console.WriteLine(
+                    $"    SKIP ITEM: no content type with alias '{alias}' - leaving unconverted.");
+
+                continue;
+            }
+
+            var udi = $"umb://element/{legacyKey.Replace("-", "")}";
+
+            var contentDataItem =
+                new JsonObject
+                {
+                    ["contentTypeKey"] = contentTypeKey.Value.ToString(),
+                    ["udi"] = udi
+                };
+
+            foreach (var propAlias in passthroughProps)
+            {
+                contentDataItem[propAlias] = item[propAlias]?.DeepClone();
+            }
+
+            contentDataItems.Add(contentDataItem);
+            layoutItems.Add(new JsonObject { ["contentUdi"] = udi });
+        }
+
+        if (contentDataItems.Count == 0)
+        {
+            return null;
+        }
+
+        return new JsonObject
+        {
+            ["layout"] = new JsonObject { ["Umbraco.BlockList"] = layoutItems },
+            ["contentData"] = contentDataItems
+        };
+    }
+
+    // Converts a "menus" (nCMenuContent) level legacy JSON string, which
+    // additionally has its own nested "link" (nCMenuList) Block List
+    // sub-property needing the same conversion one level deeper.
+    JsonObject? ConvertMenusLevel(string rawJson)
+    {
+        JsonNode? parsed;
+
+        try
+        {
+            parsed = JsonNode.Parse(rawJson);
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+
+        if (parsed is not JsonArray array)
+        {
+            return null;
+        }
+
+        var layoutItems = new JsonArray();
+        var contentDataItems = new JsonArray();
+
+        foreach (var itemNode in array)
+        {
+            if (itemNode is not JsonObject item)
+            {
+                continue;
+            }
+
+            var alias = item["ncContentTypeAlias"]?.GetValue<string>();
+            var legacyKey = item["key"]?.GetValue<string>();
+
+            if (string.IsNullOrWhiteSpace(alias) || string.IsNullOrWhiteSpace(legacyKey))
+            {
+                continue;
+            }
+
+            var contentTypeKey = ResolveContentTypeKey(alias);
+
+            if (contentTypeKey == null)
+            {
+                Console.WriteLine(
+                    $"    SKIP ITEM: no content type with alias '{alias}' - leaving unconverted.");
+
+                continue;
+            }
+
+            var udi = $"umb://element/{legacyKey.Replace("-", "")}";
+
+            var contentDataItem =
+                new JsonObject
+                {
+                    ["contentTypeKey"] = contentTypeKey.Value.ToString(),
+                    ["udi"] = udi,
+                    ["categoryName"] = item["categoryName"]?.DeepClone()
+                };
+
+            if (item["link"] is JsonValue linkValue &&
+                linkValue.TryGetValue<string>(out var linkRaw) &&
+                !string.IsNullOrWhiteSpace(linkRaw))
+            {
+                var convertedLink =
+                    ConvertLeafLevel(
+                        linkRaw,
+                        new[] { "menuList", "pageSection", "menuDescription" });
+
+                if (convertedLink != null)
+                {
+                    contentDataItem["link"] = convertedLink;
+                }
+                else
+                {
+                    Console.WriteLine(
+                        "    WARNING: could not convert nested 'link' value - leaving it out.");
+                }
+            }
+
+            contentDataItems.Add(contentDataItem);
+            layoutItems.Add(new JsonObject { ["contentUdi"] = udi });
+        }
+
+        if (contentDataItems.Count == 0)
+        {
+            return null;
+        }
+
+        return new JsonObject
+        {
+            ["layout"] = new JsonObject { ["Umbraco.BlockList"] = layoutItems },
+            ["contentData"] = contentDataItems
+        };
+    }
+
+    var topNavItems =
+        contentService.GetPagedOfType(
+            topNavType.Id,
+            0,
+            100,
+            out var totalRecords,
+            null!);
+
+    Console.WriteLine($"Found {totalRecords} 'topNavigation' node(s).");
+    Console.WriteLine();
+
+    var fixedCount = 0;
+
+    foreach (var node in topNavItems)
+    {
+        try
+        {
+            var menuInfoProperty =
+                node.Properties.FirstOrDefault(p =>
+                    p.Alias.Equals("menuInfo", StringComparison.OrdinalIgnoreCase));
+
+            var rawValue = menuInfoProperty?.GetValue() as string;
+
+            if (string.IsNullOrWhiteSpace(rawValue))
+            {
+                Console.WriteLine($"SKIP: {node.Name} (id={node.Id}) - no menuInfo value.");
+
+                continue;
+            }
+
+            JsonObject? menuInfoRoot;
+
+            try
+            {
+                menuInfoRoot = JsonNode.Parse(rawValue) as JsonObject;
+            }
+            catch (JsonException ex)
+            {
+                Console.WriteLine(
+                    $"ERROR: {node.Name} (id={node.Id}) - could not parse menuInfo: {ex.Message}");
+
+                continue;
+            }
+
+            if (menuInfoRoot?["contentData"] is not JsonArray contentDataArray)
+            {
+                Console.WriteLine(
+                    $"SKIP: {node.Name} (id={node.Id}) - menuInfo is not already a Block List value.");
+
+                continue;
+            }
+
+            var changed = false;
+
+            foreach (var entryNode in contentDataArray)
+            {
+                if (entryNode is not JsonObject entry)
+                {
+                    continue;
+                }
+
+                if (entry["menus"] is not JsonValue menusValue ||
+                    !menusValue.TryGetValue<string>(out var menusRaw) ||
+                    string.IsNullOrWhiteSpace(menusRaw))
+                {
+                    // Not a string - either already converted, or not set.
+                    continue;
+                }
+
+                var convertedMenus = ConvertMenusLevel(menusRaw);
+
+                if (convertedMenus == null)
+                {
+                    Console.WriteLine(
+                        $"  WARNING: {node.Name} - could not convert 'menus' for category " +
+                        $"\"{entry["menuDescription"]}\" - leaving it unconverted.");
+
+                    continue;
+                }
+
+                entry["menus"] = convertedMenus;
+                changed = true;
+
+                Console.WriteLine(
+                    $"  CONVERTED: {node.Name} - category \"{entry["menuDescription"]}\" " +
+                    $"({((JsonArray)convertedMenus["contentData"]!).Count} sub-item(s))");
+            }
+
+            if (!changed)
+            {
+                Console.WriteLine($"SKIP: {node.Name} (id={node.Id}) - nothing needed converting.");
+
+                continue;
+            }
+
+            node.SetValue("menuInfo", menuInfoRoot.ToJsonString());
+
+            var saveResult = contentService.Save(node);
+
+            if (!saveResult.Success)
+            {
+                Console.WriteLine($"FAILED SAVE: {node.Name} (id={node.Id})");
+
+                continue;
+            }
+
+            var publishResult = contentService.Publish(node, new[] { "*" });
+
+            if (!publishResult.Success)
+            {
+                Console.WriteLine($"SAVED BUT FAILED PUBLISH: {node.Name} (id={node.Id})");
+
+                continue;
+            }
+
+            fixedCount++;
+
+            Console.WriteLine($"FIXED + PUBLISHED: {node.Name} (id={node.Id})");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ERROR NODE {node.Id}: {ex.Message}");
+        }
+    }
+
+    Console.WriteLine();
+    Console.WriteLine($"Done. Fixed {fixedCount} of {totalRecords} node(s).");
 
     return;
 }
