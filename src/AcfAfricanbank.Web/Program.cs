@@ -1251,6 +1251,9 @@ if (args.Length > 0 &&
         string name,
         params IContentType[] allowedElementTypes)
     {
+        var desiredKeys =
+            allowedElementTypes.Select(t => t.Key.ToString()).ToList();
+
         var existing =
             (await dataTypeService.GetAllAsync())
                 .FirstOrDefault(d =>
@@ -1259,9 +1262,68 @@ if (args.Length > 0 &&
 
         if (existing != null)
         {
-            Console.WriteLine($"EXISTS BLOCKLIST DATATYPE: {name}");
+            // Self-healing: a Data Type this same name was already created
+            // for may be missing block types a later code change added to
+            // the call (e.g. appDownloadBlock added to productLoanPage's
+            // allowed sections after the first run already created this
+            // Data Type) - GetOrCreateType already does the equivalent for
+            // properties on a content type; this is that same idea for a
+            // Block List's own allowed-blocks config.
+            var existingBlocks =
+                existing.ConfigurationData.TryGetValue("blocks", out var rawBlocks)
+                    ? rawBlocks
+                    : null;
 
-            return existing;
+            var existingKeys =
+                (existingBlocks as IEnumerable<object>)?
+                    .OfType<IDictionary<string, object>>()
+                    .Select(b =>
+                        b.TryGetValue("contentElementTypeKey", out var k)
+                            ? k?.ToString()
+                            : null)
+                    .Where(k => k != null)
+                    .Cast<string>()
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase)
+                ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            var missingKeys =
+                desiredKeys.Where(k => !existingKeys.Contains(k)).ToList();
+
+            if (missingKeys.Count == 0)
+            {
+                Console.WriteLine($"EXISTS BLOCKLIST DATATYPE: {name}");
+
+                return existing;
+            }
+
+            var updatedBlocks =
+                desiredKeys
+                    .Select(k => new Dictionary<string, object>
+                    {
+                        ["contentElementTypeKey"] = k
+                    })
+                    .ToList();
+
+            existing.ConfigurationData =
+                new Dictionary<string, object> { ["blocks"] = updatedBlocks };
+
+            var updateResult =
+                await dataTypeService.UpdateAsync(
+                    existing,
+                    Constants.Security.SuperUserKey);
+
+            if (!updateResult.Success)
+            {
+                throw new InvalidOperationException(
+                    $"Could not update block list data type '{name}': " +
+                    updateResult.Status);
+            }
+
+            Console.WriteLine(
+                $"UPDATED BLOCKLIST DATATYPE: {name} " +
+                $"(+{missingKeys.Count} block type(s), {updatedBlocks.Count} total)");
+
+            return updateResult.Result;
         }
 
         if (!propertyEditors.TryGet("Umbraco.BlockList", out var editor))
@@ -1271,10 +1333,10 @@ if (args.Length > 0 &&
         }
 
         var blocks =
-            allowedElementTypes
-                .Select(t => new Dictionary<string, object>
+            desiredKeys
+                .Select(k => new Dictionary<string, object>
                 {
-                    ["contentElementTypeKey"] = t.Key.ToString()
+                    ["contentElementTypeKey"] = k
                 })
                 .ToList();
 
@@ -1388,7 +1450,9 @@ if (args.Length > 0 &&
             new PropSpec("heading", "Heading", txt),
             new PropSpec("description", "Description", txtArea),
             new PropSpec("primaryCta", "Primary Button", link),
-            new PropSpec("secondaryCta", "Secondary Button", link));
+            new PropSpec("secondaryCta", "Secondary Button", link),
+            new PropSpec("image", "Image", media),
+            new PropSpec("imageAlt", "Image Alt Text", txt));
 
     var creditLifeChecklistOne =
         await GetOrCreateBlockListAsync(
@@ -1429,6 +1493,19 @@ if (args.Length > 0 &&
             new PropSpec("cards", "Cards", crossSellCards),
             new PropSpec("image", "Image", media));
 
+    // Reused verbatim from create-home-schema (same alias/shape) - a
+    // genuinely global block, not just a "product loan page" one. If that
+    // command hasn't run yet on this database, this creates it fresh.
+    var appDownloadBlock =
+        GetOrCreateType(
+            "appDownloadBlock", "App Download", "icon-android", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("subheading", "Subheading", txt),
+            new PropSpec("description", "Description", txtArea),
+            new PropSpec("downloadLink", "Download Link", link),
+            new PropSpec("image", "Image", media),
+            new PropSpec("imageAlt", "Image Alt Text", txt));
+
     // ==========================================================
     // PRODUCT LOAN PAGE
     // ==========================================================
@@ -1444,7 +1521,8 @@ if (args.Length > 0 &&
             creditLifeInsuranceBlock,
             faqSectionBlock,
             downloadsSectionBlock,
-            crossSellBlock);
+            crossSellBlock,
+            appDownloadBlock);
 
     GetOrCreateType(
         "productLoanPage", "Product Loan Page", "icon-coin-dollar", false, true,
@@ -1466,6 +1544,225 @@ if (args.Length > 0 &&
         "Block List (e.g. homePage) the same way it's used here, no need " +
         "to redefine it. Create a Product Loan Page content node in the " +
         "backoffice and populate it by hand.");
+
+    return;
+}
+
+// ============================================================
+// CREATE-CONSOLIDATION-LOAN-CONTENT COMMAND
+// ============================================================
+//
+// Worked example of "create content, not code": builds one real
+// productLoanPage content node - no new document type, no new React file,
+// no new route - proving DynamicPage renders it purely from what's in the
+// database. Requires create-product-loan-schema to have already run
+// (specifically for heroBannerBlock's now-added image/imageAlt fields and
+// appDownloadBlock's addition to productLoanPage's allowed sections - both
+// added in the same change as this command; re-run create-product-loan-
+// schema first if this errors on either missing type).
+//
+// Builds two sections by hand as native Block List JSON (JsonObject/
+// JsonArray, same System.Text.Json.Nodes approach as fix-menu-blocklist
+// above): a hero banner ("Combine up to 5 loans in 1") and an app download
+// block ("Get the app now"), with real copy and real external-link
+// buttons. heroBannerBlock.image/appDownloadBlock.image are left null -
+// there's no real photo/mockup image file available to attach here; add
+// those two via the backoffice's Media Picker once you have them.
+//
+// Placed as a sibling of the existing "Personal Loan" productLoanPage node
+// (matched by name) so it inherits the same URL structure
+// (/en/home/product-consolidation-loan/) without hardcoding a parent node
+// id, which differs per install. Idempotent: finds and updates an existing
+// node by name rather than duplicating it.
+
+if (args.Length > 0 &&
+    args[0].Equals("create-consolidation-loan-content", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" CREATE CONSOLIDATION LOAN CONTENT");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService =
+        app.Services.GetRequiredService<IContentTypeService>();
+
+    var contentService =
+        app.Services.GetRequiredService<IContentService>();
+
+    var productLoanPageType = contentTypeService.Get("productLoanPage");
+
+    if (productLoanPageType == null)
+    {
+        Console.WriteLine(
+            "ERROR: no 'productLoanPage' content type exists - run " +
+            "'create-product-loan-schema' first.");
+
+        return;
+    }
+
+    var heroBannerBlockType = contentTypeService.Get("heroBannerBlock");
+    var appDownloadBlockType = contentTypeService.Get("appDownloadBlock");
+
+    if (heroBannerBlockType == null || appDownloadBlockType == null)
+    {
+        Console.WriteLine(
+            "ERROR: 'heroBannerBlock' or 'appDownloadBlock' content type " +
+            "is missing - run 'create-product-loan-schema' again (it now " +
+            "also creates/updates both).");
+
+        return;
+    }
+
+    JsonArray BuildExternalLink(string label, string url) =>
+        new JsonArray(
+            new JsonObject
+            {
+                ["name"] = label,
+                ["target"] = null,
+                ["udi"] = null,
+                ["url"] = url,
+                ["queryString"] = null
+            });
+
+    var heroUdi = $"umb://element/{Guid.NewGuid():N}";
+    var appDownloadUdi = $"umb://element/{Guid.NewGuid():N}";
+
+    var heroContentData =
+        new JsonObject
+        {
+            ["contentTypeKey"] = heroBannerBlockType.Key.ToString(),
+            ["udi"] = heroUdi,
+            ["heading"] = "Combine up to 5 loans in 1",
+            ["description"] =
+                "Things work better when we work together. Make the most of " +
+                "your budget when you combine your loans today. Mix 'n match " +
+                "up to 5 loans into 1 easy-to-manage Consolidation Loan to " +
+                "the value of R500 000 and save cash with a lower repayment. " +
+                "Earn 1.3% of your loan instalments back in Audacious " +
+                "Rewards points",
+            ["primaryCta"] =
+                BuildExternalLink(
+                        "APPLY NOW",
+                        "https://www.africanbank.co.za/en/home/get-a-quote?" +
+                        "utm_source=Website&utm_medium=Productpage&utm_campaign=WebLead")
+                    .ToJsonString(),
+            ["secondaryCta"] = null,
+            ["image"] = null,
+            ["imageAlt"] = null
+        };
+
+    var appDownloadContentData =
+        new JsonObject
+        {
+            ["contentTypeKey"] = appDownloadBlockType.Key.ToString(),
+            ["udi"] = appDownloadUdi,
+            ["heading"] = "Get the app now",
+            ["subheading"] = "",
+            ["description"] =
+                "Take your banking experience to the next level with our mobile app.",
+            ["downloadLink"] =
+                BuildExternalLink(
+                        "DOWNLOAD NOW",
+                        "https://play.google.com/store/apps/details?id=za.co.android.africanbank")
+                    .ToJsonString(),
+            ["image"] = null,
+            ["imageAlt"] = null
+        };
+
+    var sectionsValue =
+        new JsonObject
+        {
+            ["layout"] =
+                new JsonObject
+                {
+                    ["Umbraco.BlockList"] =
+                        new JsonArray(
+                            new JsonObject { ["contentUdi"] = heroUdi },
+                            new JsonObject { ["contentUdi"] = appDownloadUdi })
+                },
+            ["contentData"] = new JsonArray(heroContentData, appDownloadContentData)
+        };
+
+    var existingProductLoanPages =
+        contentService.GetPagedOfType(
+            productLoanPageType.Id,
+            0,
+            50,
+            out _,
+            null!)
+            .ToList();
+
+    var parentId = -1;
+    var parentDescription = "root";
+
+    var personalLoanNode =
+        existingProductLoanPages.FirstOrDefault(n =>
+            n.Name != null &&
+            n.Name.Contains("Personal Loan", StringComparison.OrdinalIgnoreCase));
+
+    if (personalLoanNode != null)
+    {
+        parentId = personalLoanNode.ParentId;
+        parentDescription = $"same parent as \"{personalLoanNode.Name}\" (id={parentId})";
+    }
+    else
+    {
+        Console.WriteLine(
+            "NOTE: no existing 'Personal Loan' productLoanPage node found " +
+            "to match its parent/URL structure - creating at root instead. " +
+            "You may need to move this node in the content tree afterward " +
+            "so its route matches /en/home/product-consolidation-loan/.");
+    }
+
+    const string nodeName = "Product Consolidation Loan";
+
+    var existingNode =
+        existingProductLoanPages.FirstOrDefault(n =>
+            n.Name != null &&
+            n.Name.Equals(nodeName, StringComparison.OrdinalIgnoreCase));
+
+    IContent node;
+
+    if (existingNode != null)
+    {
+        node = existingNode;
+
+        Console.WriteLine($"EXISTS: \"{nodeName}\" (id={node.Id}) - updating its sections.");
+    }
+    else
+    {
+        node = contentService.Create(nodeName, parentId, "productLoanPage");
+
+        Console.WriteLine($"CREATED: \"{nodeName}\" under {parentDescription}");
+    }
+
+    node.SetValue("sections", sectionsValue.ToJsonString());
+
+    var saveResult = contentService.Save(node);
+
+    if (!saveResult.Success)
+    {
+        Console.WriteLine($"FAILED SAVE: {node.Name} (id={node.Id})");
+
+        return;
+    }
+
+    var publishResult = contentService.Publish(node, new[] { "*" });
+
+    if (!publishResult.Success)
+    {
+        Console.WriteLine($"SAVED BUT FAILED PUBLISH: {node.Name} (id={node.Id})");
+
+        return;
+    }
+
+    Console.WriteLine();
+    Console.WriteLine($"DONE. Published \"{nodeName}\" (id={node.Id}).");
+    Console.WriteLine(
+        "No images were set (heroBannerBlock.image / appDownloadBlock.image) " +
+        "- add those in the backoffice's Media Picker once you have the real " +
+        "photos. Everything else (heading/description/buttons) is real content.");
 
     return;
 }

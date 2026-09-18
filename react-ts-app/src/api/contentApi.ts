@@ -979,6 +979,8 @@ export type ProductLoanPageSection =
       description: string;
       primaryCta: { label: string; url: string } | null;
       secondaryCta: { label: string; url: string } | null;
+      imageUrl: string;
+      imageAlt: string;
     }
   | { kind: 'loanCalculatorBlock'; props: Partial<LoanCalculatorProps> }
   | {
@@ -1006,6 +1008,8 @@ export function mapProductLoanPageSection(
         description: str(props.description),
         primaryCta: mapButton(props.primaryCta),
         secondaryCta: mapButton(props.secondaryCta),
+        imageUrl: mapMediaUrl(props.image),
+        imageAlt: str(props.imageAlt),
       };
 
     case 'loanCalculatorBlock': {

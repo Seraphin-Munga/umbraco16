@@ -11,6 +11,7 @@ import { BusinessAudacitySection } from '../components/Home/BusinessAudacitySect
 import { AppDownloadSection } from '../components/Home/AppDownloadSection';
 import { Testimonials } from '../components/Home/Testimonials';
 import { Accordion } from '../components/ui/Accordion/Accordion';
+import { Button } from '../components/ui/Button/Button';
 
 // Single shared block registry, used by Home.tsx, PersonalLoanPage.tsx AND
 // DynamicPage.tsx (the catch-all route for any new CMS page - see that
@@ -185,7 +186,41 @@ export function renderPageSection(section: AnyPageSection, index: number): React
       return <Testimonials key={index} videos={section.videos} heading={section.heading || undefined} />;
 
     case 'heroBannerBlock':
-      return (
+      // Two layouts share this one block type: Personal Loan's hero has no
+      // photo (a plain overlay banner, its original hardcoded look), while
+      // a hero with an image (e.g. Consolidation Loan) gets a two-column
+      // text+photo layout instead - same "optional image changes the
+      // layout" pattern loanCalculatorBlock's own imagePosition already
+      // uses elsewhere.
+      return section.imageUrl ? (
+        <section className="mtb-120" key={index}>
+          <div className="container">
+            <div className="row d-flex align-items-center row-change md-text-center">
+              <div className="col-xl-6 col-lg-6 col-md-6">
+                <h1 className="color-brand-1 major-title mb-20">{section.heading}</h1>
+                <p className="font-md color-brand-1">{section.description}</p>
+                <div className="combo-btn mt-50 text-start column1">
+                  {section.primaryCta && (
+                    <p className="combo-btn-text primary">
+                      <Button href={section.primaryCta.url}>{section.primaryCta.label}</Button>
+                    </p>
+                  )}
+                  {section.secondaryCta && (
+                    <p className="combo-btn-text secondary">
+                      <Button href={section.secondaryCta.url} variant="brand-link">
+                        {section.secondaryCta.label}
+                      </Button>
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="col-xl-6 col-lg-6 col-md-6">
+                <img className="d-block" src={section.imageUrl} alt={section.imageAlt} />
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : (
         <section className="section-banner" key={index}>
           <div className="contact-banner">
             <div className="contact-overlay">
