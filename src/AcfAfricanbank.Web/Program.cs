@@ -1837,6 +1837,450 @@ if (args.Length > 0 &&
 }
 
 // ============================================================
+// MIGRATE-PRODUCT-LOAN-PAGES COMMAND
+// ============================================================
+//
+// Migrates the two real, live legacy "pageLoans" pages
+// (/en/home/product-personal-loan/, /en/home/product-consolidation-loan/)
+// onto the new productLoanPage system - explicitly requested and confirmed
+// before running, since it changes live, SEO-indexed URLs.
+//
+// For each page: renames the existing legacy pageLoans node (appending
+// " (Legacy)"), which frees up its URL, since two published nodes can't
+// share a route - its content/SEO metadata stays intact, just at a new
+// URL. Then creates (or reuses/renames an already-existing) productLoanPage
+// node as a sibling of the renamed legacy node, so it inherits the exact
+// same /en/home/ URL structure the legacy page had.
+//
+// Personal Loan's content is real, ported from PersonalLoanPage.tsx before
+// it was deleted (its own hero/credit-life-insurance/cross-sell copy) -
+// hero banner, loan calculator, credit life insurance (with real nested
+// featureItem checklists), and cross-sell (with real nested contentCard
+// links) sections. Deliberately does NOT include a FAQ or downloads
+// section here - faqSectionBlock's items need Rich Text values and
+// downloadsSectionBlock's items need a real Media file, and this command
+// can't safely guess the exact raw JSON envelope Umbraco's Rich Text
+// (Tiptap) editor expects for a value written outside the backoffice UI -
+// getting that wrong risks the same class of "Expected start object" crash
+// already hit once this session. Add those two sections by hand in the
+// backoffice instead, where the Rich Text/Media Picker UI always writes
+// correct values.
+//
+// Consolidation Loan reuses the exact content already seeded by
+// create-consolidation-loan-content (hero banner + app download) - that
+// command's own node is found and renamed/moved here rather than
+// duplicated, so run it first if it hasn't been run yet on this database.
+//
+// Nested Block List values (checklistOne/checklistTwo/cards) are built the
+// same proven way as fix-menu-blocklist's own conversions above - a
+// generic BuildBlockList helper, since this command needs several
+// different nested lists rather than just one shape.
+
+if (args.Length > 0 &&
+    args[0].Equals("migrate-product-loan-pages", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" MIGRATE PRODUCT LOAN PAGES");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService =
+        app.Services.GetRequiredService<IContentTypeService>();
+
+    var contentService =
+        app.Services.GetRequiredService<IContentService>();
+
+    var productLoanPageType = contentTypeService.Get("productLoanPage");
+    var pageLoansType = contentTypeService.Get("pageLoans");
+    var heroBannerBlockType = contentTypeService.Get("heroBannerBlock");
+    var loanCalculatorBlockType = contentTypeService.Get("loanCalculatorBlock");
+    var creditLifeInsuranceBlockType = contentTypeService.Get("creditLifeInsuranceBlock");
+    var featureItemType = contentTypeService.Get("featureItem");
+    var crossSellBlockType = contentTypeService.Get("crossSellBlock");
+    var contentCardType = contentTypeService.Get("contentCard");
+
+    if (productLoanPageType == null || pageLoansType == null ||
+        heroBannerBlockType == null || loanCalculatorBlockType == null ||
+        creditLifeInsuranceBlockType == null || featureItemType == null ||
+        crossSellBlockType == null || contentCardType == null)
+    {
+        Console.WriteLine(
+            "ERROR: one or more required content types are missing - run " +
+            "'create-product-loan-schema' (and 'create-home-schema', for " +
+            "shared types) first.");
+
+        return;
+    }
+
+    JsonArray BuildExternalLink(string label, string url) =>
+        new JsonArray(
+            new JsonObject
+            {
+                ["name"] = label,
+                ["target"] = null,
+                ["udi"] = null,
+                ["url"] = url,
+                ["queryString"] = null
+            });
+
+    JsonObject BuildBlockList(
+        IContentType elementType,
+        IEnumerable<Dictionary<string, JsonNode?>> itemsProps)
+    {
+        var layoutItems = new JsonArray();
+        var contentDataItems = new JsonArray();
+
+        foreach (var props in itemsProps)
+        {
+            var udi = $"umb://element/{Guid.NewGuid():N}";
+
+            var contentDataItem =
+                new JsonObject
+                {
+                    ["contentTypeKey"] = elementType.Key.ToString(),
+                    ["udi"] = udi
+                };
+
+            foreach (var (key, value) in props)
+            {
+                contentDataItem[key] = value;
+            }
+
+            contentDataItems.Add(contentDataItem);
+            layoutItems.Add(new JsonObject { ["contentUdi"] = udi });
+        }
+
+        return new JsonObject
+        {
+            ["layout"] = new JsonObject { ["Umbraco.BlockList"] = layoutItems },
+            ["contentData"] = contentDataItems
+        };
+    }
+
+    JsonObject BuildFeatureList(IEnumerable<string> texts) =>
+        BuildBlockList(
+            featureItemType,
+            texts.Select(t =>
+                new Dictionary<string, JsonNode?> { ["text"] = t }));
+
+    JsonObject BuildCards(
+        IEnumerable<(string Title, string Description, string CtaLabel, string CtaUrl)> cards) =>
+        BuildBlockList(
+            contentCardType,
+            cards.Select(c =>
+                new Dictionary<string, JsonNode?>
+                {
+                    ["title"] = c.Title,
+                    ["description"] = c.Description,
+                    ["cta"] = BuildExternalLink(c.CtaLabel, c.CtaUrl).ToJsonString()
+                }));
+
+    // Renames the legacy pageLoans node whose name contains
+    // `containsName` (skipping ones already migrated, i.e. already
+    // carrying " (Legacy)"), freeing up its URL. Idempotent: on a re-run,
+    // finds and returns the already-renamed node instead of renaming again.
+    IContent? FreeUpLegacyUrl(string containsName)
+    {
+        var legacyNodes =
+            contentService.GetPagedOfType(pageLoansType.Id, 0, 500, out _, null!).ToList();
+
+        var alreadyRenamed =
+            legacyNodes.FirstOrDefault(n =>
+                n.Name != null &&
+                n.Name.Contains(containsName, StringComparison.OrdinalIgnoreCase) &&
+                n.Name.Contains("(Legacy)", StringComparison.OrdinalIgnoreCase));
+
+        if (alreadyRenamed != null)
+        {
+            Console.WriteLine($"ALREADY MIGRATED: \"{alreadyRenamed.Name}\" (id={alreadyRenamed.Id})");
+
+            return alreadyRenamed;
+        }
+
+        var node =
+            legacyNodes.FirstOrDefault(n =>
+                n.Name != null &&
+                n.Name.Contains(containsName, StringComparison.OrdinalIgnoreCase));
+
+        if (node == null)
+        {
+            return null;
+        }
+
+        var oldName = node.Name;
+        node.Name = $"{node.Name} (Legacy)";
+
+        contentService.Save(node);
+        contentService.Publish(node, new[] { "*" });
+
+        Console.WriteLine(
+            $"RENAMED LEGACY PAGE: \"{oldName}\" -> \"{node.Name}\" (id={node.Id}) - " +
+            "its old URL is now free.");
+
+        return node;
+    }
+
+    IContent CreateOrUpdateProductLoanPage(string nodeName, int parentId, JsonObject sectionsValue)
+    {
+        var existing =
+            contentService.GetPagedOfType(productLoanPageType.Id, 0, 500, out _, null!)
+                .FirstOrDefault(n =>
+                    n.Name != null &&
+                    n.Name.Equals(nodeName, StringComparison.OrdinalIgnoreCase));
+
+        IContent node;
+
+        if (existing != null)
+        {
+            node = existing;
+
+            Console.WriteLine($"EXISTS: \"{nodeName}\" (id={node.Id}) - updating its sections.");
+
+            if (node.ParentId != parentId)
+            {
+                contentService.Move(node, parentId);
+
+                Console.WriteLine($"MOVED: \"{nodeName}\" to parent id={parentId}");
+            }
+        }
+        else
+        {
+            node = contentService.Create(nodeName, parentId, "productLoanPage");
+
+            Console.WriteLine($"CREATED: \"{nodeName}\" under parent id={parentId}");
+        }
+
+        node.SetValue("sections", sectionsValue.ToJsonString());
+
+        var saveResult = contentService.Save(node);
+
+        if (!saveResult.Success)
+        {
+            throw new InvalidOperationException($"Could not save \"{nodeName}\": {saveResult.Result}");
+        }
+
+        var publishResult = contentService.Publish(node, new[] { "*" });
+
+        if (!publishResult.Success)
+        {
+            throw new InvalidOperationException($"Could not publish \"{nodeName}\": {publishResult.Result}");
+        }
+
+        Console.WriteLine($"PUBLISHED: \"{nodeName}\" (id={node.Id})");
+
+        return node;
+    }
+
+    // --------------------------------------------------------
+    // PERSONAL LOAN
+    // --------------------------------------------------------
+
+    Console.WriteLine();
+    Console.WriteLine("--- personal loan ---");
+
+    var legacyPersonalLoan = FreeUpLegacyUrl("Personal Loan");
+
+    if (legacyPersonalLoan == null)
+    {
+        Console.WriteLine(
+            "SKIP: no legacy 'Personal Loan' pageLoans node found - nothing to migrate.");
+    }
+    else
+    {
+        const string applyUrl =
+            "https://www.africanbank.co.za/en/home/get-a-quote?" +
+            "utm_source=Website&utm_medium=Productpage&utm_campaign=WebLead";
+
+        var heroContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = heroBannerBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "We give credit where progress is due",
+                ["description"] =
+                    "At African Bank, we back the things that matter most - your " +
+                    "education, your business, your home, your future - because " +
+                    "we give credit where progress is due and for you.",
+                ["primaryCta"] =
+                    BuildExternalLink("Do I qualify?", "/en/home/get-a-quote").ToJsonString(),
+                ["secondaryCta"] = BuildExternalLink("Apply now", applyUrl).ToJsonString(),
+                ["image"] = null,
+                ["imageAlt"] = null
+            };
+
+        var loanCalculatorContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = loanCalculatorBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["minAmount"] = 2000,
+                ["maxAmount"] = 250000,
+                ["defaultAmount"] = null,
+                ["minTerm"] = null,
+                ["maxTerm"] = null,
+                ["applyLink"] = BuildExternalLink("Apply Now", applyUrl).ToJsonString(),
+                ["image"] = null,
+                ["imageAlt"] = null,
+                ["imageOnRight"] = false
+            };
+
+        var creditLifeContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = creditLifeInsuranceBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Credit Life Insurance",
+                ["paragraphOne"] =
+                    "With African Bank's Credit Life Insurance, you can rest assured " +
+                    "that your credit is insured should anything happen to you that " +
+                    "would prevent you from making repayments. You are covered for*.",
+                ["paragraphTwo"] =
+                    "With MyWORLD, you can open up to 5 accounts with no monthly " +
+                    "fees, allowing you to share finances seamlessly with friends " +
+                    "and family.",
+                ["checklistOne"] =
+                    BuildFeatureList(
+                        ["Retrenchment", "Death", "Compulsory Unpaid Leave", "Lay Offs", "Short Time"])
+                        .ToJsonString(),
+                ["checklistTwo"] =
+                    BuildFeatureList(
+                        [
+                            "Loss of Income", "Retrenchment Balance Claim",
+                            "Temporary Disability", "Permanent Disability"
+                        ])
+                        .ToJsonString(),
+                ["image"] = null
+            };
+
+        var crossSellContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = crossSellBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Find your ideal loan solution with African Bank.",
+                ["cards"] =
+                    BuildCards(
+                        [
+                            ("Consolidation Loan:",
+                                "For those seeking to streamline their finances into one manageable instalment.",
+                                "View Consolidation Loan", "/en/home/product-consolidation-loan/"),
+                            ("12% Loan:",
+                                "Benefit from our competitive 12% Loan, featuring a low interest rate for loans up to R50 000.",
+                                "View the 12% Loan", "/en/home/product-12-loan/"),
+                            ("Tech Deals:",
+                                "Explore our deals and add a cellphone, tablet or laptop to any loan.",
+                                "View Tech Deals", "/en/home/tech-deals/")
+                        ])
+                        .ToJsonString(),
+                ["image"] = null
+            };
+
+        var personalLoanUdis =
+            new[]
+            {
+                heroContentData["udi"]!.GetValue<string>(),
+                loanCalculatorContentData["udi"]!.GetValue<string>(),
+                creditLifeContentData["udi"]!.GetValue<string>(),
+                crossSellContentData["udi"]!.GetValue<string>()
+            };
+
+        var personalLoanSections =
+            new JsonObject
+            {
+                ["layout"] =
+                    new JsonObject
+                    {
+                        ["Umbraco.BlockList"] =
+                            new JsonArray(personalLoanUdis
+                                .Select(udi => (JsonNode)new JsonObject { ["contentUdi"] = udi })
+                                .ToArray())
+                    },
+                ["contentData"] =
+                    new JsonArray(
+                        heroContentData,
+                        loanCalculatorContentData,
+                        creditLifeContentData,
+                        crossSellContentData)
+            };
+
+        CreateOrUpdateProductLoanPage(
+            "Product Personal Loan",
+            legacyPersonalLoan.ParentId,
+            personalLoanSections);
+
+        Console.WriteLine(
+            "NOTE: FAQ and downloads sections were not migrated (Rich Text/" +
+            "Media Picker values) - add those two sections by hand in the " +
+            "backoffice.");
+    }
+
+    // --------------------------------------------------------
+    // CONSOLIDATION LOAN
+    // --------------------------------------------------------
+
+    Console.WriteLine();
+    Console.WriteLine("--- consolidation loan ---");
+
+    var legacyConsolidationLoan = FreeUpLegacyUrl("Consolidation Loan");
+
+    if (legacyConsolidationLoan == null)
+    {
+        Console.WriteLine(
+            "SKIP: no legacy 'Consolidation Loan' pageLoans node found - nothing to migrate.");
+    }
+    else
+    {
+        var demoNode =
+            contentService.GetPagedOfType(productLoanPageType.Id, 0, 500, out _, null!)
+                .FirstOrDefault(n =>
+                    n.Name != null &&
+                    n.Name.Equals(
+                        "Dynamic Page Demo - Consolidation Loan",
+                        StringComparison.OrdinalIgnoreCase));
+
+        if (demoNode != null)
+        {
+            demoNode.Name = "Product Consolidation Loan";
+
+            if (demoNode.ParentId != legacyConsolidationLoan.ParentId)
+            {
+                contentService.Move(demoNode, legacyConsolidationLoan.ParentId);
+            }
+
+            var saveResult = contentService.Save(demoNode);
+
+            if (!saveResult.Success)
+            {
+                Console.WriteLine($"FAILED SAVE: {demoNode.Name} (id={demoNode.Id})");
+            }
+            else
+            {
+                var publishResult = contentService.Publish(demoNode, new[] { "*" });
+
+                Console.WriteLine(
+                    publishResult.Success
+                        ? $"RENAMED + PUBLISHED: \"Product Consolidation Loan\" (id={demoNode.Id}), reusing its existing content"
+                        : $"SAVED BUT FAILED PUBLISH: {demoNode.Name} (id={demoNode.Id})");
+            }
+        }
+        else
+        {
+            Console.WriteLine(
+                "ERROR: no 'Dynamic Page Demo - Consolidation Loan' node found - " +
+                "run 'create-consolidation-loan-content' first, then re-run this command.");
+        }
+    }
+
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine("MIGRATION COMPLETE");
+    Console.WriteLine("=================================================");
+
+    return;
+}
+
+// ============================================================
 // FIND-ORPHANED-ELEMENTS COMMAND
 // ============================================================
 //
