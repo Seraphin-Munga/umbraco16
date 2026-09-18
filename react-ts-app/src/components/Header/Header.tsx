@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Logo } from '../icons/Logo';
 import { NavModal } from './NavModal';
 import {
@@ -26,6 +27,17 @@ const PERSONAL_MENU_GROUPS = PERSONAL_MENU_CATEGORY_ORDER.map((category) => ({
   pages: PERSONAL_MENU_PAGES.filter((page) => page.category === category),
   externalLinks: PERSONAL_MENU_EXTERNAL_LINKS.filter((link) => link.category === category),
 }));
+
+// CMS-sourced link.url values are either a relative in-app path or a fully
+// qualified off-site URL (see mapLinks' comment in contentApi.ts) - only
+// the former is safe to hand to react-router's Link (it treats its `to`
+// as an app-internal path regardless of shape, so pointing it at an
+// absolute "https://..." URL would mangle navigation instead of leaving
+// the page). "//" is excluded too since that's still protocol-relative to
+// another host.
+function isInternalPath(url: string): boolean {
+  return url.startsWith('/') && !url.startsWith('//');
+}
 
 export function Header() {
   const dispatch = useAppDispatch();
@@ -70,9 +82,9 @@ export function Header() {
                   <span className="icon-bar" />
                 </button>
 
-                <a className="navbar-brand" href="/en/home/">
+                <Link className="navbar-brand" to="/en/home/">
                   <Logo />
-                </a>
+                </Link>
               </div>
 
               <div className={`collapse navbar-collapse${navOpen ? ' in' : ''}`}>
@@ -98,9 +110,9 @@ export function Header() {
                     </a>
                   </li>
                   <li>
-                    <a href="/en/home/" className="no-left-padding">
+                    <Link to="/en/home/" className="no-left-padding">
                       <span className="visible-xs">Home</span>
-                    </a>
+                    </Link>
                   </li>
 
                   {loading && <li className="nav-status">Loading menu…</li>}
@@ -116,7 +128,11 @@ export function Header() {
                         if (link.url !== '#') {
                           return (
                             <li key={key}>
-                              <a href={link.url}>{link.title}</a>
+                              {isInternalPath(link.url) ? (
+                                <Link to={link.url}>{link.title}</Link>
+                              ) : (
+                                <a href={link.url}>{link.title}</a>
+                              )}
                             </li>
                           );
                         }
@@ -159,9 +175,13 @@ export function Header() {
                                                 <div className="product-category">{group.category}</div>
                                                 {group.pages.map((page) => (
                                                   <div className="product" key={page.path}>
-                                                    <a className="title" href={page.path}>
+                                                    <Link
+                                                      className="title"
+                                                      to={page.path}
+                                                      onClick={() => setOpenMegaMenuKey(null)}
+                                                    >
                                                       {page.title}
-                                                    </a>
+                                                    </Link>
                                                     <p className="descr">{page.description}</p>
                                                   </div>
                                                 ))}
@@ -188,16 +208,24 @@ export function Header() {
                                                       className="product"
                                                       key={`${linkGroupIndex}-${productLinkIndex}`}
                                                     >
-                                                      <a
-                                                        className="title"
-                                                        href={
-                                                          linkGroup.pageSection
-                                                            ? `${productLink.url}${linkGroup.pageSection}`
-                                                            : productLink.url
-                                                        }
-                                                      >
-                                                        {productLink.title}
-                                                      </a>
+                                                      {(() => {
+                                                        const productUrl = linkGroup.pageSection
+                                                          ? `${productLink.url}${linkGroup.pageSection}`
+                                                          : productLink.url;
+                                                        return isInternalPath(productUrl) ? (
+                                                          <Link
+                                                            className="title"
+                                                            to={productUrl}
+                                                            onClick={() => setOpenMegaMenuKey(null)}
+                                                          >
+                                                            {productLink.title}
+                                                          </Link>
+                                                        ) : (
+                                                          <a className="title" href={productUrl}>
+                                                            {productLink.title}
+                                                          </a>
+                                                        );
+                                                      })()}
                                                       <p className="descr">{linkGroup.menuDescription}</p>
                                                     </div>
                                                   )),
