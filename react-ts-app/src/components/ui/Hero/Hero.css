@@ -16,7 +16,10 @@
   border-radius: 24px;
   overflow: hidden;
   display: flex;
-  margin: 14px;
+  /* Top margin dropped - this always renders as the first thing on the
+     page (a hero), so the live page's own 14px-all-round margin left an
+     ugly gap under the header here. */
+  margin: 0 14px 14px;
   background-color: #000;
   box-sizing: border-box;
 }
@@ -50,11 +53,19 @@
 @media (max-width: 768px) {
   .contact-banner {
     height: 320px;
-    margin: 10px;
+    margin: 0 10px 10px;
     border-radius: 16px;
   }
 
   .contact-content {
     padding: 20px 25px;
   }
+}
+
+/* HeroSplit.tsx - the .mtb-120 utility (margin: 120px 0) also renders this
+   as the first thing on the page (a hero), so its own top margin left the
+   same kind of gap under the header .contact-banner's did. Keeps the
+   120px bottom margin - only the top gap is the bug. */
+.hero-split.mtb-120 {
+  margin-top: 0;
 }
