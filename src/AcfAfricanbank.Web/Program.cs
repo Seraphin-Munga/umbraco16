@@ -302,25 +302,6 @@ if (args.Length > 0 &&
     var localConnectionString =
         $"Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog={localDatabaseName};Integrated Security=True";
 
-    // LocalDB's own SQL Server engine version is newer (2022) than the
-    // actual remote target (MTWSQL2019 - SQL Server 2019) - confirmed
-    // live: DacFx embeds a "target platform" in whatever it extracts
-    // based on the source database's own COMPATIBILITY_LEVEL, and refuses
-    // to deploy/import anything declaring a newer platform than the real
-    // target server ("A project which specifies SQL Server 2022 ... cannot
-    // be published to SQL Server 2019"). Lowering compatibility level to
-    // 150 (SQL Server 2019) on the LOCAL database only - a personal
-    // sandbox, not the shared remote server - fixes what DacFx embeds
-    // without touching anything on the remote end.
-    await using (var compatConnection = new SqlConnection(localConnectionString))
-    {
-        await compatConnection.OpenAsync();
-
-        await ExecuteSqlAsync(
-            compatConnection,
-            $"ALTER DATABASE [{localDatabaseName}] SET COMPATIBILITY_LEVEL = 150;");
-    }
-
     var remoteBuilder = new SqlConnectionStringBuilder(targetConnectionString);
     var remoteDatabaseName = remoteBuilder.InitialCatalog;
 
@@ -445,6 +426,21 @@ if (args.Length > 0 &&
             var deployOptions = new DacDeployOptions
             {
                 BlockOnPossibleDataLoss = false,
+                // LocalDB's own engine is a newer SQL Server version (2022)
+                // than the real remote target (MTWSQL2019 - SQL Server
+                // 2019) - confirmed live: DacFx embeds a "target platform"
+                // in whatever it extracts based on the actual connected
+                // engine version (not a per-database COMPATIBILITY_LEVEL
+                // setting - tried that first, made no difference), and
+                // refuses to deploy anything declaring a newer platform
+                // than the real target ("cannot be published to SQL Server
+                // 2019"). This is the documented, supported bypass for
+                // exactly that check (mirrors SqlPackage's own
+                // /p:AllowIncompatiblePlatform=true) - the schema itself
+                // doesn't actually use any 2022-only feature, so there's
+                // nothing for the older server to reject once deployment
+                // is allowed to proceed.
+                AllowIncompatiblePlatform = true,
             };
 
             deployDac.Deploy(dacpac, remoteDatabaseName, upgradeExisting: true, deployOptions);
