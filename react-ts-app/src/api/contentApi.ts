@@ -203,11 +203,28 @@ function mapLinks(value: unknown): DeliveryLink[] {
   // wrongly assumed and then concatenated - producing "##" and breaking
   // the `!== '#'` check in Header.tsx worse than before). queryString
   // isn't needed for that comparison at all.
-  return value.map((raw: Record<string, unknown>) => ({
-    url: typeof raw?.url === 'string' ? raw.url : '#',
-    title: typeof raw?.title === 'string' ? raw.title : String(raw?.name ?? ''),
-    target: typeof raw?.target === 'string' ? raw.target : null,
-  }));
+  //
+  // ALSO confirmed against a live response (topNavigation's own menuList,
+  // which is exactly this shape): url is "#" for that same reason on an
+  // *internal page* link too, not just a genuinely-unset one - Umbraco's
+  // Delivery API puts an internal link's real destination under
+  // `route.path` instead (the same shape fetchContentByRoute/route.path
+  // reads elsewhere in this file), never in `url` itself. An earlier
+  // version of this function only read `url`, so every internal-page menu/
+  // CTA link silently resolved to "#" and appeared to do nothing when
+  // clicked - falling back to `route.path` when `url` is "#" fixes that
+  // without changing anything for a genuinely external link (which does
+  // carry a real `url` and has no `route`).
+  return value.map((raw: Record<string, unknown>) => {
+    const url = typeof raw?.url === 'string' ? raw.url : '#';
+    const routePath = (raw?.route as { path?: unknown } | null | undefined)?.path;
+
+    return {
+      url: url === '#' && typeof routePath === 'string' ? routePath : url,
+      title: typeof raw?.title === 'string' ? raw.title : String(raw?.name ?? ''),
+      target: typeof raw?.target === 'string' ? raw.target : null,
+    };
+  });
 }
 
 function mapRichText(value: unknown): string {
