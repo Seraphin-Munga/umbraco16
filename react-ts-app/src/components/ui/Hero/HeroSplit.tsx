@@ -34,7 +34,7 @@ export function HeroSplit({
   const hasImage = Boolean(imageUrl);
 
   return (
-    <section className="hero-split mtb-120">
+    <section className="hero-split mtb-120 bg-grey-60">
       <div className="container">
         <div className="row d-flex align-items-center row-change md-text-center">
           <div className={hasImage ? 'col-xl-6 col-lg-6 col-md-6' : 'col-xl-12 col-lg-12 col-md-12'}>

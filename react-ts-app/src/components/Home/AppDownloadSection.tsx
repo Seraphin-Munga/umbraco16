@@ -26,13 +26,13 @@ export function AppDownloadSection({
   heading,
 }: AppDownloadSectionProps) {
   return (
-    <section className="mtb-120">
+    <section className="section pb-40 pt-40">
       <div className="container">
-        <div className="row d-flex row-change md-text-center">
+        <div className="row align-items-center row-change d-flex flex-row-reverse md-text-center">
           <div className="col-xl-6 col-lg-6 col-md-6">
-            <h1 className="color-brand-1 major-title mb-20">{heading}</h1>
+            <h1 className="color-brand-1 mb-20">{heading}</h1>
 
-            <h4 className="color-brand-1 mb-20">{subheading}</h4>
+            {subheading && <h4 className="color-brand-1 mb-20">{subheading}</h4>}
             <p className="font-md color-brand-1">{description}</p>
 
             {downloadUrl && downloadLabel && (
