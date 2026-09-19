@@ -209,14 +209,38 @@ if (args.Length > 0 &&
     Console.WriteLine("=================================================");
     Console.WriteLine();
 
-    // Matches appsettings.json's own committed LocalDB connection string
-    // verbatim - that file's personal-sandbox entry, not the (possibly
-    // user-secrets-overridden) umbracoDbDSN this command's own target
-    // uses below. |DataDirectory| resolves via the same AppDomain.SetData
-    // call this file makes for itself, above.
-    const string localConnectionString =
-        "Data Source=(localdb)\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\\Umbraco16_AB_CMS_10Sept.mdf;Integrated Security=True";
+    // appsettings.json's own committed LocalDB connection string uses
+    // AttachDbFilename (an ad-hoc "attach this .mdf file for the duration
+    // of this connection" style) - confirmed live: DacServices flatly
+    // rejects that as an unsupported connection string argument
+    // ("AttachDBFilename is not supported"). Attach the .mdf under its
+    // real name first (a plain SqlConnection, which - unlike DacServices -
+    // has no problem with AttachDbFilename) so it becomes an ordinary
+    // LocalDB database DacServices can address by Initial Catalog alone.
     const string localDatabaseName = "Umbraco16_AB_CMS_10Sept";
+
+    var dataDirectory = (string)AppDomain.CurrentDomain.GetData("DataDirectory")!;
+    var localMdfPath = Path.Combine(dataDirectory, $"{localDatabaseName}.mdf");
+
+    await using (var attachConnection =
+        new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Integrated Security=True"))
+    {
+        await attachConnection.OpenAsync();
+
+        await ExecuteSqlAsync(
+            attachConnection,
+            $"""
+            IF DB_ID('{localDatabaseName}') IS NULL
+            BEGIN
+                CREATE DATABASE [{localDatabaseName}]
+                ON (FILENAME = N'{localMdfPath}')
+                FOR ATTACH;
+            END
+            """);
+    }
+
+    var localConnectionString =
+        $"Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog={localDatabaseName};Integrated Security=True";
 
     var remoteBuilder = new SqlConnectionStringBuilder(targetConnectionString);
     var remoteDatabaseName = remoteBuilder.InitialCatalog;
