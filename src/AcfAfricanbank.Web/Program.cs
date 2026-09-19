@@ -509,6 +509,9 @@ if (args.Length > 0 &&
         string name,
         params IContentType[] allowedElementTypes)
     {
+        var desiredKeys =
+            allowedElementTypes.Select(t => t.Key.ToString()).ToList();
+
         var existing =
             (await dataTypeService.GetAllAsync())
                 .FirstOrDefault(d =>
@@ -517,9 +520,69 @@ if (args.Length > 0 &&
 
         if (existing != null)
         {
-            Console.WriteLine($"EXISTS BLOCKLIST DATATYPE: {name}");
+            // Self-healing: a Data Type this same name was already created
+            // for may be missing block types a later code change added to
+            // the call (e.g. heroImageBannerBlock added to homePage's
+            // allowed sections after the first run already created this
+            // Data Type) - GetOrCreateType already does the equivalent for
+            // properties on a content type; this is that same idea for a
+            // Block List's own allowed-blocks config. Mirrors create-
+            // product-loan-schema's own copy of this helper.
+            var existingBlocks =
+                existing.ConfigurationData.TryGetValue("blocks", out var rawBlocks)
+                    ? rawBlocks
+                    : null;
 
-            return existing;
+            var existingKeys =
+                (existingBlocks as IEnumerable<object>)?
+                    .OfType<IDictionary<string, object>>()
+                    .Select(b =>
+                        b.TryGetValue("contentElementTypeKey", out var k)
+                            ? k?.ToString()
+                            : null)
+                    .Where(k => k != null)
+                    .Cast<string>()
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase)
+                ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            var missingKeys =
+                desiredKeys.Where(k => !existingKeys.Contains(k)).ToList();
+
+            if (missingKeys.Count == 0)
+            {
+                Console.WriteLine($"EXISTS BLOCKLIST DATATYPE: {name}");
+
+                return existing;
+            }
+
+            var updatedBlocks =
+                desiredKeys
+                    .Select(k => new Dictionary<string, object>
+                    {
+                        ["contentElementTypeKey"] = k
+                    })
+                    .ToList();
+
+            existing.ConfigurationData =
+                new Dictionary<string, object> { ["blocks"] = updatedBlocks };
+
+            var updateResult =
+                await dataTypeService.UpdateAsync(
+                    existing,
+                    Constants.Security.SuperUserKey);
+
+            if (!updateResult.Success)
+            {
+                throw new InvalidOperationException(
+                    $"Could not update block list data type '{name}': " +
+                    updateResult.Status);
+            }
+
+            Console.WriteLine(
+                $"UPDATED BLOCKLIST DATATYPE: {name} " +
+                $"(+{missingKeys.Count} block type(s), {updatedBlocks.Count} total)");
+
+            return updateResult.Result;
         }
 
         if (!propertyEditors.TryGet("Umbraco.BlockList", out var editor))
@@ -529,10 +592,10 @@ if (args.Length > 0 &&
         }
 
         var blocks =
-            allowedElementTypes
-                .Select(t => new Dictionary<string, object>
+            desiredKeys
+                .Select(k => new Dictionary<string, object>
                 {
-                    ["contentElementTypeKey"] = t.Key.ToString()
+                    ["contentElementTypeKey"] = k
                 })
                 .ToList();
 
@@ -718,6 +781,146 @@ if (args.Length > 0 &&
             new PropSpec("gridItems", "Product Grid Items", heroGridItems),
             new PropSpec("autoAdvanceSeconds", "Auto-Advance Seconds", num));
 
+    // Full-bleed background-photo hero (react-ts-app's HeroBanner.tsx) - a
+    // second, visually distinct hero style from heroBannerBlock's own
+    // two-column layout (see PRODUCT LOAN PAGE SECTION BLOCKS below): a
+    // dark overlay across a CMS-picked photo, e.g. the Personal Loan
+    // "We give credit / where progress is due" hero. headingLead/
+    // headingHighlight are two plain fields (thin line, then bold line)
+    // rather than one string parsed by a heuristic - same reasoning as
+    // myWorldAccountBlock's own heading/highlightWord split.
+    var heroImageBannerBlock =
+        GetOrCreateType(
+            "heroImageBannerBlock", "Hero Image Banner", "icon-picture", true, false,
+            new PropSpec("headingLead", "Heading (thin line)", txt),
+            new PropSpec("headingHighlight", "Heading (bold line)", txt),
+            new PropSpec("description", "Description", txtArea),
+            new PropSpec("primaryCta", "Primary Button", link),
+            new PropSpec("secondaryCta", "Secondary Button", link),
+            new PropSpec("image", "Background Image", media),
+            new PropSpec("imageAlt", "Image Alt Text", txt));
+
+    // Two-column promo with two pill CTAs (a filled primary + an outlined
+    // secondary) - e.g. the MyWORLD "Bank Account" promo
+    // (react-ts-app's PromoSplit.tsx). imageOnRight mirrors
+    // loanCalculatorBlock's own property of the same name/purpose.
+    var promoSplitBlock =
+        GetOrCreateType(
+            "promoSplitBlock", "Promo Split", "icon-newspaper", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("description", "Description", txtArea),
+            new PropSpec("primaryCta", "Primary Button", link),
+            new PropSpec("secondaryCta", "Secondary Button", link),
+            new PropSpec("image", "Image", media),
+            new PropSpec("imageAlt", "Image Alt Text", txt),
+            new PropSpec("imageOnRight", "Image On Right", boolType));
+
+    // Two-column feature list (bold-lead lines, not a checklist) beside a
+    // photo - e.g. "Why Choose MyWORLD?" (react-ts-app's FeatureSplit.tsx).
+    // Reuses contentCard for its feature items (title+description already
+    // matches; each item's own cta is simply left unset here, same as
+    // crossSellBlock/bankWithAudacityBlock reusing this same element type
+    // for a different shape of block).
+    var featureSplitFeatures =
+        await GetOrCreateBlockListAsync(
+            "React Migration - featureSplitBlock.features", contentCard);
+
+    var featureSplitBlock =
+        GetOrCreateType(
+            "featureSplitBlock", "Feature Split", "icon-bulleted-list", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("features", "Features", featureSplitFeatures),
+            new PropSpec("cta", "Button", link),
+            new PropSpec("image", "Image", media),
+            new PropSpec("imageAlt", "Image Alt Text", txt),
+            new PropSpec("imageOnRight", "Image On Right", boolType));
+
+    // Two-column checkmarked feature list beside a photo, with its own
+    // eyebrow subheading and CTA - e.g. "What is a Pocket Account"
+    // (react-ts-app's FeatureChecklist.tsx). Reuses featureItem (same
+    // plain-text shape myWorldAccountBlock's own checklist already uses).
+    var featureChecklistFeatures =
+        await GetOrCreateBlockListAsync(
+            "React Migration - featureChecklistBlock.features", featureItem);
+
+    var featureChecklistBlock =
+        GetOrCreateType(
+            "featureChecklistBlock", "Feature Checklist", "icon-checkbox", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("subheading", "Subheading (eyebrow)", txt),
+            new PropSpec("features", "Features", featureChecklistFeatures),
+            new PropSpec("cta", "Button", link),
+            new PropSpec("image", "Image", media),
+            new PropSpec("imageAlt", "Image Alt Text", txt),
+            new PropSpec("imageOnRight", "Image On Right", boolType));
+
+    // faqSectionBlock/downloadsSectionBlock/crossSellBlock/
+    // creditLifeInsuranceBlock are general-purpose (originally built for
+    // Product Loan pages - see create-product-loan-schema below - but not
+    // exclusive to them). Defined here too (idempotent, same alias/shape -
+    // either command can run first) so they're also available on
+    // homePage's own "sections" Block List, not just productLoanPage's.
+    var faqItem =
+        GetOrCreateType(
+            "faqItem", "FAQ Item", "icon-help-alt", true, false,
+            new PropSpec("question", "Question", txt),
+            new PropSpec("answer", "Answer", rte));
+
+    var faqItems =
+        await GetOrCreateBlockListAsync(
+            "React Migration - faqSectionBlock.items", faqItem);
+
+    var faqSectionBlock =
+        GetOrCreateType(
+            "faqSectionBlock", "FAQ Section", "icon-help-alt", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("items", "Questions", faqItems));
+
+    var downloadItem =
+        GetOrCreateType(
+            "downloadItem", "Download Item", "icon-download-alt", true, false,
+            new PropSpec("label", "Label", txt),
+            new PropSpec("file", "File", media));
+
+    var downloadsSectionItems =
+        await GetOrCreateBlockListAsync(
+            "React Migration - downloadsSectionBlock.items", downloadItem);
+
+    var downloadsSectionBlock =
+        GetOrCreateType(
+            "downloadsSectionBlock", "Downloads Section", "icon-download-alt", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("items", "Downloads", downloadsSectionItems));
+
+    var crossSellCards =
+        await GetOrCreateBlockListAsync(
+            "React Migration - crossSellBlock.cards", contentCard);
+
+    var crossSellBlock =
+        GetOrCreateType(
+            "crossSellBlock", "Cross-Sell", "icon-trolley", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("cards", "Cards", crossSellCards),
+            new PropSpec("image", "Image", media));
+
+    var creditLifeChecklistOne =
+        await GetOrCreateBlockListAsync(
+            "React Migration - creditLifeInsuranceBlock.checklistOne", featureItem);
+
+    var creditLifeChecklistTwo =
+        await GetOrCreateBlockListAsync(
+            "React Migration - creditLifeInsuranceBlock.checklistTwo", featureItem);
+
+    var creditLifeInsuranceBlock =
+        GetOrCreateType(
+            "creditLifeInsuranceBlock", "Credit Life Insurance", "icon-umbrella", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("paragraphOne", "Paragraph One", txtArea),
+            new PropSpec("paragraphTwo", "Paragraph Two", txtArea),
+            new PropSpec("checklistOne", "Checklist One", creditLifeChecklistOne),
+            new PropSpec("checklistTwo", "Checklist Two", creditLifeChecklistTwo),
+            new PropSpec("image", "Image", media));
+
     var bankWithAudacityCards =
         await GetOrCreateBlockListAsync(
             "React Migration - bankWithAudacityBlock.cards", contentCard);
@@ -828,6 +1031,10 @@ if (args.Length > 0 &&
         await GetOrCreateBlockListAsync(
             "React Migration - homePage.sections",
             heroCarouselBlock,
+            heroImageBannerBlock,
+            promoSplitBlock,
+            featureSplitBlock,
+            featureChecklistBlock,
             bankWithAudacityBlock,
             loanCalculatorBlock,
             myWorldAccountBlock,
@@ -836,7 +1043,11 @@ if (args.Length > 0 &&
             tap2GlassBlock,
             businessAudacityBlock,
             appDownloadBlock,
-            testimonialsBlock);
+            testimonialsBlock,
+            faqSectionBlock,
+            downloadsSectionBlock,
+            crossSellBlock,
+            creditLifeInsuranceBlock);
 
     var homePage =
         GetOrCreateType(
@@ -1371,12 +1582,13 @@ if (args.Length > 0 &&
     // ==========================================================
     // GLOBAL / SHARED ELEMENT TYPES
     // ==========================================================
-    // Not scoped to the product loan page - faqItem/faqSectionBlock are
-    // general-purpose and meant to be added to any other page's own
-    // "sections" Block List later without redefining them (see this
-    // command's own top comment). contentCard and featureItem are reused
-    // as-is from create-home-schema (same alias, same shape) rather than
-    // redefined here.
+    // Not scoped to the product loan page. contentCard, featureItem,
+    // faqItem/faqSectionBlock, downloadItem/downloadsSectionBlock,
+    // crossSellBlock and creditLifeInsuranceBlock are all reused as-is from
+    // create-home-schema (same alias, same shape, idempotent - either
+    // command can run first) rather than redefined here - homePage's own
+    // "sections" Block List already includes all of them too, so none of
+    // these blocks are exclusive to Product Loan pages.
 
     Console.WriteLine();
     Console.WriteLine("--- global/shared element types ---");
@@ -1454,6 +1666,62 @@ if (args.Length > 0 &&
             new PropSpec("image", "Image", media),
             new PropSpec("imageAlt", "Image Alt Text", txt));
 
+    // Reused verbatim from create-home-schema (same alias/shape) - a
+    // genuinely global block, not just a home page one. If that command
+    // hasn't run yet on this database, this creates it fresh.
+    var heroImageBannerBlock =
+        GetOrCreateType(
+            "heroImageBannerBlock", "Hero Image Banner", "icon-picture", true, false,
+            new PropSpec("headingLead", "Heading (thin line)", txt),
+            new PropSpec("headingHighlight", "Heading (bold line)", txt),
+            new PropSpec("description", "Description", txtArea),
+            new PropSpec("primaryCta", "Primary Button", link),
+            new PropSpec("secondaryCta", "Secondary Button", link),
+            new PropSpec("image", "Background Image", media),
+            new PropSpec("imageAlt", "Image Alt Text", txt));
+
+    // Reused verbatim from create-home-schema (same alias/shape) - see that
+    // command's own comments for what each renders as in react-ts-app.
+    var promoSplitBlock =
+        GetOrCreateType(
+            "promoSplitBlock", "Promo Split", "icon-newspaper", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("description", "Description", txtArea),
+            new PropSpec("primaryCta", "Primary Button", link),
+            new PropSpec("secondaryCta", "Secondary Button", link),
+            new PropSpec("image", "Image", media),
+            new PropSpec("imageAlt", "Image Alt Text", txt),
+            new PropSpec("imageOnRight", "Image On Right", boolType));
+
+    var featureSplitFeatures =
+        await GetOrCreateBlockListAsync(
+            "React Migration - featureSplitBlock.features", contentCard);
+
+    var featureSplitBlock =
+        GetOrCreateType(
+            "featureSplitBlock", "Feature Split", "icon-bulleted-list", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("features", "Features", featureSplitFeatures),
+            new PropSpec("cta", "Button", link),
+            new PropSpec("image", "Image", media),
+            new PropSpec("imageAlt", "Image Alt Text", txt),
+            new PropSpec("imageOnRight", "Image On Right", boolType));
+
+    var featureChecklistFeatures =
+        await GetOrCreateBlockListAsync(
+            "React Migration - featureChecklistBlock.features", featureItem);
+
+    var featureChecklistBlock =
+        GetOrCreateType(
+            "featureChecklistBlock", "Feature Checklist", "icon-checkbox", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("subheading", "Subheading (eyebrow)", txt),
+            new PropSpec("features", "Features", featureChecklistFeatures),
+            new PropSpec("cta", "Button", link),
+            new PropSpec("image", "Image", media),
+            new PropSpec("imageAlt", "Image Alt Text", txt),
+            new PropSpec("imageOnRight", "Image On Right", boolType));
+
     var creditLifeChecklistOne =
         await GetOrCreateBlockListAsync(
             "React Migration - creditLifeInsuranceBlock.checklistOne", featureItem);
@@ -1517,6 +1785,10 @@ if (args.Length > 0 &&
         await GetOrCreateBlockListAsync(
             "React Migration - productLoanPage.sections",
             heroBannerBlock,
+            heroImageBannerBlock,
+            promoSplitBlock,
+            featureSplitBlock,
+            featureChecklistBlock,
             loanCalculatorBlock,
             creditLifeInsuranceBlock,
             faqSectionBlock,
@@ -1893,7 +2165,7 @@ if (args.Length > 0 &&
 
     var productLoanPageType = contentTypeService.Get("productLoanPage");
     var pageLoansType = contentTypeService.Get("pageLoans");
-    var heroBannerBlockType = contentTypeService.Get("heroBannerBlock");
+    var heroImageBannerBlockType = contentTypeService.Get("heroImageBannerBlock");
     var loanCalculatorBlockType = contentTypeService.Get("loanCalculatorBlock");
     var creditLifeInsuranceBlockType = contentTypeService.Get("creditLifeInsuranceBlock");
     var featureItemType = contentTypeService.Get("featureItem");
@@ -1901,7 +2173,7 @@ if (args.Length > 0 &&
     var contentCardType = contentTypeService.Get("contentCard");
 
     if (productLoanPageType == null || pageLoansType == null ||
-        heroBannerBlockType == null || loanCalculatorBlockType == null ||
+        heroImageBannerBlockType == null || loanCalculatorBlockType == null ||
         creditLifeInsuranceBlockType == null || featureItemType == null ||
         crossSellBlockType == null || contentCardType == null)
     {
@@ -2092,12 +2364,21 @@ if (args.Length > 0 &&
             "https://www.africanbank.co.za/en/home/get-a-quote?" +
             "utm_source=Website&utm_medium=Productpage&utm_campaign=WebLead";
 
+        // heroImageBannerBlock, not heroBannerBlock - this hero is the
+        // full-bleed background-photo style (react-ts-app's HeroBanner.tsx),
+        // not the two-column one. Previously seeded as a heroBannerBlock
+        // with image left null, which rendered through a contact-banner/
+        // contact-overlay CSS class pair that was never actually styled
+        // anywhere in the app - switching block type fixes that and adds
+        // real (if still-empty) background image support. Attach the photo
+        // via the backoffice's Media Picker once you have it.
         var heroContentData =
             new JsonObject
             {
-                ["contentTypeKey"] = heroBannerBlockType.Key.ToString(),
+                ["contentTypeKey"] = heroImageBannerBlockType.Key.ToString(),
                 ["udi"] = $"umb://element/{Guid.NewGuid():N}",
-                ["heading"] = "We give credit where progress is due",
+                ["headingLead"] = "We give credit",
+                ["headingHighlight"] = "where progress is due",
                 ["description"] =
                     "At African Bank, we back the things that matter most - your " +
                     "education, your business, your home, your future - because " +

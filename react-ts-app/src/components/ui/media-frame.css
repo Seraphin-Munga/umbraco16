@@ -1,0 +1,28 @@
+/* Shared "blob" product-photo treatment used by HeroSplit, PromoSplit,
+   FeatureSplit and FeatureChecklist - a soft organic-shaped light backdrop
+   behind an image that's itself clipped to a similar rounded, non-
+   rectangular shape, matching the product photography style already used
+   across the live site's loan/account promo sections. */
+.product-image-frame {
+  position: relative;
+  width: 100%;
+}
+
+.product-image-frame::before {
+  content: '';
+  position: absolute;
+  inset: -4%;
+  background: #eceff3;
+  border-radius: 71% 29% 66% 34% / 41% 42% 58% 59%;
+  z-index: 0;
+}
+
+.product-image-frame img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 71% 29% 66% 34% / 41% 42% 58% 59%;
+}

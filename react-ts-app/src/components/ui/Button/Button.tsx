@@ -1,17 +1,19 @@
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from 'react';
 
 // Shared button so every "btn btn-brand-1 hover-up" / "btn-brand-link
-// hover-up" anchor across the ported site (see HeroCarousel.tsx,
-// MyWorldAccount.tsx, BankWithAudacity.tsx, etc.) goes through one place.
-// The classNames themselves come from the global vendor stylesheet
+// hover-up" / "btn btn-brand-secondary hover-up" anchor across the ported
+// site (see HeroCarousel.tsx, MyWorldAccount.tsx, BankWithAudacity.tsx,
+// Hero/HeroBanner.tsx, etc.) goes through one place. The classNames
+// themselves come from the global vendor stylesheet
 // (public/vendor/projectmagic.css) and Home.css, not from anything
 // defined here - this component only picks which of those to apply.
 // Renders an <a> when given an href, a <button> otherwise.
-export type ButtonVariant = 'brand-1' | 'brand-link';
+export type ButtonVariant = 'brand-1' | 'brand-link' | 'brand-secondary';
 
 const VARIANT_CLASS: Record<ButtonVariant, string> = {
   'brand-1': 'btn btn-brand-1',
   'brand-link': 'btn-brand-link',
+  'brand-secondary': 'btn btn-brand-secondary',
 };
 
 interface ButtonOwnProps {

@@ -1,6 +1,14 @@
 import type { ReactNode } from 'react';
 import type { AnyPageSection } from '../api/contentApi';
 import { HeroCarousel } from '../components/Home/HeroCarousel';
+import { HeroSplit } from '../components/ui/Hero/HeroSplit';
+import { HeroBanner } from '../components/ui/Hero/HeroBanner';
+import { PromoSplit } from '../components/ui/PromoSplit/PromoSplit';
+import { FeatureSplit } from '../components/ui/FeatureSplit/FeatureSplit';
+import { FeatureChecklist } from '../components/ui/FeatureChecklist/FeatureChecklist';
+import { DownloadsSection } from '../components/ui/DownloadsSection/DownloadsSection';
+import { FaqSection } from '../components/ui/FaqSection/FaqSection';
+import { CrossSell } from '../components/ui/CrossSell/CrossSell';
 import { BankWithAudacity } from '../components/Home/BankWithAudacity';
 import { LoanCalculator } from '../components/ui/LoanCalculator/LoanCalculator';
 import { MyWorldAccount } from '../components/Home/MyWorldAccount';
@@ -10,8 +18,6 @@ import { Tap2GlassSection } from '../components/Home/Tap2GlassSection';
 import { BusinessAudacitySection } from '../components/Home/BusinessAudacitySection';
 import { AppDownloadSection } from '../components/Home/AppDownloadSection';
 import { Testimonials } from '../components/Home/Testimonials';
-import { Accordion } from '../components/ui/Accordion/Accordion';
-import { Button } from '../components/ui/Button/Button';
 
 // Single shared block registry, used by Home.tsx, PersonalLoanPage.tsx AND
 // DynamicPage.tsx (the catch-all route for any new CMS page - see that
@@ -186,71 +192,82 @@ export function renderPageSection(section: AnyPageSection, index: number): React
       return <Testimonials key={index} videos={section.videos} heading={section.heading || undefined} />;
 
     case 'heroBannerBlock':
-      // Two layouts share this one block type: Personal Loan's hero has no
-      // photo (a plain overlay banner, its original hardcoded look), while
-      // a hero with an image (e.g. Consolidation Loan) gets a two-column
-      // text+photo layout instead - same "optional image changes the
-      // layout" pattern loanCalculatorBlock's own imagePosition already
-      // uses elsewhere.
-      return section.imageUrl ? (
-        <section className="mtb-120" key={index}>
-          <div className="container">
-            <div className="row d-flex align-items-center row-change md-text-center">
-              <div className="col-xl-6 col-lg-6 col-md-6">
-                <h1 className="color-brand-1 major-title mb-20">{section.heading}</h1>
-                <p className="font-md color-brand-1">{section.description}</p>
-                <div className="combo-btn mt-50 text-start column1">
-                  {section.primaryCta && (
-                    <p className="combo-btn-text primary">
-                      <Button href={section.primaryCta.url}>{section.primaryCta.label}</Button>
-                    </p>
-                  )}
-                  {section.secondaryCta && (
-                    <p className="combo-btn-text secondary">
-                      <Button href={section.secondaryCta.url} variant="brand-link">
-                        {section.secondaryCta.label}
-                      </Button>
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div className="col-xl-6 col-lg-6 col-md-6">
-                <img className="d-block" src={section.imageUrl} alt={section.imageAlt} />
-              </div>
-            </div>
-          </div>
-        </section>
-      ) : (
-        <section className="section-banner" key={index}>
-          <div className="contact-banner">
-            <div className="contact-overlay">
-              <div className="contact-content">
-                <h1 className="text-white major-title mb-10">{section.heading}</h1>
-                <p className="text-white major-title mb-10">{section.description}</p>
-                <div className="combo-btn">
-                  {section.primaryCta && (
-                    <div className="text-start column1">
-                      <p className="combo-btn-text primary">
-                        <a href={section.primaryCta.url} className="btn btn-brand-secondary hover-up">
-                          {section.primaryCta.label}
-                        </a>
-                      </p>
-                    </div>
-                  )}
-                  {section.secondaryCta && (
-                    <div className="text-start column2">
-                      <p className="combo-btn-text secondary">
-                        <a href={section.secondaryCta.url} className="btn btn-brand-1 hover-up">
-                          {section.secondaryCta.label}
-                        </a>
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+      // Two-column hero (HeroSplit) - e.g. Consolidation Loan's "Combine up
+      // to 5 loans in 1". See heroImageBannerBlock below for the other,
+      // full-bleed hero style (e.g. Personal Loan's "We give credit").
+      return (
+        <HeroSplit
+          key={index}
+          heading={section.heading}
+          description={section.description}
+          primaryCta={section.primaryCta}
+          secondaryCta={section.secondaryCta}
+          imageUrl={section.imageUrl}
+          imageAlt={section.imageAlt}
+        />
+      );
+
+    case 'heroImageBannerBlock':
+      // Full-bleed background-photo hero (HeroBanner) - e.g. Personal
+      // Loan's "We give credit / where progress is due".
+      return (
+        <HeroBanner
+          key={index}
+          headingLead={section.headingLead}
+          headingHighlight={section.headingHighlight}
+          description={section.description}
+          primaryCta={section.primaryCta}
+          secondaryCta={section.secondaryCta}
+          imageUrl={section.imageUrl}
+          imageAlt={section.imageAlt}
+        />
+      );
+
+    case 'promoSplitBlock':
+      // Two-column promo, two pill CTAs (PromoSplit) - e.g. the MyWORLD
+      // "Bank Account" promo.
+      return (
+        <PromoSplit
+          key={index}
+          heading={section.heading}
+          description={section.description}
+          primaryCta={section.primaryCta}
+          secondaryCta={section.secondaryCta}
+          imageUrl={section.imageUrl}
+          imageAlt={section.imageAlt}
+          imageOnRight={section.imageOnRight}
+        />
+      );
+
+    case 'featureSplitBlock':
+      // Two-column bold-lead feature list (FeatureSplit) - e.g.
+      // "Why Choose MyWORLD?".
+      return (
+        <FeatureSplit
+          key={index}
+          heading={section.heading}
+          features={section.features}
+          cta={section.cta}
+          imageUrl={section.imageUrl}
+          imageAlt={section.imageAlt}
+          imageOnRight={section.imageOnRight}
+        />
+      );
+
+    case 'featureChecklistBlock':
+      // Two-column checkmarked feature list (FeatureChecklist) - e.g.
+      // "What is a Pocket Account".
+      return (
+        <FeatureChecklist
+          key={index}
+          heading={section.heading}
+          subheading={section.subheading}
+          features={section.features}
+          cta={section.cta}
+          imageUrl={section.imageUrl}
+          imageAlt={section.imageAlt}
+          imageOnRight={section.imageOnRight}
+        />
       );
 
     case 'creditLifeInsuranceBlock':
@@ -303,93 +320,20 @@ export function renderPageSection(section: AnyPageSection, index: number): React
 
     case 'faqSectionBlock':
       return (
-        <section className="section pt-45 pb-45" key={index}>
-          <div className="container">
-            <div className="row align-items-center d-flex row-change md-text-center">
-              <div className="col-xl-12 col-lg-12 col-md-12">
-                <h1 className="color-brand-1 mt-15 mb-20 text-center faqHeader">{section.heading}</h1>
-                <Accordion
-                  id={`accordionFAQ-${index}`}
-                  variant="style2"
-                  items={section.items.map((item) => ({
-                    title: item.question,
-                    content: <div dangerouslySetInnerHTML={{ __html: item.answerHtml }} />,
-                  }))}
-                />
-              </div>
-            </div>
-          </div>
-        </section>
+        <FaqSection
+          key={index}
+          id={`accordionFAQ-${index}`}
+          heading={section.heading}
+          items={section.items}
+        />
       );
 
     case 'downloadsSectionBlock':
-      return (
-        <section className="section pb-40 pt-40 bg-grey-60" key={index}>
-          <div className="container">
-            <div className="row d-flex align-items-center row-change md-text-center">
-              <div className="col-xl-6 col-lg-6 col-md-6">
-                <h1 className="color-brand-1 mt-15 mb-20">{section.heading}</h1>
-              </div>
-              <div className="col-xl-6 col-lg-6 col-md-6" />
-            </div>
-
-            <div className="campaign-list">
-              <ul>
-                {section.items.map((item, itemIndex) => (
-                  <li key={item.label}>
-                    <div className={`row no-gutter download-item${itemIndex === 0 ? ' first' : ''}`}>
-                      <div className="col-sm-9">
-                        <div className="download-descr">{item.label}</div>
-                      </div>
-                      <div className="col-sm-3">
-                        <a href={item.fileUrl} target="_blank" rel="noreferrer" className="download-btn">
-                          Download
-                        </a>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </section>
-      );
+      return <DownloadsSection key={index} heading={section.heading} items={section.items} />;
 
     case 'crossSellBlock':
       return (
-        <section className="section-800" key={index}>
-          <div className="container">
-            <div className="row d-flex align-items-center row-change md-text-center">
-              <div className="col-md-6">
-                <h1 className="color-brand-1 mt-15 mb-20">{section.heading}</h1>
-                <div className="row mt-5">
-                  {section.cards.map((card) => (
-                    <div className="col-md-6" key={card.id}>
-                      <div className="card-offer hover-up">
-                        <div className="card-info">
-                          <h4 className="color-brand-2">{card.title}</h4>
-                          <p className="font-sm color-grey-500 mb-15">{card.description}</p>
-                          <div className="box-button-offer">
-                            <a
-                              href={card.buttonUrl}
-                              className="btn btn-default font-sm-bold pl-0 color-brand-1 arrow-right"
-                              aria-label={card.buttonLabel || card.title}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              {section.imageUrl && (
-                <div className="col-md-6">
-                  <img className="d-block" src={section.imageUrl} alt="" />
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
+        <CrossSell key={index} heading={section.heading} cards={section.cards} imageUrl={section.imageUrl} />
       );
 
     default:

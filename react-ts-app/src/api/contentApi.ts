@@ -734,6 +734,45 @@ export type HomePageSection =
       gridItems: HeroProductGridItem[];
       autoAdvanceSeconds: number | null;
     }
+  | {
+      kind: 'heroImageBannerBlock';
+      headingLead: string;
+      headingHighlight: string;
+      description: string;
+      primaryCta: { label: string; url: string } | null;
+      secondaryCta: { label: string; url: string } | null;
+      imageUrl: string;
+      imageAlt: string;
+    }
+  | {
+      kind: 'promoSplitBlock';
+      heading: string;
+      description: string;
+      primaryCta: { label: string; url: string } | null;
+      secondaryCta: { label: string; url: string } | null;
+      imageUrl: string;
+      imageAlt: string;
+      imageOnRight: boolean;
+    }
+  | {
+      kind: 'featureSplitBlock';
+      heading: string;
+      features: { title: string; description: string }[];
+      cta: { label: string; url: string } | null;
+      imageUrl: string;
+      imageAlt: string;
+      imageOnRight: boolean;
+    }
+  | {
+      kind: 'featureChecklistBlock';
+      heading: string;
+      subheading: string;
+      features: string[];
+      cta: { label: string; url: string } | null;
+      imageUrl: string;
+      imageAlt: string;
+      imageOnRight: boolean;
+    }
   | { kind: 'bankWithAudacityBlock'; heading: string; cards: AudacityCard[] }
   | { kind: 'loanCalculatorBlock'; props: Partial<LoanCalculatorProps> }
   | {
@@ -792,6 +831,56 @@ export function mapHomePageSection(
         slides: mapBlocks(props.slides, mapHomeHeroSlide),
         gridItems: mapBlocks(props.gridItems, mapHomeGridItem),
         autoAdvanceSeconds: num(props.autoAdvanceSeconds),
+      };
+
+    case 'heroImageBannerBlock':
+      return {
+        kind: 'heroImageBannerBlock',
+        headingLead: str(props.headingLead),
+        headingHighlight: str(props.headingHighlight),
+        description: str(props.description),
+        primaryCta: mapButton(props.primaryCta),
+        secondaryCta: mapButton(props.secondaryCta),
+        imageUrl: mapMediaUrl(props.image),
+        imageAlt: str(props.imageAlt),
+      };
+
+    case 'promoSplitBlock':
+      return {
+        kind: 'promoSplitBlock',
+        heading: str(props.heading),
+        description: str(props.description),
+        primaryCta: mapButton(props.primaryCta),
+        secondaryCta: mapButton(props.secondaryCta),
+        imageUrl: mapMediaUrl(props.image),
+        imageAlt: str(props.imageAlt),
+        imageOnRight: props.imageOnRight !== false,
+      };
+
+    case 'featureSplitBlock':
+      return {
+        kind: 'featureSplitBlock',
+        heading: str(props.heading),
+        features: mapBlocks(props.features, (p) => ({
+          title: str(p.title),
+          description: str(p.description),
+        })),
+        cta: mapButton(props.cta),
+        imageUrl: mapMediaUrl(props.image),
+        imageAlt: str(props.imageAlt),
+        imageOnRight: props.imageOnRight === true,
+      };
+
+    case 'featureChecklistBlock':
+      return {
+        kind: 'featureChecklistBlock',
+        heading: str(props.heading),
+        subheading: str(props.subheading),
+        features: mapBlocks(props.features, (p) => str(p.text)).filter(Boolean),
+        cta: mapButton(props.cta),
+        imageUrl: mapMediaUrl(props.image),
+        imageAlt: str(props.imageAlt),
+        imageOnRight: props.imageOnRight === true,
       };
 
     case 'bankWithAudacityBlock':
