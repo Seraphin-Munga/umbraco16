@@ -242,12 +242,14 @@ if (args.Length > 0 &&
 //
 // Runs BEFORE Umbraco boots (raw SQL Server administration, same
 // reasoning as "reset" above) since the remote database needs to not
-// exist while it gets recreated from the bacpac.
+// exist yet for ImportBacpac to create it fresh.
 //
-// DESTRUCTIVE: drops the entire remote database and recreates it from the
-// local one. Uses the same interactive "type the database name to
-// confirm" guard as "reset" above (rather than a --force flag) so this
-// can't be scripted/automated past by accident.
+// NEVER DROPS ANYTHING: this only ever creates the remote database if it
+// doesn't already exist - if it does, it refuses and stops rather than
+// touching it (see the exists-check below). Still uses the same
+// interactive "type the database name to confirm" guard as "reset" above,
+// since creating a database on a shared server is still worth a deliberate
+// confirmation, even though nothing here is destructive.
 
 if (args.Length > 0 &&
     args[0].Equals("migrate-local-to-remote", StringComparison.OrdinalIgnoreCase))
@@ -340,9 +342,10 @@ if (args.Length > 0 &&
 
     Console.WriteLine();
     Console.WriteLine(
-        "This permanently DESTROYS everything currently in the remote " +
-        "database above and replaces it with a full copy of the local " +
-        "database.");
+        "This creates a brand-new remote database and imports a full copy " +
+        "of the local database into it. It never drops or modifies an " +
+        "existing database - if the remote database above already exists, " +
+        "this will refuse and stop further down instead of touching it.");
     Console.WriteLine();
     Console.Write($"Type the remote database name ({remoteDatabaseName}) to confirm: ");
 
@@ -370,40 +373,34 @@ if (args.Length > 0 &&
     Console.WriteLine("Export complete.");
     Console.WriteLine();
 
-    await using (var adminConnection = new SqlConnection(remoteServerConnectionString))
+    // This command never drops the remote database, under any
+    // circumstance - only ever creates it fresh via ImportBacpac below,
+    // which requires it to not already exist. If it does, stop here
+    // rather than touching it; removing/renaming it (if that's genuinely
+    // what's wanted) is a deliberate, separate, manual decision for
+    // whoever administers the remote server - not something this command
+    // does on your behalf.
+    await using (var checkConnection = new SqlConnection(remoteServerConnectionString))
     {
-        await adminConnection.OpenAsync();
+        await checkConnection.OpenAsync();
 
-        // Checked as its own plain read first, deliberately - SQL Server
-        // validates DROP DATABASE/ALTER DATABASE permission for a batch at
-        // compile time, regardless of whether an "IF DB_ID(...) IS NOT
-        // NULL" guard around it is even true at runtime. Sending that DDL
-        // text at all (even dead code inside a false branch) demands drop
-        // permission - which an identity that's only ever meant to CREATE
-        // a not-yet-existing database may not have. Only emit the DROP at
-        // all when the database is confirmed to actually exist.
         await using var existsCommand =
-            new SqlCommand($"SELECT DB_ID('{remoteDatabaseName}');", adminConnection);
+            new SqlCommand($"SELECT DB_ID('{remoteDatabaseName}');", checkConnection);
 
         var databaseExists = await existsCommand.ExecuteScalarAsync() is not DBNull and not null;
 
         if (databaseExists)
         {
-            Console.WriteLine($"Dropping remote database '{remoteDatabaseName}' ...");
+            Console.WriteLine(
+                $"REFUSED: remote database '{remoteDatabaseName}' already exists. " +
+                "This command never drops a database - remove or rename it " +
+                "yourself first (SSMS/sqlcmd) if you actually want to replace " +
+                "it, then re-run this command.");
 
-            await ExecuteSqlAsync(
-                adminConnection,
-                $"""
-                ALTER DATABASE [{remoteDatabaseName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-                DROP DATABASE [{remoteDatabaseName}];
-                """);
+            return;
+        }
 
-            Console.WriteLine("Dropped.");
-        }
-        else
-        {
-            Console.WriteLine($"Remote database '{remoteDatabaseName}' doesn't exist yet - nothing to drop.");
-        }
+        Console.WriteLine($"Remote database '{remoteDatabaseName}' doesn't exist yet - proceeding to create it.");
     }
 
     Console.WriteLine();
