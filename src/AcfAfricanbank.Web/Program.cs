@@ -232,24 +232,33 @@ if (args.Length > 0 &&
 // Copies this machine's local LocalDB database (the personal dev sandbox
 // connection string committed in appsettings.json - see that file's own
 // comment) onto the remote target database (umbracoDbDSN - normally set
-// via user-secrets, see MIGRATION.md) via a BACPAC export/import
-// (Microsoft.SqlServer.DacFx). Unlike a native SQL Server BACKUP/RESTORE,
-// this streams schema+data through THIS machine's own two connections
-// rather than needing a file path both SQL Server processes can see -
-// works as long as this machine can reach both databases over the
-// network, which matters here since local and remote are different
-// physical servers.
+// via user-secrets, see MIGRATION.md), using Microsoft.SqlServer.DacFx.
+// Unlike a native SQL Server BACKUP/RESTORE, this streams schema+data
+// through THIS machine's own two connections rather than needing a file
+// path both SQL Server processes can see - works as long as this machine
+// can reach both databases over the network, which matters here since
+// local and remote are different physical servers.
+//
+// NEVER DROPS OR RECREATES THE REMOTE DATABASE, under any circumstance.
+// Which of two paths runs depends entirely on whether it already exists
+// (checked below, before anything happens):
+//   - doesn't exist yet -> export+import a bacpac (schema+data in one
+//     step), which creates it fresh. Needs CREATE DATABASE permission.
+//   - already exists (e.g. a DBA created an empty shell for it ahead of
+//     time) -> extract a dacpac (schema only) from local and
+//     DacServices.Deploy it into the existing database - deploy targets
+//     an existing database by design, so this needs only ordinary
+//     db_owner/db_ddladmin rights within it, not CREATE/DROP DATABASE -
+//     then copy every table's data across directly via SqlBulkCopy
+//     (KeepIdentity, so every row keeps its original ID - essential,
+//     since Umbraco's internal references depend on exact IDs matching),
+//     with foreign keys disabled for the copy and re-enabled after.
 //
 // Runs BEFORE Umbraco boots (raw SQL Server administration, same
-// reasoning as "reset" above) since the remote database needs to not
-// exist yet for ImportBacpac to create it fresh.
-//
-// NEVER DROPS ANYTHING: this only ever creates the remote database if it
-// doesn't already exist - if it does, it refuses and stops rather than
-// touching it (see the exists-check below). Still uses the same
-// interactive "type the database name to confirm" guard as "reset" above,
-// since creating a database on a shared server is still worth a deliberate
-// confirmation, even though nothing here is destructive.
+// reasoning as "reset" above). Still uses the same interactive "type the
+// database name to confirm" guard as "reset" above - even though neither
+// path here is destructive, both make real changes on a shared server
+// worth a deliberate confirmation.
 
 if (args.Length > 0 &&
     args[0].Equals("migrate-local-to-remote", StringComparison.OrdinalIgnoreCase))
@@ -342,10 +351,11 @@ if (args.Length > 0 &&
 
     Console.WriteLine();
     Console.WriteLine(
-        "This creates a brand-new remote database and imports a full copy " +
-        "of the local database into it. It never drops or modifies an " +
-        "existing database - if the remote database above already exists, " +
-        "this will refuse and stop further down instead of touching it.");
+        "This copies the local database's schema and data onto the remote " +
+        "database above. If it doesn't exist yet, it gets created fresh; " +
+        "if it already exists, its schema is updated in place and every " +
+        "table's data is copied in - either way, the remote database is " +
+        "never dropped or recreated.");
     Console.WriteLine();
     Console.Write($"Type the remote database name ({remoteDatabaseName}) to confirm: ");
 
@@ -359,27 +369,18 @@ if (args.Length > 0 &&
         return;
     }
 
-    var bacpacPath =
-        Path.Combine(Path.GetTempPath(), $"local-migration-{Guid.NewGuid():N}.bacpac");
+    // This command never drops or recreates the remote database, under any
+    // circumstance. Which of the two paths below runs depends entirely on
+    // whether it already exists:
+    //   - doesn't exist yet -> export+import a bacpac, which creates it
+    //     fresh in one step (needs CREATE DATABASE permission).
+    //   - already exists (e.g. a DBA already created an empty shell for
+    //     it) -> deploy the schema into it (DacServices.Deploy, which
+    //     targets an existing database - no CREATE/DROP DATABASE
+    //     permission needed, just ordinary db_owner/db_ddladmin rights
+    //     within it) and then copy every table's data across directly.
+    bool databaseExists;
 
-    Console.WriteLine();
-    Console.WriteLine($"Exporting local database to {bacpacPath} ...");
-
-    var localDac = new DacServices(localConnectionString);
-    localDac.Message += (_, e) => Console.WriteLine($"  [export] {e.Message}");
-
-    localDac.ExportBacpac(bacpacPath, localDatabaseName);
-
-    Console.WriteLine("Export complete.");
-    Console.WriteLine();
-
-    // This command never drops the remote database, under any
-    // circumstance - only ever creates it fresh via ImportBacpac below,
-    // which requires it to not already exist. If it does, stop here
-    // rather than touching it; removing/renaming it (if that's genuinely
-    // what's wanted) is a deliberate, separate, manual decision for
-    // whoever administers the remote server - not something this command
-    // does on your behalf.
     await using (var checkConnection = new SqlConnection(remoteServerConnectionString))
     {
         await checkConnection.OpenAsync();
@@ -387,44 +388,164 @@ if (args.Length > 0 &&
         await using var existsCommand =
             new SqlCommand($"SELECT DB_ID('{remoteDatabaseName}');", checkConnection);
 
-        var databaseExists = await existsCommand.ExecuteScalarAsync() is not DBNull and not null;
+        databaseExists = await existsCommand.ExecuteScalarAsync() is not DBNull and not null;
+    }
 
-        if (databaseExists)
+    if (databaseExists)
+    {
+        Console.WriteLine();
+        Console.WriteLine(
+            $"Remote database '{remoteDatabaseName}' already exists - " +
+            "deploying the schema into it and copying data table-by-table " +
+            "(not dropping or recreating the database itself).");
+
+        var dacpacPath =
+            Path.Combine(Path.GetTempPath(), $"local-schema-{Guid.NewGuid():N}.dacpac");
+
+        Console.WriteLine();
+        Console.WriteLine($"Extracting local schema to {dacpacPath} ...");
+
+        var extractDac = new DacServices(localConnectionString);
+        extractDac.Message += (_, e) => Console.WriteLine($"  [extract] {e.Message}");
+
+        extractDac.Extract(
+            dacpacPath,
+            localDatabaseName,
+            "AcfAfricanbank",
+            new Version(1, 0, 0, 0));
+
+        Console.WriteLine("Extract complete.");
+        Console.WriteLine();
+        Console.WriteLine($"Deploying schema into '{remoteDatabaseName}' ...");
+
+        var deployDac = new DacServices(remoteServerConnectionString);
+        deployDac.Message += (_, e) => Console.WriteLine($"  [deploy] {e.Message}");
+
+        using (var dacpac = DacPackage.Load(dacpacPath))
         {
-            Console.WriteLine(
-                $"REFUSED: remote database '{remoteDatabaseName}' already exists. " +
-                "This command never drops a database - remove or rename it " +
-                "yourself first (SSMS/sqlcmd) if you actually want to replace " +
-                "it, then re-run this command.");
+            var deployOptions = new DacDeployOptions
+            {
+                BlockOnPossibleDataLoss = false,
+            };
 
-            return;
+            deployDac.Deploy(dacpac, remoteDatabaseName, upgradeExisting: true, deployOptions);
         }
 
-        Console.WriteLine($"Remote database '{remoteDatabaseName}' doesn't exist yet - proceeding to create it.");
+        Console.WriteLine("Schema deploy complete.");
+        Console.WriteLine();
+        Console.WriteLine("Copying table data (this can take a while for large tables) ...");
+
+        await using (var localDataConnection = new SqlConnection(localConnectionString))
+        await using (var remoteDataConnection = new SqlConnection(targetConnectionString))
+        {
+            await localDataConnection.OpenAsync();
+            await remoteDataConnection.OpenAsync();
+
+            var tables = await GetTableListAsync(localDataConnection);
+
+            Console.WriteLine(
+                "Disabling foreign key constraints on the remote database " +
+                "(re-enabled once every table is copied) ...");
+
+            await ExecuteSqlAsync(
+                remoteDataConnection,
+                """
+                DECLARE @sql NVARCHAR(MAX) = N'';
+                SELECT @sql += 'ALTER TABLE ' + QUOTENAME(SCHEMA_NAME(schema_id)) + '.' + QUOTENAME(name) + ' NOCHECK CONSTRAINT ALL;'
+                FROM sys.tables;
+                EXEC sp_executesql @sql;
+                """);
+
+            foreach (var table in tables)
+            {
+                Console.WriteLine($"  {table.Name} ({table.RowCount} rows) ...");
+
+                await using var sourceCommand =
+                    new SqlCommand($"SELECT * FROM [dbo].[{table.Name}];", localDataConnection)
+                    {
+                        CommandTimeout = 300,
+                    };
+
+                await using var reader = await sourceCommand.ExecuteReaderAsync();
+
+                using var bulkCopy = new SqlBulkCopy(
+                    remoteDataConnection,
+                    SqlBulkCopyOptions.KeepIdentity | SqlBulkCopyOptions.TableLock,
+                    externalTransaction: null)
+                {
+                    DestinationTableName = $"[dbo].[{table.Name}]",
+                    BulkCopyTimeout = 300,
+                };
+
+                await bulkCopy.WriteToServerAsync(reader);
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("Re-enabling foreign key constraints on the remote database ...");
+
+            await ExecuteSqlAsync(
+                remoteDataConnection,
+                """
+                DECLARE @sql NVARCHAR(MAX) = N'';
+                SELECT @sql += 'ALTER TABLE ' + QUOTENAME(SCHEMA_NAME(schema_id)) + '.' + QUOTENAME(name) + ' WITH CHECK CHECK CONSTRAINT ALL;'
+                FROM sys.tables;
+                EXEC sp_executesql @sql;
+                """);
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("=================================================");
+        Console.WriteLine("MIGRATION COMPLETE");
+        Console.WriteLine("=================================================");
+        Console.WriteLine();
+        Console.WriteLine(
+            $"Remote database '{remoteDatabaseName}' (the same database - " +
+            "never dropped) now has the local database's schema and data.");
+        Console.WriteLine(
+            $"Temporary dacpac file: {dacpacPath} (safe to delete once " +
+            "you've confirmed the app works).");
     }
-
-    Console.WriteLine();
-    Console.WriteLine($"Importing into remote database '{remoteDatabaseName}' ...");
-
-    var remoteDac = new DacServices(remoteServerConnectionString);
-    remoteDac.Message += (_, e) => Console.WriteLine($"  [import] {e.Message}");
-
-    using (var package = BacPackage.Load(bacpacPath))
+    else
     {
-        remoteDac.ImportBacpac(package, remoteDatabaseName);
+        Console.WriteLine();
+        Console.WriteLine($"Remote database '{remoteDatabaseName}' doesn't exist yet - creating it.");
+
+        var bacpacPath =
+            Path.Combine(Path.GetTempPath(), $"local-migration-{Guid.NewGuid():N}.bacpac");
+
+        Console.WriteLine();
+        Console.WriteLine($"Exporting local database to {bacpacPath} ...");
+
+        var localDac = new DacServices(localConnectionString);
+        localDac.Message += (_, e) => Console.WriteLine($"  [export] {e.Message}");
+
+        localDac.ExportBacpac(bacpacPath, localDatabaseName);
+
+        Console.WriteLine("Export complete.");
+        Console.WriteLine();
+        Console.WriteLine($"Importing into new remote database '{remoteDatabaseName}' ...");
+
+        var remoteDac = new DacServices(remoteServerConnectionString);
+        remoteDac.Message += (_, e) => Console.WriteLine($"  [import] {e.Message}");
+
+        using (var package = BacPackage.Load(bacpacPath))
+        {
+            remoteDac.ImportBacpac(package, remoteDatabaseName);
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("=================================================");
+        Console.WriteLine("MIGRATION COMPLETE");
+        Console.WriteLine("=================================================");
+        Console.WriteLine();
+        Console.WriteLine(
+            $"Remote database '{remoteDatabaseName}' was created and now " +
+            "contains a full copy of the local database.");
+        Console.WriteLine(
+            $"Temporary bacpac file: {bacpacPath} (safe to delete once " +
+            "you've confirmed the app works).");
     }
 
-    Console.WriteLine();
-    Console.WriteLine("=================================================");
-    Console.WriteLine("MIGRATION COMPLETE");
-    Console.WriteLine("=================================================");
-    Console.WriteLine();
-    Console.WriteLine(
-        $"Remote database '{remoteDatabaseName}' now contains a full copy " +
-        "of the local database (schema, content, everything).");
-    Console.WriteLine(
-        $"Temporary bacpac file: {bacpacPath} (safe to delete once you've " +
-        "confirmed the app works).");
     Console.WriteLine();
     Console.WriteLine(
         "Next: run the app normally ('dotnet run') to confirm it boots " +
