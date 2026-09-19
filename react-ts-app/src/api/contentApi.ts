@@ -1306,9 +1306,11 @@ export async function fetchLatestBlogPosts(signal?: AbortSignal): Promise<BlogPo
 // (_pageHeaderImage, _pageShoulder, _benefitsSection, _howToApplySection,
 // _heroKneeTabs, _testimonials, _campaignTabHeaders, _downloadList).
 // `pageLoans` is shared by every /product-*/ page (consolidation loan, 12%
-// loan, overdraft, ...) - each is one node under a fixed route
-// (src/routes/personalMenuPages.ts has them all), discriminated by that
-// route rather than by content type. fetchProductLoanPage takes that route
+// loan, overdraft, ...) - each is one node under a fixed route,
+// discriminated by that route rather than by content type. The site's own
+// CMS-managed navigation (topNavigation, read by fetchTopNavigation below)
+// is the source of truth for what routes exist - there's no separate
+// hardcoded route list in the app. fetchProductLoanPage takes that route
 // and walks the same child-lookup chain the Razor view does:
 //   pageLoans (by route)
 //     -> heroHeader / heroShoulder / heroChest / heroBody / heroKnees /
@@ -1643,8 +1645,9 @@ function mapProductCallMeBack(item: RawContentItem): ProductCallMeBack {
 
 /**
  * Fetches one pageLoans product page (personal loan, consolidation loan,
- * the 12% loan, ...) by its site route - see src/routes/personalMenuPages.ts
- * for the full list of routes this can be called with. Every section is
+ * the 12% loan, ...) by its site route - see the CMS-managed topNavigation
+ * content (fetchTopNavigation above) for the full list of routes this can
+ * be called with. Every section is
  * independently best-effort: a missing/misshapen child degrades that one
  * section to empty rather than failing the whole page (see this section's
  * top comment for why - no live Delivery API response was available to

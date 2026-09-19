@@ -2,11 +2,6 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Logo } from '../icons/Logo';
 import { NavModal } from './NavModal';
-import {
-  PERSONAL_MENU_CATEGORY_ORDER,
-  PERSONAL_MENU_EXTERNAL_LINKS,
-  PERSONAL_MENU_PAGES,
-} from '../../routes/personalMenuPages';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchHeaderNavigation } from '../../store/slices/headerSlice';
 import './Header.css';
@@ -15,18 +10,6 @@ import './Header.css';
 // fallback "Upload documents" link when a menu item's link has neither a
 // real URL nor a Target set.
 const ONLINE_UPLOAD_URL = import.meta.env.VITE_ONLINE_UPLOAD_URL || '#';
-
-// The "PERSONAL" top-level item's dropdown is rendered from our own ported
-// route list instead of the CMS fetch below - it always shows and links to
-// real routes in this app regardless of the Umbraco backend being reachable.
-// Every other top-level item (Business, etc.) still comes from the header
-// slice's fetchHeaderNavigation thunk (src/store/slices/headerSlice.ts) as
-// before.
-const PERSONAL_MENU_GROUPS = PERSONAL_MENU_CATEGORY_ORDER.map((category) => ({
-  category,
-  pages: PERSONAL_MENU_PAGES.filter((page) => page.category === category),
-  externalLinks: PERSONAL_MENU_EXTERNAL_LINKS.filter((link) => link.category === category),
-}));
 
 // CMS-sourced link.url values are either a relative in-app path or a fully
 // qualified off-site URL (see mapLinks' comment in contentApi.ts) - only
@@ -142,8 +125,7 @@ export function Header() {
                         // both a real target and no target at all, i.e. null).
                         if (link.target !== '') {
                           const isOpen = openMegaMenuKey === key;
-                          const isPersonalMenu = link.title.trim().toUpperCase() === 'PERSONAL';
-                          const hasMegaMenu = isPersonalMenu || menuItem.menus.length > 0;
+                          const hasMegaMenu = menuItem.menus.length > 0;
 
                           return (
                             <li
@@ -168,71 +150,43 @@ export function Header() {
                                 <div className="dropdown-menu">
                                   <div className="container">
                                     <div className="row eq-height">
-                                      {isPersonalMenu
-                                        ? PERSONAL_MENU_GROUPS.map((group) => (
-                                            <div className="col-sm-3" key={group.category}>
-                                              <div className="mega-menu-product">
-                                                <div className="product-category">{group.category}</div>
-                                                {group.pages.map((page) => (
-                                                  <div className="product" key={page.path}>
-                                                    <Link
-                                                      className="title"
-                                                      to={page.path}
-                                                      onClick={() => setOpenMegaMenuKey(null)}
-                                                    >
-                                                      {page.title}
-                                                    </Link>
-                                                    <p className="descr">{page.description}</p>
-                                                  </div>
-                                                ))}
-                                                {group.externalLinks.map((externalLink) => (
-                                                  <div className="product" key={externalLink.url}>
-                                                    <a className="title" href={externalLink.url}>
-                                                      {externalLink.title}
-                                                    </a>
-                                                    <p className="descr">{externalLink.description}</p>
-                                                  </div>
-                                                ))}
-                                              </div>
+                                      {menuItem.menus.map((category, categoryIndex) => (
+                                        <div className="col-sm-3" key={categoryIndex}>
+                                          <div className="mega-menu-product">
+                                            <div className="product-category">
+                                              {category.categoryName}
                                             </div>
-                                          ))
-                                        : menuItem.menus.map((category, categoryIndex) => (
-                                            <div className="col-sm-3" key={categoryIndex}>
-                                              <div className="mega-menu-product">
-                                                <div className="product-category">
-                                                  {category.categoryName}
+                                            {category.link.map((linkGroup, linkGroupIndex) =>
+                                              linkGroup.menuList.map((productLink, productLinkIndex) => (
+                                                <div
+                                                  className="product"
+                                                  key={`${linkGroupIndex}-${productLinkIndex}`}
+                                                >
+                                                  {(() => {
+                                                    const productUrl = linkGroup.pageSection
+                                                      ? `${productLink.url}${linkGroup.pageSection}`
+                                                      : productLink.url;
+                                                    return isInternalPath(productUrl) ? (
+                                                      <Link
+                                                        className="title"
+                                                        to={productUrl}
+                                                        onClick={() => setOpenMegaMenuKey(null)}
+                                                      >
+                                                        {productLink.title}
+                                                      </Link>
+                                                    ) : (
+                                                      <a className="title" href={productUrl}>
+                                                        {productLink.title}
+                                                      </a>
+                                                    );
+                                                  })()}
+                                                  <p className="descr">{linkGroup.menuDescription}</p>
                                                 </div>
-                                                {category.link.map((linkGroup, linkGroupIndex) =>
-                                                  linkGroup.menuList.map((productLink, productLinkIndex) => (
-                                                    <div
-                                                      className="product"
-                                                      key={`${linkGroupIndex}-${productLinkIndex}`}
-                                                    >
-                                                      {(() => {
-                                                        const productUrl = linkGroup.pageSection
-                                                          ? `${productLink.url}${linkGroup.pageSection}`
-                                                          : productLink.url;
-                                                        return isInternalPath(productUrl) ? (
-                                                          <Link
-                                                            className="title"
-                                                            to={productUrl}
-                                                            onClick={() => setOpenMegaMenuKey(null)}
-                                                          >
-                                                            {productLink.title}
-                                                          </Link>
-                                                        ) : (
-                                                          <a className="title" href={productUrl}>
-                                                            {productLink.title}
-                                                          </a>
-                                                        );
-                                                      })()}
-                                                      <p className="descr">{linkGroup.menuDescription}</p>
-                                                    </div>
-                                                  )),
-                                                )}
-                                              </div>
-                                            </div>
-                                          ))}
+                                              )),
+                                            )}
+                                          </div>
+                                        </div>
+                                      ))}
                                     </div>
                                   </div>
                                 </div>
