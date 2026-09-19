@@ -238,7 +238,8 @@ textarea {
 	border: 1px solid #29418A;
 	font-family: "Montserrat", sans-serif;
 	text-transform: uppercase;
-	color: #29418A;
+	background: #fff;
+	color: #002b60;
 	border-radius: 50px;
 	font-size: 14px;
 	font-weight: 600;
