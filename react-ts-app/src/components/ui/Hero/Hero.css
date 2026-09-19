@@ -1,29 +1,37 @@
-/* HeroBanner.tsx - full-bleed background hero. heroBannerBlock's own
-   contact-banner/contact-overlay classes (the pre-existing no-image branch
-   this replaces in renderPageSection.tsx) were never actually styled
-   anywhere in this app - .hero-banner defines real styling instead of
-   inheriting that gap. */
-.hero-banner {
+/* HeroBanner.tsx - full-bleed background hero. .contact-banner's rule below
+   is the real production CSS for this exact section (confirmed from a live
+   page, e.g. the Personal Loan "We give credit" hero) - background-image is
+   set inline per CMS image instead of the live page's own hardcoded
+   url(...). .contact-overlay's gradient matches Home.css's own
+   .carousel-overlay (the same live site's other confirmed overlay
+   treatment) rather than an invented value. .contact-content's own real
+   rule isn't confirmed - padding/max-width added so text reads well
+   against the photo. */
+.contact-banner {
   position: relative;
-  min-height: 480px;
-  display: flex;
-  align-items: center;
-  background-color: #002b60;
+  width: 100%;
+  height: 450px;
   background-size: cover;
   background-position: center;
+  border-radius: 24px;
   overflow: hidden;
+  display: flex;
+  margin: 14px;
+  background-color: #000;
+  box-sizing: border-box;
 }
 
-.hero-banner__overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, #002a60e0 0%, #002a6099 45%, #002a6040 100%);
-}
-
-.hero-banner__content {
+.contact-overlay {
   position: relative;
-  z-index: 1;
-  padding: 60px 15px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  background: transparent linear-gradient(270deg, #002a602e 0%, #002a6085 38%, #002a60ba 100%) 0% 0% no-repeat padding-box;
+}
+
+.contact-content {
+  padding: 40px 50px;
   max-width: 700px;
 }
 
@@ -40,11 +48,13 @@
 }
 
 @media (max-width: 768px) {
-  .hero-banner {
-    min-height: 360px;
+  .contact-banner {
+    height: 320px;
+    margin: 10px;
+    border-radius: 16px;
   }
 
-  .hero-banner__content {
-    padding: 40px 15px;
+  .contact-content {
+    padding: 20px 25px;
   }
 }
