@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Data.SqlClient;
+using Microsoft.SqlServer.Dac;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -171,6 +172,174 @@ if (args.Length > 0 &&
         "Next: run the app normally once (no args) to let Umbraco");
     Console.WriteLine(
         "rebuild its schema fresh, then run 'create-home-schema' again.");
+
+    return;
+}
+
+// ============================================================
+// MIGRATE-LOCAL-TO-REMOTE COMMAND
+// ============================================================
+//
+// Copies this machine's local LocalDB database (the personal dev sandbox
+// connection string committed in appsettings.json - see that file's own
+// comment) onto the remote target database (umbracoDbDSN - normally set
+// via user-secrets, see MIGRATION.md) via a BACPAC export/import
+// (Microsoft.SqlServer.DacFx). Unlike a native SQL Server BACKUP/RESTORE,
+// this streams schema+data through THIS machine's own two connections
+// rather than needing a file path both SQL Server processes can see -
+// works as long as this machine can reach both databases over the
+// network, which matters here since local and remote are different
+// physical servers.
+//
+// Runs BEFORE Umbraco boots (raw SQL Server administration, same
+// reasoning as "reset" above) since the remote database needs to not
+// exist while it gets recreated from the bacpac.
+//
+// DESTRUCTIVE: drops the entire remote database and recreates it from the
+// local one. Uses the same interactive "type the database name to
+// confirm" guard as "reset" above (rather than a --force flag) so this
+// can't be scripted/automated past by accident.
+
+if (args.Length > 0 &&
+    args[0].Equals("migrate-local-to-remote", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" MIGRATE LOCAL DATABASE -> REMOTE TARGET (BACPAC)");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    // Matches appsettings.json's own committed LocalDB connection string
+    // verbatim - that file's personal-sandbox entry, not the (possibly
+    // user-secrets-overridden) umbracoDbDSN this command's own target
+    // uses below. |DataDirectory| resolves via the same AppDomain.SetData
+    // call this file makes for itself, above.
+    const string localConnectionString =
+        "Data Source=(localdb)\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\\Umbraco16_AB_CMS_10Sept.mdf;Integrated Security=True";
+    const string localDatabaseName = "Umbraco16_AB_CMS_10Sept";
+
+    var remoteBuilder = new SqlConnectionStringBuilder(targetConnectionString);
+    var remoteDatabaseName = remoteBuilder.InitialCatalog;
+
+    if (string.IsNullOrWhiteSpace(remoteDatabaseName))
+    {
+        Console.WriteLine("ERROR: the target connection string has no database name set.");
+
+        return;
+    }
+
+    // A connection to the target database itself can't DROP/CREATE that
+    // same database - "master" is used for the admin (drop + import)
+    // steps below, same as any SSMS/sqlcmd workflow would.
+    var remoteServerConnectionString =
+        new SqlConnectionStringBuilder(targetConnectionString) { InitialCatalog = "master" }
+            .ConnectionString;
+
+    Console.WriteLine($"Local source:   (localdb)\\MSSQLLocalDB / {localDatabaseName}");
+    Console.WriteLine($"Remote target:  {remoteBuilder.DataSource} / {remoteDatabaseName}");
+    Console.WriteLine();
+
+    try
+    {
+        await using var checkConnection = new SqlConnection(targetConnectionString);
+        await checkConnection.OpenAsync();
+
+        var existingTables = await GetTableListAsync(checkConnection);
+
+        Console.WriteLine($"Remote database currently has {existingTables.Count} table(s).");
+
+        foreach (var t in existingTables.Take(10))
+        {
+            Console.WriteLine($"  {t.Name} ({t.RowCount} rows)");
+        }
+
+        if (existingTables.Count > 10)
+        {
+            Console.WriteLine($"  ... and {existingTables.Count - 10} more");
+        }
+    }
+    catch (SqlException ex)
+    {
+        Console.WriteLine(
+            $"NOTE: could not inspect the remote database ({ex.Message}) - " +
+            "it may not exist yet, which is fine.");
+    }
+
+    Console.WriteLine();
+    Console.WriteLine(
+        "This permanently DESTROYS everything currently in the remote " +
+        "database above and replaces it with a full copy of the local " +
+        "database.");
+    Console.WriteLine();
+    Console.Write($"Type the remote database name ({remoteDatabaseName}) to confirm: ");
+
+    var confirmation = Console.ReadLine();
+
+    if (!string.Equals(confirmation, remoteDatabaseName, StringComparison.Ordinal))
+    {
+        Console.WriteLine();
+        Console.WriteLine("Confirmation did not match. Aborted - nothing was changed.");
+
+        return;
+    }
+
+    var bacpacPath =
+        Path.Combine(Path.GetTempPath(), $"local-migration-{Guid.NewGuid():N}.bacpac");
+
+    Console.WriteLine();
+    Console.WriteLine($"Exporting local database to {bacpacPath} ...");
+
+    var localDac = new DacServices(localConnectionString);
+    localDac.Message += (_, e) => Console.WriteLine($"  [export] {e.Message}");
+
+    localDac.ExportBacpac(bacpacPath, localDatabaseName);
+
+    Console.WriteLine("Export complete.");
+    Console.WriteLine();
+    Console.WriteLine($"Dropping remote database '{remoteDatabaseName}' (if it exists) ...");
+
+    await using (var adminConnection = new SqlConnection(remoteServerConnectionString))
+    {
+        await adminConnection.OpenAsync();
+
+        await ExecuteSqlAsync(
+            adminConnection,
+            $"""
+            IF DB_ID('{remoteDatabaseName}') IS NOT NULL
+            BEGIN
+                ALTER DATABASE [{remoteDatabaseName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+                DROP DATABASE [{remoteDatabaseName}];
+            END
+            """);
+    }
+
+    Console.WriteLine("Dropped (or didn't exist).");
+    Console.WriteLine();
+    Console.WriteLine($"Importing into remote database '{remoteDatabaseName}' ...");
+
+    var remoteDac = new DacServices(remoteServerConnectionString);
+    remoteDac.Message += (_, e) => Console.WriteLine($"  [import] {e.Message}");
+
+    using (var package = BacPackage.Load(bacpacPath))
+    {
+        remoteDac.ImportBacpac(package, remoteDatabaseName);
+    }
+
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine("MIGRATION COMPLETE");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+    Console.WriteLine(
+        $"Remote database '{remoteDatabaseName}' now contains a full copy " +
+        "of the local database (schema, content, everything).");
+    Console.WriteLine(
+        $"Temporary bacpac file: {bacpacPath} (safe to delete once you've " +
+        "confirmed the app works).");
+    Console.WriteLine();
+    Console.WriteLine(
+        "Next: run the app normally ('dotnet run') to confirm it boots " +
+        "against the remote target.");
 
     return;
 }

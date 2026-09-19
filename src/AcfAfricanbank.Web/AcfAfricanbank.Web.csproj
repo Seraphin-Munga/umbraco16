@@ -12,6 +12,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Used only by Program.cs's "migrate-local-to-remote" command - a
+         BACPAC export/import that copies the local dev database onto the
+         remote target without needing a file path both SQL Server
+         instances can see (unlike a native BACKUP/RESTORE). -->
+    <PackageReference Include="Microsoft.SqlServer.DacFx" Version="162.4.92" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
     <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
     <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="72.1.0.3" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
