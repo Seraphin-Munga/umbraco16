@@ -1060,7 +1060,7 @@ export interface ProductFaqItem {
 }
 
 export interface ProductDownloadLink {
-  label: string;
+  description: string;
   fileUrl: string;
 }
 
@@ -1073,7 +1073,7 @@ function mapProductFaqItem(props: Record<string, unknown>): ProductFaqItem {
 
 function mapProductLoanDownloadItem(props: Record<string, unknown>): ProductDownloadLink {
   return {
-    label: str(props.label),
+    description: str(props.description),
     fileUrl: mapMediaUrl(props.file),
   };
 }

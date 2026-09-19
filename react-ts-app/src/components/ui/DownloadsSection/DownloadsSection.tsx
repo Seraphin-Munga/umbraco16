@@ -1,5 +1,5 @@
 export interface DownloadItem {
-  label: string;
+  description: string;
   fileUrl: string;
 }
 
@@ -24,10 +24,10 @@ export function DownloadsSection({ heading, items }: DownloadsSectionProps) {
         <div className="campaign-list">
           <ul>
             {items.map((item, itemIndex) => (
-              <li key={item.label}>
+              <li key={item.description}>
                 <div className={`row no-gutter download-item${itemIndex === 0 ? ' first' : ''}`}>
                   <div className="col-sm-9">
-                    <div className="download-descr">{item.label}</div>
+                    <div className="download-descr">{item.description}</div>
                   </div>
                   <div className="col-sm-3">
                     <a href={item.fileUrl} target="_blank" rel="noreferrer" className="download-btn">

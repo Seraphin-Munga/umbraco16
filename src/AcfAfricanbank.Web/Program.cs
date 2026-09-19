@@ -879,7 +879,7 @@ if (args.Length > 0 &&
     var downloadItem =
         GetOrCreateType(
             "downloadItem", "Download Item", "icon-download-alt", true, false,
-            new PropSpec("label", "Label", txt),
+            new PropSpec("description", "Description", txt),
             new PropSpec("file", "File", media));
 
     var downloadsSectionItems =
@@ -1624,7 +1624,7 @@ if (args.Length > 0 &&
     var downloadItem =
         GetOrCreateType(
             "downloadItem", "Download Item", "icon-download-alt", true, false,
-            new PropSpec("label", "Label", txt),
+            new PropSpec("description", "Description", txt),
             new PropSpec("file", "File", media));
 
     // --------------------------------------------------------
