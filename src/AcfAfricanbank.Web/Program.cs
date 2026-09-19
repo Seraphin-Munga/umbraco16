@@ -177,6 +177,55 @@ if (args.Length > 0 &&
 }
 
 // ============================================================
+// TEST-CONNECTION COMMAND
+// ============================================================
+//
+// Quick, non-destructive check: opens umbracoDbDSN - exactly the same
+// connection string/provider the app itself uses (see "TARGET UMBRACO 16
+// DATABASE" above) - and reports success/failure. Deliberately exercises
+// the real Microsoft.Data.SqlClient connection-string parsing rather than
+// a raw sqlcmd/SSMS login test (which uses separate -S/-U/-P flags and so
+// never actually parses a "Password=..." value the way this app does) -
+// catches connection-string-level mistakes (a mis-escaped/mis-quoted
+// Password value), not just wrong credentials.
+
+if (args.Length > 0 &&
+    args[0].Equals("test-connection", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" TEST CONNECTION - umbracoDbDSN");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    try
+    {
+        await using var connection = new SqlConnection(targetConnectionString);
+        await connection.OpenAsync();
+
+        Console.WriteLine("Connected OK.");
+        Console.WriteLine($"  Server:   {connection.DataSource}");
+        Console.WriteLine($"  Database: {connection.Database}");
+
+        await using var versionCommand =
+            new SqlCommand("SELECT @@VERSION;", connection) { CommandTimeout = 15 };
+
+        var version = (string?)await versionCommand.ExecuteScalarAsync();
+        Console.WriteLine($"  Version:  {version?.Split('\n')[0].Trim()}");
+
+        var tables = await GetTableListAsync(connection);
+        Console.WriteLine($"  Tables:   {tables.Count}");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("CONNECTION FAILED:");
+        Console.WriteLine($"  {ex.GetType().Name}: {ex.Message}");
+    }
+
+    return;
+}
+
+// ============================================================
 // MIGRATE-LOCAL-TO-REMOTE COMMAND
 // ============================================================
 //
@@ -320,24 +369,43 @@ if (args.Length > 0 &&
 
     Console.WriteLine("Export complete.");
     Console.WriteLine();
-    Console.WriteLine($"Dropping remote database '{remoteDatabaseName}' (if it exists) ...");
 
     await using (var adminConnection = new SqlConnection(remoteServerConnectionString))
     {
         await adminConnection.OpenAsync();
 
-        await ExecuteSqlAsync(
-            adminConnection,
-            $"""
-            IF DB_ID('{remoteDatabaseName}') IS NOT NULL
-            BEGIN
+        // Checked as its own plain read first, deliberately - SQL Server
+        // validates DROP DATABASE/ALTER DATABASE permission for a batch at
+        // compile time, regardless of whether an "IF DB_ID(...) IS NOT
+        // NULL" guard around it is even true at runtime. Sending that DDL
+        // text at all (even dead code inside a false branch) demands drop
+        // permission - which an identity that's only ever meant to CREATE
+        // a not-yet-existing database may not have. Only emit the DROP at
+        // all when the database is confirmed to actually exist.
+        await using var existsCommand =
+            new SqlCommand($"SELECT DB_ID('{remoteDatabaseName}');", adminConnection);
+
+        var databaseExists = await existsCommand.ExecuteScalarAsync() is not DBNull and not null;
+
+        if (databaseExists)
+        {
+            Console.WriteLine($"Dropping remote database '{remoteDatabaseName}' ...");
+
+            await ExecuteSqlAsync(
+                adminConnection,
+                $"""
                 ALTER DATABASE [{remoteDatabaseName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
                 DROP DATABASE [{remoteDatabaseName}];
-            END
-            """);
+                """);
+
+            Console.WriteLine("Dropped.");
+        }
+        else
+        {
+            Console.WriteLine($"Remote database '{remoteDatabaseName}' doesn't exist yet - nothing to drop.");
+        }
     }
 
-    Console.WriteLine("Dropped (or didn't exist).");
     Console.WriteLine();
     Console.WriteLine($"Importing into remote database '{remoteDatabaseName}' ...");
 
