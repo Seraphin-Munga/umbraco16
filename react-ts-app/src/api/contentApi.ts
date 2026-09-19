@@ -1062,6 +1062,7 @@ export interface ProductFaqItem {
 export interface ProductDownloadLink {
   description: string;
   fileUrl: string;
+  buttonText: string;
 }
 
 function mapProductFaqItem(props: Record<string, unknown>): ProductFaqItem {
@@ -1073,8 +1074,9 @@ function mapProductFaqItem(props: Record<string, unknown>): ProductFaqItem {
 
 function mapProductLoanDownloadItem(props: Record<string, unknown>): ProductDownloadLink {
   return {
-    description: str(props.description),
-    fileUrl: mapMediaUrl(props.file),
+    description: str(props.downloadTextDescription),
+    fileUrl: mapMediaUrl(props.downloadButtonRedirectLink2),
+    buttonText: str(props.downloadButtonText, 'Download'),
   };
 }
 

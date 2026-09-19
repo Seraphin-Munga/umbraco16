@@ -879,8 +879,9 @@ if (args.Length > 0 &&
     var downloadItem =
         GetOrCreateType(
             "downloadItem", "Download Item", "icon-download-alt", true, false,
-            new PropSpec("description", "Description", txt),
-            new PropSpec("file", "File", media));
+            new PropSpec("downloadTextDescription", "Description", txt),
+            new PropSpec("downloadButtonRedirectLink2", "File", media),
+            new PropSpec("downloadButtonText", "Button Text", txt));
 
     var downloadsSectionItems =
         await GetOrCreateBlockListAsync(
@@ -1624,8 +1625,9 @@ if (args.Length > 0 &&
     var downloadItem =
         GetOrCreateType(
             "downloadItem", "Download Item", "icon-download-alt", true, false,
-            new PropSpec("description", "Description", txt),
-            new PropSpec("file", "File", media));
+            new PropSpec("downloadTextDescription", "Description", txt),
+            new PropSpec("downloadButtonRedirectLink2", "File", media),
+            new PropSpec("downloadButtonText", "Button Text", txt));
 
     // --------------------------------------------------------
     // loanCalculatorBlock - reused verbatim from create-home-schema. If

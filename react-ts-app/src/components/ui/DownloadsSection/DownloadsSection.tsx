@@ -1,6 +1,7 @@
 export interface DownloadItem {
   description: string;
   fileUrl: string;
+  buttonText: string;
 }
 
 export interface DownloadsSectionProps {
@@ -31,7 +32,7 @@ export function DownloadsSection({ heading, items }: DownloadsSectionProps) {
                   </div>
                   <div className="col-sm-3">
                     <a href={item.fileUrl} target="_blank" rel="noreferrer" className="download-btn">
-                      Download
+                      {item.buttonText}
                     </a>
                   </div>
                 </div>
