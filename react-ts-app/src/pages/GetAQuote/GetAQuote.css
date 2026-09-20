@@ -19,9 +19,16 @@
 @import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css');
 
 /*RESET*/
+/* `div` is deliberately left out of this list (unlike the original
+   newqqstyle.css, which reset it along with everything else): a div has no
+   default browser margin/padding to reset in the first place, but
+   `.get-a-quote-page div` (one class + one tag) has higher specificity
+   than Bootstrap's own single-class `.container`/`.row`/`.col-*` rules, so
+   keeping it here was silently zeroing out their centering margin and
+   gutter padding/negative-margins - collapsing the card grid and losing
+   the page's horizontal centering. */
 .get-a-quote-page html,
 .get-a-quote-page body,
-.get-a-quote-page div,
 .get-a-quote-page span,
 .get-a-quote-page applet,
 .get-a-quote-page object,
