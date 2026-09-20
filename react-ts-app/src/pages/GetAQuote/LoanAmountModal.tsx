@@ -18,16 +18,17 @@ import './GetAQuote.css';
 // already global via public/vendor/projectmagic.css and
 // public/vendor/loan-calculator.css.
 //
-// The modal chrome itself (.model_overlay/.modal_dialog/.modal_header/
-// .modal_body/.modal_footer) is NOT part of that global vendor bundle - it
-// only ever lived in Platform/Web/css/newqqstyle.css, a page-specific
-// stylesheet the legacy site linked from newQQ.cshtml alone, so it never
-// got ported. GetAQuote.css now copies those five rules in verbatim (they
-// don't exist anywhere else in this app, so it's collision-free) rather
-// than reinventing the styling under different class names. The close
-// icon is a plain "x" rather than <i class="material-icons"> for the same
-// reason - the Material Icons webfont isn't loaded anywhere in this app
-// either, so that glyph rendered as the literal word "close".
+// The modal chrome (.model_overlay/.modal_dialog/.modal_header/.modal_body/
+// .modal_footer/#amountModal .loans/#amountModal .Months) comes from
+// GetAQuote.css, which is now a full copy of Platform/Web/css/newqqstyle.css
+// - the page-specific stylesheet the legacy site linked from newQQ.cshtml
+// alone. That means classes this app already defines differently elsewhere
+// (.btn-primary, .card-upsale, .major-title, h1-h6, its own CSS reset) are
+// now redefined a second time, globally, by this import - see GetAQuote.css's
+// own closing comment block for that tradeoff. The close icon is a plain
+// "x" rather than <i class="material-icons"> - the Material Icons webfont
+// isn't loaded anywhere in this app, so that glyph rendered as the literal
+// word "close".
 //
 // The legacy modal's "Get Started" button (submitLoanAmount('amountModal'))
 // fed into the rest of that 1500+ line multi-step quick-quote wizard
@@ -94,6 +95,7 @@ export function LoanAmountModal({
 
   return (
     <div
+      id="amountModal"
       className="model_overlay"
       role="dialog"
       aria-modal="true"
@@ -145,7 +147,7 @@ export function LoanAmountModal({
               />
             </div>
 
-            <div className="get-a-quote-amount-row">
+            <div className="loans">
               <div>{formatRand(minAmount)}</div>
               <div>{formatRand(maxAmount)}</div>
             </div>
@@ -178,7 +180,7 @@ export function LoanAmountModal({
               />
             </div>
 
-            <div className="get-a-quote-term-row">
+            <div className="Months">
               <div>{minTerm} Months</div>
               <div>{maxTerm} Months</div>
             </div>

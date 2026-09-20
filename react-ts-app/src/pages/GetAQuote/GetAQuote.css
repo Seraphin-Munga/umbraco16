@@ -4690,3 +4690,103 @@ width: 302px !important;
     flex-direction: column;
 }
 }
+/* ---------------------------------------------------------------------
+   Additions below this point are NOT part of newqqstyle.css - they're
+   this port's own, kept collision-free since these exact class names
+   don't appear anywhere else in this file or in this app's other
+   stylesheets. Everything above this line is a verbatim copy of
+   Platform/Web/css/newqqstyle.css, which is only ever linked from the
+   legacy newQQ.cshtml page - it also redefines .btn/.btn-primary,
+   .card-upsale, .major-title/.span-major-title, h1-h6, and runs its own
+   full CSS reset (margin/padding/font-size zeroed on every element),
+   all with different values than public/vendor/projectmagic.css and
+   Home.css already use for those same selectors elsewhere in this app.
+   Loading it globally (this app has no per-route CSS scoping - see
+   LoanCalculator.tsx's comment) means the Home page and every other
+   route now render with whichever of the two conflicting definitions
+   wins the cascade for each shared class, rather than exclusively
+   Home.css/projectmagic.css's own.
+   --------------------------------------------------------------------- */
+
+.get-a-quote-modal-close {
+  border: none;
+  background: none;
+  padding: 0;
+  width: 28px;
+  height: 28px;
+  line-height: 1;
+  font-size: 22px;
+  color: #002b60;
+  cursor: pointer;
+}
+
+/* Ported from the inline <style> block at the top of Platform/Web/Views/
+   newQQ.cshtml (page-specific rules, not part of newqqstyle.css above). */
+.mt-24 {
+  margin-top: 24px;
+}
+
+.mb-34 {
+  margin-bottom: 34px;
+}
+
+.parent-container {
+  min-height: 89.6vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.step-subtitle {
+  font-size: 10px !important;
+}
+
+.loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.loader-overlay.visible {
+  display: flex;
+}
+
+.dot-loader {
+  width: 40px;
+  aspect-ratio: 4;
+  background:
+    radial-gradient(circle closest-side, red 90%, transparent) 0 50%,
+    radial-gradient(circle closest-side, green 90%, transparent) 50% 50%,
+    radial-gradient(circle closest-side, blue 90%, transparent) 100% 50%;
+  background-size: calc(100% / 3) 100%;
+  background-repeat: no-repeat;
+  clip-path: inset(0 100% 0 0);
+  animation: get-a-quote-dot-anim 1s steps(4) infinite;
+}
+
+@keyframes get-a-quote-dot-anim {
+  to {
+    clip-path: inset(0 -34% 0 0);
+  }
+}
+
+.check-icon {
+  color: green;
+  font-size: 16px;
+  float: right;
+  margin-right: 3px;
+}
+
+.arrow-icon {
+  float: right;
+  margin-right: 10px;
+  font-size: 22px;
+  color: #555;
+}
