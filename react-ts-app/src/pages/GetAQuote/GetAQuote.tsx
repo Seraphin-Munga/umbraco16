@@ -186,24 +186,32 @@ export function GetAQuote() {
             onChange={setPersonalDetails}
             onOpenExpensesCalculator={() => setExpensiveModalOpen(true)}
           />
+        </div>
+      )}
 
-          <div className="container buttons">
-            <button
-              type="button"
-              className="btn btn-tertiary"
-              onClick={() => setCancelModalOpen(true)}
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              className="btn btn-primary"
-              disabled={!isPersonalDetailsComplete(personalDetails)}
-              onClick={() => setCreditBureauModalOpen(true)}
-            >
-              Continue
-            </button>
-          </div>
+      {wizardStep === 'details' && (
+        // Ported as a sibling of .qqcontainer, not nested inside it - the
+        // source markup (newQQ.cshtml) has this bar as its own top-level
+        // block alongside the footer. .buttons sets width:100% with a gray
+        // background, but .qqcontainer caps out at max-width:857px; nesting
+        // this inside it was clipping the gray bar to that width instead of
+        // letting it span the full page.
+        <div className="container buttons">
+          <button
+            type="button"
+            className="btn btn-tertiary"
+            onClick={() => setCancelModalOpen(true)}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary"
+            disabled={!isPersonalDetailsComplete(personalDetails)}
+            onClick={() => setCreditBureauModalOpen(true)}
+          >
+            Continue
+          </button>
         </div>
       )}
 
