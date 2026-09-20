@@ -104,7 +104,7 @@ export function GetAQuote() {
   }
 
   return (
-    <div className="parent-container">
+    <div className="parent-container get-a-quote-page">
       <WizardHeader step={wizardStep} />
 
       {wizardStep === 'product' && (
