@@ -1,6 +1,5 @@
 import type { ChangeEvent, KeyboardEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
-import { Button } from '../../components/ui/Button/Button';
 
 // Ported from "#otpModal" in Platform/Web/Views/newQQ.cshtml - six single-
 // digit boxes (handleBoxInput) feeding a hidden combined OTP value, a 60
@@ -149,9 +148,14 @@ export function OtpModal({
           </div>
         </div>
         <div className="modal_footer">
-          <Button disabled={!isComplete} onClick={onVerified}>
+          <button
+            type="button"
+            className="btn btn-primary"
+            disabled={!isComplete}
+            onClick={onVerified}
+          >
             Continue
-          </Button>
+          </button>
         </div>
       </div>
     </div>

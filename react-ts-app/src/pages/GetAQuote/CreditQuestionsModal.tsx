@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Button } from '../../components/ui/Button/Button';
 
 // Ported from the "#creditQuestionsModal" overlay in Platform/Web/Views/
 // newQQ.cshtml - the credit-status/POPIA consent step that follows the loan
@@ -155,7 +154,13 @@ export function CreditQuestionsModal({
         </div>
 
         <div className="modal_footer">
-          <Button onClick={() => onContinue(answers)}>Continue</Button>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => onContinue(answers)}
+          >
+            Continue
+          </button>
         </div>
       </div>
     </div>

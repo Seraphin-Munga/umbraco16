@@ -1,4 +1,3 @@
-import { Button } from '../../components/ui/Button/Button';
 import {
   estimateMonthlyInstallment,
   formatRand,
@@ -77,19 +76,20 @@ export function OffersStep({ amount, termMonths }: OffersStepProps) {
 
         <div id="newCustomer" className="register-section">
           <div className="footer-declare">
-            <Button
-              variant="brand-secondary"
+            <a
+              className="btn btn-tertiary"
               href="/en/home/product-personal-loan"
             >
               Close
-            </Button>
-            <Button
+            </a>
+            <a
+              className="btn btn-primary"
               href="https://ib.africanbank.co.za/Modules/Subscription/Controls/AB/Onboarding/ABOnboarding.aspx"
               target="_blank"
               rel="noreferrer"
             >
               Finish Registration and apply
-            </Button>
+            </a>
           </div>
         </div>
       </div>

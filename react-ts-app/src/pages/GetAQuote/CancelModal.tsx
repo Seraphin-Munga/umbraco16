@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { Button } from '../../components/ui/Button/Button';
 
 // Ported from "#cancelModal" in Platform/Web/Views/newQQ.cshtml.
 interface CancelModalProps {
@@ -46,10 +45,16 @@ export function CancelModal({ open, onClose, onConfirm }: CancelModalProps) {
           </p>
         </div>
         <div className="modal_footer">
-          <Button onClick={onClose}>No, Continue</Button>
-          <Button variant="brand-secondary" onClick={onConfirm}>
+          <button type="button" className="btn btn-primary" onClick={onClose}>
+            No, Continue
+          </button>
+          <button
+            type="button"
+            className="btn btn-tertiary"
+            onClick={onConfirm}
+          >
             Yes, Cancel
-          </Button>
+          </button>
         </div>
       </div>
     </div>

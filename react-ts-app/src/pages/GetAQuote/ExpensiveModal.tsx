@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Button } from '../../components/ui/Button/Button';
 import { Input } from '../../components/ui/Input/Input';
 import { formatRand } from '../../utils/loanCalculator';
 
@@ -150,7 +149,9 @@ export function ExpensiveModal({ open, onClose, onSave }: ExpensiveModalProps) {
         </p>
 
         <div className="modal_footer">
-          <Button
+          <button
+            type="button"
+            className="btn btn-primary"
             disabled={total === 0}
             onClick={() => {
               onSave(total, breakdown);
@@ -158,7 +159,7 @@ export function ExpensiveModal({ open, onClose, onSave }: ExpensiveModalProps) {
             }}
           >
             Continue
-          </Button>
+          </button>
         </div>
       </div>
     </div>

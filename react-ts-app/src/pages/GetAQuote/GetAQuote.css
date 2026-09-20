@@ -4812,3 +4812,16 @@ width: 302px !important;
   font-size: 22px;
   color: #555;
 }
+
+/* Home.css has its own bare `button { text-transform: uppercase; }` reset
+   (pre-existing, not part of this page - left untouched per instructions).
+   It's an unscoped tag selector, so it still matches every <button> in this
+   page too, forcing "APPLY"/"CONTINUE" instead of the vendored
+   newqqstyle.css .btn-primary/.btn-tertiary design's intended mixed case
+   (confirmed against the reference: <a class="btn ..."> buttons elsewhere
+   on this page were unaffected since that rule only targets <button>,
+   never <a>). Two classes + a tag outweighs Home.css's single-tag
+   selector, so this wins without needing !important. */
+.get-a-quote-page button.btn {
+  text-transform: none;
+}

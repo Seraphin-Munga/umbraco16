@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Button } from '../../components/ui/Button/Button';
 import { LoanAmountModal } from './LoanAmountModal';
 import { CreditQuestionsModal } from './CreditQuestionsModal';
 import { CancelModal } from './CancelModal';
@@ -148,21 +147,24 @@ export function GetAQuote() {
                     </div>
                     <div>
                       {card.href ? (
-                        <Button
+                        <a
+                          className="btn btn-primary"
                           href={card.href}
                           target="_blank"
                           rel="noreferrer"
                           aria-label={`Apply now for a ${card.title}`}
                         >
                           Apply
-                        </Button>
+                        </a>
                       ) : (
-                        <Button
+                        <button
+                          type="button"
+                          className="btn btn-primary"
                           onClick={() => setAmountModalOpen(true)}
                           aria-label={`Apply now for a ${card.title}`}
                         >
                           Apply
-                        </Button>
+                        </button>
                       )}
                     </div>
                   </div>
@@ -186,18 +188,21 @@ export function GetAQuote() {
           />
 
           <div className="container buttons">
-            <Button
-              variant="brand-secondary"
+            <button
+              type="button"
+              className="btn btn-tertiary"
               onClick={() => setCancelModalOpen(true)}
             >
               Cancel
-            </Button>
-            <Button
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary"
               disabled={!isPersonalDetailsComplete(personalDetails)}
               onClick={() => setCreditBureauModalOpen(true)}
             >
               Continue
-            </Button>
+            </button>
           </div>
         </div>
       )}

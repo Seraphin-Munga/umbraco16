@@ -1,6 +1,5 @@
 import type { ChangeEvent, KeyboardEvent } from 'react';
 import { useEffect, useState } from 'react';
-import { Button } from '../../components/ui/Button/Button';
 import { Input } from '../../components/ui/Input/Input';
 import { Select } from '../../components/ui/Input/Select';
 import {
@@ -197,9 +196,13 @@ export function LoanAmountModal({
           </div>
         </div>
         <div className="modal_footer">
-          <Button onClick={() => onGetStarted(amount, term)}>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => onGetStarted(amount, term)}
+          >
             Get Started
-          </Button>
+          </button>
         </div>
       </div>
     </div>
