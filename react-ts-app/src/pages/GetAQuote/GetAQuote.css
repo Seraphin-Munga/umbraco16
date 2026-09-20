@@ -1,0 +1,129 @@
+/* Modal chrome copied verbatim from Platform/Web/css/newqqstyle.css
+   (.model_overlay through .modal_footer, ~line 3322 onward, plus .step/
+   .step.active's slide-up entrance). That stylesheet is only ever linked
+   from the legacy newQQ.cshtml page itself, so none of it made it into
+   this app's global public/vendor bundle - these class names don't exist
+   anywhere else in this app, confirmed by grepping both src/ and
+   public/vendor/, so adding them here is collision-free.
+   .btn-primary/.card-upsale/.major-title/h1-h6 and newqqstyle.css's own
+   CSS reset are NOT included here even though the same file defines them -
+   this app already has its own (different) versions of all of those in
+   public/vendor/projectmagic.css and Home.css, and overwriting them
+   globally would visibly change the Home page and every other route.
+   Likewise .loan-select-term/.loan-inpt/.loan-range/#input-Amount1/
+   #installment_calc1 are already styled - with different values again -
+   by public/vendor/loan-calculator.css, which is what actually renders
+   the calculator form; newqqstyle.css's plainer versions of those were
+   deliberately left out to avoid changing LoanCalculator.tsx's look. */
+
+.model_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal_dialog {
+  background: white;
+  padding: 40px 50px;
+  border-radius: 32px;
+  text-align: center;
+}
+
+.modal_header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.modal_body {
+  font-size: 14px;
+  position: relative;
+  padding: 0 20px;
+  text-align: center;
+  display: grid;
+  justify-content: center;
+}
+
+.modal_body h2 {
+  font-size: 25px;
+  font-weight: bold !important;
+  color: #000;
+}
+
+.modal_footer {
+  margin-top: 20px;
+  border-top: none;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.modal_footer button,
+.modal_footer .btn {
+  min-width: 180px;
+}
+
+/* Close button - a plain "x" rather than <i class="material-icons"> since
+   the Material Icons webfont isn't loaded anywhere in this app either (the
+   source markup's icon rendered as the literal word "close" without it). */
+.get-a-quote-modal-close {
+  border: none;
+  background: none;
+  padding: 0;
+  width: 28px;
+  height: 28px;
+  line-height: 1;
+  font-size: 22px;
+  color: #002b60;
+  cursor: pointer;
+}
+
+.get-a-quote-amount-row,
+.get-a-quote-term-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #335580;
+}
+
+/* Ported from newqqstyle.css's .step/.step.active - the entrance animation
+   for the "#step1" product-picker section. */
+.step {
+  display: none;
+}
+
+.step.active {
+  display: block;
+  animation: get-a-quote-slide-up 0.5s ease-in-out;
+}
+
+@keyframes get-a-quote-slide-up {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 767px) {
+  .modal_dialog {
+    width: 380px;
+    padding: 12px 11px;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}

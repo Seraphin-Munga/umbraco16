@@ -1,15 +1,33 @@
 import type { ChangeEvent, KeyboardEvent } from 'react';
 import { useEffect, useState } from 'react';
+import { Button } from '../../components/ui/Button/Button';
 import { Input } from '../../components/ui/Input/Input';
 import { Select } from '../../components/ui/Input/Select';
-import { estimateMonthlyInstallment, formatRand } from '../../utils/loanCalculator';
+import {
+  estimateMonthlyInstallment,
+  formatRand,
+} from '../../utils/loanCalculator';
+import './GetAQuote.css';
 
 // Ported from the "#amountModal" overlay in Platform/Web/Views/newQQ.cshtml
 // (lines 652-726) - the loan-amount step that "Personal Loan and Credit
 // Card" opens from the get-a-quote product picker (openDialog('amountModal')
 // in the source markup). Reuses the same estimateMonthlyInstallment/
 // formatRand math as LoanCalculator.tsx rather than re-deriving it, and the
-// same .calculator-form/.loan-range styling from Home.css.
+// same .calculator-form/.loan-range/.cal-amount/.loan-select-term styling
+// already global via public/vendor/projectmagic.css and
+// public/vendor/loan-calculator.css.
+//
+// The modal chrome itself (.model_overlay/.modal_dialog/.modal_header/
+// .modal_body/.modal_footer) is NOT part of that global vendor bundle - it
+// only ever lived in Platform/Web/css/newqqstyle.css, a page-specific
+// stylesheet the legacy site linked from newQQ.cshtml alone, so it never
+// got ported. GetAQuote.css now copies those five rules in verbatim (they
+// don't exist anywhere else in this app, so it's collision-free) rather
+// than reinventing the styling under different class names. The close
+// icon is a plain "x" rather than <i class="material-icons"> for the same
+// reason - the Material Icons webfont isn't loaded anywhere in this app
+// either, so that glyph rendered as the literal word "close".
 //
 // The legacy modal's "Get Started" button (submitLoanAmount('amountModal'))
 // fed into the rest of that 1500+ line multi-step quick-quote wizard
@@ -20,7 +38,11 @@ import { estimateMonthlyInstallment, formatRand } from '../../utils/loanCalculat
 
 function allowDigitsOnly(event: KeyboardEvent<HTMLInputElement>) {
   const charCode = event.charCode;
-  const isAllowed = charCode === 8 || charCode === 0 || charCode === 13 || (charCode >= 48 && charCode <= 57);
+  const isAllowed =
+    charCode === 8 ||
+    charCode === 0 ||
+    charCode === 13 ||
+    (charCode >= 48 && charCode <= 57);
   if (!isAllowed) event.preventDefault();
 }
 
@@ -71,110 +93,111 @@ export function LoanAmountModal({
   }
 
   return (
-    <div className="model_overlay" role="dialog" aria-modal="true" aria-labelledby="amount-modal-title">
+    <div
+      className="model_overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="amount-modal-title"
+    >
       <div className="modal_dialog">
-        <div className="modal_content">
-          <div className="modal_header">
-            <i className="material-icons close-icon" onClick={onClose} role="button" aria-label="Close">
-              close
-            </i>
-          </div>
-          <div className="modal_body">
-            <h2 id="amount-modal-title" className="color-brand-1 mt-15 mb-20">
-              How much would you like to borrow for your Loan?
-            </h2>
+        <div className="modal_header">
+          <button
+            type="button"
+            className="get-a-quote-modal-close"
+            onClick={onClose}
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+        <div className="modal_body">
+          <h2 id="amount-modal-title" className="color-brand-1 mt-15 mb-20">
+            How much would you like to borrow for your Loan?
+          </h2>
 
-            <div className="calculator-form">
-              <p className="cal-loan-disclaimer" style={{ padding: '5px 0px' }}>
-                Please enter Loan amount between <b>{formatRand(minAmount)}</b> to <b>{formatRand(maxAmount)}.</b>
-              </p>
-              <label className="cal-amount">Amount</label>
+          <div className="calculator-form">
+            <p className="cal-loan-disclaimer" style={{ padding: '5px 0px' }}>
+              Please enter Loan amount between <b>{formatRand(minAmount)}</b> to{' '}
+              <b>{formatRand(maxAmount)}.</b>
+            </p>
+            <label className="cal-amount">Amount</label>
+            <Input
+              id="input-Amount1"
+              className="loan-inpt"
+              type="text"
+              value={amount}
+              onChange={handleAmountChange}
+              onKeyPress={allowDigitsOnly}
+            />
+
+            <div className="range-wrap">
+              <div className="range-value" id="rangeV1" />
               <Input
-                id="input-Amount1"
-                className="loan-inpt"
-                type="text"
+                id="slide-range1"
+                type="range"
+                className="loan-range"
+                min={minAmount}
+                max={maxAmount}
+                step={500}
                 value={amount}
-                onChange={handleAmountChange}
-                onKeyPress={allowDigitsOnly}
-              />
-
-              <div className="range-wrap">
-                <div className="range-value" id="rangeV1" />
-                <Input
-                  id="slide-range1"
-                  type="range"
-                  className="loan-range"
-                  min={minAmount}
-                  max={maxAmount}
-                  step={500}
-                  value={amount}
-                  onChange={(event) => setAmount(Number(event.target.value))}
-                  style={{ backgroundImage: RANGE_GRADIENT }}
-                />
-              </div>
-
-              <div className="loans">
-                <div className="col-1" style={{ textAlign: 'left', fontSize: '14px', color: '#335580' }}>
-                  {formatRand(minAmount)}
-                </div>
-                <div className="col-2" style={{ textAlign: 'right', fontSize: '14px', color: '#335580' }}>
-                  {formatRand(maxAmount)}
-                </div>
-              </div>
-
-              <label className="cal-amount">Repayment Term</label>
-              <Select
-                className="loan-select-term"
-                id="term1"
-                value={term}
-                onChange={(event) => setTerm(Number(event.target.value))}
-              >
-                {TERM_OPTIONS.map((months) => (
-                  <option value={months} key={months}>
-                    {months} Months
-                  </option>
-                ))}
-              </Select>
-
-              <div className="range-wrap">
-                <div className="range-value" id="rangeV2" />
-                <Input
-                  id="input-month1"
-                  type="range"
-                  className="loan-range"
-                  min={minTerm}
-                  max={maxTerm}
-                  value={term}
-                  onChange={(event) => setTerm(Number(event.target.value))}
-                  style={{ backgroundImage: RANGE_GRADIENT }}
-                />
-              </div>
-
-              <div className="Months">
-                <div className="col-1" style={{ textAlign: 'left', fontSize: '14px', color: '#335580' }}>
-                  {minTerm} Months
-                </div>
-                <div className="col-2" style={{ textAlign: 'right', fontSize: '14px', color: '#335580' }}>
-                  {maxTerm} Months
-                </div>
-              </div>
-
-              <label className="cal-amount">Your Monthly Repayment will be</label>
-              <Input
-                id="installment_calc1"
-                className="loan-inpt-return"
-                type="text"
-                value={formatRand(estimateMonthlyInstallment(amount, term))}
-                readOnly
-                aria-label="Monthly installment amount"
+                onChange={(event) => setAmount(Number(event.target.value))}
+                style={{ backgroundImage: RANGE_GRADIENT }}
               />
             </div>
+
+            <div className="get-a-quote-amount-row">
+              <div>{formatRand(minAmount)}</div>
+              <div>{formatRand(maxAmount)}</div>
+            </div>
+
+            <label className="cal-amount">Repayment Term</label>
+            <Select
+              className="loan-select-term"
+              id="term1"
+              value={term}
+              onChange={(event) => setTerm(Number(event.target.value))}
+            >
+              {TERM_OPTIONS.map((months) => (
+                <option value={months} key={months}>
+                  {months} Months
+                </option>
+              ))}
+            </Select>
+
+            <div className="range-wrap">
+              <div className="range-value" id="rangeV2" />
+              <Input
+                id="input-month1"
+                type="range"
+                className="loan-range"
+                min={minTerm}
+                max={maxTerm}
+                value={term}
+                onChange={(event) => setTerm(Number(event.target.value))}
+                style={{ backgroundImage: RANGE_GRADIENT }}
+              />
+            </div>
+
+            <div className="get-a-quote-term-row">
+              <div>{minTerm} Months</div>
+              <div>{maxTerm} Months</div>
+            </div>
+
+            <label className="cal-amount">Your Monthly Repayment will be</label>
+            <Input
+              id="installment_calc1"
+              className="loan-inpt-return"
+              type="text"
+              value={formatRand(estimateMonthlyInstallment(amount, term))}
+              readOnly
+              aria-label="Monthly installment amount"
+            />
           </div>
-          <div className="modal_footer">
-            <button className="btn btn-primary" onClick={() => onGetStarted(amount, term)}>
-              Get Started
-            </button>
-          </div>
+        </div>
+        <div className="modal_footer">
+          <Button onClick={() => onGetStarted(amount, term)}>
+            Get Started
+          </Button>
         </div>
       </div>
     </div>
