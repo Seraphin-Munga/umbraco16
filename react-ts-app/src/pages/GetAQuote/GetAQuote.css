@@ -2554,7 +2554,13 @@ color: #FFFFFF !important;
   -webkit-appearance: none;
   width: 20px;
   height: 20px;
-  
+  /* GetAQuote.css's own generic `input { padding: 15px 25px; border: 2px
+     solid #DBDBDB; }` reset (further up this file) still applies here too
+     - it doesn't set width/height so specificity never has to arbitrate
+     it, but its padding was adding 50x30px on top of the 20x20 box above,
+     rendering a 54x34px checkbox. Reset padding explicitly; keep that
+     rule's border since a thin gray outline is the intended look. */
+  padding: 0;
   border-radius: 3px;
   background-color: #fff;
   cursor: pointer;
