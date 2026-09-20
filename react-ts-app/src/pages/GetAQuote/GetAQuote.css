@@ -2545,6 +2545,13 @@ color: #FFFFFF !important;
     padding: 14px 32px;
     justify-content: space-between;
     width: 100%;
+    /* Bootstrap's own `.container` rule sets max-width:1170px at
+       min-width:1400px (a separate property from the width:Npx rules at
+       the other breakpoints, so overriding `width` above isn't enough to
+       beat it). This element also carries the `.container` class, so
+       without this, the gray bar still got capped to 1170px and centered
+       on wide screens even though `width:100%` had already "won". */
+    max-width: none;
     background-color: #f8f8f8;
 }
 /* Custom checkbox styling (looks native but allows white checkmark) */
