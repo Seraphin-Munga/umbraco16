@@ -1,15 +1,29 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { ChevronDown, Menu, Search, X } from 'lucide-react';
 import { Logo } from '../icons/Logo';
 import { NavModal } from './NavModal';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchHeaderNavigation } from '../../store/slices/headerSlice';
-import './Header.css';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from '../ui/navigation-menu';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
+import { Button } from '../ui/shadcn-button';
+import { Input } from '../ui/shadcn-input';
 
 // Mirrors Configuration["online_upload"] in Navigation.cshtml, used for the
 // fallback "Upload documents" link when a menu item's link has neither a
 // real URL nor a Target set.
 const ONLINE_UPLOAD_URL = import.meta.env.VITE_ONLINE_UPLOAD_URL || '#';
+
+const navLinkClass =
+  'text-white hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white data-active:bg-white/10';
 
 // CMS-sourced link.url values are either a relative in-app path or a fully
 // qualified off-site URL (see mapLinks' comment in contentApi.ts) - only
@@ -28,266 +42,357 @@ export function Header() {
   const menu = data?.menu ?? [];
   const loading = status === 'idle' || status === 'loading';
 
-  const [navOpen, setNavOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
-  // No Bootstrap JS is loaded in this app (index.html only pulls in its
-  // CSS) - data-toggle="dropdown" alone does nothing, same reason navOpen/
-  // searchOpen above are plain React state instead of Bootstrap's own JS.
-  const [openMegaMenuKey, setOpenMegaMenuKey] = useState<string | null>(null);
 
   useEffect(() => {
     const promise = dispatch(fetchHeaderNavigation());
     return () => promise.abort();
   }, [dispatch]);
 
-  return (
-    <header>
-      {/* Matches MasterNew.cshtml's <header><nav class="navbar navbar-expand-lg
-          navbar-dark custom-nav new-navbar-ab">@Html.Partial(Navigation.cshtml)</nav></header> -
-          Navigation.cshtml's own root (header-container + its own inner navbar-default
-          nav) nests inside this, matching the real @Html.Partial composition. */}
-      <nav className="navbar navbar-expand-lg navbar-dark custom-nav new-navbar-ab">
-        <div className="header-container">
-          <nav className="navbar navbar-default dropdown-container new-navbar-ab">
-            <div className="container">
-              <div className="navbar-header">
-                <button
-                  type="button"
-                  className={`navbar-toggle padding-left-20 padding-right-15${navOpen ? '' : ' collapsed'}`}
-                  aria-expanded={navOpen}
-                  onClick={() => setNavOpen((open) => !open)}
-                >
-                  <span className="sr-only">Toggle navigation</span>
-                  <span className="icon-bar" />
-                  <span className="icon-bar" />
-                  <span className="icon-bar" />
-                </button>
+  const closeMobile = () => setMobileOpen(false);
+  const openRegisterLogin = () => setModalOpen(true);
 
-                <Link className="navbar-brand" to="/en/home/">
+  return (
+    <header className="sticky top-0 z-50 bg-brand-navy font-sans text-white shadow-md">
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
+        <Link to="/en/home/" className="shrink-0" onClick={closeMobile}>
+          <Logo />
+        </Link>
+
+        <NavigationMenu viewport={false} className="hidden max-w-none flex-1 justify-start lg:flex">
+          <NavigationMenuList className="justify-start gap-1">
+            {loading && <li className="px-2.5 py-1.5 text-sm text-white/60">Loading menu…</li>}
+            {error && <li className="px-2.5 py-1.5 text-sm text-red-300">{error}</li>}
+
+            {!loading &&
+              !error &&
+              menu.map((menuItem, menuIndex) =>
+                menuItem.menuName.map((link, linkIndex) => {
+                  const key = `${menuIndex}-${linkIndex}`;
+
+                  // Real destination -> plain link.
+                  if (link.url !== '#') {
+                    return (
+                      <NavigationMenuItem key={key}>
+                        <NavigationMenuLink asChild className={navLinkClass}>
+                          {isInternalPath(link.url) ? (
+                            <Link to={link.url}>{link.title}</Link>
+                          ) : (
+                            <a href={link.url}>{link.title}</a>
+                          )}
+                        </NavigationMenuLink>
+                      </NavigationMenuItem>
+                    );
+                  }
+
+                  // No URL but Target isn't the empty string (matches the
+                  // Razor view's `relatedLink.Target != ""` - true for
+                  // both a real target and no target at all, i.e. null).
+                  if (link.target !== '') {
+                    const hasMegaMenu = menuItem.menus.length > 0;
+
+                    if (!hasMegaMenu) {
+                      return (
+                        <NavigationMenuItem key={key}>
+                          <NavigationMenuLink asChild className={navLinkClass}>
+                            <a href="/en/home/">{link.title}</a>
+                          </NavigationMenuLink>
+                        </NavigationMenuItem>
+                      );
+                    }
+
+                    return (
+                      <NavigationMenuItem key={key}>
+                        <NavigationMenuTrigger className={`bg-transparent ${navLinkClass}`}>
+                          {link.title}
+                        </NavigationMenuTrigger>
+                        <NavigationMenuContent className="text-foreground">
+                          <div className="grid w-[min(90vw,64rem)] grid-cols-2 gap-x-8 gap-y-6 p-6 sm:grid-cols-4">
+                            {menuItem.menus.map((category, categoryIndex) => (
+                              <div key={categoryIndex}>
+                                <div className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                                  {category.categoryName}
+                                </div>
+                                <ul>
+                                  {category.link.map((linkGroup, linkGroupIndex) =>
+                                    linkGroup.menuList.map((productLink, productLinkIndex) => {
+                                      const productUrl = linkGroup.pageSection
+                                        ? `${productLink.url}${linkGroup.pageSection}`
+                                        : productLink.url;
+                                      const productKey = `${linkGroupIndex}-${productLinkIndex}`;
+                                      const content = (
+                                        <>
+                                          <span className="font-medium text-foreground">{productLink.title}</span>
+                                          {linkGroup.menuDescription && (
+                                            <span className="text-xs text-muted-foreground">
+                                              {linkGroup.menuDescription}
+                                            </span>
+                                          )}
+                                        </>
+                                      );
+                                      return (
+                                        <li key={productKey}>
+                                          <NavigationMenuLink asChild className="flex-col items-start gap-0.5">
+                                            {isInternalPath(productUrl) ? (
+                                              <Link to={productUrl}>{content}</Link>
+                                            ) : (
+                                              <a href={productUrl}>{content}</a>
+                                            )}
+                                          </NavigationMenuLink>
+                                        </li>
+                                      );
+                                    }),
+                                  )}
+                                </ul>
+                              </div>
+                            ))}
+                          </div>
+                        </NavigationMenuContent>
+                      </NavigationMenuItem>
+                    );
+                  }
+
+                  // No URL, Target is the empty string -> fallback
+                  // "Upload documents" link.
+                  return (
+                    <NavigationMenuItem key={key}>
+                      <NavigationMenuLink asChild className={navLinkClass}>
+                        <a href={ONLINE_UPLOAD_URL} target="_blank" rel="noreferrer">
+                          Upload documents
+                        </a>
+                      </NavigationMenuLink>
+                    </NavigationMenuItem>
+                  );
+                }),
+              )}
+          </NavigationMenuList>
+        </NavigationMenu>
+
+        <div className="hidden items-center gap-5 lg:flex">
+          <a href="#" className="text-sm text-white/70 transition-colors hover:text-white">
+            Blog
+          </a>
+          <a href="#" className="text-sm text-white/70 transition-colors hover:text-white">
+            Contact Us
+          </a>
+          <button
+            type="button"
+            aria-label={searchOpen ? 'Close search' : 'Open search'}
+            aria-expanded={searchOpen}
+            onClick={() => setSearchOpen((open) => !open)}
+            className="rounded-full p-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            {searchOpen ? <X className="size-5" /> : <Search className="size-5" />}
+          </button>
+          <Button
+            onClick={openRegisterLogin}
+            className="rounded-full bg-brand-green px-5 text-white hover:bg-brand-green/90"
+          >
+            Register/Login
+          </Button>
+        </div>
+
+        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+          <SheetTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white hover:bg-white/10 hover:text-white lg:hidden"
+            >
+              <Menu className="size-5" />
+              <span className="sr-only">Toggle navigation</span>
+            </Button>
+          </SheetTrigger>
+          <SheetContent
+            side="left"
+            className="flex w-full max-w-xs flex-col gap-0 border-none bg-brand-navy text-white sm:max-w-xs [&_[data-slot=sheet-close]]:text-white [&_[data-slot=sheet-close]]:hover:bg-white/10"
+          >
+            <SheetHeader className="border-b border-white/10">
+              <SheetTitle asChild>
+                <Link to="/en/home/" onClick={closeMobile}>
                   <Logo />
                 </Link>
-              </div>
+              </SheetTitle>
+            </SheetHeader>
 
-              <div className={`collapse navbar-collapse${navOpen ? ' in' : ''}`}>
-                <ul className="nav navbar-nav dropdown-container left-nav">
-                  <li>
-                    <a
-                      href="https://ib.africanbank.co.za/modules/Registration/Public/Register.aspx"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="register-btn visible-xs"
-                    >
-                      <span>Register</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="https://ib.africanbank.co.za/"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="register-btn visible-xs"
-                    >
-                      <span>Login</span>
-                    </a>
-                  </li>
-                  <li>
-                    <Link to="/en/home/" className="no-left-padding">
-                      <span className="visible-xs">Home</span>
-                    </Link>
-                  </li>
+            <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-4">
+              <a
+                href="https://ib.africanbank.co.za/modules/Registration/Public/Register.aspx"
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-white/10"
+              >
+                Register
+              </a>
+              <a
+                href="https://ib.africanbank.co.za/"
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-white/10"
+              >
+                Login
+              </a>
+              <Link
+                to="/en/home/"
+                onClick={closeMobile}
+                className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-white/10"
+              >
+                Home
+              </Link>
 
-                  {loading && <li className="nav-status">Loading menu…</li>}
-                  {error && <li className="nav-status nav-status--error">{error}</li>}
+              {loading && <span className="px-3 py-2 text-sm text-white/60">Loading menu…</span>}
+              {error && <span className="px-3 py-2 text-sm text-red-300">{error}</span>}
 
-                  {!loading &&
-                    !error &&
-                    menu.map((menuItem, menuIndex) =>
-                      menuItem.menuName.map((link, linkIndex) => {
-                        const key = `${menuIndex}-${linkIndex}`;
+              {!loading &&
+                !error &&
+                menu.map((menuItem, menuIndex) =>
+                  menuItem.menuName.map((link, linkIndex) => {
+                    const key = `${menuIndex}-${linkIndex}`;
 
-                        // Real destination -> plain link.
-                        if (link.url !== '#') {
-                          return (
-                            <li key={key}>
-                              {isInternalPath(link.url) ? (
-                                <Link to={link.url}>{link.title}</Link>
-                              ) : (
-                                <a href={link.url}>{link.title}</a>
-                              )}
-                            </li>
-                          );
-                        }
+                    if (link.url !== '#') {
+                      return isInternalPath(link.url) ? (
+                        <Link
+                          key={key}
+                          to={link.url}
+                          onClick={closeMobile}
+                          className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-white/10"
+                        >
+                          {link.title}
+                        </Link>
+                      ) : (
+                        <a
+                          key={key}
+                          href={link.url}
+                          className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-white/10"
+                        >
+                          {link.title}
+                        </a>
+                      );
+                    }
 
-                        // No URL but Target isn't the empty string (matches the
-                        // Razor view's `relatedLink.Target != ""` - true for
-                        // both a real target and no target at all, i.e. null).
-                        if (link.target !== '') {
-                          const isOpen = openMegaMenuKey === key;
-                          const hasMegaMenu = menuItem.menus.length > 0;
+                    if (link.target !== '') {
+                      const hasMegaMenu = menuItem.menus.length > 0;
 
-                          return (
-                            <li
-                              key={key}
-                              className={`header-mega-menu dropdown${isOpen ? ' open' : ''}`}
-                            >
-                              <a
-                                href="/en/home/"
-                                className="dropdown-toggle"
-                                role="button"
-                                aria-haspopup="true"
-                                aria-expanded={isOpen}
-                                onClick={(event) => {
-                                  event.preventDefault();
-                                  setOpenMegaMenuKey((current) => (current === key ? null : key));
-                                }}
-                              >
-                                {link.title}
-                                {hasMegaMenu && <i className="fa fa-angle-down" />}
-                              </a>
-                              {hasMegaMenu && (
-                                <div className="dropdown-menu">
-                                  <div className="container">
-                                    <div className="row eq-height">
-                                      {menuItem.menus.map((category, categoryIndex) => (
-                                        <div className="col-sm-3" key={categoryIndex}>
-                                          <div className="mega-menu-product">
-                                            <div className="product-category">
-                                              {category.categoryName}
-                                            </div>
-                                            {category.link.map((linkGroup, linkGroupIndex) =>
-                                              linkGroup.menuList.map((productLink, productLinkIndex) => (
-                                                <div
-                                                  className="product"
-                                                  key={`${linkGroupIndex}-${productLinkIndex}`}
-                                                >
-                                                  {(() => {
-                                                    const productUrl = linkGroup.pageSection
-                                                      ? `${productLink.url}${linkGroup.pageSection}`
-                                                      : productLink.url;
-                                                    return isInternalPath(productUrl) ? (
-                                                      <Link
-                                                        className="title"
-                                                        to={productUrl}
-                                                        onClick={() => setOpenMegaMenuKey(null)}
-                                                      >
-                                                        {productLink.title}
-                                                      </Link>
-                                                    ) : (
-                                                      <a className="title" href={productUrl}>
-                                                        {productLink.title}
-                                                      </a>
-                                                    );
-                                                  })()}
-                                                  <p className="descr">{linkGroup.menuDescription}</p>
-                                                </div>
-                                              )),
-                                            )}
-                                          </div>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                            </li>
-                          );
-                        }
-
-                        // No URL, Target is the empty string -> fallback
-                        // "Upload documents" link.
+                      if (!hasMegaMenu) {
                         return (
-                          <li key={key}>
-                            <a href={ONLINE_UPLOAD_URL} target="_blank" rel="noreferrer">
-                              Upload documents
-                            </a>
-                          </li>
+                          <a
+                            key={key}
+                            href="/en/home/"
+                            className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-white/10"
+                          >
+                            {link.title}
+                          </a>
                         );
-                      }),
-                    )}
-                </ul>
+                      }
 
-                <ul className="horizontal-list">
-                  <li>
-                    <a>Blog</a>
-                  </li>
-                  <li>
-                    <a>Contact Us</a>
-                  </li>
-                </ul>
+                      return (
+                        <details key={key} className="group rounded-lg px-3 py-2">
+                          <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-medium">
+                            {link.title}
+                            <ChevronDown className="size-4 shrink-0 transition-transform group-open:rotate-180" />
+                          </summary>
+                          <div className="mt-2 space-y-4 border-l border-white/10 pl-3">
+                            {menuItem.menus.map((category, categoryIndex) => (
+                              <div key={categoryIndex}>
+                                <div className="mb-1 text-xs font-semibold tracking-wide text-white/50 uppercase">
+                                  {category.categoryName}
+                                </div>
+                                <div>
+                                  {category.link.map((linkGroup, linkGroupIndex) =>
+                                    linkGroup.menuList.map((productLink, productLinkIndex) => {
+                                      const productUrl = linkGroup.pageSection
+                                        ? `${productLink.url}${linkGroup.pageSection}`
+                                        : productLink.url;
+                                      const productKey = `${linkGroupIndex}-${productLinkIndex}`;
+                                      return isInternalPath(productUrl) ? (
+                                        <Link
+                                          key={productKey}
+                                          to={productUrl}
+                                          onClick={closeMobile}
+                                          className="block py-1 text-sm text-white/80 hover:text-white"
+                                        >
+                                          {productLink.title}
+                                        </Link>
+                                      ) : (
+                                        <a
+                                          key={productKey}
+                                          href={productUrl}
+                                          className="block py-1 text-sm text-white/80 hover:text-white"
+                                        >
+                                          {productLink.title}
+                                        </a>
+                                      );
+                                    }),
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </details>
+                      );
+                    }
 
-                <ul className="nav navbar-nav navbar-right" style={{ marginTop: '-20px' }}>
-                  <li>
-                    <a
-                      href="#"
-                      className="search-icon globalSearch"
-                      data-toggle="tooltip"
-                      data-placement="bottom"
-                      data-original-title=""
-                      title=""
-                      onClick={(event) => {
-                        event.preventDefault();
-                        setSearchOpen((open) => !open);
-                      }}
-                    >
-                      <span className="hidden-md hidden-lg hidden-sm search-text">Search</span>
-                      <span className="fa fa-search fa-2x" />
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      className="login-btn hidden-xs"
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => setModalOpen(true)}
-                    >
-                      Register/Login
-                    </a>
-                  </li>
-                </ul>
-              </div>
+                    return (
+                      <a
+                        key={key}
+                        href={ONLINE_UPLOAD_URL}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-white/10"
+                      >
+                        Upload documents
+                      </a>
+                    );
+                  }),
+                )}
+
+              <div className="my-2 border-t border-white/10" />
+              <a href="#" className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-white/10">
+                Blog
+              </a>
+              <a href="#" className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-white/10">
+                Contact Us
+              </a>
+            </nav>
+
+            <div className="border-t border-white/10 p-4">
+              <Button
+                onClick={() => {
+                  closeMobile();
+                  openRegisterLogin();
+                }}
+                className="w-full rounded-full bg-brand-green text-white hover:bg-brand-green/90"
+              >
+                Register/Login
+              </Button>
             </div>
+          </SheetContent>
+        </Sheet>
+      </div>
 
-            <div className="global-search-bar" style={{ display: searchOpen ? 'block' : 'none' }}>
-              <div className="area_search">
-                <div
-                  className="global-search-new-close-btn"
-                  onClick={() => setSearchOpen(false)}
-                />
-                <form
-                  id="site_search"
-                  className="search-placeholder-text"
-                  onSubmit={(event) => event.preventDefault()}
-                >
-                  <input
-                    type="text"
-                    autoComplete="off"
-                    className="form-control global-search-text"
-                    id="search_box"
-                    placeholder="PlaceholderSearch"
-                    value={searchTerm}
-                    onChange={(event) => setSearchTerm(event.target.value)}
-                  />
-                </form>
-                <div className="global-search-results">
-                  <div className="container-fluid">
-                    <div className="row">
-                      <div className="col-xs-12">
-                        <h5>Top Results</h5>
-                      </div>
-                      <div className="col-xs-12">
-                        <ul id="search_results" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </nav>
-
-          <NavModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      {searchOpen && (
+        <div className="hidden border-t border-white/10 bg-[#00224d] lg:block">
+          <form
+            onSubmit={(event) => event.preventDefault()}
+            className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:px-6 lg:px-8"
+          >
+            <Search className="size-4 shrink-0 text-white/60" />
+            <Input
+              autoFocus
+              autoComplete="off"
+              placeholder="Search"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              className="border-none bg-transparent text-white placeholder:text-white/50 focus-visible:ring-0"
+            />
+          </form>
         </div>
-      </nav>
+      )}
+
+      <NavModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </header>
   );
 }

@@ -5,19 +5,13 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>react-ts-app</title>
-    <link rel="stylesheet" href="/vendor/bootstrap.min.css" />
-    <link rel="stylesheet" href="/vendor/font-awesome-5.15.3.min.css" />
-    <!-- Matches MasterNew.cshtml's <head> - the footer's Twitter/X icon
-         uses the bi-twitter-x class from here (plus an inline SVG fallback
-         in Footer.tsx, same redundancy the source markup has). -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
-    <link rel="stylesheet" href="/vendor/style.css" />
-    <link rel="stylesheet" href="/vendor/media-query.css" />
-    <link rel="stylesheet" href="/vendor/main.min.css" />
-    <link rel="stylesheet" href="/vendor/custom_main.min.css" />
-    <link rel="stylesheet" href="/vendor/projectmagic.css" />
-    <link rel="stylesheet" href="/vendor/loan-calculator.css" />
-    <link rel="stylesheet" href="/vendor/cookieconsent.css" />
+    <!-- bootstrap.min.css removed - Header is migrated to Tailwind/shadcn.
+         The rest of this vendor CSS (still styling unmigrated components -
+         Footer, Home sections, etc.) has moved into src/index.css as
+         @import ... layer(legacy) statements instead of <link> tags here,
+         so it's forced below Tailwind's own layers in the cascade and can
+         no longer silently beat Tailwind utility classes (see index.css's
+         comment on the "legacy" layer for why that was happening). -->
   </head>
   <body>
     <div id="root"></div>
