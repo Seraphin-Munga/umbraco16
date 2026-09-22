@@ -1,5 +1,6 @@
 import type { ChangeEvent, KeyboardEvent, ReactNode } from 'react';
 import { useMemo, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { Button } from '../Button/Button';
 import { Input } from '../Input/Input';
 import { Select } from '../Input/Select';
@@ -11,12 +12,7 @@ import { estimateMonthlyInstallment, formatRand } from '../../../utils/loanCalcu
 // PersonalLoanPage.tsx's own calculator section, which reuses the
 // estimateMonthlyInstallment formula but not this component, since that
 // page's surrounding layout - disclaimer text instead of an image - is
-// different). Its styling still lives in src/components/Home/Home.css
-// (.home-loan-calculator, .calculator-form, .loan-range, etc.) rather than
-// a CSS file of its own - that's fine at runtime since Vite bundles every
-// imported stylesheet into one global CSS file regardless of which route
-// renders it, but it does mean Home.css can't be deleted while this
-// component is still in use elsewhere.
+// different).
 //
 // The repayment formula (estimateMonthlyInstallment) was found in
 // personalLoanCampaign.cshtml's `installmentEstimator` JS function - this
@@ -35,8 +31,18 @@ function allowDigitsOnly(event: KeyboardEvent<HTMLInputElement>) {
 
 const TERM_OPTIONS = [7, 9, 12, 18, 24, 30, 36, 42, 48, 60, 72];
 
-const RANGE_GRADIENT =
-  '-webkit-gradient(linear, 0% 0%, 100% 0%, from(rgb(136, 188, 71)), from(rgb(0, 43, 96)))';
+// The visible track color of both range sliders - a fixed green-to-navy
+// gradient (not a value-tracking fill) matching the original's own static
+// `background-image` on the slider, just expressed as a Tailwind gradient
+// instead of a raw `-webkit-gradient(...)` string.
+const RANGE_TRACK_CLASS =
+  'h-1.5 w-full cursor-pointer appearance-none rounded-full bg-gradient-to-r from-brand-green to-brand-navy outline-none ' +
+  '[&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-0 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-[1px_2px_5px_rgba(0,0,0,0.2)] [&::-webkit-slider-thumb]:transition-all ' +
+  '[&:hover::-webkit-slider-thumb]:h-6 [&:hover::-webkit-slider-thumb]:w-6 ' +
+  '[&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:shadow-[1px_2px_5px_rgba(0,0,0,0.2)]';
+
+const PILL_INPUT_CLASS =
+  'h-[50px] w-full rounded-full border-0 bg-white px-5 text-center text-xl font-bold text-black outline-none placeholder:text-base placeholder:font-medium placeholder:text-[#696969] focus:ring-2 focus:ring-[#259cd8]';
 
 export interface LoanCalculatorProps {
   minAmount?: number;
@@ -78,114 +84,103 @@ export function LoanCalculator({
   }
 
   const form: ReactNode = (
-    <div className="col-md-6">
-      <h1 className="calculator-brand-1 mt-15 mb-20">Loan Calculator</h1>
+    <div>
+      <h1 className="mb-5 text-3xl font-bold text-white md:text-4xl">Loan Calculator</h1>
 
-      <div className="calculator-form" aria-describedby="loan-disclaimer">
-        <p className="cal-loan-disclaimer" style={{ padding: '5px 0px' }}>
+      <div className="text-center" aria-describedby="loan-disclaimer">
+        <p className="mb-6 text-left text-sm text-white">
           Please enter Loan amount between {formatRand(minAmount)} to {formatRand(maxAmount)}
         </p>
-        <label className="cal-amount" />
 
         <Input
           id="input-Amount1"
-          className="loan-inpt"
+          className={PILL_INPUT_CLASS}
           type="text"
-          value={amount}
+          value={formatRand(amount)}
           onChange={handleAmountChange}
           onKeyPress={allowDigitsOnly}
         />
-        <div className="range-wrap">
-          <div className="range-value" id="rangeV1" />
+
+        <div className="mt-4">
           <Input
             id="slide-range1"
             type="range"
-            className="loan-range"
+            className={RANGE_TRACK_CLASS}
             min={minAmount}
             max={maxAmount}
             step={500}
             value={amount}
             onChange={(event) => setAmount(Number(event.target.value))}
-            style={{ backgroundImage: RANGE_GRADIENT }}
           />
         </div>
 
-        <div className="loans" aria-hidden="true" style={{ marginBottom: '-7px' }}>
-          <div className="col-1" style={{ textAlign: 'left', fontSize: '14px' }}>
-            {formatRand(minAmount)}
-          </div>
-          <div />
-          <div className="col-2" style={{ textAlign: 'right', fontSize: '14px' }}>
-            {formatRand(maxAmount)}
-          </div>
+        <div className="mb-6 flex justify-between text-sm text-white" aria-hidden="true">
+          <span>{formatRand(minAmount)}</span>
+          <span>{formatRand(maxAmount)}</span>
         </div>
 
-        <label className="cal-amount">Repayment Term</label>
-        <Select
-          className="loan-select-term"
-          id="term1"
-          value={term}
-          onChange={(event) => setTerm(Number(event.target.value))}
-        >
-          {termOptions.map((months) => (
-            <option value={months} key={months}>
-              {months} Months
-            </option>
-          ))}
-        </Select>
+        <label htmlFor="term1" className="mb-2 block text-left text-sm font-bold text-white">
+          Repayment Term
+        </label>
+        <div className="relative">
+          <Select
+            className={`${PILL_INPUT_CLASS} appearance-none pr-12 text-left`}
+            id="term1"
+            value={term}
+            onChange={(event) => setTerm(Number(event.target.value))}
+          >
+            {termOptions.map((months) => (
+              <option value={months} key={months}>
+                {months} Months
+              </option>
+            ))}
+          </Select>
+          <ChevronDown className="pointer-events-none absolute top-1/2 right-5 size-4 -translate-y-1/2 text-black" />
+        </div>
 
-        <div className="range-wrap">
-          <div className="range-value" id="rangeV2" />
+        <div className="mt-4">
           <Input
             id="input-month1"
             type="range"
-            className="loan-range"
+            className={RANGE_TRACK_CLASS}
             min={minTerm}
             max={maxTerm}
             value={term}
             onChange={(event) => setTerm(Number(event.target.value))}
-            style={{ backgroundImage: RANGE_GRADIENT }}
           />
         </div>
 
-        <div className="Months" style={{ marginBottom: '-7px' }}>
-          <div className="col-1" style={{ textAlign: 'left', fontSize: '14px' }}>
-            {minTerm} Months
-          </div>
-          <div />
-          <div className="col-2" style={{ textAlign: 'right', fontSize: '14px' }}>
-            {' '}
-            {maxTerm} Months
-          </div>
+        <div className="mb-6 flex justify-between text-sm text-white" aria-hidden="true">
+          <span>{minTerm} Months</span>
+          <span>{maxTerm} Months</span>
         </div>
 
-        <label className="cal-amount">Monthly Repayment will be</label>
+        <label htmlFor="installment_calc1" className="mb-2 block text-left text-sm font-bold text-white">
+          Monthly Repayment Will Be
+        </label>
         <Input
           id="installment_calc1"
-          className="loan-inpt-return"
+          className={`${PILL_INPUT_CLASS} mb-8`}
           type="text"
           value={monthlyRepayment}
           readOnly
           aria-label="Monthly installment amount"
         />
 
-        <div className="combo-btn">
-          <div className="mt-50 text-start column1">
-            <p className="combo-btn-text primary">
-              <Button href={applyUrl} role="button" aria-label="apply for a loan button">
-                Apply Now
-              </Button>
-            </p>
-          </div>
+        <div className="text-left">
+          <Button href={applyUrl} role="button" aria-label="apply for a loan button">
+            Apply Now
+          </Button>
         </div>
       </div>
     </div>
   );
 
   const image: ReactNode = (
-    <div className="col-md-6">
+    <div className="relative mx-auto flex max-w-sm items-center justify-center">
+      <div className="absolute inset-0 rounded-[40%_60%_60%_40%/50%_60%_40%_50%] bg-white/25" />
       <img
-        className="img-responsive d-block"
+        className="relative block max-h-[420px] w-auto"
         src={imageUrl}
         alt={imageAlt}
         role="img"
@@ -196,20 +191,22 @@ export function LoanCalculator({
   );
 
   return (
-    <section className="section-800 pt-50 pb-40 home-loan-calculator calculator-bg" aria-labelledby="loan-calculator">
-      <div className="container">
-        <div className="row d-flex align-items-center row-change md-text-center">
-          {imagePosition === 'left' ? (
-            <>
-              {image}
-              {form}
-            </>
-          ) : (
-            <>
-              {form}
-              {image}
-            </>
-          )}
+    <section className="flex items-center py-10 md:py-20" aria-labelledby="loan-calculator">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="rounded-[29px] bg-[#8095af] p-8 md:p-14">
+          <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-2 md:gap-16">
+            {imagePosition === 'left' ? (
+              <>
+                {image}
+                {form}
+              </>
+            ) : (
+              <>
+                {form}
+                {image}
+              </>
+            )}
+          </div>
         </div>
       </div>
     </section>
