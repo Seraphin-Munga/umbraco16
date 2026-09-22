@@ -48,9 +48,8 @@ export function Header() {
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
-    // TEMP-DISABLED-FOR-VISUAL-QA
-    // const promise = dispatch(fetchHeaderNavigation());
-    // return () => promise.abort();
+    const promise = dispatch(fetchHeaderNavigation());
+    return () => promise.abort();
   }, [dispatch]);
 
   const closeMobile = () => setMobileOpen(false);
@@ -107,7 +106,9 @@ export function Header() {
 
                     return (
                       <NavigationMenuItem key={key}>
-                        <NavigationMenuTrigger className={`bg-transparent ${navLinkClass}`}>
+                        <NavigationMenuTrigger
+                          className={`bg-transparent data-open:bg-white/10 data-open:hover:bg-white/10 data-open:focus:bg-white/10 data-popup-open:bg-white/10 data-popup-open:hover:bg-white/10 ${navLinkClass}`}
+                        >
                           {link.title}
                         </NavigationMenuTrigger>
                         <NavigationMenuContent>
