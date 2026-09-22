@@ -23,7 +23,7 @@ import { Input } from '../ui/shadcn-input';
 const ONLINE_UPLOAD_URL = import.meta.env.VITE_ONLINE_UPLOAD_URL || '#';
 
 const navLinkClass =
-  'text-white hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white data-active:bg-white/10';
+  'text-white uppercase text-xs font-medium tracking-wide whitespace-nowrap px-2 py-1.5 hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white data-active:bg-white/10';
 
 // CMS-sourced link.url values are either a relative in-app path or a fully
 // qualified off-site URL (see mapLinks' comment in contentApi.ts) - only
@@ -57,13 +57,13 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-brand-navy font-sans text-white shadow-md">
-      <div className="mx-auto flex h-20 max-w-7xl items-center gap-6 px-4 sm:px-6 lg:px-8">
+      <div className="flex h-20 items-center gap-6 px-4 sm:px-6 lg:px-8">
         <Link to="/en/home/" className="shrink-0" onClick={closeMobile}>
           <Logo />
         </Link>
 
-        <NavigationMenu viewport={false} className="hidden lg:flex">
-          <NavigationMenuList className="gap-1">
+        <NavigationMenu viewport={false} className="hidden lg:flex lg:min-w-0 lg:flex-1">
+          <NavigationMenuList className="flex-nowrap gap-0.5">
             {loading && <li className="px-2.5 py-1.5 text-sm text-white/60">Loading menu…</li>}
             {error && <li className="px-2.5 py-1.5 text-sm text-red-300">{error}</li>}
 
@@ -181,12 +181,23 @@ export function Header() {
           >
             {searchOpen ? <X className="size-5" /> : <Search className="size-5" />}
           </button>
-          <Button
-            onClick={openRegisterLogin}
-            className="rounded-full bg-brand-green px-5 text-white hover:bg-brand-green/90"
-          >
-            Register/Login
-          </Button>
+          <div className="flex items-center overflow-hidden rounded-full bg-brand-green text-sm font-semibold text-white">
+            <button
+              type="button"
+              onClick={openRegisterLogin}
+              className="px-5 py-2 uppercase tracking-wide transition-colors hover:bg-black/10"
+            >
+              Register
+            </button>
+            <span className="h-4 w-px bg-white/40" aria-hidden="true" />
+            <button
+              type="button"
+              onClick={openRegisterLogin}
+              className="px-5 py-2 uppercase tracking-wide transition-colors hover:bg-black/10"
+            >
+              Login
+            </button>
+          </div>
         </div>
 
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
@@ -363,7 +374,7 @@ export function Header() {
         <div className="hidden border-t border-white/10 bg-[#00224d] lg:block">
           <form
             onSubmit={(event) => event.preventDefault()}
-            className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:px-6 lg:px-8"
+            className="flex items-center gap-3 px-4 py-3 sm:px-6 lg:px-8"
           >
             <Search className="size-4 shrink-0 text-white/60" />
             <Input

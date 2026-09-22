@@ -17,7 +17,6 @@
 @import url('/vendor/media-query.css') layer(legacy);
 @import url('/vendor/main.min.css') layer(legacy);
 @import url('/vendor/custom_main.min.css') layer(legacy);
-@import url('/vendor/projectmagic.css') layer(legacy);
 @import url('/vendor/loan-calculator.css') layer(legacy);
 @import url('/vendor/cookieconsent.css') layer(legacy);
 @import 'tailwindcss';
