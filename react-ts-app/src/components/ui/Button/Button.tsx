@@ -1,4 +1,5 @@
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from 'react';
+import { cn } from 'cn';
 
 // Shared button so every CTA across the ported site (HeroCarousel.tsx,
 // MyWorldAccount.tsx, BankWithAudacity.tsx, Hero/HeroBanner.tsx, etc.) goes
@@ -35,7 +36,7 @@ export type ButtonProps = ButtonAsLink | ButtonAsButton;
 
 export function Button(props: ButtonProps) {
   const { variant = 'brand-1', className, children, ...rest } = props;
-  const classes = [VARIANT_CLASS[variant], className].filter(Boolean).join(' ');
+  const classes = cn(VARIANT_CLASS[variant], className);
 
   if (rest.href !== undefined) {
     const { href, ...anchorProps } = rest as AnchorHTMLAttributes<HTMLAnchorElement> & { href: string };

@@ -31,18 +31,33 @@ function allowDigitsOnly(event: KeyboardEvent<HTMLInputElement>) {
 
 const TERM_OPTIONS = [7, 9, 12, 18, 24, 30, 36, 42, 48, 60, 72];
 
-// The visible track color of both range sliders - a fixed green-to-navy
-// gradient (not a value-tracking fill) matching the original's own static
-// `background-image` on the slider, just expressed as a Tailwind gradient
-// instead of a raw `-webkit-gradient(...)` string.
+// Compact "R2 000" form used for the disclaimer and the slider min/max
+// labels - distinct from formatRand's "R 2 000.00" (space + cents), which
+// only the editable amount field and the read-only repayment result use.
+function formatRandCompact(value: number): string {
+  return `R${Math.round(value).toLocaleString('en-US').replace(/,/g, ' ')}`;
+}
+
+// The visible track color of both range sliders - solid brand navy, no
+// value-tracking fill (matches the original's own malformed
+// `-webkit-gradient(linear, 0% 0%, 100% 0%, from(green), from(navy))` -
+// two `from()` stops with no `to()` isn't valid gradient syntax, so
+// browsers resolve it as the last color only, i.e. solid navy).
 const RANGE_TRACK_CLASS =
-  'h-1.5 w-full cursor-pointer appearance-none rounded-full bg-gradient-to-r from-brand-green to-brand-navy outline-none ' +
+  'h-1.5 w-full cursor-pointer appearance-none rounded-full bg-brand-navy outline-none ' +
   '[&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-0 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-[1px_2px_5px_rgba(0,0,0,0.2)] [&::-webkit-slider-thumb]:transition-all ' +
   '[&:hover::-webkit-slider-thumb]:h-6 [&:hover::-webkit-slider-thumb]:w-6 ' +
   '[&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:shadow-[1px_2px_5px_rgba(0,0,0,0.2)]';
 
+// Input.tsx/Select.tsx are plain passthroughs (no tailwind-merge) - a
+// second color utility appended to this string wouldn't reliably override
+// `text-black` here, so the readonly repayment field (navy, not black)
+// gets its own variant instead of overriding this one.
 const PILL_INPUT_CLASS =
   'h-[50px] w-full rounded-full border-0 bg-white px-5 text-center text-xl font-bold text-black outline-none placeholder:text-base placeholder:font-medium placeholder:text-[#696969] focus:ring-2 focus:ring-[#259cd8]';
+
+const PILL_RESULT_CLASS =
+  'h-[50px] w-full rounded-full border-0 bg-white px-5 text-center text-xl font-bold text-brand-navy outline-none';
 
 export interface LoanCalculatorProps {
   minAmount?: number;
@@ -89,7 +104,7 @@ export function LoanCalculator({
 
       <div className="text-center" aria-describedby="loan-disclaimer">
         <p className="mb-6 text-left text-sm text-white">
-          Please enter Loan amount between {formatRand(minAmount)} to {formatRand(maxAmount)}
+          Please enter Loan amount between {formatRandCompact(minAmount)} to {formatRandCompact(maxAmount)}
         </p>
 
         <Input
@@ -115,8 +130,8 @@ export function LoanCalculator({
         </div>
 
         <div className="mb-6 flex justify-between text-sm text-white" aria-hidden="true">
-          <span>{formatRand(minAmount)}</span>
-          <span>{formatRand(maxAmount)}</span>
+          <span>{formatRandCompact(minAmount)}</span>
+          <span>{formatRandCompact(maxAmount)}</span>
         </div>
 
         <label htmlFor="term1" className="mb-2 block text-left text-sm font-bold text-white">
@@ -160,7 +175,7 @@ export function LoanCalculator({
         </label>
         <Input
           id="installment_calc1"
-          className={`${PILL_INPUT_CLASS} mb-8`}
+          className={`${PILL_RESULT_CLASS} mb-8`}
           type="text"
           value={monthlyRepayment}
           readOnly
@@ -168,7 +183,7 @@ export function LoanCalculator({
         />
 
         <div className="text-left">
-          <Button href={applyUrl} role="button" aria-label="apply for a loan button">
+          <Button href={applyUrl} role="button" aria-label="apply for a loan button" className="normal-case">
             Apply Now
           </Button>
         </div>
@@ -176,11 +191,13 @@ export function LoanCalculator({
     </div>
   );
 
+  // No wrapping shape here - the source image itself is a pre-cut PNG with
+  // its own soft, organic-edged transparency (matching the original
+  // component's plain <img>, no extra markup around it).
   const image: ReactNode = (
-    <div className="relative mx-auto flex max-w-sm items-center justify-center">
-      <div className="absolute inset-0 rounded-[40%_60%_60%_40%/50%_60%_40%_50%] bg-white/25" />
+    <div className="mx-auto flex max-w-sm items-center justify-center">
       <img
-        className="relative block max-h-[420px] w-auto"
+        className="block max-h-[420px] w-auto"
         src={imageUrl}
         alt={imageAlt}
         role="img"
