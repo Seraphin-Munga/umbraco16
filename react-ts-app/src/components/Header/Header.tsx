@@ -57,13 +57,13 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-brand-navy font-sans text-white shadow-md">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-20 max-w-7xl items-center gap-6 px-4 sm:px-6 lg:px-8">
         <Link to="/en/home/" className="shrink-0" onClick={closeMobile}>
           <Logo />
         </Link>
 
-        <NavigationMenu viewport={false} className="hidden max-w-none flex-1 justify-start lg:flex">
-          <NavigationMenuList className="justify-start gap-1">
+        <NavigationMenu viewport={false} className="hidden lg:flex">
+          <NavigationMenuList className="gap-1">
             {loading && <li className="px-2.5 py-1.5 text-sm text-white/60">Loading menu…</li>}
             {error && <li className="px-2.5 py-1.5 text-sm text-red-300">{error}</li>}
 
@@ -171,13 +171,7 @@ export function Header() {
           </NavigationMenuList>
         </NavigationMenu>
 
-        <div className="hidden items-center gap-5 lg:flex">
-          <a href="#" className="text-sm text-white/70 transition-colors hover:text-white">
-            Blog
-          </a>
-          <a href="#" className="text-sm text-white/70 transition-colors hover:text-white">
-            Contact Us
-          </a>
+        <div className="ml-auto hidden items-center gap-5 lg:flex">
           <button
             type="button"
             aria-label={searchOpen ? 'Close search' : 'Open search'}
@@ -200,7 +194,7 @@ export function Header() {
             <Button
               variant="ghost"
               size="icon"
-              className="text-white hover:bg-white/10 hover:text-white lg:hidden"
+              className="ml-auto text-white hover:bg-white/10 hover:text-white lg:hidden"
             >
               <Menu className="size-5" />
               <span className="sr-only">Toggle navigation</span>
@@ -348,14 +342,6 @@ export function Header() {
                     );
                   }),
                 )}
-
-              <div className="my-2 border-t border-white/10" />
-              <a href="#" className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-white/10">
-                Blog
-              </a>
-              <a href="#" className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-white/10">
-                Contact Us
-              </a>
             </nav>
 
             <div className="border-t border-white/10 p-4">
