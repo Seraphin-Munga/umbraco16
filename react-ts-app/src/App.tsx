@@ -5,7 +5,6 @@ import { KaraboChat } from './components/KaraboChat/KaraboChat'
 import { Home } from './components/Home/Home'
 import { DynamicPage } from './pages/DynamicPage/DynamicPage'
 import { GetAQuote } from './pages/GetAQuote/GetAQuote'
-import { LoanCalculator } from './components/ui/LoanCalculator/LoanCalculator'
 
 // Every Umbraco page except Home renders through the DynamicPage catch-all -
 // no per-page route/component to add here as new content gets created. It
@@ -26,7 +25,6 @@ function App() {
             <Route path="/" element={<Navigate to="/en/home/" replace />} />
             <Route path="/en/home/" element={<Home />} />
             <Route path="/en/home/get-a-quote" element={<GetAQuote />} />
-            <Route path="/__debug/loan-calculator" element={<LoanCalculator />} />
             <Route path="*" element={<DynamicPage />} />
           </Routes>
         </main>
