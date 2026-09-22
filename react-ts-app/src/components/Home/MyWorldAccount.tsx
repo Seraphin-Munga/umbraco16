@@ -16,47 +16,37 @@ interface MyWorldAccountProps {
 
 export function MyWorldAccount({ features, ctaLabel, ctaUrl, heading, subheading }: MyWorldAccountProps) {
   return (
-    <section className="section-title mtb-120">
-      <div className="container">
-        <div className="row align-items-end md-text-center">
-          <div className="col-md-7">
-            <h1 className="color-brand-1 major-title">{heading}</h1>
-            {ctaLabel && ctaUrl && (
-              <div className="mt-50 text-start">
-                <div className="mb-50">
-                  <div className="combo-btn mt-50 text-start column1">
-                    <p className="combo-btn-text primary">
-                      <Button href={ctaUrl}>{ctaLabel}</Button>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="col-md-5">
-            <h4 className="color-brand-1 mb-20">{subheading}</h4>
-            <div className="mt-30 mb-30 inline-checklist">
-              <ul className="list-ticks list-ticks-2">
-                {features.map((feature) => (
-                  <li key={feature}>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-check-lg"
-                      viewBox="0 0 16 16"
-                      style={{ color: '#5dc300' }}
-                    >
-                      <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z" />
-                    </svg>
-                    {feature}
-                  </li>
-                ))}
-              </ul>
+    <section className="my-10 md:my-[120px]">
+      <div className="mx-auto max-w-7xl px-4 text-center max-[768px]:text-left sm:px-6 md:grid md:grid-cols-12 md:items-end md:gap-8 lg:px-8">
+        <div className="md:col-span-7">
+          <h1 className="text-[20px] leading-none font-extralight text-brand-ink sm:text-[65px]">{heading}</h1>
+          {ctaLabel && ctaUrl && (
+            <div className="mt-8 text-left">
+              <Button href={ctaUrl}>{ctaLabel}</Button>
             </div>
-          </div>
+          )}
+        </div>
+
+        <div className="mt-10 md:col-span-5 md:mt-0">
+          <h4 className="mb-5 font-semibold text-brand-ink">{subheading}</h4>
+          <ul className="flex flex-wrap">
+            {features.map((feature) => (
+              <li key={feature} className="mb-3 flex w-1/2 items-start gap-2 pr-2 text-left text-sm text-brand-ink">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  viewBox="0 0 16 16"
+                  className="mt-0.5 shrink-0"
+                  style={{ color: '#5dc300' }}
+                >
+                  <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z" />
+                </svg>
+                {feature}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>

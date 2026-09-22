@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Play, X } from 'lucide-react';
 
 // Ported from the "testimonial-section" video grid in the current live home
 // page markup - replaces this file's old API-driven avatar/story carousel
@@ -32,29 +33,26 @@ export function Testimonials({ videos, heading }: TestimonialsProps) {
   }, [openVideoId]);
 
   return (
-    <section className="testimonial-section">
-      <div className="container">
-        <div className="row">
-          <div className="col-md-12 mb-50">
-            <h1 className="text-white span-major-title">{heading}</h1>
-          </div>
-        </div>
+    <section className="bg-[linear-gradient(152deg,rgba(0,43,96,1)_33%,rgba(4,24,49,1)_51%)] px-4 py-[60px] text-center">
+      <div className="mx-auto max-w-7xl">
+        <h1 className="mb-[50px] text-[20px] font-bold text-white sm:text-[65px]">{heading}</h1>
 
-        <div className="row">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
           {videos.map((video) => (
-            <div className="col-md-4 col-sm-4 col-xs-12 mb-20" key={video.id}>
-              <div
-                className="video-placeholder"
-                role="button"
-                tabIndex={0}
-                aria-label="Play video"
-                onClick={() => setOpenVideoId(video.videoId)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' || event.key === ' ') setOpenVideoId(video.videoId);
-                }}
-              >
-                <img src={video.thumbnailUrl} alt="Video Preview" />
-                <div className="play-btn" />
+            <div
+              className="relative w-full cursor-pointer overflow-hidden rounded-[29px] bg-brand-ink"
+              role="button"
+              tabIndex={0}
+              aria-label="Play video"
+              onClick={() => setOpenVideoId(video.videoId)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') setOpenVideoId(video.videoId);
+              }}
+              key={video.id}
+            >
+              <img className="block h-auto w-full" src={video.thumbnailUrl} alt="Video Preview" />
+              <div className="absolute top-1/2 left-1/2 flex size-[60px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black/60">
+                <Play className="size-6 fill-white text-white" />
               </div>
             </div>
           ))}
@@ -62,17 +60,20 @@ export function Testimonials({ videos, heading }: TestimonialsProps) {
       </div>
 
       {openVideoId && (
-        <div className="video-modal-overlay" onClick={() => setOpenVideoId(null)}>
-          <div className="video-modal-wrapper" onClick={(event) => event.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-[1050] flex items-center justify-center bg-black/75 p-5"
+          onClick={() => setOpenVideoId(null)}
+        >
+          <div className="relative w-full max-w-[900px]" onClick={(event) => event.stopPropagation()}>
             <button
               type="button"
-              className="video-modal-close"
+              className="absolute -top-10 right-0 cursor-pointer border-none bg-transparent p-0 text-white"
               aria-label="Close video"
               onClick={() => setOpenVideoId(null)}
             >
-              ×
+              <X className="size-8" />
             </button>
-            <div className="video-modal">
+            <div className="aspect-video w-full overflow-hidden rounded-xl bg-black">
               <iframe
                 width="100%"
                 height="100%"

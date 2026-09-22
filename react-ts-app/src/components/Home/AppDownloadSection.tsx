@@ -26,27 +26,25 @@ export function AppDownloadSection({
   heading,
 }: AppDownloadSectionProps) {
   return (
-    <section className="section pb-40 pt-40">
-      <div className="container">
-        <div className="row align-items-center row-change d-flex flex-row-reverse md-text-center">
-          <div className="col-xl-6 col-lg-6 col-md-6">
-            <h1 className="color-brand-1 mb-20">{heading}</h1>
+    <section className="py-10">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col items-center gap-8 text-center max-[768px]:text-left md:flex-row-reverse">
+          <div className="md:w-1/2">
+            <h1 className="mb-5 text-brand-ink">{heading}</h1>
 
-            {subheading && <h4 className="color-brand-1 mb-20">{subheading}</h4>}
-            <p className="font-md color-brand-1">{description}</p>
+            {subheading && <h4 className="mb-5 font-semibold text-brand-ink">{subheading}</h4>}
+            <p className="text-base text-brand-ink">{description}</p>
 
             {downloadUrl && downloadLabel && (
-              <div className="mt-50 text-start">
+              <div className="mt-8 text-left">
                 <Button href={downloadUrl}>
-                  {downloadLabel}{' '}
+                  {downloadLabel}
                   <svg
                     stroke="currentColor"
                     fill="currentColor"
                     strokeWidth={0}
                     viewBox="0 0 512 512"
-                    className="right-icon"
-                    height="1em"
-                    width="1em"
+                    className="ml-2 size-4 transition-transform duration-500 group-hover:translate-x-1"
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
@@ -63,8 +61,8 @@ export function AppDownloadSection({
           </div>
 
           {imageUrl && (
-            <div className="col-xl-6 col-lg-6 col-md-6">
-              <img className="d-block" src={imageUrl} alt={imageAlt} />
+            <div className="md:w-1/2">
+              <img className="block" src={imageUrl} alt={imageAlt} />
             </div>
           )}
         </div>

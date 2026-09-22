@@ -25,40 +25,30 @@ interface RewardsSectionProps {
 
 export function RewardsSection({ cards, heading, subheading, intro }: RewardsSectionProps) {
   return (
-    <section className="borrow-section">
-      <div className="section-title">
-        <div className="container">
-          <div className="row align-items-end md-text-center">
-            <div className="col-md-6">
-              <h1 className="color-brand-1 major-title">{heading}</h1>
-            </div>
-            <div className="col-md-6">
-              <h4 className="color-brand-1 mb-20">{subheading}</h4>
-              <p className="font-md color-brand-1">{intro}</p>
-            </div>
+    <section className="-mt-[55px] bg-[#f2f2f2] pt-[100px] pb-5 max-[768px]:-mt-[100px] min-[769px]:pb-[100px]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="items-end text-center max-[768px]:text-left md:grid md:grid-cols-2 md:gap-8">
+          <div>
+            <h1 className="text-[20px] leading-none font-extralight text-brand-ink sm:text-[65px]">{heading}</h1>
           </div>
+          <div>
+            <h4 className="mb-5 font-semibold text-brand-ink">{subheading}</h4>
+            <p className="text-base text-brand-ink">{intro}</p>
+          </div>
+        </div>
 
-          <div className="row row-eq-height mtb-40">
-            {cards.map((card) => (
-              <div className="col-md-4 mb-20" key={card.id}>
-                <div className="card-offer box">
-                  <div className="card-info">
-                    <div>
-                      <div>
-                        <img className="d-block" src={card.imageUrl} alt={card.imageAlt} />
-                      </div>
-                    </div>
-                    <p className="font-md color-brand-1 mb-15">{card.description}</p>
-                  </div>
-                  <div className="combo-btn mt-50 text-start column1">
-                    <p className="combo-btn-text primary">
-                      <Button href={card.buttonUrl}>{card.buttonLabel}</Button>
-                    </p>
-                  </div>
-                </div>
+        <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
+          {cards.map((card) => (
+            <div className="flex h-full flex-col justify-between rounded-[29px] bg-white p-[15px]" key={card.id}>
+              <div>
+                <img className="block" src={card.imageUrl} alt={card.imageAlt} />
+                <p className="mt-4 mb-4 text-base text-brand-ink">{card.description}</p>
               </div>
-            ))}
-          </div>
+              <div className="text-left">
+                <Button href={card.buttonUrl}>{card.buttonLabel}</Button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

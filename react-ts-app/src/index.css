@@ -65,6 +65,13 @@
        loads that vendor CSS for its own copies of these same values. */
     --color-brand-navy: #002b60;
     --color-brand-green: #88bc47;
+    /* .color-brand-1 / .color-brand-2 / .btn-brand-1's green from
+       projectmagic.css - a second, brighter green distinct from
+       brand-green above (used for CTA buttons/checkmarks/accents), and
+       the dark ink navy most body copy/headings use (distinct from the
+       header's own brand-navy). */
+    --color-brand-ink: #112768;
+    --color-brand-lime: #5dc300;
     --radius-sm: calc(var(--radius) * 0.6);
     --radius-md: calc(var(--radius) * 0.8);
     --radius-lg: var(--radius);

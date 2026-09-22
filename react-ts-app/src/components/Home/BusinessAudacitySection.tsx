@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
+import { Play } from 'lucide-react';
 
 // Ported from the "We back your business audacity" section of the current
 // live home page markup: a text-slider carousel (Bootstrap's own
@@ -31,6 +32,8 @@ interface BusinessAudacitySectionProps {
   contactCards?: StackedContactCard[];
 }
 
+const CARD_BG = ['bg-brand-navy', 'bg-[#5dc300]'];
+
 export function BusinessAudacitySection({
   slides,
   initialIndex = 0,
@@ -39,75 +42,76 @@ export function BusinessAudacitySection({
   contactCards = [],
 }: BusinessAudacitySectionProps) {
   const [activeIndex, setActiveIndex] = useState(initialIndex);
+  const activeSlide = slides[activeIndex];
 
   return (
-    <section className="section-800 bg-grey-60 section-container">
-      <div className="container">
-        <div className="row md-text-center">
-          <div className="col-md-6 col-sm-12 col-xs-12">
-            <h1 className="color-brand-1 major-title mb-20">{heading}</h1>
+    <section className="flex min-h-[800px] items-center bg-[#f2f2f2] py-10">
+      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-10 px-4 text-center max-[768px]:text-left sm:px-6 md:grid-cols-2 lg:px-8">
+        <div>
+          <h1 className="mb-5 text-[20px] leading-none font-extralight text-brand-ink sm:text-[65px]">{heading}</h1>
 
-            <div className="container text-slider-carousel">
-              <div className="slide-number" id="slideNumber">
-                <span className="current-slide">{activeIndex + 1}</span>
-                <span className="divider"> / </span>
-                <span className="total-slides">{slides.length}</span>
-              </div>
-
-              <div id="testimonialCarousel" className="carousel slide">
-                <ol className="carousel-indicators">
-                  {slides.map((_, index) => (
-                    <li
-                      key={index}
-                      className={index === activeIndex ? 'active' : ''}
-                      onClick={() => setActiveIndex(index)}
-                    />
-                  ))}
-                </ol>
-
-                <div className="carousel-inner carousel-inner-height" role="listbox">
-                  {slides.map((slide, index) => (
-                    <div className={`item${index === activeIndex ? ' active' : ''}`} key={index}>
-                      <h4 className="color-brand-2 mb-20">{slide.title}</h4>
-                      {slide.paragraphs.map((paragraph, paragraphIndex) => (
-                        <p
-                          className={`font-md color-brand-1${
-                            paragraphIndex < slide.paragraphs.length - 1 ? ' mb-15' : ''
-                          }`}
-                          key={paragraphIndex}
-                        >
-                          {paragraph}
-                        </p>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+          <div className="mt-10 min-h-[180px]">
+            {activeSlide && (
+              <>
+                <h4 className="mb-5 font-semibold text-[#5dc300]">{activeSlide.title}</h4>
+                {activeSlide.paragraphs.map((paragraph, paragraphIndex) => (
+                  <p
+                    className={`text-base text-brand-ink ${
+                      paragraphIndex < activeSlide.paragraphs.length - 1 ? 'mb-[15px]' : ''
+                    }`}
+                    key={paragraphIndex}
+                  >
+                    {paragraph}
+                  </p>
+                ))}
+              </>
+            )}
           </div>
 
-          <div className="col-md-6 col-sm-12 col-xs-12">
-            <div className="row video-section">
-              {videoThumbnailUrl && (
-                <div className="col-md-6 col-sm-12 col-xs-12 mb-20">
-                  <div className="video-placeholder">
-                    <img src={videoThumbnailUrl} alt="Video Preview" />
-                    <div className="play-btn" />
-                  </div>
-                </div>
-              )}
-
-              <div className="col-md-6 col-sm-12 col-xs-12">
-                {contactCards.map((card, index) => (
-                  <div className={`card-stack card-stack-bg-${(index % 2) + 1}`} key={card.title}>
-                    <div className="centered-text">
-                      <h4 className="text-white">{card.title}</h4>
-                      {card.subtitle && <p className="font-xs text-white">{card.subtitle}</p>}
-                    </div>
-                  </div>
+          {slides.length > 1 && (
+            <div className="mt-8 flex items-center justify-center gap-4 max-[768px]:justify-start">
+              <div className="flex gap-2">
+                {slides.map((_, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    aria-label={`Show slide ${index + 1}`}
+                    onClick={() => setActiveIndex(index)}
+                    className={`size-2.5 rounded-full transition-colors ${
+                      index === activeIndex ? 'bg-brand-ink' : 'bg-[#ccc]'
+                    }`}
+                  />
                 ))}
               </div>
+              <span className="text-sm text-[#666]">
+                <span className="text-base text-brand-navy">{activeIndex + 1}</span> / {slides.length}
+              </span>
             </div>
+          )}
+        </div>
+
+        <div className="flex flex-col items-center gap-5 max-[768px]:mt-[70px] sm:flex-row">
+          {videoThumbnailUrl && (
+            <div className="w-full sm:w-1/2">
+              <div className="relative w-full cursor-pointer overflow-hidden rounded-[29px] bg-brand-ink">
+                <img className="block h-auto w-full" src={videoThumbnailUrl} alt="Video Preview" />
+                <div className="absolute top-1/2 left-1/2 flex size-[60px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black/60">
+                  <Play className="size-6 fill-white text-white" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="w-full sm:w-1/2">
+            {contactCards.map((card, index) => (
+              <div
+                className={`mb-[15px] flex h-[200px] w-full flex-col items-start justify-center rounded-[29px] p-5 ${CARD_BG[index % 2]}`}
+                key={card.title}
+              >
+                <h4 className="text-2xl font-semibold text-white">{card.title}</h4>
+                {card.subtitle && <p className="text-xs text-white">{card.subtitle}</p>}
+              </div>
+            ))}
           </div>
         </div>
       </div>
