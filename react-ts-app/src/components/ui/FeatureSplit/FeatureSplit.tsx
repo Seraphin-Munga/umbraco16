@@ -1,5 +1,4 @@
 import { Button } from '../Button/Button';
-import '../media-frame.css';
 
 export interface FeatureSplitItem {
   title: string;
@@ -25,6 +24,11 @@ export interface FeatureSplitProps {
 // (CMS-driven, any page - see cms/renderPageSection.tsx). See
 // FeatureChecklist.tsx for the sibling checkmarked-list variant of this
 // same two-column shape.
+//
+// Was previously `.feature-split`/`.container`/`.row`/`.col-xl-6`/`.major-
+// title`/etc - see PromoSplit.tsx's own comment for why that stylesheet
+// (public/vendor/projectmagic.css) isn't actually loaded, so this
+// rendered unstyled.
 export function FeatureSplit({
   heading,
   features,
@@ -36,36 +40,36 @@ export function FeatureSplit({
   const hasImage = Boolean(imageUrl);
 
   const textColumn = (
-    <div className={hasImage ? 'col-xl-6 col-lg-6 col-md-6' : 'col-xl-12 col-lg-12 col-md-12'}>
-      <h1 className="color-brand-1 major-title mb-20">{heading}</h1>
+    <div>
+      <h1 className="mb-[20px] text-[20px] leading-none font-extralight text-brand-ink sm:text-[65px]">{heading}</h1>
       {features.map((feature) => (
-        <p className="font-md color-brand-1 mb-20" key={feature.title}>
+        <p className="mb-[20px] text-base leading-[1.3] text-[#335580]" key={feature.title}>
           <strong>{feature.title} - </strong>
           {feature.description}
         </p>
       ))}
       {cta && (
-        <div className="combo-btn mt-30 text-start column1">
-          <p className="combo-btn-text primary">
-            <Button href={cta.url}>{cta.label}</Button>
-          </p>
+        <div className="mt-[30px] flex flex-wrap items-center gap-[30px]">
+          <Button href={cta.url}>{cta.label}</Button>
         </div>
       )}
     </div>
   );
 
   const imageColumn = hasImage && (
-    <div className="col-xl-6 col-lg-6 col-md-6">
-      <div className="product-image-frame">
-        <img src={imageUrl} alt={imageAlt} />
-      </div>
+    <div className="relative w-full">
+      <img
+        className="block h-auto w-full rounded-[71%_29%_66%_34%/41%_42%_58%_59%] object-cover"
+        src={imageUrl}
+        alt={imageAlt}
+      />
     </div>
   );
 
   return (
-    <section className="feature-split mtb-120">
-      <div className="container">
-        <div className="row d-flex align-items-center row-change md-text-center">
+    <section className="my-[40px] sm:my-[120px]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className={`grid grid-cols-1 items-center gap-10 ${hasImage ? 'md:grid-cols-2 md:gap-16' : ''}`}>
           {imageOnRight ? (
             <>
               {textColumn}

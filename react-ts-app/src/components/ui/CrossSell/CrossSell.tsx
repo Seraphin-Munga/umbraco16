@@ -1,3 +1,4 @@
+import { ChevronRight } from 'lucide-react';
 import type { AudacityCard } from '../../Home/BankWithAudacity';
 
 export interface CrossSellProps {
@@ -9,36 +10,46 @@ export interface CrossSellProps {
 // "Find your ideal loan solution" style cross-sell card grid beside a
 // photo (crossSellBlock, CMS-driven, any page - see
 // cms/renderPageSection.tsx).
+//
+// Was previously `.section-800`/`.container`/`.row`/`.col-md-6`/`.card-
+// offer`/`.btn.btn-default`/etc, styled by public/vendor/projectmagic.css
+// - a stylesheet that isn't actually loaded anywhere (see PromoSplit.tsx's
+// own comment on that gap), so this rendered unstyled in production.
+// Tailwind classes below reproduce its confirmed values (`.card-offer`'s
+// padding:20px/border-radius:30px, `.btn.btn-default`'s 40px circle, etc);
+// the source's `.btn.btn-default.arrow-right` was an empty anchor with
+// only an aria-label and a CSS `content: '❯'` pseudo-element for its
+// visible glyph - replaced here with a real ChevronRight icon instead of
+// reproducing that pseudo-element trick.
 export function CrossSell({ heading, cards, imageUrl }: CrossSellProps) {
   return (
-    <section className="section-800">
-      <div className="container">
-        <div className="row d-flex align-items-center row-change md-text-center">
-          <div className="col-md-6">
-            <h1 className="color-brand-1 mt-15 mb-20">{heading}</h1>
-            <div className="row mt-5">
+    <section className="flex min-h-[800px] w-full items-center py-10">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className={`grid grid-cols-1 items-center gap-10 ${imageUrl ? 'md:grid-cols-2 md:gap-16' : ''}`}>
+          <div>
+            <h1 className="mt-[15px] mb-[20px] text-brand-ink">{heading}</h1>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               {cards.map((card) => (
-                <div className="col-md-6" key={card.id}>
-                  <div className="card-offer hover-up">
-                    <div className="card-info">
-                      <h4 className="color-brand-2">{card.title}</h4>
-                      <p className="font-sm color-grey-500 mb-15">{card.description}</p>
-                      <div className="box-button-offer">
-                        <a
-                          href={card.buttonUrl}
-                          className="btn btn-default font-sm-bold pl-0 color-brand-1 arrow-right"
-                          aria-label={card.buttonLabel || card.title}
-                        />
-                      </div>
-                    </div>
-                  </div>
+                <div
+                  className="rounded-[30px] border border-[#F2F2F2] p-5 pr-[20px] transition-shadow hover:shadow-[0_3px_15px_rgba(0,0,0,0.1)]"
+                  key={card.id}
+                >
+                  <h4 className="text-brand-lime">{card.title}</h4>
+                  <p className="mb-[15px] text-base leading-[1.2] text-[#3D565F]">{card.description}</p>
+                  <a
+                    href={card.buttonUrl}
+                    className="flex size-10 items-center justify-center rounded-full bg-white text-brand-ink shadow-[0_3px_6px_rgba(0,0,0,0.16)] transition-colors hover:bg-brand-lime hover:text-white"
+                    aria-label={card.buttonLabel || card.title}
+                  >
+                    <ChevronRight className="size-5" />
+                  </a>
                 </div>
               ))}
             </div>
           </div>
           {imageUrl && (
-            <div className="col-md-6">
-              <img className="d-block" src={imageUrl} alt="" />
+            <div>
+              <img className="block w-full" src={imageUrl} alt="" />
             </div>
           )}
         </div>

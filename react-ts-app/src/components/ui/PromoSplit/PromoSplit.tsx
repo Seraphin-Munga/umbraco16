@@ -1,5 +1,4 @@
 import { Button } from '../Button/Button';
-import '../media-frame.css';
 
 export interface PromoSplitCta {
   label: string;
@@ -22,6 +21,17 @@ export interface PromoSplitProps {
 // Same layout family as Hero/HeroSplit.tsx, but the secondary CTA renders
 // as its own pill (brand-secondary) instead of a text link, and the image
 // side is CMS-toggleable rather than always on the right.
+//
+// Was previously `.promo-split`/`.container`/`.row`/`.col-xl-6`/`.major-
+// title`/`.combo-btn`/etc, styled entirely by public/vendor/projectmagic.css
+// - a stylesheet that isn't actually loaded anywhere (only style.css,
+// media-query.css, main.min.css, custom_main.min.css and loan-calculator.css
+// are, per index.css), so this component has been rendering unstyled in
+// production. Tailwind classes below reproduce projectmagic.css's real
+// values (.major-title's font-weight:200/65px, .combo-btn's flex gap:30px,
+// .mb-20's margin-bottom:20px, etc - note these px-suffixed utility names
+// are 1:1 pixel values there, not Tailwind's own same-named rem scale) -
+// same porting approach as Button.tsx's own variant classes.
 export function PromoSplit({
   heading,
   description,
@@ -34,22 +44,16 @@ export function PromoSplit({
   const hasImage = Boolean(imageUrl);
 
   const textColumn = (
-    <div className={hasImage ? 'col-xl-6 col-lg-6 col-md-6' : 'col-xl-12 col-lg-12 col-md-12'}>
-      <h1 className="color-brand-1 major-title mb-20">{heading}</h1>
-      {description && <p className="font-md color-brand-1">{description}</p>}
+    <div>
+      <h1 className="mb-[20px] text-[20px] leading-none font-extralight text-brand-ink sm:text-[65px]">{heading}</h1>
+      {description && <p className="text-base leading-[1.3] text-[#335580]">{description}</p>}
       {(primaryCta || secondaryCta) && (
-        <div className="combo-btn mt-50 text-start column1">
-          {primaryCta && (
-            <p className="combo-btn-text primary">
-              <Button href={primaryCta.url}>{primaryCta.label}</Button>
-            </p>
-          )}
+        <div className="mt-[50px] flex flex-wrap items-center gap-[30px]">
+          {primaryCta && <Button href={primaryCta.url}>{primaryCta.label}</Button>}
           {secondaryCta && (
-            <p className="combo-btn-text secondary">
-              <Button href={secondaryCta.url} variant="brand-secondary">
-                {secondaryCta.label}
-              </Button>
-            </p>
+            <Button href={secondaryCta.url} variant="brand-secondary">
+              {secondaryCta.label}
+            </Button>
           )}
         </div>
       )}
@@ -57,17 +61,19 @@ export function PromoSplit({
   );
 
   const imageColumn = hasImage && (
-    <div className="col-xl-6 col-lg-6 col-md-6">
-      <div className="product-image-frame">
-        <img src={imageUrl} alt={imageAlt} />
-      </div>
+    <div className="relative w-full">
+      <img
+        className="block h-auto w-full rounded-[71%_29%_66%_34%/41%_42%_58%_59%] object-cover"
+        src={imageUrl}
+        alt={imageAlt}
+      />
     </div>
   );
 
   return (
-    <section className="promo-split mtb-120">
-      <div className="container">
-        <div className="row d-flex align-items-center row-change md-text-center">
+    <section className="my-[40px] sm:my-[120px]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className={`grid grid-cols-1 items-center gap-10 ${hasImage ? 'md:grid-cols-2 md:gap-16' : ''}`}>
           {imageOnRight ? (
             <>
               {textColumn}

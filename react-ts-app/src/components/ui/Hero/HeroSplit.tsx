@@ -1,6 +1,4 @@
 import { Button } from '../Button/Button';
-import '../media-frame.css';
-import './Hero.css';
 
 export interface HeroCta {
   label: string;
@@ -23,6 +21,14 @@ export interface HeroSplitProps {
 // not just Product Loan pages. Renders a single centered column, with no
 // empty column reserved, when the editor hasn't attached a photo yet -
 // image is optional on this block.
+//
+// Was previously `.hero-split`/`.container`/`.row`/`.col-xl-6`/`.major-
+// title`/`.combo-btn`/etc - see PromoSplit.tsx's own comment for why that
+// stylesheet (public/vendor/projectmagic.css) isn't actually loaded, so
+// this rendered unstyled. `mt-0` below reproduces the local Hero.css
+// override this used to carry (`.hero-split.mtb-120 { margin-top: 0 }`) -
+// this always renders first on the page (a hero), so the vertical-margin
+// utility's own top half left a gap under the header.
 export function HeroSplit({
   heading,
   description,
@@ -34,35 +40,33 @@ export function HeroSplit({
   const hasImage = Boolean(imageUrl);
 
   return (
-    <section className="hero-split mtb-120 bg-grey-60">
-      <div className="container">
-        <div className="row d-flex align-items-center row-change md-text-center">
-          <div className={hasImage ? 'col-xl-6 col-lg-6 col-md-6' : 'col-xl-12 col-lg-12 col-md-12'}>
-            <h1 className="color-brand-1 major-title mb-20">{heading}</h1>
-            {description && <p className="font-md color-brand-1">{description}</p>}
+    <section className="mt-0 mb-[40px] bg-[#F2F2F2] sm:mb-[120px]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className={`grid grid-cols-1 items-center gap-10 ${hasImage ? 'md:grid-cols-2 md:gap-16' : ''}`}>
+          <div>
+            <h1 className="mb-[20px] text-[20px] leading-none font-extralight text-brand-ink sm:text-[65px]">
+              {heading}
+            </h1>
+            {description && <p className="text-base leading-[1.3] text-[#335580]">{description}</p>}
             {(primaryCta || secondaryCta) && (
-              <div className="combo-btn mt-50 text-start column1">
-                {primaryCta && (
-                  <p className="combo-btn-text primary">
-                    <Button href={primaryCta.url}>{primaryCta.label}</Button>
-                  </p>
-                )}
+              <div className="mt-[50px] flex flex-wrap items-center gap-[30px]">
+                {primaryCta && <Button href={primaryCta.url}>{primaryCta.label}</Button>}
                 {secondaryCta && (
-                  <p className="combo-btn-text secondary">
-                    <Button href={secondaryCta.url} variant="brand-link">
-                      {secondaryCta.label}
-                    </Button>
-                  </p>
+                  <Button href={secondaryCta.url} variant="brand-link">
+                    {secondaryCta.label}
+                  </Button>
                 )}
               </div>
             )}
           </div>
 
           {hasImage && (
-            <div className="col-xl-6 col-lg-6 col-md-6">
-              <div className="product-image-frame">
-                <img src={imageUrl} alt={imageAlt} />
-              </div>
+            <div className="relative w-full">
+              <img
+                className="block h-auto w-full rounded-[71%_29%_66%_34%/41%_42%_58%_59%] object-cover"
+                src={imageUrl}
+                alt={imageAlt}
+              />
             </div>
           )}
         </div>

@@ -1,6 +1,5 @@
 import { Button } from '../Button/Button';
 import type { HeroCta } from './HeroSplit';
-import './Hero.css';
 
 export interface HeroBannerProps {
   headingLead?: string;
@@ -14,15 +13,24 @@ export interface HeroBannerProps {
 
 // Full-bleed background-photo hero (heroImageBannerBlock, CMS-driven - see
 // cms/renderPageSection.tsx) - e.g. the Personal Loan "We give credit /
-// where progress is due" hero. Markup/classNames (section-banner/contact-
-// banner/contact-overlay/contact-content) match the real production markup
-// for this exact section verbatim - not invented names - so it renders
-// correctly once that CSS (added to Hero.css) is loaded. headingLead is
-// the thin line, headingHighlight the bold one underneath it - two plain
-// CMS fields rather than one string an author would have to remember to
-// format a certain way. Falls back to a plain black background (matches
-// .contact-banner's own background-color) when no photo has been attached
-// yet.
+// where progress is due" hero. headingLead is the thin line,
+// headingHighlight the bold one underneath it - two plain CMS fields
+// rather than one string an author would have to remember to format a
+// certain way. Falls back to a plain black background (matches the
+// original .contact-banner's own background-color) when no photo has been
+// attached yet.
+//
+// Was previously `.section-banner`/`.contact-banner`/`.contact-overlay`/
+// `.contact-content` (own local Hero.css, ported verbatim from a live page
+// - the Personal Loan hero) plus `.major-title`/`.span-major-title`/
+// `.combo-btn`/etc from public/vendor/projectmagic.css, which isn't
+// actually loaded anywhere (see PromoSplit.tsx's own comment on that same
+// gap) - so those classNames rendered unstyled in production. Tailwind
+// classes below reproduce Hero.css's confirmed values directly instead of
+// a shared stylesheet - see LoanCalculator.tsx's own top comment for why
+// the original's malformed background gradient (two `from()` stops, no
+// `to()`) resolves to solid color, not a real gradient; this hero's own
+// linear-gradient is well-formed, so it's reproduced as an actual gradient.
 export function HeroBanner({
   headingLead,
   headingHighlight,
@@ -33,42 +41,32 @@ export function HeroBanner({
   imageAlt = '',
 }: HeroBannerProps) {
   return (
-    <section className="section-banner">
+    <section>
       <div
-        className="contact-banner"
+        className="relative mx-[10px] mb-[10px] box-border flex h-[320px] overflow-hidden rounded-[16px] bg-black bg-cover bg-center sm:mx-[14px] sm:mb-[14px] sm:h-[450px] sm:rounded-[24px]"
         style={imageUrl ? { backgroundImage: `url("${imageUrl}")` } : undefined}
       >
-        {imageAlt && <span className="visually-hidden">{imageAlt}</span>}
-        <div className="contact-overlay">
-          <div className="contact-content">
+        {imageAlt && <span className="sr-only">{imageAlt}</span>}
+        <div className="relative flex h-full w-full items-center bg-[linear-gradient(270deg,#002a602e_0%,#002a6085_38%,#002a60ba_100%)]">
+          <div className="max-w-[700px] px-[25px] py-[20px] sm:px-[50px] sm:py-[40px]">
             {(headingLead || headingHighlight) && (
-              <h1 className="text-white major-title mb-10">
+              <h1 className="mb-[10px] text-[20px] leading-none font-extralight text-white sm:text-[65px]">
                 {headingLead}
                 {headingLead && headingHighlight && <br />}
                 <strong>
-                  <span className="span-major-title">{headingHighlight}</span>
+                  <span className="text-[20px] font-bold sm:text-[65px]">{headingHighlight}</span>
                 </strong>
               </h1>
             )}
-            {description && <p className="text-white font-md mb-10">{description}</p>}
+            {description && <p className="mb-[10px] text-base leading-[1.3] text-white">{description}</p>}
             {(primaryCta || secondaryCta) && (
-              <div className="combo-btn">
+              <div className="flex flex-wrap items-center gap-[30px]">
                 {primaryCta && (
-                  <div className="text-start column1">
-                    <p className="combo-btn-text primary">
-                      <Button href={primaryCta.url} variant="brand-secondary">
-                        {primaryCta.label}
-                      </Button>
-                    </p>
-                  </div>
+                  <Button href={primaryCta.url} variant="brand-secondary">
+                    {primaryCta.label}
+                  </Button>
                 )}
-                {secondaryCta && (
-                  <div className="text-start column2">
-                    <p className="combo-btn-text secondary">
-                      <Button href={secondaryCta.url}>{secondaryCta.label}</Button>
-                    </p>
-                  </div>
-                )}
+                {secondaryCta && <Button href={secondaryCta.url}>{secondaryCta.label}</Button>}
               </div>
             )}
           </div>
