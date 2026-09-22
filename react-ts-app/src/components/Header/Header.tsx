@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronDown, Menu, Search, X } from 'lucide-react';
+import { ChevronDown, ChevronRight, Menu, Search, X } from 'lucide-react';
 import { Logo } from '../icons/Logo';
 import { NavModal } from './NavModal';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
@@ -48,8 +48,9 @@ export function Header() {
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
-    const promise = dispatch(fetchHeaderNavigation());
-    return () => promise.abort();
+    // TEMP-DISABLED-FOR-VISUAL-QA
+    // const promise = dispatch(fetchHeaderNavigation());
+    // return () => promise.abort();
   }, [dispatch]);
 
   const closeMobile = () => setMobileOpen(false);
@@ -62,7 +63,7 @@ export function Header() {
           <Logo />
         </Link>
 
-        <NavigationMenu viewport={false} className="hidden lg:flex lg:min-w-0 lg:flex-1">
+        <NavigationMenu className="hidden lg:flex lg:min-w-0 lg:flex-1">
           <NavigationMenuList className="flex-nowrap gap-0.5">
             {loading && <li className="px-2.5 py-1.5 text-sm text-white/60">Loading menu…</li>}
             {error && <li className="px-2.5 py-1.5 text-sm text-red-300">{error}</li>}
@@ -109,14 +110,17 @@ export function Header() {
                         <NavigationMenuTrigger className={`bg-transparent ${navLinkClass}`}>
                           {link.title}
                         </NavigationMenuTrigger>
-                        <NavigationMenuContent className="text-foreground">
-                          <div className="grid w-[min(90vw,64rem)] grid-cols-2 gap-x-8 gap-y-6 p-6 sm:grid-cols-4">
+                        <NavigationMenuContent>
+                          <div
+                            className="mx-auto grid max-w-7xl gap-x-10 divide-x divide-white/10 px-4 py-10 sm:px-6 lg:px-8"
+                            style={{ gridTemplateColumns: `repeat(${menuItem.menus.length}, minmax(0, 1fr))` }}
+                          >
                             {menuItem.menus.map((category, categoryIndex) => (
-                              <div key={categoryIndex}>
-                                <div className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                              <div key={categoryIndex} className="pl-10 first:pl-0">
+                                <div className="mb-6 text-xs font-semibold tracking-wide text-brand-green uppercase">
                                   {category.categoryName}
                                 </div>
-                                <ul>
+                                <ul className="space-y-5">
                                   {category.link.map((linkGroup, linkGroupIndex) =>
                                     linkGroup.menuList.map((productLink, productLinkIndex) => {
                                       const productUrl = linkGroup.pageSection
@@ -125,17 +129,25 @@ export function Header() {
                                       const productKey = `${linkGroupIndex}-${productLinkIndex}`;
                                       const content = (
                                         <>
-                                          <span className="font-medium text-foreground">{productLink.title}</span>
-                                          {linkGroup.menuDescription && (
-                                            <span className="text-xs text-muted-foreground">
-                                              {linkGroup.menuDescription}
+                                          <ChevronRight className="mt-0.5 size-3.5 shrink-0 text-white/60 transition-transform group-hover:translate-x-0.5 group-hover:text-brand-green" />
+                                          <span>
+                                            <span className="block text-sm font-semibold text-white transition-colors group-hover:text-brand-green">
+                                              {productLink.title}
                                             </span>
-                                          )}
+                                            {linkGroup.menuDescription && (
+                                              <span className="mt-1 block text-xs text-white/50">
+                                                {linkGroup.menuDescription}
+                                              </span>
+                                            )}
+                                          </span>
                                         </>
                                       );
                                       return (
                                         <li key={productKey}>
-                                          <NavigationMenuLink asChild className="flex-col items-start gap-0.5">
+                                          <NavigationMenuLink
+                                            asChild
+                                            className="group items-start gap-2 rounded-md p-0 hover:bg-transparent focus:bg-transparent"
+                                          >
                                             {isInternalPath(productUrl) ? (
                                               <Link to={productUrl}>{content}</Link>
                                             ) : (
