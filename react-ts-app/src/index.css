@@ -13,12 +13,6 @@
 @layer legacy;
 @import url('/vendor/font-awesome-5.15.3.min.css') layer(legacy);
 @import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css') layer(legacy);
-@import url('/vendor/style.css') layer(legacy);
-@import url('/vendor/media-query.css') layer(legacy);
-@import url('/vendor/main.min.css') layer(legacy);
-@import url('/vendor/custom_main.min.css') layer(legacy);
-@import url('/vendor/loan-calculator.css') layer(legacy);
-@import url('/vendor/cookieconsent.css') layer(legacy);
 @import 'tailwindcss';
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
