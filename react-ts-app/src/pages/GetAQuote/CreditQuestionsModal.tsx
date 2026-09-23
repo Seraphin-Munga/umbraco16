@@ -1,12 +1,21 @@
 import { useEffect, useState } from 'react';
+import {
+  modalBody,
+  modalCloseButton,
+  modalDialog,
+  modalFooter,
+  modalHeader,
+  modalOverlay,
+  modalTitle,
+  btnPrimary,
+} from './styles';
 
 // Ported from the "#creditQuestionsModal" overlay in Platform/Web/Views/
 // newQQ.cshtml - the credit-status/POPIA consent step that follows the loan
-// amount step (see LoanAmountModal.tsx). Styling (.toggle, .slider-qa,
-// .toggle-line, and the #creditQuestionsModal-scoped custom checkbox rules)
-// comes from GetAQuote.css. The "Select All" button from the source markup
-// was left out - it's hidden via inline `style="display:none"` there with
-// no visible trigger to un-hide it, so it renders nothing either way.
+// amount step (see LoanAmountModal.tsx). The "Select All" button from the
+// source markup was left out - it's hidden via inline `style="display:none"`
+// there with no visible trigger to un-hide it, so it renders nothing either
+// way.
 //
 // submitCreditQuestions() in the legacy page fed into further steps of that
 // wizard that haven't been built here yet, so onContinue just hands back
@@ -43,6 +52,7 @@ const QUESTIONS: {
         href="https://www.africanbank.co.za/media/icynwcb2/african-bank-privacy-policy-final-19092018-pdf.pdf"
         target="_blank"
         rel="noreferrer"
+        className="underline"
       >
         Do you give African Bank consent to process your personal information?
       </a>
@@ -56,6 +66,9 @@ const DEFAULT_ANSWERS: CreditQuestionsAnswers = {
   popiaConsent: false,
   popiaPermission: false,
 };
+
+const checkboxClass =
+  "relative h-5 w-5 shrink-0 cursor-pointer appearance-none rounded-[3px] border-2 border-[#DBDBDB] bg-[#fff] align-middle transition-all duration-200 checked:border-[#5dc300] checked:bg-[#5dc300] checked:after:absolute checked:after:-top-[3px] checked:after:left-[3px] checked:after:text-base checked:after:font-bold checked:after:text-white checked:after:content-['✓']";
 
 export function CreditQuestionsModal({
   open,
@@ -82,81 +95,72 @@ export function CreditQuestionsModal({
   return (
     <div
       id="creditQuestionsModal"
-      className="model_overlay"
+      className={modalOverlay}
       role="dialog"
       aria-modal="true"
       aria-labelledby="credit-questions-modal-title"
     >
-      <div className="modal_dialog">
-        <div className="modal_header">
+      <div className={modalDialog}>
+        <div className={modalHeader}>
           <button
             type="button"
-            className="get-a-quote-modal-close"
+            className={modalCloseButton}
             onClick={onClose}
             aria-label="Close"
           >
             ×
           </button>
         </div>
-        <div className="modal_body">
-          <h2
-            id="credit-questions-modal-title"
-            className="color-brand-1 mt-15 mb-20"
-          >
+        <div className={modalBody}>
+          <h2 id="credit-questions-modal-title" className={modalTitle}>
             Your credit status and preferences
           </h2>
-          <p className="font-md color-brand-1 mb-20">
+          <p className="mb-5 text-base text-brand-navy">
             In accordance with the Protection of Personal Information Act
             (POPIA).
           </p>
 
           {QUESTIONS.map((question) => (
-            <div className="toggle" key={question.id}>
-              <label>
-                <div>
-                  <input
-                    type="checkbox"
-                    id={question.id}
-                    name={question.id}
-                    checked={answers[question.id]}
-                    onChange={() => toggle(question.id)}
-                  />
-                </div>
-                <div>
-                  <span className="slider-qa font-md color-brand-1">
-                    {question.label}
-                  </span>
-                </div>
+            <div className="mb-2 flex items-center text-left" key={question.id}>
+              <label className="flex cursor-pointer items-center gap-[13px]">
+                <input
+                  type="checkbox"
+                  id={question.id}
+                  name={question.id}
+                  checked={answers[question.id]}
+                  onChange={() => toggle(question.id)}
+                  className={checkboxClass}
+                />
+                <span className="inline-block text-left text-base text-brand-navy">
+                  {question.label}
+                </span>
               </label>
             </div>
           ))}
 
-          <hr className="toggle-line" />
+          <hr className="my-4 w-full border-t border-[#E5EAEF]" />
 
-          <div className="toggle">
-            <label>
-              <div>
-                <input
-                  type="checkbox"
-                  id="popiaPermission"
-                  name="popiaPermission"
-                  checked={answers.popiaPermission}
-                  onChange={() => toggle('popiaPermission')}
-                />
-              </div>
-              <div>
-                <span className="slider-qa font-md color-brand-1">
-                  Can we inform you of African Bank specials and offers?
-                </span>
-              </div>
+          <div className="mb-2 flex items-center text-left">
+            <label className="flex cursor-pointer items-center gap-[13px]">
+              <input
+                type="checkbox"
+                id="popiaPermission"
+                name="popiaPermission"
+                checked={answers.popiaPermission}
+                onChange={() => toggle('popiaPermission')}
+                className={checkboxClass}
+              />
+              <span className="inline-block text-left text-base text-brand-navy">
+                Can we inform you of African Bank specials and offers?
+              </span>
             </label>
           </div>
         </div>
 
-        <div className="modal_footer">
+        <div className={modalFooter}>
           <button
             type="button"
-            className="btn btn-primary"
+            className={btnPrimary}
             onClick={() => onContinue(answers)}
           >
             Continue

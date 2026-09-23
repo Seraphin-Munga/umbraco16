@@ -7,6 +7,12 @@ import {
   isPersonalComplete,
   type PersonalDetailsForm,
 } from './personalDetailsForm';
+import {
+  fieldLabel,
+  inputField,
+  selectField,
+  tooltipWrapperClass,
+} from './styles';
 
 // Ported from "#step2" in Platform/Web/Views/newQQ.cshtml - the personal
 // details / income & expenses / employment & bank details accordion. The
@@ -67,6 +73,55 @@ const EMPLOYER_SUGGESTIONS = [
 
 type Section = 'personal' | 'income' | 'employment';
 
+const accordionClass =
+  'relative mb-1.5 flex cursor-pointer items-center overflow-hidden rounded-[32px] bg-[#fff] px-[25px] py-[15px] text-left text-base font-bold text-[#112768] shadow-[0px_2px_4px_rgba(0,0,0,0.1)] transition-all duration-300 hover:bg-[#f9f9f9] hover:shadow-[0px_2px_6px_rgba(0,0,0,0.15)]';
+
+const accordionContentClass = 'mb-4 mt-4 px-5 pb-2.5';
+
+const rowClass = 'grid grid-cols-1 gap-x-[30px] md:grid-cols-2';
+
+// The dropdown arrow / search glyph here used Bootstrap's Glyphicons font
+// (.glyphicon-menu-down / .glyphicon-search), which this app never loaded -
+// they rendered as empty, invisible spans. Swapped for real inline SVGs so
+// the affordance the original markup clearly intended actually shows up.
+function ChevronIcon() {
+  return (
+    <svg
+      className="pointer-events-none absolute right-[5%] top-1/2 h-4 w-4 -translate-y-1/2 text-[#3d565f]"
+      viewBox="0 0 20 20"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M5 7.5L10 12.5L15 7.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg
+      className="pointer-events-none absolute right-[5%] top-[29%] h-4 w-4 text-[#6b6f81]"
+      viewBox="0 0 20 20"
+      fill="none"
+      aria-hidden="true"
+    >
+      <circle cx="9" cy="9" r="6" stroke="currentColor" strokeWidth="1.5" />
+      <path
+        d="M14 14L18 18"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 interface PersonalDetailsStepProps {
   value: PersonalDetailsForm;
   onChange: (value: PersonalDetailsForm) => void;
@@ -98,38 +153,48 @@ export function PersonalDetailsStep({
   );
 
   return (
-    <div id="step2" className="step active">
-      <h1 className="color-brand-1 major-title1 mt-24 mb-34">
-        <span className="span-major-title1">
+    <div id="step2" className="animate-[get-a-quote-slide-up_0.5s_ease-in-out]">
+      <h1 className="mb-[34px] mt-6 pb-3 text-center text-[30px] font-semibold text-brand-navy max-md:text-[28px]">
+        <span className="text-[30px] font-bold max-md:text-[28px] max-md:leading-[25px]">
           Let&rsquo;s find out what you qualify for
         </span>
       </h1>
-      <p className="font-md color-brand-1 mb-20">
+      <p className="mb-5 pb-1 text-base text-brand-navy">
         Please enter your details below to continue:
       </p>
 
       <div
-        className={`accordion${openSection === 'personal' ? ' active' : ''}`}
+        className={accordionClass}
         onClick={() => toggle('personal')}
       >
         1. Personal details
         {isPersonalComplete(value) && (
-          <i className="material-symbols-outlined check-icon">✓</i>
+          <i className="mr-[3px] text-base text-[green]">✓</i>
         )}
-        <i className="material-icons">⌄</i>
+        <i
+          className={`ml-auto transition-transform duration-300 ${openSection === 'personal' ? 'rotate-180' : 'rotate-[270deg]'}`}
+        >
+          ⌄
+        </i>
       </div>
       <div
-        className="accordion_content"
+        className={accordionContentClass}
         style={{ display: openSection === 'personal' ? 'block' : 'none' }}
       >
-        <div className="row">
-          <div className="col-md-6">
-            <label htmlFor="fullname">Full name(s)</label>
-            <div className="input-group">
-              <span className="input-group-addon title-id" id="basic-addon1">
+        <div className={rowClass}>
+          <div>
+            <label htmlFor="fullname" className={fieldLabel}>
+              Full name(s)
+            </label>
+            <div className="flex w-full">
+              <span
+                id="basic-addon1"
+                className="flex w-[29%] shrink-0 items-center justify-center rounded-l-[30px] border-2 border-r-0 border-[#e5eaef] bg-[#F8F7F8]"
+              >
                 <Select
                   value={value.title}
                   onChange={(event) => set('title', event.target.value)}
+                  className="w-full appearance-none bg-none px-[15px] py-[5px] text-[#112768] outline-none"
                 >
                   <option value="">Title</option>
                   <option value="Mr">Mr</option>
@@ -139,7 +204,7 @@ export function PersonalDetailsStep({
               </span>
               <Input
                 id="fullname"
-                className="rounded-right fullname-reset"
+                className={`${inputField} rounded-l-none`}
                 placeholder="Enter here"
                 value={value.fullname}
                 onChange={(event) => set('fullname', event.target.value)}
@@ -147,12 +212,14 @@ export function PersonalDetailsStep({
               />
             </div>
           </div>
-          <div className="col-md-6">
-            <label htmlFor="surname">Surname</label>
-            <div className="input-group">
+          <div>
+            <label htmlFor="surname" className={fieldLabel}>
+              Surname
+            </label>
+            <div className="w-full">
               <Input
                 id="surname"
-                className="rounded-right fullname-reset"
+                className={inputField}
                 placeholder="Enter here"
                 value={value.surname}
                 onChange={(event) => set('surname', event.target.value)}
@@ -160,12 +227,15 @@ export function PersonalDetailsStep({
             </div>
           </div>
         </div>
-        <div className="row">
-          <div className="col-md-6">
-            <label htmlFor="idnumber">ID number</label>
-            <div className="input-group">
+        <div className={rowClass}>
+          <div>
+            <label htmlFor="idnumber" className={fieldLabel}>
+              ID number
+            </label>
+            <div className="w-full">
               <Input
                 id="idnumber"
+                className={inputField}
                 placeholder="Enter here"
                 maxLength={13}
                 value={value.idnumber}
@@ -175,13 +245,15 @@ export function PersonalDetailsStep({
               />
             </div>
           </div>
-          <div className="col-md-6">
-            <label htmlFor="mobile">Contact number</label>
-            <div className="input-group">
+          <div>
+            <label htmlFor="mobile" className={fieldLabel}>
+              Contact number
+            </label>
+            <div className="w-full">
               <Input
                 id="mobile"
                 type="tel"
-                className="rounded-right mobile-reset"
+                className={inputField}
                 placeholder="Enter here"
                 maxLength={10}
                 value={value.mobile}
@@ -195,26 +267,32 @@ export function PersonalDetailsStep({
       </div>
 
       <div
-        className={`accordion${openSection === 'income' ? ' active' : ''}`}
+        className={accordionClass}
         onClick={() => toggle('income')}
       >
         2. Income &amp; expenses
         {isIncomeComplete(value) && (
-          <i className="material-symbols-outlined check-icon">✓</i>
+          <i className="mr-[3px] text-base text-[green]">✓</i>
         )}
-        <i className="material-icons">⌄</i>
+        <i
+          className={`ml-auto transition-transform duration-300 ${openSection === 'income' ? 'rotate-180' : 'rotate-[270deg]'}`}
+        >
+          ⌄
+        </i>
       </div>
       <div
-        className="accordion_content"
+        className={accordionContentClass}
         style={{ display: openSection === 'income' ? 'block' : 'none' }}
       >
-        <div className="row">
-          <div className="col-md-6">
-            <label htmlFor="grosssalary">Gross income (in Rands)</label>
-            <div className="input-group">
+        <div className={rowClass}>
+          <div>
+            <label htmlFor="grosssalary" className={fieldLabel}>
+              Gross income (in Rands)
+            </label>
+            <div className="w-full">
               <Input
                 id="grosssalary"
-                className="rounded-right fullname-reset"
+                className={inputField}
                 placeholder="Enter here"
                 value={value.grosssalary}
                 onChange={(event) =>
@@ -223,12 +301,14 @@ export function PersonalDetailsStep({
               />
             </div>
           </div>
-          <div className="col-md-6">
-            <label htmlFor="income">Net income (in Rands)</label>
-            <div className="input-group-R">
+          <div>
+            <label htmlFor="income" className={fieldLabel}>
+              Net income (in Rands)
+            </label>
+            <div className="w-full">
               <Input
                 id="income"
-                className="rounded-right fullname-reset"
+                className={inputField}
                 placeholder="Enter here"
                 value={value.income}
                 onChange={(event) =>
@@ -238,12 +318,15 @@ export function PersonalDetailsStep({
             </div>
           </div>
         </div>
-        <div className="row">
-          <div className="col-md-6">
-            <label htmlFor="frequencytype">Frequency</label>
-            <div className="custom-select-wrapper">
+        <div className={rowClass}>
+          <div>
+            <label htmlFor="frequencytype" className={fieldLabel}>
+              Frequency
+            </label>
+            <div className="relative w-full">
               <Select
                 id="frequencytype"
+                className={selectField}
                 value={value.frequencytype}
                 onChange={(event) => set('frequencytype', event.target.value)}
               >
@@ -252,15 +335,17 @@ export function PersonalDetailsStep({
                 <option value="F">Fortnightly</option>
                 <option value="W">Weekly</option>
               </Select>
-              <span className="glyphicon glyphicon-menu-down" />
+              <ChevronIcon />
             </div>
           </div>
-          <div className="col-md-6">
-            <label htmlFor="expenses">Living expenses (in Rands)</label>
-            <div className="input-group-R">
+          <div>
+            <label htmlFor="expenses" className={fieldLabel}>
+              Living expenses (in Rands)
+            </label>
+            <div className="w-full">
               <Input
                 id="expenses"
-                className="rounded-right fullname-reset"
+                className={inputField}
                 placeholder="Enter here"
                 value={value.expenses}
                 onFocus={onOpenExpensesCalculator}
@@ -275,25 +360,32 @@ export function PersonalDetailsStep({
       </div>
 
       <div
-        className={`accordion${openSection === 'employment' ? ' active' : ''}`}
+        className={accordionClass}
         onClick={() => toggle('employment')}
       >
         3. Employment &amp; bank details
         {isEmploymentComplete(value) && (
-          <i className="material-symbols-outlined check-icon">✓</i>
+          <i className="mr-[3px] text-base text-[green]">✓</i>
         )}
-        <i className="material-icons">⌄</i>
+        <i
+          className={`ml-auto transition-transform duration-300 ${openSection === 'employment' ? 'rotate-180' : 'rotate-[270deg]'}`}
+        >
+          ⌄
+        </i>
       </div>
       <div
-        className="accordion_content"
+        className={accordionContentClass}
         style={{ display: openSection === 'employment' ? 'block' : 'none' }}
       >
-        <div className="row">
-          <div className="col-md-6">
-            <label htmlFor="yourbank">Select your bank</label>
-            <div className="custom-select-wrapper">
+        <div className={rowClass}>
+          <div>
+            <label htmlFor="yourbank" className={fieldLabel}>
+              Select your bank
+            </label>
+            <div className="relative w-full">
               <Select
                 id="yourbank"
+                className={selectField}
                 value={value.yourbank}
                 onChange={(event) => set('yourbank', event.target.value)}
               >
@@ -304,17 +396,20 @@ export function PersonalDetailsStep({
                   </option>
                 ))}
               </Select>
-              <span className="glyphicon glyphicon-menu-down" />
+              <ChevronIcon />
             </div>
           </div>
-          <div className="col-md-6">
-            <label htmlFor="employeeType">Employment sector</label>
+          <div>
+            <label htmlFor="employeeType" className={fieldLabel}>
+              Employment sector
+            </label>
             <div
-              className="custom-select-wrapper tooltip-wrapper"
+              className={`relative ${tooltipWrapperClass}`}
               data-tooltip="Government Sector refers to the South African government's payroll system used for processing salaries of public sector employees."
             >
               <Select
                 id="employeeType"
+                className={selectField}
                 value={value.employeeType}
                 onChange={(event) => set('employeeType', event.target.value)}
               >
@@ -325,16 +420,19 @@ export function PersonalDetailsStep({
                   </option>
                 ))}
               </Select>
-              <span className="glyphicon glyphicon-menu-down" />
+              <ChevronIcon />
             </div>
           </div>
         </div>
-        <div className="row">
-          <div className="col-md-6">
-            <label htmlFor="youremployer">Search your employer</label>
-            <div className="search-controls">
+        <div className={rowClass}>
+          <div>
+            <label htmlFor="youremployer" className={fieldLabel}>
+              Search your employer
+            </label>
+            <div className="relative">
               <Input
                 id="youremployer"
+                className={inputField}
                 placeholder="Search here"
                 autoComplete="off"
                 value={employerQuery}
@@ -348,14 +446,14 @@ export function PersonalDetailsStep({
                   setTimeout(() => setShowEmployerSuggestions(false), 150)
                 }
               />
-              <span className="glyphicon glyphicon-search" />
+              <SearchIcon />
               {showEmployerSuggestions &&
                 employerQuery &&
                 employerMatches.length > 0 && (
-                  <div className="autocomplete-items">
+                  <div className="relative top-full z-[99] -mt-[15px] text-[15px] font-medium text-brand-navy">
                     {employerMatches.map((name) => (
                       <div
-                        className="autocomplete-item"
+                        className="cursor-pointer border-2 border-t-0 border-[#f2f2f2] p-2.5 first:border-t-2 hover:bg-[#e9e9e9]"
                         key={name}
                         onMouseDown={() => {
                           setEmployerQuery(name);
@@ -370,13 +468,14 @@ export function PersonalDetailsStep({
                 )}
             </div>
           </div>
-          <div className="col-md-6">
-            <label htmlFor="occupationstatus">
+          <div>
+            <label htmlFor="occupationstatus" className={fieldLabel}>
               Select your employment status
             </label>
-            <div className="custom-select-wrapper">
+            <div className="relative w-full">
               <Select
                 id="occupationstatus"
+                className={selectField}
                 value={value.occupationstatus}
                 onChange={(event) =>
                   set('occupationstatus', event.target.value)
@@ -389,27 +488,33 @@ export function PersonalDetailsStep({
                   </option>
                 ))}
               </Select>
-              <span className="glyphicon glyphicon-menu-down" />
+              <ChevronIcon />
             </div>
           </div>
         </div>
-        <div className="row">
-          <div className="col-md-6">
-            <label htmlFor="datetimeInput">Employment start date</label>
-            <div className="input-group">
+        <div className={rowClass}>
+          <div>
+            <label htmlFor="datetimeInput" className={fieldLabel}>
+              Employment start date
+            </label>
+            <div className="w-full">
               <Input
                 id="datetimeInput"
                 type="date"
+                className={inputField}
                 value={value.datetimeInput}
                 onChange={(event) => set('datetimeInput', event.target.value)}
               />
             </div>
           </div>
-          <div className="col-md-6">
-            <label htmlFor="occupationtype">Select your occupation type</label>
-            <div className="custom-select-wrapper">
+          <div>
+            <label htmlFor="occupationtype" className={fieldLabel}>
+              Select your occupation type
+            </label>
+            <div className="relative w-full">
               <Select
                 id="occupationtype"
+                className={selectField}
                 value={value.occupationtype}
                 onChange={(event) => set('occupationtype', event.target.value)}
               >
@@ -420,7 +525,7 @@ export function PersonalDetailsStep({
                   </option>
                 ))}
               </Select>
-              <span className="glyphicon glyphicon-menu-down" />
+              <ChevronIcon />
             </div>
           </div>
         </div>

@@ -6,28 +6,22 @@ import {
   estimateMonthlyInstallment,
   formatRand,
 } from '../../utils/loanCalculator';
-import './GetAQuote.css';
+import {
+  btnPrimary,
+  modalBody,
+  modalCloseButton,
+  modalDialog,
+  modalFooter,
+  modalHeader,
+  modalOverlay,
+  modalTitle,
+} from './styles';
 
 // Ported from the "#amountModal" overlay in Platform/Web/Views/newQQ.cshtml
 // (lines 652-726) - the loan-amount step that "Personal Loan and Credit
 // Card" opens from the get-a-quote product picker (openDialog('amountModal')
 // in the source markup). Reuses the same estimateMonthlyInstallment/
-// formatRand math as LoanCalculator.tsx rather than re-deriving it, and the
-// same .calculator-form/.loan-range/.cal-amount/.loan-select-term styling
-// already global via public/vendor/projectmagic.css and
-// public/vendor/loan-calculator.css.
-//
-// The modal chrome (.model_overlay/.modal_dialog/.modal_header/.modal_body/
-// .modal_footer/#amountModal .loans/#amountModal .Months) comes from
-// GetAQuote.css, which is now a full copy of Platform/Web/css/newqqstyle.css
-// - the page-specific stylesheet the legacy site linked from newQQ.cshtml
-// alone. That means classes this app already defines differently elsewhere
-// (.btn-primary, .card-upsale, .major-title, h1-h6, its own CSS reset) are
-// now redefined a second time, globally, by this import - see GetAQuote.css's
-// own closing comment block for that tradeoff. The close icon is a plain
-// "x" rather than <i class="material-icons"> - the Material Icons webfont
-// isn't loaded anywhere in this app, so that glyph rendered as the literal
-// word "close".
+// formatRand math as LoanCalculator.tsx rather than re-deriving it.
 //
 // The legacy modal's "Get Started" button (submitLoanAmount('amountModal'))
 // fed into the rest of that 1500+ line multi-step quick-quote wizard
@@ -49,6 +43,18 @@ function allowDigitsOnly(event: KeyboardEvent<HTMLInputElement>) {
 const TERM_OPTIONS = [7, 9, 12, 18, 24, 30, 36, 42, 48, 60, 72];
 const RANGE_GRADIENT =
   '-webkit-gradient(linear, 0% 0%, 100% 0%, from(rgb(136, 188, 71)), from(rgb(0, 43, 96)))';
+
+const calcFieldBase =
+  'mb-[23px] h-[50px] w-full rounded-[32px] border-none text-2xl text-[#112768] outline-none';
+
+const amountInputClass = `${calcFieldBase} bg-[#E5EAEF] text-center font-bold`;
+
+const outputInputClass = `${calcFieldBase} bg-transparent text-center text-[40px] appearance-none`;
+
+const termSelectClass = `${calcFieldBase} mx-auto appearance-none cursor-pointer bg-[#E5EAEF] bg-[url('https://www.africanbank.co.za/media/1pzbuq4v/dropdown-select.svg')] bg-[right_7%_center] bg-no-repeat text-center transition-shadow duration-300 hover:shadow-[0px_5px_5px_#0000000a]`;
+
+const rangeSliderClass =
+  "my-[15px] w-full cursor-pointer appearance-none rounded-[5px] border-none py-[5px] outline-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#fff] [&::-webkit-slider-thumb]:shadow-[1px_2px_5px_rgba(0,0,0,0.2)] [&::-webkit-slider-thumb]:transition-[width,height,box-shadow] [&::-webkit-slider-thumb]:duration-300 hover:[&::-webkit-slider-thumb]:h-[25px] hover:[&::-webkit-slider-thumb]:w-[25px] hover:[&::-webkit-slider-thumb]:shadow-[1px_2px_5px_rgba(0,0,0,0.5)]";
 
 interface LoanAmountModalProps {
   open: boolean;
@@ -95,48 +101,51 @@ export function LoanAmountModal({
   return (
     <div
       id="amountModal"
-      className="model_overlay"
+      className={modalOverlay}
       role="dialog"
       aria-modal="true"
       aria-labelledby="amount-modal-title"
     >
-      <div className="modal_dialog">
-        <div className="modal_header">
+      <div className={`${modalDialog} text-center`}>
+        <div className={modalHeader}>
           <button
             type="button"
-            className="get-a-quote-modal-close"
+            className={modalCloseButton}
             onClick={onClose}
             aria-label="Close"
           >
             ×
           </button>
         </div>
-        <div className="modal_body">
-          <h2 id="amount-modal-title" className="color-brand-1 mt-15 mb-20">
+        <div className={modalBody}>
+          <h2 id="amount-modal-title" className={modalTitle}>
             How much would you like to borrow for your Loan?
           </h2>
 
-          <div className="calculator-form">
-            <p className="cal-loan-disclaimer" style={{ padding: '5px 0px' }}>
-              Please enter Loan amount between <b>{formatRand(minAmount)}</b> to{' '}
-              <b>{formatRand(maxAmount)}.</b>
+          <div className="text-left">
+            <p className="py-[5px] text-sm text-brand-navy">
+              Please enter Loan amount between{' '}
+              <b className="text-brand-navy">{formatRand(minAmount)}</b> to{' '}
+              <b className="text-brand-navy">{formatRand(maxAmount)}.</b>
             </p>
-            <label className="cal-amount">Amount</label>
+            <label className="mb-0 text-left text-sm font-bold text-brand-navy">
+              Amount
+            </label>
             <Input
               id="input-Amount1"
-              className="loan-inpt"
+              className={amountInputClass}
               type="text"
               value={amount}
               onChange={handleAmountChange}
               onKeyPress={allowDigitsOnly}
             />
 
-            <div className="range-wrap">
-              <div className="range-value" id="rangeV1" />
+            <div className="relative">
+              <div id="rangeV1" />
               <Input
                 id="slide-range1"
                 type="range"
-                className="loan-range"
+                className={rangeSliderClass}
                 min={minAmount}
                 max={maxAmount}
                 step={500}
@@ -146,14 +155,16 @@ export function LoanAmountModal({
               />
             </div>
 
-            <div className="loans">
+            <div className="flex justify-between">
               <div>{formatRand(minAmount)}</div>
               <div>{formatRand(maxAmount)}</div>
             </div>
 
-            <label className="cal-amount">Repayment Term</label>
+            <label className="mb-0 text-left text-sm font-bold text-brand-navy">
+              Repayment Term
+            </label>
             <Select
-              className="loan-select-term"
+              className={termSelectClass}
               id="term1"
               value={term}
               onChange={(event) => setTerm(Number(event.target.value))}
@@ -165,12 +176,12 @@ export function LoanAmountModal({
               ))}
             </Select>
 
-            <div className="range-wrap">
-              <div className="range-value" id="rangeV2" />
+            <div className="relative">
+              <div id="rangeV2" />
               <Input
                 id="input-month1"
                 type="range"
-                className="loan-range"
+                className={rangeSliderClass}
                 min={minTerm}
                 max={maxTerm}
                 value={term}
@@ -179,15 +190,17 @@ export function LoanAmountModal({
               />
             </div>
 
-            <div className="Months">
+            <div className="flex justify-between">
               <div>{minTerm} Months</div>
               <div>{maxTerm} Months</div>
             </div>
 
-            <label className="cal-amount">Your Monthly Repayment will be</label>
+            <label className="mb-0 text-left text-sm font-bold text-brand-navy">
+              Your Monthly Repayment will be
+            </label>
             <Input
               id="installment_calc1"
-              className="loan-inpt-return"
+              className={outputInputClass}
               type="text"
               value={formatRand(estimateMonthlyInstallment(amount, term))}
               readOnly
@@ -195,10 +208,10 @@ export function LoanAmountModal({
             />
           </div>
         </div>
-        <div className="modal_footer">
+        <div className={modalFooter}>
           <button
             type="button"
-            className="btn btn-primary"
+            className={btnPrimary}
             onClick={() => onGetStarted(amount, term)}
           >
             Get Started

@@ -161,3 +161,15 @@
     @apply font-sans;
     }
 }
+
+/* Used by GetAQuote's animate-[...] utilities (its step transitions and the
+   qqcontainer entrance) - Tailwind's arbitrary animate-[] values need the
+   referenced @keyframes defined somewhere in plain CSS. */
+@keyframes get-a-quote-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes get-a-quote-slide-up {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

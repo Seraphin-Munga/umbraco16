@@ -1,6 +1,18 @@
 import { useEffect, useState } from 'react';
 import { Input } from '../../components/ui/Input/Input';
 import { formatRand } from '../../utils/loanCalculator';
+import {
+  btnPrimary,
+  fieldLabel,
+  inputField,
+  modalBody,
+  modalCloseButton,
+  modalDialog,
+  modalFooter,
+  modalHeader,
+  modalOverlay,
+  modalTitle,
+} from './styles';
 
 // Ported from "#expensivemodal" in Platform/Web/Views/newQQ.cshtml - the
 // living-expenses breakdown that the "Living expenses" field on the income
@@ -57,31 +69,28 @@ export function ExpensiveModal({ open, onClose, onSave }: ExpensiveModalProps) {
 
   return (
     <div
-      className="model_overlay"
+      className={modalOverlay}
       role="dialog"
       aria-modal="true"
       aria-labelledby="expensive-modal-title"
     >
-      <div className="modal_dialog">
-        <div className="modal_header">
+      <div className={modalDialog}>
+        <div className={modalHeader}>
           <button
             type="button"
-            className="get-a-quote-modal-close"
+            className={modalCloseButton}
             onClick={onClose}
             aria-label="Close"
           >
             ×
           </button>
         </div>
-        <div className="modal_body">
-          <h2 id="expensive-modal-title" className="color-brand-1 mt-15 mb-20">
+        <div className={modalBody}>
+          <h2 id="expensive-modal-title" className={modalTitle}>
             Calculate Your Expenses
           </h2>
 
-          <span
-            style={{ lineHeight: '18px', fontSize: '12px' }}
-            className="color-brand-1 expense-span"
-          >
+          <span className="mb-[15px] block text-left text-xs leading-[18px] text-brand-navy">
             Please do not include medical aid contribution reflected on your
             payslip. Also do not include repayments on loans and other credit
             e.g. credit cards, clothing accounts and bonds. You may include the
@@ -89,12 +98,16 @@ export function ExpensiveModal({ open, onClose, onSave }: ExpensiveModalProps) {
             expenses, education and child maintenance.
           </span>
 
-          <label htmlFor="rent">Rent</label>
-          <div className="input-group-R">
-            <span className="currency-prefix">R</span>
+          <label htmlFor="rent" className={`${fieldLabel} text-left`}>
+            Rent
+          </label>
+          <div className="relative">
+            <span className="pointer-events-none absolute left-[25px] top-1/2 -translate-y-1/2 text-sm font-normal text-brand-navy">
+              R
+            </span>
             <Input
               id="rent"
-              className="rounded-right fullname-reset"
+              className={`${inputField} pl-10`}
               placeholder="0"
               value={breakdown.rent || ''}
               onChange={(event) => update('rent', event.target.value)}
@@ -102,12 +115,16 @@ export function ExpensiveModal({ open, onClose, onSave }: ExpensiveModalProps) {
             />
           </div>
 
-          <label htmlFor="transport">Transport</label>
-          <div className="input-group-R">
-            <span className="currency-prefix">R</span>
+          <label htmlFor="transport" className={`${fieldLabel} text-left`}>
+            Transport
+          </label>
+          <div className="relative">
+            <span className="pointer-events-none absolute left-[25px] top-1/2 -translate-y-1/2 text-sm font-normal text-brand-navy">
+              R
+            </span>
             <Input
               id="transport"
-              className="rounded-right fullname-reset"
+              className={`${inputField} pl-10`}
               placeholder="0"
               value={breakdown.transport || ''}
               onChange={(event) => update('transport', event.target.value)}
@@ -115,12 +132,16 @@ export function ExpensiveModal({ open, onClose, onSave }: ExpensiveModalProps) {
             />
           </div>
 
-          <label htmlFor="groceries">Groceries</label>
-          <div className="input-group-R">
-            <span className="currency-prefix">R</span>
+          <label htmlFor="groceries" className={`${fieldLabel} text-left`}>
+            Groceries
+          </label>
+          <div className="relative">
+            <span className="pointer-events-none absolute left-[25px] top-1/2 -translate-y-1/2 text-sm font-normal text-brand-navy">
+              R
+            </span>
             <Input
               id="groceries"
-              className="rounded-right fullname-reset"
+              className={`${inputField} pl-10`}
               placeholder="0"
               value={breakdown.groceries || ''}
               onChange={(event) => update('groceries', event.target.value)}
@@ -128,14 +149,16 @@ export function ExpensiveModal({ open, onClose, onSave }: ExpensiveModalProps) {
             />
           </div>
 
-          <label htmlFor="others">
+          <label htmlFor="others" className={`${fieldLabel} text-left`}>
             Other (Medical Expenses, Education and Child Maintenance)
           </label>
-          <div className="input-group-R">
-            <span className="currency-prefix">R</span>
+          <div className="relative">
+            <span className="pointer-events-none absolute left-[25px] top-1/2 -translate-y-1/2 text-sm font-normal text-brand-navy">
+              R
+            </span>
             <Input
               id="others"
-              className="rounded-right fullname-reset"
+              className={`${inputField} pl-10`}
               placeholder="0"
               value={breakdown.others || ''}
               onChange={(event) => update('others', event.target.value)}
@@ -144,14 +167,14 @@ export function ExpensiveModal({ open, onClose, onSave }: ExpensiveModalProps) {
           </div>
         </div>
 
-        <p id="expense-summary" className="mt-15 color-brand-1 text-center">
+        <p id="expense-summary" className="mt-[15px] text-center text-brand-navy">
           Total monthly expenses: <strong>{formatRand(total)}</strong>
         </p>
 
-        <div className="modal_footer">
+        <div className={modalFooter}>
           <button
             type="button"
-            className="btn btn-primary"
+            className={btnPrimary}
             disabled={total === 0}
             onClick={() => {
               onSave(total, breakdown);

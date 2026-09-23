@@ -1,4 +1,15 @@
 import { useEffect } from 'react';
+import {
+  modalBody,
+  modalCloseButton,
+  modalDialog,
+  modalFooter,
+  modalHeader,
+  modalOverlay,
+  modalTitle,
+  btnPrimary,
+  btnTertiary,
+} from './styles';
 
 // Ported from "#cancelModal" in Platform/Web/Views/newQQ.cshtml.
 interface CancelModalProps {
@@ -20,39 +31,35 @@ export function CancelModal({ open, onClose, onConfirm }: CancelModalProps) {
 
   return (
     <div
-      className="model_overlay"
+      className={modalOverlay}
       role="dialog"
       aria-modal="true"
       aria-labelledby="cancel-modal-title"
     >
-      <div className="modal_dialog">
-        <div className="modal_header">
+      <div className={modalDialog}>
+        <div className={modalHeader}>
           <button
             type="button"
-            className="get-a-quote-modal-close"
+            className={modalCloseButton}
             onClick={onClose}
             aria-label="Close"
           >
             ×
           </button>
         </div>
-        <div className="modal_body">
-          <h2 id="cancel-modal-title" className="color-brand-1 mt-15 mb-20">
+        <div className={modalBody}>
+          <h2 id="cancel-modal-title" className={modalTitle}>
             Confirmation
           </h2>
-          <p className="font-md color-brand-1 mb-20">
+          <p className="mb-5 text-base text-brand-navy">
             Are you sure you want to cancel?
           </p>
         </div>
-        <div className="modal_footer">
-          <button type="button" className="btn btn-primary" onClick={onClose}>
+        <div className={modalFooter}>
+          <button type="button" className={btnPrimary} onClick={onClose}>
             No, Continue
           </button>
-          <button
-            type="button"
-            className="btn btn-tertiary"
-            onClick={onConfirm}
-          >
+          <button type="button" className={btnTertiary} onClick={onConfirm}>
             Yes, Cancel
           </button>
         </div>

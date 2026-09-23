@@ -1,5 +1,14 @@
 import type { ChangeEvent, KeyboardEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
+import {
+  btnPrimary,
+  modalBody,
+  modalCloseButton,
+  modalDialog,
+  modalFooter,
+  modalHeader,
+  modalOverlay,
+} from './styles';
 
 // Ported from "#otpModal" in Platform/Web/Views/newQQ.cshtml - six single-
 // digit boxes (handleBoxInput) feeding a hidden combined OTP value, a 60
@@ -76,35 +85,40 @@ export function OtpModal({
 
   return (
     <div
-      className="model_overlay"
+      className={modalOverlay}
       role="dialog"
       aria-modal="true"
       aria-labelledby="otp-modal-title"
     >
-      <div className="modal_dialog">
-        <div className="modal_header">
+      <div className={modalDialog}>
+        <div className={modalHeader}>
           <button
             type="button"
-            className="get-a-quote-modal-close"
+            className={modalCloseButton}
             onClick={onClose}
             aria-label="Close"
           >
             ×
           </button>
         </div>
-        <div className="modal_body">
-          <h2 id="otp-modal-title" className="color-brand-1 mt-15">
+        <div className={modalBody}>
+          <h2 id="otp-modal-title" className="mt-[15px] text-2xl font-bold text-brand-navy">
             Verify your information
           </h2>
-          <p id="optNumberUser">
+          <p id="optNumberUser" className="mb-2.5 mt-5 text-sm">
             {phoneNumber
               ? `We've sent a one-time PIN to ${phoneNumber}.`
               : 'We’ve sent you a one-time PIN.'}
           </p>
 
-          <div className="input_container">
-            <label htmlFor="otp-box-0">OTP Number:</label>
-            <div id="otp-boxes">
+          <div className="mb-[15px] flex flex-col items-center">
+            <label
+              htmlFor="otp-box-0"
+              className="mb-[5px] mt-[15px] text-center text-sm font-bold text-brand-navy"
+            >
+              OTP Number:
+            </label>
+            <div id="otp-boxes" className="mt-2.5 flex justify-center gap-2">
               {digits.map((digit, index) => (
                 <input
                   key={index}
@@ -112,7 +126,7 @@ export function OtpModal({
                   ref={(el) => {
                     inputRefs.current[index] = el;
                   }}
-                  className="otp-input"
+                  className="h-[50px] w-10 rounded border-none bg-[#F8F7F8] text-center text-sm font-bold text-[#3D565F] outline-none"
                   type="text"
                   inputMode="numeric"
                   maxLength={1}
@@ -124,10 +138,10 @@ export function OtpModal({
             </div>
           </div>
 
-          <p className="color-brand-1">
+          <p className="text-brand-navy">
             Did not receive OTP?{' '}
             <a
-              className="resend-otp"
+              className="cursor-pointer text-[#007bff] underline"
               onClick={() => setSecondsLeft(COUNTDOWN_SECONDS)}
               role="button"
               tabIndex={0}
@@ -136,21 +150,14 @@ export function OtpModal({
             </a>
           </p>
 
-          <div
-            style={{
-              textAlign: 'center',
-              marginTop: '30px',
-              color: '#002b60',
-              fontWeight: 700,
-            }}
-          >
+          <div className="mt-[30px] text-center font-bold text-brand-navy">
             {formatCountdown(secondsLeft)}
           </div>
         </div>
-        <div className="modal_footer">
+        <div className={modalFooter}>
           <button
             type="button"
-            className="btn btn-primary"
+            className={btnPrimary}
             disabled={!isComplete}
             onClick={onVerified}
           >

@@ -13,6 +13,7 @@ import {
   type PersonalDetailsForm,
 } from './personalDetailsForm';
 import { OffersStep } from './OffersStep';
+import { btnPrimary, btnTertiary } from './styles';
 
 // Ported from Platform/Web/Views/newQQ.cshtml (the live "/en/home/get-a-quote/"
 // multi-step quick-quote wizard): product picker -> loan amount -> credit
@@ -103,52 +104,53 @@ export function GetAQuote() {
   }
 
   return (
-    <div className="parent-container get-a-quote-page">
+    <div className="flex min-h-[89.6vh] flex-col justify-between">
       <WizardHeader step={wizardStep} />
 
       {wizardStep === 'product' && (
         <section
           id="step1"
-          className="step active mtb-30"
+          className="my-[30px] animate-[get-a-quote-slide-up_0.5s_ease-in-out]"
           aria-labelledby="bank-with-audacity"
         >
-          <div className="container">
-            <div className="row">
-              <div className="col-xs-12 mb-30">
-                <h1>
-                  <span className="major-title">Select a Product</span>
-                  <br />
-                  <span className="span-major-title">that's best for you!</span>
-                </h1>
-              </div>
+          <div className="mx-auto max-w-[1170px] px-4">
+            <div className="mb-[30px] max-md:text-center">
+              <h1>
+                <span className="text-[52px] leading-[58px] text-brand-navy max-md:text-[28px] max-md:leading-[25px]">
+                  Select a Product
+                </span>
+                <br />
+                <span className="text-[52px] italic font-bold leading-[58px] text-brand-navy max-md:text-[28px] max-md:leading-[25px]">
+                  that's best for you!
+                </span>
+              </h1>
             </div>
 
-            <div className="row">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
               {QUOTE_CARDS.map((card) => (
-                <div
-                  className="col-xs-12 col-sm-4 col-md-4 mb-30"
-                  role="listitem"
-                  key={card.id}
-                >
+                <div role="listitem" key={card.id}>
                   <div
-                    className="card-upsale"
+                    className="mx-auto flex h-auto min-h-[210px] w-full flex-col justify-between rounded-[20px] border border-[#f2f2f2] bg-[#fff] p-[30px_32px] shadow-[0_1px_15px_0_rgba(0,0,0,0.15)] hover:bg-[#f2f2f2] max-md:my-5 md:p-[30px_20px]"
                     role="region"
                     aria-labelledby={`card-${card.id}`}
                   >
-                    <div className="title">
-                      <h4 id={`card-${card.id}`} className="color-brand-1">
+                    <div>
+                      <h4
+                        id={`card-${card.id}`}
+                        className="text-xl font-bold text-brand-navy md:min-h-[46px]"
+                      >
                         {card.title}
                       </h4>
                     </div>
-                    <div className="description" aria-label="Description">
-                      <p className="font-sm-2 color-brand-1">
+                    <div aria-label="Description">
+                      <p className="text-sm leading-normal text-brand-navy md:min-h-[100px]">
                         {card.description}
                       </p>
                     </div>
                     <div>
                       {card.href ? (
                         <a
-                          className="btn btn-primary"
+                          className={`${btnPrimary} mt-3.5`}
                           href={card.href}
                           target="_blank"
                           rel="noreferrer"
@@ -159,7 +161,7 @@ export function GetAQuote() {
                       ) : (
                         <button
                           type="button"
-                          className="btn btn-primary"
+                          className={`${btnPrimary} mt-3.5`}
                           onClick={() => setAmountModalOpen(true)}
                           aria-label={`Apply now for a ${card.title}`}
                         >
@@ -170,17 +172,13 @@ export function GetAQuote() {
                   </div>
                 </div>
               ))}
-              <div
-                className="col-xs-12 col-sm-4 col-md-4 mb-30"
-                role="listitem"
-              />
             </div>
           </div>
         </section>
       )}
 
       {wizardStep === 'details' && (
-        <div className="qqcontainer">
+        <div className="mx-auto my-5 max-w-[857px] animate-[get-a-quote-fade-in_0.5s_ease-in] px-10 text-left max-md:px-4 max-md:pb-4 md:max-lg:w-4/5 md:max-lg:px-[15px] md:max-lg:text-sm lg:w-3/5 lg:text-lg">
           <PersonalDetailsStep
             value={personalDetails}
             onChange={setPersonalDetails}
@@ -190,23 +188,21 @@ export function GetAQuote() {
       )}
 
       {wizardStep === 'details' && (
-        // Ported as a sibling of .qqcontainer, not nested inside it - the
-        // source markup (newQQ.cshtml) has this bar as its own top-level
-        // block alongside the footer. .buttons sets width:100% with a gray
-        // background, but .qqcontainer caps out at max-width:857px; nesting
-        // this inside it was clipping the gray bar to that width instead of
-        // letting it span the full page.
-        <div className="container buttons">
+        // Ported as a sibling of the details container above, not nested
+        // inside it - the source markup (newQQ.cshtml) has this bar as its
+        // own top-level block alongside the footer, spanning the full page
+        // width rather than the details container's own max-width.
+        <div className="flex w-full items-center justify-between bg-[#f8f8f8] px-8 py-3.5 max-md:mt-5 max-md:grid max-md:justify-center max-md:gap-3.5">
           <button
             type="button"
-            className="btn btn-tertiary"
+            className={btnTertiary}
             onClick={() => setCancelModalOpen(true)}
           >
             Cancel
           </button>
           <button
             type="button"
-            className="btn btn-primary"
+            className={btnPrimary}
             disabled={!isPersonalDetailsComplete(personalDetails)}
             onClick={() => setCreditBureauModalOpen(true)}
           >

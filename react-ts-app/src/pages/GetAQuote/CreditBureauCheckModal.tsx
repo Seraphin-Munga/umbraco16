@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { modalCloseButton, modalHeader, modalOverlay, modalTitle } from './styles';
 
 // Ported from "#creditBureauCheckModal" in Platform/Web/Views/newQQ.cshtml.
 // The real page polled a credit-bureau-check API and updated
@@ -39,32 +40,32 @@ export function CreditBureauCheckModal({
 
   return (
     <div
-      className="model_overlay"
+      className={modalOverlay}
       role="dialog"
       aria-modal="true"
       aria-labelledby="credit-bureau-modal-title"
     >
-      <div className="creditBureau_modal_dialog">
-        <div className="creditBureau_modal_header">
+      <div className="w-[47%] max-sm:w-4/5 rounded-[32px] bg-[#fff] py-5 text-center shadow-[0_4px_10px_rgba(0,0,0,0.3)]">
+        <div className={`${modalHeader} mb-4 px-5`}>
           <button
             type="button"
-            className="get-a-quote-modal-close"
+            className={modalCloseButton}
             onClick={onClose}
             aria-label="Close"
           >
             ×
           </button>
         </div>
-        <div className="creditBureau_modal_body">
-          <h2
-            id="credit-bureau-modal-title"
-            className="color-brand-1 mt-15 mb-20"
-          >
+        <div className="relative text-sm">
+          <h2 id="credit-bureau-modal-title" className={`${modalTitle} pr-1.5`}>
             Quick Verifications
           </h2>
 
           {status === 'complete' && (
-            <div id="creditCheckStatus" className="credit_check_status">
+            <div
+              id="creditCheckStatus"
+              className="mx-10 my-2.5 flex items-center justify-between text-base text-white"
+            >
               <span>
                 <strong>Credit Bureau Check</strong>
               </span>
@@ -72,16 +73,19 @@ export function CreditBureauCheckModal({
             </div>
           )}
 
-          <p id="verificationText" className="font-md color-brand-1">
+          <p
+            id="verificationText"
+            className="text-base font-bold text-brand-navy"
+          >
             {status === 'checking'
               ? 'Credit Bureau Check Checking . . .'
               : 'Verification complete.'}
           </p>
 
           {status === 'checking' && (
-            <div className="creditBureau_loading">
-              <p className="font-md color-brand-1">Loading</p>
-              <span className="dots">. . . ..</span>
+            <div className="mt-5 text-center">
+              <p className="text-base text-brand-navy">Loading</p>
+              <span>. . . ..</span>
             </div>
           )}
         </div>
