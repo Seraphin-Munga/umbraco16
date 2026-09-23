@@ -31,14 +31,14 @@ export function CrossSell({ heading, cards, imageUrl }: CrossSellProps) {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               {cards.map((card) => (
                 <div
-                  className="rounded-[30px] border border-[#F2F2F2] p-5 pr-[20px] transition-shadow hover:shadow-[0_3px_15px_rgba(0,0,0,0.1)]"
+                  className="rounded-[30px] border border-brand-mist p-5 pr-[20px] transition-shadow hover:shadow-brand-hover"
                   key={card.id}
                 >
                   <h4 className="text-brand-lime">{card.title}</h4>
-                  <p className="mb-[15px] text-base leading-[1.2] text-[#3D565F]">{card.description}</p>
+                  <p className="mb-[15px] text-base leading-[1.2] text-brand-slate">{card.description}</p>
                   <a
                     href={card.buttonUrl}
-                    className="flex size-10 items-center justify-center rounded-full bg-white text-brand-ink shadow-[0_3px_6px_rgba(0,0,0,0.16)] transition-colors hover:bg-brand-lime hover:text-white"
+                    className="flex size-10 items-center justify-center rounded-full bg-white text-brand-ink shadow-brand-icon transition-colors hover:bg-brand-lime hover:text-white"
                     aria-label={card.buttonLabel || card.title}
                   >
                     <ChevronRight className="size-5" />

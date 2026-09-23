@@ -1,4 +1,5 @@
 import { Button } from '../Button/Button';
+import { BlobImage } from '../Image/BlobImage';
 
 export interface FeatureSplitItem {
   title: string;
@@ -43,7 +44,7 @@ export function FeatureSplit({
     <div>
       <h1 className="mb-[20px] text-[20px] leading-none font-extralight text-brand-ink sm:text-[65px]">{heading}</h1>
       {features.map((feature) => (
-        <p className="mb-[20px] text-base leading-[1.3] text-[#335580]" key={feature.title}>
+        <p className="mb-[20px] text-base leading-[1.3] text-brand-blue" key={feature.title}>
           <strong>{feature.title} - </strong>
           {feature.description}
         </p>
@@ -58,11 +59,7 @@ export function FeatureSplit({
 
   const imageColumn = hasImage && (
     <div className="relative w-full">
-      <img
-        className="block h-auto w-full rounded-[71%_29%_66%_34%/41%_42%_58%_59%] object-cover"
-        src={imageUrl}
-        alt={imageAlt}
-      />
+      <BlobImage src={imageUrl} alt={imageAlt} />
     </div>
   );
 

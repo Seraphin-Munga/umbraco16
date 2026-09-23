@@ -45,16 +45,17 @@ function formatRandCompact(value: number): string {
 // browsers resolve it as the last color only, i.e. solid navy).
 const RANGE_TRACK_CLASS =
   'h-1.5 w-full cursor-pointer appearance-none rounded-full bg-brand-navy outline-none ' +
-  '[&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-0 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-[1px_2px_5px_rgba(0,0,0,0.2)] [&::-webkit-slider-thumb]:transition-all ' +
+  '[&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-0 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-brand-thumb [&::-webkit-slider-thumb]:transition-all ' +
   '[&:hover::-webkit-slider-thumb]:h-6 [&:hover::-webkit-slider-thumb]:w-6 ' +
-  '[&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:shadow-[1px_2px_5px_rgba(0,0,0,0.2)]';
+  '[&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:shadow-brand-thumb';
 
-// Input.tsx/Select.tsx are plain passthroughs (no tailwind-merge) - a
-// second color utility appended to this string wouldn't reliably override
-// `text-black` here, so the readonly repayment field (navy, not black)
-// gets its own variant instead of overriding this one.
+// Input.tsx/Select.tsx now delegate to the shadcn Input/Select, which do
+// merge classes via tailwind-merge (the `cn` package) - a later color
+// utility here reliably overrides an earlier one, but the readonly
+// repayment field (navy, not black) still gets its own variant below for
+// clarity rather than overriding this one inline.
 const PILL_INPUT_CLASS =
-  'h-[50px] w-full rounded-full border-0 bg-white px-5 text-center text-xl font-bold text-black outline-none placeholder:text-base placeholder:font-medium placeholder:text-[#696969] focus:ring-2 focus:ring-[#259cd8]';
+  'h-[50px] w-full rounded-full border-0 bg-white px-5 text-center text-xl font-bold text-black outline-none placeholder:text-base placeholder:font-medium placeholder:text-brand-muted focus:ring-2 focus:ring-brand-focus';
 
 const PILL_RESULT_CLASS =
   'h-[50px] w-full rounded-full border-0 bg-white px-5 text-center text-xl font-bold text-brand-navy outline-none';
@@ -210,7 +211,7 @@ export function LoanCalculator({
   return (
     <section className="py-10 md:py-20" aria-labelledby="loan-calculator">
       <div className="px-4 sm:px-6 lg:px-8">
-        <div className="rounded-[29px] bg-[#8095af] p-8 md:p-14">
+        <div className="rounded-[29px] bg-brand-steel p-8 md:p-14">
           <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-2 md:gap-16">
             {imagePosition === 'left' ? (
               <>

@@ -47,7 +47,7 @@ export function HeroBanner({
         style={imageUrl ? { backgroundImage: `url("${imageUrl}")` } : undefined}
       >
         {imageAlt && <span className="sr-only">{imageAlt}</span>}
-        <div className="relative flex h-full w-full items-center bg-[linear-gradient(270deg,#002a602e_0%,#002a6085_38%,#002a60ba_100%)]">
+        <div className="relative flex h-full w-full items-center bg-[image:var(--gradient-hero-overlay)]">
           <div className="max-w-[700px] px-[25px] py-[20px] sm:px-[50px] sm:py-[40px]">
             {(headingLead || headingHighlight) && (
               <h1 className="mb-[10px] text-[20px] leading-none font-extralight text-white sm:text-[65px]">

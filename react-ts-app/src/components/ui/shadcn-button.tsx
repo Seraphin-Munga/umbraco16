@@ -18,6 +18,17 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         link: "text-primary underline-offset-4 hover:underline",
+        // Brand pill CTAs ported from the legacy .btn.btn-brand-1 /
+        // .btn.btn-brand-secondary / .btn-brand-link classes - pair with
+        // size="pill" (brand-1/brand-secondary) or size="link"
+        // (brand-link). Color-only here; dimensions live in `size` so they
+        // don't fight the color classes for the same utility group.
+        "brand-1":
+          "rounded-full bg-brand-lime font-sans font-semibold uppercase text-white shadow-brand-sm transition-transform duration-500 ease-out",
+        "brand-secondary":
+          "rounded-full border border-brand-accent bg-white font-sans font-semibold uppercase text-brand-navy shadow-brand-sm transition-transform duration-500 ease-out",
+        "brand-link":
+          "rounded-none font-sans font-semibold text-brand-lime transition-colors hover:underline",
       },
       size: {
         default:
@@ -31,6 +42,10 @@ const buttonVariants = cva(
         "icon-sm":
           "size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
         "icon-lg": "size-9",
+        // Dimensions for the brand-1/brand-secondary pill CTAs.
+        pill: "h-[50px] min-w-[220px] gap-1.5 px-0 text-sm",
+        // Dimensions for the brand-link text CTA (no fixed box at all).
+        link: "h-auto w-auto gap-1 p-0 text-sm",
       },
     },
     defaultVariants: {

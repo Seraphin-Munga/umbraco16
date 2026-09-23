@@ -72,6 +72,26 @@
        header's own brand-navy). */
     --color-brand-ink: #112768;
     --color-brand-lime: #5dc300;
+    /* Additional one-off brand colors ported from projectmagic.css/
+       main.min.css, promoted to theme tokens so every ui/ component
+       references a variable instead of an inline hex value. */
+    --color-brand-mist: #f2f2f2;
+    --color-brand-line: #e5e5e5;
+    --color-brand-slate: #3d565f;
+    --color-brand-blue: #335580;
+    --color-brand-steel: #8095af;
+    --color-brand-accent: #29418a;
+    --color-brand-highlight: #ecf1f2;
+    --color-brand-muted: #696969;
+    --color-brand-focus: #259cd8;
+    /* Shadows reused across the brand-pill Button, Accordion's style2 card
+       and CrossSell's hover/icon states - tokenized so the same depth
+       reads consistently instead of one-off rgba() values per component. */
+    --shadow-brand-sm: 2px 5px 10px rgba(0, 0, 0, 0.16);
+    --shadow-brand-thumb: 1px 2px 5px rgba(0, 0, 0, 0.2);
+    --shadow-brand-card: 9px 11px 23px rgba(6, 61, 79, 0.12);
+    --shadow-brand-hover: 0 3px 15px rgba(0, 0, 0, 0.1);
+    --shadow-brand-icon: 0 3px 6px rgba(0, 0, 0, 0.16);
     --radius-sm: calc(var(--radius) * 0.6);
     --radius-md: calc(var(--radius) * 0.8);
     --radius-lg: var(--radius);
@@ -114,6 +134,15 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
+    /* HeroBanner's photo-darkening overlay - a navy wash built from the
+       brand-navy token via color-mix() instead of three separate
+       pre-mixed hex+alpha stops, so it stays in sync with --color-brand-navy. */
+    --gradient-hero-overlay: linear-gradient(
+        270deg,
+        color-mix(in srgb, var(--color-brand-navy) 18%, transparent) 0%,
+        color-mix(in srgb, var(--color-brand-navy) 52%, transparent) 38%,
+        color-mix(in srgb, var(--color-brand-navy) 73%, transparent) 100%
+    );
 }
 
 .dark {

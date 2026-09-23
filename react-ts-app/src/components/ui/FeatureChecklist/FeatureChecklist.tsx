@@ -1,4 +1,5 @@
 import { Button } from '../Button/Button';
+import { BlobImage } from '../Image/BlobImage';
 
 export interface FeatureChecklistCta {
   label: string;
@@ -43,13 +44,13 @@ export function FeatureChecklist({
   const textColumn = (
     <div>
       <h1 className="mb-[10px] text-[20px] leading-none font-extralight text-brand-ink sm:text-[65px]">{heading}</h1>
-      {subheading && <p className="mb-[20px] text-sm font-normal text-[#3D565F] uppercase">{subheading}</p>}
+      {subheading && <p className="mb-[20px] text-sm font-normal text-brand-slate uppercase">{subheading}</p>}
       <div className="mt-[20px] mb-[30px]">
         <ul className="flex flex-wrap">
           {features.map((feature) => (
             <li
               key={feature}
-              className="mb-[8px] flex w-1/2 items-center gap-[10px] text-[14px] leading-[18px] text-[#3D565F]"
+              className="mb-[8px] flex w-1/2 items-center gap-[10px] text-[14px] leading-[18px] text-brand-slate"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -76,11 +77,7 @@ export function FeatureChecklist({
 
   const imageColumn = hasImage && (
     <div className="relative w-full">
-      <img
-        className="block h-auto w-full rounded-[71%_29%_66%_34%/41%_42%_58%_59%] object-cover"
-        src={imageUrl}
-        alt={imageAlt}
-      />
+      <BlobImage src={imageUrl} alt={imageAlt} />
     </div>
   );
 

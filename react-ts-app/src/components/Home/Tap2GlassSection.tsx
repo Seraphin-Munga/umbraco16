@@ -35,7 +35,7 @@ export function Tap2GlassSection({
                 fill="currentColor"
                 strokeWidth={0}
                 viewBox="0 0 512 512"
-                className="ml-2 size-4 transition-transform duration-500 group-hover:translate-x-1"
+                className="ml-2 size-4 transition-transform duration-500 group-hover/button:translate-x-1"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path

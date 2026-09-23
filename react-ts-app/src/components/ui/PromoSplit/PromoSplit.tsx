@@ -1,4 +1,5 @@
 import { Button } from '../Button/Button';
+import { BlobImage } from '../Image/BlobImage';
 
 export interface PromoSplitCta {
   label: string;
@@ -46,7 +47,7 @@ export function PromoSplit({
   const textColumn = (
     <div>
       <h1 className="mb-[20px] text-[20px] leading-none font-extralight text-brand-ink sm:text-[65px]">{heading}</h1>
-      {description && <p className="text-base leading-[1.3] text-[#335580]">{description}</p>}
+      {description && <p className="text-base leading-[1.3] text-brand-blue">{description}</p>}
       {(primaryCta || secondaryCta) && (
         <div className="mt-[50px] flex flex-wrap items-center gap-[30px]">
           {primaryCta && <Button href={primaryCta.url}>{primaryCta.label}</Button>}
@@ -62,11 +63,7 @@ export function PromoSplit({
 
   const imageColumn = hasImage && (
     <div className="relative w-full">
-      <img
-        className="block h-auto w-full rounded-[71%_29%_66%_34%/41%_42%_58%_59%] object-cover"
-        src={imageUrl}
-        alt={imageAlt}
-      />
+      <BlobImage src={imageUrl} alt={imageAlt} />
     </div>
   );
 

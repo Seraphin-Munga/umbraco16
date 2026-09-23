@@ -45,8 +45,8 @@ export function Accordion({ items, variant = 'default', id, defaultOpenIndex = n
             key={item.title}
             className={
               isStyle2
-                ? 'mb-[20px] overflow-hidden rounded-[50px] bg-white shadow-[9px_11px_23px_rgba(6,61,79,0.12)] last:mb-0'
-                : 'border-b border-[#e5e5e5] first:border-t'
+                ? 'mb-[20px] overflow-hidden rounded-[50px] bg-white shadow-brand-card last:mb-0'
+                : 'border-b border-brand-line first:border-t'
             }
           >
             <h5>
@@ -55,7 +55,7 @@ export function Accordion({ items, variant = 'default', id, defaultOpenIndex = n
                 className={
                   isStyle2
                     ? 'flex w-full items-center justify-between bg-white px-5 py-5 text-left text-base font-bold text-brand-ink'
-                    : `flex w-full items-center justify-between rounded-t-[8px] px-[30px] pt-[25px] pb-[20px] text-left text-base font-bold text-brand-ink transition-colors ${isOpen ? 'bg-[#ECF1F2]' : 'bg-transparent'}`
+                    : `flex w-full items-center justify-between rounded-t-[8px] px-[30px] pt-[25px] pb-[20px] text-left text-base font-bold text-brand-ink transition-colors ${isOpen ? 'bg-brand-highlight' : 'bg-transparent'}`
                 }
                 aria-expanded={isOpen}
                 onClick={() => setOpenIndex((current) => (current === index ? null : index))}
@@ -67,7 +67,7 @@ export function Accordion({ items, variant = 'default', id, defaultOpenIndex = n
               </button>
             </h5>
             {isOpen && (
-              <div className={isStyle2 ? 'bg-white px-5 pb-5' : 'rounded-b-[8px] bg-[#ECF1F2] px-[30px] pt-0 pb-[30px]'}>
+              <div className={isStyle2 ? 'bg-white px-5 pb-5' : 'rounded-b-[8px] bg-brand-highlight px-[30px] pt-0 pb-[30px]'}>
                 <div className="text-brand-ink">{item.content}</div>
               </div>
             )}
