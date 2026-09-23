@@ -36,9 +36,14 @@ import { Testimonials } from '../components/Home/Testimonials';
 // Renders a single-field CMS heading string in the same brand-span style
 // every section's own hardcoded heading uses - `undefined` (not an empty
 // span) when the field is blank, so the component keeps its own default
-// heading instead of rendering nothing.
+// heading instead of rendering nothing. `font-bold` alone (no explicit
+// size) is intentional - every caller nests this inside an h1 already
+// sized `text-[20px] sm:text-[65px]` (was `.major-title`/`.span-major-
+// title`'s own always-65px-until-the-768px-breakpoint pair), so the span
+// just needs to override the h1's own font-extralight weight, not repeat
+// its responsive size.
 function brandHeading(text: string): ReactNode | undefined {
-  return text ? <span className="span-major-title">{text}</span> : undefined;
+  return text ? <span className="font-bold">{text}</span> : undefined;
 }
 
 // bankWithAudacityBlock has no separate highlightWord field the way
@@ -57,7 +62,7 @@ function bankWithAudacityHeading(text: string): ReactNode | undefined {
 
   return (
     <>
-      <span className="span-major-title">{lead}</span>
+      <span className="font-bold">{lead}</span>
       <br />
       {lastWord}
     </>
@@ -70,7 +75,7 @@ function bankWithAudacityHeading(text: string): ReactNode | undefined {
 // finds "Tap2Glass" itself (the one word that's always the product name,
 // regardless of the surrounding copy) and bolds just that, line-breaking
 // before it, matching the original hardcoded JSX's
-// `Get The <br/><span className="span-major-title">Tap2Glass</span> App`.
+// `Get The <br/><span className="font-bold">Tap2Glass</span> App`.
 // Falls back to a single bold span if an editor ever removes the word
 // "Tap2Glass" from the heading entirely.
 function tap2GlassHeading(text: string): ReactNode | undefined {
@@ -85,7 +90,7 @@ function tap2GlassHeading(text: string): ReactNode | undefined {
     <>
       {before.trim()}
       <br />
-      <span className="span-major-title">{brand}</span>
+      <span className="font-bold">{brand}</span>
       {after}
     </>
   );
@@ -127,7 +132,7 @@ export function renderPageSection(section: AnyPageSection, index: number): React
           heading={
             section.highlightWord || section.heading ? (
               <>
-                <span className="span-major-title">{section.highlightWord}</span> <br />
+                <span className="font-bold">{section.highlightWord}</span> <br />
                 {section.heading}
               </>
             ) : undefined
@@ -271,35 +276,46 @@ export function renderPageSection(section: AnyPageSection, index: number): React
       );
 
     case 'creditLifeInsuranceBlock':
+      // Was previously `.section-800`/`.container`/`.row`/`.col-xl-7`/
+      // `.list-ticks`/etc, styled entirely by public/vendor/projectmagic.css
+      // - a stylesheet that isn't actually loaded anywhere (see
+      // PromoSplit.tsx's own top comment for why), so this rendered
+      // unstyled in production. Tailwind classes below reproduce its
+      // confirmed values (`.section-800`'s min-height:800px, `.list-ticks
+      // li`'s width:50%/margin-bottom:8px, `.mt-15`/`.mb-20`/etc's literal
+      // pixel values - not Tailwind's own same-named rem scale). The
+      // 7/5 column split (col-xl-7/col-xl-5) is reproduced via a 12-col
+      // grid with matching spans rather than this app's usual 50/50
+      // grid-cols-2, since the source wasn't an even split.
       return (
-        <section className="section-800 bg-grey-60" key={index}>
-          <div className="container">
-            <div className="row d-flex align-items-center row-change reverse-row md-text-center">
-              <div className="col-xl-7 col-lg-7 col-md-7">
-                <h1 className="color-brand-1 mt-15 mb-20">{section.heading}</h1>
+        <section className="flex min-h-[800px] w-full items-center bg-[#F2F2F2] py-10" key={index}>
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className={`grid grid-cols-1 items-center gap-10 ${section.imageUrl ? 'md:grid-cols-12 md:gap-16' : ''}`}>
+              <div className={section.imageUrl ? 'md:col-span-7' : undefined}>
+                <h1 className="mt-[15px] mb-[20px] text-brand-ink">{section.heading}</h1>
                 {section.paragraphOne && (
-                  <p className="font-md color-brand-1">{section.paragraphOne}</p>
+                  <p className="text-base leading-[1.3] text-[#335580]">{section.paragraphOne}</p>
                 )}
                 {section.paragraphTwo && (
-                  <p className="font-md color-brand-1 mt-20">{section.paragraphTwo}</p>
+                  <p className="mt-[20px] text-base leading-[1.3] text-[#335580]">{section.paragraphTwo}</p>
                 )}
-                <div className="row">
-                  <div className="col-xl-6 col-lg-6 col-md-6">
-                    <div className="mt-30 mb-30 inline-checklist">
-                      <ul className="list-ticks list-ticks-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2">
+                  <div>
+                    <div className="mt-[30px] mb-[30px]">
+                      <ul className="flex flex-wrap">
                         {section.checklistOne.map((item) => (
-                          <li key={item}>
+                          <li key={item} className="mb-[8px] w-1/2 text-[14px] leading-[18px] text-[#3D565F]">
                             <strong>{item}</strong>
                           </li>
                         ))}
                       </ul>
                     </div>
                   </div>
-                  <div className="col-xl-6 col-lg-6 col-md-6">
-                    <div className="mt-30 mb-30 inline-checklist">
-                      <ul className="list-ticks list-ticks-2">
+                  <div>
+                    <div className="mt-[30px] mb-[30px]">
+                      <ul className="flex flex-wrap">
                         {section.checklistTwo.map((item) => (
-                          <li key={item}>
+                          <li key={item} className="mb-[8px] w-1/2 text-[14px] leading-[18px] text-[#3D565F]">
                             <strong>{item}</strong>
                           </li>
                         ))}
@@ -309,8 +325,8 @@ export function renderPageSection(section: AnyPageSection, index: number): React
                 </div>
               </div>
               {section.imageUrl && (
-                <div className="col-xl-5 col-lg-5 col-md-5">
-                  <img className="d-block" src={section.imageUrl} alt={section.heading} />
+                <div className="md:col-span-5">
+                  <img className="block" src={section.imageUrl} alt={section.heading} />
                 </div>
               )}
             </div>
