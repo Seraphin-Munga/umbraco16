@@ -105,7 +105,7 @@ export function HeroCarousel({
               <a
                 href={item.url}
                 key={item.label}
-                className={`group relative flex cursor-pointer flex-col items-center justify-center border border-white/5 bg-[#003b85] text-center text-xs font-bold text-white shadow-[0_2px_8px_rgba(0,0,0,0.2)] transition-[background-color] duration-200 after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:bg-[linear-gradient(to_bottom,rgba(255,255,255,0.05),rgba(0,0,0,0.05))] hover:bg-[#002d66] max-[768px]:h-[10vh] max-[768px]:px-2.5 max-[768px]:py-10 min-[769px]:aspect-square ${
+                className={`group relative flex cursor-pointer flex-col items-center justify-center border border-white/5 bg-[#003b85] text-center text-xs font-bold text-white shadow-[0_2px_8px_rgba(0,0,0,0.2)] transition-[background-color] duration-200 after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:bg-[linear-gradient(to_bottom,rgba(255,255,255,0.05),rgba(0,0,0,0.05))] hover:bg-[#002d66] max-[768px]:h-[10vh] max-[768px]:px-2.5 max-[768px]:py-10  ${
                   index === gridItems.length - 1 && gridItems.length % 2 === 1 ? 'col-span-2' : ''
                 }`}
               >

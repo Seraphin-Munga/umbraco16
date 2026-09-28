@@ -212,7 +212,7 @@ export function LoanCalculator({
     <section className="py-10 md:py-20" aria-labelledby="loan-calculator">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="rounded-[29px] bg-brand-steel p-8 md:p-14">
-          <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-2 md:gap-16">
+          <div className="grid mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid-cols-1 items-center gap-10 md:grid-cols-2 md:gap-16">
             {imagePosition === 'left' ? (
               <>
                 {image}

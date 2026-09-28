@@ -29,9 +29,9 @@ export function MyWorldAccount({ features, ctaLabel, ctaUrl, heading, subheading
 
         <div className="mt-10 md:col-span-5 md:mt-0">
           <h4 className="mb-5 font-semibold text-brand-ink">{subheading}</h4>
-          <ul className="flex flex-wrap">
+          <ul className="flex flex-col">
             {features.map((feature) => (
-              <li key={feature} className="mb-3 flex w-1/2 items-start gap-2 pr-2 text-left text-sm text-brand-ink">
+              <li key={feature} className="mb-3 flex items-start gap-2 text-left text-sm text-brand-ink">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"

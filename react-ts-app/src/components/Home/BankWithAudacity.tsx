@@ -24,7 +24,7 @@ export function BankWithAudacity({ cards, heading }: BankWithAudacityProps) {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <h1
           id="bank-with-audacity"
-          className="mb-[30px] text-center text-[20px] leading-none font-extralight text-brand-ink max-[768px]:text-left sm:text-[65px]"
+          className="mb-[30px] text-[20px] leading-none font-extralight text-brand-ink max-[768px]:text-left sm:text-[65px]"
           role="heading"
           aria-level={1}
         >

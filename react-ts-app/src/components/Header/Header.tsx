@@ -23,7 +23,7 @@ import { Input } from '../ui/shadcn-input';
 const ONLINE_UPLOAD_URL = import.meta.env.VITE_ONLINE_UPLOAD_URL || '#';
 
 const navLinkClass =
-  'text-white uppercase text-xs font-medium tracking-wide whitespace-nowrap px-2 py-1.5 hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white data-active:bg-white/10';
+  'text-white uppercase text-sm font-semibold tracking-wider whitespace-nowrap px-3 py-2 hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white data-active:bg-white/10';
 
 // CMS-sourced link.url values are either a relative in-app path or a fully
 // qualified off-site URL (see mapLinks' comment in contentApi.ts) - only
@@ -63,7 +63,7 @@ export function Header() {
         </Link>
 
         <NavigationMenu className="hidden lg:flex lg:min-w-0 lg:flex-1">
-          <NavigationMenuList className="flex-nowrap gap-0.5">
+          <NavigationMenuList className="flex-nowrap gap-1.5">
             {loading && <li className="px-2.5 py-1.5 text-sm text-white/60">Loading menu…</li>}
             {error && <li className="px-2.5 py-1.5 text-sm text-red-300">{error}</li>}
 
@@ -113,7 +113,7 @@ export function Header() {
                         </NavigationMenuTrigger>
                         <NavigationMenuContent>
                           <div
-                            className="mx-auto grid max-w-7xl gap-x-10 divide-x divide-white/10 px-4 py-10 sm:px-6 lg:px-8"
+                            className="mx-auto grid max-w-7xl items-start gap-x-10 divide-x divide-white/10 px-4 py-10 sm:px-6 lg:px-8"
                             style={{ gridTemplateColumns: `repeat(${menuItem.menus.length}, minmax(0, 1fr))` }}
                           >
                             {menuItem.menus.map((category, categoryIndex) => (

@@ -487,5 +487,7 @@ $RECYCLE.BIN/
 **/umbraco/mediacache/
 **/wwwroot/media/
 !**/wwwroot/media/.gitkeep
+src/AcfAfricanbank.Web/media/
+!src/AcfAfricanbank.Web/media/.gitkeep
 !**/umbraco/Data/.gitkeep
 **/appsettings.Development.json
