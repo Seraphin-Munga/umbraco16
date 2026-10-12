@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Button } from '../ui/Button/Button';
+import { LazyImage } from '../ui/Image/LazyImage';
 
 // Ported from the "Tap2Glass App" section of the current live home page
 // markup. Content comes from the CMS-managed homePage node (see
@@ -54,7 +55,12 @@ export function Tap2GlassSection({
           {imageUrl && (
             <div className="md:col-span-8">
               <div className="max-h-[350px] overflow-hidden rounded-[29px]">
-                <img className="block w-full object-cover" src={imageUrl} alt={imageAlt} />
+                <LazyImage
+                  wrapperClassName="h-full w-full"
+                  className="block w-full object-cover"
+                  src={imageUrl}
+                  alt={imageAlt}
+                />
               </div>
             </div>
           )}

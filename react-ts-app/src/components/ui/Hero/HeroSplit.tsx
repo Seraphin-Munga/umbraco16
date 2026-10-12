@@ -13,6 +13,7 @@ export interface HeroSplitProps {
   secondaryCta?: HeroCta | null;
   imageUrl?: string;
   imageAlt?: string;
+  background?: string;
 }
 
 // Two-column product hero (heroBannerBlock, CMS-driven - see
@@ -37,11 +38,12 @@ export function HeroSplit({
   secondaryCta,
   imageUrl,
   imageAlt = '',
+  background = 'bg-brand-mist',
 }: HeroSplitProps) {
   const hasImage = Boolean(imageUrl);
 
   return (
-    <section className="mt-0 mb-[40px] bg-brand-mist sm:mb-[120px]">
+    <section className={`mt-0 pb-[40px] sm:pb-[120px] ${background}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className={`grid grid-cols-1 items-center gap-10 ${hasImage ? 'md:grid-cols-2 md:gap-16' : ''}`}>
           <div>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Play, X } from 'lucide-react';
+import { LazyImage } from '../ui/Image/LazyImage';
 
 // Ported from the "testimonial-section" video grid in the current live home
 // page markup - replaces this file's old API-driven avatar/story carousel
@@ -50,7 +51,7 @@ export function Testimonials({ videos, heading }: TestimonialsProps) {
               }}
               key={video.id}
             >
-              <img className="block h-auto w-full" src={video.thumbnailUrl} alt="Video Preview" />
+              <LazyImage className="block h-auto w-full" src={video.thumbnailUrl} alt="Video Preview" />
               <div className="absolute top-1/2 left-1/2 flex size-[60px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black/60">
                 <Play className="size-6 fill-white text-white" />
               </div>

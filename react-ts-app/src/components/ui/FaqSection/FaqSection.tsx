@@ -9,6 +9,7 @@ export interface FaqSectionProps {
   id: string;
   heading: string;
   items: FaqItem[];
+  background?: string;
 }
 
 // FAQ accordion section (faqSectionBlock, CMS-driven, any page - see
@@ -18,17 +19,19 @@ export interface FaqSectionProps {
 // Was previously `.container`/`.row`/`.col-xl-12`/etc - see
 // PromoSplit.tsx's own comment for why that stylesheet (public/vendor/
 // projectmagic.css) isn't actually loaded, so this rendered unstyled.
-export function FaqSection({ id, heading, items }: FaqSectionProps) {
+export function FaqSection({ id, heading, items, background = '' }: FaqSectionProps) {
   return (
-    <section className="py-[45px]">
+    <section className={`py-[45px] ${background}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h1 className="mt-[15px] mb-[20px] text-center text-brand-ink">{heading}</h1>
+        <h1 className="mt-[15px] mb-[20px] text-center text-brand-ink font-bold! text-[42px]! leading-[1.2]! [font-family:'Montserrat',sans-serif]!">
+          {heading}
+        </h1>
         <Accordion
           id={id}
           variant="style2"
           items={items.map((item) => ({
             title: item.question,
-            content: <div dangerouslySetInnerHTML={{ __html: item.answerHtml }} />,
+            content: <div className="rich-text-ticks" dangerouslySetInnerHTML={{ __html: item.answerHtml }} />,
           }))}
         />
       </div>

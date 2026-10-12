@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchFooterData } from '../../store/slices/footerSlice';
+import { FooterLogo } from '../icons/FooterLogo';
 import { FooterPattern } from '../icons/FooterPattern';
 
 const SOCIAL_ICON_CLASS =
@@ -60,7 +61,9 @@ export function Footer() {
         <div className="mt-[60px] border-t border-[#89bb4f] pt-[30px] text-[9px]">
           <div className="grid grid-cols-1 items-start gap-8 sm:grid-cols-12">
             <div className="sm:col-span-7">
-              <img src="/media/t0dajzsi/african-bank-updated-logo.png" width="170" alt="African Bank" className="mx-auto sm:mx-0" />
+              <div className="mx-auto w-[170px] sm:mx-0">
+                <FooterLogo />
+              </div>
               <div
                 className="mt-[30px] text-xs font-extralight max-sm:text-center"
                 dangerouslySetInnerHTML={{ __html: disclaimerMarkup }}

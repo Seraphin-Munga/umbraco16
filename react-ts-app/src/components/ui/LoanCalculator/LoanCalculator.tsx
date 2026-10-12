@@ -4,6 +4,7 @@ import { ChevronDown } from 'lucide-react';
 import { Button } from '../Button/Button';
 import { Input } from '../Input/Input';
 import { Select } from '../Input/Select';
+import { LazyImage } from '../Image/LazyImage';
 import { estimateMonthlyInstallment, formatRand } from '../../../utils/loanCalculator';
 
 // Ported from the "#loan-calculator" section of the current live home page
@@ -197,13 +198,12 @@ export function LoanCalculator({
   // component's plain <img>, no extra markup around it).
   const image: ReactNode = (
     <div className="mx-auto flex max-w-sm items-center justify-center">
-      <img
+      <LazyImage
         className="block max-h-[420px] w-auto"
         src={imageUrl}
         alt={imageAlt}
         role="img"
         aria-label={imageAlt}
-        loading="lazy"
       />
     </div>
   );

@@ -111,13 +111,13 @@ export function Header() {
                         >
                           {link.title}
                         </NavigationMenuTrigger>
-                        <NavigationMenuContent>
+                        <NavigationMenuContent className="md:w-full">
                           <div
-                            className="mx-auto grid max-w-7xl items-start gap-x-10 divide-x divide-white/10 px-4 py-10 sm:px-6 lg:px-8"
+                            className="mx-auto grid w-full max-w-7xl items-stretch gap-x-10 divide-x divide-white/25 px-4 py-10 sm:px-6 lg:px-8"
                             style={{ gridTemplateColumns: `repeat(${menuItem.menus.length}, minmax(0, 1fr))` }}
                           >
                             {menuItem.menus.map((category, categoryIndex) => (
-                              <div key={categoryIndex} className="pl-10 first:pl-0">
+                              <div key={categoryIndex} className="pr-2 pl-2 first:pl-0 last:pr-0">
                                 <div className="mb-6 text-xs font-semibold tracking-wide text-brand-green uppercase">
                                   {category.categoryName}
                                 </div>
@@ -136,7 +136,7 @@ export function Header() {
                                               {productLink.title}
                                             </span>
                                             {linkGroup.menuDescription && (
-                                              <span className="mt-1 block text-xs text-white/50">
+                                              <span className="mb-[15px] block text-[11px] font-light text-brand-green [text-align:inherit]">
                                                 {linkGroup.menuDescription}
                                               </span>
                                             )}

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { Play } from 'lucide-react';
+import { LazyImage } from '../ui/Image/LazyImage';
 
 // Ported from the "We back your business audacity" section of the current
 // live home page markup: a text-slider carousel (Bootstrap's own
@@ -94,7 +95,7 @@ export function BusinessAudacitySection({
           {videoThumbnailUrl && (
             <div className="w-full sm:w-1/2">
               <div className="relative w-full cursor-pointer overflow-hidden rounded-[29px] bg-brand-ink">
-                <img className="block h-auto w-full" src={videoThumbnailUrl} alt="Video Preview" />
+                <LazyImage className="block h-auto w-full" src={videoThumbnailUrl} alt="Video Preview" />
                 <div className="absolute top-1/2 left-1/2 flex size-[60px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black/60">
                   <Play className="size-6 fill-white text-white" />
                 </div>

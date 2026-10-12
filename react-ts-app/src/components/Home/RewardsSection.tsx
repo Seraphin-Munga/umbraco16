@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Button } from '../ui/Button/Button';
+import { LazyImage } from '../ui/Image/LazyImage';
 
 // Ported from the "borrow-section" / Audacious Rewards block of the current
 // live home page markup (the "borrow-section" class name is a leftover from
@@ -41,7 +42,7 @@ export function RewardsSection({ cards, heading, subheading, intro }: RewardsSec
           {cards.map((card) => (
             <div className="flex h-full flex-col justify-between rounded-[29px] bg-white p-[15px]" key={card.id}>
               <div>
-                <img className="block" src={card.imageUrl} alt={card.imageAlt} />
+                <LazyImage className="block" src={card.imageUrl} alt={card.imageAlt} />
                 <p className="mt-4 mb-4 text-base text-brand-ink">{card.description}</p>
               </div>
               <div className="text-left">

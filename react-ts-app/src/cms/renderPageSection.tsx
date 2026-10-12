@@ -9,6 +9,7 @@ import { FeatureChecklist } from '../components/ui/FeatureChecklist/FeatureCheck
 import { DownloadsSection } from '../components/ui/DownloadsSection/DownloadsSection';
 import { FaqSection } from '../components/ui/FaqSection/FaqSection';
 import { CrossSell } from '../components/ui/CrossSell/CrossSell';
+import { BlobImage } from '../components/ui/Image/BlobImage';
 import { BankWithAudacity } from '../components/Home/BankWithAudacity';
 import { LoanCalculator } from '../components/ui/LoanCalculator/LoanCalculator';
 import { MyWorldAccount } from '../components/Home/MyWorldAccount';
@@ -18,6 +19,11 @@ import { Tap2GlassSection } from '../components/Home/Tap2GlassSection';
 import { BusinessAudacitySection } from '../components/Home/BusinessAudacitySection';
 import { AppDownloadSection } from '../components/Home/AppDownloadSection';
 import { Testimonials } from '../components/Home/Testimonials';
+import { TechHero } from '../components/ui/TechDeals/TechHero';
+import { PlugAndGo } from '../components/ui/TechDeals/PlugAndGo';
+import { TechRequirements } from '../components/ui/TechDeals/TechRequirements';
+import { TechCallToAction } from '../components/ui/TechDeals/TechCallToAction';
+import { ContactInfo } from '../components/ui/ContactInfo/ContactInfo';
 
 // Single shared block registry, used by Home.tsx, PersonalLoanPage.tsx AND
 // DynamicPage.tsx (the catch-all route for any new CMS page - see that
@@ -44,6 +50,33 @@ import { Testimonials } from '../components/Home/Testimonials';
 // its responsive size.
 function brandHeading(text: string): ReactNode | undefined {
   return text ? <span className="font-bold">{text}</span> : undefined;
+}
+
+// Single-column tick list used by both halves of creditLifeInsuranceBlock's
+// checklist - was previously nested inside a `flex flex-wrap` with its own
+// `w-1/2` items while already sitting inside an `sm:grid-cols-2` half-width
+// column, which wrapped each column's items into a second, narrower pair of
+// sub-columns instead of the plain vertical list the source design uses.
+function creditLifeChecklist(items: string[]): ReactNode {
+  return (
+    <ul>
+      {items.map((item) => (
+        <li key={item} className="mb-[8px] flex items-center gap-[10px] text-[14px] leading-[18px] text-[#3D565F]">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            fill="currentColor"
+            className="shrink-0 text-brand-green"
+            viewBox="0 0 16 16"
+          >
+            <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z" />
+          </svg>
+          <strong>{item}</strong>
+        </li>
+      ))}
+    </ul>
+  );
 }
 
 // bankWithAudacityBlock has no separate highlightWord field the way
@@ -94,6 +127,42 @@ function tap2GlassHeading(text: string): ReactNode | undefined {
       {after}
     </>
   );
+}
+
+// appDownloadBlock has no separate highlightWord field either - just one
+// plain heading string ("Download the African Bank App"). Unlike the other
+// per-block splitters above, the bold portion here is the generic lead-in
+// (the first two words) rather than the brand/product words - "African
+// Bank App" stays the h1's own thin default weight and wraps onto its own
+// line(s) through ordinary text flow.
+function appDownloadHeading(text: string): ReactNode | undefined {
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return undefined;
+  if (words.length <= 2) return brandHeading(text);
+
+  const lead = words.slice(0, 2).join(' ');
+  const rest = words.slice(2).join(' ');
+
+  return (
+    <>
+      <span className="font-bold">{lead}</span>
+      <br />
+      {rest}
+    </>
+  );
+}
+
+// Zebra-striped band color for the "plain" product-loan-style blocks below
+// (heroBannerBlock/appDownloadBlock/featureChecklistBlock/faqSectionBlock/
+// downloadsSectionBlock/crossSellBlock/creditLifeInsuranceBlock) - first
+// such block on a page is #F2F2F2 (brand-mist), the next is white, and so
+// on by render position. Deliberately not applied to every case (e.g.
+// heroCarouselBlock/bankWithAudacityBlock/rewardsSectionBlock/etc keep
+// their own fixed brand colors - this alternation is only for the flat,
+// color-agnostic bands these loan-page blocks were previously hardcoding
+// inconsistently).
+function sectionBackground(index: number): string {
+  return index % 2 === 0 ? 'bg-brand-mist' : 'bg-white';
 }
 
 export function renderPageSection(section: AnyPageSection, index: number): ReactNode {
@@ -189,7 +258,8 @@ export function renderPageSection(section: AnyPageSection, index: number): React
           downloadLabel={section.downloadLabel ?? undefined}
           imageUrl={section.imageUrl}
           imageAlt={section.imageAlt}
-          heading={brandHeading(section.heading)}
+          heading={appDownloadHeading(section.heading)}
+          background={sectionBackground(index)}
         />
       );
 
@@ -209,6 +279,7 @@ export function renderPageSection(section: AnyPageSection, index: number): React
           secondaryCta={section.secondaryCta}
           imageUrl={section.imageUrl}
           imageAlt={section.imageAlt}
+          background={sectionBackground(index)}
         />
       );
 
@@ -241,6 +312,8 @@ export function renderPageSection(section: AnyPageSection, index: number): React
           imageUrl={section.imageUrl}
           imageAlt={section.imageAlt}
           imageOnRight={section.imageOnRight}
+          background={section.backgroundColor}
+          imagePlain={section.imagePlain}
         />
       );
 
@@ -272,6 +345,7 @@ export function renderPageSection(section: AnyPageSection, index: number): React
           imageUrl={section.imageUrl}
           imageAlt={section.imageAlt}
           imageOnRight={section.imageOnRight}
+          background={sectionBackground(index)}
         />
       );
 
@@ -288,45 +362,27 @@ export function renderPageSection(section: AnyPageSection, index: number): React
       // grid with matching spans rather than this app's usual 50/50
       // grid-cols-2, since the source wasn't an even split.
       return (
-        <section className="flex min-h-[800px] w-full items-center bg-[#F2F2F2] py-10" key={index}>
+        <section className={`flex min-h-[800px] w-full items-center py-10 ${sectionBackground(index)}`} key={index}>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className={`grid grid-cols-1 items-center gap-10 ${section.imageUrl ? 'md:grid-cols-12 md:gap-16' : ''}`}>
               <div className={section.imageUrl ? 'md:col-span-7' : undefined}>
-                <h1 className="mt-[15px] mb-[20px] text-brand-ink">{section.heading}</h1>
+                <h1 className="mt-[15px] mb-[20px] text-brand-ink font-bold! text-[42px]! leading-[1.2]! [font-family:'Montserrat',sans-serif]!">
+                  {section.heading}
+                </h1>
                 {section.paragraphOne && (
                   <p className="text-base leading-[1.3] text-[#335580]">{section.paragraphOne}</p>
                 )}
                 {section.paragraphTwo && (
                   <p className="mt-[20px] text-base leading-[1.3] text-[#335580]">{section.paragraphTwo}</p>
                 )}
-                <div className="grid grid-cols-1 sm:grid-cols-2">
-                  <div>
-                    <div className="mt-[30px] mb-[30px]">
-                      <ul className="flex flex-wrap">
-                        {section.checklistOne.map((item) => (
-                          <li key={item} className="mb-[8px] w-1/2 text-[14px] leading-[18px] text-[#3D565F]">
-                            <strong>{item}</strong>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                  <div>
-                    <div className="mt-[30px] mb-[30px]">
-                      <ul className="flex flex-wrap">
-                        {section.checklistTwo.map((item) => (
-                          <li key={item} className="mb-[8px] w-1/2 text-[14px] leading-[18px] text-[#3D565F]">
-                            <strong>{item}</strong>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
+                <div className="mt-[30px] mb-[30px] grid grid-cols-1 gap-x-10 sm:grid-cols-2">
+                  {creditLifeChecklist(section.checklistOne)}
+                  {creditLifeChecklist(section.checklistTwo)}
                 </div>
               </div>
               {section.imageUrl && (
                 <div className="md:col-span-5">
-                  <img className="block" src={section.imageUrl} alt={section.heading} />
+                  <BlobImage src={section.imageUrl} alt={section.heading} />
                 </div>
               )}
             </div>
@@ -341,16 +397,97 @@ export function renderPageSection(section: AnyPageSection, index: number): React
           id={`accordionFAQ-${index}`}
           heading={section.heading}
           items={section.items}
+          background={sectionBackground(index)}
         />
       );
 
     case 'downloadsSectionBlock':
-      return <DownloadsSection key={index} heading={section.heading} items={section.items} />;
+      return (
+        <DownloadsSection
+          key={index}
+          heading={section.heading}
+          items={section.items}
+          background={sectionBackground(index)}
+        />
+      );
 
     case 'crossSellBlock':
       return (
-        <CrossSell key={index} heading={section.heading} cards={section.cards} imageUrl={section.imageUrl} />
+        <CrossSell
+          key={index}
+          heading={section.heading}
+          cards={section.cards}
+          imageUrl={section.imageUrl}
+          background={sectionBackground(index)}
+        />
       );
+
+    case 'techHeroBlock':
+      // Tech Deals' own top banner (TechHero) - "Welcome to Tech Deals"
+      // beside a row of category icon tiles. `sectionBackground(index + 1)`
+      // (not `sectionBackground(index)`, which the product-loan blocks
+      // above use) - Tech Deals' own band sequence starts white, one
+      // position earlier than that convention's own gray-first default, so
+      // shifting by one reuses the same helper instead of a duplicate one.
+      return (
+        <TechHero
+          key={index}
+          heading={section.heading}
+          highlightHeading={section.highlightHeading}
+          subheading={section.subheading}
+          categories={section.categories}
+          background={sectionBackground(index + 1)}
+        />
+      );
+
+    case 'plugAndGoBlock':
+      return (
+        <PlugAndGo
+          key={index}
+          heading={section.heading}
+          productName={section.productName}
+          description={section.description}
+          bundleLabel={section.bundleLabel}
+          priceAmount={section.priceAmount}
+          priceSuffix={section.priceSuffix}
+          cta={section.cta}
+          imageUrl={section.imageUrl}
+          imageAlt={section.imageAlt}
+          background={sectionBackground(index + 1)}
+        />
+      );
+
+    case 'techRequirementsBlock':
+      return (
+        <TechRequirements
+          key={index}
+          heading={section.heading}
+          bodyHtml={section.bodyHtml}
+          itemsHeading={section.itemsHeading}
+          itemsIntro={section.itemsIntro}
+          items={section.items}
+          perksHeading={section.perksHeading}
+          perks={section.perks}
+          background={sectionBackground(index + 1)}
+        />
+      );
+
+    case 'techCallToActionBlock':
+      return (
+        <TechCallToAction
+          key={index}
+          heading={section.heading}
+          phoneNumber={section.phoneNumber}
+          phoneUrl={section.phoneUrl}
+          termsLabel={section.termsLabel}
+          termsUrl={section.termsUrl}
+          disclaimerHtml={section.disclaimerHtml}
+          background={sectionBackground(index + 1)}
+        />
+      );
+
+    case 'contactInfoBlock':
+      return <ContactInfo key={index} heading={section.heading} cards={section.cards} />;
 
     default:
       return null;

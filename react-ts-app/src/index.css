@@ -196,3 +196,29 @@
   from { transform: translateY(10px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+/* FAQ answer rich text (FaqSection.tsx's dangerouslySetInnerHTML) - CMS
+   editors write plain <ul>/<li> lists with no way to attach a React icon
+   per item, so <li> markers get the same brand-green checkmark used by
+   FeatureChecklist/creditLifeInsuranceBlock's own checklists (same SVG
+   path, same --color-brand-green) instead of a default bullet. */
+.rich-text-ticks ul {
+  list-style: none;
+  padding-left: 0;
+}
+.rich-text-ticks li {
+  position: relative;
+  padding-left: 26px;
+  margin-bottom: 8px;
+}
+.rich-text-ticks li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 3px;
+  width: 16px;
+  height: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%2388bc47'%3E%3Cpath d='M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+}

@@ -1,10 +1,12 @@
 import { ChevronRight } from 'lucide-react';
 import type { AudacityCard } from '../../Home/BankWithAudacity';
+import { LazyImage } from '../Image/LazyImage';
 
 export interface CrossSellProps {
   heading: string;
   cards: AudacityCard[];
   imageUrl?: string;
+  background?: string;
 }
 
 // "Find your ideal loan solution" style cross-sell card grid beside a
@@ -21,9 +23,9 @@ export interface CrossSellProps {
 // only an aria-label and a CSS `content: '❯'` pseudo-element for its
 // visible glyph - replaced here with a real ChevronRight icon instead of
 // reproducing that pseudo-element trick.
-export function CrossSell({ heading, cards, imageUrl }: CrossSellProps) {
+export function CrossSell({ heading, cards, imageUrl, background = '' }: CrossSellProps) {
   return (
-    <section className="flex min-h-[800px] w-full items-center py-10">
+    <section className={`flex min-h-[800px] w-full items-center py-10 ${background}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className={`grid grid-cols-1 items-center gap-10 ${imageUrl ? 'md:grid-cols-2 md:gap-16' : ''}`}>
           <div>
@@ -49,7 +51,7 @@ export function CrossSell({ heading, cards, imageUrl }: CrossSellProps) {
           </div>
           {imageUrl && (
             <div>
-              <img className="block w-full" src={imageUrl} alt="" />
+              <LazyImage className="block w-full" src={imageUrl} alt="" />
             </div>
           )}
         </div>

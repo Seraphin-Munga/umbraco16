@@ -110,7 +110,12 @@ export function HeroCarousel({
                 }`}
               >
                 <div>
-                  <img className="mx-auto h-[35px] max-[768px]:mt-0.5 max-[768px]:h-[30px]" src={item.iconUrl} alt="" />
+                  <img
+                    className="mx-auto h-[35px] max-[768px]:mt-0.5 max-[768px]:h-[30px]"
+                    src={item.iconUrl}
+                    alt=""
+                    loading="lazy"
+                  />
                   <div className="mt-0 text-white">{item.label}</div>
                 </div>
               </a>

@@ -14,6 +14,7 @@ export interface FeatureChecklistProps {
   imageUrl?: string;
   imageAlt?: string;
   imageOnRight?: boolean;
+  background?: string;
 }
 
 // Two-column checkmarked feature list beside a photo, with its own eyebrow
@@ -38,6 +39,7 @@ export function FeatureChecklist({
   imageUrl,
   imageAlt = '',
   imageOnRight = false,
+  background = '',
 }: FeatureChecklistProps) {
   const hasImage = Boolean(imageUrl);
 
@@ -82,7 +84,7 @@ export function FeatureChecklist({
   );
 
   return (
-    <section className="my-[40px] sm:my-[120px]">
+    <section className={`py-[40px] sm:py-[120px] ${background}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className={`grid grid-cols-1 items-center gap-10 ${hasImage ? 'md:grid-cols-2 md:gap-16' : ''}`}>
           {imageOnRight ? (

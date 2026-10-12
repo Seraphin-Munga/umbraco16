@@ -43,7 +43,7 @@ export function HeroBanner({
   return (
     <section>
       <div
-        className="relative mx-[10px] mb-[10px] box-border flex h-[320px] overflow-hidden rounded-[16px] bg-black bg-cover bg-center sm:mx-[14px] sm:mb-[14px] sm:h-[450px] sm:rounded-[24px]"
+        className="relative mx-[10px] my-[10px] box-border flex h-[320px] overflow-hidden rounded-[16px] bg-black bg-cover bg-center sm:mx-[14px] sm:my-[14px] sm:h-[450px] sm:rounded-[24px]"
         style={imageUrl ? { backgroundImage: `url("${imageUrl}")` } : undefined}
       >
         {imageAlt && <span className="sr-only">{imageAlt}</span>}

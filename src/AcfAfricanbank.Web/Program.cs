@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +28,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy(ReactDevClientCorsPolicy, policy =>
         policy
-            .WithOrigins("http://localhost:5173")
+            .WithOrigins("http://localhost:5173", "http://37.27.4.29:8070")
             .AllowAnyHeader()
             .AllowAnyMethod());
 });
@@ -1207,7 +1208,26 @@ if (args.Length > 0 &&
             new PropSpec("secondaryCta", "Secondary Button", link),
             new PropSpec("image", "Image", media),
             new PropSpec("imageAlt", "Image Alt Text", txt),
-            new PropSpec("imageOnRight", "Image On Right", boolType));
+            new PropSpec("imageOnRight", "Image On Right", boolType),
+            // Optional - blank/unset on every promoSplitBlock instance
+            // seeded before this was added (GetOrCreateType's self-healing
+            // "ADDED PROPERTY" path backfills it onto existing nodes as an
+            // empty field, same as any other new property here), so this
+            // doesn't change how any existing instance looks. Only the
+            // Tech Deals page sets it - a plain Tailwind class name
+            // ("bg-brand-mist"/"bg-white") the React side applies as-is
+            // when present, letting a specific page control its own promo
+            // sections' alternating background without a global rule that
+            // would also repaint every other page's promoSplitBlock.
+            new PropSpec("backgroundColor", "Background Colour (optional)", txt),
+            // Optional, default false - every instance seeded before Tech
+            // Deals leaves it unset, keeping their existing BlobImage
+            // organic-crop look unchanged. Tech Deals' two promo sections
+            // set this true: their images are real posters with logo/text
+            // right to the edges, which the blob crop cuts into - true
+            // sits the full, uncropped image on a plain white card instead
+            // (see PromoSplit.tsx's own `imagePlain` prop).
+            new PropSpec("imagePlain", "Image: Plain (no blob crop)", boolType));
 
     // Two-column feature list (bold-lead lines, not a checklist) beside a
     // photo - e.g. "Why Choose MyWORLD?" (react-ts-app's FeatureSplit.tsx).
@@ -2087,7 +2107,26 @@ if (args.Length > 0 &&
             new PropSpec("secondaryCta", "Secondary Button", link),
             new PropSpec("image", "Image", media),
             new PropSpec("imageAlt", "Image Alt Text", txt),
-            new PropSpec("imageOnRight", "Image On Right", boolType));
+            new PropSpec("imageOnRight", "Image On Right", boolType),
+            // Optional - blank/unset on every promoSplitBlock instance
+            // seeded before this was added (GetOrCreateType's self-healing
+            // "ADDED PROPERTY" path backfills it onto existing nodes as an
+            // empty field, same as any other new property here), so this
+            // doesn't change how any existing instance looks. Only the
+            // Tech Deals page sets it - a plain Tailwind class name
+            // ("bg-brand-mist"/"bg-white") the React side applies as-is
+            // when present, letting a specific page control its own promo
+            // sections' alternating background without a global rule that
+            // would also repaint every other page's promoSplitBlock.
+            new PropSpec("backgroundColor", "Background Colour (optional)", txt),
+            // Optional, default false - every instance seeded before Tech
+            // Deals leaves it unset, keeping their existing BlobImage
+            // organic-crop look unchanged. Tech Deals' two promo sections
+            // set this true: their images are real posters with logo/text
+            // right to the edges, which the blob crop cuts into - true
+            // sits the full, uncropped image on a plain white card instead
+            // (see PromoSplit.tsx's own `imagePlain` prop).
+            new PropSpec("imagePlain", "Image: Plain (no blob crop)", boolType));
 
     var featureSplitFeatures =
         await GetOrCreateBlockListAsync(
@@ -2170,6 +2209,137 @@ if (args.Length > 0 &&
             new PropSpec("image", "Image", media),
             new PropSpec("imageAlt", "Image Alt Text", txt));
 
+    // --------------------------------------------------------
+    // TECH DEALS PAGE BLOCKS
+    // --------------------------------------------------------
+    //
+    // Built for the Tech Deals page (/en/home/tech-deals/) - no equivalent
+    // for these four elsewhere in this schema: an icon category row, the
+    // single-product "Plug & Go" bundle card, the apply-requirements
+    // section (which also carries its own nested "perks" mini-carousel, as
+    // one block rather than two, matching how the source design nests the
+    // grey "Choose our tech credit..." card inside the white requirements
+    // section rather than as its own full-width band), and a page-specific
+    // phone-number/terms footer strip. Each item below carries its own
+    // `iconImage` Media Picker field (not a Lucide icon-key lookup - an
+    // earlier version of this schema did that, but the real site needs
+    // actual uploaded icon artwork). Named `iconImage`, not `icon` -
+    // GetOrCreateType can add a new property to an existing content type,
+    // but can't retype an existing one in place, so reusing the old `icon`
+    // (txt) alias here would just silently no-op on any install that
+    // already ran the earlier version. That old `icon` field is left
+    // orphaned (harmless, unused) on such an install rather than migrated.
+    //
+    // No real icon files were available to upload here - every item below
+    // ships with iconImage unset, same "no real media available"
+    // treatment as every other image field in this command. Upload the
+    // real icon artwork (Handset/Tablets/Laptops/... category icons, the
+    // requirements-list icons, the three perk icons) via the backoffice's
+    // Media Picker once available.
+
+    var techCategoryItem =
+        GetOrCreateType(
+            "techCategoryItem", "Tech Category Item", "icon-tags", true, false,
+            new PropSpec("iconImage", "Icon", media),
+            new PropSpec("label", "Label", txt));
+
+    var techHeroCategories =
+        await GetOrCreateBlockListAsync(
+            "React Migration - techHeroBlock.categories", techCategoryItem);
+
+    var techHeroBlock =
+        GetOrCreateType(
+            "techHeroBlock", "Tech Hero", "icon-mobile", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("highlightHeading", "Highlight Heading", txt),
+            new PropSpec("subheading", "Subheading", txt),
+            new PropSpec("categories", "Categories", techHeroCategories));
+
+    var plugAndGoBlock =
+        GetOrCreateType(
+            "plugAndGoBlock", "Plug And Go", "icon-wand", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("productName", "Product Name", txt),
+            new PropSpec("description", "Description", txtArea),
+            new PropSpec("bundleLabel", "Bundle Label", txt),
+            new PropSpec("priceAmount", "Price Amount", txt),
+            new PropSpec("priceSuffix", "Price Suffix", txt),
+            new PropSpec("cta", "Button", link),
+            new PropSpec("image", "Image", media),
+            new PropSpec("imageAlt", "Image Alt Text", txt));
+
+    var requirementItem =
+        GetOrCreateType(
+            "requirementItem", "Requirement Item", "icon-document", true, false,
+            new PropSpec("iconImage", "Icon", media),
+            new PropSpec("label", "Label", txt));
+
+    var techRequirementsItems =
+        await GetOrCreateBlockListAsync(
+            "React Migration - techRequirementsBlock.items", requirementItem);
+
+    var benefitCard =
+        GetOrCreateType(
+            "benefitCard", "Benefit Card", "icon-trophy", true, false,
+            new PropSpec("iconImage", "Icon", media),
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("description", "Description", txtArea));
+
+    var techRequirementsPerks =
+        await GetOrCreateBlockListAsync(
+            "React Migration - techRequirementsBlock.perks", benefitCard);
+
+    var techRequirementsBlock =
+        GetOrCreateType(
+            "techRequirementsBlock", "Tech Requirements", "icon-list", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("bodyHtml", "Body", rte),
+            new PropSpec("itemsHeading", "Items Heading", txt),
+            new PropSpec("itemsIntro", "Items Intro", txtArea),
+            new PropSpec("items", "Items", techRequirementsItems),
+            new PropSpec("perksHeading", "Perks Heading", txt),
+            new PropSpec("perks", "Perks", techRequirementsPerks));
+
+    var techCallToActionBlock =
+        GetOrCreateType(
+            "techCallToActionBlock", "Tech Call To Action", "icon-phone", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("phoneNumber", "Phone Number", txt),
+            new PropSpec("phoneUrl", "Phone Url", txt),
+            new PropSpec("termsLabel", "Terms Label", txt),
+            new PropSpec("termsUrl", "Terms Url", txt),
+            new PropSpec("disclaimerHtml", "Disclaimer", rte));
+
+    // --------------------------------------------------------
+    // TALK TO US PAGE BLOCKS
+    // --------------------------------------------------------
+    //
+    // Built for the Talk To Us page (/en/home/talk-to-us/) - a green
+    // banner heading above a grid of contact cards (Customer Service
+    // Centre, MyWORLD customers, Lost or stolen cards, ...). Each card's
+    // real content is too varied (some are a single phone+email, some
+    // nest two labelled sub-sections like "Personal Banking"/"Business
+    // and Commercial Banking", some are WhatsApp-only) to model as strict
+    // fields, so contactCardItem is just a heading plus one rich-text
+    // body - same "free text over strict fields" choice as
+    // techRequirementsBlock's own bodyHtml/disclaimerHtml above.
+
+    var contactCardItem =
+        GetOrCreateType(
+            "contactCardItem", "Contact Card Item", "icon-megaphone", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("bodyHtml", "Body", rte));
+
+    var contactInfoCards =
+        await GetOrCreateBlockListAsync(
+            "React Migration - contactInfoBlock.cards", contactCardItem);
+
+    var contactInfoBlock =
+        GetOrCreateType(
+            "contactInfoBlock", "Contact Info", "icon-address-book", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("cards", "Cards", contactInfoCards));
+
     // ==========================================================
     // PRODUCT LOAN PAGE
     // ==========================================================
@@ -2184,6 +2354,11 @@ if (args.Length > 0 &&
             heroImageBannerBlock,
             promoSplitBlock,
             featureSplitBlock,
+            techHeroBlock,
+            plugAndGoBlock,
+            techRequirementsBlock,
+            techCallToActionBlock,
+            contactInfoBlock,
             featureChecklistBlock,
             loanCalculatorBlock,
             creditLifeInsuranceBlock,
@@ -2559,6 +2734,9 @@ if (args.Length > 0 &&
     var contentService =
         app.Services.GetRequiredService<IContentService>();
 
+    var languageService =
+        app.Services.GetRequiredService<ILanguageService>();
+
     var productLoanPageType = contentTypeService.Get("productLoanPage");
     var pageLoansType = contentTypeService.Get("pageLoans");
     var heroImageBannerBlockType = contentTypeService.Get("heroImageBannerBlock");
@@ -2567,11 +2745,37 @@ if (args.Length > 0 &&
     var featureItemType = contentTypeService.Get("featureItem");
     var crossSellBlockType = contentTypeService.Get("crossSellBlock");
     var contentCardType = contentTypeService.Get("contentCard");
+    var heroBannerBlockType = contentTypeService.Get("heroBannerBlock");
+    var appDownloadBlockType = contentTypeService.Get("appDownloadBlock");
+    var faqSectionBlockType = contentTypeService.Get("faqSectionBlock");
+    var faqItemType = contentTypeService.Get("faqItem");
+    var downloadsSectionBlockType = contentTypeService.Get("downloadsSectionBlock");
+    var downloadItemType = contentTypeService.Get("downloadItem");
+    var featureChecklistBlockType = contentTypeService.Get("featureChecklistBlock");
+    var promoSplitBlockType = contentTypeService.Get("promoSplitBlock");
+    var techCategoryItemType = contentTypeService.Get("techCategoryItem");
+    var techHeroBlockType = contentTypeService.Get("techHeroBlock");
+    var plugAndGoBlockType = contentTypeService.Get("plugAndGoBlock");
+    var requirementItemType = contentTypeService.Get("requirementItem");
+    var benefitCardType = contentTypeService.Get("benefitCard");
+    var techRequirementsBlockType = contentTypeService.Get("techRequirementsBlock");
+    var techCallToActionBlockType = contentTypeService.Get("techCallToActionBlock");
+    var contactCardItemType = contentTypeService.Get("contactCardItem");
+    var contactInfoBlockType = contentTypeService.Get("contactInfoBlock");
 
     if (productLoanPageType == null || pageLoansType == null ||
         heroImageBannerBlockType == null || loanCalculatorBlockType == null ||
         creditLifeInsuranceBlockType == null || featureItemType == null ||
-        crossSellBlockType == null || contentCardType == null)
+        crossSellBlockType == null || contentCardType == null ||
+        heroBannerBlockType == null || appDownloadBlockType == null ||
+        faqSectionBlockType == null || faqItemType == null ||
+        downloadsSectionBlockType == null || downloadItemType == null ||
+        featureChecklistBlockType == null || promoSplitBlockType == null ||
+        techCategoryItemType == null || techHeroBlockType == null ||
+        plugAndGoBlockType == null || requirementItemType == null ||
+        benefitCardType == null || techRequirementsBlockType == null ||
+        techCallToActionBlockType == null || contactCardItemType == null ||
+        contactInfoBlockType == null)
     {
         Console.WriteLine(
             "ERROR: one or more required content types are missing - run " +
@@ -2579,6 +2783,62 @@ if (args.Length > 0 &&
             "shared types) first.");
 
         return;
+    }
+
+    // productLoanPage turns out to vary by culture on this install (not
+    // something create-product-loan-schema's GetOrCreateType call ever set
+    // explicitly - set by hand in the backoffice at some point) - plain
+    // `node.Name = "..."` is a silent no-op for variant content (Save()
+    // reports success, but the name never actually changes - confirmed by
+    // reloading from the database after a rename attempt below), so every
+    // rename in this command needs SetCultureName(name, defaultCulture)
+    // instead. Resolved once here rather than per-call.
+    var defaultCulture =
+        productLoanPageType.VariesByCulture()
+            ? await languageService.GetDefaultIsoCodeAsync()
+            : null;
+
+    // Renames `node` to `name`, culture-aware per the comment above, and
+    // returns the name actually persisted (re-read from the database) so
+    // callers can verify the rename really stuck instead of trusting
+    // Save()'s success flag alone.
+    string? RenameProductLoanPageNode(IContent node, string name)
+    {
+        if (defaultCulture != null)
+        {
+            node.SetCultureName(name, defaultCulture);
+        }
+        else
+        {
+            node.Name = name;
+        }
+
+        contentService.Save(node);
+
+        var reloaded = contentService.GetById(node.Id);
+
+        return defaultCulture != null ? reloaded?.GetCultureName(defaultCulture) : reloaded?.Name;
+    }
+
+    // Optional second arg scopes this run to just one product's section
+    // below instead of all three - e.g. `migrate-product-loan-pages
+    // 12-loan` touches only the 12% Loan node, leaving Personal Loan's and
+    // Consolidation Loan's nodes completely unexecuted (not just
+    // unchanged-by-idempotency - their blocks never run at all). Omit the
+    // arg to run all three, same as before this was added.
+    var sectionFilter = args.Length > 1 ? args[1] : null;
+
+    bool ShouldRunSection(string name)
+    {
+        var run = sectionFilter == null || sectionFilter.Equals(name, StringComparison.OrdinalIgnoreCase);
+
+        if (!run)
+        {
+            Console.WriteLine();
+            Console.WriteLine($"--- {name.Replace('-', ' ')} --- SKIPPED (filtered by '{sectionFilter}')");
+        }
+
+        return run;
     }
 
     JsonArray BuildExternalLink(string label, string url) =>
@@ -2644,6 +2904,36 @@ if (args.Length > 0 &&
                     ["cta"] = BuildExternalLink(c.CtaLabel, c.CtaUrl).ToJsonString()
                 }));
 
+    // Umbraco.RichText (Tiptap)'s own stored value shape - a plain-
+    // paragraph markup string plus an empty Block-in-Rich-Text envelope
+    // (no blocks used here, just text), matching RichTextEditorValue's own
+    // {markup, blocks:{layout,contentData,settingsData}} serialization.
+    // Nested one level inside a Block List item's own contentData (same as
+    // every other nested property above), so it's stringified the same way
+    // cta/checklistOne/etc already are.
+    JsonObject BuildRichText(string html) =>
+        new JsonObject
+        {
+            ["markup"] = html,
+            ["blocks"] =
+                new JsonObject
+                {
+                    ["layout"] = new JsonObject(),
+                    ["contentData"] = new JsonArray(),
+                    ["settingsData"] = new JsonArray()
+                }
+        };
+
+    JsonObject BuildFaqItems(IEnumerable<(string Question, string AnswerHtml)> items) =>
+        BuildBlockList(
+            faqItemType,
+            items.Select(i =>
+                new Dictionary<string, JsonNode?>
+                {
+                    ["question"] = i.Question,
+                    ["answer"] = BuildRichText(i.AnswerHtml).ToJsonString()
+                }));
+
     // Renames the legacy pageLoans node whose name contains
     // `containsName` (skipping ones already migrated, i.e. already
     // carrying " (Legacy)"), freeing up its URL. Idempotent: on a re-run,
@@ -2689,13 +2979,68 @@ if (args.Length > 0 &&
         return node;
     }
 
+    // Same "free up a URL slug" idea as FreeUpLegacyUrl above, but for a
+    // page with no dedicated legacy content type to search (e.g. Talk To
+    // Us - the real site already has a page named exactly this, of
+    // whatever ad-hoc content type it was built with, sitting as a direct
+    // sibling of the productLoanPage nodes under `parentId`). Searches
+    // that parent's own children by exact name instead of GetPagedOfType,
+    // and explicitly excludes productLoanPage nodes so it can never find
+    // (and re-rename) a page this same command already created. Idempotent
+    // the same way - an already-"(Legacy)"-suffixed match is returned as
+    // -is, not renamed again.
+    IContent? FreeUpSiblingUrl(int parentId, string exactName)
+    {
+        var siblings = contentService.GetPagedChildren(parentId, 0, 500, out _, null!).ToList();
+
+        var alreadyRenamed =
+            siblings.FirstOrDefault(n =>
+                n.Name != null &&
+                n.Name.Contains(exactName, StringComparison.OrdinalIgnoreCase) &&
+                n.Name.Contains("(Legacy)", StringComparison.OrdinalIgnoreCase));
+
+        if (alreadyRenamed != null)
+        {
+            Console.WriteLine($"ALREADY MIGRATED: \"{alreadyRenamed.Name}\" (id={alreadyRenamed.Id})");
+
+            return alreadyRenamed;
+        }
+
+        var node =
+            siblings.FirstOrDefault(n =>
+                n.Name != null &&
+                n.ContentTypeId != productLoanPageType.Id &&
+                n.Name.Equals(exactName, StringComparison.OrdinalIgnoreCase));
+
+        if (node == null)
+        {
+            return null;
+        }
+
+        var oldName = node.Name;
+        node.Name = $"{node.Name} (Legacy)";
+
+        contentService.Save(node);
+        contentService.Publish(node, new[] { "*" });
+
+        Console.WriteLine(
+            $"RENAMED SIBLING PAGE: \"{oldName}\" -> \"{node.Name}\" (id={node.Id}) - " +
+            "its old URL is now free.");
+
+        return node;
+    }
+
     IContent CreateOrUpdateProductLoanPage(string nodeName, int parentId, JsonObject sectionsValue)
     {
+        // Culture-aware name match - plain `.Name` isn't reliable here (see
+        // the "productLoanPage varies by culture" comment above), so the
+        // same name a variant node was given via SetCultureName needs to be
+        // read back the same way to find it again.
+        string? NodeName(IContent n) => defaultCulture != null ? n.GetCultureName(defaultCulture) : n.Name;
+
         var existing =
             contentService.GetPagedOfType(productLoanPageType.Id, 0, 500, out _, null!)
-                .FirstOrDefault(n =>
-                    n.Name != null &&
-                    n.Name.Equals(nodeName, StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefault(n => nodeName.Equals(NodeName(n), StringComparison.OrdinalIgnoreCase));
 
         IContent node;
 
@@ -2716,6 +3061,17 @@ if (args.Length > 0 &&
         {
             node = contentService.Create(nodeName, parentId, "productLoanPage");
 
+            // The 3-arg Create(...) overload above sets the plain/invariant
+            // name, which a variant content type silently ignores (same
+            // issue the rename helper above works around) - without this,
+            // a brand-new node here would have no name for its only
+            // culture and fail on Save with "Cannot save content with an
+            // empty name".
+            if (defaultCulture != null)
+            {
+                node.SetCultureName(nodeName, defaultCulture);
+            }
+
             Console.WriteLine($"CREATED: \"{nodeName}\" under parent id={parentId}");
         }
 
@@ -2732,6 +3088,20 @@ if (args.Length > 0 &&
 
         if (!publishResult.Success)
         {
+            var invalidProperties =
+                publishResult.InvalidProperties == null || !publishResult.InvalidProperties.Any()
+                    ? "(none reported)"
+                    : string.Join(", ", publishResult.InvalidProperties.Select(p => $"{p.Alias} (culture={p.Values.FirstOrDefault()?.Culture ?? "invariant"})"));
+
+            Console.WriteLine(
+                $"PUBLISH FAILED: \"{nodeName}\" - result={publishResult.Result}, " +
+                $"invalid properties: {invalidProperties}");
+
+            foreach (var eventMessage in publishResult.EventMessages?.GetAll() ?? [])
+            {
+                Console.WriteLine($"  EVENT MESSAGE [{eventMessage.Category}/{eventMessage.MessageType}]: {eventMessage.Message}");
+            }
+
             throw new InvalidOperationException($"Could not publish \"{nodeName}\": {publishResult.Result}");
         }
 
@@ -2744,6 +3114,8 @@ if (args.Length > 0 &&
     // PERSONAL LOAN
     // --------------------------------------------------------
 
+    if (ShouldRunSection("personal-loan"))
+    {
     Console.WriteLine();
     Console.WriteLine("--- personal loan ---");
 
@@ -2891,11 +3263,36 @@ if (args.Length > 0 &&
             "Media Picker values) - add those two sections by hand in the " +
             "backoffice.");
     }
+    }
 
     // --------------------------------------------------------
     // CONSOLIDATION LOAN
     // --------------------------------------------------------
+    //
+    // Builds the full page explicitly here (hero banner + app download +
+    // "how it works" feature checklist + FAQ + cross-sell + credit life
+    // insurance + downloads) instead of reusing create-consolidation-loan-
+    // content's demo node as-is, so this command alone produces the real,
+    // final page content matching the live /en/home/product-consolidation-
+    // loan/ layout - heroBannerBlock/appDownloadBlock copy matches what
+    // that command seeds, featureChecklistBlock/creditLifeInsuranceBlock/
+    // downloadsSectionBlock reuse the same shape as Product Personal
+    // Loan's/Product 12% Loan's own sections above. If the demo node (from
+    // an earlier create-consolidation-loan-content run) still exists under
+    // its old "Dynamic Page Demo - Consolidation Loan" name, it's renamed
+    // here first so CreateOrUpdateProductLoanPage (which matches by exact
+    // name) updates it in place instead of creating a duplicate node.
+    //
+    // FAQ answers are plain single-paragraph placeholder copy - African
+    // Bank's real consolidation-loan FAQ answers weren't available to port
+    // verbatim, so verify/refine the exact wording in the backoffice's Rich
+    // Text editor once this has run. Same caveat for the downloads item:
+    // no real file attached (downloadButtonRedirectLink2 left null) -
+    // attach the actual Loan Terms and Conditions PDF via the backoffice's
+    // Media Picker.
 
+    if (ShouldRunSection("consolidation-loan"))
+    {
     Console.WriteLine();
     Console.WriteLine("--- consolidation loan ---");
 
@@ -2908,50 +3305,1401 @@ if (args.Length > 0 &&
     }
     else
     {
+        const string demoNodeName = "Dynamic Page Demo - Consolidation Loan";
+        const string consolidationApplyUrl =
+            "https://www.africanbank.co.za/en/home/get-a-quote?" +
+            "utm_source=Website&utm_medium=Productpage&utm_campaign=WebLead";
+
         var demoNode =
             contentService.GetPagedOfType(productLoanPageType.Id, 0, 500, out _, null!)
                 .FirstOrDefault(n =>
                     n.Name != null &&
-                    n.Name.Equals(
-                        "Dynamic Page Demo - Consolidation Loan",
-                        StringComparison.OrdinalIgnoreCase));
+                    n.Name.Equals(demoNodeName, StringComparison.OrdinalIgnoreCase));
 
         if (demoNode != null)
         {
             demoNode.Name = "Product Consolidation Loan";
+            contentService.Save(demoNode);
 
-            if (demoNode.ParentId != legacyConsolidationLoan.ParentId)
+            Console.WriteLine(
+                $"RENAMED: \"{demoNodeName}\" -> \"Product Consolidation Loan\" (id={demoNode.Id})");
+        }
+
+        var heroContentData =
+            new JsonObject
             {
-                contentService.Move(demoNode, legacyConsolidationLoan.ParentId);
-            }
+                ["contentTypeKey"] = heroBannerBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Combine up to 5 loans in 1",
+                ["description"] =
+                    "Things work better when we work together. Make the most of " +
+                    "your budget when you combine your loans today. Mix 'n match " +
+                    "up to 5 loans into 1 easy-to-manage Consolidation Loan to " +
+                    "the value of R500 000 and save cash with a lower repayment. " +
+                    "Earn 1.3% of your loan instalments back in Audacious " +
+                    "Rewards points",
+                ["primaryCta"] =
+                    BuildExternalLink("APPLY NOW", consolidationApplyUrl).ToJsonString(),
+                ["secondaryCta"] = null,
+                ["image"] = null,
+                ["imageAlt"] = null
+            };
 
-            var saveResult = contentService.Save(demoNode);
-
-            if (!saveResult.Success)
+        var appDownloadContentData =
+            new JsonObject
             {
-                Console.WriteLine($"FAILED SAVE: {demoNode.Name} (id={demoNode.Id})");
-            }
-            else
-            {
-                var publishResult = contentService.Publish(demoNode, new[] { "*" });
+                ["contentTypeKey"] = appDownloadBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Get the app now",
+                ["subheading"] = "",
+                ["description"] =
+                    "Take your banking experience to the next level with our mobile app.",
+                ["downloadLink"] =
+                    BuildExternalLink(
+                            "DOWNLOAD NOW",
+                            "https://play.google.com/store/apps/details?id=za.co.android.africanbank")
+                        .ToJsonString(),
+                ["image"] = null,
+                ["imageAlt"] = null
+            };
 
-                Console.WriteLine(
-                    publishResult.Success
-                        ? $"RENAMED + PUBLISHED: \"Product Consolidation Loan\" (id={demoNode.Id}), reusing its existing content"
-                        : $"SAVED BUT FAILED PUBLISH: {demoNode.Name} (id={demoNode.Id})");
-            }
+        var howItWorksContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = featureChecklistBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "How An Online Consolidation Loan Application Works",
+                ["subheading"] = "",
+                ["features"] =
+                    BuildFeatureList(
+                        [
+                            "Lock interest on your loans with a fixed interest rate and less fees on one loan repayment.",
+                            "Improve your cash flow, repayment terms from 18 to 72 months.",
+                            "No settlement quotes are required. Proof of payment that your loans have been settled.",
+                            "Choose your break on your qualifying consolidation and for one month, take a break on your repayment."
+                        ])
+                        .ToJsonString(),
+                ["cta"] =
+                    BuildExternalLink("APPLY NOW", consolidationApplyUrl).ToJsonString(),
+                ["image"] = null,
+                ["imageAlt"] = null,
+                ["imageOnRight"] = true
+            };
+
+        var faqContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = faqSectionBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Consolidation Loan FAQ",
+                ["items"] =
+                    BuildFaqItems(
+                        [
+                            ("How To Apply For A Bank Consolidation loan?",
+                                "<p>Apply online, over the phone or at your nearest branch. We'll review the loans you want to combine and, once approved, pay your new Consolidation Loan out directly to settle them.</p>"),
+                            ("What is a Consolidation loan?",
+                                "<p>A Consolidation Loan combines up to 5 existing loans into a single, easy-to-manage African Bank loan with one fixed interest rate and one monthly repayment.</p>"),
+                            ("How And When Do I Make Loan Repayments?",
+                                "<p>Your repayment is deducted monthly via debit order on the date you choose when you apply, for the full term of your loan.</p>")
+                        ])
+                        .ToJsonString()
+            };
+
+        var crossSellContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = crossSellBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Find your ideal loan solution with African Bank.",
+                // Self-excludes Consolidation Loan (the page this cross-sell
+                // sits on) in favour of Personal Loan - confirmed live:
+                // Product Personal Loan's own cross-sell above self-excludes
+                // the same way (Consolidation/12%/Tech, no Personal Loan
+                // card), and the 12% Loan page below does too.
+                ["cards"] =
+                    BuildCards(
+                        [
+                            ("Personal Loan:",
+                                "Offers amounts from R2 000 to R500 000 with flexible repayment terms of 7 to 72 months.",
+                                "View Personal Loan", "/en/home/product-personal-loan/"),
+                            ("12% Loan:",
+                                "Benefit from our competitive 12% Loan, featuring a low interest rate for loans up to R50 000.",
+                                "View the 12% Loan", "/en/home/product-12-loan/"),
+                            ("Tech Deals:",
+                                "Explore our deals and add a cellphone, tablet or laptop to any loan.",
+                                "View Tech Deals", "/en/home/tech-deals/")
+                        ])
+                        .ToJsonString(),
+                ["image"] = null
+            };
+
+        var creditLifeContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = creditLifeInsuranceBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Credit Life Insurance",
+                ["paragraphOne"] =
+                    "With African Bank's Credit Life Insurance, you can rest assured " +
+                    "that your credit is insured should anything happen to you that " +
+                    "would prevent you from making repayments. You are covered for*.",
+                ["paragraphTwo"] =
+                    "With MyWORLD, you can open up to 5 accounts with no monthly " +
+                    "fees, allowing you to share finances seamlessly with friends " +
+                    "and family.",
+                ["checklistOne"] =
+                    BuildFeatureList(
+                        ["Retrenchment", "Death", "Compulsory Unpaid Leave", "Lay Offs", "Short Time"])
+                        .ToJsonString(),
+                ["checklistTwo"] =
+                    BuildFeatureList(
+                        [
+                            "Loss of Income", "Retrenchment Balance Claim",
+                            "Temporary Disability", "Permanent Disability"
+                        ])
+                        .ToJsonString(),
+                ["image"] = null
+            };
+
+        var downloadsContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = downloadsSectionBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "More to read",
+                ["items"] =
+                    BuildBlockList(
+                        downloadItemType,
+                        [
+                            new Dictionary<string, JsonNode?>
+                            {
+                                ["downloadTextDescription"] = "Loan Terms and Conditions",
+                                ["downloadButtonRedirectLink2"] = null,
+                                ["downloadButtonText"] = "Download"
+                            }
+                        ])
+                        .ToJsonString()
+            };
+
+        var consolidationLoanUdis =
+            new[]
+            {
+                heroContentData["udi"]!.GetValue<string>(),
+                appDownloadContentData["udi"]!.GetValue<string>(),
+                howItWorksContentData["udi"]!.GetValue<string>(),
+                faqContentData["udi"]!.GetValue<string>(),
+                crossSellContentData["udi"]!.GetValue<string>(),
+                creditLifeContentData["udi"]!.GetValue<string>(),
+                downloadsContentData["udi"]!.GetValue<string>()
+            };
+
+        var consolidationLoanSections =
+            new JsonObject
+            {
+                ["layout"] =
+                    new JsonObject
+                    {
+                        ["Umbraco.BlockList"] =
+                            new JsonArray(consolidationLoanUdis
+                                .Select(udi => (JsonNode)new JsonObject { ["contentUdi"] = udi })
+                                .ToArray())
+                    },
+                ["contentData"] =
+                    new JsonArray(
+                        heroContentData,
+                        appDownloadContentData,
+                        howItWorksContentData,
+                        faqContentData,
+                        crossSellContentData,
+                        creditLifeContentData,
+                        downloadsContentData)
+            };
+
+        CreateOrUpdateProductLoanPage(
+            "Product Consolidation Loan",
+            legacyConsolidationLoan.ParentId,
+            consolidationLoanSections);
+
+        Console.WriteLine(
+            "NOTE: FAQ answers above are placeholder copy, not ported from a " +
+            "real source - verify/refine the exact wording in the backoffice.");
+    }
+    }
+
+    // --------------------------------------------------------
+    // 12% LOAN
+    // --------------------------------------------------------
+    //
+    // Same shape as Consolidation Loan above: two heroBannerBlock sections
+    // (a top banner, then a separate "how it works" explainer further down
+    // the page - the real page uses this block twice, each with its own
+    // heading/description), an app download, a FAQ, a downloads section and
+    // a self-excluding cross-sell. "12% Loan" is assumed as the legacy
+    // pageLoans node's exact Name (matching the Personal Loan/Consolidation
+    // Loan naming convention and the /en/home/product-12-loan/ route) - if
+    // the real node is named differently, FreeUpLegacyUrl below won't find
+    // it and this section will just log a SKIP, same as it would for any
+    // other missing legacy node.
+    //
+    // downloadsSectionBlock's one item has no real file attached
+    // (downloadButtonRedirectLink2 left null, same "no real media
+    // available" treatment as every image field elsewhere in this command)
+    // - attach the actual Loan Terms and Conditions PDF via the backoffice's
+    // Media Picker. FAQ answer is placeholder copy, same caveat as
+    // Consolidation Loan's above - only one question was visible to port
+    // from the source page; add any others by hand in the backoffice.
+
+    if (ShouldRunSection("12-loan"))
+    {
+    Console.WriteLine();
+    Console.WriteLine("--- 12% loan ---");
+
+    // A node already exists in the backoffice at this exact key, named
+    // "Product  12 Loan" (double space, no "%") - created by hand at some
+    // point, not by this command. CreateOrUpdateProductLoanPage below
+    // matches by exact name ("Product 12% Loan") AND by content type
+    // (GetPagedOfType(productLoanPageType.Id, ...)), so as long as the name
+    // mismatch stands, it can never find this node - it would instead try
+    // to create a second, competing node. A prior run here renamed it but
+    // CreateOrUpdateProductLoanPage still logged "CREATED" (a new node)
+    // right after, which then crashed on Save ("Cannot save content with
+    // an empty name") - meaning this node almost certainly isn't actually
+    // a productLoanPage (GetPagedOfType filters by content type id, so a
+    // name match alone wouldn't explain a miss). Diagnosing by content
+    // type below before touching anything else, so a second wrong-type
+    // node (and a second crash) can't happen again.
+    var existingTwelvePercentLoanNode =
+        contentService.GetById(Guid.Parse("29da8b90-22e2-4339-97a8-01ec68c0d6b3"));
+
+    if (existingTwelvePercentLoanNode == null)
+    {
+        Console.WriteLine("DIAGNOSTIC: no node found at key 29da8b90-22e2-4339-97a8-01ec68c0d6b3.");
+    }
+    else
+    {
+        var existingNodeTypeAlias =
+            contentTypeService.Get(existingTwelvePercentLoanNode.ContentTypeId)?.Alias ?? "(unknown)";
+
+        Console.WriteLine(
+            $"DIAGNOSTIC: id={existingTwelvePercentLoanNode.Id}, " +
+            $"name=\"{existingTwelvePercentLoanNode.Name}\", " +
+            $"contentType=\"{existingNodeTypeAlias}\" (expected \"productLoanPage\"), " +
+            $"parentId={existingTwelvePercentLoanNode.ParentId}, " +
+            $"trashed={existingTwelvePercentLoanNode.Trashed}");
+
+        if (existingTwelvePercentLoanNode.ContentTypeId != productLoanPageType.Id)
+        {
+            Console.WriteLine(
+                $"STOP: that node's content type is \"{existingNodeTypeAlias}\", not " +
+                "\"productLoanPage\" - renaming/publishing sections onto it, or creating a " +
+                "new productLoanPage node under its parent, would either corrupt it or create " +
+                "a URL-colliding duplicate. Not touching it. Check in the backoffice what this " +
+                "node's actual Document Type is and what should happen to it before this " +
+                "command tries 12% Loan again.");
+
+            existingTwelvePercentLoanNode = null;
         }
         else
         {
-            Console.WriteLine(
-                "ERROR: no 'Dynamic Page Demo - Consolidation Loan' node found - " +
-                "run 'create-consolidation-loan-content' first, then re-run this command.");
+            var currentTwelvePercentLoanName =
+                defaultCulture != null
+                    ? existingTwelvePercentLoanNode.GetCultureName(defaultCulture)
+                    : existingTwelvePercentLoanNode.Name;
+
+            if (!"Product 12% Loan".Equals(currentTwelvePercentLoanName, StringComparison.Ordinal))
+            {
+                var persistedName = RenameProductLoanPageNode(existingTwelvePercentLoanNode, "Product 12% Loan");
+
+                Console.WriteLine(
+                    $"RENAME (culture={defaultCulture ?? "(invariant)"}): " +
+                    $"\"{currentTwelvePercentLoanName}\" -> requested \"Product 12% Loan\", " +
+                    $"persisted \"{persistedName}\"");
+
+                if ("Product 12% Loan".Equals(persistedName, StringComparison.Ordinal))
+                {
+                    Console.WriteLine($"RENAMED: id={existingTwelvePercentLoanNode.Id}");
+                }
+                else
+                {
+                    Console.WriteLine(
+                        "STOP: the rename didn't stick after reloading from the database - not " +
+                        "proceeding to create/publish anything for 12% Loan until this is understood.");
+
+                    existingTwelvePercentLoanNode = null;
+                }
+            }
         }
+    }
+
+    var legacy12PercentLoan = FreeUpLegacyUrl("12% Loan");
+
+    // legacy12PercentLoan is only needed for its ParentId (and to free up
+    // its URL, best-effort, when it exists) - the renamed node above
+    // already sits in the right place in the tree, so its own ParentId
+    // works just as well when no "12% Loan" pageLoans node is found (e.g.
+    // because the legacy node itself has the same "no %" naming mismatch -
+    // see the rename comment above). Only truly nothing to do when neither
+    // source gives a parent to create/update under.
+    var twelvePercentLoanParentId = legacy12PercentLoan?.ParentId ?? existingTwelvePercentLoanNode?.ParentId;
+
+    if (twelvePercentLoanParentId == null)
+    {
+        Console.WriteLine(
+            "SKIP: no legacy '12% Loan' pageLoans node or existing Product 12% " +
+            "Loan node found - nothing to migrate.");
+    }
+    else
+    {
+        const string twelvePercentApplyUrl =
+            "https://www.africanbank.co.za/en/home/get-a-quote?" +
+            "utm_source=Website&utm_medium=Productpage&utm_campaign=WebLead";
+
+        var heroContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = heroBannerBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "The 12% Loan",
+                ["description"] =
+                    "With a low interest rate fixed at 12% you will always have the " +
+                    "peace of mind of knowing that your repayments will stay the " +
+                    "same, with a fixed interest rate and fixed monthly repayments. " +
+                    "Start your application journey by finding out how much you can " +
+                    "possibly qualify for",
+                ["primaryCta"] =
+                    BuildExternalLink("APPLY NOW", twelvePercentApplyUrl).ToJsonString(),
+                ["secondaryCta"] = null,
+                ["image"] = null,
+                ["imageAlt"] = null
+            };
+
+        var appDownloadContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = appDownloadBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Get the app now",
+                ["subheading"] = "",
+                ["description"] =
+                    "Take your banking experience to the next level with our mobile app.",
+                ["downloadLink"] =
+                    BuildExternalLink(
+                            "DOWNLOAD NOW",
+                            "https://play.google.com/store/apps/details?id=za.co.android.africanbank")
+                        .ToJsonString(),
+                ["image"] = null,
+                ["imageAlt"] = null
+            };
+
+        var howItWorksContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = heroBannerBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "How The 12% Loan Application Works.",
+                ["description"] =
+                    "Sometimes you want the loan without the endless phone calls and " +
+                    "interviews. We can help. You can apply now for an online loan " +
+                    "of up to R50,000 in just 3 minutes! Simply fill in your contact " +
+                    "details and financial information. For security reasons, you " +
+                    "will need to enter an OTP (called a One Time PIN), and we will " +
+                    "display an indicative quote to you in seconds if you qualify. " +
+                    "Thereafter follow the easy steps to complete your online " +
+                    "application.",
+                ["primaryCta"] =
+                    BuildExternalLink("APPLY NOW", twelvePercentApplyUrl).ToJsonString(),
+                ["secondaryCta"] = null,
+                ["image"] = null,
+                ["imageAlt"] = null
+            };
+
+        var faqContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = faqSectionBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "12% Loan FAQ",
+                ["items"] =
+                    BuildFaqItems(
+                        [
+                            ("Reach your goals with a Personal Loan from African Bank?",
+                                "<p>Our 12% Loan gives you a fixed, low interest rate and a fixed monthly repayment, so you always know exactly what you owe - apply online in minutes to see what you qualify for.</p>")
+                        ])
+                        .ToJsonString()
+            };
+
+        var downloadsContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = downloadsSectionBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "More to read",
+                ["items"] =
+                    BuildBlockList(
+                        downloadItemType,
+                        [
+                            new Dictionary<string, JsonNode?>
+                            {
+                                ["downloadTextDescription"] = "Loan Terms and Conditions",
+                                ["downloadButtonRedirectLink2"] = null,
+                                ["downloadButtonText"] = "Download"
+                            }
+                        ])
+                        .ToJsonString()
+            };
+
+        var crossSellContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = crossSellBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Find your ideal loan solution with African Bank.",
+                // Self-excludes the 12% Loan (this page) - confirmed live,
+                // same as Personal Loan's and Consolidation Loan's own
+                // cross-sell sections above.
+                ["cards"] =
+                    BuildCards(
+                        [
+                            ("Personal Loan:",
+                                "Offers amounts from R2 000 to R500 000 with flexible repayment terms of 7 to 72 months.",
+                                "View Personal Loan", "/en/home/product-personal-loan/"),
+                            ("Consolidation Loan:",
+                                "For those seeking to streamline their finances into one manageable instalment.",
+                                "View Consolidation Loan", "/en/home/product-consolidation-loan/"),
+                            ("Tech Deals:",
+                                "Explore our deals and add a cellphone, tablet or laptop to any loan.",
+                                "View Tech Deals", "/en/home/tech-deals/")
+                        ])
+                        .ToJsonString(),
+                ["image"] = null
+            };
+
+        var twelvePercentLoanUdis =
+            new[]
+            {
+                heroContentData["udi"]!.GetValue<string>(),
+                appDownloadContentData["udi"]!.GetValue<string>(),
+                howItWorksContentData["udi"]!.GetValue<string>(),
+                faqContentData["udi"]!.GetValue<string>(),
+                downloadsContentData["udi"]!.GetValue<string>(),
+                crossSellContentData["udi"]!.GetValue<string>()
+            };
+
+        var twelvePercentLoanSections =
+            new JsonObject
+            {
+                ["layout"] =
+                    new JsonObject
+                    {
+                        ["Umbraco.BlockList"] =
+                            new JsonArray(twelvePercentLoanUdis
+                                .Select(udi => (JsonNode)new JsonObject { ["contentUdi"] = udi })
+                                .ToArray())
+                    },
+                ["contentData"] =
+                    new JsonArray(
+                        heroContentData,
+                        appDownloadContentData,
+                        howItWorksContentData,
+                        faqContentData,
+                        downloadsContentData,
+                        crossSellContentData)
+            };
+
+        CreateOrUpdateProductLoanPage(
+            "Product 12% Loan",
+            twelvePercentLoanParentId.Value,
+            twelvePercentLoanSections);
+
+        Console.WriteLine(
+            "NOTE: FAQ answer is placeholder copy and the downloads item has " +
+            "no file attached - verify the FAQ wording and attach the real " +
+            "Loan Terms and Conditions PDF in the backoffice.");
+    }
+    }
+
+    // --------------------------------------------------------
+    // TECH DEALS
+    // --------------------------------------------------------
+    //
+    // Unlike Personal/Consolidation/12% Loan above, this page is built
+    // almost entirely from block types that exist only for it (see the
+    // "TECH DEALS PAGE BLOCKS" comment in create-product-loan-schema) -
+    // promoSplitBlock is the one block here reused as-is from elsewhere.
+    // "Learn More"/"View Catalogue" below link to the site root as a
+    // placeholder (no real destination URL was available to port) -
+    // update both in the backoffice once the real C-Connect/catalogue
+    // pages are known. Icon keys (e.g. "handset", "income") are resolved
+    // to a Lucide icon client-side - see TechHero.tsx/TechRequirements.tsx
+    // for the lookup; an unrecognised key just renders no icon rather than
+    // failing, so a typo here is a cosmetic, not a breaking, mistake.
+
+    if (ShouldRunSection("tech-deals"))
+    {
+    Console.WriteLine();
+    Console.WriteLine("--- tech deals ---");
+
+    var legacyTechDeals = FreeUpLegacyUrl("Tech Deals");
+
+    if (legacyTechDeals == null)
+    {
+        Console.WriteLine(
+            "SKIP: no legacy 'Tech Deals' pageLoans node found - nothing to migrate.");
+    }
+    else
+    {
+        const string techDealsApplyUrl =
+            "https://www.africanbank.co.za/en/home/get-a-quote?" +
+            "utm_source=Website&utm_medium=Productpage&utm_campaign=WebLead";
+        const string techDealsPlaceholderUrl = "https://www.africanbank.co.za/";
+
+        var techHeroContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = techHeroBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Welcome to",
+                ["highlightHeading"] = "Tech Deals",
+                ["subheading"] = "Add a tech device to your Personal Loan",
+                ["categories"] =
+                    BuildBlockList(
+                        techCategoryItemType,
+                        [
+                            new Dictionary<string, JsonNode?> { ["iconImage"] = null, ["label"] = "Handset" },
+                            new Dictionary<string, JsonNode?> { ["iconImage"] = null, ["label"] = "Tablets" },
+                            new Dictionary<string, JsonNode?> { ["iconImage"] = null, ["label"] = "Laptops" },
+                            new Dictionary<string, JsonNode?> { ["iconImage"] = null, ["label"] = "Connectivity" },
+                            new Dictionary<string, JsonNode?> { ["iconImage"] = null, ["label"] = "Power Solutions" }
+                        ])
+                        .ToJsonString()
+            };
+
+        var plugAndGoContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = plugAndGoBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Plug & Go",
+                ["productName"] = "Samsung S24",
+                ["description"] = "3GB Anytime Data + 200 Anytime Any-Network Minutes per month",
+                ["bundleLabel"] = "C-ULTRA BUNDLE",
+                ["priceAmount"] = "From R945*",
+                ["priceSuffix"] = "P/M",
+                ["cta"] = BuildExternalLink("Apply Now", techDealsApplyUrl).ToJsonString(),
+                ["image"] = null,
+                ["imageAlt"] = "Samsung S24"
+            };
+
+        var simPromoContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = promoSplitBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Get the only SIM with a pocket and C the rewards",
+                ["description"] =
+                    "C-CONNECT, the mobile network SIM that keeps on providing you more " +
+                    "lifestyle benefits and rewards.",
+                ["primaryCta"] = BuildExternalLink("Learn More", techDealsPlaceholderUrl).ToJsonString(),
+                ["secondaryCta"] = null,
+                ["image"] = null,
+                ["imageAlt"] = null,
+                ["imageOnRight"] = false,
+                ["backgroundColor"] = "bg-white",
+                ["imagePlain"] = true
+            };
+
+        var cataloguePromoContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = promoSplitBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "",
+                ["description"] =
+                    "Browse our catalogue for latest deals and value bundles on " +
+                    "smartphones, tablets and laptops.",
+                ["primaryCta"] = BuildExternalLink("View Catalogue", techDealsPlaceholderUrl).ToJsonString(),
+                ["secondaryCta"] = null,
+                ["image"] = null,
+                ["imageAlt"] = null,
+                ["imageOnRight"] = true,
+                ["backgroundColor"] = "bg-brand-mist",
+                ["imagePlain"] = true
+            };
+
+        var techRequirementsContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = techRequirementsBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "At African Bank, we believe in giving our customers the best value",
+                ["bodyHtml"] =
+                    BuildRichText(
+                            "<h3>Why apply for a Tech Deal from African Bank?</h3>" +
+                            "<ul>" +
+                            "<li>We offer our customers a range of devices with the best value</li>" +
+                            "<li>A simple, secure online application process, via our banking App or Online Banking</li>" +
+                            "<li>You get a fixed interest rate of only 12%, payable over 24 months</li>" +
+                            "</ul>" +
+                            "<h3>How to apply for a Tech Deal?</h3>" +
+                            "<ul>" +
+                            "<li>Simply add a deal of your choice to your loan at any time during application.</li>" +
+                            "<li>To apply for a loan, download our banking App or register for our Online Banking</li>" +
+                            "</ul>")
+                        .ToJsonString(),
+                ["itemsHeading"] = "What will you need to apply for a Tech Deal?",
+                ["itemsIntro"] =
+                    "To get a Tech Deal suited to your lifestyle, you will need to have the " +
+                    "following documents on hand:",
+                ["items"] =
+                    BuildBlockList(
+                        requirementItemType,
+                        [
+                            new Dictionary<string, JsonNode?>
+                            {
+                                ["iconImage"] = null,
+                                ["label"] = "Most recent proof of income, reflecting three salary deposits"
+                            },
+                            new Dictionary<string, JsonNode?>
+                            {
+                                ["iconImage"] = null,
+                                ["label"] = "You must be over 18 to apply for a Loan"
+                            },
+                            new Dictionary<string, JsonNode?>
+                            {
+                                ["iconImage"] = null,
+                                ["label"] = "Latest 3 months bank statements"
+                            },
+                            new Dictionary<string, JsonNode?>
+                            {
+                                ["iconImage"] = null,
+                                ["label"] = "Original ID, Passport or Valid Driver's License (if you don't have an account)"
+                            }
+                        ])
+                        .ToJsonString(),
+                ["perksHeading"] = "Choose our tech credit for your device and enjoy the following",
+                ["perks"] =
+                    BuildBlockList(
+                        benefitCardType,
+                        [
+                            new Dictionary<string, JsonNode?>
+                            {
+                                ["iconImage"] = null,
+                                ["heading"] = "INTEREST RATE FROM 12%",
+                                ["description"] = "Including low repayments over 24 months"
+                            },
+                            new Dictionary<string, JsonNode?>
+                            {
+                                ["iconImage"] = null,
+                                ["heading"] = "FREE NATIONAL DELIVERY",
+                                ["description"] = "You click, we bring"
+                            },
+                            new Dictionary<string, JsonNode?>
+                            {
+                                ["iconImage"] = null,
+                                ["heading"] = "GET CONNECTED",
+                                ["description"] = "Network packages supplied through C-Connect"
+                            }
+                        ])
+                        .ToJsonString()
+            };
+
+        var techCallToActionContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = techCallToActionBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "1 Number to call",
+                ["phoneNumber"] = "0861 123 456",
+                ["phoneUrl"] = "tel:0861123456",
+                ["termsLabel"] = "Website Terms and Conditions",
+                ["termsUrl"] = techDealsPlaceholderUrl,
+                ["disclaimerHtml"] =
+                    BuildRichText(
+                            "<p>Devices are subject to stock availability*. The indicated " +
+                            "instalments have been calculated over 72 months at the maximum " +
+                            "NCA rate. Terms, conditions &amp; affordability rates apply. All " +
+                            "minutes &amp; data packages are only available for 24 months.</p>")
+                        .ToJsonString()
+            };
+
+        var techDealsUdis =
+            new[]
+            {
+                techHeroContentData["udi"]!.GetValue<string>(),
+                plugAndGoContentData["udi"]!.GetValue<string>(),
+                simPromoContentData["udi"]!.GetValue<string>(),
+                cataloguePromoContentData["udi"]!.GetValue<string>(),
+                techRequirementsContentData["udi"]!.GetValue<string>(),
+                techCallToActionContentData["udi"]!.GetValue<string>()
+            };
+
+        var techDealsSections =
+            new JsonObject
+            {
+                ["layout"] =
+                    new JsonObject
+                    {
+                        ["Umbraco.BlockList"] =
+                            new JsonArray(techDealsUdis
+                                .Select(udi => (JsonNode)new JsonObject { ["contentUdi"] = udi })
+                                .ToArray())
+                    },
+                ["contentData"] =
+                    new JsonArray(
+                        techHeroContentData,
+                        plugAndGoContentData,
+                        simPromoContentData,
+                        cataloguePromoContentData,
+                        techRequirementsContentData,
+                        techCallToActionContentData)
+            };
+
+        CreateOrUpdateProductLoanPage("Tech Deals", legacyTechDeals.ParentId, techDealsSections);
+
+        Console.WriteLine(
+            "NOTE: \"Learn More\"/\"View Catalogue\" link to the site root as a " +
+            "placeholder, and the Plug & Go/catalogue images have no real file " +
+            "attached - update all three in the backoffice once the real " +
+            "destinations/photos are available. None of the category/" +
+            "requirement/perk icons have an image attached either (iconImage " +
+            "left unset on all 12 items) - upload the real icon artwork for " +
+            "each via the backoffice's Media Picker.");
+    }
+    }
+
+    // --------------------------------------------------------
+    // CREDIT REPORT
+    // --------------------------------------------------------
+    //
+    // Unlike every product-loan page above, no legacy pageLoans node exists
+    // for this one (it's brand-new content, not a migration of an existing
+    // site page) - FreeUpLegacyUrl is tried first in case a node does turn
+    // up under an unexpected name, but the real parent source is normally
+    // the fallback below: any already-migrated productLoanPage's own
+    // ParentId, since every product-loan-family page lives as a sibling
+    // under the same "/en/home/" node. Naming the node "Credit Report"
+    // (no "Product " prefix, same as "Tech Deals") so Umbraco's generated
+    // URL slug is "/en/home/credit-report/" rather than
+    // "/en/home/product-credit-report/".
+    //
+    // All four blocks are existing, reused types (heroBannerBlock /
+    // featureChecklistBlock / appDownloadBlock) - no new Umbraco content
+    // types needed. featureChecklistBlock has no field for a closing
+    // paragraph below its checklist, so the source page's trailing
+    // "When you apply for credit..." paragraph isn't captured here - add
+    // it by hand in the backoffice if it's wanted (see the NOTE below).
+
+    if (ShouldRunSection("credit-report"))
+    {
+    Console.WriteLine();
+    Console.WriteLine("--- credit report ---");
+
+    var legacyCreditReport = FreeUpLegacyUrl("Credit Report") ?? FreeUpLegacyUrl("Credit Score");
+
+    var creditReportParentId =
+        legacyCreditReport?.ParentId ??
+        contentService.GetPagedOfType(productLoanPageType.Id, 0, 500, out _, null!)
+            .FirstOrDefault()?.ParentId;
+
+    if (creditReportParentId == null)
+    {
+        Console.WriteLine(
+            "SKIP: no legacy 'Credit Report' pageLoans node and no existing " +
+            "productLoanPage sibling found to infer a parent from - nothing to migrate.");
+    }
+    else
+    {
+        const string creditReportPlaceholderUrl = "https://www.africanbank.co.za/";
+
+        var heroContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = heroBannerBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "What is my credit score?",
+                ["description"] =
+                    "Your credit score is a personal asset and an investment in your " +
+                    "future. It is your key to financial security and greater " +
+                    "financial freedom. To get your free credit report, simply click " +
+                    "on the register button or download the African Bank App now " +
+                    "from your App store.",
+                ["primaryCta"] =
+                    BuildExternalLink("REGISTER/LOGIN", creditReportPlaceholderUrl).ToJsonString(),
+                ["secondaryCta"] = null,
+                ["image"] = null,
+                ["imageAlt"] = null
+            };
+
+        var goodCreditContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = featureChecklistBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "How will a GOOD credit score benefit you?",
+                ["subheading"] =
+                    "Your credit score and your ability to afford credit will help you " +
+                    "to achieve your financial goals, which will mean a brighter " +
+                    "future for you and your loves ones:",
+                ["features"] =
+                    BuildFeatureList(
+                        [
+                            "Landing that dream job",
+                            "Getting a cell phone contract",
+                            "Renting a place of your own",
+                            "Buying your own car",
+                            "Buying your own home",
+                            "Building or extending your home",
+                            "Buying household items",
+                            "Educating your children"
+                        ])
+                        .ToJsonString(),
+                ["cta"] =
+                    BuildExternalLink("REGISTER/LOGIN", creditReportPlaceholderUrl).ToJsonString(),
+                ["image"] = null,
+                ["imageAlt"] = null,
+                ["imageOnRight"] = false
+            };
+
+        var badCreditContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = heroBannerBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "How will a BAD credit score affect you?",
+                ["description"] =
+                    "A bad credit score will limit your access to credit and keep you " +
+                    "from reaching your financial goals. At African Bank, it is our " +
+                    "purpose to advance lives. We care about your financial well " +
+                    "being. As a valued customer, we offer you unlimited access to " +
+                    "your FREE credit report. You will now be able to check your " +
+                    "credit score every time you log on to your African Bank App or " +
+                    "internet banking. African Bank respects your privacy and " +
+                    "confidentiality. We will only make this information available " +
+                    "to you, based on your stated consent",
+                ["primaryCta"] =
+                    BuildExternalLink("REGISTER/LOGIN", creditReportPlaceholderUrl).ToJsonString(),
+                ["secondaryCta"] = null,
+                ["image"] = null,
+                ["imageAlt"] = null
+            };
+
+        var creditReportAppDownloadContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = appDownloadBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Get the app now",
+                ["subheading"] = "",
+                ["description"] =
+                    "Take your banking experience to the next level with our mobile app.",
+                ["downloadLink"] =
+                    BuildExternalLink(
+                            "DOWNLOAD NOW",
+                            "https://play.google.com/store/apps/details?id=za.co.android.africanbank")
+                        .ToJsonString(),
+                ["image"] = null,
+                ["imageAlt"] = null
+            };
+
+        var creditReportUdis =
+            new[]
+            {
+                heroContentData["udi"]!.GetValue<string>(),
+                goodCreditContentData["udi"]!.GetValue<string>(),
+                badCreditContentData["udi"]!.GetValue<string>(),
+                creditReportAppDownloadContentData["udi"]!.GetValue<string>()
+            };
+
+        var creditReportSections =
+            new JsonObject
+            {
+                ["layout"] =
+                    new JsonObject
+                    {
+                        ["Umbraco.BlockList"] =
+                            new JsonArray(creditReportUdis
+                                .Select(udi => (JsonNode)new JsonObject { ["contentUdi"] = udi })
+                                .ToArray())
+                    },
+                ["contentData"] =
+                    new JsonArray(
+                        heroContentData,
+                        goodCreditContentData,
+                        badCreditContentData,
+                        creditReportAppDownloadContentData)
+            };
+
+        CreateOrUpdateProductLoanPage("Credit Report", creditReportParentId.Value, creditReportSections);
+
+        Console.WriteLine(
+            "NOTE: \"Register/Login\" links to the site root as a placeholder - " +
+            "no real registration/login destination was available to port - update " +
+            "it in the backoffice once known. All three photos (both hero images " +
+            "and the credit-bureau phone mockup) have no real file attached - " +
+            "upload them via the Media Picker. The GOOD-credit-score checklist's " +
+            "closing paragraph (\"When you apply for credit, credit providers will " +
+            "do a credit check on you...\") has no field to hold it on " +
+            "featureChecklistBlock - add it by hand in the backoffice if it's " +
+            "wanted.");
+    }
+    }
+
+    // --------------------------------------------------------
+    // TALK TO US
+    // --------------------------------------------------------
+    //
+    // Like Credit Report above, no legacy pageLoans node exists for this
+    // one - FreeUpLegacyUrl is tried first in case one turns up under an
+    // unexpected name, falling back to any already-migrated
+    // productLoanPage's own ParentId. Named "Talk To Us" (no "Product "
+    // prefix) so the generated URL slug is "/en/home/talk-to-us/".
+    //
+    // Every phone/fax number below links as a plain `tel:` URI (digits
+    // only, "+" kept where the source itself used international format);
+    // every email as `mailto:`. The source page's "Apply now"/"Upload
+    // documents" links (under Direct Sales) have no real destination
+    // available - they point at the site root as a placeholder, same
+    // "no real link available" treatment as every other placeholder URL
+    // in this command - update them in the backoffice once known.
+
+    if (ShouldRunSection("talk-to-us"))
+    {
+    Console.WriteLine();
+    Console.WriteLine("--- talk to us ---");
+
+    var legacyTalkToUs =
+        FreeUpLegacyUrl("Talk To Us") ?? FreeUpLegacyUrl("Contact Us") ?? FreeUpLegacyUrl("Contact Information");
+
+    var talkToUsParentId =
+        legacyTalkToUs?.ParentId ??
+        contentService.GetPagedOfType(productLoanPageType.Id, 0, 500, out _, null!)
+            .FirstOrDefault()?.ParentId;
+
+    if (talkToUsParentId == null)
+    {
+        Console.WriteLine(
+            "SKIP: no legacy 'Talk To Us' pageLoans node and no existing " +
+            "productLoanPage sibling found to infer a parent from - nothing to migrate.");
+    }
+    else
+    {
+        // The real site already has a page named exactly "Talk to us"
+        // under this same parent (a pageTalkAndFindUs node, not a
+        // pageLoans one, so FreeUpLegacyUrl above never finds it) -
+        // without freeing its name first, Umbraco's own sibling-name
+        // uniqueness silently renamed the new productLoanPage node to
+        // "Talk To Us (1)" on an earlier run of this command, giving it
+        // the URL slug "/en/home/talk-to-us-1/" instead of the intended
+        // "/en/home/talk-to-us/". FreeUpSiblingUrl frees the name; the
+        // orphaned "(1)" node (if an earlier run already created one) is
+        // then renamed back to "Talk To Us" so CreateOrUpdateProductLoanPage
+        // below finds and updates it by name instead of creating a third,
+        // still-misnamed duplicate.
+        FreeUpSiblingUrl(talkToUsParentId.Value, "Talk to us");
+
+        var orphanedTalkToUsNode =
+            contentService.GetPagedOfType(productLoanPageType.Id, 0, 500, out _, null!)
+                .FirstOrDefault(n =>
+                    n.Name != null &&
+                    n.Name.StartsWith("Talk To Us (", StringComparison.OrdinalIgnoreCase));
+
+        if (orphanedTalkToUsNode != null)
+        {
+            var oldOrphanName = orphanedTalkToUsNode.Name;
+            var persistedOrphanName = RenameProductLoanPageNode(orphanedTalkToUsNode, "Talk To Us");
+
+            Console.WriteLine(
+                $"RENAMED: \"{oldOrphanName}\" -> \"Talk To Us\" (persisted " +
+                $"\"{persistedOrphanName}\", id={orphanedTalkToUsNode.Id})");
+        }
+
+        const string talkToUsPlaceholderUrl = "https://www.africanbank.co.za/";
+
+        var contactCards =
+            BuildBlockList(
+                contactCardItemType,
+                [
+                    new Dictionary<string, JsonNode?>
+                    {
+                        ["heading"] = "Customer service centre",
+                        ["bodyHtml"] =
+                            BuildRichText(
+                                    "<p>Tel: <a href=\"tel:0861111011\">0861 111 011</a><br/>" +
+                                    "Tel: <a href=\"tel:0112074500\">011 207 4500</a><br/>" +
+                                    "Email: <a href=\"mailto:CExperience@africanbank.co.za\">CExperience@africanbank.co.za</a></p>" +
+                                    "<p>Operating hours:</p>" +
+                                    "<p>Monday-Friday: 7:00 to 19:00<br/>Saturday: 8:00 to 16:00<br/>Sunday: 8:00 to 14:00</p>")
+                                .ToJsonString()
+                    },
+                    new Dictionary<string, JsonNode?>
+                    {
+                        ["heading"] = "MyWORLD customers",
+                        ["bodyHtml"] =
+                            BuildRichText(
+                                    "<p>Service related queries and Fraud Reporting</p>" +
+                                    "<p>Tel: <a href=\"tel:0861123456\">0861 123 456</a><br/>" +
+                                    "Email: <a href=\"mailto:CExperience@africanbank.co.za\">CExperience@africanbank.co.za</a></p>" +
+                                    "<p>Operating hours:</p>" +
+                                    "<p>Monday – Friday: 7:00 to 19:00<br/>Saturday: 08:00 to 16:00<br/>Sunday: 08:00 to 14:00</p>")
+                                .ToJsonString()
+                    },
+                    new Dictionary<string, JsonNode?>
+                    {
+                        ["heading"] = "Direct sales (new loan applications)",
+                        ["bodyHtml"] =
+                            BuildRichText(
+                                    "<p>Tel: <a href=\"tel:0860333004\">0860 333 004</a></p>" +
+                                    $"<p><a href=\"{talkToUsPlaceholderUrl}\">Apply now</a></p>" +
+                                    $"<p><a href=\"{talkToUsPlaceholderUrl}\">Upload documents</a></p>" +
+                                    "<p>Where is my loan: <a href=\"tel:0861111011\">0861 111 011</a></p>")
+                                .ToJsonString()
+                    },
+                    new Dictionary<string, JsonNode?>
+                    {
+                        ["heading"] = "Savings and Investments",
+                        ["bodyHtml"] =
+                            BuildRichText(
+                                    "<p>Tel: <a href=\"tel:0860494940\">0860 494 940</a></p>" +
+                                    "<p>Email: <a href=\"mailto:investments@africanbank.co.za\">investments@africanbank.co.za</a></p>")
+                                .ToJsonString()
+                    },
+                    new Dictionary<string, JsonNode?>
+                    {
+                        ["heading"] = "Document upload",
+                        ["bodyHtml"] =
+                            BuildRichText(
+                                    "<p>You can upload documents on WhatsApp.</p>" +
+                                    "<p>Here's our WhatsApp number: <a href=\"https://wa.me/27600123716\">060 012 3716</a></p>")
+                                .ToJsonString()
+                    },
+                    new Dictionary<string, JsonNode?>
+                    {
+                        ["heading"] = "Debt counselling",
+                        ["bodyHtml"] =
+                            BuildRichText(
+                                    "<p>Tel: <a href=\"tel:0112569323\">011 256 9323</a></p>" +
+                                    "<p>Email: <a href=\"mailto:DebtCounselling@africanbank.co.za\">DebtCounselling@africanbank.co.za</a></p>" +
+                                    "<p>Operating Hours:</p>" +
+                                    "<p>Monday – Friday 8:00 – 16:00</p>")
+                                .ToJsonString()
+                    },
+                    new Dictionary<string, JsonNode?>
+                    {
+                        ["heading"] = "Lost or stolen cards",
+                        ["bodyHtml"] =
+                            BuildRichText(
+                                    "<p>Stop card international Tel: <a href=\"tel:+27112569988\">+27 11 256 9988</a></p>" +
+                                    "<p>South Africa Tel: <a href=\"tel:0861000555\">0861 000 555</a></p>" +
+                                    "<p>Activation line Tel: <a href=\"tel:0861000444\">0861 000 444</a></p>")
+                                .ToJsonString()
+                    },
+                    new Dictionary<string, JsonNode?>
+                    {
+                        ["heading"] = "Anonymous complaints or Tip-offs",
+                        ["bodyHtml"] =
+                            BuildRichText(
+                                    "<p>Tel: <a href=\"tel:0800633633\">0800 633 633</a><br/>" +
+                                    "Fax: 0864 944 107<br/>" +
+                                    "Email: <a href=\"mailto:africanbank@tip-offs.com\">africanbank@tip-offs.com</a></p>")
+                                .ToJsonString()
+                    },
+                    new Dictionary<string, JsonNode?>
+                    {
+                        ["heading"] = "Collections",
+                        ["bodyHtml"] =
+                            BuildRichText(
+                                    "<p>Tel: <a href=\"tel:0112074500\">011 207 4500</a></p>")
+                                .ToJsonString()
+                    },
+                    new Dictionary<string, JsonNode?>
+                    {
+                        ["heading"] = "Funeral Cover Service",
+                        ["bodyHtml"] =
+                            BuildRichText(
+                                    "<p>Tel: <a href=\"tel:0860000975\">0860 000 975</a></p>" +
+                                    "<p>Email: <a href=\"mailto:FuneralPlan@AfricanBank.co.za\">FuneralPlan@AfricanBank.co.za</a></p>" +
+                                    "<p>Operating hours</p>" +
+                                    "<p>Monday-Friday: 08:00-17:00<br/>Saturday: 09:00-13:00</p>")
+                                .ToJsonString()
+                    },
+                    new Dictionary<string, JsonNode?>
+                    {
+                        ["heading"] = "Funeral Claims",
+                        ["bodyHtml"] =
+                            BuildRichText(
+                                    "<p>Tel: <a href=\"tel:0860000979\">0860 000 979</a></p>" +
+                                    "<p>Email: <a href=\"mailto:FuneralPlanClaims@AfricanBank.co.za\">FuneralPlanClaims@AfricanBank.co.za</a></p>" +
+                                    "<p>Operating Hours</p>" +
+                                    "<p>Monday-Friday: 08:00-16:30<br/>Weekend closed</p>")
+                                .ToJsonString()
+                    },
+                    new Dictionary<string, JsonNode?>
+                    {
+                        ["heading"] = "Sponsorships",
+                        ["bodyHtml"] =
+                            BuildRichText(
+                                    "<p>Contact us to discuss sponsorship opportunities</p>" +
+                                    "<p>Email: <a href=\"mailto:Sponsorship@africanbank.co.za\">Sponsorship@africanbank.co.za</a></p>")
+                                .ToJsonString()
+                    },
+                    new Dictionary<string, JsonNode?>
+                    {
+                        ["heading"] = "Credit Life Claims",
+                        ["bodyHtml"] =
+                            BuildRichText(
+                                    "<p>Email: <a href=\"mailto:InsuranceClaims@AfricanBank.co.za\">InsuranceClaims@AfricanBank.co.za</a></p>" +
+                                    "<p>Operating Hours</p>" +
+                                    "<p>Monday-Friday: 08:00-16:30<br/>Weekend closed</p>")
+                                .ToJsonString()
+                    },
+                    new Dictionary<string, JsonNode?>
+                    {
+                        ["heading"] = "Customer Fraud Reporting and Hotline",
+                        ["bodyHtml"] =
+                            BuildRichText(
+                                    "<p><strong>Personal Banking</strong></p>" +
+                                    "<p>Tel: <a href=\"tel:0112569988\">011 256 9988</a><br/>" +
+                                    "Tel: <a href=\"tel:0112569227\">011 256 9227</a><br/>" +
+                                    "Email: <a href=\"mailto:fdtection@africanbank.co.za\">fdtection@africanbank.co.za</a></p>" +
+                                    "<p><strong>Business and Commercial Banking</strong></p>" +
+                                    "<p>Tel: <a href=\"tel:0861123120\">0861 123 120</a><br/>" +
+                                    "Tel: <a href=\"tel:0112569227\">011 256 9227</a><br/>" +
+                                    "Email: <a href=\"mailto:bcbfraud@africanbank.co.za\">bcbfraud@africanbank.co.za</a></p>")
+                                .ToJsonString()
+                    }
+                ]);
+
+        var contactInfoContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = contactInfoBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Contact information",
+                ["cards"] = contactCards.ToJsonString()
+            };
+
+        var talkToUsSections =
+            new JsonObject
+            {
+                ["layout"] =
+                    new JsonObject
+                    {
+                        ["Umbraco.BlockList"] =
+                            new JsonArray(
+                                new JsonObject { ["contentUdi"] = contactInfoContentData["udi"]!.GetValue<string>() })
+                    },
+                ["contentData"] = new JsonArray(contactInfoContentData)
+            };
+
+        CreateOrUpdateProductLoanPage("Talk To Us", talkToUsParentId.Value, talkToUsSections);
+
+        Console.WriteLine(
+            "NOTE: Direct Sales' \"Apply now\"/\"Upload documents\" links point at " +
+            "the site root as a placeholder - no real destinations were available " +
+            "to port - update both in the backoffice once known.");
+    }
     }
 
     Console.WriteLine();
     Console.WriteLine("=================================================");
     Console.WriteLine("MIGRATION COMPLETE");
+    Console.WriteLine("=================================================");
+
+    return;
+}
+
+// ============================================================
+// INSPECT-PRODUCT-LOAN-PAGES COMMAND
+// ============================================================
+//
+// Read-only diagnostic: lists every productLoanPage and legacy pageLoans
+// node (Id/Name/ParentId/Published), and for each productLoanPage prints
+// the content-type alias + heading of every block actually stored in its
+// "sections" property right now. Written to track down a live report of
+// /en/home/product-consolidation-loan/ rendering sections that
+// migrate-product-loan-pages never wrote (a checklist-style "How An Online
+// Consolidation Loan Application Works" hero and a Credit Life Insurance
+// section, which that command only ever writes onto Product Personal
+// Loan) - run this first to see whether that's a duplicate node sharing
+// the URL, leftover content on the node this command already updates, or
+// something else, before changing any seeding code again.
+
+if (args.Length > 0 &&
+    args[0].Equals("inspect-product-loan-pages", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" INSPECT PRODUCT LOAN PAGES");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService = app.Services.GetRequiredService<IContentTypeService>();
+    var contentService = app.Services.GetRequiredService<IContentService>();
+
+    var productLoanPageType = contentTypeService.Get("productLoanPage");
+    var pageLoansType = contentTypeService.Get("pageLoans");
+
+    var typeNamesByKey =
+        contentTypeService.GetAll()
+            .ToDictionary(t => t.Key.ToString(), t => t.Alias, StringComparer.OrdinalIgnoreCase);
+
+    void PrintNode(IContent node)
+    {
+        Console.WriteLine(
+            $"  id={node.Id,-6} published={node.Published,-5} parentId={node.ParentId,-6} name=\"{node.Name}\"");
+    }
+
+    // Prints the ancestor chain (id/name/contentType) from `id` up to the
+    // site root (-1), so it's clear whether two different parentIds seen
+    // below are the same "/en/home/" tree or two genuinely separate trees -
+    // walking ParentId by hand (not relying on a published-content/Url
+    // lookup, which needs the published cache rather than this
+    // IContentService-level diagnostic).
+    void PrintAncestry(int id)
+    {
+        var chain = new List<string>();
+        var currentId = id;
+        var guard = 0;
+
+        while (currentId > 0 && guard++ < 50)
+        {
+            var current = contentService.GetById(currentId);
+
+            if (current == null)
+            {
+                chain.Add($"id={currentId} (NOT FOUND)");
+                break;
+            }
+
+            var typeAlias =
+                contentTypeService.Get(current.ContentTypeId)?.Alias ?? "?";
+
+            chain.Add($"id={current.Id} \"{current.Name}\" [{typeAlias}]");
+            currentId = current.ParentId;
+        }
+
+        Console.WriteLine($"  {id} -> " + string.Join("  <-  ", chain));
+    }
+
+    Console.WriteLine("--- ancestry of the two parentIds seen on legacy/productLoanPage nodes ---");
+    PrintAncestry(8523);
+    PrintAncestry(8534);
+    Console.WriteLine();
+
+    // "Public Site" (7973) and "Public Site(1)" (8075) are BOTH top-level
+    // nodes - the "(1)" strongly suggests one is a full-tree copy of the
+    // other (Umbraco auto-renames on a name collision when you copy a
+    // node), so node id order alone can't say which one real requests
+    // actually route to. Domain bindings are what Umbraco's routing
+    // actually keys off of, so list them here and show which of the two
+    // root ids (if either) owns them.
+    Console.WriteLine("--- domain bindings (decides which site tree real requests route to) ---");
+
+    var domainService = app.Services.GetRequiredService<IDomainService>();
+    var allDomains = domainService.GetAll(true).ToList();
+
+    if (allDomains.Count == 0)
+    {
+        Console.WriteLine("  (no domains registered at all)");
+    }
+    else
+    {
+        foreach (var domain in allDomains)
+        {
+            Console.WriteLine(
+                $"  domain=\"{domain.DomainName}\" rootContentId={domain.RootContentId} isWildcard={domain.IsWildcard}");
+        }
+    }
+
+    Console.WriteLine();
+
+    if (pageLoansType != null)
+    {
+        Console.WriteLine("--- legacy pageLoans nodes ---");
+
+        var legacyNodes = contentService.GetPagedOfType(pageLoansType.Id, 0, 500, out _, null!).ToList();
+
+        Console.WriteLine($"({legacyNodes.Count} node(s))");
+
+        foreach (var node in legacyNodes)
+        {
+            PrintNode(node);
+        }
+
+        Console.WriteLine();
+    }
+
+    if (productLoanPageType != null)
+    {
+        Console.WriteLine("--- productLoanPage nodes ---");
+
+        var pages = contentService.GetPagedOfType(productLoanPageType.Id, 0, 500, out _, null!).ToList();
+
+        Console.WriteLine($"({pages.Count} node(s))");
+        Console.WriteLine();
+
+        foreach (var node in pages)
+        {
+            PrintNode(node);
+
+            var raw = node.GetValue<string>("sections");
+
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                Console.WriteLine("    (sections is empty)");
+                Console.WriteLine();
+                continue;
+            }
+
+            JsonNode? parsed;
+
+            try
+            {
+                parsed = JsonNode.Parse(raw);
+            }
+            catch (JsonException ex)
+            {
+                Console.WriteLine($"    FAILED TO PARSE sections: {ex.Message}");
+                Console.WriteLine();
+                continue;
+            }
+
+            var contentData = parsed?["contentData"] as JsonArray;
+
+            if (contentData == null)
+            {
+                Console.WriteLine("    (no contentData array in sections)");
+                Console.WriteLine();
+                continue;
+            }
+
+            Console.WriteLine($"    {contentData.Count} block(s) in sections:");
+
+            foreach (var block in contentData)
+            {
+                var typeKey = block?["contentTypeKey"]?.ToString();
+                var alias =
+                    typeKey != null && typeNamesByKey.TryGetValue(typeKey, out var a)
+                        ? a
+                        : $"unknown ({typeKey})";
+
+                var label =
+                    block?["heading"]?.ToString() ??
+                    block?["headingLead"]?.ToString() ??
+                    block?["headingHighlight"]?.ToString();
+
+                Console.WriteLine(
+                    label != null
+                        ? $"      - {alias}: \"{label}\""
+                        : $"      - {alias}");
+            }
+
+            Console.WriteLine();
+        }
+    }
+
+    Console.WriteLine("=================================================");
+    Console.WriteLine("DONE (read-only - nothing was changed)");
     Console.WriteLine("=================================================");
 
     return;

@@ -1,5 +1,6 @@
 import { Button } from '../Button/Button';
 import { BlobImage } from '../Image/BlobImage';
+import { LazyImage } from '../Image/LazyImage';
 
 export interface PromoSplitCta {
   label: string;
@@ -14,6 +15,8 @@ export interface PromoSplitProps {
   imageUrl?: string;
   imageAlt?: string;
   imageOnRight?: boolean;
+  background?: string;
+  imagePlain?: boolean;
 }
 
 // Two-column promo with two pill CTAs (a filled primary + an outlined
@@ -41,6 +44,8 @@ export function PromoSplit({
   imageUrl,
   imageAlt = '',
   imageOnRight = true,
+  background = '',
+  imagePlain = false,
 }: PromoSplitProps) {
   const hasImage = Boolean(imageUrl);
 
@@ -61,14 +66,31 @@ export function PromoSplit({
     </div>
   );
 
+  // `imagePlain` is opt-in (default false keeps every existing
+  // promoSplitBlock instance's blob crop unchanged) - the Tech Deals
+  // catalogue/SIM promo images are real posters with their own logo/text
+  // right up to the edges, which BlobImage's asymmetric crop cuts into.
+  // Sits the full, uncropped image on a plain white rounded card instead.
   const imageColumn = hasImage && (
     <div className="relative w-full">
-      <BlobImage src={imageUrl} alt={imageAlt} />
+      {imagePlain ? (
+        <div className="mx-auto w-full max-w-xs rounded-[30px] bg-white p-4 shadow-brand-hover">
+          <LazyImage className="block w-full object-contain" src={imageUrl} alt={imageAlt} />
+        </div>
+      ) : (
+        <BlobImage src={imageUrl} alt={imageAlt} />
+      )}
     </div>
   );
 
   return (
-    <section className="my-[40px] sm:my-[120px]">
+    // `background` is opt-in (see PromoSplitProps above) - every instance
+    // seeded before Tech Deals leaves it unset, so this keeps their exact
+    // original margin-based spacing/no background. Only when a page
+    // explicitly sets one (currently only Tech Deals' two promo sections)
+    // does spacing switch to padding, so the colour band fills the full
+    // section instead of stopping short of the margin gap.
+    <section className={background ? `py-[40px] sm:py-[120px] ${background}` : 'my-[40px] sm:my-[120px]'}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className={`grid grid-cols-1 items-center gap-10 ${hasImage ? 'md:grid-cols-2 md:gap-16' : ''}`}>
           {imageOnRight ? (

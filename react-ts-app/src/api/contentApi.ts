@@ -770,6 +770,8 @@ export type HomePageSection =
       imageUrl: string;
       imageAlt: string;
       imageOnRight: boolean;
+      backgroundColor: string;
+      imagePlain: boolean;
     }
   | {
       kind: 'featureSplitBlock';
@@ -872,6 +874,8 @@ export function mapHomePageSection(
         imageUrl: mapMediaUrl(props.image),
         imageAlt: str(props.imageAlt),
         imageOnRight: props.imageOnRight !== false,
+        backgroundColor: str(props.backgroundColor),
+        imagePlain: props.imagePlain === true,
       };
 
     case 'featureSplitBlock':
@@ -1102,7 +1106,50 @@ export type ProductLoanPageSection =
     }
   | { kind: 'faqSectionBlock'; heading: string; items: ProductFaqItem[] }
   | { kind: 'downloadsSectionBlock'; heading: string; items: ProductDownloadLink[] }
-  | { kind: 'crossSellBlock'; heading: string; cards: AudacityCard[]; imageUrl: string };
+  | { kind: 'crossSellBlock'; heading: string; cards: AudacityCard[]; imageUrl: string }
+  | {
+      kind: 'techHeroBlock';
+      heading: string;
+      highlightHeading: string;
+      subheading: string;
+      categories: { iconUrl: string; label: string }[];
+    }
+  | {
+      kind: 'plugAndGoBlock';
+      heading: string;
+      productName: string;
+      description: string;
+      bundleLabel: string;
+      priceAmount: string;
+      priceSuffix: string;
+      cta: { label: string; url: string } | null;
+      imageUrl: string;
+      imageAlt: string;
+    }
+  | {
+      kind: 'techRequirementsBlock';
+      heading: string;
+      bodyHtml: string;
+      itemsHeading: string;
+      itemsIntro: string;
+      items: { iconUrl: string; label: string }[];
+      perksHeading: string;
+      perks: { iconUrl: string; heading: string; description: string }[];
+    }
+  | {
+      kind: 'techCallToActionBlock';
+      heading: string;
+      phoneNumber: string;
+      phoneUrl: string;
+      termsLabel: string;
+      termsUrl: string;
+      disclaimerHtml: string;
+    }
+  | {
+      kind: 'contactInfoBlock';
+      heading: string;
+      cards: { heading: string; bodyHtml: string }[];
+    };
 
 export function mapProductLoanPageSection(
   contentType: string,
@@ -1175,6 +1222,66 @@ export function mapProductLoanPageSection(
         imageUrl: mapMediaUrl(props.image),
       };
 
+    case 'techHeroBlock':
+      return {
+        kind: 'techHeroBlock',
+        heading: str(props.heading),
+        highlightHeading: str(props.highlightHeading),
+        subheading: str(props.subheading),
+        categories: mapBlocks(props.categories, (p) => ({ iconUrl: mapMediaUrl(p.iconImage), label: str(p.label) })),
+      };
+
+    case 'plugAndGoBlock':
+      return {
+        kind: 'plugAndGoBlock',
+        heading: str(props.heading),
+        productName: str(props.productName),
+        description: str(props.description),
+        bundleLabel: str(props.bundleLabel),
+        priceAmount: str(props.priceAmount),
+        priceSuffix: str(props.priceSuffix),
+        cta: mapButton(props.cta),
+        imageUrl: mapMediaUrl(props.image),
+        imageAlt: str(props.imageAlt),
+      };
+
+    case 'techRequirementsBlock':
+      return {
+        kind: 'techRequirementsBlock',
+        heading: str(props.heading),
+        bodyHtml: mapRichText(props.bodyHtml),
+        itemsHeading: str(props.itemsHeading),
+        itemsIntro: str(props.itemsIntro),
+        items: mapBlocks(props.items, (p) => ({ iconUrl: mapMediaUrl(p.iconImage), label: str(p.label) })),
+        perksHeading: str(props.perksHeading),
+        perks: mapBlocks(props.perks, (p) => ({
+          iconUrl: mapMediaUrl(p.iconImage),
+          heading: str(p.heading),
+          description: str(p.description),
+        })),
+      };
+
+    case 'techCallToActionBlock':
+      return {
+        kind: 'techCallToActionBlock',
+        heading: str(props.heading),
+        phoneNumber: str(props.phoneNumber),
+        phoneUrl: str(props.phoneUrl),
+        termsLabel: str(props.termsLabel),
+        termsUrl: str(props.termsUrl),
+        disclaimerHtml: mapRichText(props.disclaimerHtml),
+      };
+
+    case 'contactInfoBlock':
+      return {
+        kind: 'contactInfoBlock',
+        heading: str(props.heading),
+        cards: mapBlocks(props.cards, (p) => ({
+          heading: str(p.heading),
+          bodyHtml: mapRichText(p.bodyHtml),
+        })),
+      };
+
     default:
       return null;
   }
@@ -1213,6 +1320,8 @@ const ANY_PAGE_SECTIONS_EXPAND =
   'checklistOne[properties[$all]],' +
   'checklistTwo[properties[$all]],' +
   'items[properties[$all]],' +
+  'categories[properties[$all]],' +
+  'perks[properties[$all]],' +
   '$all]],$all]';
 
 export type AnyPageSection = HomePageSection | ProductLoanPageSection;
