@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ChevronDown, ChevronRight, Menu, Search, X } from 'lucide-react';
 import { Logo } from '../icons/Logo';
 import { NavModal } from './NavModal';
@@ -38,6 +38,7 @@ function isInternalPath(url: string): boolean {
 
 export function Header() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { data, status, error } = useAppSelector((state) => state.header);
   const menu = data?.menu ?? [];
   const loading = status === 'idle' || status === 'loading';
@@ -55,11 +56,19 @@ export function Header() {
   const closeMobile = () => setMobileOpen(false);
   const openRegisterLogin = () => setModalOpen(true);
 
+  const submitSearch = () => {
+    const term = searchTerm.trim();
+    if (!term) return;
+    navigate(`/search?q=${encodeURIComponent(term)}`);
+    setSearchOpen(false);
+  };
+
   return (
     <header className="sticky top-0 z-50 bg-brand-navy font-sans text-white shadow-md">
-      <div className="flex h-20 items-center gap-6 px-4 sm:px-6 lg:px-8">
+      <div className="flex h-20  justify-between items-center gap-6 px-4 sm:px-6 lg:px-8">
         <Link to="/en/home/" className="shrink-0" onClick={closeMobile}>
           <Logo />
+          
         </Link>
 
         <NavigationMenu className="hidden lg:flex lg:min-w-0 lg:flex-1">
@@ -386,7 +395,10 @@ export function Header() {
       {searchOpen && (
         <div className="hidden border-t border-white/10 bg-[#00224d] lg:block">
           <form
-            onSubmit={(event) => event.preventDefault()}
+            onSubmit={(event) => {
+              event.preventDefault();
+              submitSearch();
+            }}
             className="flex items-center gap-3 px-4 py-3 sm:px-6 lg:px-8"
           >
             <Search className="size-4 shrink-0 text-white/60" />

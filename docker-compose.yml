@@ -1,0 +1,91 @@
+# Deploys the full stack this project has been running on 37.27.4.29 by hand
+# all session: SQL Server, the Umbraco backend, and the React frontend, on
+# one shared "umbraco-net" network. Replaces the ad-hoc `docker run`
+# commands used to stand this up originally - same container names, same
+# network, same named volume and media bind mount, so running this against
+# the server picks up the existing database/media instead of starting over.
+#
+# Usage (on the server, from the repo root):
+#   docker compose up -d --build
+#
+# That rebuilds both app images from the current source and (re)starts all
+# three containers. SQL Server is left alone unless its own image/config
+# changes - `up` doesn't recreate a service whose definition hasn't changed,
+# so the database isn't touched by a routine redeploy.
+#
+# Every value below can be overridden via a .env file next to this one
+# (e.g. MSSQL_SA_PASSWORD=..., PUBLIC_BACKEND_URL=https://your-domain) -
+# the defaults match this project's current server setup so it runs as-is
+# with no .env file at all.
+
+services:
+  umbraco-sql:
+    image: mcr.microsoft.com/mssql/server:2025-latest
+    container_name: umbraco-sql
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:-Sera1234!@}"
+      MSSQL_PID: Developer
+      MSSQL_MEMORY_LIMIT_MB: "${MSSQL_MEMORY_LIMIT_MB:-1536}"
+    volumes:
+      - umbraco-sql-data:/var/opt/mssql
+    networks:
+      - umbraco-net
+
+  umbraco-backend:
+    build:
+      context: .
+      dockerfile: src/AcfAfricanbank.Web/Dockerfile
+    container_name: umbraco-backend
+    restart: unless-stopped
+    depends_on:
+      - umbraco-sql
+    ports:
+      - "${BACKEND_PORT:-889}:8080"
+    volumes:
+      # Real uploaded media lives on the host, outside the image/container
+      # lifecycle - same path already populated via rsync from the local
+      # dev database's own wwwroot/media. Matches BlobImage/LazyImage's
+      # own expectation that /media/<guid>/<file> resolves to a real file.
+      - ${MEDIA_HOST_PATH:-/root/platform-umbraco16-media}:/app/wwwroot/media
+    environment:
+      ConnectionStrings__umbracoDbDSN: "Server=umbraco-sql,1433;Database=${MSSQL_DATABASE:-Umbraco16_AB_CMS_10Sept};User Id=sa;Password=${MSSQL_SA_PASSWORD:-Sera1234!@};TrustServerCertificate=True;"
+      ConnectionStrings__umbracoDbDSN_ProviderName: Microsoft.Data.SqlClient
+      Umbraco__CMS__Unattended__InstallUnattended: "true"
+      Umbraco__CMS__Unattended__UnattendedUserName: "${UMBRACO_ADMIN_NAME:-Admin}"
+      Umbraco__CMS__Unattended__UnattendedUserEmail: "${UMBRACO_ADMIN_EMAIL:-sngoymunga733@gmail.com}"
+      Umbraco__CMS__Unattended__UnattendedUserPassword: "${UMBRACO_ADMIN_PASSWORD:-UmbracoAdmin1!}"
+      ASPNETCORE_ENVIRONMENT: Production
+    networks:
+      - umbraco-net
+
+  umbraco-frontend:
+    build:
+      context: ./react-ts-app
+      args:
+        # Vite inlines VITE_* at build time (not at container start), so
+        # this must point at wherever the backend is actually reachable
+        # from a browser - override via .env if deploying somewhere other
+        # than this project's own 37.27.4.29 server.
+        VITE_UMBRACO_API_BASE_URL: "${PUBLIC_BACKEND_URL:-http://37.27.4.29:889}"
+        VITE_ONLINE_UPLOAD_URL: "${VITE_ONLINE_UPLOAD_URL:-}"
+    container_name: umbraco-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-8070}:80"
+    networks:
+      - umbraco-net
+
+networks:
+  umbraco-net:
+    # Already exists on the server from the original manual setup -
+    # `external: true` tells compose to use it as-is rather than erroring
+    # on (or trying to recreate) a network that's already there.
+    external: true
+
+volumes:
+  umbraco-sql-data:
+    # Same reasoning as the network above - this already holds the real
+    # database, so it must be adopted, not recreated.
+    external: true

@@ -1296,6 +1296,143 @@ export function mapProductLoanPageSection(
 // DynamicPage.tsx, which every productLoanPage route uses for exactly
 // this reason).
 
+// businessBankingPage's own section types (create-business-schema). Not
+// scoped to the Business Banking page by any technical restriction - any
+// future dynamic page could reuse businessOfferingsBlock/cardIconFeature -
+// but businessHeroCarouselBlock is deliberately its own content type
+// rather than reusing homePage's heroCarouselBlock: mapAnySection below
+// tries mapHomePageSection first, so a shared 'heroCarouselBlock' alias
+// would always render with Home's own HeroCarousel look (see that
+// component's comment) - a dedicated alias keeps this page's own simpler
+// carousel visual distinct instead.
+export type BusinessPageSection =
+  | {
+      kind: 'businessHeroCarouselBlock';
+      slides: HeroCarouselSlide[];
+      autoAdvanceSeconds: number | null;
+      backLink: { label: string; url: string } | null;
+    }
+  | { kind: 'businessOfferingsBlock'; heading: string; cards: AudacityCard[] }
+  | {
+      kind: 'cardIconFeature';
+      iconUrl: string;
+      heading: string;
+      bodyHtml: string;
+      cta: { label: string; url: string } | null;
+      imageUrl: string;
+      imageAlt: string;
+      imageOnRight: boolean;
+    }
+  | { kind: 'textIntroBlock'; heading: string; bodyHtml: string }
+  | {
+      kind: 'benefitsPanelBlock';
+      heading: string;
+      features: string[];
+      imageUrl: string;
+      imageAlt: string;
+      imageOnRight: boolean;
+    }
+  | { kind: 'iconGridBlock'; heading: string; items: HeroProductGridItem[] }
+  | {
+      kind: 'documentRequirementsBlock';
+      heading: string;
+      categories: { categoryName: string; documents: string[] }[];
+      sizesFormatsHeading: string;
+      sizesFormatsText: string;
+    }
+  | {
+      kind: 'pricingGuideBlock';
+      heading: string;
+      links: { label: string; fileUrl: string }[];
+      imageUrl: string;
+      imageAlt: string;
+    };
+
+export function mapBusinessPageSection(
+  contentType: string,
+  props: Record<string, unknown>,
+): BusinessPageSection | null {
+  switch (contentType) {
+    case 'businessHeroCarouselBlock':
+      return {
+        kind: 'businessHeroCarouselBlock',
+        slides: mapBlocks(props.slides, mapHomeHeroSlide),
+        autoAdvanceSeconds: num(props.autoAdvanceSeconds),
+        backLink: mapButton(props.backLink),
+      };
+
+    case 'businessOfferingsBlock':
+      return {
+        kind: 'businessOfferingsBlock',
+        heading: str(props.heading),
+        cards: mapBlocks(props.cards, mapHomeContentCard),
+      };
+
+    case 'cardIconFeature':
+      return {
+        kind: 'cardIconFeature',
+        iconUrl: mapMediaUrl(props.icon),
+        heading: str(props.heading),
+        bodyHtml: mapRichText(props.bodyHtml),
+        cta: mapButton(props.cta),
+        imageUrl: mapMediaUrl(props.image),
+        imageAlt: str(props.imageAlt),
+        imageOnRight: props.imageOnRight === true,
+      };
+
+    case 'textIntroBlock':
+      return {
+        kind: 'textIntroBlock',
+        heading: str(props.heading),
+        bodyHtml: mapRichText(props.bodyHtml),
+      };
+
+    case 'benefitsPanelBlock':
+      return {
+        kind: 'benefitsPanelBlock',
+        heading: str(props.heading),
+        features: mapBlocks(props.features, (p) => str(p.text)).filter(Boolean),
+        imageUrl: mapMediaUrl(props.image),
+        imageAlt: str(props.imageAlt),
+        imageOnRight: props.imageOnRight === true,
+      };
+
+    case 'iconGridBlock':
+      return {
+        kind: 'iconGridBlock',
+        heading: str(props.heading),
+        items: mapBlocks(props.items, mapHomeGridItem),
+      };
+
+    case 'documentRequirementsBlock':
+      return {
+        kind: 'documentRequirementsBlock',
+        heading: str(props.heading),
+        categories: mapBlocks(props.categories, (p) => ({
+          categoryName: str(p.categoryName),
+          documents: mapBlocks(p.documents, (d) => str(d.text)).filter(Boolean),
+        })),
+        sizesFormatsHeading: str(props.sizesFormatsHeading),
+        sizesFormatsText: mapRichText(props.sizesFormatsText),
+      };
+
+    case 'pricingGuideBlock':
+      return {
+        kind: 'pricingGuideBlock',
+        heading: str(props.heading),
+        links: mapBlocks(props.links, (p) => ({
+          label: str(p.label),
+          fileUrl: mapMediaUrl(p.file),
+        })),
+        imageUrl: mapMediaUrl(props.image),
+        imageAlt: str(props.imageAlt),
+      };
+
+    default:
+      return null;
+  }
+}
+
 // ============================================================
 // DYNAMIC PAGES (any document type with a "sections" Block List)
 // ============================================================
@@ -1320,17 +1457,22 @@ const ANY_PAGE_SECTIONS_EXPAND =
   'checklistOne[properties[$all]],' +
   'checklistTwo[properties[$all]],' +
   'items[properties[$all]],' +
-  'categories[properties[$all]],' +
+  'categories[properties[documents[properties[$all]],$all]],' +
   'perks[properties[$all]],' +
+  'links[properties[$all]],' +
   '$all]],$all]';
 
-export type AnyPageSection = HomePageSection | ProductLoanPageSection;
+export type AnyPageSection = HomePageSection | ProductLoanPageSection | BusinessPageSection;
 
 export function mapAnySection(
   contentType: string,
   props: Record<string, unknown>,
 ): AnyPageSection | null {
-  return mapHomePageSection(contentType, props) ?? mapProductLoanPageSection(contentType, props);
+  return (
+    mapHomePageSection(contentType, props) ??
+    mapProductLoanPageSection(contentType, props) ??
+    mapBusinessPageSection(contentType, props)
+  );
 }
 
 export interface DynamicPageResult {
@@ -1956,4 +2098,51 @@ export async function fetchPersonalLoanCampaign(path: string, signal?: AbortSign
   } catch {
     return EMPTY_CAMPAIGN;
   }
+}
+
+// ============================================================
+// SITE SEARCH
+// ============================================================
+//
+// Uses the Delivery API's own `filter=name:*term*` support directly -
+// confirmed live against the real deployed content (e.g. `name:*loan*`
+// correctly matches "Product Loan Page" among 75 results) - rather than a
+// custom backend search endpoint/index, since this already works and this
+// app has no Examine-backed search API of its own to call instead.
+//
+// Only matches by content NAME (the editor-assigned node name, not body
+// copy) - that's the whole surface the Delivery API's filter exposes, so
+// this is a "find the page named X" search, not full-text. Results
+// without a `route` (element types, media-adjacent content, folders -
+// anything the Delivery API returns that isn't itself a routable page)
+// are filtered out, since there'd be nowhere to link them to.
+export interface SearchResultItem {
+  id: string;
+  name: string;
+  path: string;
+  contentType: string;
+}
+
+// Umbraco's own filter syntax breaks on a literal `:` inside the search
+// term itself (parsed as a field:value separator) - stripped rather than
+// escaped, since there's no documented escape sequence for it and a user
+// typing a colon almost certainly didn't mean it literally.
+function sanitizeSearchTerm(term: string): string {
+  return term.trim().replace(/:/g, '');
+}
+
+export async function searchContent(term: string, signal?: AbortSignal): Promise<SearchResultItem[]> {
+  const safeTerm = sanitizeSearchTerm(term);
+  if (!safeTerm) return [];
+
+  const items = await fetchContent(`?filter=name:*${encodeURIComponent(safeTerm)}*&take=50`, signal);
+
+  return items
+    .filter((item): item is RawContentItem & { route: { path: string } } => Boolean(item.route?.path))
+    .map((item) => ({
+      id: item.id,
+      name: item.name ?? '',
+      path: item.route.path,
+      contentType: item.contentType,
+    }));
 }

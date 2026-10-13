@@ -24,6 +24,14 @@ import { PlugAndGo } from '../components/ui/TechDeals/PlugAndGo';
 import { TechRequirements } from '../components/ui/TechDeals/TechRequirements';
 import { TechCallToAction } from '../components/ui/TechDeals/TechCallToAction';
 import { ContactInfo } from '../components/ui/ContactInfo/ContactInfo';
+import { BusinessHeroCarousel } from '../components/ui/BusinessBanking/BusinessHeroCarousel';
+import { BusinessOfferings } from '../components/ui/BusinessBanking/BusinessOfferings';
+import { IconFeaturePanel } from '../components/ui/BusinessBanking/IconFeaturePanel';
+import { TextIntro } from '../components/ui/BusinessBanking/TextIntro';
+import { BenefitsPanel } from '../components/ui/BusinessBanking/BenefitsPanel';
+import { IconGrid } from '../components/ui/BusinessBanking/IconGrid';
+import { DocumentRequirements } from '../components/ui/BusinessBanking/DocumentRequirements';
+import { PricingGuide } from '../components/ui/BusinessBanking/PricingGuide';
 
 // Single shared block registry, used by Home.tsx, PersonalLoanPage.tsx AND
 // DynamicPage.tsx (the catch-all route for any new CMS page - see that
@@ -488,6 +496,82 @@ export function renderPageSection(section: AnyPageSection, index: number): React
 
     case 'contactInfoBlock':
       return <ContactInfo key={index} heading={section.heading} cards={section.cards} />;
+
+    case 'businessHeroCarouselBlock':
+      return (
+        <BusinessHeroCarousel
+          key={index}
+          slides={section.slides}
+          autoAdvanceMs={
+            section.autoAdvanceSeconds ? section.autoAdvanceSeconds * 1000 : undefined
+          }
+          backLink={section.backLink}
+        />
+      );
+
+    case 'businessOfferingsBlock':
+      return <BusinessOfferings key={index} heading={section.heading} cards={section.cards} />;
+
+    case 'cardIconFeature':
+      // `sectionBackground(index + 1)` (not `sectionBackground(index)`,
+      // see techHeroBlock's own comment on this same offset) - the live
+      // page's own two panels start white, one position earlier than that
+      // convention's own gray-first default.
+      return (
+        <IconFeaturePanel
+          key={index}
+          iconUrl={section.iconUrl}
+          heading={section.heading}
+          bodyHtml={section.bodyHtml}
+          cta={section.cta}
+          imageUrl={section.imageUrl}
+          imageAlt={section.imageAlt}
+          imageOnRight={section.imageOnRight}
+          background={sectionBackground(index + 1)}
+        />
+      );
+
+    case 'textIntroBlock':
+      return <TextIntro key={index} heading={section.heading} bodyHtml={section.bodyHtml} />;
+
+    case 'benefitsPanelBlock':
+      return (
+        <BenefitsPanel
+          key={index}
+          heading={section.heading}
+          features={section.features}
+          imageUrl={section.imageUrl}
+          imageAlt={section.imageAlt}
+          imageOnRight={section.imageOnRight}
+        />
+      );
+
+    case 'iconGridBlock':
+      return <IconGrid key={index} heading={section.heading} items={section.items} />;
+
+    case 'documentRequirementsBlock':
+      return (
+        <DocumentRequirements
+          key={index}
+          heading={section.heading}
+          categories={section.categories}
+          sizesFormatsHeading={section.sizesFormatsHeading}
+          sizesFormatsText={section.sizesFormatsText}
+          background={sectionBackground(index + 1)}
+        />
+      );
+
+    case 'pricingGuideBlock':
+      return (
+        <PricingGuide
+          key={index}
+          heading={section.heading}
+          links={section.links}
+          imageUrl={section.imageUrl}
+          imageAlt={section.imageAlt}
+          background={sectionBackground(index + 1)}
+        />
+      );
 
     default:
       return null;

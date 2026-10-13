@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { fetchHomePageSections } from '../../api/contentApi';
 import type { HomePageSection } from '../../api/contentApi';
 import { renderPageSection } from '../../cms/renderPageSection';
-import './Home.css';
+
 
 // Ported from Platform/Web/Views/home.cshtml (the live site's actual
 // template - see contentApi.ts's own HOME PAGE section comment for why

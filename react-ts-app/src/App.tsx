@@ -5,6 +5,7 @@ import { KaraboChat } from './components/KaraboChat/KaraboChat'
 import { Home } from './components/Home/Home'
 import { DynamicPage } from './pages/DynamicPage/DynamicPage'
 import { GetAQuote } from './pages/GetAQuote/GetAQuote'
+import { SearchResults } from './pages/SearchResults/SearchResults'
 
 // Every Umbraco page except Home renders through the DynamicPage catch-all -
 // no per-page route/component to add here as new content gets created. It
@@ -12,9 +13,10 @@ import { GetAQuote } from './pages/GetAQuote/GetAQuote'
 // "sections" Block List content comes back, so a brand-new page just needs
 // to be published in Umbraco to work - nothing to change in this file.
 //
-// "/en/home/get-a-quote" is the one exception: static, hardcoded product-
-// picker content (see GetAQuote.tsx) rather than CMS-authored, so it's
-// special-cased ahead of the catch-all the same way "/en/home/" is.
+// "/en/home/get-a-quote" and "/search" are the two exceptions: static app
+// routes (GetAQuote.tsx's hardcoded product picker, SearchResults.tsx's
+// own site search) rather than CMS-authored pages, so both are special-
+// cased ahead of the catch-all the same way "/en/home/" is.
 function App() {
   return (
     <BrowserRouter>
@@ -25,6 +27,7 @@ function App() {
             <Route path="/" element={<Navigate to="/en/home/" replace />} />
             <Route path="/en/home/" element={<Home />} />
             <Route path="/en/home/get-a-quote" element={<GetAQuote />} />
+            <Route path="/search" element={<SearchResults />} />
             <Route path="*" element={<DynamicPage />} />
           </Routes>
         </main>

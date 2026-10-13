@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using Microsoft.Data.SqlClient;
 using Microsoft.SqlServer.Dac;
 using Umbraco.Cms.Core;
@@ -832,9 +833,32 @@ if (args.Length > 0 &&
 
             foreach (var prop in props)
             {
-                if (existing.PropertyTypes.Any(p =>
-                        p.Alias.Equals(prop.Alias, StringComparison.OrdinalIgnoreCase)))
+                var existingProp =
+                    existing.PropertyTypes.FirstOrDefault(p =>
+                        p.Alias.Equals(prop.Alias, StringComparison.OrdinalIgnoreCase));
+
+                if (existingProp != null)
                 {
+                    // Self-healing: fixes a property that was originally
+                    // created Mandatory but whose content (e.g. heroSlide's
+                    // own "image", seeded blank on purpose for pages with
+                    // no real photo available yet - see create-business-
+                    // content's own comment) is now deliberately left
+                    // blank, which otherwise fails publish with
+                    // FailedPublishContentInvalid every time (confirmed
+                    // live) regardless of how many times this command
+                    // re-runs, since this loop used to just skip an
+                    // already-existing property entirely.
+                    if (existingProp.Mandatory != prop.Mandatory)
+                    {
+                        existingProp.Mandatory = prop.Mandatory;
+                        changed = true;
+
+                        Console.WriteLine(
+                            $"  ~ UPDATED PROPERTY: {alias}.{prop.Alias} " +
+                            $"(mandatory -> {prop.Mandatory})");
+                    }
+
                     continue;
                 }
 
@@ -1035,7 +1059,13 @@ if (args.Length > 0 &&
     var heroSlide =
         GetOrCreateType(
             "heroSlide", "Hero Slide", "icon-carousel", true, false,
-            new PropSpec("image", "Image", media, true),
+            // Not mandatory - a hero slide with no real photo available
+            // yet (e.g. seeded by create-business-content/create-
+            // tap2glass-content, both of which leave it blank on purpose)
+            // must still be publishable; GetOrCreateType's own self-
+            // healing (see its comment) fixes this on an already-created
+            // heroSlide type too, not just a fresh one.
+            new PropSpec("image", "Image", media),
             new PropSpec("titleMain", "Title", txt),
             new PropSpec("titleHighlight", "Title Highlight", txt),
             new PropSpec("description", "Description", txtArea),
@@ -1813,9 +1843,32 @@ if (args.Length > 0 &&
 
             foreach (var prop in props)
             {
-                if (existing.PropertyTypes.Any(p =>
-                        p.Alias.Equals(prop.Alias, StringComparison.OrdinalIgnoreCase)))
+                var existingProp =
+                    existing.PropertyTypes.FirstOrDefault(p =>
+                        p.Alias.Equals(prop.Alias, StringComparison.OrdinalIgnoreCase));
+
+                if (existingProp != null)
                 {
+                    // Self-healing: fixes a property that was originally
+                    // created Mandatory but whose content (e.g. heroSlide's
+                    // own "image", seeded blank on purpose for pages with
+                    // no real photo available yet - see create-business-
+                    // content's own comment) is now deliberately left
+                    // blank, which otherwise fails publish with
+                    // FailedPublishContentInvalid every time (confirmed
+                    // live) regardless of how many times this command
+                    // re-runs, since this loop used to just skip an
+                    // already-existing property entirely.
+                    if (existingProp.Mandatory != prop.Mandatory)
+                    {
+                        existingProp.Mandatory = prop.Mandatory;
+                        changed = true;
+
+                        Console.WriteLine(
+                            $"  ~ UPDATED PROPERTY: {alias}.{prop.Alias} " +
+                            $"(mandatory -> {prop.Mandatory})");
+                    }
+
                     continue;
                 }
 
@@ -2392,6 +2445,2379 @@ if (args.Length > 0 &&
 }
 
 // ============================================================
+// CREATE-BUSINESS-SCHEMA COMMAND
+// ============================================================
+//
+// Builds the Document Types for the Business Banking page
+// (/en/home/business-banking/, the live africanbank.co.za page used as the
+// reference for this command - header/nav/footer excluded, body only).
+// Same pattern as create-home-schema/create-product-loan-schema above:
+// idempotent GetOrCreateType/GetOrCreateBlockListAsync helpers, a
+// dedicated Document Types folder, shared scalar Data Types looked up by
+// editor alias (reused across every create-*-schema command against the
+// same Umbraco instance).
+//
+// Shape, read off the live page's body:
+//   - Hero carousel at the top -> its own dedicated businessHeroCarouselBlock
+//     (not a reuse of homePage's heroCarouselBlock - see that type's own
+//     comment below for why a shared alias wouldn't actually render with
+//     this page's own distinct carousel look).
+//   - "Our offerings" -> a heading plus three small cards (Bank/Borrow/
+//     Invest: title + description + button). Modelled as its own element
+//     type rather than reusing contentCard, since this page's own
+//     repeating unit is specifically a "card" component - cardOffering,
+//     wrapped in a new businessOfferingsBlock the same way
+//     crossSellBlock/rewardsSectionBlock wrap their own cards.
+//   - Two icon-led feature panels (MSME Access to Finance Report, Book A
+//     Banker) -> each an icon + heading + rich-text body + button beside
+//     an image. Modelled as cardIconFeature, added directly to the page's
+//     sections twice (once per panel) rather than wrapped in its own
+//     BlockList, since these two panels aren't a repeating list under a
+//     shared heading the way the offerings cards are.
+//
+// Idempotent: re-running finds already-created types by alias and skips
+// them, same as every other create-*-schema command.
+
+if (args.Length > 0 &&
+    args[0].Equals("create-business-schema", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" CREATE BUSINESS BANKING PAGE DOCUMENT TYPE STRUCTURE");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService =
+        app.Services.GetRequiredService<IContentTypeService>();
+
+    var dataTypeService =
+        app.Services.GetRequiredService<IDataTypeService>();
+
+    var propertyEditors =
+        app.Services.GetRequiredService<PropertyEditorCollection>();
+
+    var configurationEditorJsonSerializer =
+        app.Services.GetRequiredService<IConfigurationEditorJsonSerializer>();
+
+    var shortStringHelper =
+        app.Services.GetRequiredService<IShortStringHelper>();
+
+    var contentTypeContainerService =
+        app.Services.GetRequiredService<IContentTypeContainerService>();
+
+    // --------------------------------------------------------
+    // FOLDER
+    // --------------------------------------------------------
+
+    var existingFolders =
+        (await contentTypeContainerService.GetAllAsync()).ToList();
+
+    var businessFolder =
+        existingFolders.FirstOrDefault(x =>
+            x.Name != null &&
+            x.Name.Equals("React Business Banking Page", StringComparison.OrdinalIgnoreCase) &&
+            x.ParentId == -1);
+
+    if (businessFolder == null)
+    {
+        var folderResult =
+            await contentTypeContainerService.CreateAsync(
+                null,
+                "React Business Banking Page",
+                null,
+                Constants.Security.SuperUserKey);
+
+        if (!folderResult.Success || folderResult.Result == null)
+        {
+            Console.WriteLine(
+                $"FAILED FOLDER: React Business Banking Page - {folderResult.Status}");
+
+            return;
+        }
+
+        businessFolder = folderResult.Result;
+
+        Console.WriteLine("CREATED FOLDER: React Business Banking Page");
+    }
+    else
+    {
+        Console.WriteLine("EXISTS FOLDER: React Business Banking Page");
+    }
+
+    var folderId = businessFolder.Id;
+
+    // --------------------------------------------------------
+    // SHARED SCALAR DATA TYPES (same pattern as create-home-schema/
+    // create-product-loan-schema above - see their own comments)
+    // --------------------------------------------------------
+
+    var sharedDataTypeCache =
+        new Dictionary<string, IDataType>(StringComparer.OrdinalIgnoreCase);
+
+    async Task<IDataType> GetOrCreateSharedDataTypeAsync(
+        string editorAlias,
+        string editorUiAlias,
+        string name)
+    {
+        if (sharedDataTypeCache.TryGetValue(editorAlias, out var cached))
+        {
+            return cached;
+        }
+
+        var existing =
+            (await dataTypeService.GetAllAsync())
+                .FirstOrDefault(d =>
+                    d.EditorAlias.Equals(
+                        editorAlias,
+                        StringComparison.OrdinalIgnoreCase));
+
+        if (existing != null)
+        {
+            sharedDataTypeCache[editorAlias] = existing;
+
+            Console.WriteLine($"EXISTS DATATYPE: {existing.Name}");
+
+            return existing;
+        }
+
+        if (!propertyEditors.TryGet(editorAlias, out var editor))
+        {
+            throw new InvalidOperationException(
+                $"Property editor '{editorAlias}' is not registered.");
+        }
+
+        var dataType =
+            new DataType(editor, configurationEditorJsonSerializer)
+            {
+                Name = name,
+                EditorUiAlias = editorUiAlias
+            };
+
+        var createResult =
+            await dataTypeService.CreateAsync(
+                dataType,
+                Constants.Security.SuperUserKey);
+
+        if (!createResult.Success)
+        {
+            throw new InvalidOperationException(
+                $"Could not create data type '{name}': {createResult.Status}");
+        }
+
+        sharedDataTypeCache[editorAlias] = createResult.Result;
+
+        Console.WriteLine($"CREATED DATATYPE: {name}");
+
+        return createResult.Result;
+    }
+
+    var txt =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.TextBox", "Umb.PropertyEditorUi.TextBox", "React Migration - Textstring");
+
+    var txtArea =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.TextArea", "Umb.PropertyEditorUi.TextArea", "React Migration - Textarea");
+
+    var rte =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.RichText", "Umb.PropertyEditorUi.Tiptap", "React Migration - Richtext");
+
+    var media =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.MediaPicker3", "Umb.PropertyEditorUi.MediaPicker", "React Migration - Media Picker");
+
+    var link =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.MultiUrlPicker", "Umb.PropertyEditorUi.MultiUrlPicker", "React Migration - Link Picker");
+
+    var num =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.Integer", "Umb.PropertyEditorUi.Integer", "React Migration - Number");
+
+    var boolType =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.TrueFalse", "Umb.PropertyEditorUi.Toggle", "React Migration - Toggle");
+
+    // --------------------------------------------------------
+    // ELEMENT TYPE / DOCUMENT TYPE + BLOCK LIST HELPERS
+    // (identical to create-home-schema's own - see its comments)
+    // --------------------------------------------------------
+
+    void EnsureContentTab(IContentType type)
+    {
+        if (type.PropertyGroups.Any(g =>
+                g.Alias.Equals("content", StringComparison.OrdinalIgnoreCase)))
+        {
+            return;
+        }
+
+        type.AddPropertyGroup("content", "Content");
+
+        var tab =
+            type.PropertyGroups.FirstOrDefault(g =>
+                g.Alias.Equals("content", StringComparison.OrdinalIgnoreCase));
+
+        if (tab != null)
+        {
+            tab.Type = PropertyGroupType.Tab;
+        }
+    }
+
+    IContentType GetOrCreateType(
+        string alias,
+        string name,
+        string icon,
+        bool isElement,
+        bool allowedAsRoot,
+        params PropSpec[] props)
+    {
+        var existing = contentTypeService.Get(alias);
+
+        if (existing != null)
+        {
+            var changed = false;
+
+            if (!existing.PropertyGroups.Any(g =>
+                    g.Alias.Equals("content", StringComparison.OrdinalIgnoreCase) &&
+                    g.Type == PropertyGroupType.Tab))
+            {
+                EnsureContentTab(existing);
+                changed = true;
+            }
+
+            foreach (var prop in props)
+            {
+                var existingProp =
+                    existing.PropertyTypes.FirstOrDefault(p =>
+                        p.Alias.Equals(prop.Alias, StringComparison.OrdinalIgnoreCase));
+
+                if (existingProp != null)
+                {
+                    // Self-healing: fixes a property that was originally
+                    // created Mandatory but whose content (e.g. heroSlide's
+                    // own "image", seeded blank on purpose for pages with
+                    // no real photo available yet - see create-business-
+                    // content's own comment) is now deliberately left
+                    // blank, which otherwise fails publish with
+                    // FailedPublishContentInvalid every time (confirmed
+                    // live) regardless of how many times this command
+                    // re-runs, since this loop used to just skip an
+                    // already-existing property entirely.
+                    if (existingProp.Mandatory != prop.Mandatory)
+                    {
+                        existingProp.Mandatory = prop.Mandatory;
+                        changed = true;
+
+                        Console.WriteLine(
+                            $"  ~ UPDATED PROPERTY: {alias}.{prop.Alias} " +
+                            $"(mandatory -> {prop.Mandatory})");
+                    }
+
+                    continue;
+                }
+
+                var propertyType =
+                    new PropertyType(shortStringHelper, prop.Type, prop.Alias)
+                    {
+                        Name = prop.Name,
+                        Mandatory = prop.Mandatory
+                    };
+
+                existing.AddPropertyType(propertyType, "content");
+                changed = true;
+
+                Console.WriteLine($"  + ADDED PROPERTY: {alias}.{prop.Alias}");
+            }
+
+            if (changed)
+            {
+                contentTypeService.Save(existing);
+            }
+
+            Console.WriteLine($"EXISTS TYPE: {alias}");
+
+            return existing;
+        }
+
+        var contentType =
+            new ContentType(shortStringHelper, folderId)
+            {
+                Alias = alias,
+                Name = name,
+                Icon = icon,
+                IsElement = isElement,
+                AllowedAsRoot = allowedAsRoot
+            };
+
+        EnsureContentTab(contentType);
+
+        foreach (var prop in props)
+        {
+            var propertyType =
+                new PropertyType(shortStringHelper, prop.Type, prop.Alias)
+                {
+                    Name = prop.Name,
+                    Mandatory = prop.Mandatory
+                };
+
+            contentType.AddPropertyType(propertyType, "content");
+        }
+
+        contentTypeService.Save(contentType);
+
+        Console.WriteLine($"CREATED TYPE: {alias}");
+
+        return contentType;
+    }
+
+    async Task<IDataType> GetOrCreateBlockListAsync(
+        string name,
+        params IContentType[] allowedElementTypes)
+    {
+        var desiredKeys =
+            allowedElementTypes.Select(t => t.Key.ToString()).ToList();
+
+        var existing =
+            (await dataTypeService.GetAllAsync())
+                .FirstOrDefault(d =>
+                    d.Name != null &&
+                    d.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+        if (existing != null)
+        {
+            var existingBlocks =
+                existing.ConfigurationData.TryGetValue("blocks", out var rawBlocks)
+                    ? rawBlocks
+                    : null;
+
+            var existingKeys =
+                (existingBlocks as IEnumerable<object>)?
+                    .OfType<IDictionary<string, object>>()
+                    .Select(b =>
+                        b.TryGetValue("contentElementTypeKey", out var k)
+                            ? k?.ToString()
+                            : null)
+                    .Where(k => k != null)
+                    .Cast<string>()
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase)
+                ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            var missingKeys =
+                desiredKeys.Where(k => !existingKeys.Contains(k)).ToList();
+
+            if (missingKeys.Count == 0)
+            {
+                Console.WriteLine($"EXISTS BLOCKLIST DATATYPE: {name}");
+
+                return existing;
+            }
+
+            var updatedBlocks =
+                desiredKeys
+                    .Select(k => new Dictionary<string, object>
+                    {
+                        ["contentElementTypeKey"] = k
+                    })
+                    .ToList();
+
+            existing.ConfigurationData =
+                new Dictionary<string, object> { ["blocks"] = updatedBlocks };
+
+            var updateResult =
+                await dataTypeService.UpdateAsync(
+                    existing,
+                    Constants.Security.SuperUserKey);
+
+            if (!updateResult.Success)
+            {
+                throw new InvalidOperationException(
+                    $"Could not update block list data type '{name}': " +
+                    updateResult.Status);
+            }
+
+            Console.WriteLine(
+                $"UPDATED BLOCKLIST DATATYPE: {name} " +
+                $"(+{missingKeys.Count} block type(s), {updatedBlocks.Count} total)");
+
+            return updateResult.Result;
+        }
+
+        if (!propertyEditors.TryGet("Umbraco.BlockList", out var editor))
+        {
+            throw new InvalidOperationException(
+                "Umbraco.BlockList editor is not registered.");
+        }
+
+        var blocks =
+            desiredKeys
+                .Select(k => new Dictionary<string, object>
+                {
+                    ["contentElementTypeKey"] = k
+                })
+                .ToList();
+
+        var dataType =
+            new DataType(editor, configurationEditorJsonSerializer)
+            {
+                Name = name,
+                EditorUiAlias = "Umb.PropertyEditorUi.BlockList",
+                ConfigurationData =
+                    new Dictionary<string, object> { ["blocks"] = blocks }
+            };
+
+        var createResult =
+            await dataTypeService.CreateAsync(
+                dataType,
+                Constants.Security.SuperUserKey);
+
+        if (!createResult.Success)
+        {
+            throw new InvalidOperationException(
+                $"Could not create block list data type '{name}': " +
+                createResult.Status);
+        }
+
+        Console.WriteLine(
+            $"CREATED BLOCKLIST DATATYPE: {name} " +
+            $"({blocks.Count} block type(s))");
+
+        return createResult.Result;
+    }
+
+    // ==========================================================
+    // BUSINESS HERO CAROUSEL
+    // ==========================================================
+    // Its own dedicated alias (businessHeroCarouselBlock), not a reuse of
+    // homePage's heroCarouselBlock - the live page's own carousel is a
+    // simpler, visually distinct style (plain navy band, no product grid),
+    // and the React side's mapAnySection tries Home's own section mapper
+    // first, so a shared 'heroCarouselBlock' alias would always render
+    // with Home's carousel look regardless (see
+    // BusinessHeroCarousel.tsx's own comment). heroSlide itself is still
+    // the same shared leaf element type create-home-schema defines -
+    // redeclared idempotently here same as every other shared block -
+    // only the parent carousel wrapper is dedicated.
+
+    Console.WriteLine();
+    Console.WriteLine("--- business hero carousel ---");
+
+    var heroSlide =
+        GetOrCreateType(
+            "heroSlide", "Hero Slide", "icon-carousel", true, false,
+            // Not mandatory - a hero slide with no real photo available
+            // yet (e.g. seeded by create-business-content/create-
+            // tap2glass-content, both of which leave it blank on purpose)
+            // must still be publishable; GetOrCreateType's own self-
+            // healing (see its comment) fixes this on an already-created
+            // heroSlide type too, not just a fresh one.
+            new PropSpec("image", "Image", media),
+            new PropSpec("titleMain", "Title", txt),
+            new PropSpec("titleHighlight", "Title Highlight", txt),
+            new PropSpec("description", "Description", txtArea),
+            new PropSpec("cta", "Button", link));
+
+    var businessHeroSlides =
+        await GetOrCreateBlockListAsync(
+            "React Migration - businessHeroCarouselBlock.slides", heroSlide);
+
+    var businessHeroCarouselBlock =
+        GetOrCreateType(
+            "businessHeroCarouselBlock", "Business Hero Carousel", "icon-carousel", true, false,
+            new PropSpec("slides", "Slides", businessHeroSlides),
+            new PropSpec("autoAdvanceSeconds", "Auto-Advance Seconds", num),
+            // Optional - blank on the main Business Banking page's own
+            // carousel (unset on every instance seeded before this was
+            // added, same backfill-as-blank behaviour as every other new
+            // property here). Only a sub-page under Business Banking (e.g.
+            // Tap2Glass) sets it, to show a "< Back" link above the hero
+            // pointing at the Business Banking page itself - the React
+            // side only renders that link when a real value is present
+            // (see BusinessHeroCarousel.tsx), so this never appears on the
+            // parent page's own hero.
+            new PropSpec("backLink", "Back Link (optional)", link));
+
+    // ==========================================================
+    // BUSINESS PAGE CARD COMPONENTS
+    // ==========================================================
+    // cardOffering - the three small "Our offerings" cards (Bank/Borrow/
+    // Invest): a title, a short description, and a button. cardIconFeature
+    // - the two icon-led panels (MSME Access to Finance Report, Book A
+    // Banker): an icon, a heading, a rich-text body, a button, and an
+    // image (with an imageOnRight toggle, same convention as
+    // promoSplitBlock/featureSplitBlock elsewhere in this file).
+
+    Console.WriteLine();
+    Console.WriteLine("--- business page card components ---");
+
+    var cardOffering =
+        GetOrCreateType(
+            "cardOffering", "Card - Offering", "icon-thumbnail-list", true, false,
+            new PropSpec("title", "Title", txt),
+            new PropSpec("description", "Description", txtArea),
+            new PropSpec("cta", "Button", link));
+
+    var cardIconFeature =
+        GetOrCreateType(
+            "cardIconFeature", "Card - Icon Feature", "icon-lightbulb", true, false,
+            new PropSpec("icon", "Icon", media),
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("bodyHtml", "Body", rte),
+            new PropSpec("cta", "Button", link),
+            new PropSpec("image", "Image", media),
+            new PropSpec("imageAlt", "Image Alt Text", txt),
+            new PropSpec("imageOnRight", "Image On Right", boolType));
+
+    // ==========================================================
+    // OUR OFFERINGS SECTION
+    // ==========================================================
+    // Wraps cardOffering in a heading + Block List, same shape as
+    // crossSellBlock/rewardsSectionBlock wrapping their own cards above.
+
+    var businessOfferingsCards =
+        await GetOrCreateBlockListAsync(
+            "React Migration - businessOfferingsBlock.cards", cardOffering);
+
+    var businessOfferingsBlock =
+        GetOrCreateType(
+            "businessOfferingsBlock", "Business Offerings", "icon-thumbnail-list", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("cards", "Cards", businessOfferingsCards));
+
+    // ==========================================================
+    // PLAIN TEXT INTRO + BENEFITS PANEL
+    // ==========================================================
+    // textIntroBlock - a lone heading plus a rich-text body, no image, no
+    // card (e.g. Tap2Glass's own "Why choose Tap2Glass?" intro) - none of
+    // the existing heading+body blocks fit without several unused fields
+    // (promoSplitBlock's two CTAs, heroImageBannerBlock's image), so this
+    // is intentionally the minimal shape instead of overloading one of
+    // those. benefitsPanelBlock - a heading, a green divider, and an
+    // arrow-bulleted feature list (not a checkmark list like
+    // featureChecklistBlock's own - a visually distinct card, reusing the
+    // same shared featureItem element type for its items) beside an
+    // image, wrapped in the same card look as cardIconFeature.
+
+    Console.WriteLine();
+    Console.WriteLine("--- text intro + benefits panel ---");
+
+    var textIntroBlock =
+        GetOrCreateType(
+            "textIntroBlock", "Text Intro", "icon-article", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("bodyHtml", "Body", rte));
+
+    var featureItem =
+        GetOrCreateType(
+            "featureItem", "Feature Item", "icon-bulleted-list", true, false,
+            new PropSpec("text", "Text", txt));
+
+    var benefitsPanelFeatures =
+        await GetOrCreateBlockListAsync(
+            "React Migration - benefitsPanelBlock.features", featureItem);
+
+    var benefitsPanelBlock =
+        GetOrCreateType(
+            "benefitsPanelBlock", "Benefits Panel", "icon-trophy", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("features", "Features", benefitsPanelFeatures),
+            new PropSpec("image", "Image", media),
+            new PropSpec("imageAlt", "Image Alt Text", txt),
+            new PropSpec("imageOnRight", "Image On Right", boolType));
+
+    // faqSectionBlock/faqItem - reused as-is from create-home-schema (same
+    // alias/shape, idempotent - either command can run first), e.g.
+    // Tap2Glass's own FAQ section.
+
+    var faqItem =
+        GetOrCreateType(
+            "faqItem", "FAQ Item", "icon-help-alt", true, false,
+            new PropSpec("question", "Question", txt),
+            new PropSpec("answer", "Answer", rte));
+
+    var faqItems =
+        await GetOrCreateBlockListAsync(
+            "React Migration - faqSectionBlock.items", faqItem);
+
+    var faqSectionBlock =
+        GetOrCreateType(
+            "faqSectionBlock", "FAQ Section", "icon-help-alt", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("items", "Questions", faqItems));
+
+    // ==========================================================
+    // ICON GRID, DOCUMENT REQUIREMENTS, PRICING GUIDE
+    // ==========================================================
+    // iconGridBlock - a heading plus a row of small icon+label items (no
+    // card, no description - e.g. "Easy online access"/"Free EFT deposit"
+    // on Business Transactional Account), reusing heroGridItem (icon,
+    // label, link - already shared from create-home-schema) rather than a
+    // new leaf type, since the shape is identical.
+    //
+    // documentRequirementsBlock - a heading, a tab list of named
+    // categories (documentCategory: a name plus a list of document names,
+    // reusing featureItem) and a trailing sizes/formats note.
+    //
+    // pricingGuideBlock - a heading, a list of named downloadable files
+    // beside an image. Its own dedicated leaf type (pricingLinkItem)
+    // rather than reusing downloadItem/downloadsSectionBlock - those are
+    // already claimed by Home's own DownloadsSection look (same
+    // shared-alias-different-page-visual reasoning as
+    // businessHeroCarouselBlock's own comment above).
+
+    Console.WriteLine();
+    Console.WriteLine("--- icon grid, document requirements, pricing guide ---");
+
+    var heroGridItem =
+        GetOrCreateType(
+            "heroGridItem", "Hero Grid Item", "icon-grid", true, false,
+            new PropSpec("icon", "Icon", media),
+            new PropSpec("label", "Label", txt),
+            new PropSpec("link", "Link", link));
+
+    var iconGridItems =
+        await GetOrCreateBlockListAsync(
+            "React Migration - iconGridBlock.items", heroGridItem);
+
+    var iconGridBlock =
+        GetOrCreateType(
+            "iconGridBlock", "Icon Grid", "icon-grid", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("items", "Items", iconGridItems));
+
+    var documentCategoryDocuments =
+        await GetOrCreateBlockListAsync(
+            "React Migration - documentCategory.documents", featureItem);
+
+    var documentCategory =
+        GetOrCreateType(
+            "documentCategory", "Document Category", "icon-folder", true, false,
+            new PropSpec("categoryName", "Category Name", txt),
+            new PropSpec("documents", "Documents", documentCategoryDocuments));
+
+    var documentRequirementsCategories =
+        await GetOrCreateBlockListAsync(
+            "React Migration - documentRequirementsBlock.categories", documentCategory);
+
+    var documentRequirementsBlock =
+        GetOrCreateType(
+            "documentRequirementsBlock", "Document Requirements", "icon-document", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("categories", "Categories", documentRequirementsCategories),
+            new PropSpec("sizesFormatsHeading", "Sizes/Formats Heading", txt),
+            new PropSpec("sizesFormatsText", "Sizes/Formats Text", rte));
+
+    var pricingLinkItem =
+        GetOrCreateType(
+            "pricingLinkItem", "Pricing Link Item", "icon-download-alt", true, false,
+            new PropSpec("label", "Label", txt),
+            new PropSpec("file", "File", media));
+
+    var pricingGuideLinks =
+        await GetOrCreateBlockListAsync(
+            "React Migration - pricingGuideBlock.links", pricingLinkItem);
+
+    var pricingGuideBlock =
+        GetOrCreateType(
+            "pricingGuideBlock", "Pricing Guide", "icon-download-alt", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("links", "Links", pricingGuideLinks),
+            new PropSpec("image", "Image", media),
+            new PropSpec("imageAlt", "Image Alt Text", txt));
+
+    // ==========================================================
+    // BUSINESS BANKING PAGE
+    // ==========================================================
+    // Reused generically for every Business Banking page, not just the
+    // top-level one - e.g. Tap2Glass (a sub-page under it) is its own
+    // separate businessBankingPage content node with a different mix of
+    // these same section types, same as how any page type here is reused
+    // across several real content nodes.
+
+    Console.WriteLine();
+    Console.WriteLine("--- business banking page ---");
+
+    var businessBankingPageSections =
+        await GetOrCreateBlockListAsync(
+            "React Migration - businessBankingPage.sections",
+            businessHeroCarouselBlock,
+            businessOfferingsBlock,
+            cardIconFeature,
+            textIntroBlock,
+            benefitsPanelBlock,
+            faqSectionBlock,
+            iconGridBlock,
+            documentRequirementsBlock,
+            pricingGuideBlock);
+
+    GetOrCreateType(
+        "businessBankingPage", "Business Banking Page", "icon-briefcase", false, true,
+        new PropSpec("sections", "Page Sections", businessBankingPageSections));
+
+    // ==========================================================
+    // RESULT
+    // ==========================================================
+
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine("BUSINESS BANKING PAGE SCHEMA CREATED");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+    Console.WriteLine(
+        "Document types are created empty - no content values were seeded " +
+        "from the live page. cardIconFeature has no own BlockList wrapper - " +
+        "add it directly to businessBankingPage's sections twice (once per " +
+        "panel), same as appDownloadBlock is added directly elsewhere. " +
+        "Create a Business Banking Page content node in the backoffice and " +
+        "populate it by hand.");
+
+    return;
+}
+
+// ============================================================
+// CREATE-BUSINESS-CONTENT COMMAND
+// ============================================================
+//
+// Builds one real businessBankingPage content node under the Home node
+// (so it lands at /en/home/business-banking/, matching the live page's own
+// URL), using the Document Types create-business-schema defines. Content
+// is real, ported directly from the live page's body: 3 hero carousel
+// slides, the 3 "Our offerings" cards (Bank/Borrow/Invest), and the 2 icon
+// feature panels (MSME Access to Finance Report, Book A Banker).
+//
+// Images (the vector illustrations, finfindbanner, icon-report.svg,
+// book-banker.svg) are deliberately left null - those are the live site's
+// own Media library files, not available here, same honest "no real photo
+// available" choice create-consolidation-loan-content already makes for
+// heroBannerBlock.image/appDownloadBlock.image above. Add them via the
+// backoffice's Media Picker once you have the real files. The "Book A
+// Banker" panel's own button is left null too (its real href is empty -
+// "Coming soon", not a real destination).
+//
+// Rich text (cardIconFeature.bodyHtml) uses BuildRichText below - the same
+// proven {markup, blocks:{layout,contentData,settingsData}} envelope
+// migrate-product-loan-pages' own BuildRichText already uses safely
+// elsewhere (see its own comment on why a raw guess at this shape was
+// risky before that helper existed).
+//
+// Idempotent: finds an existing "Business Banking" node by name under the
+// Home node (or wherever it was moved to) and updates its sections in
+// place rather than duplicating it, same pattern as every other content-
+// creation command above.
+
+if (args.Length > 0 &&
+    args[0].Equals("create-business-content", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" CREATE BUSINESS BANKING CONTENT");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService =
+        app.Services.GetRequiredService<IContentTypeService>();
+
+    var contentService =
+        app.Services.GetRequiredService<IContentService>();
+
+    var businessBankingPageType = contentTypeService.Get("businessBankingPage");
+    var businessHeroCarouselBlockType = contentTypeService.Get("businessHeroCarouselBlock");
+    var heroSlideType = contentTypeService.Get("heroSlide");
+    var businessOfferingsBlockType = contentTypeService.Get("businessOfferingsBlock");
+    var cardOfferingType = contentTypeService.Get("cardOffering");
+    var cardIconFeatureType = contentTypeService.Get("cardIconFeature");
+
+    if (businessBankingPageType == null || businessHeroCarouselBlockType == null ||
+        heroSlideType == null || businessOfferingsBlockType == null ||
+        cardOfferingType == null || cardIconFeatureType == null)
+    {
+        Console.WriteLine(
+            "ERROR: one or more required content types are missing - run " +
+            "'create-business-schema' first.");
+
+        return;
+    }
+
+    JsonArray BuildExternalLink(string label, string url) =>
+        new JsonArray(
+            new JsonObject
+            {
+                ["name"] = label,
+                ["target"] = null,
+                ["udi"] = null,
+                ["url"] = url,
+                ["queryString"] = null
+            });
+
+    JsonObject BuildRichText(string html) =>
+        new JsonObject
+        {
+            ["markup"] = html,
+            ["blocks"] =
+                new JsonObject
+                {
+                    ["layout"] = new JsonObject(),
+                    ["contentData"] = new JsonArray(),
+                    ["settingsData"] = new JsonArray()
+                }
+        };
+
+    JsonObject BuildBlockList(
+        IContentType elementType,
+        IEnumerable<Dictionary<string, JsonNode?>> itemsProps)
+    {
+        var layoutItems = new JsonArray();
+        var contentDataItems = new JsonArray();
+
+        foreach (var props in itemsProps)
+        {
+            var udi = $"umb://element/{Guid.NewGuid():N}";
+
+            var contentDataItem =
+                new JsonObject
+                {
+                    ["contentTypeKey"] = elementType.Key.ToString(),
+                    ["udi"] = udi
+                };
+
+            foreach (var (key, value) in props)
+            {
+                contentDataItem[key] = value;
+            }
+
+            contentDataItems.Add(contentDataItem);
+            layoutItems.Add(new JsonObject { ["contentUdi"] = udi });
+        }
+
+        return new JsonObject
+        {
+            ["layout"] = new JsonObject { ["Umbraco.BlockList"] = layoutItems },
+            ["contentData"] = contentDataItems
+        };
+    }
+
+    // --------------------------------------------------------
+    // HERO CAROUSEL - 3 slides, ported from the live carousel
+    // --------------------------------------------------------
+
+    var heroSlides =
+        BuildBlockList(
+            heroSlideType,
+            new[]
+            {
+                new Dictionary<string, JsonNode?>
+                {
+                    ["titleMain"] = "Welcome to Business and Commercial",
+                    ["description"] =
+                        "At African Bank Business and Commercial, we are here to help " +
+                        "your business grow. We offer simple solutions to support your " +
+                        "plans, manage your money, and build a better future. We listen " +
+                        "to your needs and find what works best for you.",
+                },
+                new Dictionary<string, JsonNode?>
+                {
+                    ["titleMain"] =
+                        "Need R20 000 to R5 million for your business? We will back you.",
+                    ["description"] =
+                        "Qualify for a Digital Business Loan if your business makes " +
+                        "R1 million+ in turnover per year.\n\nNo queues and no hidden " +
+                        "fees with funds paid into your account within 48 hours from " +
+                        "approval.",
+                    ["cta"] =
+                        BuildExternalLink(
+                                "Apply now", "/en/home/business-and-commercial-banking/")
+                            .ToJsonString(),
+                },
+                new Dictionary<string, JsonNode?>
+                {
+                    ["titleMain"] =
+                        "Unlock Funding Insights with the MSME Access to Finance Report",
+                    ["description"] =
+                        "Discover what lenders are looking for. Learn about funding " +
+                        "trends, common barriers to finance, and how to improve your " +
+                        "chances of approval — so you can apply with confidence and " +
+                        "grow your business.",
+                    ["cta"] =
+                        BuildExternalLink("explore", "/en/home/business-banking/contact")
+                            .ToJsonString(),
+                },
+            });
+
+    var heroCarouselUdi = $"umb://element/{Guid.NewGuid():N}";
+
+    var heroCarouselContentData =
+        new JsonObject
+        {
+            ["contentTypeKey"] = businessHeroCarouselBlockType.Key.ToString(),
+            ["udi"] = heroCarouselUdi,
+            ["slides"] = heroSlides.ToJsonString(),
+        };
+
+    // --------------------------------------------------------
+    // OUR OFFERINGS - 3 cards (Bank/Borrow/Invest)
+    // --------------------------------------------------------
+
+    var offeringCards =
+        BuildBlockList(
+            cardOfferingType,
+            new[]
+            {
+                new Dictionary<string, JsonNode?>
+                {
+                    ["title"] = "Bank",
+                    ["description"] = "Manage your business accounts securely, online.",
+                    ["cta"] = BuildExternalLink("Explore", "/en/home/bank/").ToJsonString(),
+                },
+                new Dictionary<string, JsonNode?>
+                {
+                    ["title"] = "Borrow",
+                    ["description"] =
+                        "Get the money your business needs with easy and flexible " +
+                        "financing options.",
+                    ["cta"] =
+                        BuildExternalLink(
+                                "Explore", "/en/home/business-and-commercial-banking/")
+                            .ToJsonString(),
+                },
+                new Dictionary<string, JsonNode?>
+                {
+                    ["title"] = "Invest",
+                    ["description"] =
+                        "Achieve your business goals with secure, high-return savings " +
+                        "solutions.",
+                    ["cta"] = BuildExternalLink("Explore", "/en/home/invest/").ToJsonString(),
+                },
+            });
+
+    var businessOfferingsUdi = $"umb://element/{Guid.NewGuid():N}";
+
+    var businessOfferingsContentData =
+        new JsonObject
+        {
+            ["contentTypeKey"] = businessOfferingsBlockType.Key.ToString(),
+            ["udi"] = businessOfferingsUdi,
+            ["heading"] = "Our offerings",
+            ["cards"] = offeringCards.ToJsonString(),
+        };
+
+    // --------------------------------------------------------
+    // ICON FEATURE PANELS - MSME Access to Finance Report, Book A Banker
+    // --------------------------------------------------------
+
+    var msmeReportUdi = $"umb://element/{Guid.NewGuid():N}";
+
+    var msmeReportContentData =
+        new JsonObject
+        {
+            ["contentTypeKey"] = cardIconFeatureType.Key.ToString(),
+            ["udi"] = msmeReportUdi,
+            ["heading"] = "Access to finance insights, all in one place",
+            ["bodyHtml"] =
+                BuildRichText(
+                        "<p>Gain <strong>expert-backed insights,</strong> so you can " +
+                        "apply for funding with confidence.</p><p>Download the " +
+                        "<strong>MSME Access to Finance Report</strong> and uncover " +
+                        "funding trends, common barriers, and what lenders are really " +
+                        "looking for. This report will help you understand where you " +
+                        "stand and <strong>improve your chances for approval</strong>.</p>")
+                    .ToJsonString(),
+            ["cta"] =
+                BuildExternalLink("Explore", "/en/home/business-banking/contact/")
+                    .ToJsonString(),
+            ["imageOnRight"] = true,
+        };
+
+    var bookBankerUdi = $"umb://element/{Guid.NewGuid():N}";
+
+    var bookBankerContentData =
+        new JsonObject
+        {
+            ["contentTypeKey"] = cardIconFeatureType.Key.ToString(),
+            ["udi"] = bookBankerUdi,
+            ["heading"] = "Book A Banker, banking on your schedule",
+            ["bodyHtml"] =
+                BuildRichText(
+                        "<p>With our easy online booking system, you can " +
+                        "<strong>schedule and manage</strong> a virtual meeting with " +
+                        "one of our expert Business Bankers in just 4 simple steps.</p>" +
+                        "<p>Whether you need <strong>help with business loans, " +
+                        "financial planning,</strong> or <strong>any other banking " +
+                        "needs,</strong> our experts are here to offer " +
+                        "<strong>personalised support,</strong> all from the comfort " +
+                        "of your home, office or anywhere you are.</p>")
+                    .ToJsonString(),
+            // No real cta - the live page's own button here is a disabled
+            // "Coming soon" with an empty href, not a real destination.
+            ["imageOnRight"] = true,
+        };
+
+    // --------------------------------------------------------
+    // PAGE SECTIONS - hero carousel, offerings, 2 icon feature panels
+    // --------------------------------------------------------
+
+    var sectionsValue =
+        new JsonObject
+        {
+            ["layout"] =
+                new JsonObject
+                {
+                    ["Umbraco.BlockList"] =
+                        new JsonArray(
+                            new JsonObject { ["contentUdi"] = heroCarouselUdi },
+                            new JsonObject { ["contentUdi"] = businessOfferingsUdi },
+                            new JsonObject { ["contentUdi"] = msmeReportUdi },
+                            new JsonObject { ["contentUdi"] = bookBankerUdi })
+                },
+            ["contentData"] =
+                new JsonArray(
+                    heroCarouselContentData,
+                    businessOfferingsContentData,
+                    msmeReportContentData,
+                    bookBankerContentData)
+        };
+
+    // --------------------------------------------------------
+    // PLACEMENT - as a child of the Home node, so the route comes out as
+    // /en/home/business-banking/ (Umbraco slugifies the node name)
+    // --------------------------------------------------------
+
+    var parentId = -1;
+    var parentDescription = "root";
+
+    var pageHomeType = contentTypeService.Get("pageHome");
+
+    var homeNode =
+        pageHomeType == null
+            ? null
+            : contentService
+                .GetPagedOfType(pageHomeType.Id, 0, 10, out _, null!)
+                .FirstOrDefault();
+
+    if (homeNode != null)
+    {
+        parentId = homeNode.Id;
+        parentDescription = $"child of \"{homeNode.Name}\" (id={parentId})";
+    }
+    else
+    {
+        Console.WriteLine(
+            "NOTE: no 'pageHome' content node found - creating at root instead. " +
+            "You may need to move this node under Home in the content tree " +
+            "afterward so its route matches /en/home/business-banking/.");
+    }
+
+    const string nodeName = "Business Banking";
+
+    // This site's own migrated legacy content already has a REAL page
+    // named exactly "Business Banking" directly under Home (a pre-
+    // existing baseModernUI-typed node, confirmed live) - the same
+    // situation migrate-product-loan-pages' own comment describes for
+    // productLoanPage ("two published nodes can't share a route"). Rename
+    // that legacy sibling (not touched otherwise - its own content/SEO
+    // metadata stays intact, just at a new name) to free up the exact
+    // name/route for the new businessBankingPage node below. Scoped
+    // strictly to a DIRECT CHILD of Home with the exact legacy name - this
+    // site has several unrelated "Business Banking"-named nodes elsewhere
+    // in the tree (card/File/Folder types), which this must not touch.
+    if (parentId != -1)
+    {
+        var legacySibling =
+            contentService
+                .GetPagedChildren(parentId, 0, 500, out _, null!)
+                .FirstOrDefault(n =>
+                    !n.ContentType.Alias.Equals("businessBankingPage", StringComparison.OrdinalIgnoreCase) &&
+                    n.Name != null &&
+                    n.Name.Equals(nodeName, StringComparison.OrdinalIgnoreCase));
+
+        if (legacySibling != null)
+        {
+            var legacyName = $"{legacySibling.Name} (Legacy)";
+            legacySibling.Name = legacyName;
+            contentService.Save(legacySibling);
+            var legacyPublishResult = contentService.Publish(legacySibling, new[] { "*" });
+
+            Console.WriteLine(
+                $"RENAMED LEGACY SIBLING: \"{nodeName}\" (id={legacySibling.Id}) -> " +
+                $"\"{legacyName}\" - frees up the route for the node below. " +
+                $"Publish: {legacyPublishResult.Result}");
+        }
+    }
+
+    // Self-heals the duplicate "Business Banking (1)"/"(2)"/... nodes an
+    // earlier run of this command created (before the legacy-sibling
+    // rename above existed, every run collided with that legacy node and
+    // got auto-renamed by Umbraco instead of ever finding its own
+    // previous output - this lookup only checked for an EXACT name match,
+    // which a "(1)"-suffixed name never satisfies). Matches any
+    // businessBankingPage-typed direct child of Home whose name is the
+    // target name or that name plus a Umbraco-style " (n)" suffix, keeps
+    // the oldest (lowest id) as the real node, and trashes the rest.
+    var candidateNodes =
+        (parentId == -1
+            ? contentService.GetPagedOfType(businessBankingPageType.Id, 0, 50, out _, null!)
+            : contentService.GetPagedChildren(parentId, 0, 500, out _, null!))
+            .Where(n =>
+                n.ContentType.Alias.Equals("businessBankingPage", StringComparison.OrdinalIgnoreCase) &&
+                n.Name != null &&
+                (n.Name.Equals(nodeName, StringComparison.OrdinalIgnoreCase) ||
+                 Regex.IsMatch(n.Name, $@"^{Regex.Escape(nodeName)} \(\d+\)$")))
+            .OrderBy(n => n.Id)
+            .ToList();
+
+    IContent node;
+
+    if (candidateNodes.Count > 0)
+    {
+        node = candidateNodes[0];
+
+        foreach (var duplicate in candidateNodes.Skip(1))
+        {
+            contentService.Delete(duplicate);
+
+            Console.WriteLine($"DELETED DUPLICATE: \"{duplicate.Name}\" (id={duplicate.Id})");
+        }
+
+        if (node.Name != nodeName)
+        {
+            node.Name = nodeName;
+
+            Console.WriteLine($"RENAMED: \"{candidateNodes[0].Name}\" (id={node.Id}) -> \"{nodeName}\"");
+        }
+        else
+        {
+            Console.WriteLine($"EXISTS: \"{nodeName}\" (id={node.Id}) - updating its sections.");
+        }
+
+        if (node.ParentId != parentId)
+        {
+            contentService.Move(node, parentId);
+
+            Console.WriteLine($"MOVED: \"{nodeName}\" to {parentDescription}");
+        }
+    }
+    else
+    {
+        node = contentService.Create(nodeName, parentId, "businessBankingPage");
+
+        Console.WriteLine($"CREATED: \"{nodeName}\" under {parentDescription}");
+    }
+
+    node.SetValue("sections", sectionsValue.ToJsonString());
+
+    var saveResult = contentService.Save(node);
+
+    if (!saveResult.Success)
+    {
+        Console.WriteLine($"FAILED SAVE: {node.Name} (id={node.Id})");
+
+        return;
+    }
+
+    var publishResult = contentService.Publish(node, new[] { "*" });
+
+    if (!publishResult.Success)
+    {
+        Console.WriteLine($"SAVED BUT FAILED PUBLISH: {node.Name} (id={node.Id}) - {publishResult.Result}");
+
+        return;
+    }
+
+    Console.WriteLine();
+    Console.WriteLine($"DONE. Published \"{nodeName}\" (id={node.Id}).");
+    Console.WriteLine("View it at /en/home/business-banking/");
+    Console.WriteLine(
+        "No images were set (illustrations/finfindbanner/icon-report/book-" +
+        "banker) and the 'Book A Banker' panel has no button - add those in " +
+        "the backoffice (Media Picker / Link Picker) once you have the real " +
+        "files/destination. Everything else (headings/copy/working buttons) " +
+        "is real content from the live page.");
+
+    return;
+}
+
+// ============================================================
+// FIX-HOME-ALLOWED-CHILDREN COMMAND
+// ============================================================
+//
+// Home's own Document Type (pageHome) has an empty "allowed child node
+// types" list in this database - confirmed live: it's what already lets
+// real children exist under Home today (productLoanPage, businessBankingPage,
+// homePageElements - that check is only enforced by the backoffice UI's own
+// create/move/restore flows, not by IContentService.Create/Move called
+// directly, which is how every create-*-content command above added its
+// own children without ever hitting it). It's exactly why restoring a
+// trashed node back under Home from the backoffice's Recycle Bin fails
+// with a 400 "operation was not permitted" - confirmed live via the
+// backoffice's own browser console error.
+//
+// Sets the allow-list to the content types that already exist as real
+// children of Home (read off this exact database), so the backoffice UI
+// stops blocking an action its own existing content already proves is
+// fine. Idempotent - re-running just confirms/re-sets the same list.
+//
+// Optionally also restores one specific trashed node back under Home in
+// the same run (pass its GUID as a second argument) - e.g.:
+//   dotnet run -- fix-home-allowed-children 9bd96777-5a67-488d-8c70-465a6ce7d84b
+
+if (args.Length > 0 &&
+    args[0].Equals("fix-home-allowed-children", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" FIX HOME ALLOWED CHILD TYPES");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService =
+        app.Services.GetRequiredService<IContentTypeService>();
+
+    var contentService =
+        app.Services.GetRequiredService<IContentService>();
+
+    var pageHomeType = contentTypeService.Get("pageHome");
+
+    if (pageHomeType == null)
+    {
+        Console.WriteLine("ERROR: 'pageHome' content type not found.");
+
+        return;
+    }
+
+    var childAliases =
+        new[] { "homePageElements", "productLoanPage", "businessBankingPage" };
+
+    var childTypes =
+        childAliases
+            .Select(alias => contentTypeService.Get(alias))
+            .Where(t => t != null)
+            .Cast<IContentType>()
+            .ToList();
+
+    var sort = 0;
+
+    pageHomeType.AllowedContentTypes =
+        childTypes
+            .Select(t => new ContentTypeSort(t.Key, sort++, t.Alias))
+            .ToList();
+
+    contentTypeService.Save(pageHomeType);
+
+    Console.WriteLine(
+        $"SET: pageHome's allowed child types -> " +
+        string.Join(", ", childTypes.Select(t => t.Alias)));
+
+    if (args.Length > 1 && Guid.TryParse(args[1], out var nodeKey))
+    {
+        var node = contentService.GetById(nodeKey);
+
+        if (node == null)
+        {
+            Console.WriteLine($"ERROR: no content node found with key {nodeKey}.");
+
+            return;
+        }
+
+        var homeNode =
+            contentService
+                .GetPagedOfType(pageHomeType.Id, 0, 10, out _, null!)
+                .FirstOrDefault();
+
+        if (homeNode == null)
+        {
+            Console.WriteLine("ERROR: no 'pageHome' content node found to restore under.");
+
+            return;
+        }
+
+        // Move() out of the recycle bin is the same underlying operation
+        // the backoffice's own "Restore" button performs - it un-trashes
+        // the node as part of moving it.
+        var moveResult = contentService.Move(node, homeNode.Id);
+
+        Console.WriteLine(
+            $"RESTORE: \"{node.Name}\" (id={node.Id}) -> child of " +
+            $"\"{homeNode.Name}\" (id={homeNode.Id}). Result: {moveResult}");
+    }
+
+    Console.WriteLine();
+    Console.WriteLine("DONE.");
+
+    return;
+}
+
+// ============================================================
+// CREATE-TAP2GLASS-CONTENT COMMAND
+// ============================================================
+//
+// Builds one real businessBankingPage content node under the Home node (so
+// it lands at /en/home/tap2glass/, matching the real nav link already live
+// on the site's own Business mega menu - "BANK" category, "Tap2Glass").
+// Same document type as create-business-content's own "Business Banking"
+// node above - businessBankingPage is reused generically, this is just a
+// second content node of it with a different mix of sections: a single-
+// slide hero (with a "< Back" link to the Business Banking page itself -
+// businessHeroCarouselBlock's own backLink field), a plain text intro, the
+// 3 pricing cards (no heading, no buttons - just stats), a Benefits panel,
+// and an FAQ section.
+//
+// Image (the phone mockup, the Benefits photo) and the FAQ answers are
+// deliberately left blank - the live page's own files/copy aren't
+// available here, same honest "not available" choice every other content-
+// creation command above makes for what it doesn't actually have. Add
+// those via the backoffice once you have them.
+//
+// Idempotent: finds an existing "Tap2Glass" node by name under the Home
+// node (or wherever it was moved to) and updates its sections in place
+// rather than duplicating it, same pattern as create-business-content.
+
+if (args.Length > 0 &&
+    args[0].Equals("create-tap2glass-content", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" CREATE TAP2GLASS CONTENT");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService =
+        app.Services.GetRequiredService<IContentTypeService>();
+
+    var contentService =
+        app.Services.GetRequiredService<IContentService>();
+
+    var businessBankingPageType = contentTypeService.Get("businessBankingPage");
+    var businessHeroCarouselBlockType = contentTypeService.Get("businessHeroCarouselBlock");
+    var heroSlideType = contentTypeService.Get("heroSlide");
+    var textIntroBlockType = contentTypeService.Get("textIntroBlock");
+    var businessOfferingsBlockType = contentTypeService.Get("businessOfferingsBlock");
+    var cardOfferingType = contentTypeService.Get("cardOffering");
+    var benefitsPanelBlockType = contentTypeService.Get("benefitsPanelBlock");
+    var featureItemType = contentTypeService.Get("featureItem");
+    var faqSectionBlockType = contentTypeService.Get("faqSectionBlock");
+    var faqItemType = contentTypeService.Get("faqItem");
+
+    if (businessBankingPageType == null || businessHeroCarouselBlockType == null ||
+        heroSlideType == null || textIntroBlockType == null ||
+        businessOfferingsBlockType == null || cardOfferingType == null ||
+        benefitsPanelBlockType == null || featureItemType == null ||
+        faqSectionBlockType == null || faqItemType == null)
+    {
+        Console.WriteLine(
+            "ERROR: one or more required content types are missing - run " +
+            "'create-business-schema' first.");
+
+        return;
+    }
+
+    JsonArray BuildExternalLink(string label, string url) =>
+        new JsonArray(
+            new JsonObject
+            {
+                ["name"] = label,
+                ["target"] = null,
+                ["udi"] = null,
+                ["url"] = url,
+                ["queryString"] = null
+            });
+
+    JsonObject BuildRichText(string html) =>
+        new JsonObject
+        {
+            ["markup"] = html,
+            ["blocks"] =
+                new JsonObject
+                {
+                    ["layout"] = new JsonObject(),
+                    ["contentData"] = new JsonArray(),
+                    ["settingsData"] = new JsonArray()
+                }
+        };
+
+    JsonObject BuildBlockList(
+        IContentType elementType,
+        IEnumerable<Dictionary<string, JsonNode?>> itemsProps)
+    {
+        var layoutItems = new JsonArray();
+        var contentDataItems = new JsonArray();
+
+        foreach (var props in itemsProps)
+        {
+            var udi = $"umb://element/{Guid.NewGuid():N}";
+
+            var contentDataItem =
+                new JsonObject
+                {
+                    ["contentTypeKey"] = elementType.Key.ToString(),
+                    ["udi"] = udi
+                };
+
+            foreach (var (key, value) in props)
+            {
+                contentDataItem[key] = value;
+            }
+
+            contentDataItems.Add(contentDataItem);
+            layoutItems.Add(new JsonObject { ["contentUdi"] = udi });
+        }
+
+        return new JsonObject
+        {
+            ["layout"] = new JsonObject { ["Umbraco.BlockList"] = layoutItems },
+            ["contentData"] = contentDataItems
+        };
+    }
+
+    // --------------------------------------------------------
+    // HERO - single slide, with a back link to Business Banking
+    // --------------------------------------------------------
+
+    var heroSlides =
+        BuildBlockList(
+            heroSlideType,
+            new[]
+            {
+                new Dictionary<string, JsonNode?>
+                {
+                    ["titleMain"] = "Tap2Glass",
+                    ["description"] =
+                        "Tap2Glass turns your NFC enabled Android device (phone or " +
+                        "tablet) into a card machine for easy customer payments. It's " +
+                        "a quick, cost-effective, convenient, and more importantly, a " +
+                        "secure way to transact.",
+                },
+            });
+
+    var heroCarouselUdi = $"umb://element/{Guid.NewGuid():N}";
+
+    var heroCarouselContentData =
+        new JsonObject
+        {
+            ["contentTypeKey"] = businessHeroCarouselBlockType.Key.ToString(),
+            ["udi"] = heroCarouselUdi,
+            ["slides"] = heroSlides.ToJsonString(),
+            ["backLink"] =
+                BuildExternalLink("Back", "/en/home/business-banking/").ToJsonString(),
+        };
+
+    // --------------------------------------------------------
+    // TEXT INTRO - "Why choose Tap2Glass?"
+    // --------------------------------------------------------
+
+    var textIntroUdi = $"umb://element/{Guid.NewGuid():N}";
+
+    var textIntroContentData =
+        new JsonObject
+        {
+            ["contentTypeKey"] = textIntroBlockType.Key.ToString(),
+            ["udi"] = textIntroUdi,
+            ["heading"] = "Why choose Tap2Glass?",
+            ["bodyHtml"] =
+                BuildRichText(
+                        "<p>A smarter way to manage your business and get paid—anytime, " +
+                        "anywhere. Just load Tap2Glass on your mobile device and your " +
+                        "customers can pay you instantly through the Tap2Glass App.</p>" +
+                        "<p><strong>A Business Transactional Account is required to use " +
+                        "the App.</strong></p>")
+                    .ToJsonString(),
+        };
+
+    // --------------------------------------------------------
+    // PRICING CARDS - 3 stats, no heading, no buttons
+    // --------------------------------------------------------
+
+    var pricingCards =
+        BuildBlockList(
+            cardOfferingType,
+            new[]
+            {
+                new Dictionary<string, JsonNode?>
+                {
+                    ["title"] = "2.5% fixed rate",
+                    ["description"] = "Only 2.5%* per transaction – a super-low fixed rate.",
+                },
+                new Dictionary<string, JsonNode?>
+                {
+                    ["title"] = "R8.00 cash out fee",
+                    ["description"] =
+                        "Pay only R8.00* to transfer money from Tap2Glass to your Bank " +
+                        "account.",
+                },
+                new Dictionary<string, JsonNode?>
+                {
+                    ["title"] = "Value for you",
+                    ["description"] =
+                        "No hidden fees – free to download with no monthly " +
+                        "subscriptions. Data charges may apply from your mobile " +
+                        "network provider.\n\n* Fees and rates shown are exclusive of " +
+                        "VAT. VAT will be added where applicable..",
+                },
+            });
+
+    var pricingCardsUdi = $"umb://element/{Guid.NewGuid():N}";
+
+    var pricingCardsContentData =
+        new JsonObject
+        {
+            ["contentTypeKey"] = businessOfferingsBlockType.Key.ToString(),
+            ["udi"] = pricingCardsUdi,
+            ["heading"] = "",
+            ["cards"] = pricingCards.ToJsonString(),
+        };
+
+    // --------------------------------------------------------
+    // BENEFITS PANEL
+    // --------------------------------------------------------
+
+    var benefitsFeatures =
+        BuildBlockList(
+            featureItemType,
+            new[]
+            {
+                new Dictionary<string, JsonNode?>
+                {
+                    ["text"] = "Easy payments: Payments made easy for you and your customers.",
+                },
+                new Dictionary<string, JsonNode?>
+                {
+                    ["text"] =
+                        "Real-time tracking and reporting: See transactions instantly " +
+                        "for better business and financial control.",
+                },
+                new Dictionary<string, JsonNode?>
+                {
+                    ["text"] = "Mobile-friendly: Set up in minutes, receive payments on the go.",
+                },
+            });
+
+    var benefitsPanelUdi = $"umb://element/{Guid.NewGuid():N}";
+
+    var benefitsPanelContentData =
+        new JsonObject
+        {
+            ["contentTypeKey"] = benefitsPanelBlockType.Key.ToString(),
+            ["udi"] = benefitsPanelUdi,
+            ["heading"] = "Benefits",
+            ["features"] = benefitsFeatures.ToJsonString(),
+            ["imageOnRight"] = true,
+        };
+
+    // --------------------------------------------------------
+    // FAQ
+    // --------------------------------------------------------
+    // Answers are a placeholder - the live page's accordions were closed
+    // with no answer text visible to port, so this is honestly blank
+    // rather than a guess. Fill the real answers in via the backoffice.
+
+    var placeholderAnswer =
+        BuildRichText("<p>Add the real answer in the backoffice.</p>").ToJsonString();
+
+    var faqItems =
+        BuildBlockList(
+            faqItemType,
+            new[]
+            {
+                new Dictionary<string, JsonNode?>
+                {
+                    ["question"] = "What types of payments can be accepted through the Tap2Glass App?",
+                    ["answer"] = placeholderAnswer,
+                },
+                new Dictionary<string, JsonNode?>
+                {
+                    ["question"] = "What cards can be used on Tap2Glass?",
+                    ["answer"] = placeholderAnswer,
+                },
+                new Dictionary<string, JsonNode?>
+                {
+                    ["question"] = "Does Tap2Glass accept payments from Samsung Pay or Apple Pay?",
+                    ["answer"] = placeholderAnswer,
+                },
+            });
+
+    var faqUdi = $"umb://element/{Guid.NewGuid():N}";
+
+    var faqContentData =
+        new JsonObject
+        {
+            ["contentTypeKey"] = faqSectionBlockType.Key.ToString(),
+            ["udi"] = faqUdi,
+            ["heading"] = "FAQ",
+            ["items"] = faqItems.ToJsonString(),
+        };
+
+    // --------------------------------------------------------
+    // PAGE SECTIONS
+    // --------------------------------------------------------
+
+    var sectionsValue =
+        new JsonObject
+        {
+            ["layout"] =
+                new JsonObject
+                {
+                    ["Umbraco.BlockList"] =
+                        new JsonArray(
+                            new JsonObject { ["contentUdi"] = heroCarouselUdi },
+                            new JsonObject { ["contentUdi"] = textIntroUdi },
+                            new JsonObject { ["contentUdi"] = pricingCardsUdi },
+                            new JsonObject { ["contentUdi"] = benefitsPanelUdi },
+                            new JsonObject { ["contentUdi"] = faqUdi })
+                },
+            ["contentData"] =
+                new JsonArray(
+                    heroCarouselContentData,
+                    textIntroContentData,
+                    pricingCardsContentData,
+                    benefitsPanelContentData,
+                    faqContentData)
+        };
+
+    // --------------------------------------------------------
+    // PLACEMENT - as a child of the Home node, so the route comes out as
+    // /en/home/tap2glass/ (Umbraco slugifies the node name)
+    // --------------------------------------------------------
+
+    var parentId = -1;
+    var parentDescription = "root";
+
+    var pageHomeType = contentTypeService.Get("pageHome");
+
+    var homeNode =
+        pageHomeType == null
+            ? null
+            : contentService
+                .GetPagedOfType(pageHomeType.Id, 0, 10, out _, null!)
+                .FirstOrDefault();
+
+    if (homeNode != null)
+    {
+        parentId = homeNode.Id;
+        parentDescription = $"child of \"{homeNode.Name}\" (id={parentId})";
+    }
+    else
+    {
+        Console.WriteLine(
+            "NOTE: no 'pageHome' content node found - creating at root instead. " +
+            "You may need to move this node under Home in the content tree " +
+            "afterward so its route matches /en/home/tap2glass/.");
+    }
+
+    const string nodeName = "Tap2Glass";
+
+    // This site's own migrated legacy content already has a REAL page
+    // named "tap2Glass" directly under Home (a pre-existing baseModernUI-
+    // typed node, confirmed live) - same situation as create-business-
+    // content's own rename below handles for "Business Banking", see that
+    // comment. Scoped strictly to a direct child of Home with the exact
+    // legacy name (case-insensitive) - several unrelated "Tap2Glass"-named
+    // nodes exist elsewhere in the tree, which this must not touch.
+    if (parentId != -1)
+    {
+        var legacySibling =
+            contentService
+                .GetPagedChildren(parentId, 0, 500, out _, null!)
+                .FirstOrDefault(n =>
+                    !n.ContentType.Alias.Equals("businessBankingPage", StringComparison.OrdinalIgnoreCase) &&
+                    n.Name != null &&
+                    n.Name.Equals(nodeName, StringComparison.OrdinalIgnoreCase));
+
+        if (legacySibling != null)
+        {
+            var legacyName = $"{legacySibling.Name} (Legacy)";
+            legacySibling.Name = legacyName;
+            contentService.Save(legacySibling);
+            var legacyPublishResult = contentService.Publish(legacySibling, new[] { "*" });
+
+            Console.WriteLine(
+                $"RENAMED LEGACY SIBLING: \"{nodeName}\" (id={legacySibling.Id}) -> " +
+                $"\"{legacyName}\" - frees up the route for the node below. " +
+                $"Publish: {legacyPublishResult.Result}");
+        }
+    }
+
+    // Self-heals any duplicate "Tap2Glass (1)"/"(2)"/... nodes a prior run
+    // created before this rename step existed - see create-business-
+    // content's own identical comment above for why.
+    var candidateNodes =
+        (parentId == -1
+            ? contentService.GetPagedOfType(businessBankingPageType.Id, 0, 50, out _, null!)
+            : contentService.GetPagedChildren(parentId, 0, 500, out _, null!))
+            .Where(n =>
+                n.ContentType.Alias.Equals("businessBankingPage", StringComparison.OrdinalIgnoreCase) &&
+                n.Name != null &&
+                (n.Name.Equals(nodeName, StringComparison.OrdinalIgnoreCase) ||
+                 Regex.IsMatch(n.Name, $@"^{Regex.Escape(nodeName)} \(\d+\)$")))
+            .OrderBy(n => n.Id)
+            .ToList();
+
+    IContent node;
+
+    if (candidateNodes.Count > 0)
+    {
+        node = candidateNodes[0];
+
+        foreach (var duplicate in candidateNodes.Skip(1))
+        {
+            contentService.Delete(duplicate);
+
+            Console.WriteLine($"DELETED DUPLICATE: \"{duplicate.Name}\" (id={duplicate.Id})");
+        }
+
+        if (node.Name != nodeName)
+        {
+            node.Name = nodeName;
+
+            Console.WriteLine($"RENAMED: \"{candidateNodes[0].Name}\" (id={node.Id}) -> \"{nodeName}\"");
+        }
+        else
+        {
+            Console.WriteLine($"EXISTS: \"{nodeName}\" (id={node.Id}) - updating its sections.");
+        }
+
+        if (node.ParentId != parentId)
+        {
+            contentService.Move(node, parentId);
+
+            Console.WriteLine($"MOVED: \"{nodeName}\" to {parentDescription}");
+        }
+    }
+    else
+    {
+        node = contentService.Create(nodeName, parentId, "businessBankingPage");
+
+        Console.WriteLine($"CREATED: \"{nodeName}\" under {parentDescription}");
+    }
+
+    node.SetValue("sections", sectionsValue.ToJsonString());
+
+    var saveResult = contentService.Save(node);
+
+    if (!saveResult.Success)
+    {
+        Console.WriteLine($"FAILED SAVE: {node.Name} (id={node.Id})");
+
+        return;
+    }
+
+    var publishResult = contentService.Publish(node, new[] { "*" });
+
+    if (!publishResult.Success)
+    {
+        Console.WriteLine($"SAVED BUT FAILED PUBLISH: {node.Name} (id={node.Id}) - {publishResult.Result}");
+
+        return;
+    }
+
+    Console.WriteLine();
+    Console.WriteLine($"DONE. Published \"{nodeName}\" (id={node.Id}).");
+    Console.WriteLine("View it at /en/home/tap2glass/");
+    Console.WriteLine(
+        "No images were set (the phone mockup, the Benefits photo) and the " +
+        "FAQ answers are a placeholder ('Add the real answer in the " +
+        "backoffice.') - the live page's own files/copy weren't available " +
+        "here. Add them via the backoffice (Media Picker for images, the " +
+        "Rich Text editor for each FAQ answer) once you have them. " +
+        "Everything else (headings/copy/stats/benefits) is real content " +
+        "from the live page.");
+
+    return;
+}
+
+// ============================================================
+// CREATE-BUSINESS-TRANSACTIONAL-CONTENT COMMAND
+// ============================================================
+//
+// Builds one real businessBankingPage content node under the Home node (so
+// it lands at /en/home/business-transactional-account/), using the
+// Document Types create-business-schema defines - a single-slide hero
+// (with a "< Back" link to Business Banking), a text intro, an icon-only
+// benefits row, the "Key features" panel, a second text intro, the 4
+// "Easy application" steps, the tabbed document requirements block, and
+// the pricing guide downloads list.
+//
+// Images (the debit card photo, the Key Features photo, the Pricing Guide
+// photo) and the Pricing Guide's actual PDF files are deliberately left
+// blank - not available here, same honest choice every other content-
+// creation command above makes for what it doesn't actually have. Two
+// CTAs are also left blank for the same reason: the hero's own real "Apply
+// Now" destination and Step 2/3's real destinations reuse this site's own
+// already-confirmed real URLs (get-a-quote, ib.africanbank.co.za, the Play
+// Store listing - all seen live elsewhere in this codebase), but Step 4's
+// "Learn more" (debit card activation) has no confirmed real destination
+// anywhere in this codebase, so it's left without a button rather than a
+// guessed URL.
+//
+// "Key features"' own bullet list (benefitsPanelBlock.features) loses the
+// live page's mid-sentence bold emphasis ("future-dated", "payroll", ...)
+// - featureItem (shared across many other checklists in this app) is
+// plain text, not rich text, so only a leading "Label:" prefix (Tap2Glass's
+// own Benefits panel shape) can render bold; arbitrary inline bold mid-
+// string can't without widening that shared type for every other caller.
+//
+// Idempotent: finds an existing "Business Transactional Account" node by
+// name under the Home node (or wherever it was moved to) and updates its
+// sections in place rather than duplicating it, same pattern - including
+// the legacy-sibling-rename self-heal - as create-business-content/
+// create-tap2glass-content above.
+
+if (args.Length > 0 &&
+    args[0].Equals("create-business-transactional-content", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" CREATE BUSINESS TRANSACTIONAL ACCOUNT CONTENT");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService =
+        app.Services.GetRequiredService<IContentTypeService>();
+
+    var contentService =
+        app.Services.GetRequiredService<IContentService>();
+
+    var businessBankingPageType = contentTypeService.Get("businessBankingPage");
+    var businessHeroCarouselBlockType = contentTypeService.Get("businessHeroCarouselBlock");
+    var heroSlideType = contentTypeService.Get("heroSlide");
+    var textIntroBlockType = contentTypeService.Get("textIntroBlock");
+    var iconGridBlockType = contentTypeService.Get("iconGridBlock");
+    var heroGridItemType = contentTypeService.Get("heroGridItem");
+    var benefitsPanelBlockType = contentTypeService.Get("benefitsPanelBlock");
+    var featureItemType = contentTypeService.Get("featureItem");
+    var businessOfferingsBlockType = contentTypeService.Get("businessOfferingsBlock");
+    var cardOfferingType = contentTypeService.Get("cardOffering");
+    var documentRequirementsBlockType = contentTypeService.Get("documentRequirementsBlock");
+    var documentCategoryType = contentTypeService.Get("documentCategory");
+    var pricingGuideBlockType = contentTypeService.Get("pricingGuideBlock");
+    var pricingLinkItemType = contentTypeService.Get("pricingLinkItem");
+
+    if (businessBankingPageType == null || businessHeroCarouselBlockType == null ||
+        heroSlideType == null || textIntroBlockType == null || iconGridBlockType == null ||
+        heroGridItemType == null || benefitsPanelBlockType == null || featureItemType == null ||
+        businessOfferingsBlockType == null || cardOfferingType == null ||
+        documentRequirementsBlockType == null || documentCategoryType == null ||
+        pricingGuideBlockType == null || pricingLinkItemType == null)
+    {
+        Console.WriteLine(
+            "ERROR: one or more required content types are missing - run " +
+            "'create-business-schema' first.");
+
+        return;
+    }
+
+    JsonArray BuildExternalLink(string label, string url) =>
+        new JsonArray(
+            new JsonObject
+            {
+                ["name"] = label,
+                ["target"] = null,
+                ["udi"] = null,
+                ["url"] = url,
+                ["queryString"] = null
+            });
+
+    JsonObject BuildRichText(string html) =>
+        new JsonObject
+        {
+            ["markup"] = html,
+            ["blocks"] =
+                new JsonObject
+                {
+                    ["layout"] = new JsonObject(),
+                    ["contentData"] = new JsonArray(),
+                    ["settingsData"] = new JsonArray()
+                }
+        };
+
+    JsonObject BuildBlockList(
+        IContentType elementType,
+        IEnumerable<Dictionary<string, JsonNode?>> itemsProps)
+    {
+        var layoutItems = new JsonArray();
+        var contentDataItems = new JsonArray();
+
+        foreach (var props in itemsProps)
+        {
+            var udi = $"umb://element/{Guid.NewGuid():N}";
+
+            var contentDataItem =
+                new JsonObject
+                {
+                    ["contentTypeKey"] = elementType.Key.ToString(),
+                    ["udi"] = udi
+                };
+
+            foreach (var (key, value) in props)
+            {
+                contentDataItem[key] = value;
+            }
+
+            contentDataItems.Add(contentDataItem);
+            layoutItems.Add(new JsonObject { ["contentUdi"] = udi });
+        }
+
+        return new JsonObject
+        {
+            ["layout"] = new JsonObject { ["Umbraco.BlockList"] = layoutItems },
+            ["contentData"] = contentDataItems
+        };
+    }
+
+    const string applyNowUrl =
+        "https://www.africanbank.co.za/en/home/get-a-quote?" +
+        "utm_source=Website&utm_medium=Productpage&utm_campaign=WebLead";
+
+    // --------------------------------------------------------
+    // HERO
+    // --------------------------------------------------------
+
+    var heroSlides =
+        BuildBlockList(
+            heroSlideType,
+            new[]
+            {
+                new Dictionary<string, JsonNode?>
+                {
+                    ["titleMain"] = "Business Transactional Account",
+                    ["description"] =
+                        "Manage your business better with customised payment and " +
+                        "beyond banking solutions, with an account you can access " +
+                        "anytime, anywhere.",
+                    ["cta"] = BuildExternalLink("Apply Now", applyNowUrl).ToJsonString(),
+                },
+            });
+
+    var heroUdi = $"umb://element/{Guid.NewGuid():N}";
+
+    var heroContentData =
+        new JsonObject
+        {
+            ["contentTypeKey"] = businessHeroCarouselBlockType.Key.ToString(),
+            ["udi"] = heroUdi,
+            ["slides"] = heroSlides.ToJsonString(),
+            ["backLink"] =
+                BuildExternalLink("Back", "/en/home/business-banking/").ToJsonString(),
+        };
+
+    // --------------------------------------------------------
+    // "EFFORTLESS BANKING" INTRO + ICON GRID
+    // --------------------------------------------------------
+
+    var introUdi = $"umb://element/{Guid.NewGuid():N}";
+
+    var introContentData =
+        new JsonObject
+        {
+            ["contentTypeKey"] = textIntroBlockType.Key.ToString(),
+            ["udi"] = introUdi,
+            ["heading"] = "Effortless banking for your business",
+            ["bodyHtml"] =
+                BuildRichText(
+                        "<p>Our Business Transactional Account offers a digital " +
+                        "solution with <strong>convenience, flexibility,</strong> " +
+                        "and <strong>24/7 access</strong> anytime, anywhere, " +
+                        "through our mobile app.</p><p><strong>Enjoy these " +
+                        "benefits with our Business Transactional Account:" +
+                        "</strong></p>")
+                    .ToJsonString(),
+        };
+
+    var iconGridItems =
+        BuildBlockList(
+            heroGridItemType,
+            new[]
+            {
+                new Dictionary<string, JsonNode?> { ["label"] = "Easy online access" },
+                new Dictionary<string, JsonNode?> { ["label"] = "Free EFT deposit" },
+                new Dictionary<string, JsonNode?> { ["label"] = "Low banking fees" },
+                new Dictionary<string, JsonNode?> { ["label"] = "Secure payments" },
+            });
+
+    var iconGridUdi = $"umb://element/{Guid.NewGuid():N}";
+
+    var iconGridContentData =
+        new JsonObject
+        {
+            ["contentTypeKey"] = iconGridBlockType.Key.ToString(),
+            ["udi"] = iconGridUdi,
+            ["heading"] = "",
+            ["items"] = iconGridItems.ToJsonString(),
+        };
+
+    // --------------------------------------------------------
+    // "KEY FEATURES" PANEL
+    // --------------------------------------------------------
+
+    var keyFeatures =
+        BuildBlockList(
+            featureItemType,
+            new[]
+            {
+                new Dictionary<string, JsonNode?>
+                {
+                    ["text"] =
+                        "Make payments securely, including future-dated and " +
+                        "recurring payments.",
+                },
+                new Dictionary<string, JsonNode?>
+                {
+                    ["text"] =
+                        "Delegate your authority to your staff while you " +
+                        "concentrate on managing your business.",
+                },
+                new Dictionary<string, JsonNode?>
+                {
+                    ["text"] = "Create your own payroll and payslips.",
+                },
+                new Dictionary<string, JsonNode?>
+                {
+                    ["text"] = "Customise quote and invoice templates.",
+                },
+            });
+
+    var keyFeaturesUdi = $"umb://element/{Guid.NewGuid():N}";
+
+    var keyFeaturesContentData =
+        new JsonObject
+        {
+            ["contentTypeKey"] = benefitsPanelBlockType.Key.ToString(),
+            ["udi"] = keyFeaturesUdi,
+            ["heading"] = "Key features",
+            ["features"] = keyFeatures.ToJsonString(),
+            ["imageOnRight"] = true,
+        };
+
+    // --------------------------------------------------------
+    // "EASY APPLICATION" INTRO + 4 STEPS
+    // --------------------------------------------------------
+
+    var applicationIntroUdi = $"umb://element/{Guid.NewGuid():N}";
+
+    var applicationIntroContentData =
+        new JsonObject
+        {
+            ["contentTypeKey"] = textIntroBlockType.Key.ToString(),
+            ["udi"] = applicationIntroUdi,
+            ["heading"] = "Easy application",
+            ["bodyHtml"] =
+                BuildRichText(
+                        "<p>We know you're eager to get started, so we've made " +
+                        "the process simple, for you.</p>")
+                    .ToJsonString(),
+        };
+
+    var applicationSteps =
+        BuildBlockList(
+            cardOfferingType,
+            new[]
+            {
+                new Dictionary<string, JsonNode?>
+                {
+                    ["title"] = "Step 1",
+                    ["description"] = "Apply for a Business Transactional Account.",
+                    ["cta"] = BuildExternalLink("Apply Now", applyNowUrl).ToJsonString(),
+                },
+                new Dictionary<string, JsonNode?>
+                {
+                    ["title"] = "Step 2",
+                    ["description"] = "Register for Online Banking.",
+                    ["cta"] =
+                        BuildExternalLink("Register", "https://ib.africanbank.co.za/")
+                            .ToJsonString(),
+                },
+                new Dictionary<string, JsonNode?>
+                {
+                    ["title"] = "Step 3",
+                    ["description"] = "Download our Mobile Banking App.",
+                    ["cta"] =
+                        BuildExternalLink(
+                                "Download",
+                                "https://play.google.com/store/apps/details?" +
+                                "id=za.co.android.africanbank")
+                            .ToJsonString(),
+                },
+                new Dictionary<string, JsonNode?>
+                {
+                    ["title"] = "Step 4",
+                    ["description"] = "Activate and manage your debit card.",
+                    // No real "Learn more" destination confirmed anywhere
+                    // in this codebase - left blank rather than guessed.
+                },
+            });
+
+    var applicationStepsUdi = $"umb://element/{Guid.NewGuid():N}";
+
+    var applicationStepsContentData =
+        new JsonObject
+        {
+            ["contentTypeKey"] = businessOfferingsBlockType.Key.ToString(),
+            ["udi"] = applicationStepsUdi,
+            ["heading"] = "",
+            ["cards"] = applicationSteps.ToJsonString(),
+        };
+
+    // --------------------------------------------------------
+    // DOCUMENT REQUIREMENTS
+    // --------------------------------------------------------
+
+    var privateCompanyDocuments =
+        BuildBlockList(
+            featureItemType,
+            new[]
+            {
+                new Dictionary<string, JsonNode?> { ["text"] = "CIPC Document" },
+                new Dictionary<string, JsonNode?> { ["text"] = "ID Document" },
+                new Dictionary<string, JsonNode?> { ["text"] = "Resolution Document" },
+                new Dictionary<string, JsonNode?>
+                {
+                    ["text"] =
+                        "Proof of Address (Any document issued by an independent " +
+                        "3rd party that reflects the residential address of the " +
+                        "person being verified.)",
+                },
+            });
+
+    var noDocuments = BuildBlockList(featureItemType, Array.Empty<Dictionary<string, JsonNode?>>());
+
+    var documentCategories =
+        BuildBlockList(
+            documentCategoryType,
+            new[]
+            {
+                new Dictionary<string, JsonNode?>
+                {
+                    ["categoryName"] = "Private company",
+                    ["documents"] = privateCompanyDocuments.ToJsonString(),
+                },
+                new Dictionary<string, JsonNode?>
+                {
+                    ["categoryName"] = "Sole proprietor",
+                    ["documents"] = noDocuments.ToJsonString(),
+                },
+                new Dictionary<string, JsonNode?>
+                {
+                    ["categoryName"] = "General",
+                    ["documents"] = noDocuments.ToJsonString(),
+                },
+            });
+
+    var documentRequirementsUdi = $"umb://element/{Guid.NewGuid():N}";
+
+    var documentRequirementsContentData =
+        new JsonObject
+        {
+            ["contentTypeKey"] = documentRequirementsBlockType.Key.ToString(),
+            ["udi"] = documentRequirementsUdi,
+            ["heading"] = "Documents you will need to open a Business Transactional Account",
+            ["categories"] = documentCategories.ToJsonString(),
+            ["sizesFormatsHeading"] = "Document required sizes and formats:",
+            ["sizesFormatsText"] =
+                BuildRichText(
+                        "<p>The document format required include pdf, doc, docx, " +
+                        "xls, xlsx and gif.</p><p>A maximum document size allowed " +
+                        "is 5 megabytes (MB) per document.</p>")
+                    .ToJsonString(),
+        };
+
+    // --------------------------------------------------------
+    // PRICING GUIDE
+    // --------------------------------------------------------
+
+    var pricingLinks =
+        BuildBlockList(
+            pricingLinkItemType,
+            new[]
+            {
+                new Dictionary<string, JsonNode?> { ["label"] = "Pricing guide" },
+                new Dictionary<string, JsonNode?> { ["label"] = "Privacy and Security" },
+                new Dictionary<string, JsonNode?> { ["label"] = "Terms and Conditions" },
+            });
+
+    var pricingGuideUdi = $"umb://element/{Guid.NewGuid():N}";
+
+    var pricingGuideContentData =
+        new JsonObject
+        {
+            ["contentTypeKey"] = pricingGuideBlockType.Key.ToString(),
+            ["udi"] = pricingGuideUdi,
+            ["heading"] = "Pricing guide",
+            ["links"] = pricingLinks.ToJsonString(),
+        };
+
+    // --------------------------------------------------------
+    // PAGE SECTIONS
+    // --------------------------------------------------------
+
+    var sectionsValue =
+        new JsonObject
+        {
+            ["layout"] =
+                new JsonObject
+                {
+                    ["Umbraco.BlockList"] =
+                        new JsonArray(
+                            new JsonObject { ["contentUdi"] = heroUdi },
+                            new JsonObject { ["contentUdi"] = introUdi },
+                            new JsonObject { ["contentUdi"] = iconGridUdi },
+                            new JsonObject { ["contentUdi"] = keyFeaturesUdi },
+                            new JsonObject { ["contentUdi"] = applicationIntroUdi },
+                            new JsonObject { ["contentUdi"] = applicationStepsUdi },
+                            new JsonObject { ["contentUdi"] = documentRequirementsUdi },
+                            new JsonObject { ["contentUdi"] = pricingGuideUdi })
+                },
+            ["contentData"] =
+                new JsonArray(
+                    heroContentData,
+                    introContentData,
+                    iconGridContentData,
+                    keyFeaturesContentData,
+                    applicationIntroContentData,
+                    applicationStepsContentData,
+                    documentRequirementsContentData,
+                    pricingGuideContentData)
+        };
+
+    // --------------------------------------------------------
+    // PLACEMENT - as a child of the Home node, so the route comes out as
+    // /en/home/business-transactional-account/
+    // --------------------------------------------------------
+
+    var parentId = -1;
+    var parentDescription = "root";
+
+    var pageHomeType = contentTypeService.Get("pageHome");
+
+    var homeNode =
+        pageHomeType == null
+            ? null
+            : contentService
+                .GetPagedOfType(pageHomeType.Id, 0, 10, out _, null!)
+                .FirstOrDefault();
+
+    if (homeNode != null)
+    {
+        parentId = homeNode.Id;
+        parentDescription = $"child of \"{homeNode.Name}\" (id={parentId})";
+    }
+    else
+    {
+        Console.WriteLine(
+            "NOTE: no 'pageHome' content node found - creating at root instead. " +
+            "You may need to move this node under Home in the content tree " +
+            "afterward so its route matches " +
+            "/en/home/business-transactional-account/.");
+    }
+
+    const string nodeName = "Business Transactional Account";
+
+    if (parentId != -1)
+    {
+        var legacySibling =
+            contentService
+                .GetPagedChildren(parentId, 0, 500, out _, null!)
+                .FirstOrDefault(n =>
+                    !n.ContentType.Alias.Equals("businessBankingPage", StringComparison.OrdinalIgnoreCase) &&
+                    n.Name != null &&
+                    n.Name.Equals(nodeName, StringComparison.OrdinalIgnoreCase));
+
+        if (legacySibling != null)
+        {
+            var legacyName = $"{legacySibling.Name} (Legacy)";
+            legacySibling.Name = legacyName;
+            contentService.Save(legacySibling);
+            var legacyPublishResult = contentService.Publish(legacySibling, new[] { "*" });
+
+            Console.WriteLine(
+                $"RENAMED LEGACY SIBLING: \"{nodeName}\" (id={legacySibling.Id}) -> " +
+                $"\"{legacyName}\" - frees up the route for the node below. " +
+                $"Publish: {legacyPublishResult.Result}");
+        }
+    }
+
+    var candidateNodes =
+        (parentId == -1
+            ? contentService.GetPagedOfType(businessBankingPageType.Id, 0, 50, out _, null!)
+            : contentService.GetPagedChildren(parentId, 0, 500, out _, null!))
+            .Where(n =>
+                n.ContentType.Alias.Equals("businessBankingPage", StringComparison.OrdinalIgnoreCase) &&
+                n.Name != null &&
+                (n.Name.Equals(nodeName, StringComparison.OrdinalIgnoreCase) ||
+                 Regex.IsMatch(n.Name, $@"^{Regex.Escape(nodeName)} \(\d+\)$")))
+            .OrderBy(n => n.Id)
+            .ToList();
+
+    IContent node;
+
+    if (candidateNodes.Count > 0)
+    {
+        node = candidateNodes[0];
+
+        foreach (var duplicate in candidateNodes.Skip(1))
+        {
+            contentService.Delete(duplicate);
+
+            Console.WriteLine($"DELETED DUPLICATE: \"{duplicate.Name}\" (id={duplicate.Id})");
+        }
+
+        if (node.Name != nodeName)
+        {
+            node.Name = nodeName;
+
+            Console.WriteLine($"RENAMED: \"{candidateNodes[0].Name}\" (id={node.Id}) -> \"{nodeName}\"");
+        }
+        else
+        {
+            Console.WriteLine($"EXISTS: \"{nodeName}\" (id={node.Id}) - updating its sections.");
+        }
+
+        if (node.ParentId != parentId)
+        {
+            contentService.Move(node, parentId);
+
+            Console.WriteLine($"MOVED: \"{nodeName}\" to {parentDescription}");
+        }
+    }
+    else
+    {
+        node = contentService.Create(nodeName, parentId, "businessBankingPage");
+
+        Console.WriteLine($"CREATED: \"{nodeName}\" under {parentDescription}");
+    }
+
+    node.SetValue("sections", sectionsValue.ToJsonString());
+
+    var saveResult = contentService.Save(node);
+
+    if (!saveResult.Success)
+    {
+        Console.WriteLine($"FAILED SAVE: {node.Name} (id={node.Id})");
+
+        return;
+    }
+
+    var publishResult = contentService.Publish(node, new[] { "*" });
+
+    if (!publishResult.Success)
+    {
+        Console.WriteLine($"SAVED BUT FAILED PUBLISH: {node.Name} (id={node.Id}) - {publishResult.Result}");
+
+        return;
+    }
+
+    Console.WriteLine();
+    Console.WriteLine($"DONE. Published \"{nodeName}\" (id={node.Id}).");
+    Console.WriteLine("View it at /en/home/business-transactional-account/");
+    Console.WriteLine(
+        "No images were set (debit card photo, Key Features photo, " +
+        "Pricing Guide photo) and the Pricing Guide links have no actual " +
+        "files attached, and Step 4's button has no destination - none of " +
+        "those were available here. Add them via the backoffice (Media " +
+        "Picker for images/files, Link Picker for Step 4) once you have " +
+        "them. Everything else (headings/copy/steps/document lists) is " +
+        "real content from the live page.");
+
+    return;
+}
+
+// ============================================================
 // CREATE-CONSOLIDATION-LOAN-CONTENT COMMAND
 // ============================================================
 //
@@ -2663,7 +5089,7 @@ if (args.Length > 0 &&
 
     if (!publishResult.Success)
     {
-        Console.WriteLine($"SAVED BUT FAILED PUBLISH: {node.Name} (id={node.Id})");
+        Console.WriteLine($"SAVED BUT FAILED PUBLISH: {node.Name} (id={node.Id}) - {publishResult.Result}");
 
         return;
     }
@@ -5242,7 +7668,7 @@ if (args.Length > 0 &&
 
             if (!publishResult.Success)
             {
-                Console.WriteLine($"SAVED BUT FAILED PUBLISH: {node.Name} (id={node.Id})");
+                Console.WriteLine($"SAVED BUT FAILED PUBLISH: {node.Name} (id={node.Id}) - {publishResult.Result}");
 
                 continue;
             }
