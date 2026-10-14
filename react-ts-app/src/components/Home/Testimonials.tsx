@@ -2,15 +2,7 @@ import { useEffect, useState } from 'react';
 import { Play, X } from 'lucide-react';
 import { LazyImage } from '../ui/Image/LazyImage';
 
-// Ported from the "testimonial-section" video grid in the current live home
-// page markup - replaces this file's old API-driven avatar/story carousel
-// entirely. Content comes from the CMS-managed homePage node (see
-// contentApi.ts's fetchHomePageSections) - no hardcoded fallback content.
-// The source's data-toggle="modal" / data-target="#videoModal" wiring was
-// dropped since no #videoModal markup existed anywhere in the ported source
-// - clicking a thumbnail now opens a YouTube embed in a lightweight overlay
-// instead, following the same open/onClose + body-scroll-lock pattern
-// Header/NavModal.tsx already uses for its own modal.
+
 export interface VideoTestimonial {
   id: string;
   videoId: string;

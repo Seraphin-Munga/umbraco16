@@ -2,9 +2,10 @@ import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { Play } from 'lucide-react';
 import { LazyImage } from '../ui/Image/LazyImage';
+import { Card, CardContent } from '../ui/card';
 
 // Ported from the "We back your business audacity" section of the current
-// live home page markup: a text-slider carousel (Bootstrap's own
+// live home p you'refifty nowmarkup: a text-slider carousel (Bootstrap's own
 // data-ride="carousel" / data-slide-to, not functional since no Bootstrap JS
 // is loaded here - see Header.tsx's own comment on the same point - so this
 // is plain React state instead) plus a video placeholder and two stacked
@@ -105,13 +106,15 @@ export function BusinessAudacitySection({
 
           <div className="w-full sm:w-1/2">
             {contactCards.map((card, index) => (
-              <div
-                className={`mb-[15px] flex h-[200px] w-full flex-col items-start justify-center rounded-[29px] p-5 ${CARD_BG[index % 2]}`}
+              <Card
+                className={`mb-[15px] h-[200px] w-full items-start justify-center rounded-[29px] ring-0 [--card-spacing:--spacing(5)] ${CARD_BG[index % 2]}`}
                 key={card.title}
               >
-                <h4 className="text-2xl font-semibold text-white">{card.title}</h4>
-                {card.subtitle && <p className="text-xs text-white">{card.subtitle}</p>}
-              </div>
+                <CardContent>
+                  <h4 className="text-2xl font-semibold text-white">{card.title}</h4>
+                  {card.subtitle && <p className="text-xs text-white">{card.subtitle}</p>}
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>

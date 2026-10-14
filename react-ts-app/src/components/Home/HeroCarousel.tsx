@@ -1,11 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '../ui/Button/Button';
 
-// Ported from the "#heroSlider" carousel + "#productGrid" static grid in the
-// current live home page markup - a single <section class="section-rounded-edge-3">
-// block. Content (slides/gridItems) comes from the CMS-managed homePage
-// node (see contentApi.ts's fetchHomePageSections) - no hardcoded fallback
-// content, so an empty CMS section list here just renders nothing.
+
 export interface HeroCarouselSlide {
   imageUrl: string;
   titleMain: string;

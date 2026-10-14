@@ -7,23 +7,7 @@ import { Select } from '../Input/Select';
 import { LazyImage } from '../Image/LazyImage';
 import { estimateMonthlyInstallment, formatRand } from '../../../utils/loanCalculator';
 
-// Ported from the "#loan-calculator" section of the current live home page
-// markup (originally src/components/Home/LoanCalculator.tsx, moved here so
-// it can be reused outside Home - see Home.tsx's own usage, and
-// PersonalLoanPage.tsx's own calculator section, which reuses the
-// estimateMonthlyInstallment formula but not this component, since that
-// page's surrounding layout - disclaimer text instead of an image - is
-// different).
-//
-// The repayment formula (estimateMonthlyInstallment) was found in
-// personalLoanCampaign.cshtml's `installmentEstimator` JS function - this
-// component now recalculates on every amount/term change instead of only
-// ever showing the source's static default (879.53 for 2 000 over 7
-// months). Two things from the source are intentionally dropped: a stray
-// "optioncount += 1;" text node inside the <select> (leftover template
-// output, not real content) and a mangled `<="" div="">` attribute on the
-// <img> tag (a stray closing tag that got merged into it, not a real
-// attribute).
+
 function allowDigitsOnly(event: KeyboardEvent<HTMLInputElement>) {
   const charCode = event.charCode;
   const isAllowed = charCode === 8 || charCode === 0 || charCode === 13 || (charCode >= 48 && charCode <= 57);
@@ -39,22 +23,14 @@ function formatRandCompact(value: number): string {
   return `R${Math.round(value).toLocaleString('en-US').replace(/,/g, ' ')}`;
 }
 
-// The visible track color of both range sliders - solid brand navy, no
-// value-tracking fill (matches the original's own malformed
-// `-webkit-gradient(linear, 0% 0%, 100% 0%, from(green), from(navy))` -
-// two `from()` stops with no `to()` isn't valid gradient syntax, so
-// browsers resolve it as the last color only, i.e. solid navy).
+
 const RANGE_TRACK_CLASS =
   'h-1.5 w-full cursor-pointer appearance-none rounded-full bg-brand-navy outline-none ' +
   '[&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-0 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-brand-thumb [&::-webkit-slider-thumb]:transition-all ' +
   '[&:hover::-webkit-slider-thumb]:h-6 [&:hover::-webkit-slider-thumb]:w-6 ' +
   '[&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:shadow-brand-thumb';
 
-// Input.tsx/Select.tsx now delegate to the shadcn Input/Select, which do
-// merge classes via tailwind-merge (the `cn` package) - a later color
-// utility here reliably overrides an earlier one, but the readonly
-// repayment field (navy, not black) still gets its own variant below for
-// clarity rather than overriding this one inline.
+
 const PILL_INPUT_CLASS =
   'h-[50px] w-full rounded-full border-0 bg-white px-5 text-center text-xl font-bold text-black outline-none placeholder:text-base placeholder:font-medium placeholder:text-brand-muted focus:ring-2 focus:ring-brand-focus';
 

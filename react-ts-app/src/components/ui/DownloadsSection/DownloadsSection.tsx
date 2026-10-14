@@ -10,21 +10,7 @@ export interface DownloadsSectionProps {
   background?: string;
 }
 
-// "More to read" style downloads list (downloadsSectionBlock, CMS-driven,
-// any page - see cms/renderPageSection.tsx).
-//
-// Was previously `.container`/`.row`/`.col-xl-6`/`.campaign-list`/`.col-
-// sm-9`/`.col-sm-3`/etc - most of that grid only had a `width:100%` mobile
-// fallback defined anywhere loaded (main.min.css), with no wider
-// breakpoint - see PromoSplit.tsx's own comment on why the real Bootstrap
-// grid (public/vendor/projectmagic.css/bootstrap.css) isn't loaded, so
-// each download row always stacked full-width regardless of viewport.
-// Kept that stacked-by-default behavior but added a real sm+ breakpoint
-// (75/25 split, matching the source's col-sm-9/col-sm-3 proportions)
-// instead of reproducing the broken always-stacked original. `.download-
-// btn`'s own hover color (#002b60) is real - defined in main.min.css,
-// which is loaded - and matches the brand-navy token 1:1, so the hover
-// below references that token instead of repeating the hex value.
+
 export function DownloadsSection({ heading, items, background = 'bg-brand-mist' }: DownloadsSectionProps) {
   return (
     <section className={`py-10 ${background}`}>

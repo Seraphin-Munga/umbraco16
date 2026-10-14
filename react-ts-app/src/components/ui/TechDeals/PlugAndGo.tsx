@@ -1,5 +1,6 @@
 import { Button } from '../Button/Button';
 import { LazyImage } from '../Image/LazyImage';
+import { Card } from '../card';
 
 export interface PlugAndGoCta {
   label: string;
@@ -46,8 +47,8 @@ export function PlugAndGo({
           {heading}
         </h1>
 
-        <div
-          className={`grid grid-cols-1 items-end gap-10 rounded-[30px] bg-white p-6 sm:p-10 ${hasImage ? 'md:grid-cols-2' : ''}`}
+        <Card
+          className={`grid grid-cols-1 items-end gap-10 overflow-visible rounded-[30px] bg-card p-6 shadow-none ring-0 sm:p-10 ${hasImage ? 'md:grid-cols-2' : ''}`}
         >
           <div className="flex flex-col justify-center">
             <h3 className="text-lg font-bold text-brand-ink">{productName}</h3>
@@ -75,7 +76,7 @@ export function PlugAndGo({
               <LazyImage className="block max-h-[520px] w-full object-contain" src={imageUrl} alt={imageAlt} />
             </div>
           )}
-        </div>
+        </Card>
       </div>
     </section>
   );

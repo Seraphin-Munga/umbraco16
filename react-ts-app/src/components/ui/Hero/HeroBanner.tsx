@@ -11,26 +11,7 @@ export interface HeroBannerProps {
   imageAlt?: string;
 }
 
-// Full-bleed background-photo hero (heroImageBannerBlock, CMS-driven - see
-// cms/renderPageSection.tsx) - e.g. the Personal Loan "We give credit /
-// where progress is due" hero. headingLead is the thin line,
-// headingHighlight the bold one underneath it - two plain CMS fields
-// rather than one string an author would have to remember to format a
-// certain way. Falls back to a plain black background (matches the
-// original .contact-banner's own background-color) when no photo has been
-// attached yet.
-//
-// Was previously `.section-banner`/`.contact-banner`/`.contact-overlay`/
-// `.contact-content` (own local Hero.css, ported verbatim from a live page
-// - the Personal Loan hero) plus `.major-title`/`.span-major-title`/
-// `.combo-btn`/etc from public/vendor/projectmagic.css, which isn't
-// actually loaded anywhere (see PromoSplit.tsx's own comment on that same
-// gap) - so those classNames rendered unstyled in production. Tailwind
-// classes below reproduce Hero.css's confirmed values directly instead of
-// a shared stylesheet - see LoanCalculator.tsx's own top comment for why
-// the original's malformed background gradient (two `from()` stops, no
-// `to()`) resolves to solid color, not a real gradient; this hero's own
-// linear-gradient is well-formed, so it's reproduced as an actual gradient.
+
 export function HeroBanner({
   headingLead,
   headingHighlight,

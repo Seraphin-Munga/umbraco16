@@ -20,16 +20,7 @@ export interface FeatureSplitProps {
   imageOnRight?: boolean;
 }
 
-// Two-column feature list (bold-lead lines, not a checklist) beside a
-// photo, e.g. "Why Choose MyWORLD?". Backed by featureSplitBlock
-// (CMS-driven, any page - see cms/renderPageSection.tsx). See
-// FeatureChecklist.tsx for the sibling checkmarked-list variant of this
-// same two-column shape.
-//
-// Was previously `.feature-split`/`.container`/`.row`/`.col-xl-6`/`.major-
-// title`/etc - see PromoSplit.tsx's own comment for why that stylesheet
-// (public/vendor/projectmagic.css) isn't actually loaded, so this
-// rendered unstyled.
+
 export function FeatureSplit({
   heading,
   features,

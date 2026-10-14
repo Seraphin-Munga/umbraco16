@@ -16,21 +16,7 @@ export interface HeroSplitProps {
   background?: string;
 }
 
-// Two-column product hero (heroBannerBlock, CMS-driven - see
-// cms/renderPageSection.tsx) - copy and CTA(s) on one side, a photo on the
-// other, e.g. the Consolidation Loan "Combine up to 5 loans in 1" hero.
-// Used on any page whose "sections" Block List includes a heroBannerBlock,
-// not just Product Loan pages. Renders a single centered column, with no
-// empty column reserved, when the editor hasn't attached a photo yet -
-// image is optional on this block.
-//
-// Was previously `.hero-split`/`.container`/`.row`/`.col-xl-6`/`.major-
-// title`/`.combo-btn`/etc - see PromoSplit.tsx's own comment for why that
-// stylesheet (public/vendor/projectmagic.css) isn't actually loaded, so
-// this rendered unstyled. `mt-0` below reproduces the local Hero.css
-// override this used to carry (`.hero-split.mtb-120 { margin-top: 0 }`) -
-// this always renders first on the page (a hero), so the vertical-margin
-// utility's own top half left a gap under the header.
+
 export function HeroSplit({
   heading,
   description,

@@ -6,11 +6,7 @@ export type LazyImageProps = ComponentProps<'img'> & {
   wrapperClassName?: string;
 };
 
-// Native lazy-loading (loading="lazy") plus a pulsing skeleton shown until
-// the image has actually finished loading, so CMS-driven photos below the
-// fold don't pop in against a blank gap once they scroll into view. Every
-// sizing/visual className passed in still lands on the <img> itself
-// unchanged - this only wraps it and fades it in over the skeleton.
+
 export function LazyImage({
   className,
   wrapperClassName,

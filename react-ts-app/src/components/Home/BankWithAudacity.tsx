@@ -1,10 +1,14 @@
 import type { ReactNode } from 'react';
 import { Button } from '../ui/Button/Button';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from '../ui/card';
 
-// Ported from the "#bank-with-audacity" section of the current live home
-// page markup - a static grid of product upsell cards. Content comes from
-// the CMS-managed homePage node (see contentApi.ts's fetchHomePageSections)
-// - no hardcoded fallback content.
+
 export interface AudacityCard {
   id: string;
   title: string;
@@ -33,21 +37,24 @@ export function BankWithAudacity({ cards, heading }: BankWithAudacityProps) {
 
         <div className="grid grid-cols-1 gap-[30px] sm:grid-cols-2 md:grid-cols-3" role="list">
           {cards.map((card) => (
-            <div
-              className="flex h-[170px] flex-col justify-between rounded-[29px] border border-[#f2f2f2] p-5 shadow-[0_2px_15px_rgba(50,50,105,0.1),0_1px_1px_rgba(0,0,0,0.05)]"
+            <Card
+              className="h-[170px] justify-between rounded-[29px] border-[#f2f2f2] bg-card py-0 shadow-[0_2px_15px_rgba(50,50,105,0.1),0_1px_1px_rgba(0,0,0,0.05)] ring-0 [--card-spacing:--spacing(5)]"
               role="region"
               aria-labelledby={`card-${card.id}`}
               key={card.id}
             >
-              <div>
-                <h4 id={`card-${card.id}`} className="font-semibold text-brand-ink">
+              <CardHeader className="gap-0 px-(--card-spacing) pt-(--card-spacing)">
+                <CardTitle
+                  id={`card-${card.id}`}
+                  className="font-semibold text-brand-ink"
+                >
                   {card.title}
-                </h4>
-              </div>
-              <div aria-label="Description">
+                </CardTitle>
+              </CardHeader>
+              <CardContent aria-label="Description">
                 <p className="text-sm text-brand-ink">{card.description}</p>
-              </div>
-              <div>
+              </CardContent>
+              <CardFooter className="border-t-0 bg-transparent pb-(--card-spacing)">
                 <Button
                   href={card.buttonUrl}
                   variant="brand-link"
@@ -56,8 +63,8 @@ export function BankWithAudacity({ cards, heading }: BankWithAudacityProps) {
                 >
                   {card.buttonLabel}
                 </Button>
-              </div>
-            </div>
+              </CardFooter>
+            </Card>
           ))}
         </div>
       </div>

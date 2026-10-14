@@ -1,11 +1,7 @@
 import type { ReactNode } from 'react';
 import { Button } from '../ui/Button/Button';
 
-// Ported from the "MyWORLD bank account" promo section of the current live
-// home page markup. Content comes from the CMS-managed homePage node (see
-// contentApi.ts's fetchHomePageSections) - no hardcoded fallback content,
-// so the CTA button only renders when the editor has set both a label and
-// a URL for it.
+
 interface MyWorldAccountProps {
   features: string[];
   ctaLabel?: string;

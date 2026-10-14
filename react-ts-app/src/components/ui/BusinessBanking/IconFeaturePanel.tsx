@@ -1,6 +1,7 @@
 import { ArrowRight } from 'lucide-react';
 import { Button } from '../Button/Button';
 import { BlobImage } from '../Image/BlobImage';
+import { Card, CardContent } from '../card';
 
 export interface IconFeaturePanelProps {
   iconUrl?: string;
@@ -87,21 +88,23 @@ export function IconFeaturePanel({
   return (
     <section className={`py-10 ${background}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="rounded-[20px] bg-white p-8 shadow-[0_9px_18px_0_rgba(0,0,0,0.15)] sm:p-11">
-          <div className={`grid grid-cols-1 items-center gap-10 ${hasImage ? 'md:grid-cols-2 md:gap-16' : ''}`}>
-            {imageOnRight ? (
-              <>
-                {textColumn}
-                {imageColumn}
-              </>
-            ) : (
-              <>
-                {imageColumn}
-                {textColumn}
-              </>
-            )}
-          </div>
-        </div>
+        <Card className="rounded-[20px] bg-card shadow-[0_9px_18px_0_rgba(0,0,0,0.15)] ring-0 [--card-spacing:--spacing(8)] sm:[--card-spacing:--spacing(11)]">
+          <CardContent>
+            <div className={`grid grid-cols-1 items-center gap-10 ${hasImage ? 'md:grid-cols-2 md:gap-16' : ''}`}>
+              {imageOnRight ? (
+                <>
+                  {textColumn}
+                  {imageColumn}
+                </>
+              ) : (
+                <>
+                  {imageColumn}
+                  {textColumn}
+                </>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </section>
   );

@@ -12,13 +12,7 @@ export interface FaqSectionProps {
   background?: string;
 }
 
-// FAQ accordion section (faqSectionBlock, CMS-driven, any page - see
-// cms/renderPageSection.tsx). `id` must be unique per rendered instance -
-// callers pass something derived from the section's own index/key.
-//
-// Was previously `.container`/`.row`/`.col-xl-12`/etc - see
-// PromoSplit.tsx's own comment for why that stylesheet (public/vendor/
-// projectmagic.css) isn't actually loaded, so this rendered unstyled.
+
 export function FaqSection({ id, heading, items, background = '' }: FaqSectionProps) {
   return (
     <section className={`py-[45px] ${background}`}>

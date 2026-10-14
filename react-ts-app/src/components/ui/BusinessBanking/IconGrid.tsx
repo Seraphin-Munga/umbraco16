@@ -1,3 +1,4 @@
+import { Card } from '../card';
 import type { HeroProductGridItem } from '../../Home/HeroCarousel';
 
 export interface IconGridProps {
@@ -23,10 +24,10 @@ export function IconGrid({ heading, items, background = '' }: IconGridProps) {
         <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
           {items.map((item) => {
             const content = (
-              <div className="flex h-full flex-col items-center justify-center gap-5 rounded-lg border border-brand-line bg-white px-4 py-10 text-center">
+              <Card className="h-full flex-col items-center justify-center gap-5 rounded-lg border border-brand-line bg-card px-4 py-10 text-center ring-0 shadow-none">
                 {item.iconUrl && <img src={item.iconUrl} alt="" className="h-16 w-16" loading="lazy" />}
                 <div className="text-[20px] leading-[1.2] font-semibold text-brand-navy">{item.label}</div>
-              </div>
+              </Card>
             );
 
             return item.url !== '#' ? (

@@ -1,5 +1,6 @@
 import { ArrowRight } from 'lucide-react';
 import { Button } from '../Button/Button';
+import { Card, CardContent, CardFooter } from '../card';
 import type { AudacityCard } from '../../Home/BankWithAudacity';
 
 export interface BusinessOfferingsProps {
@@ -27,25 +28,25 @@ export function BusinessOfferings({ heading, cards }: BusinessOfferingsProps) {
       <div className="bg-brand-mist py-14">
         <div className="mx-auto flex max-w-7xl flex-wrap gap-8 px-4 sm:px-6 lg:px-8">
           {cards.map((card) => (
-            <div
+            <Card
               key={card.id}
-              className="flex w-full max-w-[344px] flex-col justify-between rounded-lg bg-white p-5 text-left shadow-[0_9px_18px_0_rgba(0,0,0,0.15)]"
+              className="w-full max-w-[344px] justify-between gap-6 rounded-lg bg-card text-left shadow-[0_9px_18px_0_rgba(0,0,0,0.15)] ring-0 [--card-spacing:--spacing(5)]"
             >
-              <div>
+              <CardContent>
                 <h3 className="text-[24px] font-semibold text-brand-navy">{card.title}</h3>
                 <div className="my-[10px] h-px w-full bg-brand-green" />
                 <p className="text-base text-brand-navy">{card.description}</p>
-              </div>
+              </CardContent>
 
               {card.buttonUrl !== '#' && (
-                <div className="mt-6">
+                <CardFooter className="border-t-0 bg-transparent px-(--card-spacing) pt-0">
                   <Button href={card.buttonUrl} className="gap-2">
                     {card.buttonLabel}
                     <ArrowRight className="size-4" />
                   </Button>
-                </div>
+                </CardFooter>
               )}
-            </div>
+            </Card>
           ))}
         </div>
       </div>

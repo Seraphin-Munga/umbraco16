@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Button } from '../ui/Button/Button';
 import { LazyImage } from '../ui/Image/LazyImage';
+import { Card, CardContent, CardFooter } from '../ui/card';
 
 // Ported from the "borrow-section" / Audacious Rewards block of the current
 // live home page markup (the "borrow-section" class name is a leftover from
@@ -40,15 +41,15 @@ export function RewardsSection({ cards, heading, subheading, intro }: RewardsSec
 
         <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
           {cards.map((card) => (
-            <div className="flex h-full flex-col justify-between rounded-[29px] bg-white p-[15px]" key={card.id}>
-              <div>
+            <Card className="h-full justify-between rounded-[29px] bg-card ring-0 [--card-spacing:15px]" key={card.id}>
+              <CardContent>
                 <LazyImage className="block" src={card.imageUrl} alt={card.imageAlt} />
                 <p className="mt-4 mb-4 text-base text-brand-ink">{card.description}</p>
-              </div>
-              <div className="text-left">
+              </CardContent>
+              <CardFooter className="border-t-0 bg-transparent px-(--card-spacing) pb-(--card-spacing) pt-0 text-left">
                 <Button href={card.buttonUrl}>{card.buttonLabel}</Button>
-              </div>
-            </div>
+              </CardFooter>
+            </Card>
           ))}
         </div>
       </div>

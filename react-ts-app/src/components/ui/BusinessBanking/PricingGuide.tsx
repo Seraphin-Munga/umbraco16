@@ -1,5 +1,6 @@
 import { Download } from 'lucide-react';
 import { BlobImage } from '../Image/BlobImage';
+import { Card, CardContent } from '../card';
 
 export interface PricingGuideLink {
   label: string;
@@ -38,44 +39,42 @@ export function PricingGuide({ heading, links, imageUrl, imageAlt = '', backgrou
             living in a separate column beside it. `relative` + no
             overflow-hidden on the card itself is what lets the
             absolutely-positioned image bleed past its edges like that. */}
-        <div
-          className={`relative rounded-[20px] bg-white p-8 shadow-[0_9px_18px_0_rgba(0,0,0,0.15)] sm:p-11 ${
-            hasImage ? 'sm:pr-[280px]' : ''
-          }`}
-        >
-          <ul className="max-w-md space-y-4">
-            {links.map((link) =>
-              link.fileUrl ? (
-                <li key={link.label}>
-                  <a
-                    href={link.fileUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-2 text-sm font-semibold text-brand-green underline"
-                  >
+        <Card className="relative overflow-visible rounded-[20px] bg-card shadow-[0_9px_18px_0_rgba(0,0,0,0.15)] ring-0 [--card-spacing:--spacing(8)] sm:[--card-spacing:--spacing(11)]">
+          <CardContent className={hasImage ? 'sm:pr-[280px]' : ''}>
+            <ul className="max-w-md space-y-4">
+              {links.map((link) =>
+                link.fileUrl ? (
+                  <li key={link.label}>
+                    <a
+                      href={link.fileUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-2 text-sm font-semibold text-brand-green underline"
+                    >
+                      {link.label}
+                      <Download className="size-4" />
+                    </a>
+                  </li>
+                ) : (
+                  <li key={link.label} className="flex items-center gap-2 text-sm font-semibold text-brand-slate">
                     {link.label}
                     <Download className="size-4" />
-                  </a>
-                </li>
-              ) : (
-                <li key={link.label} className="flex items-center gap-2 text-sm font-semibold text-brand-slate">
-                  {link.label}
-                  <Download className="size-4" />
-                </li>
-              ),
-            )}
-          </ul>
+                  </li>
+                ),
+              )}
+            </ul>
 
-          {hasImage && (
-            <div className="mt-8 w-full max-w-[220px] sm:absolute sm:top-1/2 sm:right-10 sm:mt-0 sm:w-[220px] sm:-translate-y-1/2">
-              {/* Fixed aspect ratio reserves the height immediately, so
-                  nothing jumps once this lazy-loaded photo finishes
-                  loading - see BlobImage's own comment on
-                  wrapperClassName. */}
-              <BlobImage src={imageUrl} alt={imageAlt} wrapperClassName="aspect-[320/335] w-full" />
-            </div>
-          )}
-        </div>
+            {hasImage && (
+              <div className="mt-8 w-full max-w-[220px] sm:absolute sm:top-1/2 sm:right-10 sm:mt-0 sm:w-[220px] sm:-translate-y-1/2">
+                {/* Fixed aspect ratio reserves the height immediately, so
+                    nothing jumps once this lazy-loaded photo finishes
+                    loading - see BlobImage's own comment on
+                    wrapperClassName. */}
+                <BlobImage src={imageUrl} alt={imageAlt} wrapperClassName="aspect-[320/335] w-full" />
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </section>
   );

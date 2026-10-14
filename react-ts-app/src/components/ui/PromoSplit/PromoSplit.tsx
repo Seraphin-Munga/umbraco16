@@ -1,6 +1,7 @@
 import { Button } from '../Button/Button';
 import { BlobImage } from '../Image/BlobImage';
 import { LazyImage } from '../Image/LazyImage';
+import { Card } from '../card';
 
 export interface PromoSplitCta {
   label: string;
@@ -74,9 +75,9 @@ export function PromoSplit({
   const imageColumn = hasImage && (
     <div className="relative w-full">
       {imagePlain ? (
-        <div className="mx-auto w-full max-w-xs rounded-[30px] bg-white p-4 shadow-brand-hover">
+        <Card className="mx-auto w-full max-w-xs rounded-[30px] bg-card p-4 py-4 shadow-brand-hover ring-0">
           <LazyImage className="block w-full object-contain" src={imageUrl} alt={imageAlt} />
-        </div>
+        </Card>
       ) : (
         <BlobImage src={imageUrl} alt={imageAlt} />
       )}

@@ -2,11 +2,8 @@ import type { ReactNode } from 'react';
 import { Button } from '../ui/Button/Button';
 import { LazyImage } from '../ui/Image/LazyImage';
 
-// Ported from the "Download the African Bank App" section of the current
-// live home page markup. Content comes from the CMS-managed homePage node
-// (see contentApi.ts's fetchHomePageSections) - no hardcoded fallback
-// content, so the download button/image only render when the editor has
-// set them.
+
+
 interface AppDownloadSectionProps {
   downloadUrl?: string;
   downloadLabel?: string;

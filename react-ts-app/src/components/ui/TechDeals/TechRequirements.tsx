@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { LazyImage } from '../Image/LazyImage';
+import { Card, CardContent } from '../card';
 
 export interface RequirementItem {
   iconUrl: string;
@@ -78,45 +79,49 @@ export function TechRequirements({
         )}
 
         {perks.length > 0 && (
-          <div className="mt-10 rounded-[20px] bg-brand-mist p-6 sm:p-10">
-            {perksHeading && <h2 className="mb-6 text-xl font-bold text-brand-ink">{perksHeading}</h2>}
+          <Card className="mt-10 rounded-[20px] bg-brand-mist ring-0 [--card-spacing:--spacing(6)] sm:[--card-spacing:--spacing(10)]">
+            <CardContent>
+              {perksHeading && <h2 className="mb-6 text-xl font-bold text-brand-ink">{perksHeading}</h2>}
 
-            <div ref={perksTrackRef} className="flex gap-6 overflow-x-auto scroll-smooth">
-              {perks.map((perk, index) => (
-                <div
-                  key={`${perk.heading}-${index}`}
-                  className="min-w-[220px] flex-1 rounded-[20px] bg-white p-6 text-center"
-                >
-                  <div className="mx-auto mb-4 flex size-24 items-center justify-center rounded-full bg-brand-mist">
-                    {perk.iconUrl && <LazyImage className="size-14 object-contain" src={perk.iconUrl} alt="" />}
-                  </div>
-                  <p className="text-sm font-bold tracking-wide text-brand-ink uppercase">{perk.heading}</p>
-                  {perk.description && <p className="mt-2 text-xs text-brand-slate">{perk.description}</p>}
-                </div>
-              ))}
-            </div>
-
-            {perks.length > 1 && (
-              <div className="mt-6 flex justify-end gap-3">
-                <button
-                  type="button"
-                  aria-label="Previous"
-                  onClick={() => scrollPerks(-1)}
-                  className="flex size-10 items-center justify-center rounded-full bg-white text-brand-ink shadow-brand-icon transition-colors hover:bg-brand-lime hover:text-white"
-                >
-                  <ChevronLeft className="size-5" />
-                </button>
-                <button
-                  type="button"
-                  aria-label="Next"
-                  onClick={() => scrollPerks(1)}
-                  className="flex size-10 items-center justify-center rounded-full bg-white text-brand-ink shadow-brand-icon transition-colors hover:bg-brand-lime hover:text-white"
-                >
-                  <ChevronRight className="size-5" />
-                </button>
+              <div ref={perksTrackRef} className="flex gap-6 overflow-x-auto scroll-smooth">
+                {perks.map((perk, index) => (
+                  <Card
+                    key={`${perk.heading}-${index}`}
+                    className="min-w-[220px] flex-1 rounded-[20px] bg-card text-center ring-0 [--card-spacing:--spacing(6)]"
+                  >
+                    <CardContent>
+                      <div className="mx-auto mb-4 flex size-24 items-center justify-center rounded-full bg-brand-mist">
+                        {perk.iconUrl && <LazyImage className="size-14 object-contain" src={perk.iconUrl} alt="" />}
+                      </div>
+                      <p className="text-sm font-bold tracking-wide text-brand-ink uppercase">{perk.heading}</p>
+                      {perk.description && <p className="mt-2 text-xs text-brand-slate">{perk.description}</p>}
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
-            )}
-          </div>
+
+              {perks.length > 1 && (
+                <div className="mt-6 flex justify-end gap-3">
+                  <button
+                    type="button"
+                    aria-label="Previous"
+                    onClick={() => scrollPerks(-1)}
+                    className="flex size-10 items-center justify-center rounded-full bg-white text-brand-ink shadow-brand-icon transition-colors hover:bg-brand-lime hover:text-white"
+                  >
+                    <ChevronLeft className="size-5" />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Next"
+                    onClick={() => scrollPerks(1)}
+                    className="flex size-10 items-center justify-center rounded-full bg-white text-brand-ink shadow-brand-icon transition-colors hover:bg-brand-lime hover:text-white"
+                  >
+                    <ChevronRight className="size-5" />
+                  </button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         )}
       </div>
     </section>

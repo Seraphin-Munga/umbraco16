@@ -17,21 +17,13 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../u
 import { Button } from '../ui/shadcn-button';
 import { Input } from '../ui/shadcn-input';
 
-// Mirrors Configuration["online_upload"] in Navigation.cshtml, used for the
-// fallback "Upload documents" link when a menu item's link has neither a
-// real URL nor a Target set.
+
 const ONLINE_UPLOAD_URL = import.meta.env.VITE_ONLINE_UPLOAD_URL || '#';
 
 const navLinkClass =
   'text-white uppercase text-sm font-semibold tracking-wider whitespace-nowrap px-3 py-2 hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white data-active:bg-white/10';
 
-// CMS-sourced link.url values are either a relative in-app path or a fully
-// qualified off-site URL (see mapLinks' comment in contentApi.ts) - only
-// the former is safe to hand to react-router's Link (it treats its `to`
-// as an app-internal path regardless of shape, so pointing it at an
-// absolute "https://..." URL would mangle navigation instead of leaving
-// the page). "//" is excluded too since that's still protocol-relative to
-// another host.
+
 function isInternalPath(url: string): boolean {
   return url.startsWith('/') && !url.startsWith('//');
 }
@@ -394,23 +386,25 @@ export function Header() {
 
       {searchOpen && (
         <div className="hidden border-t border-white/10 bg-[#00224d] lg:block">
-          <form
-            onSubmit={(event) => {
-              event.preventDefault();
-              submitSearch();
-            }}
-            className="flex items-center gap-3 px-4 py-3 sm:px-6 lg:px-8"
-          >
-            <Search className="size-4 shrink-0 text-white/60" />
-            <Input
-              autoFocus
-              autoComplete="off"
-              placeholder="Search"
-              value={searchTerm}
-              onChange={(event) => setSearchTerm(event.target.value)}
-              className="border-none bg-transparent text-white placeholder:text-white/50 focus-visible:ring-0"
-            />
-          </form>
+          <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+            <form
+              onSubmit={(event) => {
+                event.preventDefault();
+                submitSearch();
+              }}
+              className="relative flex w-full items-center"
+            >
+              <Search className="pointer-events-none absolute left-3.5 size-4 shrink-0 text-muted-foreground" />
+              <Input
+                autoFocus
+                autoComplete="off"
+                placeholder="Search"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                className="h-11 rounded-full border-none bg-white pl-10 text-brand-ink shadow-sm placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-brand-lime"
+              />
+            </form>
+          </div>
         </div>
       )}
 

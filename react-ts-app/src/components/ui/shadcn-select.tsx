@@ -1,10 +1,7 @@
 import * as React from "react"
 import { cn } from "cn"
 
-// A native <select> styled to match shadcn-input.tsx's token language
-// (same border/background/focus-ring/disabled treatment as Input), kept as
-// a plain <select> rather than a Radix listbox so existing call sites can
-// keep using native value/onChange/<option> children unchanged.
+
 function Select({ className, ...props }: React.ComponentProps<"select">) {
   return (
     <select
