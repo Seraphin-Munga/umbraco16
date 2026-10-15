@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <CompressionEnabled>false</CompressionEnabled> <!-- Disable compression. E.g. for umbraco backoffice files. These files should be precompressed by node and not let dotnet handle it -->
@@ -8,7 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Umbraco.Cms" Version="16.5.1" />
+    <PackageReference Include="Umbraco.Cms" Version="17.7.1" />
+    <!-- Required as of Umbraco 17: ModelsMode InMemoryAuto now needs this
+         package for Razor runtime compilation - it used to be bundled with
+         Umbraco.Cms itself. -->
+    <PackageReference Include="Umbraco.Cms.DevelopmentMode.Backoffice" Version="17.7.1" />
   </ItemGroup>
 
   <ItemGroup>

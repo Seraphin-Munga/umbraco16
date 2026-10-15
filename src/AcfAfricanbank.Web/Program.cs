@@ -3636,6 +3636,514 @@ if (args.Length > 0 &&
 }
 
 // ============================================================
+// CREATE-BANKING-PAGE-STRUCTURE COMMAND
+// ============================================================
+//
+// Adds the "Personal Banking" page (new - no such node exists yet,
+// confirmed against the live local DB) as a sibling of the existing
+// "Business Banking" node under Home, then gives each of the two a shared
+// set of empty sub-pages - "Products"/"Campaigns"/"Blogs" under both, plus
+// "About Company" (Personal Banking only) and "SMEs" (Business Banking
+// only). Every new node reuses businessBankingPage (the same generic
+// "sections" Block List type create-business-content's own comment
+// describes as "reused generically for every Business Banking page, not
+// just the top-level one") rather than a new document type - these are
+// empty containers, created with no sections set, same "create it empty,
+// populate it by hand in the backoffice" choice create-business-schema's
+// own result message already makes.
+//
+// Also sets businessBankingPage's own allowed child types to itself, the
+// same fix fix-home-allowed-children below applies to pageHome - without
+// it the backoffice blocks creating/moving a page under these new parents
+// even though IContentService.Create (used below) isn't itself blocked by
+// it (see fix-home-allowed-children's own comment on why).
+//
+// Does NOT touch any existing content - the flat productLoanPage/
+// businessBankingPage siblings already under Home (Product 12% Loan,
+// Tap2Glass, Business Transactional Account, ...) are left exactly where
+// they are; nothing is moved or deleted. Idempotent: finds existing nodes
+// by exact name + type under the right parent and skips creating them
+// again.
+
+if (args.Length > 0 &&
+    args[0].Equals("create-banking-page-structure", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" CREATE PERSONAL/BUSINESS BANKING PAGE STRUCTURE");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService =
+        app.Services.GetRequiredService<IContentTypeService>();
+
+    var contentService =
+        app.Services.GetRequiredService<IContentService>();
+
+    var businessBankingPageType = contentTypeService.Get("businessBankingPage");
+
+    if (businessBankingPageType == null)
+    {
+        Console.WriteLine(
+            "ERROR: 'businessBankingPage' content type not found - run " +
+            "'create-business-schema' first.");
+
+        return;
+    }
+
+    var currentAllowed =
+        (businessBankingPageType.AllowedContentTypes ?? Enumerable.Empty<ContentTypeSort>())
+            .ToList();
+
+    // businessBankingPage itself (so Products/Campaigns/Blogs/SMEs/About
+    // Company can nest further businessBankingPage children), plus
+    // productLoanPage (so the Products folder can also take the
+    // move-products-under-personal-banking command's own nodes via the
+    // backoffice afterward, not just this command's direct DB writes).
+    var requiredAllowedAliases = new[] { "businessBankingPage", "productLoanPage" };
+
+    foreach (var alias in requiredAllowedAliases)
+    {
+        if (currentAllowed.Any(t => t.Alias == alias))
+        {
+            Console.WriteLine($"EXISTS: businessBankingPage already allows \"{alias}\" as a child type.");
+
+            continue;
+        }
+
+        var allowedType =
+            alias == businessBankingPageType.Alias
+                ? businessBankingPageType
+                : contentTypeService.Get(alias);
+
+        if (allowedType == null)
+        {
+            Console.WriteLine($"SKIPPED: content type \"{alias}\" not found.");
+
+            continue;
+        }
+
+        currentAllowed.Add(new ContentTypeSort(allowedType.Key, currentAllowed.Count, allowedType.Alias));
+
+        Console.WriteLine($"SET: businessBankingPage now allows \"{alias}\" as a child type.");
+    }
+
+    businessBankingPageType.AllowedContentTypes = currentAllowed;
+
+    contentTypeService.Save(businessBankingPageType);
+
+    var pageHomeType = contentTypeService.Get("pageHome");
+
+    var homeNode =
+        pageHomeType == null
+            ? null
+            : contentService
+                .GetPagedOfType(pageHomeType.Id, 0, 10, out _, null!)
+                .FirstOrDefault();
+
+    if (homeNode == null)
+    {
+        Console.WriteLine("ERROR: no 'pageHome' content node found.");
+
+        return;
+    }
+
+    IContent EnsureChildPage(string name, IContent parent)
+    {
+        var existing =
+            contentService
+                .GetPagedChildren(parent.Id, 0, 500, out _, null!)
+                .FirstOrDefault(n =>
+                    n.ContentType.Alias.Equals("businessBankingPage", StringComparison.OrdinalIgnoreCase) &&
+                    n.Name != null &&
+                    n.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+        if (existing != null)
+        {
+            Console.WriteLine($"EXISTS: \"{name}\" (id={existing.Id}) under \"{parent.Name}\".");
+
+            return existing;
+        }
+
+        var created = contentService.Create(name, parent.Id, "businessBankingPage");
+        var saveResult = contentService.Save(created);
+
+        if (!saveResult.Success)
+        {
+            Console.WriteLine($"FAILED SAVE: \"{name}\" under \"{parent.Name}\".");
+
+            return created;
+        }
+
+        var publishResult = contentService.Publish(created, new[] { "*" });
+
+        Console.WriteLine(
+            $"CREATED: \"{name}\" (id={created.Id}) under \"{parent.Name}\" - " +
+            $"publish: {publishResult.Result}.");
+
+        return created;
+    }
+
+    // --------------------------------------------------------
+    // PERSONAL BANKING (new - didn't exist before this command)
+    // --------------------------------------------------------
+
+    var personalBanking = EnsureChildPage("Personal Banking", homeNode);
+
+    foreach (var name in new[] { "Products", "Campaigns", "About Company", "Blogs" })
+    {
+        EnsureChildPage(name, personalBanking);
+    }
+
+    // --------------------------------------------------------
+    // BUSINESS BANKING (already exists - create-business-content's node)
+    // --------------------------------------------------------
+
+    var businessBanking =
+        contentService
+            .GetPagedChildren(homeNode.Id, 0, 500, out _, null!)
+            .FirstOrDefault(n =>
+                n.ContentType.Alias.Equals("businessBankingPage", StringComparison.OrdinalIgnoreCase) &&
+                n.Name != null &&
+                n.Name.Equals("Business Banking", StringComparison.OrdinalIgnoreCase));
+
+    if (businessBanking == null)
+    {
+        Console.WriteLine(
+            "WARNING: no \"Business Banking\" node found under Home - run " +
+            "'create-business-content' first. Skipping its sub-pages.");
+    }
+    else
+    {
+        foreach (var name in new[] { "Products", "Campaigns", "Blogs", "SMEs" })
+        {
+            EnsureChildPage(name, businessBanking);
+        }
+    }
+
+    Console.WriteLine();
+    Console.WriteLine("DONE.");
+
+    return;
+}
+
+// ============================================================
+// MOVE-PRODUCTS-UNDER-PERSONAL-BANKING COMMAND
+// ============================================================
+//
+// Moves every productLoanPage node that's currently a direct child of Home
+// (Product 12% Loan, Product Consolidation Loan, Product Personal Loan,
+// Tech Deals, Credit Report, Talk To Us, ...) under "Personal Banking >
+// Products" (create-banking-page-structure's own node), matching the
+// Personal Banking section of the target content tree instead of sitting
+// flat under Home. Doesn't touch the businessBankingPage-typed siblings
+// (Tap2Glass, Business Transactional Account) - those weren't part of
+// this request, so they stay where they are.
+//
+// No data is lost - Move keeps the node (and everything under it) intact,
+// just reparents it; published content stays published.
+//
+// Idempotent: a node already moved out from under Home (into Products, or
+// anywhere else) no longer shows up in the "direct child of Home" query
+// this runs, so re-running finds nothing left to move.
+
+if (args.Length > 0 &&
+    args[0].Equals("move-products-under-personal-banking", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" MOVE PRODUCT PAGES UNDER PERSONAL BANKING > PRODUCTS");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService =
+        app.Services.GetRequiredService<IContentTypeService>();
+
+    var contentService =
+        app.Services.GetRequiredService<IContentService>();
+
+    var pageHomeType = contentTypeService.Get("pageHome");
+
+    var homeNode =
+        pageHomeType == null
+            ? null
+            : contentService
+                .GetPagedOfType(pageHomeType.Id, 0, 10, out _, null!)
+                .FirstOrDefault();
+
+    if (homeNode == null)
+    {
+        Console.WriteLine("ERROR: no 'pageHome' content node found.");
+
+        return;
+    }
+
+    var personalBanking =
+        contentService
+            .GetPagedChildren(homeNode.Id, 0, 500, out _, null!)
+            .FirstOrDefault(n =>
+                n.ContentType.Alias.Equals("businessBankingPage", StringComparison.OrdinalIgnoreCase) &&
+                n.Name != null &&
+                n.Name.Equals("Personal Banking", StringComparison.OrdinalIgnoreCase));
+
+    if (personalBanking == null)
+    {
+        Console.WriteLine(
+            "ERROR: no \"Personal Banking\" node found under Home - run " +
+            "'create-banking-page-structure' first.");
+
+        return;
+    }
+
+    var productsFolder =
+        contentService
+            .GetPagedChildren(personalBanking.Id, 0, 500, out _, null!)
+            .FirstOrDefault(n =>
+                n.ContentType.Alias.Equals("businessBankingPage", StringComparison.OrdinalIgnoreCase) &&
+                n.Name != null &&
+                n.Name.Equals("Products", StringComparison.OrdinalIgnoreCase));
+
+    if (productsFolder == null)
+    {
+        Console.WriteLine(
+            "ERROR: no \"Products\" node found under Personal Banking - run " +
+            "'create-banking-page-structure' first.");
+
+        return;
+    }
+
+    var toMove =
+        contentService
+            .GetPagedChildren(homeNode.Id, 0, 500, out _, null!)
+            .Where(n => n.ContentType.Alias.Equals("productLoanPage", StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+    if (toMove.Count == 0)
+    {
+        Console.WriteLine("Nothing to move - no productLoanPage nodes are direct children of Home.");
+    }
+
+    foreach (var node in toMove)
+    {
+        var moveResult = contentService.Move(node, productsFolder.Id);
+
+        Console.WriteLine(
+            $"MOVED: \"{node.Name}\" (id={node.Id}) -> Personal Banking > Products. " +
+            $"Result: {moveResult}");
+    }
+
+    Console.WriteLine();
+    Console.WriteLine("DONE.");
+
+    return;
+}
+
+// ============================================================
+// MOVE-BUSINESS-PAGES-UNDER-BUSINESS-BANKING COMMAND
+// ============================================================
+//
+// Moves every businessBankingPage node that's currently a direct child of
+// Home OTHER than "Business Banking" and "Personal Banking" themselves
+// (Tap2Glass, Business Transactional Account) under "Business Banking >
+// Products", matching move-products-under-personal-banking's own move for
+// Personal Banking's product pages. Same guarantees: Move reparents in
+// place (nothing lost/republished-wrong), idempotent (a node already moved
+// out from under Home no longer matches the "direct child of Home" query
+// this runs).
+
+if (args.Length > 0 &&
+    args[0].Equals("move-business-pages-under-business-banking", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" MOVE BUSINESS PAGES UNDER BUSINESS BANKING > PRODUCTS");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService =
+        app.Services.GetRequiredService<IContentTypeService>();
+
+    var contentService =
+        app.Services.GetRequiredService<IContentService>();
+
+    var pageHomeType = contentTypeService.Get("pageHome");
+
+    var homeNode =
+        pageHomeType == null
+            ? null
+            : contentService
+                .GetPagedOfType(pageHomeType.Id, 0, 10, out _, null!)
+                .FirstOrDefault();
+
+    if (homeNode == null)
+    {
+        Console.WriteLine("ERROR: no 'pageHome' content node found.");
+
+        return;
+    }
+
+    var homeChildren =
+        contentService
+            .GetPagedChildren(homeNode.Id, 0, 500, out _, null!)
+            .ToList();
+
+    var businessBanking =
+        homeChildren.FirstOrDefault(n =>
+            n.ContentType.Alias.Equals("businessBankingPage", StringComparison.OrdinalIgnoreCase) &&
+            n.Name != null &&
+            n.Name.Equals("Business Banking", StringComparison.OrdinalIgnoreCase));
+
+    if (businessBanking == null)
+    {
+        Console.WriteLine(
+            "ERROR: no \"Business Banking\" node found under Home - run " +
+            "'create-business-content' first.");
+
+        return;
+    }
+
+    var productsFolder =
+        contentService
+            .GetPagedChildren(businessBanking.Id, 0, 500, out _, null!)
+            .FirstOrDefault(n =>
+                n.ContentType.Alias.Equals("businessBankingPage", StringComparison.OrdinalIgnoreCase) &&
+                n.Name != null &&
+                n.Name.Equals("Products", StringComparison.OrdinalIgnoreCase));
+
+    if (productsFolder == null)
+    {
+        Console.WriteLine(
+            "ERROR: no \"Products\" node found under Business Banking - run " +
+            "'create-banking-page-structure' first.");
+
+        return;
+    }
+
+    var personalBanking =
+        homeChildren.FirstOrDefault(n =>
+            n.ContentType.Alias.Equals("businessBankingPage", StringComparison.OrdinalIgnoreCase) &&
+            n.Name != null &&
+            n.Name.Equals("Personal Banking", StringComparison.OrdinalIgnoreCase));
+
+    var toMove =
+        homeChildren
+            .Where(n =>
+                n.ContentType.Alias.Equals("businessBankingPage", StringComparison.OrdinalIgnoreCase) &&
+                n.Id != businessBanking.Id &&
+                (personalBanking == null || n.Id != personalBanking.Id))
+            .ToList();
+
+    if (toMove.Count == 0)
+    {
+        Console.WriteLine(
+            "Nothing to move - no other businessBankingPage nodes are direct " +
+            "children of Home.");
+    }
+
+    foreach (var node in toMove)
+    {
+        var moveResult = contentService.Move(node, productsFolder.Id);
+
+        Console.WriteLine(
+            $"MOVED: \"{node.Name}\" (id={node.Id}) -> Business Banking > Products. " +
+            $"Result: {moveResult}");
+    }
+
+    Console.WriteLine();
+    Console.WriteLine("DONE.");
+
+    return;
+}
+
+// ============================================================
+// REMOVE-EN-LANGUAGE-NODE COMMAND
+// ============================================================
+//
+// Home currently sits three levels deep - Public Site (redirect) > EN
+// (ebankITLanguage) > Home (pageHome) - a legacy v8 multi-language wrapper
+// that's never had more than the one "EN" child and isn't used for actual
+// language variance here (Umbraco's own culture/language system handles
+// that; this is just a leftover content node named "EN"). Removes it by
+// moving Home up to be a direct child of EN's own parent (Public Site -
+// left alone, along with whatever else lives under it, e.g. Sitemap),
+// then trashing the now-empty "EN" node itself.
+//
+// Trashes (MoveToRecycleBin) rather than permanently deletes - reversible
+// from the backoffice's own Recycle Bin > Restore if this turns out to be
+// wrong, same reversibility fix-home-allowed-children's own trashed-node
+// restore path relies on.
+//
+// Idempotent: if Home's parent isn't an "EN" node (already removed, or
+// never existed), this is a no-op.
+
+if (args.Length > 0 &&
+    args[0].Equals("remove-en-language-node", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" REMOVE EN LANGUAGE NODE");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService =
+        app.Services.GetRequiredService<IContentTypeService>();
+
+    var contentService =
+        app.Services.GetRequiredService<IContentService>();
+
+    var pageHomeType = contentTypeService.Get("pageHome");
+
+    var homeNode =
+        pageHomeType == null
+            ? null
+            : contentService
+                .GetPagedOfType(pageHomeType.Id, 0, 10, out _, null!)
+                .FirstOrDefault();
+
+    if (homeNode == null)
+    {
+        Console.WriteLine("ERROR: no 'pageHome' content node found.");
+
+        return;
+    }
+
+    var languageNode =
+        homeNode.ParentId > 0 ? contentService.GetById(homeNode.ParentId) : null;
+
+    if (languageNode == null ||
+        languageNode.Name == null ||
+        !languageNode.Name.Equals("EN", StringComparison.OrdinalIgnoreCase))
+    {
+        Console.WriteLine(
+            "Home's parent is not an \"EN\" node " +
+            (languageNode == null
+                ? "(Home is already at the root or has no parent)"
+                : $"(it's \"{languageNode.Name}\", id={languageNode.Id})") +
+            " - nothing to do.");
+
+        return;
+    }
+
+    var newParentId = languageNode.ParentId;
+
+    var moveResult = contentService.Move(homeNode, newParentId);
+
+    Console.WriteLine(
+        $"MOVED: \"Home\" (id={homeNode.Id}) -> parent id {newParentId} " +
+        $"(EN's own parent). Result: {moveResult}");
+
+    var trashResult = contentService.MoveToRecycleBin(languageNode);
+
+    Console.WriteLine(
+        $"TRASHED: \"EN\" (id={languageNode.Id}). Result: {trashResult}");
+
+    Console.WriteLine();
+    Console.WriteLine("DONE.");
+
+    return;
+}
+
+// ============================================================
 // FIX-HOME-ALLOWED-CHILDREN COMMAND
 // ============================================================
 //
@@ -3741,6 +4249,1306 @@ if (args.Length > 0 &&
 
     Console.WriteLine();
     Console.WriteLine("DONE.");
+
+    return;
+}
+
+// ============================================================
+// INSPECT-CONTENT-TYPE COMMAND (temporary diagnostic)
+// ============================================================
+//
+// Dumps a content type's own property groups/types exactly as
+// IContentTypeService sees them right now - used to settle whether a
+// property shown in the backoffice (e.g. a "Title"/"SEO" group seen on a
+// content node) actually lives on that node's own content type, or comes
+// from somewhere else (a composition, a core Umbraco feature, etc.).
+//
+//   dotnet run -- inspect-content-type businessBankingPage
+
+if (args.Length > 0 &&
+    args[0].Equals("inspect-content-type", StringComparison.OrdinalIgnoreCase))
+{
+    if (args.Length < 2)
+    {
+        Console.WriteLine("Usage: dotnet run -- inspect-content-type <alias>");
+
+        return;
+    }
+
+    var contentTypeServiceDiag =
+        app.Services.GetRequiredService<IContentTypeService>();
+
+    var type = contentTypeServiceDiag.Get(args[1]);
+
+    if (type == null)
+    {
+        Console.WriteLine($"ERROR: no content type found with alias \"{args[1]}\".");
+
+        return;
+    }
+
+    Console.WriteLine($"TYPE: {type.Alias} (\"{type.Name}\", id={type.Id})");
+    Console.WriteLine($"Compositions: {string.Join(", ", type.ContentTypeComposition.Select(c => c.Alias))}");
+    Console.WriteLine();
+
+    foreach (var group in type.PropertyGroups.OrderBy(g => g.SortOrder))
+    {
+        Console.WriteLine($"GROUP: {group.Name} (alias={group.Alias}, type={group.Type})");
+
+        foreach (var prop in group.PropertyTypes!.OrderBy(p => p.SortOrder))
+        {
+            Console.WriteLine($"  - {prop.Alias} (\"{prop.Name}\") editor={prop.PropertyEditorAlias}");
+        }
+    }
+
+    return;
+}
+
+// ============================================================
+// LIST-CONTENT-TYPE-USAGE COMMAND (read-only report)
+// ============================================================
+//
+// For every content type (page types and element types alike), reports:
+// live content-node count (page types only - element types are never
+// instantiated as their own nodes, only nested inside a Block List, so a
+// "0" there wouldn't mean "unused" the way it does for a page type),
+// whether any OTHER type depends on it (as a composition or as a listed
+// allowed-child-type), and whether its alias appears anywhere in the
+// react-ts-app frontend source (a plain grep over that tree, run from
+// here via Process - best-effort: if react-ts-app isn't found relative to
+// this project's own folder, that column just stays blank rather than
+// failing the whole report).
+//
+// Deliberately does NOT delete anything - this is purely the fact-finding
+// step before any "remove unused document types" decision, since deleting
+// a content type cascades to every content node of that type and can't be
+// undone without a database restore. A type with 0 content nodes is a
+// genuinely safe delete candidate; a type with real content nodes but no
+// frontend reference yet may just be a page the React port hasn't reached
+// (see MIGRATION.md) - that distinction matters and this report keeps the
+// two separate rather than collapsing them into one "unused" bucket.
+if (args.Length > 0 &&
+    args[0].Equals("list-content-type-usage", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" CONTENT TYPE USAGE REPORT");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService = app.Services.GetRequiredService<IContentTypeService>();
+    var contentService = app.Services.GetRequiredService<IContentService>();
+
+    var allTypes = contentTypeService.GetAll().OrderBy(t => t.Alias).ToList();
+
+    var compositionUsers = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+    var allowedChildUsers = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+
+    foreach (var type in allTypes)
+    {
+        foreach (var comp in type.ContentTypeComposition)
+        {
+            if (!compositionUsers.TryGetValue(comp.Alias, out var list))
+            {
+                list = new List<string>();
+                compositionUsers[comp.Alias] = list;
+            }
+
+            list.Add(type.Alias);
+        }
+
+        foreach (var allowed in type.AllowedContentTypes ?? Enumerable.Empty<ContentTypeSort>())
+        {
+            if (!allowedChildUsers.TryGetValue(allowed.Alias, out var list))
+            {
+                list = new List<string>();
+                allowedChildUsers[allowed.Alias] = list;
+            }
+
+            list.Add(type.Alias);
+        }
+    }
+
+    // Best-effort grep of react-ts-app for each alias - sibling folder to
+    // this project's own src/AcfAfricanbank.Web, matching this repo's
+    // actual layout (react-ts-app/ alongside src/).
+    var reactAppDir =
+        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "react-ts-app", "src"));
+
+    bool usedInReactApp(string alias)
+    {
+        if (!Directory.Exists(reactAppDir)) return false;
+
+        try
+        {
+            foreach (var file in Directory.EnumerateFiles(reactAppDir, "*.ts*", SearchOption.AllDirectories))
+            {
+                if (System.IO.File.ReadAllText(file).Contains(alias, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+        }
+        catch
+        {
+            // Best-effort - a read error on one file shouldn't fail the report.
+        }
+
+        return false;
+    }
+
+    Console.WriteLine(
+        $"{"ALIAS",-36} {"ELEMENT",-8} {"NODES",-7} {"USED AS COMPOSITION BY",-28} {"USED AS ALLOWED CHILD BY",-28} IN REACT APP");
+    Console.WriteLine(new string('-', 160));
+
+    foreach (var type in allTypes)
+    {
+        var nodeCount = "-";
+
+        if (!type.IsElement)
+        {
+            contentService.GetPagedOfType(type.Id, 0, 1, out var total, null!);
+            nodeCount = total.ToString();
+        }
+
+        var compUsers =
+            compositionUsers.TryGetValue(type.Alias, out var cu) ? string.Join(",", cu) : "";
+
+        var childUsers =
+            allowedChildUsers.TryGetValue(type.Alias, out var au) ? string.Join(",", au) : "";
+
+        var inReactApp = usedInReactApp(type.Alias) ? "yes" : "no";
+
+        Console.WriteLine(
+            $"{type.Alias,-36} {type.IsElement,-8} {nodeCount,-7} {compUsers,-28} {childUsers,-28} {inReactApp}");
+    }
+
+    Console.WriteLine();
+    Console.WriteLine($"TOTAL CONTENT TYPES: {allTypes.Count}");
+    Console.WriteLine(
+        "react-ts-app search root: " + reactAppDir + (Directory.Exists(reactAppDir) ? "" : " (NOT FOUND)"));
+
+    return;
+}
+
+// Throwaway diagnostic - dumps every Block List/Block Grid/Rich Text
+// DataType's own ConfigurationData["blocks"], resolved from
+// contentElementTypeKey to the element type's actual alias, so a specific
+// alias's real Block List membership can be grepped directly instead of
+// inferred. Not part of the delete-unused-content-types-v2 decision
+// pipeline itself - purely for manually spot-checking its block-element
+// scan against the live DB before trusting it.
+if (args.Length > 0 &&
+    args[0].Equals("list-blocklist-configs", StringComparison.OrdinalIgnoreCase))
+{
+    var contentTypeServiceX = app.Services.GetRequiredService<IContentTypeService>();
+    var dataTypeServiceX = app.Services.GetRequiredService<IDataTypeService>();
+
+    var byKeyX = contentTypeServiceX.GetAll().ToDictionary(t => t.Key);
+
+    foreach (var dt in await dataTypeServiceX.GetAllAsync())
+    {
+        if (dt.ConfigurationData == null ||
+            !dt.ConfigurationData.TryGetValue("blocks", out var rawBlocks) ||
+            rawBlocks is not System.Text.Json.Nodes.JsonArray blocksArray)
+        {
+            continue;
+        }
+
+        var aliases = new List<string>();
+
+        foreach (var item in blocksArray)
+        {
+            if (item is not System.Text.Json.Nodes.JsonObject blockObj) continue;
+            if (!blockObj.TryGetPropertyValue("contentElementTypeKey", out var keyNode) || keyNode == null) continue;
+
+            var keyStr = keyNode.ToString();
+
+            aliases.Add(
+                Guid.TryParse(keyStr, out var g) && byKeyX.TryGetValue(g, out var ct)
+                    ? ct.Alias
+                    : $"UNRESOLVED({keyStr})");
+        }
+
+        Console.WriteLine($"{dt.Name} (editor={dt.EditorAlias}): {string.Join(", ", aliases)}");
+    }
+
+    return;
+}
+
+// ============================================================
+// DELETE-UNUSED-CONTENT-TYPES COMMAND
+// ============================================================
+//
+// Deletes every PAGE content type (IsElement == false) that has BOTH zero
+// live content nodes AND zero dependents (not a composition of any other
+// type, not listed in any other type's AllowedContentTypes) - the exact
+// same classification list-content-type-usage above reports, recomputed
+// here from scratch rather than reading that command's saved output, so
+// this always deletes against the live DB state at run time, never a
+// stale list. Confirmed against a live run: 178 of this project's 422
+// content types fall in this bucket, the large majority a seemingly
+// unrelated "ebankIT*"-prefixed schema (a different vendor's integration/
+// demo content model, pulled in wholesale during the v8 migration dump
+// but with zero live content nodes anywhere in this database) plus
+// scattered other dead types (blog, bankingCampaign, search, sitemap,
+// ...). Reviewed and confirmed with the user before running - see the
+// chat history around this command's introduction for the three buckets
+// deliberately NOT touched here: types with real content (pending
+// frontend migration per MIGRATION.md), types with 0 content but still
+// depended on by an active type's composition/allowed-children, and
+// Block List element types (dependents on those can't be fully verified
+// this way - a Block List's allowed types live in its DataType's own
+// configuration, not in ContentTypeComposition/AllowedContentTypes, so
+// this command never touches an element type at all, regardless of its
+// own dependents count).
+//
+// Does NOT delete element types, ever (see IsElement skip below) - only
+// page/content types. Best-effort per type: one failed delete (e.g. an
+// unexpected FK this report's own two dependency checks didn't catch) is
+// logged and skipped rather than aborting the whole run.
+if (args.Length > 0 &&
+    args[0].Equals("delete-unused-content-types", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" DELETE UNUSED CONTENT TYPES");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService = app.Services.GetRequiredService<IContentTypeService>();
+    var contentService = app.Services.GetRequiredService<IContentService>();
+
+    var allTypes = contentTypeService.GetAll().OrderBy(t => t.Alias).ToList();
+
+    var compositionUsers = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+    var allowedChildUsers = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+    foreach (var type in allTypes)
+    {
+        foreach (var comp in type.ContentTypeComposition)
+        {
+            compositionUsers.Add(comp.Alias);
+        }
+
+        foreach (var allowed in type.AllowedContentTypes ?? Enumerable.Empty<ContentTypeSort>())
+        {
+            allowedChildUsers.Add(allowed.Alias);
+        }
+    }
+
+    var toDelete = new List<IContentType>();
+
+    foreach (var type in allTypes)
+    {
+        if (type.IsElement) continue;
+
+        contentService.GetPagedOfType(type.Id, 0, 1, out var total, null!);
+
+        if (total != 0) continue;
+        if (compositionUsers.Contains(type.Alias)) continue;
+        if (allowedChildUsers.Contains(type.Alias)) continue;
+
+        toDelete.Add(type);
+    }
+
+    Console.WriteLine($"Found {toDelete.Count} content types with 0 content nodes and 0 dependents.");
+    Console.WriteLine();
+
+    var deleted = 0;
+    var failed = 0;
+
+    foreach (var type in toDelete)
+    {
+        try
+        {
+            contentTypeService.Delete(type);
+            Console.WriteLine($"DELETED: {type.Alias}");
+            deleted++;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"FAILED: {type.Alias} - {ex.Message}");
+            failed++;
+        }
+    }
+
+    Console.WriteLine();
+    Console.WriteLine($"DONE. Deleted {deleted}, failed {failed}, out of {toDelete.Count} candidates.");
+
+    return;
+}
+
+// ============================================================
+// DELETE-UNUSED-CONTENT-TYPES-V2 COMMAND
+// ============================================================
+//
+// Goes further than delete-unused-content-types above: that command only
+// ever touched PAGE types with 0 content AND 0 composition/allowed-child
+// dependents - it never considered deleting an ELEMENT type (used inside
+// a Block List, never instantiated as its own content node) because
+// ContentTypeComposition/AllowedContentTypes can't see a Block List's own
+// allowed-blocks config - that lives in the owning DataType's
+// ConfigurationData["blocks"][].contentElementTypeKey, a different place
+// entirely (see GetOrCreateBlockListAsync above for the exact shape).
+// Without reading that, "0 dependents" was meaningless for element types -
+// confirmed by the fact several actively-rendered blocks (heroCarouselBlock,
+// textIntroBlock, ...) showed 0 dependents under the old check.
+//
+// This command computes a real "keep set" by closure instead of a single
+// flat dependents check:
+//   1. Seed: every type with >0 live content nodes, OR whose alias
+//      appears anywhere in react-ts-app/src (same substring search as
+//      list-content-type-usage).
+//   2. Expand to a fixed point: for every kept type, also keep (a) every
+//      type it composes (ContentTypeComposition) - removing a composition
+//      an active type depends on would strip that active type's own
+//      properties, and (b) every element type listed in the
+//      ConfigurationData["blocks"] of any Block List/Block Grid/Rich Text
+//      DataType backing one of its own properties - removing an allowed
+//      block type out from under an active page's Block List would corrupt
+//      that page's rendering.
+// Anything NOT in the final keep set - page type or element type alike -
+// is a delete candidate. This is deliberately the ONLY difference from
+// the command above: real content is still never touched (seeded into the
+// keep set by definition), matching the explicit choice made when this
+// command was introduced to leave the 68 content-bearing-but-not-yet-
+// ported types alone.
+//
+// Deletes in repeated passes (bounded) rather than a single loop, since
+// the toDelete set itself can have internal composition dependencies (an
+// unused element type composing another unused element type) - a type
+// that fails because a dependent hasn't been removed yet typically
+// succeeds on a later pass once that dependent is gone.
+if (args.Length > 0 &&
+    args[0].Equals("delete-unused-content-types-v2", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" DELETE UNUSED CONTENT TYPES (V2 - INCLUDES ELEMENT TYPES)");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService = app.Services.GetRequiredService<IContentTypeService>();
+    var contentService = app.Services.GetRequiredService<IContentService>();
+    var dataTypeService = app.Services.GetRequiredService<IDataTypeService>();
+
+    var allTypes = contentTypeService.GetAll().ToList();
+    var byAlias = allTypes.ToDictionary(t => t.Alias, StringComparer.OrdinalIgnoreCase);
+    var byKey = allTypes.ToDictionary(t => t.Key);
+
+    var reactAppDir =
+        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "react-ts-app", "src"));
+
+    var reactAppFileContents = new List<string>();
+
+    if (Directory.Exists(reactAppDir))
+    {
+        foreach (var file in Directory.EnumerateFiles(reactAppDir, "*.ts*", SearchOption.AllDirectories))
+        {
+            try
+            {
+                reactAppFileContents.Add(System.IO.File.ReadAllText(file));
+            }
+            catch
+            {
+                // Best-effort - a read error on one file shouldn't fail the run.
+            }
+        }
+    }
+
+    // Case-insensitive on purpose: an alias referenced only via a PascalCase
+    // TypeScript type name (e.g. a `FooterLinkCategory` interface for the
+    // camelCase `footerLinkCategory` alias) must still count as "used" -
+    // the safe direction for a destructive command to err in is keeping
+    // more, never fewer.
+    bool usedInReactApp(string alias) =>
+        reactAppFileContents.Any(c => c.Contains(alias, StringComparison.OrdinalIgnoreCase));
+
+    // Map every Block List/Block Grid/Rich Text DataType's own
+    // ConfigurationData["blocks"] to the element-type aliases it allows.
+    // ConfigurationData values deserialize as System.Text.Json.Nodes types
+    // (JsonArray/JsonObject), NOT IEnumerable<object>/IDictionary<string,
+    // object> - confirmed by dumping the actual runtime type via the
+    // list-blocklist-configs diagnostic above after an `as IEnumerable
+    // <object>` cast here silently matched nothing for every single Block
+    // List DataType in the database. Get this wrong and the whole point of
+    // this command (catching element types still allowed inside an active
+    // page's Block List) silently never fires - exactly the bug that
+    // version was shipped with before being caught here and fixed.
+    var allDataTypes = (await dataTypeService.GetAllAsync()).ToList();
+    var blockElementAliasesByDataTypeId = new Dictionary<int, List<string>>();
+
+    foreach (var dt in allDataTypes)
+    {
+        if (dt.ConfigurationData == null ||
+            !dt.ConfigurationData.TryGetValue("blocks", out var rawBlocks) ||
+            rawBlocks is not System.Text.Json.Nodes.JsonArray blocksArray)
+        {
+            continue;
+        }
+
+        var aliases = new List<string>();
+
+        foreach (var item in blocksArray)
+        {
+            if (item is not System.Text.Json.Nodes.JsonObject blockObj) continue;
+            if (!blockObj.TryGetPropertyValue("contentElementTypeKey", out var keyNode) || keyNode == null) continue;
+
+            if (Guid.TryParse(keyNode.ToString(), out var g) && byKey.TryGetValue(g, out var ct))
+            {
+                aliases.Add(ct.Alias);
+            }
+        }
+
+        if (aliases.Count > 0)
+        {
+            blockElementAliasesByDataTypeId[dt.Id] = aliases;
+        }
+    }
+
+    // Seed the keep set.
+    var keep = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+    foreach (var type in allTypes)
+    {
+        if (!type.IsElement)
+        {
+            contentService.GetPagedOfType(type.Id, 0, 1, out var total, null!);
+            if (total > 0)
+            {
+                keep.Add(type.Alias);
+                continue;
+            }
+        }
+
+        if (usedInReactApp(type.Alias))
+        {
+            keep.Add(type.Alias);
+        }
+    }
+
+    Console.WriteLine($"Seeded keep set: {keep.Count} types (real content or referenced in react-ts-app).");
+
+    // Expand to a fixed point.
+    var changed = true;
+
+    while (changed)
+    {
+        changed = false;
+
+        foreach (var alias in keep.ToList())
+        {
+            if (!byAlias.TryGetValue(alias, out var type)) continue;
+
+            foreach (var comp in type.ContentTypeComposition)
+            {
+                if (keep.Add(comp.Alias)) changed = true;
+            }
+
+            foreach (var prop in type.PropertyTypes)
+            {
+                if (blockElementAliasesByDataTypeId.TryGetValue(prop.DataTypeId, out var elAliases))
+                {
+                    foreach (var elAlias in elAliases)
+                    {
+                        if (keep.Add(elAlias)) changed = true;
+                    }
+                }
+            }
+        }
+    }
+
+    Console.WriteLine($"Keep set after closure: {keep.Count} types.");
+    Console.WriteLine();
+
+    var toDelete =
+        allTypes.Where(t => !keep.Contains(t.Alias)).OrderBy(t => t.Alias).ToList();
+
+    Console.WriteLine($"Delete candidates: {toDelete.Count} (of {allTypes.Count} total).");
+    Console.WriteLine();
+
+    foreach (var type in toDelete)
+    {
+        Console.WriteLine($"  {(type.IsElement ? "[element]" : "[page]   ")} {type.Alias}");
+    }
+
+    Console.WriteLine();
+
+    if (args.Length > 1 && args[1].Equals("--dry-run", StringComparison.OrdinalIgnoreCase))
+    {
+        Console.WriteLine("DRY RUN - nothing deleted. Re-run without --dry-run to actually delete.");
+
+        return;
+    }
+
+    var remaining = toDelete.ToList();
+    var totalDeleted = 0;
+    var pass = 0;
+
+    while (remaining.Count > 0 && pass < 10)
+    {
+        pass++;
+
+        var deletedThisPass = new List<IContentType>();
+
+        foreach (var type in remaining)
+        {
+            try
+            {
+                contentTypeService.Delete(type);
+                Console.WriteLine($"DELETED: {type.Alias}");
+                deletedThisPass.Add(type);
+                totalDeleted++;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"  (pass {pass}) not yet: {type.Alias} - {ex.Message}");
+            }
+        }
+
+        if (deletedThisPass.Count == 0) break;
+
+        remaining = remaining.Except(deletedThisPass).ToList();
+    }
+
+    Console.WriteLine();
+    Console.WriteLine(
+        $"DONE. Deleted {totalDeleted} of {toDelete.Count} candidates " +
+        $"({remaining.Count} could not be deleted after {pass} pass(es)).");
+
+    if (remaining.Count > 0)
+    {
+        Console.WriteLine("Still remaining:");
+
+        foreach (var type in remaining)
+        {
+            Console.WriteLine($"  {type.Alias}");
+        }
+    }
+
+    return;
+}
+
+// ============================================================
+// ADD-BLOG-SEO-PROPERTIES COMMAND
+// ============================================================
+//
+// Adds a new "SEO" property group to blogDetail (the real blog post
+// document type - 782 live content nodes, confirmed via the DB; the
+// unused "blog" alias has zero) with 5 fields matching the clean layout
+// requested: SEO Title, SEO Description, Canonical URL, OG Image, No
+// Index. blogDetail already carries SEO-shaped fields from the v8
+// migration (its own "SEO/Meta Properties" group - googlebot_tag, title,
+// descriptions - plus more of the same from its searchEngine composition -
+// title_tag, description_tag, keywords_tag, image, alternateImageText,
+// security, robots_tag), all with real migrated content across those 782
+// posts. This command does NOT touch, rename, or remove any of that - it
+// only ADDS the 5 new fields alongside them, empty, to fill in via the
+// backoffice going forward. No new "Title" field is added since blogDetail
+// already owns a "title" alias (an alias can only be used once per
+// content type) - reuse that one.
+//
+// Shared Data Types (Umbraco.TextBox/TextArea/MediaPicker3/TrueFalse),
+// same editor aliases create-home-schema's own GetOrCreateSharedDataTypeAsync
+// already reuses project-wide - this command looks them up the same way
+// rather than creating new ones.
+//
+// Idempotent: GetOrCreateType's own property-collision check (same helper
+// every create-*-schema command uses) skips any property whose alias
+// already exists.
+
+if (args.Length > 0 &&
+    args[0].Equals("add-blog-seo-properties", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" ADD SEO PROPERTIES TO BLOG POSTS");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService =
+        app.Services.GetRequiredService<IContentTypeService>();
+
+    var dataTypeService =
+        app.Services.GetRequiredService<IDataTypeService>();
+
+    var propertyEditors =
+        app.Services.GetRequiredService<PropertyEditorCollection>();
+
+    var configurationEditorJsonSerializer =
+        app.Services.GetRequiredService<IConfigurationEditorJsonSerializer>();
+
+    var shortStringHelper =
+        app.Services.GetRequiredService<IShortStringHelper>();
+
+    var blogDetailType = contentTypeService.Get("blogDetail");
+
+    if (blogDetailType == null)
+    {
+        Console.WriteLine("ERROR: 'blogDetail' content type not found.");
+
+        return;
+    }
+
+    async Task<IDataType> GetOrCreateSharedDataTypeAsync(
+        string editorAlias, string editorUiAlias, string name)
+    {
+        var existingDataType =
+            (await dataTypeService.GetAllAsync())
+                .FirstOrDefault(d =>
+                    d.EditorAlias.Equals(editorAlias, StringComparison.OrdinalIgnoreCase) &&
+                    d.Name != null &&
+                    d.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+        if (existingDataType != null)
+        {
+            Console.WriteLine($"EXISTS DATATYPE: {existingDataType.Name}");
+
+            return existingDataType;
+        }
+
+        if (!propertyEditors.TryGet(editorAlias, out var editor))
+        {
+            throw new InvalidOperationException($"Property editor '{editorAlias}' is not registered.");
+        }
+
+        var dataType =
+            new DataType(editor, configurationEditorJsonSerializer)
+            {
+                Name = name,
+                EditorUiAlias = editorUiAlias
+            };
+
+        var createResult =
+            await dataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+
+        if (!createResult.Success)
+        {
+            throw new InvalidOperationException($"Could not create data type '{name}': {createResult.Status}");
+        }
+
+        Console.WriteLine($"CREATED DATATYPE: {name}");
+
+        return createResult.Result;
+    }
+
+    var txt =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.TextBox", "Umb.PropertyEditorUi.TextBox", "React Migration - Textstring");
+
+    var txtArea =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.TextArea", "Umb.PropertyEditorUi.TextArea", "React Migration - Textarea");
+
+    var media =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.MediaPicker3", "Umb.PropertyEditorUi.MediaPicker", "React Migration - Media Picker");
+
+    var boolType =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.TrueFalse", "Umb.PropertyEditorUi.Toggle", "React Migration - Toggle");
+
+    if (!blogDetailType.PropertyGroups.Any(g =>
+            g.Alias.Equals("seo", StringComparison.OrdinalIgnoreCase)))
+    {
+        blogDetailType.AddPropertyGroup("seo", "SEO");
+
+        var seoGroup =
+            blogDetailType.PropertyGroups.First(g =>
+                g.Alias.Equals("seo", StringComparison.OrdinalIgnoreCase));
+
+        seoGroup.Type = PropertyGroupType.Tab;
+
+        Console.WriteLine("CREATED GROUP: SEO");
+    }
+    else
+    {
+        Console.WriteLine("EXISTS GROUP: SEO");
+    }
+
+    var seoProps =
+        new[]
+        {
+            new PropSpec("seoTitle", "SEO Title", txt),
+            new PropSpec("seoDescription", "SEO Description", txtArea),
+            new PropSpec("canonicalUrl", "Canonical URL", txt),
+            new PropSpec("ogImage", "OG Image", media),
+            new PropSpec("noIndex", "No Index", boolType)
+        };
+
+    var changed = false;
+
+    foreach (var prop in seoProps)
+    {
+        if (blogDetailType.PropertyTypes.Any(p =>
+                p.Alias.Equals(prop.Alias, StringComparison.OrdinalIgnoreCase)))
+        {
+            Console.WriteLine($"EXISTS PROPERTY: blogDetail.{prop.Alias}");
+
+            continue;
+        }
+
+        var propertyType =
+            new PropertyType(shortStringHelper, prop.Type, prop.Alias)
+            {
+                Name = prop.Name,
+                Mandatory = prop.Mandatory
+            };
+
+        blogDetailType.AddPropertyType(propertyType, "seo");
+        changed = true;
+
+        Console.WriteLine($"ADDED PROPERTY: blogDetail.{prop.Alias}");
+    }
+
+    if (changed)
+    {
+        contentTypeService.Save(blogDetailType);
+    }
+
+    Console.WriteLine();
+    Console.WriteLine("DONE.");
+    Console.WriteLine(
+        "New fields are empty on all 782 existing blog posts - the legacy " +
+        "SEO/Meta Properties fields they already had are untouched.");
+
+    return;
+}
+
+// ============================================================
+// ADD-BANKING-PAGE-SEO-PROPERTIES COMMAND
+// ============================================================
+//
+// Adds the same "SEO" property group/fields add-blog-seo-properties adds to
+// blogDetail (SEO Title, SEO Description, Canonical URL, OG Image, No
+// Index) to businessBankingPage instead - the generic page type reused for
+// every Personal Banking, Business Banking, and nested page (Products,
+// Campaigns, About Company, Blogs, SMEs, Tap2Glass, ...) created by
+// create-business-schema / create-banking-page-structure above.
+// businessBankingPage currently has no SEO fields at all (just "sections"),
+// unlike blogDetail's legacy v8 fields, so all 5 are new here.
+//
+// Shared Data Types reused the same way add-blog-seo-properties does - same
+// editor aliases, looked up by name rather than recreated.
+//
+// Idempotent: same per-group/per-property existence checks as
+// add-blog-seo-properties - safe to run again.
+
+if (args.Length > 0 &&
+    args[0].Equals("add-banking-page-seo-properties", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" ADD SEO PROPERTIES TO BANKING PAGES");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService =
+        app.Services.GetRequiredService<IContentTypeService>();
+
+    var dataTypeService =
+        app.Services.GetRequiredService<IDataTypeService>();
+
+    var propertyEditors =
+        app.Services.GetRequiredService<PropertyEditorCollection>();
+
+    var configurationEditorJsonSerializer =
+        app.Services.GetRequiredService<IConfigurationEditorJsonSerializer>();
+
+    var shortStringHelper =
+        app.Services.GetRequiredService<IShortStringHelper>();
+
+    var businessBankingPageType = contentTypeService.Get("businessBankingPage");
+
+    if (businessBankingPageType == null)
+    {
+        Console.WriteLine("ERROR: 'businessBankingPage' content type not found.");
+
+        return;
+    }
+
+    async Task<IDataType> GetOrCreateSharedDataTypeAsync(
+        string editorAlias, string editorUiAlias, string name)
+    {
+        var existingDataType =
+            (await dataTypeService.GetAllAsync())
+                .FirstOrDefault(d =>
+                    d.EditorAlias.Equals(editorAlias, StringComparison.OrdinalIgnoreCase) &&
+                    d.Name != null &&
+                    d.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+        if (existingDataType != null)
+        {
+            Console.WriteLine($"EXISTS DATATYPE: {existingDataType.Name}");
+
+            return existingDataType;
+        }
+
+        if (!propertyEditors.TryGet(editorAlias, out var editor))
+        {
+            throw new InvalidOperationException($"Property editor '{editorAlias}' is not registered.");
+        }
+
+        var dataType =
+            new DataType(editor, configurationEditorJsonSerializer)
+            {
+                Name = name,
+                EditorUiAlias = editorUiAlias
+            };
+
+        var createResult =
+            await dataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+
+        if (!createResult.Success)
+        {
+            throw new InvalidOperationException($"Could not create data type '{name}': {createResult.Status}");
+        }
+
+        Console.WriteLine($"CREATED DATATYPE: {name}");
+
+        return createResult.Result;
+    }
+
+    var txt =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.TextBox", "Umb.PropertyEditorUi.TextBox", "React Migration - Textstring");
+
+    var txtArea =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.TextArea", "Umb.PropertyEditorUi.TextArea", "React Migration - Textarea");
+
+    var media =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.MediaPicker3", "Umb.PropertyEditorUi.MediaPicker", "React Migration - Media Picker");
+
+    var boolType =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.TrueFalse", "Umb.PropertyEditorUi.Toggle", "React Migration - Toggle");
+
+    if (!businessBankingPageType.PropertyGroups.Any(g =>
+            g.Alias.Equals("seo", StringComparison.OrdinalIgnoreCase)))
+    {
+        businessBankingPageType.AddPropertyGroup("seo", "SEO");
+
+        var seoGroup =
+            businessBankingPageType.PropertyGroups.First(g =>
+                g.Alias.Equals("seo", StringComparison.OrdinalIgnoreCase));
+
+        seoGroup.Type = PropertyGroupType.Tab;
+
+        Console.WriteLine("CREATED GROUP: SEO");
+    }
+    else
+    {
+        Console.WriteLine("EXISTS GROUP: SEO");
+    }
+
+    var seoProps =
+        new[]
+        {
+            new PropSpec("seoTitle", "SEO Title", txt),
+            new PropSpec("seoDescription", "SEO Description", txtArea),
+            new PropSpec("canonicalUrl", "Canonical URL", txt),
+            new PropSpec("ogImage", "OG Image", media),
+            new PropSpec("noIndex", "No Index", boolType)
+        };
+
+    var changed = false;
+
+    foreach (var prop in seoProps)
+    {
+        if (businessBankingPageType.PropertyTypes.Any(p =>
+                p.Alias.Equals(prop.Alias, StringComparison.OrdinalIgnoreCase)))
+        {
+            Console.WriteLine($"EXISTS PROPERTY: businessBankingPage.{prop.Alias}");
+
+            continue;
+        }
+
+        var propertyType =
+            new PropertyType(shortStringHelper, prop.Type, prop.Alias)
+            {
+                Name = prop.Name,
+                Mandatory = prop.Mandatory
+            };
+
+        businessBankingPageType.AddPropertyType(propertyType, "seo");
+        changed = true;
+
+        Console.WriteLine($"ADDED PROPERTY: businessBankingPage.{prop.Alias}");
+    }
+
+    if (changed)
+    {
+        contentTypeService.Save(businessBankingPageType);
+    }
+
+    Console.WriteLine();
+    Console.WriteLine("DONE.");
+    Console.WriteLine(
+        "New fields are empty on every Personal Banking, Business Banking, " +
+        "and nested page (Products/Campaigns/About Company/Blogs/SMEs/...) " +
+        "that reuses businessBankingPage - fill them in via the backoffice.");
+
+    return;
+}
+
+// ============================================================
+// ADD-HOME-PAGE-SEO-PROPERTIES COMMAND
+// ============================================================
+//
+// Same "SEO" property group/fields as add-blog-seo-properties and
+// add-banking-page-seo-properties (SEO Title, SEO Description, Canonical
+// URL, OG Image, No Index), added to pageHome instead - the real, live
+// Home content node's own document type (confirmed via
+// models.generated.cs: PageHome implements ISearchEngine, so it already
+// carries the same legacy v8 SEO/meta fields - googlebot_tag,
+// description_tag, keywords_tag, image, alternateImageText, security,
+// robots_tag - blogDetail has; this command does NOT touch those, only
+// adds the 5 new ones alongside them, same as the blog command).
+//
+// Deliberately targets "pageHome" (the type the live Home node actually
+// has - see create-banking-page-structure above, which looks up
+// "pageHome" to find the real Home node) and NOT "homePage" (the empty
+// React-migration schema create-home-schema defines, which isn't used by
+// any real content node yet).
+//
+// Shared Data Types reused the same way the other two SEO commands do.
+// Idempotent: same per-group/per-property existence checks.
+
+if (args.Length > 0 &&
+    args[0].Equals("add-home-page-seo-properties", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" ADD SEO PROPERTIES TO HOME PAGE");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService =
+        app.Services.GetRequiredService<IContentTypeService>();
+
+    var dataTypeService =
+        app.Services.GetRequiredService<IDataTypeService>();
+
+    var propertyEditors =
+        app.Services.GetRequiredService<PropertyEditorCollection>();
+
+    var configurationEditorJsonSerializer =
+        app.Services.GetRequiredService<IConfigurationEditorJsonSerializer>();
+
+    var shortStringHelper =
+        app.Services.GetRequiredService<IShortStringHelper>();
+
+    var pageHomeType = contentTypeService.Get("pageHome");
+
+    if (pageHomeType == null)
+    {
+        Console.WriteLine("ERROR: 'pageHome' content type not found.");
+
+        return;
+    }
+
+    async Task<IDataType> GetOrCreateSharedDataTypeAsync(
+        string editorAlias, string editorUiAlias, string name)
+    {
+        var existingDataType =
+            (await dataTypeService.GetAllAsync())
+                .FirstOrDefault(d =>
+                    d.EditorAlias.Equals(editorAlias, StringComparison.OrdinalIgnoreCase) &&
+                    d.Name != null &&
+                    d.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+        if (existingDataType != null)
+        {
+            Console.WriteLine($"EXISTS DATATYPE: {existingDataType.Name}");
+
+            return existingDataType;
+        }
+
+        if (!propertyEditors.TryGet(editorAlias, out var editor))
+        {
+            throw new InvalidOperationException($"Property editor '{editorAlias}' is not registered.");
+        }
+
+        var dataType =
+            new DataType(editor, configurationEditorJsonSerializer)
+            {
+                Name = name,
+                EditorUiAlias = editorUiAlias
+            };
+
+        var createResult =
+            await dataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+
+        if (!createResult.Success)
+        {
+            throw new InvalidOperationException($"Could not create data type '{name}': {createResult.Status}");
+        }
+
+        Console.WriteLine($"CREATED DATATYPE: {name}");
+
+        return createResult.Result;
+    }
+
+    var txt =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.TextBox", "Umb.PropertyEditorUi.TextBox", "React Migration - Textstring");
+
+    var txtArea =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.TextArea", "Umb.PropertyEditorUi.TextArea", "React Migration - Textarea");
+
+    var media =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.MediaPicker3", "Umb.PropertyEditorUi.MediaPicker", "React Migration - Media Picker");
+
+    var boolType =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.TrueFalse", "Umb.PropertyEditorUi.Toggle", "React Migration - Toggle");
+
+    if (!pageHomeType.PropertyGroups.Any(g =>
+            g.Alias.Equals("seo", StringComparison.OrdinalIgnoreCase)))
+    {
+        pageHomeType.AddPropertyGroup("seo", "SEO");
+
+        var seoGroup =
+            pageHomeType.PropertyGroups.First(g =>
+                g.Alias.Equals("seo", StringComparison.OrdinalIgnoreCase));
+
+        seoGroup.Type = PropertyGroupType.Tab;
+
+        Console.WriteLine("CREATED GROUP: SEO");
+    }
+    else
+    {
+        Console.WriteLine("EXISTS GROUP: SEO");
+    }
+
+    var seoProps =
+        new[]
+        {
+            new PropSpec("seoTitle", "SEO Title", txt),
+            new PropSpec("seoDescription", "SEO Description", txtArea),
+            new PropSpec("canonicalUrl", "Canonical URL", txt),
+            new PropSpec("ogImage", "OG Image", media),
+            new PropSpec("noIndex", "No Index", boolType)
+        };
+
+    var changed = false;
+
+    foreach (var prop in seoProps)
+    {
+        if (pageHomeType.PropertyTypes.Any(p =>
+                p.Alias.Equals(prop.Alias, StringComparison.OrdinalIgnoreCase)))
+        {
+            Console.WriteLine($"EXISTS PROPERTY: pageHome.{prop.Alias}");
+
+            continue;
+        }
+
+        var propertyType =
+            new PropertyType(shortStringHelper, prop.Type, prop.Alias)
+            {
+                Name = prop.Name,
+                Mandatory = prop.Mandatory
+            };
+
+        pageHomeType.AddPropertyType(propertyType, "seo");
+        changed = true;
+
+        Console.WriteLine($"ADDED PROPERTY: pageHome.{prop.Alias}");
+    }
+
+    if (changed)
+    {
+        contentTypeService.Save(pageHomeType);
+    }
+
+    Console.WriteLine();
+    Console.WriteLine("DONE.");
+    Console.WriteLine(
+        "New fields are empty on the live Home page - the legacy " +
+        "SEO/Meta Properties fields it already had (via its searchEngine " +
+        "composition) are untouched.");
+
+    return;
+}
+
+// ============================================================
+// ADD-PRODUCT-LOAN-PAGE-SEO-PROPERTIES COMMAND
+// ============================================================
+//
+// Same "SEO" property group/fields as the other three add-*-seo-properties
+// commands above (SEO Title, SEO Description, Canonical URL, OG Image, No
+// Index), added to productLoanPage instead - the real children of
+// Personal Banking's "Products" folder (Product 12% Loan, Product
+// Consolidation Loan, Product Personal Loan, Tech Deals, Credit Report,
+// Talk To Us - confirmed via the live Delivery API: all 6 real
+// productLoanPage nodes site-wide sit under /home/personal-banking/
+// products/). Unlike pageHome/blogDetail, productLoanPage has no
+// composition and no legacy SEO fields at all (just "sections", same as
+// businessBankingPage before add-banking-page-seo-properties) - all 5
+// fields are new here.
+//
+// Shared Data Types reused the same way the other three SEO commands do.
+// Idempotent: same per-group/per-property existence checks.
+
+if (args.Length > 0 &&
+    args[0].Equals("add-product-loan-page-seo-properties", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" ADD SEO PROPERTIES TO PRODUCT LOAN PAGES");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService =
+        app.Services.GetRequiredService<IContentTypeService>();
+
+    var dataTypeService =
+        app.Services.GetRequiredService<IDataTypeService>();
+
+    var propertyEditors =
+        app.Services.GetRequiredService<PropertyEditorCollection>();
+
+    var configurationEditorJsonSerializer =
+        app.Services.GetRequiredService<IConfigurationEditorJsonSerializer>();
+
+    var shortStringHelper =
+        app.Services.GetRequiredService<IShortStringHelper>();
+
+    var productLoanPageType = contentTypeService.Get("productLoanPage");
+
+    if (productLoanPageType == null)
+    {
+        Console.WriteLine("ERROR: 'productLoanPage' content type not found.");
+
+        return;
+    }
+
+    async Task<IDataType> GetOrCreateSharedDataTypeAsync(
+        string editorAlias, string editorUiAlias, string name)
+    {
+        var existingDataType =
+            (await dataTypeService.GetAllAsync())
+                .FirstOrDefault(d =>
+                    d.EditorAlias.Equals(editorAlias, StringComparison.OrdinalIgnoreCase) &&
+                    d.Name != null &&
+                    d.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+        if (existingDataType != null)
+        {
+            Console.WriteLine($"EXISTS DATATYPE: {existingDataType.Name}");
+
+            return existingDataType;
+        }
+
+        if (!propertyEditors.TryGet(editorAlias, out var editor))
+        {
+            throw new InvalidOperationException($"Property editor '{editorAlias}' is not registered.");
+        }
+
+        var dataType =
+            new DataType(editor, configurationEditorJsonSerializer)
+            {
+                Name = name,
+                EditorUiAlias = editorUiAlias
+            };
+
+        var createResult =
+            await dataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+
+        if (!createResult.Success)
+        {
+            throw new InvalidOperationException($"Could not create data type '{name}': {createResult.Status}");
+        }
+
+        Console.WriteLine($"CREATED DATATYPE: {name}");
+
+        return createResult.Result;
+    }
+
+    var txt =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.TextBox", "Umb.PropertyEditorUi.TextBox", "React Migration - Textstring");
+
+    var txtArea =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.TextArea", "Umb.PropertyEditorUi.TextArea", "React Migration - Textarea");
+
+    var media =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.MediaPicker3", "Umb.PropertyEditorUi.MediaPicker", "React Migration - Media Picker");
+
+    var boolType =
+        await GetOrCreateSharedDataTypeAsync(
+            "Umbraco.TrueFalse", "Umb.PropertyEditorUi.Toggle", "React Migration - Toggle");
+
+    if (!productLoanPageType.PropertyGroups.Any(g =>
+            g.Alias.Equals("seo", StringComparison.OrdinalIgnoreCase)))
+    {
+        productLoanPageType.AddPropertyGroup("seo", "SEO");
+
+        var seoGroup =
+            productLoanPageType.PropertyGroups.First(g =>
+                g.Alias.Equals("seo", StringComparison.OrdinalIgnoreCase));
+
+        seoGroup.Type = PropertyGroupType.Tab;
+
+        Console.WriteLine("CREATED GROUP: SEO");
+    }
+    else
+    {
+        Console.WriteLine("EXISTS GROUP: SEO");
+    }
+
+    var seoProps =
+        new[]
+        {
+            new PropSpec("seoTitle", "SEO Title", txt),
+            new PropSpec("seoDescription", "SEO Description", txtArea),
+            new PropSpec("canonicalUrl", "Canonical URL", txt),
+            new PropSpec("ogImage", "OG Image", media),
+            new PropSpec("noIndex", "No Index", boolType)
+        };
+
+    var changed = false;
+
+    foreach (var prop in seoProps)
+    {
+        if (productLoanPageType.PropertyTypes.Any(p =>
+                p.Alias.Equals(prop.Alias, StringComparison.OrdinalIgnoreCase)))
+        {
+            Console.WriteLine($"EXISTS PROPERTY: productLoanPage.{prop.Alias}");
+
+            continue;
+        }
+
+        var propertyType =
+            new PropertyType(shortStringHelper, prop.Type, prop.Alias)
+            {
+                Name = prop.Name,
+                Mandatory = prop.Mandatory
+            };
+
+        productLoanPageType.AddPropertyType(propertyType, "seo");
+        changed = true;
+
+        Console.WriteLine($"ADDED PROPERTY: productLoanPage.{prop.Alias}");
+    }
+
+    if (changed)
+    {
+        contentTypeService.Save(productLoanPageType);
+    }
+
+    Console.WriteLine();
+    Console.WriteLine("DONE.");
+    Console.WriteLine(
+        "New fields are empty on every Product Loan page under Personal " +
+        "Banking's Products folder - fill them in via the backoffice.");
 
     return;
 }

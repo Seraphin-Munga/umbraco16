@@ -23,7 +23,7 @@ export function Tap2GlassSection({
   return (
     <section className="my-10 bg-white md:my-[120px]">
       <div className="mx-auto max-w-7xl px-4 text-center max-[768px]:text-left sm:px-6 lg:px-8">
-        <h1 className="text-[20px] leading-none font-extralight text-brand-ink sm:text-[65px]">{heading}</h1>
+        <h1 className="text-[20px] leading-none text-left font-extralight text-brand-ink sm:text-[65px]">{heading}</h1>
         {downloadUrl && downloadLabel && (
           <div className="mt-8 text-left">
             <Button href={downloadUrl}>

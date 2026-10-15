@@ -4,7 +4,7 @@
 # not this project's own folder - AcfAfricanbank.Web project-references
 # ../AcfAfricanbank.Core, so both projects need to be in the build context:
 #   docker build -f src/AcfAfricanbank.Web/Dockerfile .
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 COPY src/AcfAfricanbank.Core/AcfAfricanbank.Core.csproj src/AcfAfricanbank.Core/
@@ -16,7 +16,7 @@ COPY src/AcfAfricanbank.Web/ src/AcfAfricanbank.Web/
 RUN dotnet publish src/AcfAfricanbank.Web/AcfAfricanbank.Web.csproj \
     -c Release -o /app/publish --no-restore
 
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
 

@@ -26,7 +26,7 @@ export function AppDownloadSection({
   background = '',
 }: AppDownloadSectionProps) {
   return (
-    <section className={`py-10 ${background}`}>
+    <section className={`py-10 bg-white`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center gap-8 text-left md:flex-row">
           <div className="md:w-1/2">

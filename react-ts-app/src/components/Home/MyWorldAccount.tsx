@@ -15,7 +15,7 @@ export function MyWorldAccount({ features, ctaLabel, ctaUrl, heading, subheading
     <section className="my-10 md:my-[120px]">
       <div className="mx-auto max-w-7xl px-4 text-center max-[768px]:text-left sm:px-6 md:grid md:grid-cols-12 md:items-end md:gap-8 lg:px-8">
         <div className="md:col-span-7">
-          <h1 className="text-[20px] leading-none font-extralight text-brand-ink sm:text-[65px]">{heading}</h1>
+          <h1 className="text-[20px] text-left leading-none font-extralight text-brand-ink sm:text-[65px]">{heading}</h1>
           {ctaLabel && ctaUrl && (
             <div className="mt-8 text-left">
               <Button href={ctaUrl}>{ctaLabel}</Button>
@@ -24,7 +24,7 @@ export function MyWorldAccount({ features, ctaLabel, ctaUrl, heading, subheading
         </div>
 
         <div className="mt-10 md:col-span-5 md:mt-0">
-          <h4 className="mb-5 font-semibold text-brand-ink">{subheading}</h4>
+          <h4 className="mb-5 font-semibold sm:text-[18px] text-left text-brand-ink">{subheading}</h4>
           <ul className="flex flex-col">
             {features.map((feature) => (
               <li key={feature} className="mb-3 flex items-start gap-2 text-left text-sm text-brand-ink">

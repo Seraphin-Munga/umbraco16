@@ -58,7 +58,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 bg-brand-navy font-sans text-white shadow-md">
       <div className="flex h-20  justify-between items-center gap-6 px-4 sm:px-6 lg:px-8">
-        <Link to="/en/home/" className="shrink-0" onClick={closeMobile}>
+        <Link to="/" className="shrink-0" onClick={closeMobile}>
           <Logo />
           
         </Link>
@@ -99,7 +99,7 @@ export function Header() {
                       return (
                         <NavigationMenuItem key={key}>
                           <NavigationMenuLink asChild className={navLinkClass}>
-                            <a href="/en/home/">{link.title}</a>
+                            <a href="/">{link.title}</a>
                           </NavigationMenuLink>
                         </NavigationMenuItem>
                       );
@@ -231,7 +231,7 @@ export function Header() {
           >
             <SheetHeader className="border-b border-white/10">
               <SheetTitle asChild>
-                <Link to="/en/home/" onClick={closeMobile}>
+                <Link to="/" onClick={closeMobile}>
                   <Logo />
                 </Link>
               </SheetTitle>
@@ -255,7 +255,7 @@ export function Header() {
                 Login
               </a>
               <Link
-                to="/en/home/"
+                to="/"
                 onClick={closeMobile}
                 className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-white/10"
               >
@@ -299,7 +299,7 @@ export function Header() {
                         return (
                           <a
                             key={key}
-                            href="/en/home/"
+                            href="/"
                             className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-white/10"
                           >
                             {link.title}

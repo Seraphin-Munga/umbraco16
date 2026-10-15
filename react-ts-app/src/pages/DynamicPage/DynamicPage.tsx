@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { fetchPageSectionsByRoute } from '../../api/contentApi';
-import type { AnyPageSection } from '../../api/contentApi';
+import type { AnyPageSection, PageSeo } from '../../api/contentApi';
 import { renderPageSection } from '../../cms/renderPageSection';
+import { useSeoMeta } from '../../utils/useSeoMeta';
 
 // Catch-all route (see App.tsx's final <Route path="*">) for any Umbraco
 // page that isn't already explicitly registered in
@@ -25,14 +26,19 @@ import { renderPageSection } from '../../cms/renderPageSection';
 export function DynamicPage() {
   const location = useLocation();
   const [sections, setSections] = useState<AnyPageSection[]>([]);
+  const [seo, setSeo] = useState<PageSeo | null>(null);
 
   useEffect(() => {
     setSections([]);
+    setSeo(null);
 
     const controller = new AbortController();
 
     fetchPageSectionsByRoute(location.pathname, controller.signal)
-      .then((result) => setSections(result?.sections ?? []))
+      .then((result) => {
+        setSections(result?.sections ?? []);
+        setSeo(result?.seo ?? null);
+      })
       .catch((error: unknown) => {
         // AbortError fires when this effect's own cleanup cancels an
         // in-flight request - normal and expected under React 18
@@ -45,10 +51,19 @@ export function DynamicPage() {
         }
 
         setSections([]);
+        setSeo(null);
       });
 
     return () => controller.abort();
   }, [location.pathname]);
+
+  useSeoMeta({
+    title: seo?.title,
+    description: seo?.description,
+    canonicalUrl: seo?.canonicalUrl,
+    ogImage: seo?.ogImage,
+    noIndex: seo?.noIndex,
+  });
 
   return (
     <div id="page">

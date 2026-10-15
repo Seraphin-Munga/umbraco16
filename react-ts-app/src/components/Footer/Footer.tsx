@@ -73,7 +73,7 @@ export function Footer() {
             <div className="relative sm:col-span-5">
               <FooterPattern className="absolute -bottom-10 left-0 hidden sm:block" />
               <div className="flex justify-center gap-1 sm:justify-end">
-                <a href="/en/home/blog-landing/" target="_blank" rel="noreferrer" className={SOCIAL_ICON_CLASS}>
+                <a href="/home/blog-landing/" target="_blank" rel="noreferrer" className={SOCIAL_ICON_CLASS}>
                   <span style={{ fontFamily: 'Montserrat' }}>B</span>
                 </a>
                 <a href="https://www.facebook.com/africanbank/" target="_blank" rel="noreferrer" className={SOCIAL_ICON_CLASS}>

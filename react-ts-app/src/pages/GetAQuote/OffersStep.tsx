@@ -85,7 +85,7 @@ export function OffersStep({ amount, termMonths }: OffersStepProps) {
           <div className="mt-[31px] flex justify-center gap-5 max-sm:grid max-sm:justify-center max-sm:gap-2.5 max-sm:text-center">
             <a
               className={btnTertiary}
-              href="/en/home/product-personal-loan"
+              href="/home/product-personal-loan"
             >
               Close
             </a>

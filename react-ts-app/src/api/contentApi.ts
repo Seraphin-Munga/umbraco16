@@ -1,19 +1,4 @@
-// Client for Umbraco's Content Delivery API (Umbraco.CMS.Global.DeliveryApi in
-// appsettings.json). Shapes below are confirmed against the actual DTOs in
-// the installed Umbraco.Cms.Api.Delivery/Umbraco.Core packages (ApiBlockListModel,
-// ApiElement, ApiLink), NOT just inferred from Navigation.cshtml's untyped
-// IPublishedContent walk.
-//
-// menuInfo nests four levels deep, confirmed against the real v8 source
-// schema (sqlcmd against cmsContentType/cmsPropertyType) and the migration
-// fixes that make it convert correctly (Program.cs STEP 3B + the
-// string-encoded-nesting + internal-link-UDI-remap fixes):
-//   topNavigation.menuInfo      (nCMenuCategory: menuDescription, menuName, menus)
-//     -> menus                 (nCMenuContent: categoryName, link)
-//       -> link                (nCMenuList: menuList, pageSection, menuDescription)
-// An earlier version of this file only mapped menuDescription + menuName
-// because "menus" genuinely didn't exist on the migrated schema yet at the
-// time - that's fixed now, so this maps the full tree.
+
 
 import type {
   BlogPost,
@@ -150,9 +135,17 @@ async function fetchContentByRoute(
   signal?: AbortSignal,
   expand?: string,
 ): Promise<RawContentItem | undefined> {
+  // Every caller here passes a browser-facing path starting with "/en" (see
+  // App.tsx's own "/en/home/" routes), but this content tree has no culture
+  // segment in its real Umbraco routes - confirmed against a live
+  // ?filter=contentType:topNavigation response, whose own route.path is
+  // "/home/homepagelements/top-navigation/", not "/en/home/...". Without
+  // this strip, every route-based fetch (topNavigation, DynamicPage's
+  // catch-all, fetchProductLoanPage, fetchPersonalLoanCampaign) 404s.
+  const umbracoPath = path.replace(/^\/en(?=\/|$)/, '');
   const query = expand ? `?expand=${expand}` : '';
 
-  const response = await fetch(`${API_BASE}/umbraco/delivery/api/v2/content/item${path}${query}`, {
+  const response = await fetch(`${API_BASE}/umbraco/delivery/api/v2/content/item${umbracoPath}${query}`, {
     headers: { Accept: 'application/json' },
     signal,
   });
@@ -290,7 +283,7 @@ export async function fetchTopNavigation(signal?: AbortSignal): Promise<TopNavig
   // - there's more than one topNavigation-typed node in the tree, so a bare
   // type filter with take=1 isn't guaranteed to land on this specific one.
   const topNavigation = await fetchContentByRoute(
-    '/en/home/homepagelements/top-navigation/',
+    '/home/homepagelements/top-navigation/',
     signal,
     TOP_NAVIGATION_EXPAND,
   );
@@ -629,9 +622,8 @@ export async function fetchWhatsNew(signal?: AbortSignal): Promise<WhatsNew | nu
 // HOME PAGE SECTIONS (homePage doctype - Block List page builder)
 // ============================================================
 //
-// Reads the CMS-managed `homePage` content node created by Program.cs's
-// `create-home-schema` command - a single "sections" Block List whose
-// allowed block types (heroCarouselBlock, bankWithAudacityBlock, ...)
+// Reads the CMS-managed `homePage` content node - a single "sections"
+// Block List whose allowed block types (heroCarouselBlock, bankWithAudacityBlock, ...)
 // mirror the ten static <section>s Home.tsx currently renders one-to-one.
 // Sections come back in editor-defined order, so Home.tsx just maps over
 // them - reordering/adding/removing a section is then a backoffice edit,
@@ -1044,20 +1036,36 @@ export async function fetchHomePageSections(signal?: AbortSignal): Promise<HomeP
   return mapTypedBlocks(homePage.properties.sections, mapHomePageSection);
 }
 
+/**
+ * Fetches the live `pageHome` node's own SEO fields (seoTitle/
+ * seoDescription/canonicalUrl/ogImage/noIndex). Deliberately separate from
+ * fetchHomePageSections above, which reads the different, section-driven
+ * `homePage` doctype - pageHome is the real Home content node (the one
+ * Personal/Business Banking are parented under), not fetched anywhere else
+ * today. Returns null if no pageHome node exists - Home.tsx then falls
+ * back to index.html's static <title>/no-meta default via useSeoMeta.
+ */
+export async function fetchHomePageSeo(signal?: AbortSignal): Promise<PageSeo | null> {
+  const pageHome = await fetchOne(
+    '?filter=contentType:pageHome&expand=properties[$all]&take=1',
+    signal,
+  );
+  return pageHome ? mapPageSeo(pageHome.properties) : null;
+}
+
 // ============================================================
 // PRODUCT LOAN PAGE SECTIONS (productLoanPage doctype - Block List page
 // builder, same shape as the homePage one above)
 // ============================================================
 //
-// Reads the CMS-managed `productLoanPage` content node created by
-// Program.cs's `create-product-loan-schema` command - ported from
+// Reads the CMS-managed `productLoanPage` content node - ported from
 // PersonalLoanPage.tsx, the component actually rendered at
 // /en/home/product-personal-loan/ today (a fully static page - see that
 // file's own comment for why it's not fetchProductLoanPage or
 // fetchPersonalLoanCampaign above, which describe two separate retired
 // Razor templates wired to no component). faqSectionBlock/faqItem are
-// general-purpose Element Types (see create-product-loan-schema's own
-// comment) - nothing here assumes they're exclusive to this page.
+// general-purpose Element Types - nothing here assumes they're exclusive
+// to this page.
 export interface ProductFaqItem {
   question: string;
   answerHtml: string;
@@ -1475,9 +1483,34 @@ export function mapAnySection(
   );
 }
 
+// The 5 SEO fields shared across blogDetail/businessBankingPage/pageHome/
+// productLoanPage - same aliases on all of them, so one mapper covers them
+// all. ogImage reads through mapMediaUrl like every other media property
+// in this file; noIndex is Umbraco.TrueFalse, which the Delivery API
+// returns as a real JSON boolean - the string/number checks below just
+// guard against an unexpected shape rather than crashing.
+export interface PageSeo {
+  title: string;
+  description: string;
+  canonicalUrl: string;
+  ogImage: string;
+  noIndex: boolean;
+}
+
+function mapPageSeo(props: Record<string, unknown>): PageSeo {
+  return {
+    title: str(props.seoTitle),
+    description: str(props.seoDescription),
+    canonicalUrl: str(props.canonicalUrl),
+    ogImage: mapMediaUrl(props.ogImage),
+    noIndex: props.noIndex === true || props.noIndex === 'true' || props.noIndex === 1,
+  };
+}
+
 export interface DynamicPageResult {
   contentType: string;
   sections: AnyPageSection[];
+  seo: PageSeo;
 }
 
 /**
@@ -1496,6 +1529,7 @@ export async function fetchPageSectionsByRoute(
   return {
     contentType: page.contentType,
     sections: mapTypedBlocks(page.properties.sections, mapAnySection),
+    seo: mapPageSeo(page.properties),
   };
 }
 

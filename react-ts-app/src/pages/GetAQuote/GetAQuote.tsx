@@ -52,21 +52,21 @@ const QUOTE_CARDS: QuoteCard[] = [
     title: 'MyWorld Bank Account',
     description:
       'Open an account that grows with you. Enjoy lower banking fees, and instant transfers.',
-    href: '/en/home/banking/#MyWorld',
+    href: '/home/banking/#MyWorld',
   },
   {
     id: 'invest',
     title: 'Investment Account',
     description:
       'Make your money work with you. Start investing today and grow towards the future you deserve.',
-    href: '/en/home/product-fixed-deposit-investment/#myCalculator',
+    href: '/home/product-fixed-deposit-investment/#myCalculator',
   },
   {
     id: 'funeral',
     title: 'Funeral Cover',
     description:
       'Protect your loved ones with dignity. Get a reliable funeral cover that backs you.',
-    href: '/en/home/product-funeral-cover/#funeral-calculator',
+    href: '/home/product-funeral-cover/#funeral-calculator',
   },
   {
     id: 'isiko',

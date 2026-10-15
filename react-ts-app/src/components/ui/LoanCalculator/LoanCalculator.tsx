@@ -60,7 +60,7 @@ export function LoanCalculator({
   defaultTerm = 7,
   minTerm = 7,
   maxTerm = 72,
-  applyUrl = '/en/home/get-a-quote/',
+  applyUrl = '/home/get-a-quote/',
   imageUrl = 'https://www.africanbank.co.za/media/gxxokcop/loan-calc.png',
   imageAlt = 'man aplying for a loan',
   imagePosition = 'right',
