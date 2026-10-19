@@ -195,7 +195,9 @@ export function Header() {
           >
             {searchOpen ? <X className="size-5" /> : <Search className="size-5" />}
           </button>
-          <div className="flex items-center overflow-hidden rounded-full bg-brand-green text-sm font-semibold text-white">
+          {/* Legacy .login-btn uses its own brighter green (#5dc300), distinct
+              from the site's general brand-green (#88bc47) used elsewhere. */}
+          <div className="flex items-center overflow-hidden rounded-full bg-[#5dc300] text-sm font-semibold text-white">
             <button
               type="button"
               onClick={openRegisterLogin}
@@ -375,7 +377,7 @@ export function Header() {
                   closeMobile();
                   openRegisterLogin();
                 }}
-                className="w-full rounded-full bg-brand-green text-white hover:bg-brand-green/90"
+                className="w-full rounded-full bg-[#5dc300] text-white hover:bg-[#5dc300]/90"
               >
                 Register/Login
               </Button>

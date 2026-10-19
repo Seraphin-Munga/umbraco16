@@ -68,7 +68,10 @@ services:
         # this must point at wherever the backend is actually reachable
         # from a browser - override via .env if deploying somewhere other
         # than this project's own 37.27.4.29 server.
-        VITE_UMBRACO_API_BASE_URL: "${PUBLIC_BACKEND_URL:-http://37.27.4.29:889}"
+        # Empty on purpose - the backend isn't reachable on its own port from
+        # outside this host's network, so nginx.conf proxies /umbraco/ and
+        # /media/ to it instead, and the frontend calls its own origin.
+        VITE_UMBRACO_API_BASE_URL: "${PUBLIC_BACKEND_URL:-}"
         VITE_ONLINE_UPLOAD_URL: "${VITE_ONLINE_UPLOAD_URL:-}"
     container_name: umbraco-frontend
     restart: unless-stopped
