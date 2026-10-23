@@ -17,6 +17,7 @@ import type { RewardsCard } from '../components/Home/RewardsSection';
 import type { BusinessAudacitySlide } from '../components/Home/BusinessAudacitySection';
 import type { VideoTestimonial } from '../components/Home/Testimonials';
 import type { LoanCalculatorProps } from '../components/ui/LoanCalculator/LoanCalculator';
+import type { InvestmentProduct } from '../components/ui/InvestmentCalculator/InvestmentCalculator';
 
 export interface DeliveryLink {
   url: string;
@@ -778,6 +779,7 @@ export type HomePageSection =
       kind: 'featureChecklistBlock';
       heading: string;
       subheading: string;
+      bodyHtml: string;
       features: string[];
       cta: { label: string; url: string } | null;
       imageUrl: string;
@@ -849,7 +851,7 @@ export function mapHomePageSection(
         kind: 'heroImageBannerBlock',
         headingLead: str(props.headingLead),
         headingHighlight: str(props.headingHighlight),
-        description: str(props.description),
+        description: mapRichText(props.description),
         primaryCta: mapButton(props.primaryCta),
         secondaryCta: mapButton(props.secondaryCta),
         imageUrl: mapMediaUrl(props.image),
@@ -889,6 +891,7 @@ export function mapHomePageSection(
         kind: 'featureChecklistBlock',
         heading: str(props.heading),
         subheading: str(props.subheading),
+        bodyHtml: mapRichText(props.bodyHtml),
         features: mapBlocks(props.features, (p) => str(p.text)).filter(Boolean),
         cta: mapButton(props.cta),
         imageUrl: mapMediaUrl(props.image),
@@ -1157,7 +1160,118 @@ export type ProductLoanPageSection =
       kind: 'contactInfoBlock';
       heading: string;
       cards: { heading: string; bodyHtml: string }[];
+    }
+  | {
+      kind: 'ratesAndFeaturesBlock';
+      ratesHeading: string;
+      rateTiers: { tierLabel: string; rateValue: string }[];
+      ratesDisclaimerOne: string;
+      ratesDisclaimerTwo: string;
+      featuresHeading: string;
+      column1Icon: string;
+      column1Name: string;
+      column2Icon: string;
+      column2Name: string;
+      column3Icon: string;
+      column3Name: string;
+      featureRows: {
+        label: string;
+        column1Checked: boolean;
+        column1Value: string;
+        column2Checked: boolean;
+        column2Value: string;
+        column3Checked: boolean;
+        column3Value: string;
+      }[];
+    }
+  | {
+      kind: 'iconCardGridBlock';
+      heading: string;
+      cards: { iconUrl: string; title: string; description: string }[];
+    }
+  | {
+      kind: 'ratesMatrixBlock';
+      heading: string;
+      tierHeading: string;
+      columnHeadings: string[];
+      rows: { tierLabel: string; rates: string[] }[];
+      disclaimers: string[];
+    }
+  | {
+      kind: 'investmentCalculatorBlock';
+      heading: string;
+      defaultProduct: InvestmentProduct;
+      imageUrl: string;
+      imageAlt: string;
+      disclaimer: string;
+      openAccountUrl: string;
+    }
+  | {
+      kind: 'claimFormBlock';
+      heading: string;
+      intro: string;
+      imageUrl: string;
+      imageAlt: string;
+      submitUrl: string;
+      successMessage: string;
+      errorMessage: string;
+    }
+  | {
+      kind: 'stepCardsBlock';
+      heading: string;
+      introHtml: string;
+      introCta: { label: string; url: string } | null;
+      cards: { title: string; bodyHtml: string; cta: { label: string; url: string } | null }[];
+    }
+  | { kind: 'imageBannerBlock'; imageUrl: string; mobileImageUrl: string; imageAlt: string; linkUrl: string }
+  | {
+      kind: 'spendCarouselBlock';
+      heading: string;
+      introHtml: string;
+      slides: { imageUrl: string; title: string; bodyHtml: string; cta: { label: string; url: string } | null }[];
+    }
+  | {
+      kind: 'rewardsFooterBlock';
+      bandCta: { label: string; url: string } | null;
+      headingHtml: string;
+      cta: { label: string; url: string } | null;
+      links: { label: string; url: string }[];
+    }
+  | {
+      kind: 'partnerTabsBlock';
+      heading: string;
+      introHtml: string;
+      tabs: {
+        label: string;
+        heading: string;
+        subheading: string;
+        description: string;
+        imageUrl: string;
+        cards: { title: string; bodyHtml: string; link: { label: string; url: string } | null }[];
+        footnoteHtml: string;
+        closingText: string;
+        cta: { label: string; url: string } | null;
+      }[];
+    }
+  | {
+      kind: 'funeralCalculatorBlock';
+      heading: string;
+      imageUrl: string;
+      imageAlt: string;
+      applyUrl: string;
     };
+
+// ratesMatrixBlock stores its column headings and each row's rates as one
+// "|"-separated text field rather than a nested list per cell - a rates
+// table is edited a row at a time, and this keeps each row one block.
+function splitPipes(value: unknown): string[] {
+  return str(value)
+    .split('|')
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+const INVESTMENT_PRODUCTS: InvestmentProduct[] = ['Fixed', 'Notice', 'Access', 'TxFree'];
 
 export function mapProductLoanPageSection(
   contentType: string,
@@ -1168,7 +1282,7 @@ export function mapProductLoanPageSection(
       return {
         kind: 'heroBannerBlock',
         heading: str(props.heading),
-        description: str(props.description),
+        description: mapRichText(props.description),
         primaryCta: mapButton(props.primaryCta),
         secondaryCta: mapButton(props.secondaryCta),
         imageUrl: mapMediaUrl(props.image),
@@ -1288,6 +1402,161 @@ export function mapProductLoanPageSection(
           heading: str(p.heading),
           bodyHtml: mapRichText(p.bodyHtml),
         })),
+      };
+
+    case 'ratesAndFeaturesBlock':
+      return {
+        kind: 'ratesAndFeaturesBlock',
+        ratesHeading: str(props.ratesHeading),
+        rateTiers: mapBlocks(props.rateTiers, (p) => ({
+          tierLabel: str(p.tierLabel),
+          rateValue: str(p.rateValue),
+        })),
+        ratesDisclaimerOne: mapRichText(props.ratesDisclaimerOne),
+        ratesDisclaimerTwo: mapRichText(props.ratesDisclaimerTwo),
+        featuresHeading: str(props.featuresHeading),
+        column1Icon: mapMediaUrl(props.column1Icon),
+        column1Name: str(props.column1Name),
+        column2Icon: mapMediaUrl(props.column2Icon),
+        column2Name: str(props.column2Name),
+        column3Icon: mapMediaUrl(props.column3Icon),
+        column3Name: str(props.column3Name),
+        featureRows: mapBlocks(props.featureRows, (p) => ({
+          label: str(p.label),
+          column1Checked: p.column1Checked === true,
+          column1Value: str(p.column1Value),
+          column2Checked: p.column2Checked === true,
+          column2Value: str(p.column2Value),
+          column3Checked: p.column3Checked === true,
+          column3Value: str(p.column3Value),
+        })),
+      };
+
+    case 'iconCardGridBlock':
+      return {
+        kind: 'iconCardGridBlock',
+        heading: str(props.heading),
+        cards: mapBlocks(props.cards, (p) => ({
+          iconUrl: mapMediaUrl(p.icon),
+          title: str(p.title),
+          description: str(p.description),
+        })),
+      };
+
+    case 'ratesMatrixBlock':
+      return {
+        kind: 'ratesMatrixBlock',
+        heading: str(props.heading),
+        tierHeading: str(props.tierHeading),
+        columnHeadings: splitPipes(props.columnHeadings),
+        rows: mapBlocks(props.rows, (p) => ({ tierLabel: str(p.tierLabel), rates: splitPipes(p.rates) })),
+        disclaimers: mapBlocks(props.disclaimers, (p) => str(p.text)).filter(Boolean),
+      };
+
+    case 'investmentCalculatorBlock': {
+      const product = str(props.investmentType) as InvestmentProduct;
+      return {
+        kind: 'investmentCalculatorBlock',
+        heading: str(props.heading),
+        defaultProduct: INVESTMENT_PRODUCTS.includes(product) ? product : 'Fixed',
+        imageUrl: mapMediaUrl(props.image),
+        imageAlt: str(props.imageAlt),
+        disclaimer: str(props.disclaimer),
+        openAccountUrl: mapButton(props.openAccountLink)?.url ?? '',
+      };
+    }
+
+    case 'claimFormBlock':
+      return {
+        kind: 'claimFormBlock',
+        heading: str(props.heading),
+        intro: str(props.intro),
+        imageUrl: mapMediaUrl(props.image),
+        imageAlt: str(props.imageAlt),
+        submitUrl: str(props.submitUrl),
+        successMessage: str(props.successMessage),
+        errorMessage: str(props.errorMessage),
+      };
+
+    case 'stepCardsBlock':
+      return {
+        kind: 'stepCardsBlock',
+        heading: str(props.heading),
+        introHtml: mapRichText(props.introHtml),
+        introCta: mapButton(props.introCta),
+        cards: mapBlocks(props.cards, (p) => ({
+          title: str(p.title),
+          bodyHtml: mapRichText(p.bodyHtml),
+          cta: mapButton(p.cta),
+        })),
+      };
+
+    case 'imageBannerBlock':
+      return {
+        kind: 'imageBannerBlock',
+        imageUrl: mapMediaUrl(props.image),
+        mobileImageUrl: mapMediaUrl(props.mobileImage),
+        imageAlt: str(props.imageAlt),
+        linkUrl: mapButton(props.link)?.url ?? '',
+      };
+
+    case 'spendCarouselBlock':
+      return {
+        kind: 'spendCarouselBlock',
+        heading: str(props.heading),
+        introHtml: mapRichText(props.introHtml),
+        slides: mapBlocks(props.slides, (p) => ({
+          imageUrl: mapMediaUrl(p.image),
+          title: str(p.title),
+          bodyHtml: mapRichText(p.bodyHtml),
+          cta: mapButton(p.cta),
+        })),
+      };
+
+    case 'rewardsFooterBlock':
+      return {
+        kind: 'rewardsFooterBlock',
+        bandCta: mapButton(props.bandCta),
+        headingHtml: mapRichText(props.headingHtml),
+        cta: mapButton(props.cta),
+        links: [mapButton(props.link1), mapButton(props.link2)].filter(
+          (link): link is { label: string; url: string } => link !== null,
+        ),
+      };
+
+    // Each partner tab keeps its (at most two) earn-rate cards as flat
+    // card1*/card2* fields rather than a third nested Block List.
+    case 'partnerTabsBlock':
+      return {
+        kind: 'partnerTabsBlock',
+        heading: str(props.heading),
+        introHtml: mapRichText(props.introHtml),
+        tabs: mapBlocks(props.tabs, (p) => ({
+          label: str(p.label),
+          heading: str(p.heading),
+          subheading: str(p.subheading),
+          description: str(p.description),
+          imageUrl: mapMediaUrl(p.image),
+          cards: [1, 2]
+            .map((n) => ({
+              title: str(p[`card${n}Title`]),
+              bodyHtml: mapRichText(p[`card${n}Html`]),
+              link: mapButton(p[`card${n}Link`]),
+            }))
+            .filter((card) => card.title),
+          footnoteHtml: mapRichText(p.footnoteHtml),
+          closingText: str(p.closingText),
+          cta: mapButton(p.cta),
+        })),
+      };
+
+    case 'funeralCalculatorBlock':
+      return {
+        kind: 'funeralCalculatorBlock',
+        heading: str(props.heading),
+        imageUrl: mapMediaUrl(props.image),
+        imageAlt: str(props.imageAlt),
+        applyUrl: mapButton(props.applyLink)?.url ?? '',
       };
 
     default:
@@ -1468,6 +1737,9 @@ const ANY_PAGE_SECTIONS_EXPAND =
   'categories[properties[documents[properties[$all]],$all]],' +
   'perks[properties[$all]],' +
   'links[properties[$all]],' +
+  'rows[properties[$all]],' +
+  'disclaimers[properties[$all]],' +
+  'tabs[properties[$all]],' +
   '$all]],$all]';
 
 export type AnyPageSection = HomePageSection | ProductLoanPageSection | BusinessPageSection;

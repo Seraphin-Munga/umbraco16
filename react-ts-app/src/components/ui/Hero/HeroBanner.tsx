@@ -39,7 +39,12 @@ export function HeroBanner({
                 </strong>
               </h1>
             )}
-            {description && <p className="mb-[10px] text-base leading-[1.3] text-white">{description}</p>}
+            {description && (
+              <div
+                className="mb-[10px] text-base leading-[1.3] text-white [&_p]:mb-[10px] [&_p:last-child]:mb-0"
+                dangerouslySetInnerHTML={{ __html: description }}
+              />
+            )}
             {(primaryCta || secondaryCta) && (
               <div className="flex flex-wrap items-center gap-[30px]">
                 {primaryCta && (

@@ -9,6 +9,10 @@ export interface FeatureChecklistCta {
 export interface FeatureChecklistProps {
   heading: string;
   subheading?: string;
+  // Optional rich text between the heading and the checklist (e.g.
+  // Stokvel's "How To Apply" channels followed by a "Documents Required"
+  // heading) - blank on every older instance, which renders as before.
+  bodyHtml?: string;
   features: string[];
   cta?: FeatureChecklistCta | null;
   imageUrl?: string;
@@ -34,6 +38,7 @@ export interface FeatureChecklistProps {
 export function FeatureChecklist({
   heading,
   subheading,
+  bodyHtml,
   features,
   cta,
   imageUrl,
@@ -45,8 +50,17 @@ export function FeatureChecklist({
 
   const textColumn = (
     <div>
-      <h1 className="mb-[10px] text-[20px] leading-none font-extralight text-brand-ink sm:text-[65px]">{heading}</h1>
+      {heading && (
+        <h1 className="mb-[10px] text-[20px] leading-none font-extralight text-brand-ink sm:text-[65px]">{heading}</h1>
+      )}
       {subheading && <p className="mb-[20px] text-sm font-normal text-brand-slate uppercase">{subheading}</p>}
+      {bodyHtml && (
+        <div
+          className="mt-[20px] text-base text-brand-ink [&_h4]:mt-6 [&_h4]:text-lg [&_h4]:font-bold [&_li]:mb-3 [&_ul]:list-disc [&_ul]:pl-5"
+          dangerouslySetInnerHTML={{ __html: bodyHtml }}
+        />
+      )}
+      {features.length > 0 && (
       <div className="mt-[20px] mb-[30px]">
         <ul className="flex flex-wrap">
           {features.map((feature) => (
@@ -69,6 +83,7 @@ export function FeatureChecklist({
           ))}
         </ul>
       </div>
+      )}
       {cta && (
         <div className="mt-[10px] flex flex-wrap items-center gap-[30px]">
           <Button href={cta.url}>{cta.label}</Button>

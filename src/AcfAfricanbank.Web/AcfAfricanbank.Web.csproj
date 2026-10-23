@@ -24,6 +24,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Pins transitive dependencies pulled in by Umbraco.Cms/DacFx above
+         their vulnerable resolved versions (NU1902/NU1903) - all patch-
+         level bumps within the same major/minor line already in use, so
+         no behaviour change expected. Left out: SixLabors.ImageSharp
+         (also flagged, also transitive) - its fix needs a 3.x -> 4.x
+         major jump that Umbraco.Cms.Imaging.ImageSharp may not yet
+         support, so that one's deliberately not pinned here. -->
+    <PackageReference Include="System.IO.Packaging" Version="8.0.1" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
     <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
     <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="72.1.0.3" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />

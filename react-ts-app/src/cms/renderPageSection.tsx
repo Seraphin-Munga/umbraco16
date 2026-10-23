@@ -24,6 +24,17 @@ import { PlugAndGo } from '../components/ui/TechDeals/PlugAndGo';
 import { TechRequirements } from '../components/ui/TechDeals/TechRequirements';
 import { TechCallToAction } from '../components/ui/TechDeals/TechCallToAction';
 import { ContactInfo } from '../components/ui/ContactInfo/ContactInfo';
+import { RatesAndFeatures } from '../components/ui/RatesAndFeatures/RatesAndFeatures';
+import { IconCardGrid } from '../components/ui/IconCardGrid/IconCardGrid';
+import { RatesMatrix } from '../components/ui/RatesMatrix/RatesMatrix';
+import { InvestmentCalculator } from '../components/ui/InvestmentCalculator/InvestmentCalculator';
+import { ClaimForm } from '../components/ui/ClaimForm/ClaimForm';
+import { FuneralCalculator } from '../components/ui/FuneralCalculator/FuneralCalculator';
+import { StepCards } from '../components/ui/StepCards/StepCards';
+import { PartnerTabs } from '../components/ui/PartnerTabs/PartnerTabs';
+import { ImageBanner } from '../components/ui/ImageBanner/ImageBanner';
+import { SpendCarousel } from '../components/ui/SpendCarousel/SpendCarousel';
+import { RewardsFooter } from '../components/ui/RewardsFooter/RewardsFooter';
 import { BusinessHeroCarousel } from '../components/ui/BusinessBanking/BusinessHeroCarousel';
 import { BusinessOfferings } from '../components/ui/BusinessBanking/BusinessOfferings';
 import { IconFeaturePanel } from '../components/ui/BusinessBanking/IconFeaturePanel';
@@ -173,7 +184,29 @@ function sectionBackground(index: number): string {
   return index % 2 === 0 ? 'bg-brand-mist' : 'bg-white';
 }
 
-export function renderPageSection(section: AnyPageSection, index: number): ReactNode {
+// Alternates heroBannerBlock's own image side across a page with more than
+// one of them (e.g. MyWorld's 3 - see HeroSplit.tsx's own imageOnRight
+// prop): the first is image-on-right (HeroSplit's existing default look),
+// the second flips to image-on-left, the third back to the right, and so
+// on - a zigzag rhythm rather than every hero on a page looking identical.
+// Counts occurrences up to and including the current one in the FULL
+// section list (the 3rd arg Array.prototype.map already passes to its
+// callback), not just this page's own running total some other way, so
+// this needs no extra state threaded through from DynamicPage/Home.tsx.
+function heroImageOnRight(sections: readonly AnyPageSection[], index: number): boolean {
+  const heroIndex = sections.slice(0, index + 1).filter((s) => s.kind === 'heroBannerBlock').length - 1;
+  return heroIndex % 2 === 0;
+}
+
+export function renderPageSection(
+  section: AnyPageSection,
+  index: number,
+  sections: readonly AnyPageSection[],
+): ReactNode {
+  // Full-width image banners sit outside the grey/white alternation, so a
+  // page that opens with one alternates exactly as if it weren't there.
+  const bgIndex = index - sections.slice(0, index).filter((item) => item.kind === 'imageBannerBlock').length;
+
   switch (section.kind) {
     case 'heroCarouselBlock':
       return (
@@ -267,7 +300,7 @@ export function renderPageSection(section: AnyPageSection, index: number): React
           imageUrl={section.imageUrl}
           imageAlt={section.imageAlt}
           heading={appDownloadHeading(section.heading)}
-          background={sectionBackground(index)}
+          background={sectionBackground(bgIndex)}
         />
       );
 
@@ -287,7 +320,8 @@ export function renderPageSection(section: AnyPageSection, index: number): React
           secondaryCta={section.secondaryCta}
           imageUrl={section.imageUrl}
           imageAlt={section.imageAlt}
-          background={sectionBackground(index)}
+          background={sectionBackground(bgIndex)}
+          imageOnRight={heroImageOnRight(sections, index)}
         />
       );
 
@@ -348,12 +382,13 @@ export function renderPageSection(section: AnyPageSection, index: number): React
           key={index}
           heading={section.heading}
           subheading={section.subheading}
+          bodyHtml={section.bodyHtml}
           features={section.features}
           cta={section.cta}
           imageUrl={section.imageUrl}
           imageAlt={section.imageAlt}
           imageOnRight={section.imageOnRight}
-          background={sectionBackground(index)}
+          background={sectionBackground(bgIndex)}
         />
       );
 
@@ -370,7 +405,7 @@ export function renderPageSection(section: AnyPageSection, index: number): React
       // grid with matching spans rather than this app's usual 50/50
       // grid-cols-2, since the source wasn't an even split.
       return (
-        <section className={`flex min-h-[800px] w-full items-center py-10 ${sectionBackground(index)}`} key={index}>
+        <section className={`flex min-h-[800px] w-full items-center py-10 ${sectionBackground(bgIndex)}`} key={index}>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className={`grid grid-cols-1 items-center gap-10 ${section.imageUrl ? 'md:grid-cols-12 md:gap-16' : ''}`}>
               <div className={section.imageUrl ? 'md:col-span-7' : undefined}>
@@ -405,7 +440,7 @@ export function renderPageSection(section: AnyPageSection, index: number): React
           id={`accordionFAQ-${index}`}
           heading={section.heading}
           items={section.items}
-          background={sectionBackground(index)}
+          background={sectionBackground(bgIndex)}
         />
       );
 
@@ -415,7 +450,7 @@ export function renderPageSection(section: AnyPageSection, index: number): React
           key={index}
           heading={section.heading}
           items={section.items}
-          background={sectionBackground(index)}
+          background={sectionBackground(bgIndex)}
         />
       );
 
@@ -426,14 +461,14 @@ export function renderPageSection(section: AnyPageSection, index: number): React
           heading={section.heading}
           cards={section.cards}
           imageUrl={section.imageUrl}
-          background={sectionBackground(index)}
+          background={sectionBackground(bgIndex)}
         />
       );
 
     case 'techHeroBlock':
       // Tech Deals' own top banner (TechHero) - "Welcome to Tech Deals"
-      // beside a row of category icon tiles. `sectionBackground(index + 1)`
-      // (not `sectionBackground(index)`, which the product-loan blocks
+      // beside a row of category icon tiles. `sectionBackground(bgIndex + 1)`
+      // (not `sectionBackground(bgIndex)`, which the product-loan blocks
       // above use) - Tech Deals' own band sequence starts white, one
       // position earlier than that convention's own gray-first default, so
       // shifting by one reuses the same helper instead of a duplicate one.
@@ -444,7 +479,7 @@ export function renderPageSection(section: AnyPageSection, index: number): React
           highlightHeading={section.highlightHeading}
           subheading={section.subheading}
           categories={section.categories}
-          background={sectionBackground(index + 1)}
+          background={sectionBackground(bgIndex + 1)}
         />
       );
 
@@ -461,7 +496,7 @@ export function renderPageSection(section: AnyPageSection, index: number): React
           cta={section.cta}
           imageUrl={section.imageUrl}
           imageAlt={section.imageAlt}
-          background={sectionBackground(index + 1)}
+          background={sectionBackground(bgIndex + 1)}
         />
       );
 
@@ -476,7 +511,7 @@ export function renderPageSection(section: AnyPageSection, index: number): React
           items={section.items}
           perksHeading={section.perksHeading}
           perks={section.perks}
-          background={sectionBackground(index + 1)}
+          background={sectionBackground(bgIndex + 1)}
         />
       );
 
@@ -490,12 +525,145 @@ export function renderPageSection(section: AnyPageSection, index: number): React
           termsLabel={section.termsLabel}
           termsUrl={section.termsUrl}
           disclaimerHtml={section.disclaimerHtml}
-          background={sectionBackground(index + 1)}
+          background={sectionBackground(bgIndex + 1)}
         />
       );
 
     case 'contactInfoBlock':
       return <ContactInfo key={index} heading={section.heading} cards={section.cards} />;
+
+    case 'ratesAndFeaturesBlock':
+      return (
+        <RatesAndFeatures
+          key={index}
+          ratesHeading={section.ratesHeading}
+          rateTiers={section.rateTiers}
+          ratesDisclaimerOne={section.ratesDisclaimerOne}
+          ratesDisclaimerTwo={section.ratesDisclaimerTwo}
+          featuresHeading={section.featuresHeading}
+          column1Icon={section.column1Icon}
+          column1Name={section.column1Name}
+          column2Icon={section.column2Icon}
+          column2Name={section.column2Name}
+          column3Icon={section.column3Icon}
+          column3Name={section.column3Name}
+          featureRows={section.featureRows}
+        />
+      );
+
+    case 'iconCardGridBlock':
+      return (
+        <IconCardGrid key={index} heading={section.heading} cards={section.cards} background={sectionBackground(bgIndex)} />
+      );
+
+    case 'ratesMatrixBlock':
+      return (
+        <RatesMatrix
+          key={index}
+          heading={section.heading}
+          tierHeading={section.tierHeading || undefined}
+          columnHeadings={section.columnHeadings}
+          rows={section.rows}
+          disclaimers={section.disclaimers}
+          background={sectionBackground(bgIndex)}
+        />
+      );
+
+    case 'investmentCalculatorBlock':
+      return (
+        <InvestmentCalculator
+          key={index}
+          heading={section.heading || undefined}
+          defaultProduct={section.defaultProduct}
+          imageUrl={section.imageUrl || undefined}
+          imageAlt={section.imageAlt}
+          disclaimer={section.disclaimer}
+          openAccountUrl={section.openAccountUrl || undefined}
+        />
+      );
+
+    case 'claimFormBlock':
+      return (
+        <ClaimForm
+          key={index}
+          heading={section.heading || undefined}
+          intro={section.intro || undefined}
+          imageUrl={section.imageUrl || undefined}
+          imageAlt={section.imageAlt}
+          submitUrl={section.submitUrl}
+          successMessage={section.successMessage || undefined}
+          errorMessage={section.errorMessage || undefined}
+          background={sectionBackground(bgIndex)}
+        />
+      );
+
+    case 'stepCardsBlock':
+      return (
+        <StepCards
+          key={index}
+          heading={section.heading}
+          introHtml={section.introHtml}
+          introCta={section.introCta}
+          cards={section.cards}
+          background={sectionBackground(bgIndex)}
+        />
+      );
+
+    case 'imageBannerBlock':
+      return (
+        <ImageBanner
+          key={index}
+          imageUrl={section.imageUrl}
+          mobileImageUrl={section.mobileImageUrl || undefined}
+          imageAlt={section.imageAlt}
+          linkUrl={section.linkUrl || undefined}
+        />
+      );
+
+    case 'spendCarouselBlock':
+      return (
+        <SpendCarousel
+          key={index}
+          heading={section.heading}
+          introHtml={section.introHtml}
+          slides={section.slides}
+          background={sectionBackground(bgIndex)}
+        />
+      );
+
+    case 'rewardsFooterBlock':
+      return (
+        <RewardsFooter
+          key={index}
+          bandCta={section.bandCta}
+          headingHtml={section.headingHtml}
+          cta={section.cta}
+          links={section.links}
+        />
+      );
+
+    case 'partnerTabsBlock':
+      return (
+        <PartnerTabs
+          key={index}
+          heading={section.heading}
+          introHtml={section.introHtml}
+          tabs={section.tabs}
+          background={sectionBackground(bgIndex)}
+        />
+      );
+
+    case 'funeralCalculatorBlock':
+      return (
+        <FuneralCalculator
+          key={index}
+          heading={section.heading || undefined}
+          imageUrl={section.imageUrl || undefined}
+          imageAlt={section.imageAlt}
+          applyUrl={section.applyUrl || undefined}
+          background="bg-[#e9e9e9]"
+        />
+      );
 
     case 'businessHeroCarouselBlock':
       return (
@@ -513,7 +681,7 @@ export function renderPageSection(section: AnyPageSection, index: number): React
       return <BusinessOfferings key={index} heading={section.heading} cards={section.cards} />;
 
     case 'cardIconFeature':
-      // `sectionBackground(index + 1)` (not `sectionBackground(index)`,
+      // `sectionBackground(bgIndex + 1)` (not `sectionBackground(bgIndex)`,
       // see techHeroBlock's own comment on this same offset) - the live
       // page's own two panels start white, one position earlier than that
       // convention's own gray-first default.
@@ -527,7 +695,7 @@ export function renderPageSection(section: AnyPageSection, index: number): React
           imageUrl={section.imageUrl}
           imageAlt={section.imageAlt}
           imageOnRight={section.imageOnRight}
-          background={sectionBackground(index + 1)}
+          background={sectionBackground(bgIndex + 1)}
         />
       );
 
@@ -557,7 +725,7 @@ export function renderPageSection(section: AnyPageSection, index: number): React
           categories={section.categories}
           sizesFormatsHeading={section.sizesFormatsHeading}
           sizesFormatsText={section.sizesFormatsText}
-          background={sectionBackground(index + 1)}
+          background={sectionBackground(bgIndex + 1)}
         />
       );
 
@@ -569,7 +737,7 @@ export function renderPageSection(section: AnyPageSection, index: number): React
           links={section.links}
           imageUrl={section.imageUrl}
           imageAlt={section.imageAlt}
-          background={sectionBackground(index + 1)}
+          background={sectionBackground(bgIndex + 1)}
         />
       );
 

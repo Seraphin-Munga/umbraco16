@@ -1,4 +1,11 @@
-# syntax=docker/dockerfile:1
+# No "# syntax=docker/dockerfile:1" directive here on purpose - this
+# Dockerfile uses nothing beyond the classic Dockerfile frontend already
+# built into the Docker Engine itself (no heredocs, no --mount, nothing
+# BuildKit-exclusive), and that directive makes `docker compose build`
+# fetch the syntax frontend from docker.io at build time - which fails
+# outright on a host whose outbound network is allowlisted to only a few
+# domains (confirmed: registry-1.docker.io times out on the production
+# EC2 host, while mcr.microsoft.com and github.com are reachable).
 
 # Vite inlines VITE_* env vars into the bundle at build time (see .env.example),
 # so unlike a typical static site this image must be rebuilt per target

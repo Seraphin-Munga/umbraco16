@@ -1,0 +1,37 @@
+
+#!/bin/bash
+set -euo pipefail
+
+EC2_USER="ec2-user"
+EC2_HOST="10.2.15.48"
+SSH_KEY="/Users/seraphinngoymunga/Downloads/africanbank-umbraco.pem"
+REMOTE_DIR="/home/ec2-user/umbraco"
+
+SSH_OPTS=(-i "$SSH_KEY" -o IdentitiesOnly=yes)
+
+chmod 600 "$SSH_KEY"
+
+echo "Checking SSH connection..."
+ssh "${SSH_OPTS[@]}" "$EC2_USER@$EC2_HOST" \
+  "mkdir -p '$REMOTE_DIR'"
+
+echo "Uploading project..."
+rsync -avz \
+  --exclude='.git/' \
+  --exclude='**/bin/' \
+  --exclude='**/obj/' \
+  --exclude='**/node_modules/' \
+  --exclude='.env' \
+  -e "ssh -i $SSH_KEY -o IdentitiesOnly=yes" \
+  ./ "$EC2_USER@$EC2_HOST:$REMOTE_DIR/"
+
+echo "Deploying Docker containers..."
+ssh "${SSH_OPTS[@]}" "$EC2_USER@$EC2_HOST" \
+  "cd '$REMOTE_DIR' && sudo docker compose config -q && sudo docker compose up -d --build"
+
+echo "Checking containers..."
+ssh "${SSH_OPTS[@]}" "$EC2_USER@$EC2_HOST" \
+  "sudo docker compose -f '$REMOTE_DIR/docker-compose.yml' ps"
+
+echo "Deployment finished!"
+

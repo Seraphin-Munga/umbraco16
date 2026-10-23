@@ -23,9 +23,10 @@ export function AppDownloadSection({
   imageUrl,
   imageAlt,
   heading,
+  background = 'bg-white',
 }: AppDownloadSectionProps) {
   return (
-    <section className={`py-10 bg-white`}>
+    <section className={`py-10 ${background}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center gap-8 text-left md:flex-row">
           <div className="md:w-1/2">

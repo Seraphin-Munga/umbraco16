@@ -1219,7 +1219,7 @@ if (args.Length > 0 &&
             "heroImageBannerBlock", "Hero Image Banner", "icon-picture", true, false,
             new PropSpec("headingLead", "Heading (thin line)", txt),
             new PropSpec("headingHighlight", "Heading (bold line)", txt),
-            new PropSpec("description", "Description", txtArea),
+            new PropSpec("description", "Description", rte),
             new PropSpec("primaryCta", "Primary Button", link),
             new PropSpec("secondaryCta", "Secondary Button", link),
             new PropSpec("image", "Background Image", media),
@@ -2129,7 +2129,7 @@ if (args.Length > 0 &&
         GetOrCreateType(
             "heroBannerBlock", "Hero Banner", "icon-banner", true, false,
             new PropSpec("heading", "Heading", txt),
-            new PropSpec("description", "Description", txtArea),
+            new PropSpec("description", "Description", rte),
             new PropSpec("primaryCta", "Primary Button", link),
             new PropSpec("secondaryCta", "Secondary Button", link),
             new PropSpec("image", "Image", media),
@@ -2143,7 +2143,7 @@ if (args.Length > 0 &&
             "heroImageBannerBlock", "Hero Image Banner", "icon-picture", true, false,
             new PropSpec("headingLead", "Heading (thin line)", txt),
             new PropSpec("headingHighlight", "Heading (bold line)", txt),
-            new PropSpec("description", "Description", txtArea),
+            new PropSpec("description", "Description", rte),
             new PropSpec("primaryCta", "Primary Button", link),
             new PropSpec("secondaryCta", "Secondary Button", link),
             new PropSpec("image", "Background Image", media),
@@ -2155,7 +2155,7 @@ if (args.Length > 0 &&
         GetOrCreateType(
             "promoSplitBlock", "Promo Split", "icon-newspaper", true, false,
             new PropSpec("heading", "Heading", txt),
-            new PropSpec("description", "Description", txtArea),
+            new PropSpec("description", "Description", rte),
             new PropSpec("primaryCta", "Primary Button", link),
             new PropSpec("secondaryCta", "Secondary Button", link),
             new PropSpec("image", "Image", media),
@@ -2208,7 +2208,12 @@ if (args.Length > 0 &&
             new PropSpec("cta", "Button", link),
             new PropSpec("image", "Image", media),
             new PropSpec("imageAlt", "Image Alt Text", txt),
-            new PropSpec("imageOnRight", "Image On Right", boolType));
+            new PropSpec("imageOnRight", "Image On Right", boolType),
+            // Optional - rich text shown between the heading and the
+            // checklist (e.g. Stokvel's "How To Apply" channels). Blank on
+            // every instance seeded before this was added, which renders
+            // exactly as before.
+            new PropSpec("bodyHtml", "Body (optional, above the checklist)", rte));
 
     var creditLifeChecklistOne =
         await GetOrCreateBlockListAsync(
@@ -2222,8 +2227,8 @@ if (args.Length > 0 &&
         GetOrCreateType(
             "creditLifeInsuranceBlock", "Credit Life Insurance", "icon-umbrella", true, false,
             new PropSpec("heading", "Heading", txt),
-            new PropSpec("paragraphOne", "Paragraph One", txtArea),
-            new PropSpec("paragraphTwo", "Paragraph Two", txtArea),
+            new PropSpec("paragraphOne", "Paragraph One", rte),
+            new PropSpec("paragraphTwo", "Paragraph Two", rte),
             new PropSpec("checklistOne", "Checklist One", creditLifeChecklistOne),
             new PropSpec("checklistTwo", "Checklist Two", creditLifeChecklistTwo),
             new PropSpec("image", "Image", media));
@@ -2257,7 +2262,7 @@ if (args.Length > 0 &&
             "appDownloadBlock", "App Download", "icon-android", true, false,
             new PropSpec("heading", "Heading", txt),
             new PropSpec("subheading", "Subheading", txt),
-            new PropSpec("description", "Description", txtArea),
+            new PropSpec("description", "Description", rte),
             new PropSpec("downloadLink", "Download Link", link),
             new PropSpec("image", "Image", media),
             new PropSpec("imageAlt", "Image Alt Text", txt));
@@ -2393,6 +2398,257 @@ if (args.Length > 0 &&
             new PropSpec("heading", "Heading", txt),
             new PropSpec("cards", "Cards", contactInfoCards));
 
+    // --------------------------------------------------------
+    // RATES AND FEATURES BLOCK
+    // --------------------------------------------------------
+    //
+    // Ported from the legacy (pre-React) myworldPv5.cshtml/banking.cshtml/
+    // stok.cshtml/productNoticeDepositev2.cshtml Razor views' own "All
+    // Rates" + "MyWORLD Banking Features" section - this never got
+    // migrated to a React component or a Block List element type before
+    // now (confirmed: no trace of it anywhere in react-ts-app/src or
+    // elsewhere in this file). One combined block, not two - the rates
+    // table and the features comparison table always appear together as
+    // a single unit in every real instance of this content.
+    //
+    // Fixed at exactly 3 plan columns (MyWORLD/Power Pocket/Savings
+    // Pocket in the legacy content, but each column's own icon/name is
+    // editable per block instance) - matches every real instance of this
+    // table seen so far. A 4th column would need a new column1Icon/
+    // column1Name-shaped property pair added here, not a structural
+    // change.
+    //
+    // Each feature row's per-column cell is modelled as a toggle (true ->
+    // renders a checkmark) plus an optional text value (sits instead of
+    // the checkmark when set, e.g. "R0.00"/"1 User"/"Up to 10 Members") -
+    // leaving both unset renders a blank cell, matching the legacy
+    // table's own mix of checkmark/text/blank per cell per column.
+
+    var rateTierItem =
+        GetOrCreateType(
+            "rateTierItem", "Rate Tier Item", "icon-coin-dollar", true, false,
+            new PropSpec("tierLabel", "Balance Tier (e.g. \"R 0 - R 24 999\")", txt),
+            new PropSpec("rateValue", "Interest Rate (e.g. \"2.75%\")", txt));
+
+    var rateTiers =
+        await GetOrCreateBlockListAsync(
+            "React Migration - ratesAndFeaturesBlock.rateTiers", rateTierItem);
+
+    var featureRowItem =
+        GetOrCreateType(
+            "featureRowItem", "Feature Row Item", "icon-list", true, false,
+            new PropSpec("label", "Feature Label", txt),
+            new PropSpec("column1Checked", "Column 1: Checkmark", boolType),
+            new PropSpec("column1Value", "Column 1: Text Value (optional)", txt),
+            new PropSpec("column2Checked", "Column 2: Checkmark", boolType),
+            new PropSpec("column2Value", "Column 2: Text Value (optional)", txt),
+            new PropSpec("column3Checked", "Column 3: Checkmark", boolType),
+            new PropSpec("column3Value", "Column 3: Text Value (optional)", txt));
+
+    var featureRows =
+        await GetOrCreateBlockListAsync(
+            "React Migration - ratesAndFeaturesBlock.featureRows", featureRowItem);
+
+    var ratesAndFeaturesBlock =
+        GetOrCreateType(
+            "ratesAndFeaturesBlock", "Rates And Features", "icon-calculator", true, false,
+            new PropSpec("ratesHeading", "Rates Heading (e.g. \"All Rates\")", txt),
+            new PropSpec("rateTiers", "Rate Tiers", rateTiers),
+            new PropSpec("ratesDisclaimerOne", "Rates Disclaimer (NACM note)", rte),
+            new PropSpec("ratesDisclaimerTwo", "Rates Disclaimer (T&Cs note)", rte),
+            new PropSpec(
+                "featuresHeading", "Features Heading (e.g. \"MyWORLD Banking Features\")", txt),
+            new PropSpec("column1Icon", "Column 1 Icon", media),
+            new PropSpec("column1Name", "Column 1 Name", txt),
+            new PropSpec("column2Icon", "Column 2 Icon", media),
+            new PropSpec("column2Name", "Column 2 Name", txt),
+            new PropSpec("column3Icon", "Column 3 Icon", media),
+            new PropSpec("column3Name", "Column 3 Name", txt),
+            new PropSpec("featureRows", "Feature Rows", featureRows));
+
+    // --------------------------------------------------------
+    // INVESTMENT PAGE BLOCKS
+    // --------------------------------------------------------
+    //
+    // Ported from the legacy Fixed/Notice Deposit Razor pages
+    // (productFixedDepositInvestment*.cshtml, productNoticeDeposit*.cshtml):
+    // the outlined icon-card grid ("More About The Notice Deposit"), the
+    // tier x term "All Rates" table and the investment calculator. Rendered
+    // by IconCardGrid.tsx/RatesMatrix.tsx/InvestmentCalculator.tsx.
+    //
+    // ratesMatrixBlock keeps its column headings and each row's rates as
+    // one "|"-separated text field (e.g. "7 Days Notice|32 Days Notice|90
+    // Days Notice", "5.61%|6.32%|5.85%") rather than a nested list per
+    // cell, so the column count isn't fixed the way ratesAndFeaturesBlock's
+    // is - Notice Deposit has 3 columns, Fixed Deposit 6.
+
+    var iconCardItem =
+        GetOrCreateType(
+            "iconCardItem", "Icon Card Item", "icon-picture", true, false,
+            new PropSpec("icon", "Icon", media),
+            new PropSpec("title", "Title", txt),
+            new PropSpec("description", "Description", txtArea));
+
+    var iconCardGridCards =
+        await GetOrCreateBlockListAsync(
+            "React Migration - iconCardGridBlock.cards", iconCardItem);
+
+    var iconCardGridBlock =
+        GetOrCreateType(
+            "iconCardGridBlock", "Icon Card Grid", "icon-grid", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("cards", "Cards", iconCardGridCards));
+
+    var ratesMatrixRow =
+        GetOrCreateType(
+            "ratesMatrixRow", "Rates Matrix Row", "icon-coin-dollar", true, false,
+            new PropSpec("tierLabel", "Balance Tier (e.g. \"R0 - 24999.99\")", txt),
+            new PropSpec("rates", "Rates, one per column, separated by | (e.g. \"5.61%|6.32%|5.85%\")", txt));
+
+    var ratesMatrixRows =
+        await GetOrCreateBlockListAsync(
+            "React Migration - ratesMatrixBlock.rows", ratesMatrixRow);
+
+    var ratesMatrixDisclaimers =
+        await GetOrCreateBlockListAsync(
+            "React Migration - ratesMatrixBlock.disclaimers", featureItem);
+
+    var ratesMatrixBlock =
+        GetOrCreateType(
+            "ratesMatrixBlock", "Rates Matrix", "icon-calculator", true, false,
+            new PropSpec("heading", "Heading (e.g. \"All Rates\")", txt),
+            new PropSpec(
+                "columnHeadings", "Column Headings, separated by | (e.g. \"7 Days Notice|32 Days Notice\")", txt),
+            new PropSpec("rows", "Rows", ratesMatrixRows),
+            new PropSpec("disclaimers", "Disclaimers", ratesMatrixDisclaimers),
+            new PropSpec("tierHeading", "First Column Label (optional, defaults to \"Tier\")", txt));
+
+    var investmentCalculatorBlock =
+        GetOrCreateType(
+            "investmentCalculatorBlock", "Investment Calculator", "icon-calculator", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("investmentType", "Default Investment Type (Fixed, Notice, Access or TxFree)", txt),
+            new PropSpec("image", "Image", media),
+            new PropSpec("imageAlt", "Image Alt Text", txt),
+            new PropSpec("disclaimer", "Disclaimer", txtArea),
+            new PropSpec("openAccountLink", "Open Account Link", link));
+
+    // Two-step "Submit your claim" form (ClaimForm.tsx), ported from
+    // productcreditlifev2.cshtml. submitUrl is where it posts - the bank's
+    // contact service on the live site; blank it on an environment that
+    // mustn't create real claims (the form then shows errorMessage instead
+    // of posting).
+    var claimFormBlock =
+        GetOrCreateType(
+            "claimFormBlock", "Claim Form", "icon-message", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("intro", "Intro Text", txt),
+            new PropSpec("image", "Image", media),
+            new PropSpec("imageAlt", "Image Alt Text", txt),
+            new PropSpec("submitUrl", "Submit URL (blank = form shows the error message instead of posting)", txt),
+            new PropSpec("successMessage", "Success Message", txtArea),
+            new PropSpec("errorMessage", "Error Message", txtArea));
+
+    // Family Funeral Plan calculator (FuneralCalculator.tsx) - its member/
+    // cover rules live in the component, so only presentation is editable.
+    var funeralCalculatorBlock =
+        GetOrCreateType(
+            "funeralCalculatorBlock", "Funeral Calculator", "icon-calculator", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("image", "Image", media),
+            new PropSpec("imageAlt", "Image Alt Text", txt),
+            new PropSpec("applyLink", "Apply Link", link));
+
+    // Audacious Rewards page blocks (StepCards.tsx / PartnerTabs.tsx): the
+    // JOIN / EARN / SPEND row, and the "How to Earn" partner tabs. Each
+    // partner tab keeps its two earn-rate cards (Debit Card / Credit Card)
+    // as flat card1*/card2* fields rather than a third nested Block List.
+    var stepCard =
+        GetOrCreateType(
+            "stepCard", "Step Card", "icon-navigation-right", true, false,
+            new PropSpec("title", "Title", txt),
+            new PropSpec("bodyHtml", "Body", rte),
+            new PropSpec("cta", "Button", link));
+
+    var stepCardsCards =
+        await GetOrCreateBlockListAsync("React Migration - stepCardsBlock.cards", stepCard);
+
+    var stepCardsBlock =
+        GetOrCreateType(
+            "stepCardsBlock", "Step Cards", "icon-navigation-right", true, false,
+            new PropSpec("heading", "Heading (optional)", txt),
+            new PropSpec("cards", "Cards", stepCardsCards),
+            new PropSpec("introHtml", "Intro (optional, above the cards)", rte),
+            new PropSpec("introCta", "Intro Button (optional)", link));
+
+    // Full-width artwork banner whose text is baked into the image
+    // (ImageBanner.tsx), plus the "Spend with our benefit partners" slide
+    // carousel (SpendCarousel.tsx) and the page's closing strip
+    // (RewardsFooter.tsx: navy VISIT STORE band, "ACCESS YOUR REWARDS ..."
+    // heading, button and two outline document links).
+    var imageBannerBlock =
+        GetOrCreateType(
+            "imageBannerBlock", "Image Banner", "icon-picture", true, false,
+            new PropSpec("image", "Image", media),
+            new PropSpec("mobileImage", "Mobile Image (optional)", media),
+            new PropSpec("imageAlt", "Image Alt Text", txt),
+            new PropSpec("link", "Link (optional)", link));
+
+    var spendSlide =
+        GetOrCreateType(
+            "spendSlide", "Spend Slide", "icon-shopping-basket", true, false,
+            new PropSpec("image", "Partner Logo", media),
+            new PropSpec("title", "Title", txt),
+            new PropSpec("bodyHtml", "Body", rte),
+            new PropSpec("cta", "Button", link));
+
+    var spendCarouselSlides =
+        await GetOrCreateBlockListAsync("React Migration - spendCarouselBlock.slides", spendSlide);
+
+    var spendCarouselBlock =
+        GetOrCreateType(
+            "spendCarouselBlock", "Spend Carousel", "icon-shopping-basket", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("introHtml", "Intro", rte),
+            new PropSpec("slides", "Slides", spendCarouselSlides));
+
+    var rewardsFooterBlock =
+        GetOrCreateType(
+            "rewardsFooterBlock", "Rewards Footer", "icon-flag", true, false,
+            new PropSpec("bandCta", "Navy Band Button (e.g. VISIT STORE)", link),
+            new PropSpec("headingHtml", "Heading", rte),
+            new PropSpec("cta", "Button", link),
+            new PropSpec("link1", "Document Link 1 (e.g. Terms and Conditions)", link),
+            new PropSpec("link2", "Document Link 2 (e.g. FAQ's)", link));
+
+    var partnerTab =
+        GetOrCreateType(
+            "partnerTab", "Partner Tab", "icon-store", true, false,
+            new PropSpec("label", "Tab Label", txt),
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("subheading", "Subheading", txt),
+            new PropSpec("description", "Description", txtArea),
+            new PropSpec("image", "Banner Image", media),
+            new PropSpec("card1Title", "Card 1 Title (e.g. Debit Card)", txt),
+            new PropSpec("card1Html", "Card 1 Body", rte),
+            new PropSpec("card1Link", "Card 1 Link", link),
+            new PropSpec("card2Title", "Card 2 Title (e.g. Credit Card)", txt),
+            new PropSpec("card2Html", "Card 2 Body", rte),
+            new PropSpec("card2Link", "Card 2 Link", link),
+            new PropSpec("footnoteHtml", "Footnote", rte),
+            new PropSpec("closingText", "Closing Text", txtArea),
+            new PropSpec("cta", "Partner Button", link));
+
+    var partnerTabsTabs =
+        await GetOrCreateBlockListAsync("React Migration - partnerTabsBlock.tabs", partnerTab);
+
+    var partnerTabsBlock =
+        GetOrCreateType(
+            "partnerTabsBlock", "Partner Tabs", "icon-store", true, false,
+            new PropSpec("heading", "Heading", txt),
+            new PropSpec("introHtml", "Intro", rte),
+            new PropSpec("tabs", "Tabs", partnerTabsTabs));
+
     // ==========================================================
     // PRODUCT LOAN PAGE
     // ==========================================================
@@ -2418,7 +2674,18 @@ if (args.Length > 0 &&
             faqSectionBlock,
             downloadsSectionBlock,
             crossSellBlock,
-            appDownloadBlock);
+            appDownloadBlock,
+            ratesAndFeaturesBlock,
+            iconCardGridBlock,
+            ratesMatrixBlock,
+            investmentCalculatorBlock,
+            claimFormBlock,
+            funeralCalculatorBlock,
+            stepCardsBlock,
+            partnerTabsBlock,
+            imageBannerBlock,
+            spendCarouselBlock,
+            rewardsFooterBlock);
 
     GetOrCreateType(
         "productLoanPage", "Product Loan Page", "icon-coin-dollar", false, true,
@@ -5554,6 +5821,765 @@ if (args.Length > 0 &&
 }
 
 // ============================================================
+// RETYPE-PRODUCT-LOAN-RICHTEXT-FIELDS COMMAND
+// ============================================================
+//
+// create-product-loan-schema's own txtArea -> rte edit (heroBannerBlock.
+// description, heroImageBannerBlock.description, promoSplitBlock.
+// description, creditLifeInsuranceBlock.paragraphOne/paragraphTwo,
+// appDownloadBlock.description) only takes effect on a brand-new
+// database - GetOrCreateType can add a new property to an existing
+// content type but never retypes one already there (see its own comment
+// above), so on this live database those 6 properties are still
+// Umbraco.TextArea until something explicitly retypes them. This command
+// is that something, done the safe way: it (1) points each PropertyType
+// at the RichText DataType (DataTypeId/DataTypeKey/PropertyEditorAlias/
+// ValueStorageType all updated together, same four fields `new
+// PropertyType(shortStringHelper, dataType, alias)` would set for a brand
+// new one - confirmed via reflection, PropertyType has no public "retype"
+// method, just independently settable properties), then (2) rewrites
+// every live content node's already-stored plain string into RichText
+// (Tiptap)'s own {markup, blocks:{layout,contentData,settingsData}} JSON
+// shape (same shape BuildRichText helpers elsewhere in this file produce)
+// so the text itself is never dropped, only reformatted - each existing
+// line becomes its own <p> paragraph, HTML-encoded.
+//
+// Finds every place these 6 properties could actually be nested (any
+// Block List DataType whose own "blocks" config allows one of the 5
+// retyped element types, then every content type with a property wired
+// to that DataType) rather than assuming "productLoanPage.sections" is
+// the only such place - these blocks are documented as reused by homePage
+// and others too (see create-product-loan-schema's own "GLOBAL/SHARED
+// ELEMENT TYPES" comment). Warns (does not crash) if it finds one of
+// those container properties on an ELEMENT type instead of a real page -
+// confirmed via find-orphaned-elements' own report that none of this
+// schema's Block List element types have live content nodes of their own,
+// so this should never actually trigger, but a page nested two Block
+// Lists deep would need its outer property migrated by hand.
+//
+// Safe to re-run: a property already pointed at RichText is skipped (step
+// 1), and a value that already looks like JSON (starts with "{" - i.e.
+// already migrated, or was never plain text to begin with) is left alone
+// rather than double-wrapped (step 2). Only republishes a node that was
+// already published, at its current property values otherwise unchanged.
+if (args.Length > 0 &&
+    args[0].Equals("retype-product-loan-richtext-fields", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" RETYPE PRODUCT LOAN TEXTAREA FIELDS TO RICHTEXT");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService = app.Services.GetRequiredService<IContentTypeService>();
+    var contentService = app.Services.GetRequiredService<IContentService>();
+    var dataTypeService = app.Services.GetRequiredService<IDataTypeService>();
+
+    // Matched by editor alias, not name - GetOrCreateSharedDataTypeAsync
+    // (create-product-loan-schema's own helper) resolves its "rte" shared
+    // DataType the same way: it reuses whichever DataType already uses
+    // editor "Umbraco.RichText" first, before ever checking name, so on
+    // this database that's Umbraco's own built-in "Richtext editor"
+    // DataType, not a "React Migration - Richtext" one. Looking this up
+    // by name (as an earlier version of this command did) silently never
+    // matches on a database where that built-in one got reused.
+    var rteDataType =
+        (await dataTypeService.GetAllAsync())
+            .FirstOrDefault(d =>
+                d.EditorAlias.Equals("Umbraco.RichText", StringComparison.OrdinalIgnoreCase));
+
+    if (rteDataType == null)
+    {
+        Console.WriteLine(
+            "ERROR: no DataType using editor 'Umbraco.RichText' found - run " +
+            "'create-product-loan-schema' first.");
+        return;
+    }
+
+    Console.WriteLine($"Using RichText DataType: \"{rteDataType.Name}\" (id={rteDataType.Id})");
+
+    var targetProps = new (string TypeAlias, string PropAlias)[]
+    {
+        ("heroBannerBlock", "description"),
+        ("heroImageBannerBlock", "description"),
+        ("promoSplitBlock", "description"),
+        ("creditLifeInsuranceBlock", "paragraphOne"),
+        ("creditLifeInsuranceBlock", "paragraphTwo"),
+        ("appDownloadBlock", "description"),
+    };
+
+    Console.WriteLine("--- step 1: retype content type properties ---");
+
+    var targetPropsByTypeKey = new Dictionary<Guid, HashSet<string>>();
+
+    foreach (var typeAlias in targetProps.Select(t => t.TypeAlias).Distinct())
+    {
+        var contentType = contentTypeService.Get(typeAlias);
+
+        if (contentType == null)
+        {
+            Console.WriteLine($"SKIPPED TYPE (not found): {typeAlias}");
+            continue;
+        }
+
+        var propAliases =
+            targetProps
+                .Where(t => t.TypeAlias.Equals(typeAlias, StringComparison.OrdinalIgnoreCase))
+                .Select(t => t.PropAlias)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        targetPropsByTypeKey[contentType.Key] = propAliases;
+
+        var changed = false;
+
+        foreach (var propAlias in propAliases)
+        {
+            var prop =
+                contentType.PropertyTypes.FirstOrDefault(p =>
+                    p.Alias.Equals(propAlias, StringComparison.OrdinalIgnoreCase));
+
+            if (prop == null)
+            {
+                Console.WriteLine($"SKIPPED PROPERTY (not found): {typeAlias}.{propAlias}");
+                continue;
+            }
+
+            if (prop.DataTypeKey == rteDataType.Key)
+            {
+                Console.WriteLine($"ALREADY RICHTEXT: {typeAlias}.{propAlias}");
+                continue;
+            }
+
+            prop.DataTypeId = rteDataType.Id;
+            prop.DataTypeKey = rteDataType.Key;
+            prop.PropertyEditorAlias = rteDataType.EditorAlias;
+            prop.ValueStorageType = rteDataType.DatabaseType;
+            changed = true;
+
+            Console.WriteLine($"RETYPED: {typeAlias}.{propAlias} -> RichText");
+        }
+
+        if (changed)
+        {
+            contentTypeService.Save(contentType);
+        }
+    }
+
+    Console.WriteLine();
+    Console.WriteLine("--- step 2: migrate stored content values ---");
+
+    string BuildRichTextValue(string plainText)
+    {
+        var paragraphs =
+            plainText
+                .Replace("\r\n", "\n")
+                .Split('\n')
+                .Select(line => line.Trim())
+                .Where(line => line.Length > 0)
+                .Select(line => $"<p>{System.Net.WebUtility.HtmlEncode(line)}</p>")
+                .ToList();
+
+        var markup =
+            paragraphs.Count > 0
+                ? string.Concat(paragraphs)
+                : $"<p>{System.Net.WebUtility.HtmlEncode(plainText)}</p>";
+
+        var envelope =
+            new JsonObject
+            {
+                ["markup"] = markup,
+                ["blocks"] =
+                    new JsonObject
+                    {
+                        ["layout"] = new JsonObject(),
+                        ["contentData"] = new JsonArray(),
+                        ["settingsData"] = new JsonArray()
+                    }
+            };
+
+        return envelope.ToJsonString();
+    }
+
+    bool TryMigrateBlockListJson(string rawValue, out string newValue)
+    {
+        newValue = rawValue;
+
+        JsonNode? parsed;
+
+        try
+        {
+            parsed = JsonNode.Parse(rawValue);
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
+
+        if (parsed is not JsonObject root ||
+            !root.TryGetPropertyValue("contentData", out var cdNode) ||
+            cdNode is not JsonArray contentData)
+        {
+            return false;
+        }
+
+        var changed = false;
+
+        foreach (var item in contentData)
+        {
+            if (item is not JsonObject block) continue;
+
+            if (!block.TryGetPropertyValue("contentTypeKey", out var ctkNode) ||
+                ctkNode == null ||
+                !Guid.TryParse(ctkNode.ToString(), out var ctk) ||
+                !targetPropsByTypeKey.TryGetValue(ctk, out var propAliases))
+            {
+                continue;
+            }
+
+            // Each block's own properties live in a "values" array of
+            // {editorAlias, culture, segment, alias, value} tuples - NOT
+            // as flat {alias: value} keys directly on the block object
+            // (confirmed against this live database's actual stored
+            // shape; BuildBlockList's own simplified flat input gets
+            // normalized into this exact shape by Umbraco's own Block
+            // List property editor once SetValue/Save runs it through
+            // the real save pipeline - every live block already looks
+            // like this, flat or not going in).
+            if (!block.TryGetPropertyValue("values", out var valuesNode) ||
+                valuesNode is not JsonArray values)
+            {
+                continue;
+            }
+
+            foreach (var valueEntry in values)
+            {
+                if (valueEntry is not JsonObject valueObj ||
+                    !valueObj.TryGetPropertyValue("alias", out var aliasNode) ||
+                    aliasNode == null ||
+                    !propAliases.Contains(aliasNode.ToString()))
+                {
+                    continue;
+                }
+
+                if (!valueObj.TryGetPropertyValue("value", out var valNode) ||
+                    valNode is not JsonValue jsonValue ||
+                    !jsonValue.TryGetValue(out string? textValue) ||
+                    string.IsNullOrEmpty(textValue))
+                {
+                    continue;
+                }
+
+                // Already JSON-shaped (re-run of this command, or not
+                // actually plain text) - leave it alone rather than
+                // double-wrapping it.
+                if (textValue.TrimStart().StartsWith('{'))
+                {
+                    continue;
+                }
+
+                valueObj["value"] = BuildRichTextValue(textValue);
+                valueObj["editorAlias"] = "Umbraco.RichText";
+                changed = true;
+            }
+        }
+
+        if (changed)
+        {
+            newValue = root.ToJsonString();
+        }
+
+        return changed;
+    }
+
+    // Every Block List DataType that allows at least one of the 5 retyped
+    // element types, resolved to the (content type, property) pairs that
+    // actually store it - the only places these plain-text values can be
+    // nested (see list-blocklist-configs' own comment for this same
+    // config shape).
+    var targetTypeKeys = targetPropsByTypeKey.Keys.ToHashSet();
+    var scanTargets = new List<(IContentType OwnerType, string PropertyAlias)>();
+
+    foreach (var dt in await dataTypeService.GetAllAsync())
+    {
+        if (dt.ConfigurationData == null ||
+            !dt.ConfigurationData.TryGetValue("blocks", out var rawBlocks) ||
+            rawBlocks is not JsonArray blocksArray)
+        {
+            continue;
+        }
+
+        var allowsTarget =
+            blocksArray
+                .OfType<JsonObject>()
+                .Any(b =>
+                    b.TryGetPropertyValue("contentElementTypeKey", out var k) &&
+                    k != null &&
+                    Guid.TryParse(k.ToString(), out var g) &&
+                    targetTypeKeys.Contains(g));
+
+        if (!allowsTarget) continue;
+
+        foreach (var ownerType in contentTypeService.GetAll())
+        {
+            foreach (var prop in ownerType.PropertyTypes)
+            {
+                if (prop.DataTypeKey != dt.Key) continue;
+
+                if (ownerType.IsElement)
+                {
+                    Console.WriteLine(
+                        $"WARNING: {ownerType.Alias}.{prop.Alias} is a Block List " +
+                        "nested inside an ELEMENT type - not scanned (no top-level " +
+                        "page content node to read it from). Check/migrate manually.");
+
+                    continue;
+                }
+
+                scanTargets.Add((ownerType, prop.Alias));
+            }
+        }
+    }
+
+    var updatedNodes = 0;
+
+    foreach (var (ownerType, propertyAlias) in scanTargets)
+    {
+        const int pageSize = 200;
+        long pageIndex = 0;
+        long total;
+
+        do
+        {
+            var nodes =
+                contentService
+                    .GetPagedOfType(ownerType.Id, pageIndex, pageSize, out total, null!)
+                    .ToList();
+
+            foreach (var node in nodes)
+            {
+                var raw = node.GetValue<string>(propertyAlias);
+
+                if (string.IsNullOrWhiteSpace(raw))
+                {
+                    continue;
+                }
+
+                if (!TryMigrateBlockListJson(raw, out var newValue))
+                {
+                    continue;
+                }
+
+                node.SetValue(propertyAlias, newValue);
+
+                var wasPublished = node.Published;
+
+                contentService.Save(node);
+
+                if (wasPublished)
+                {
+                    contentService.Publish(node, new[] { "*" });
+                }
+
+                updatedNodes++;
+
+                Console.WriteLine(
+                    $"MIGRATED: {ownerType.Alias}.{propertyAlias} on \"{node.Name}\" " +
+                    $"(id={node.Id}, published={wasPublished})");
+            }
+
+            pageIndex++;
+        }
+        while (pageIndex * pageSize < total);
+    }
+
+    Console.WriteLine();
+    Console.WriteLine("DONE.");
+    Console.WriteLine($"Content nodes with a migrated value: {updatedNodes}");
+    Console.WriteLine(
+        "Every migrated field's original text is preserved verbatim inside " +
+        "its new RichText markup - nothing was deleted, only reformatted.");
+
+    return;
+}
+
+// ============================================================
+// SEED-MYWORLD-RATES COMMAND
+// ============================================================
+//
+// Populates the (already-present, still-empty) ratesAndFeaturesBlock
+// instance on the real "MyWorld" productLoanPage content node with the
+// actual rate/feature data from the live site's own "All Rates" /
+// "MyWORLD Banking Features" tables - a backoffice editor already added
+// an empty block of this type to that node's sections once this
+// session's create-product-loan-schema command made the type available
+// (confirmed via a direct, read-only inspection of the production
+// database), so this only fills in that one block's fields - it does
+// NOT add a new block, touch any of MyWorld's other 6 sections, or
+// change its publish state.
+//
+// Data transcribed directly from a screenshot of the live page - no
+// query against any other database. Icon fields are left unset (no real
+// icon artwork available, same "honest - not available" choice this
+// file makes everywhere else for media it doesn't have).
+//
+// Targets MyWorld's "sections" property directly rather than going
+// through productLoanPageSections/GetOrCreateBlockListAsync - this is a
+// one-off CONTENT edit, not a schema change (ratesAndFeaturesBlock
+// itself already exists and is already allowed there).
+//
+// Writes each top-level field as a {editorAlias, culture, segment,
+// alias, value} tuple into the block's own "values" array - confirmed
+// against this live database's actual stored shape for an existing
+// block (not the simplified flat shape BuildBlockList's own nested
+// lists below produce, which Umbraco's save pipeline normalizes into
+// this same shape - see retype-product-loan-richtext-fields' own
+// comment on this exact distinction, discovered the hard way earlier
+// this session). Matches the EXISTING (currently empty) block by its
+// own key rather than creating a new contentData entry - scoped to
+// "ratesAndFeaturesBlock entries with no values yet", so a second run
+// after this one succeeds finds nothing left to populate and no-ops
+// instead of double-writing.
+if (args.Length > 0 &&
+    args[0].Equals("seed-myworld-rates", StringComparison.OrdinalIgnoreCase))
+{
+    Console.WriteLine();
+    Console.WriteLine("=================================================");
+    Console.WriteLine(" SEED MYWORLD RATES AND FEATURES");
+    Console.WriteLine("=================================================");
+    Console.WriteLine();
+
+    var contentTypeService = app.Services.GetRequiredService<IContentTypeService>();
+    var contentService = app.Services.GetRequiredService<IContentService>();
+    var shortStringHelper = app.Services.GetRequiredService<IShortStringHelper>();
+
+    var ratesAndFeaturesType = contentTypeService.Get("ratesAndFeaturesBlock");
+    var rateTierItemType = contentTypeService.Get("rateTierItem");
+    var featureRowItemType = contentTypeService.Get("featureRowItem");
+
+    if (ratesAndFeaturesType == null || rateTierItemType == null || featureRowItemType == null)
+    {
+        Console.WriteLine(
+            "ERROR: ratesAndFeaturesBlock/rateTierItem/featureRowItem not found - " +
+            "run 'create-product-loan-schema' first.");
+        return;
+    }
+
+    var productLoanPageType = contentTypeService.Get("productLoanPage");
+
+    if (productLoanPageType == null)
+    {
+        Console.WriteLine("ERROR: 'productLoanPage' content type not found.");
+        return;
+    }
+
+    var myWorldNode =
+        contentService
+            .GetPagedOfType(productLoanPageType.Id, 0, 500, out _, null!)
+            .FirstOrDefault(n =>
+                n.Name != null &&
+                n.Name.Equals("MyWorld", StringComparison.OrdinalIgnoreCase));
+
+    if (myWorldNode == null)
+    {
+        Console.WriteLine("ERROR: no productLoanPage node named \"MyWorld\" found.");
+        return;
+    }
+
+    Console.WriteLine($"Found MyWorld node: id={myWorldNode.Id}, published={myWorldNode.Published}");
+
+    var raw = myWorldNode.GetValue<string>("sections");
+
+    if (string.IsNullOrWhiteSpace(raw))
+    {
+        Console.WriteLine("ERROR: MyWorld's \"sections\" property is empty.");
+        return;
+    }
+
+    JsonNode? parsed;
+
+    try
+    {
+        parsed = JsonNode.Parse(raw);
+    }
+    catch (JsonException ex)
+    {
+        Console.WriteLine($"ERROR: could not parse MyWorld's sections JSON: {ex.Message}");
+        return;
+    }
+
+    if (parsed is not JsonObject root ||
+        !root.TryGetPropertyValue("contentData", out var cdNode) ||
+        cdNode is not JsonArray contentData)
+    {
+        Console.WriteLine("ERROR: MyWorld's sections JSON has no contentData array.");
+        return;
+    }
+
+    var ratesBlockKey = ratesAndFeaturesType.Key.ToString();
+
+    // Matches an empty block (fresh from the backoffice) OR one this same
+    // command already wrote to but didn't fully complete - "featureRows" is
+    // the last of the 12 fields this command writes, so its absence is an
+    // unambiguous "not fully populated yet" signal regardless of how many
+    // of the other 11 already made it through on a prior run. Re-running
+    // this command always does a full overwrite of the block's "values"
+    // array (not a merge), so matching on "incomplete" rather than
+    // strictly "empty" makes a partial-write recoverable by just running
+    // this command again.
+    var target =
+        contentData
+            .OfType<JsonObject>()
+            .FirstOrDefault(block =>
+                block.TryGetPropertyValue("contentTypeKey", out var ctk) &&
+                ctk != null &&
+                ctk.ToString().Equals(ratesBlockKey, StringComparison.OrdinalIgnoreCase) &&
+                (!block.TryGetPropertyValue("values", out var vals) ||
+                 vals is not JsonArray valsArr ||
+                 !valsArr.OfType<JsonObject>().Any(v =>
+                     v.TryGetPropertyValue("alias", out var a) &&
+                     a != null &&
+                     a.ToString().Equals("featureRows", StringComparison.OrdinalIgnoreCase))));
+
+    if (target == null)
+    {
+        Console.WriteLine(
+            "No ratesAndFeaturesBlock instance needing population found on " +
+            "MyWorld - either none exists yet (add one via the backoffice " +
+            "first) or it's already fully populated (this command is a " +
+            "no-op once that's done).");
+        return;
+    }
+
+    Console.WriteLine($"Target block key: {target["key"]}");
+
+    if (target.TryGetPropertyValue("values", out var existingVals) &&
+        existingVals is JsonArray existingValsArr &&
+        existingValsArr.Count > 0)
+    {
+        Console.WriteLine(
+            $"NOTE: block already has {existingValsArr.Count} value(s) from an " +
+            "earlier incomplete run - overwriting with the full set below.");
+    }
+
+    // Same {markup, blocks:{layout,contentData,settingsData}} RichText shape
+    // every other BuildRichText copy in this file produces.
+    JsonObject BuildRichText(string html) =>
+        new JsonObject
+        {
+            ["markup"] = html,
+            ["blocks"] =
+                new JsonObject
+                {
+                    ["layout"] = new JsonObject(),
+                    ["contentData"] = new JsonArray(),
+                    ["settingsData"] = new JsonArray()
+                }
+        };
+
+    // Same shape every other BuildBlockList copy in this file produces (the
+    // "udi"/"contentUdi" legacy shape - Umbraco's own save pipeline
+    // normalizes this into the real "key"/"contentKey" shape on Save(), the
+    // same way it already normalized the flat-vs-values-array shape found
+    // earlier this session).
+    JsonObject BuildBlockList(
+        IContentType elementType,
+        IEnumerable<Dictionary<string, JsonNode?>> itemsProps)
+    {
+        var layoutItems = new JsonArray();
+        var contentDataItems = new JsonArray();
+
+        foreach (var props in itemsProps)
+        {
+            var udi = $"umb://element/{Guid.NewGuid():N}";
+
+            var contentDataItem =
+                new JsonObject
+                {
+                    ["contentTypeKey"] = elementType.Key.ToString(),
+                    ["udi"] = udi
+                };
+
+            foreach (var (key, value) in props)
+            {
+                contentDataItem[key] = value;
+            }
+
+            contentDataItems.Add(contentDataItem);
+            layoutItems.Add(new JsonObject { ["contentUdi"] = udi });
+        }
+
+        return new JsonObject
+        {
+            ["layout"] = new JsonObject { ["Umbraco.BlockList"] = layoutItems },
+            ["contentData"] = contentDataItems
+        };
+    }
+
+    var rateTiers = new (string TierLabel, string RateValue)[]
+    {
+        ("R 0 - R 24 999", "2.75%"),
+        ("R 25 000 - R 49 999", "3.75%"),
+        ("R 50 000 - R 99 999", "4.75%"),
+        ("R 100 000 - R 999 999", "5.25%"),
+        ("R 1 000 000+", "5.50%"),
+    };
+
+    var rateTiersValue =
+        BuildBlockList(
+            rateTierItemType,
+            rateTiers.Select(t =>
+                new Dictionary<string, JsonNode?>
+                {
+                    ["tierLabel"] = t.TierLabel,
+                    ["rateValue"] = t.RateValue
+                }))
+            .ToJsonString();
+
+    // (Label, Col1Checked, Col1Value, Col2Checked, Col2Value, Col3Checked, Col3Value)
+    var featureRows = new (string Label, bool C1, string V1, bool C2, string V2, bool C3, string V3)[]
+    {
+        ("Competitive rate on any positive balance", true, "", true, "", true, ""),
+        ("Minimum account balance", false, "R0.00", false, "R0.00", false, "R0.00"),
+        ("2 Linked Pocket accounts", false, "", true, "", true, ""),
+        ("Deposit money", true, "", true, "", true, ""),
+        ("Withdraw cash at till at selected retailers", true, "", true, "", false, ""),
+        ("Withdraw cash at any ATM", true, "", true, "", false, ""),
+        ("Pay for purchases", true, "", true, "", false, ""),
+        ("Transfer between accounts instantly", true, "", true, "", true, ""),
+        ("Link VISA debit cards", true, "", true, "", false, ""),
+        ("Add up to 5 pocket accounts", false, "", true, "", true, ""),
+        ("Add a pocket user to bank", false, "", false, "1 User", false, "1 User"),
+        ("Add pocket members to view", false, "", false, "Up to 10 Members", false, "Up to 10 Members"),
+        ("Instant Issue VISA debit cards", true, "", true, "", false, ""),
+        ("Allocate banking fees", true, "", true, "", false, ""),
+        ("Debit orders", true, "", false, "", false, ""),
+        ("Instant payments reflect instantly", true, "", true, "", false, ""),
+        ("Balance enquiry at till or ATM", true, "", true, "", false, ""),
+    };
+
+    var featureRowsValue =
+        BuildBlockList(
+            featureRowItemType,
+            featureRows.Select(r =>
+                new Dictionary<string, JsonNode?>
+                {
+                    ["label"] = r.Label,
+                    ["column1Checked"] = r.C1,
+                    ["column1Value"] = r.V1,
+                    ["column2Checked"] = r.C2,
+                    ["column2Value"] = r.V2,
+                    ["column3Checked"] = r.C3,
+                    ["column3Value"] = r.V3
+                }))
+            .ToJsonString();
+
+    JsonObject ValueEntry(string alias, string editorAlias, JsonNode? value) =>
+        new JsonObject
+        {
+            ["editorAlias"] = editorAlias,
+            ["culture"] = null,
+            ["segment"] = null,
+            ["alias"] = alias,
+            ["value"] = value
+        };
+
+    var values = new JsonArray
+    {
+        ValueEntry("ratesHeading", "Umbraco.TextBox", "All Rates"),
+        ValueEntry("rateTiers", "Umbraco.BlockList", rateTiersValue),
+        ValueEntry(
+            "ratesDisclaimerOne", "Umbraco.RichText",
+            BuildRichText(
+                "<p>Interest rates are quoted as Nominal Annual Rates Compounded " +
+                "Monthly (NACM) and are valid for today only, as they are subject " +
+                "to change.</p>").ToJsonString()),
+        ValueEntry(
+            "ratesDisclaimerTwo", "Umbraco.RichText",
+            BuildRichText(
+                "<p>Terms and conditions apply. We cannot advise you on the tax " +
+                "implications of investing. It is recommended that you contact " +
+                "your financial advisor or tax consultant.</p>").ToJsonString()),
+        ValueEntry("featuresHeading", "Umbraco.TextBox", "MyWORLD Banking Features"),
+        ValueEntry("column1Icon", "Umbraco.MediaPicker3", null),
+        ValueEntry("column1Name", "Umbraco.TextBox", "MyWORLD"),
+        ValueEntry("column2Icon", "Umbraco.MediaPicker3", null),
+        ValueEntry("column2Name", "Umbraco.TextBox", "Power Pocket"),
+        ValueEntry("column3Icon", "Umbraco.MediaPicker3", null),
+        ValueEntry("column3Name", "Umbraco.TextBox", "Savings Pocket"),
+        ValueEntry("featureRows", "Umbraco.BlockList", featureRowsValue),
+    };
+
+    target["values"] = values;
+
+    myWorldNode.SetValue("sections", root.ToJsonString());
+
+    var wasPublished = myWorldNode.Published;
+
+    contentService.Save(myWorldNode);
+
+    if (wasPublished)
+    {
+        contentService.Publish(myWorldNode, new[] { "*" });
+    }
+
+    // Self-verify against a FRESH read (not the in-memory `myWorldNode`/
+    // `root` this command just built) - re-fetches the node from the
+    // content service and re-parses its "sections" value from scratch, so
+    // this confirms what was actually persisted rather than trusting the
+    // object this command already holds in memory.
+    var expectedAliases =
+        values.OfType<JsonObject>()
+            .Select(v => v["alias"]?.ToString())
+            .Where(a => a != null)
+            .Cast<string>()
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+    var reloaded = contentService.GetById(myWorldNode.Id);
+    var reloadedRaw = reloaded?.GetValue<string>("sections");
+    var persistedAliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+    if (reloadedRaw != null &&
+        JsonNode.Parse(reloadedRaw) is JsonObject reloadedRoot &&
+        reloadedRoot.TryGetPropertyValue("contentData", out var reloadedCd) &&
+        reloadedCd is JsonArray reloadedArr)
+    {
+        var reloadedTarget =
+            reloadedArr.OfType<JsonObject>()
+                .FirstOrDefault(b =>
+                    b.TryGetPropertyValue("key", out var k) &&
+                    k != null &&
+                    k.ToString().Equals(target["key"]?.ToString(), StringComparison.OrdinalIgnoreCase));
+
+        if (reloadedTarget?["values"] is JsonArray reloadedVals)
+        {
+            foreach (var v in reloadedVals.OfType<JsonObject>())
+            {
+                if (v["alias"]?.ToString() is string alias) persistedAliases.Add(alias);
+            }
+        }
+    }
+
+    var missing = expectedAliases.Except(persistedAliases).ToList();
+
+    Console.WriteLine();
+    Console.WriteLine("DONE.");
+    Console.WriteLine(
+        $"Populated ratesAndFeaturesBlock on MyWorld (id={myWorldNode.Id}) with " +
+        $"{rateTiers.Length} rate tiers and {featureRows.Length} feature rows. " +
+        $"Published: {wasPublished}.");
+    Console.WriteLine(
+        $"VERIFY: {persistedAliases.Count}/{expectedAliases.Count} fields confirmed " +
+        "persisted on re-read.");
+
+    if (missing.Count > 0)
+    {
+        Console.WriteLine($"WARNING: these fields did NOT persist: {string.Join(", ", missing)}");
+    }
+
+    return;
+}
+
+// ============================================================
 // CREATE-TAP2GLASS-CONTENT COMMAND
 // ============================================================
 //
@@ -6971,6 +7997,9 @@ if (args.Length > 0 &&
     var languageService =
         app.Services.GetRequiredService<ILanguageService>();
 
+    var dataTypeServiceForValidation =
+        app.Services.GetRequiredService<IDataTypeService>();
+
     var productLoanPageType = contentTypeService.Get("productLoanPage");
     var pageLoansType = contentTypeService.Get("pageLoans");
     var heroImageBannerBlockType = contentTypeService.Get("heroImageBannerBlock");
@@ -6996,6 +8025,22 @@ if (args.Length > 0 &&
     var techCallToActionBlockType = contentTypeService.Get("techCallToActionBlock");
     var contactCardItemType = contentTypeService.Get("contactCardItem");
     var contactInfoBlockType = contentTypeService.Get("contactInfoBlock");
+    var featureSplitBlockType = contentTypeService.Get("featureSplitBlock");
+    var iconCardGridBlockType = contentTypeService.Get("iconCardGridBlock");
+    var iconCardItemType = contentTypeService.Get("iconCardItem");
+    var ratesMatrixBlockType = contentTypeService.Get("ratesMatrixBlock");
+    var ratesMatrixRowType = contentTypeService.Get("ratesMatrixRow");
+    var investmentCalculatorBlockType = contentTypeService.Get("investmentCalculatorBlock");
+    var claimFormBlockType = contentTypeService.Get("claimFormBlock");
+    var funeralCalculatorBlockType = contentTypeService.Get("funeralCalculatorBlock");
+    var stepCardsBlockType = contentTypeService.Get("stepCardsBlock");
+    var stepCardType = contentTypeService.Get("stepCard");
+    var partnerTabsBlockType = contentTypeService.Get("partnerTabsBlock");
+    var partnerTabType = contentTypeService.Get("partnerTab");
+    var imageBannerBlockType = contentTypeService.Get("imageBannerBlock");
+    var spendCarouselBlockType = contentTypeService.Get("spendCarouselBlock");
+    var spendSlideType = contentTypeService.Get("spendSlide");
+    var rewardsFooterBlockType = contentTypeService.Get("rewardsFooterBlock");
 
     if (productLoanPageType == null || pageLoansType == null ||
         heroImageBannerBlockType == null || loanCalculatorBlockType == null ||
@@ -7009,7 +8054,14 @@ if (args.Length > 0 &&
         plugAndGoBlockType == null || requirementItemType == null ||
         benefitCardType == null || techRequirementsBlockType == null ||
         techCallToActionBlockType == null || contactCardItemType == null ||
-        contactInfoBlockType == null)
+        contactInfoBlockType == null || featureSplitBlockType == null ||
+        iconCardGridBlockType == null || iconCardItemType == null ||
+        ratesMatrixBlockType == null || ratesMatrixRowType == null ||
+        investmentCalculatorBlockType == null || claimFormBlockType == null ||
+        funeralCalculatorBlockType == null || stepCardsBlockType == null ||
+        stepCardType == null || partnerTabsBlockType == null || partnerTabType == null ||
+        imageBannerBlockType == null || spendCarouselBlockType == null || spendSlideType == null ||
+        rewardsFooterBlockType == null)
     {
         Console.WriteLine(
             "ERROR: one or more required content types are missing - run " +
@@ -7158,6 +8210,92 @@ if (args.Length > 0 &&
                 }
         };
 
+    // Media Picker values by FILE NAME rather than by key - the same image
+    // has a different key/folder id on every environment (local vs AWS),
+    // so the key is looked up from the media library at run time. Built
+    // lazily, once per run, by walking every media item's umbracoFile
+    // value. Where several items share a file name, one whose file
+    // actually exists under wwwroot wins (the AWS media folder is missing
+    // some files the database still references).
+    var mediaServiceForPickers = app.Services.GetRequiredService<IMediaService>();
+    var webRootForPickers = app.Services.GetRequiredService<IWebHostEnvironment>().WebRootPath;
+    Dictionary<string, (Guid Key, string Src)>? mediaKeysByFileName = null;
+
+    (Guid Key, string Src)? FindMedia(string fileName)
+    {
+        if (mediaKeysByFileName == null)
+        {
+            mediaKeysByFileName = new Dictionary<string, (Guid Key, string Src)>(StringComparer.OrdinalIgnoreCase);
+            var fileExists = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var root in mediaServiceForPickers.GetRootMedia())
+            {
+                foreach (var item in new[] { root }.Concat(
+                             mediaServiceForPickers.GetPagedDescendants(root.Id, 0, int.MaxValue, out _)))
+                {
+                    var src = System.Text.RegularExpressions.Regex.Match(
+                        item.GetValue<string>("umbracoFile") ?? "", @"/media/[^""\s]+").Value;
+
+                    if (src.Length == 0) continue;
+
+                    var name = Path.GetFileName(src);
+                    var exists = System.IO.File.Exists(Path.Combine(webRootForPickers, src.TrimStart('/')));
+
+                    if (!mediaKeysByFileName.ContainsKey(name) || (exists && !fileExists.Contains(name)))
+                    {
+                        mediaKeysByFileName[name] = (item.Key, src);
+                        if (exists) fileExists.Add(name);
+                    }
+                }
+            }
+        }
+
+        if (mediaKeysByFileName.TryGetValue(fileName, out var media)) return media;
+
+        Console.WriteLine($"  MEDIA NOT FOUND: \"{fileName}\" - left unset, attach it in the backoffice.");
+
+        return null;
+    }
+
+    Guid? FindMediaKey(string fileName) => FindMedia(fileName)?.Key;
+
+    // A media file's own URL (e.g. "/media/xxchejen/stokvel_faqs.pdf"), for
+    // a plain link straight to the file - "#" when it isn't in the library.
+    string MediaUrl(string fileName) => FindMedia(fileName)?.Src ?? "#";
+
+    // Umbraco.MediaPicker3's stored value - a one-item array - or null when
+    // the file isn't in the media library.
+    string? BuildMediaPicker(string fileName) =>
+        FindMediaKey(fileName) is Guid mediaKey
+            ? new JsonArray(
+                    new JsonObject
+                    {
+                        ["key"] = Guid.NewGuid().ToString(),
+                        ["mediaKey"] = mediaKey.ToString(),
+                        ["mediaTypeAlias"] = "",
+                        ["crops"] = new JsonArray(),
+                        ["focalPoint"] = null
+                    })
+                .ToJsonString()
+            : null;
+
+    JsonObject BuildIconCards(IEnumerable<(string IconFile, string Title, string Description)> cards) =>
+        BuildBlockList(
+            iconCardItemType,
+            cards.Select(c =>
+                new Dictionary<string, JsonNode?>
+                {
+                    ["icon"] = BuildMediaPicker(c.IconFile),
+                    ["title"] = c.Title,
+                    ["description"] = c.Description
+                }));
+
+    JsonObject BuildRatesRows(IEnumerable<(string Tier, string Rates)> rows) =>
+        BuildBlockList(
+            ratesMatrixRowType,
+            rows.Select(r =>
+                new Dictionary<string, JsonNode?> { ["tierLabel"] = r.Tier, ["rates"] = r.Rates }));
+
     JsonObject BuildFaqItems(IEnumerable<(string Question, string AnswerHtml)> items) =>
         BuildBlockList(
             faqItemType,
@@ -7264,6 +8402,58 @@ if (args.Length > 0 &&
         return node;
     }
 
+    // Same "free up a URL" idea as FreeUpLegacyUrl, for a legacy page that
+    // may be a pageLoans node or one built on its own ad-hoc document
+    // type(s) (`legacyAliases`) - either way only a node whose name
+    // contains `nameContains` is ever matched, so an unrelated page that
+    // happens to share one of those types is never renamed. Returns
+    // the legacy node (if any) and the name the new productLoanPage node
+    // should take - the legacy node's original name, so it inherits the
+    // same URL slug - falling back to `defaultName`. Idempotent the same
+    // way: an already-"(Legacy)"-suffixed match is returned as-is.
+    (IContent? Legacy, string NodeName) FreeUpLegacyUrlOfTypes(
+        string[] legacyAliases, string nameContains, string defaultName)
+    {
+        var candidates =
+            legacyAliases
+                .Select(alias => contentTypeService.Get(alias))
+                .Where(t => t != null)
+                .SelectMany(t => contentService.GetPagedOfType(t!.Id, 0, 500, out _, null!))
+                .Concat(contentService.GetPagedOfType(pageLoansType.Id, 0, 500, out _, null!))
+                .Where(n => n.Name != null && n.Name.Contains(nameContains, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+        var alreadyRenamed =
+            candidates.FirstOrDefault(n =>
+                n.Name != null && n.Name.Contains("(Legacy)", StringComparison.OrdinalIgnoreCase));
+
+        if (alreadyRenamed != null)
+        {
+            Console.WriteLine($"ALREADY MIGRATED: \"{alreadyRenamed.Name}\" (id={alreadyRenamed.Id})");
+
+            return (alreadyRenamed, alreadyRenamed.Name!.Replace(" (Legacy)", "", StringComparison.OrdinalIgnoreCase));
+        }
+
+        var node = candidates.FirstOrDefault(n => n.Name != null);
+
+        if (node == null)
+        {
+            return (null, defaultName);
+        }
+
+        var oldName = node.Name!;
+        node.Name = $"{oldName} (Legacy)";
+
+        contentService.Save(node);
+        contentService.Publish(node, new[] { "*" });
+
+        Console.WriteLine(
+            $"RENAMED LEGACY PAGE: \"{oldName}\" -> \"{node.Name}\" (id={node.Id}) - " +
+            "its old URL is now free.");
+
+        return (node, oldName);
+    }
+
     IContent CreateOrUpdateProductLoanPage(string nodeName, int parentId, JsonObject sectionsValue)
     {
         // Culture-aware name match - plain `.Name` isn't reliable here (see
@@ -7334,6 +8524,43 @@ if (args.Length > 0 &&
             foreach (var eventMessage in publishResult.EventMessages?.GetAll() ?? [])
             {
                 Console.WriteLine($"  EVENT MESSAGE [{eventMessage.Category}/{eventMessage.MessageType}]: {eventMessage.Message}");
+            }
+
+            // InvalidProperties only names the top-level property - re-run
+            // its own value editor's validation to print which nested block
+            // property actually failed, and why.
+            foreach (var invalid in publishResult.InvalidProperties ?? [])
+            {
+                var dataType = dataTypeServiceForValidation.GetAsync(invalid.PropertyType.DataTypeKey).GetAwaiter().GetResult();
+                var valueEditor = dataType?.Editor?.GetValueEditor(dataType.ConfigurationObject);
+
+                // Block List results nest (NestedValidationResults etc.) -
+                // walked via reflection rather than by concrete type name,
+                // printing each level's JsonPath where one exists.
+                void PrintValidation(System.ComponentModel.DataAnnotations.ValidationResult result, string indent)
+                {
+                    var jsonPath = result.GetType().GetProperty("JsonPath")?.GetValue(result);
+
+                    Console.WriteLine(
+                        $"{indent}VALIDATION [{result.GetType().Name}]: {result.ErrorMessage} " +
+                        $"(members: {string.Join(", ", result.MemberNames)}; path: {jsonPath})");
+
+                    if (result.GetType().GetProperty("ValidationResults")?.GetValue(result)
+                        is IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> children)
+                    {
+                        foreach (var child in children)
+                        {
+                            PrintValidation(child, indent + "  ");
+                        }
+                    }
+                }
+
+                foreach (var result in valueEditor?.Validate(
+                             node.GetValue(invalid.Alias), invalid.PropertyType.Mandatory,
+                             invalid.PropertyType.ValidationRegExp, Umbraco.Cms.Core.Models.Validation.PropertyValidationContext.Empty()) ?? [])
+                {
+                    PrintValidation(result, "  ");
+                }
             }
 
             throw new InvalidOperationException($"Could not publish \"{nodeName}\": {publishResult.Result}");
@@ -8731,6 +9958,1750 @@ if (args.Length > 0 &&
             "NOTE: Direct Sales' \"Apply now\"/\"Upload documents\" links point at " +
             "the site root as a placeholder - no real destinations were available " +
             "to port - update both in the backoffice once known.");
+    }
+    }
+
+    // --------------------------------------------------------
+    // OVERDRAFT
+    // --------------------------------------------------------
+    //
+    // Ported from the live MyWORLD Overdraft page (Views/Overdraft.cshtml /
+    // overdraftV2.cshtml): hero, "What is Overdraft?", "How does it work?",
+    // costs, requirements (alternating image sides, same as the source's
+    // flex-row-reverse sections), FAQ accordion and app download.
+    //
+    // The legacy page may be a pageLoans node or one built on its own
+    // "overdraft"/"overdraftV2" document type - see FreeUpLegacyUrlOfTypes.
+    // Falls back to "Overdraft" under any productLoanPage sibling's parent,
+    // same as Credit Report/Talk To Us, when no legacy node exists.
+    //
+    // Every image has no real file attached (the source's /media/... paths
+    // aren't Media Picker values) - attach them via the backoffice. FAQ
+    // answers are ported verbatim, including the source's own R69/R60+VAT
+    // fee inconsistency - verify with the product team.
+
+    if (ShouldRunSection("overdraft"))
+    {
+    Console.WriteLine();
+    Console.WriteLine("--- overdraft ---");
+
+    var (legacyOverdraft, overdraftNodeName) =
+        FreeUpLegacyUrlOfTypes(["overdraft", "overdraftV2"], "Overdraft", "Overdraft");
+
+    var overdraftParentId =
+        legacyOverdraft?.ParentId ??
+        contentService.GetPagedOfType(productLoanPageType.Id, 0, 500, out _, null!)
+            .FirstOrDefault()?.ParentId;
+
+    if (overdraftParentId == null)
+    {
+        Console.WriteLine(
+            "SKIP: no legacy Overdraft node and no existing productLoanPage " +
+            "sibling found to infer a parent from - nothing to migrate.");
+    }
+    else
+    {
+        const string overdraftApplyUrl = "https://ib.africanbank.co.za/";
+
+        var heroContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = heroBannerBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "MyWORLD Overdraft",
+                ["description"] =
+                    BuildRichText(
+                            "<p>Giving you access to emergency funds when you need it most. And " +
+                            "because it is linked to your MyWORLD account, you still get access " +
+                            "to up to 6 linked accounts – with no monthly fees at SA’s best rates.</p>")
+                        .ToJsonString(),
+                ["primaryCta"] = BuildExternalLink("Open now", overdraftApplyUrl).ToJsonString(),
+                ["secondaryCta"] = null,
+                ["image"] = null,
+                ["imageAlt"] = null
+            };
+
+        var whatIsContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = promoSplitBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "What is Overdraft?",
+                ["description"] =
+                    BuildRichText(
+                            "<p>An African Bank Overdraft facility is a credit facility, in the form " +
+                            "of an agreement made with African Bank that allows a MyWORLD account " +
+                            "holder to use or withdraw more money than what they have in their " +
+                            "MyWORLD account, up to an approved limit. In other words, the " +
+                            "customer’s MyWORLD account can have a debit, or a negative, balance.</p>")
+                        .ToJsonString(),
+                ["primaryCta"] = BuildExternalLink("Open now", overdraftApplyUrl).ToJsonString(),
+                ["secondaryCta"] = null,
+                ["image"] = null,
+                ["imageAlt"] = null,
+                ["imageOnRight"] = false
+            };
+
+        var howItWorksContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = featureChecklistBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "How does African Bank’s Overdraft work?",
+                ["subheading"] =
+                    "Because the Overdraft is linked to your MyWORLD account, you will need " +
+                    "to have a MyWORLD account first to start the Overdraft application " +
+                    "process. Once approved for a certain limit, you will have access to " +
+                    "funds when you have used up all the money in your MyWORLD bank " +
+                    "account. You can use these funds for emergencies. You can also use " +
+                    "these funds for making ATM cash withdrawals and for making online " +
+                    "purchases using your MyWORLD bank account. You have peace of mind, " +
+                    "knowing you have access to funds in an emergency. The Overdraft can " +
+                    "help with:",
+                ["features"] =
+                    BuildFeatureList(
+                        [
+                            "Mid-month emergency expenses.",
+                            "Access to cash before pay day.",
+                            "Cover for rainy days when you are running short on cash.",
+                            "It helps you to manage your monthly cash flow and provides protection from unpaid debit orders when your salary gets used up."
+                        ])
+                        .ToJsonString(),
+                ["cta"] = BuildExternalLink("Open now", overdraftApplyUrl).ToJsonString(),
+                ["image"] = null,
+                ["imageAlt"] = null,
+                ["imageOnRight"] = true
+            };
+
+        var costContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = featureChecklistBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "How much does it cost to have an Overdraft facility at African Bank?",
+                ["subheading"] = "",
+                ["features"] =
+                    BuildFeatureList(
+                        [
+                            "The great news is that there are no initiation fees.",
+                            "Customers will be charged a monthly fee of R69 which includes VAT.",
+                            "The transaction fees are linked to the MyWORLD transaction fees. Please refer to our pricing guide here."
+                        ])
+                        .ToJsonString(),
+                ["cta"] = BuildExternalLink("Open now", overdraftApplyUrl).ToJsonString(),
+                ["image"] = null,
+                ["imageAlt"] = null,
+                ["imageOnRight"] = false
+            };
+
+        var requirementsContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = featureChecklistBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "What is required to apply for the Overdraft?",
+                ["subheading"] = "",
+                ["features"] =
+                    BuildFeatureList(
+                        [
+                            "Customers must have an active MyWORLD bank account.",
+                            "Customers must be between the age of 18 and 60.",
+                            "Customers must earn more than R3 500 a month.",
+                            "Customers must be a monthly salary or wage earner for a minimum of ONE month with the same employer.",
+                            "To activate the Overdraft, customers must switch their monthly salary to African Bank."
+                        ])
+                        .ToJsonString(),
+                ["cta"] = BuildExternalLink("Open now", overdraftApplyUrl).ToJsonString(),
+                ["image"] = null,
+                ["imageAlt"] = null,
+                ["imageOnRight"] = true
+            };
+
+        var faqContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = faqSectionBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "MyWorld Overdraft FAQ",
+                ["items"] =
+                    BuildFaqItems(
+                        [
+                            ("How do I apply for an Overdraft?",
+                                "<p>There are several ways to apply for African Bank’s Overdraft facility. You can:</p>" +
+                                "<ul>" +
+                                "<li>Apply online 24/7 using our African Bank App or by registering for Online Banking on our website. You will not be charged any data when using our digital banking platforms.</li>" +
+                                "<li>You are welcome to visit any African Bank branch and apply in our branch. You can contact our Call Centre on 0860 333 004.</li>" +
+                                "</ul>"),
+                            ("Is the Overdraft facility a Loan?",
+                                "<p>No. The Overdraft is a facility offered to the customer, providing access to additional funds up to an approved specified amount. This Overdraft will be available for use on the customer’s MyWORLD account. There is no disbursement of funds into the MyWORLD bank account, instead a facility limit is loaded thereby increasing the customer’s available funds. Customers will be able to see their current and available balances, as well as limits, on their Online Banking or Banking App profile and on their bank statements.</p>"),
+                            ("What happens if I exceed my Overdraft facility limit?",
+                                "<p>In exceptional cases, a customer may exceed their Overdraft limit due to fees processed to their account. A customer will always remain responsible for the re-payment of the full balance.</p>"),
+                            ("What is the maximum and minimum amounts on African Bank’s Overdraft facility?",
+                                "<p>Depending on the customer’s affordability, the maximum facility offered is R100 000 and the minimum facility offered is R3 500.</p>"),
+                            ("What happens if I successfully apply for an Overdraft but do not use it?",
+                                "<p>The Overdraft will remain available to you, our valued customer, and you will be charged the monthly Overdraft fee of R60 plus VAT. However, if it remains un-utilised for a period of time, African Bank may decide to cancel the Overdraft. Affected customers will be notified in advance if this happens.</p>"),
+                            ("Which documents are required to apply for an Overdraft facility?",
+                                "<p>One bank statement and 3 payslips are required or one bank statement showing 3 salary deposits and one payslip. All latest documents are required as per African Bank’s Credit Policy.</p>"),
+                            ("What will happen if the customer does not qualify for the Overdraft facility?",
+                                "<p>The customer will unfortunately be presented with a message that the customer did not qualify for the Overdraft facility. Customers are reminded to regularly check the status of their credit report as this affects their ability to apply for credit in the form of a loan or overdraft. African Bank offers all South Africans a free credit report every month. Simply register for Online Banking on our website or download the African Bank App to get your free credit report today. You do not need to be a customer of African Bank to get your free credit report.</p>"),
+                            ("What is the interest rate charged on the Overdraft?",
+                                "<p>An interest rate of 18% is charged on the Overdraft amount used.</p>"),
+                            ("Will a customer be able to add an Overdraft facility on a Pocket account?",
+                                "<p>No. The Overdraft facility is only available on the MYWORLD bank account.</p>"),
+                            ("Can a customer to reduce their Overdraft facility limit?",
+                                "<p>Yes, the facility can be adjusted. You can do this using Online Banking or the African Bank App or speak to one of our helpful agents in Branch or at our Call Centre.</p>"),
+                            ("Can a customer close the Overdraft facility/MyWORLD account?",
+                                "<p>A customer can close their Overdraft facility if the amount owed to African Bank is zero. You can do this using Online Banking or the African Bank App or speak to one of our helpful agents in Branch or at our Call Centre. You are recommended to first request a Settlement Letter. This will show you how much needs to be paid to close the Overdraft facility. You can request a Settlement Letter for free using Online Banking or the African Bank App.</p>"),
+                            ("How does the customer transfer their salary to their MyWORLD account?",
+                                "<ul>" +
+                                "<li>You can request for a MyWORLD Account Confirmation letter to be emailed to you. This can be done for free using Online Banking or the African Bank App.</li>" +
+                                "<li>You can then email the MyWORLD Account Confirmation letter to your employer to switch your salary before your next pay day.</li>" +
+                                "</ul>"),
+                            ("Are there monthly fees?",
+                                "<p>There is a monthly fee of R60 plus VAT which is charged to your account once the Overdraft facility is activated.</p>")
+                        ])
+                        .ToJsonString()
+            };
+
+        var overdraftAppDownloadContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = appDownloadBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Get the app",
+                ["subheading"] = "",
+                ["description"] =
+                    BuildRichText("<p>Take your banking experience to the next level with our mobile app.</p>")
+                        .ToJsonString(),
+                ["downloadLink"] =
+                    BuildExternalLink(
+                            "DOWNLOAD NOW",
+                            "https://play.google.com/store/apps/details?id=za.co.android.africanbank")
+                        .ToJsonString(),
+                ["image"] = null,
+                ["imageAlt"] = null
+            };
+
+        var overdraftContentData =
+            new[]
+            {
+                heroContentData,
+                whatIsContentData,
+                howItWorksContentData,
+                costContentData,
+                requirementsContentData,
+                faqContentData,
+                overdraftAppDownloadContentData
+            };
+
+        var overdraftSections =
+            new JsonObject
+            {
+                ["layout"] =
+                    new JsonObject
+                    {
+                        ["Umbraco.BlockList"] =
+                            new JsonArray(overdraftContentData
+                                .Select(c => (JsonNode)new JsonObject { ["contentUdi"] = c["udi"]!.GetValue<string>() })
+                                .ToArray())
+                    },
+                ["contentData"] = new JsonArray(overdraftContentData.Select(c => (JsonNode)c).ToArray())
+            };
+
+        CreateOrUpdateProductLoanPage(overdraftNodeName, overdraftParentId.Value, overdraftSections);
+
+        Console.WriteLine(
+            "NOTE: none of the six Overdraft images have a real file attached - " +
+            "upload them via the backoffice's Media Picker. The cost section's " +
+            "\"pricing guide here\" has no link (featureItem is plain text) - " +
+            "add one by hand if wanted.");
+    }
+    }
+
+    // --------------------------------------------------------
+    // FIXED DEPOSIT
+    // --------------------------------------------------------
+    //
+    // Ported from the live Fixed Deposit page (Views/
+    // productFixedDepositInvestment*.cshtml / fixedDepositV2.cshtml): hero,
+    // "More about the Fixed Deposit" icon cards, "All Rates" table (tier x
+    // 6 terms), Fixed Deposit Calculator and account requirements. Images
+    // are matched by file name (BuildMediaPicker). Legacy node lookup works
+    // the same as Overdraft's above; defaults to "Product Fixed Deposit
+    // Investment" so the slug matches the source page's own
+    // /fixed-deposit-investment route check.
+
+    if (ShouldRunSection("fixed-deposit"))
+    {
+    Console.WriteLine();
+    Console.WriteLine("--- fixed deposit ---");
+
+    var (legacyFixedDeposit, fixedDepositNodeName) =
+        FreeUpLegacyUrlOfTypes(
+            ["productFixedDepositInvestment", "productFixedDepositInvestmentV2", "fixedDepositV2", "fixed"],
+            "Fixed Deposit",
+            "Product Fixed Deposit Investment");
+
+    var fixedDepositParentId =
+        legacyFixedDeposit?.ParentId ??
+        contentService.GetPagedOfType(productLoanPageType.Id, 0, 500, out _, null!)
+            .FirstOrDefault()?.ParentId;
+
+    if (fixedDepositParentId == null)
+    {
+        Console.WriteLine(
+            "SKIP: no legacy Fixed Deposit node and no existing productLoanPage " +
+            "sibling found to infer a parent from - nothing to migrate.");
+    }
+    else
+    {
+        const string fixedDepositOpenUrl = "https://ib.africanbank.co.za";
+
+        var heroContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = heroBannerBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "A Fixed Deposit that delivers",
+                ["description"] =
+                    BuildRichText("<p>Secure competitive interest rates with no monthly fees. Open in minutes.</p>")
+                        .ToJsonString(),
+                ["primaryCta"] = BuildExternalLink("INVEST TODAY", fixedDepositOpenUrl).ToJsonString(),
+                ["secondaryCta"] = BuildExternalLink("CALCULATE RETURNS", "#myCalculator").ToJsonString(),
+                ["image"] = BuildMediaPicker("inv2509_001_fd_dig.png"),
+                ["imageAlt"] = "A Fixed Deposit that delivers"
+            };
+
+        var moreAboutContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = iconCardGridBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "More about the Fixed Deposit",
+                ["cards"] =
+                    BuildIconCards(
+                        [
+                            ("easy-repayments.png", "FIXED RATE",
+                                "Guaranteed returns with an interest rate which is fixed for the duration of the investment."),
+                            ("bnaking-on-move.png", "PAYOUT OPTIONS",
+                                "Receive your interest payouts monthly, every 6 or 12 months, or at maturity."),
+                            ("instant-issue.png", "ONCE-OFF DEPOSIT",
+                                "To get around transfer limits, you have 7 days to complete your total opening deposit."),
+                            ("earn-int-on-pos-bal.png", "TERMS", "Terms range from 3 to 60 months."),
+                            ("instant-issue.png", "EASY APPLICATION", "Register and open your account online in minutes.")
+                        ])
+                        .ToJsonString()
+            };
+
+        var ratesContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = ratesMatrixBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "All Rates",
+                ["columnHeadings"] =
+                    "Fixed Deposit 3 Months|Fixed Deposit 6 Months|Fixed Deposit 12 Months|" +
+                    "Fixed Deposit 24 Months|Fixed Deposit 36 Months|Fixed Deposit 60 Months",
+                ["rows"] =
+                    BuildRatesRows(
+                        [
+                            ("R0 - 49999.99", "6.51%|6.93%|7.26%|6.93%|7.02%|8.05%"),
+                            ("R50000.00 - R249999.99", "6.60%|7.02%|7.35%|7.12%|7.26%|8.43%"),
+                            ("R250000.00 - R999999.99", "6.70%|7.02%|7.40%|7.26%|7.49%|8.45%"),
+                            ("> R1 000 000.00", "6.79%|7.17%|7.49%|7.40%|7.73%|8.47%")
+                        ])
+                        .ToJsonString(),
+                ["disclaimers"] =
+                    BuildFeatureList(
+                        [
+                            "Interest rates are quoted as Nominal Annual Rates Compounded Monthly (NACM) and are valid for today only, as they are subject to change.",
+                            "Terms and conditions apply. We cannot advise you on the tax implications of investing. It is recommended that you contact your financial advisor or tax consultant."
+                        ])
+                        .ToJsonString()
+            };
+
+        var calculatorContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = investmentCalculatorBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Fixed Deposit Calculator",
+                ["investmentType"] = "Fixed",
+                ["image"] = BuildMediaPicker("12-loan.png"),
+                ["imageAlt"] = "Investment Vehicle",
+                ["disclaimer"] =
+                    "*Our calculators are only a guide. Actual payout could differ due to the number of days " +
+                    "in a month and interest rates at the start date of the investment.",
+                ["openAccountLink"] = BuildExternalLink("Open an account", fixedDepositOpenUrl).ToJsonString()
+            };
+
+        var requirementsContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = featureChecklistBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "What you need to open your Fixed Deposit account",
+                ["subheading"] = "",
+                ["features"] =
+                    BuildFeatureList(
+                        [
+                            "Identity document",
+                            "Non SA Citizen require a Passport, Valid working permit and proof of address to open an Investment.",
+                            "The minimum opening deposit is R500."
+                        ])
+                        .ToJsonString(),
+                ["cta"] = BuildExternalLink("OPEN ACCOUNT", fixedDepositOpenUrl).ToJsonString(),
+                ["image"] = BuildMediaPicker("grow-your-wealth_inv.png"),
+                ["imageAlt"] = "What you need to open your Fixed Deposit account",
+                ["imageOnRight"] = false
+            };
+
+        // No "More to read" downloads section: downloadItem inherits its
+        // File field from the legacy structureTextAndButton composition,
+        // which marks it mandatory, and the source PDFs aren't in the media
+        // library - an item without one fails publish validation. Add the
+        // section in the backoffice once the PDFs are uploaded.
+        var fixedDepositContentData =
+            new[]
+            {
+                heroContentData,
+                moreAboutContentData,
+                ratesContentData,
+                calculatorContentData,
+                requirementsContentData
+            };
+
+        var fixedDepositSections =
+            new JsonObject
+            {
+                ["layout"] =
+                    new JsonObject
+                    {
+                        ["Umbraco.BlockList"] =
+                            new JsonArray(fixedDepositContentData
+                                .Select(c => (JsonNode)new JsonObject { ["contentUdi"] = c["udi"]!.GetValue<string>() })
+                                .ToArray())
+                    },
+                ["contentData"] = new JsonArray(fixedDepositContentData.Select(c => (JsonNode)c).ToArray())
+            };
+
+        CreateOrUpdateProductLoanPage(fixedDepositNodeName, fixedDepositParentId.Value, fixedDepositSections);
+
+        Console.WriteLine(
+            "NOTE: \"More to read\" downloads and the Interest Rate Infographic " +
+            "button were not ported - their PDFs aren't in the media library.");
+    }
+    }
+
+    // --------------------------------------------------------
+    // NOTICE DEPOSIT
+    // --------------------------------------------------------
+    //
+    // Ported from the live Notice Deposit page (Views/
+    // productNoticeDeposit*.cshtml): hero, "More About The Notice Deposit"
+    // icon cards, "All Rates" table, Notice Deposit Calculator and "How To
+    // Apply". Images are matched by file name (BuildMediaPicker). Same
+    // legacy lookup as Fixed Deposit above, and the same omission: no
+    // "More to read" downloads until their PDFs are in the media library.
+
+    if (ShouldRunSection("notice-deposit"))
+    {
+    Console.WriteLine();
+    Console.WriteLine("--- notice deposit ---");
+
+    var (legacyNoticeDeposit, noticeDepositNodeName) =
+        FreeUpLegacyUrlOfTypes(
+            ["productNoticeDeposit", "productNoticeDepositeV1", "productNoticeDepositev2"],
+            "Notice Deposit",
+            "Product Notice Deposit");
+
+    var noticeDepositParentId =
+        legacyNoticeDeposit?.ParentId ??
+        contentService.GetPagedOfType(productLoanPageType.Id, 0, 500, out _, null!)
+            .FirstOrDefault()?.ParentId;
+
+    if (noticeDepositParentId == null)
+    {
+        Console.WriteLine(
+            "SKIP: no legacy Notice Deposit node and no existing productLoanPage " +
+            "sibling found to infer a parent from - nothing to migrate.");
+    }
+    else
+    {
+        const string noticeDepositOpenUrl = "https://ib.africanbank.co.za/";
+
+        var heroContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = heroBannerBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Notice Deposits",
+                ["description"] =
+                    BuildRichText(
+                            "<p>Enjoy competitive interest rates for as long as you choose, with the " +
+                            "flexibility to access your funds by providing 7, 32, or 90 days' notice.</p>")
+                        .ToJsonString(),
+                ["primaryCta"] = BuildExternalLink("OPEN ACCOUNT", noticeDepositOpenUrl).ToJsonString(),
+                ["secondaryCta"] = BuildExternalLink("CALCULATE RETURNS", "#myCalculator").ToJsonString(),
+                ["image"] = BuildMediaPicker("mw-overdraft-_bg.png"),
+                ["imageAlt"] = "Notice Deposits"
+            };
+
+        var moreAboutContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = iconCardGridBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "More About The Notice Deposit",
+                ["cards"] =
+                    BuildIconCards(
+                        [
+                            ("bnaking-on-move.png", "NOTICE PERIOD", "Choose your notice period of 7, 32 or 90 days."),
+                            ("62-days-intr-free.png", "EXTRA DEPOSITS",
+                                "You can set up a debit order or make extra deposits from as little as R100 to grow your money."),
+                            ("cc-limit.png", "EASY NOTICE", "Call us on 0860 49 49 40, or place notice on app or online."),
+                            ("earn-int-on-pos-bal.png", "EASY APPLICATION", "Register and open your account online in minutes."),
+                            ("62-days-intr-free.png", "VARYING INTEREST RATES",
+                                "Interest rate changes in line with prevailing marketing conditions."),
+                            ("easy-repayments.png", "TERM",
+                                "Investment account has an indefinite term as long as the minimum balance of R500 is maintained.")
+                        ])
+                        .ToJsonString()
+            };
+
+        var ratesContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = ratesMatrixBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "All Rates",
+                ["columnHeadings"] = "7 Days Notice|32 Days Notice|90 Days Notice",
+                ["rows"] =
+                    BuildRatesRows(
+                        [
+                            ("R0 - 24999.99", "5.61%|6.32%|5.85%"),
+                            ("R25000.00 - R99999.99", "6.79%|7.02%|6.88%"),
+                            ("R100000.00 - R249999.99", "6.93%|7.07%|7.07%"),
+                            ("R250000.00 - R999999.99", "6.98%|7.12%|7.26%"),
+                            ("> R1 000 000.00", "7.02%|7.17%|7.26%")
+                        ])
+                        .ToJsonString(),
+                ["disclaimers"] =
+                    BuildFeatureList(
+                        [
+                            "Interest rates are quoted as Nominal Annual Rates Compounded Monthly (NACM) and are valid for today only, as they are subject to change.",
+                            "Terms and conditions apply. We cannot advise you on the tax implications of investing. It is recommended that you contact your financial adviser or tax consultant."
+                        ])
+                        .ToJsonString()
+            };
+
+        var calculatorContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = investmentCalculatorBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Notice Deposit Calculator",
+                ["investmentType"] = "Notice",
+                ["image"] = BuildMediaPicker("12-loan.png"),
+                ["imageAlt"] = "Investment Vehicle",
+                ["disclaimer"] =
+                    "*Our calculators are only a guide. Actual payout could differ due to the number of days " +
+                    "in a month and interest rates at the start date of the investment.",
+                ["openAccountLink"] = BuildExternalLink("Open an account", noticeDepositOpenUrl).ToJsonString()
+            };
+
+        var howToApplyContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = featureChecklistBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "How To Apply",
+                ["subheading"] = "What you need to open your Notice Deposit account.",
+                ["features"] =
+                    BuildFeatureList(
+                        [
+                            "Identity document or Passport",
+                            "Non SA Citizen require a Passport, Valid working permit and proof of address to open an Investment.",
+                            "The minimum opening deposit is R500"
+                        ])
+                        .ToJsonString(),
+                ["cta"] = BuildExternalLink("OPEN ACCOUNT", "https://ib.africanbank.co.za").ToJsonString(),
+                ["image"] = BuildMediaPicker("how-an-online.png"),
+                ["imageAlt"] = "How To Apply",
+                ["imageOnRight"] = false
+            };
+
+        var noticeDepositContentData =
+            new[]
+            {
+                heroContentData,
+                moreAboutContentData,
+                ratesContentData,
+                calculatorContentData,
+                howToApplyContentData
+            };
+
+        var noticeDepositSections =
+            new JsonObject
+            {
+                ["layout"] =
+                    new JsonObject
+                    {
+                        ["Umbraco.BlockList"] =
+                            new JsonArray(noticeDepositContentData
+                                .Select(c => (JsonNode)new JsonObject { ["contentUdi"] = c["udi"]!.GetValue<string>() })
+                                .ToArray())
+                    },
+                ["contentData"] = new JsonArray(noticeDepositContentData.Select(c => (JsonNode)c).ToArray())
+            };
+
+        CreateOrUpdateProductLoanPage(noticeDepositNodeName, noticeDepositParentId.Value, noticeDepositSections);
+
+        Console.WriteLine(
+            "NOTE: \"More to read\" downloads were not ported - their PDFs aren't " +
+            "in the media library. Add a Downloads Section in the backoffice once " +
+            "they're uploaded.");
+    }
+    }
+
+    // --------------------------------------------------------
+    // ACCESS ACCUMULATOR
+    // --------------------------------------------------------
+    //
+    // Ported from the live Access Accumulator page (Views/
+    // productAccessAccumulator*.cshtml): hero, "More about the Access
+    // Accumulator" icon cards, single-column "All Rates" table, Access
+    // Accumulator Calculator and "How to apply". Same shape and omission
+    // as Notice Deposit above - no "Downloads" section until its PDFs
+    // (incl. the marketing flyer) are in the media library.
+
+    if (ShouldRunSection("access-accumulator"))
+    {
+    Console.WriteLine();
+    Console.WriteLine("--- access accumulator ---");
+
+    var (legacyAccessAccumulator, accessAccumulatorNodeName) =
+        FreeUpLegacyUrlOfTypes(
+            ["productAccessAccumulator", "productAccessAccumulatorV1"],
+            "Access Accumulator",
+            "Product Access Accumulator");
+
+    var accessAccumulatorParentId =
+        legacyAccessAccumulator?.ParentId ??
+        contentService.GetPagedOfType(productLoanPageType.Id, 0, 500, out _, null!)
+            .FirstOrDefault()?.ParentId;
+
+    if (accessAccumulatorParentId == null)
+    {
+        Console.WriteLine(
+            "SKIP: no legacy Access Accumulator node and no existing productLoanPage " +
+            "sibling found to infer a parent from - nothing to migrate.");
+    }
+    else
+    {
+        const string accessAccumulatorOpenUrl = "https://ib.africanbank.co.za";
+
+        var heroContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = heroBannerBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Access Accumulator",
+                ["description"] =
+                    BuildRichText(
+                            "<p>With Access Accumulator, you can invest your money with the ability to access it " +
+                            "immediately, in full or partially. The distinct feature of the Access Accumulator is " +
+                            "that it allows you to earn a competitive interest rate that increases monthly over a " +
+                            "maximum term of 24 months.</p>")
+                        .ToJsonString(),
+                ["primaryCta"] = BuildExternalLink("OPEN ACCOUNT", accessAccumulatorOpenUrl).ToJsonString(),
+                ["secondaryCta"] = BuildExternalLink("CALCULATE RETURNS", "#myCalculator").ToJsonString(),
+                ["image"] = BuildMediaPicker("how-an-online.png"),
+                ["imageAlt"] = "Access Accumulator"
+            };
+
+        var moreAboutContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = iconCardGridBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "More about the Access Accumulator",
+                ["cards"] =
+                    BuildIconCards(
+                        [
+                            ("bnaking-on-move.png", "EARN INCREASING INTEREST",
+                                "Your interest increases by 0.15% monthly, for the duration of 24 months. The interest rate will never decrease for the duration of the investment."),
+                            ("earn-int-on-pos-bal.png", "ACCESS TO YOUR MONEY",
+                                "You have access to your money at any time either partially or fully."),
+                            ("cc-limit.png", "EASY APPLICATION", "Register and open your account online in minutes.")
+                        ])
+                        .ToJsonString()
+            };
+
+        var ratesContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = ratesMatrixBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "All Rates",
+                ["columnHeadings"] = "Access Accumulator 24 Months",
+                ["rows"] =
+                    BuildRatesRows(
+                        [
+                            ("R0 - 24999.99", "5.02%"),
+                            ("R25000.00 - R99999.99", "5.26%"),
+                            ("R100000.00 - R249999.99", "5.49%"),
+                            ("> R250000.00", "5.72%")
+                        ])
+                        .ToJsonString(),
+                ["disclaimers"] =
+                    BuildFeatureList(
+                        [
+                            "Quoted interest rates are starting rates, expressed as Nominal Annual Rates Compounded Monthly (NACM). Valid for today only and are subject to change.",
+                            "Terms and conditions apply. Disclaimer: African Bank cannot advise you of the tax implications of investing. It is recommended that you contact your financial advisor or your tax consultant."
+                        ])
+                        .ToJsonString()
+            };
+
+        var calculatorContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = investmentCalculatorBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Access Accumulator Calculator",
+                ["investmentType"] = "Access",
+                ["image"] = BuildMediaPicker("12-loan.png"),
+                ["imageAlt"] = "Investment Vehicle",
+                ["disclaimer"] =
+                    "*Our calculators are only a guide. Actual payout could differ due to the number of days " +
+                    "in a month and interest rates at the start date of the investment.",
+                ["openAccountLink"] = BuildExternalLink("Open an account", "https://ib.africanbank.co.za/").ToJsonString()
+            };
+
+        var howToApplyContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = featureChecklistBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "How to apply",
+                ["subheading"] =
+                    "With a minimum of R500.00, opening an account is easy. We’ll help you along the way with " +
+                    "any of your inquiries. To kick-start your savings journey, simply enter your details below.",
+                ["features"] =
+                    BuildFeatureList(
+                        [
+                            "Identity Document",
+                            "Non SA Citizen require a Passport, Valid working permit and proof of address to open an Investment.",
+                            "The minimum opening deposit is R500"
+                        ])
+                        .ToJsonString(),
+                ["cta"] = BuildExternalLink("OPEN ACCOUNT", accessAccumulatorOpenUrl).ToJsonString(),
+                ["image"] = BuildMediaPicker("mw-overdraft-_bg.png"),
+                ["imageAlt"] = "How to apply",
+                ["imageOnRight"] = false
+            };
+
+        var accessAccumulatorContentData =
+            new[]
+            {
+                heroContentData,
+                moreAboutContentData,
+                ratesContentData,
+                calculatorContentData,
+                howToApplyContentData
+            };
+
+        var accessAccumulatorSections =
+            new JsonObject
+            {
+                ["layout"] =
+                    new JsonObject
+                    {
+                        ["Umbraco.BlockList"] =
+                            new JsonArray(accessAccumulatorContentData
+                                .Select(c => (JsonNode)new JsonObject { ["contentUdi"] = c["udi"]!.GetValue<string>() })
+                                .ToArray())
+                    },
+                ["contentData"] = new JsonArray(accessAccumulatorContentData.Select(c => (JsonNode)c).ToArray())
+            };
+
+        CreateOrUpdateProductLoanPage(
+            accessAccumulatorNodeName, accessAccumulatorParentId.Value, accessAccumulatorSections);
+
+        Console.WriteLine(
+            "NOTE: the \"Downloads\" section was not ported - its PDFs (incl. the " +
+            "Access Accumulator marketing flyer) aren't in the media library.");
+    }
+    }
+
+    // --------------------------------------------------------
+    // TAX FREE
+    // --------------------------------------------------------
+    //
+    // Ported from the live Tax-Free Investment page (Views/
+    // productTaxFree*.cshtml): hero, "More about Tax-Free Investments" icon
+    // cards, single-column "All Rates" table, Tax Free Calculator and
+    // account requirements. Node named "Product Tax Free" so the slug is
+    // /product-tax-free/. Same omission as the other investment pages - no
+    // "More to read" downloads until their PDFs are in the media library.
+
+    if (ShouldRunSection("tax-free"))
+    {
+    Console.WriteLine();
+    Console.WriteLine("--- tax free ---");
+
+    var (legacyTaxFree, taxFreeNodeName) =
+        FreeUpLegacyUrlOfTypes(["productTaxFree", "productTaxFreeV1"], "Tax Free", "Product Tax Free");
+
+    var taxFreeParentId =
+        legacyTaxFree?.ParentId ??
+        contentService.GetPagedOfType(productLoanPageType.Id, 0, 500, out _, null!)
+            .FirstOrDefault()?.ParentId;
+
+    if (taxFreeParentId == null)
+    {
+        Console.WriteLine(
+            "SKIP: no legacy Tax Free node and no existing productLoanPage " +
+            "sibling found to infer a parent from - nothing to migrate.");
+    }
+    else
+    {
+        const string taxFreeOpenUrl = "https://ib.africanbank.co.za";
+
+        var heroContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = heroBannerBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Tax-Free Investment",
+                ["description"] =
+                    BuildRichText(
+                            "<p>You can save by investing your money at competitive interest rates with " +
+                            "non-taxable payouts.</p>")
+                        .ToJsonString(),
+                ["primaryCta"] = BuildExternalLink("OPEN ACCOUNT", taxFreeOpenUrl).ToJsonString(),
+                ["secondaryCta"] = BuildExternalLink("CALCULATE RETURNS", "#myCalculator").ToJsonString(),
+                ["image"] = BuildMediaPicker("how-an-online.png"),
+                ["imageAlt"] = "Tax-Free Investment"
+            };
+
+        var moreAboutContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = iconCardGridBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "More about Tax-Free Investments",
+                ["cards"] =
+                    BuildIconCards(
+                        [
+                            ("bnaking-on-move.png", "INVEST FROM R50",
+                                "You can make additional deposits from as little as R50 per month."),
+                            ("62-days-intr-free.png", "INVEST UP TO R 46 000 PER YEAR TAX FREE",
+                                "You can invest tax free up to R 46 000 per tax year and a total of R 500 000 during your lifetime."),
+                            ("cc-limit.png", "INTEREST RATE",
+                                "Your interest rate remains the same for the first 12 months of the investment. But if the rate increases, you benefit from the increase. On anniversary of the account, the applicable rate at the time will apply."),
+                            ("earn-int-on-pos-bal.png", "PAYOUT",
+                                "You have the option to withdraw funds during the anniversary month, and every 12 months thereafter."),
+                            ("instant-issue.png", "TERM",
+                                "Allow your Tax-Free investment to grow as long as you like, provided a minimum balance of R50 is maintained."),
+                            ("easy-repayments.png", "EASY APPLICATION", "Register and open your account online in minutes.")
+                        ])
+                        .ToJsonString()
+            };
+
+        var ratesContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = ratesMatrixBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "All Rates",
+                ["columnHeadings"] = "Tax Free Deposit 1 Day",
+                ["rows"] =
+                    BuildRatesRows(
+                        [
+                            ("R0 - 9999.99", "6.98%"),
+                            ("R10000.00 - R74999.99", "7.07%"),
+                            ("R75000.00 - R249999.99", "7.17%"),
+                            ("> R250000.00", "7.26%")
+                        ])
+                        .ToJsonString(),
+                ["disclaimers"] =
+                    BuildFeatureList(
+                        [
+                            "Interest rates are quoted as Nominal Annual Rates Compounded Monthly (NACM) and are valid for today only, as they are subject to change.",
+                            "Terms and conditions apply. We cannot advise you on the tax implications of investing. It is recommended that you contact your financial advisor or tax consultant."
+                        ])
+                        .ToJsonString()
+            };
+
+        var calculatorContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = investmentCalculatorBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Tax Free Calculator",
+                ["investmentType"] = "TxFree",
+                ["image"] = BuildMediaPicker("12-loan.png"),
+                ["imageAlt"] = "Investment Vehicle",
+                ["disclaimer"] =
+                    "*Our calculators are only a guide. Actual payout could differ due to the number of days " +
+                    "in a month and interest rates at the start date of the investment.",
+                ["openAccountLink"] = BuildExternalLink("Open an account", "https://ib.africanbank.co.za/").ToJsonString()
+            };
+
+        var requirementsContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = featureChecklistBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "What you need to open a Tax-Free Investment account",
+                ["subheading"] = "The minimum opening deposit is R50.",
+                ["features"] =
+                    BuildFeatureList(
+                        [
+                            "Identity document",
+                            "Non SA Citizen require a Passport, Valid working permit and proof of address to open an Investment.",
+                            "The minimum opening deposit is R50."
+                        ])
+                        .ToJsonString(),
+                ["cta"] = BuildExternalLink("OPEN ACCOUNT", taxFreeOpenUrl).ToJsonString(),
+                ["image"] = BuildMediaPicker("mw-overdraft-_bg.png"),
+                ["imageAlt"] = "What you need to open a Tax-Free Investment account",
+                ["imageOnRight"] = false
+            };
+
+        var taxFreeContentData =
+            new[]
+            {
+                heroContentData,
+                moreAboutContentData,
+                ratesContentData,
+                calculatorContentData,
+                requirementsContentData
+            };
+
+        var taxFreeSections =
+            new JsonObject
+            {
+                ["layout"] =
+                    new JsonObject
+                    {
+                        ["Umbraco.BlockList"] =
+                            new JsonArray(taxFreeContentData
+                                .Select(c => (JsonNode)new JsonObject { ["contentUdi"] = c["udi"]!.GetValue<string>() })
+                                .ToArray())
+                    },
+                ["contentData"] = new JsonArray(taxFreeContentData.Select(c => (JsonNode)c).ToArray())
+            };
+
+        CreateOrUpdateProductLoanPage(taxFreeNodeName, taxFreeParentId.Value, taxFreeSections);
+
+        Console.WriteLine(
+            "NOTE: \"More to read\" downloads were not ported - their PDFs aren't " +
+            "in the media library.");
+    }
+    }
+
+    // --------------------------------------------------------
+    // STOKVEL
+    // --------------------------------------------------------
+    //
+    // Ported from the live Stokvel Account page (Views/stok.cshtml /
+    // stokvelV1.cshtml): full-bleed photo hero, "Stokvel Account Benefits"
+    // icon cards (title only), sideways "All Rates" table (balances as
+    // columns, one "Interest Rate" row), "How To Apply" (channels as rich
+    // text above the documents checklist), "More to read" downloads and the
+    // "1 Number to call" strip. Unlike the investment pages, every file
+    // here - including the download PDFs - is in the media library.
+
+    if (ShouldRunSection("stokvel"))
+    {
+    Console.WriteLine();
+    Console.WriteLine("--- stokvel ---");
+
+    var (legacyStokvel, stokvelNodeName) =
+        FreeUpLegacyUrlOfTypes(["stok", "stokvelV1"], "Stokvel", "Stokvel");
+
+    var stokvelParentId =
+        legacyStokvel?.ParentId ??
+        contentService.GetPagedOfType(productLoanPageType.Id, 0, 500, out _, null!)
+            .FirstOrDefault()?.ParentId;
+
+    if (stokvelParentId == null)
+    {
+        Console.WriteLine(
+            "SKIP: no legacy Stokvel node and no existing productLoanPage " +
+            "sibling found to infer a parent from - nothing to migrate.");
+    }
+    else
+    {
+        var heroContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = heroImageBannerBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["headingLead"] = "African Bank",
+                ["headingHighlight"] = "Stokvel Account",
+                ["description"] =
+                    BuildRichText(
+                            "<p><strong>Strength in saving together</strong></p>" +
+                            "<p>Digital access for up to 100 members. African Bank has been trusted with over " +
+                            "R1 billion in stokvel savings.</p>")
+                        .ToJsonString(),
+                ["primaryCta"] = BuildExternalLink("Apply Now", "https://ib.africanbank.co.za/").ToJsonString(),
+                ["secondaryCta"] = BuildExternalLink("Stokvel Faq's", MediaUrl("stokvel_faqs.pdf")).ToJsonString(),
+                ["image"] = BuildMediaPicker("dig2603_003_stokvel_productpage.jpg"),
+                ["imageAlt"] = "African Bank Stokvel Account"
+            };
+
+        var benefitsContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = iconCardGridBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Stokvel Account Benefits",
+                ["cards"] =
+                    BuildIconCards(
+                        [
+                            ("abw2312_003_stokvel_webpage_assets_icons1.png", "No monthly management fee", ""),
+                            ("abw2312_003_stokvel_webpage_assets_icons2.png", "Earn interest at competitive rates", ""),
+                            ("abw2312_003_stokvel_webpage_assets_icons3.png", "Transact digitally anytime and everywhere", ""),
+                            ("abw2312_003_stokvel_webpage_assets_icons4.png", "No Constitution? We will create one for you!", ""),
+                            ("abw2312_003_stokvel_webpage_assets_icons5.png",
+                                "Quick and easy application process – online, in branch and via call centre", ""),
+                            ("abw2312_003_stokvel_webpage_assets_icons6.png", "Add up to 100 members", "")
+                        ])
+                        .ToJsonString()
+            };
+
+        var ratesContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = ratesMatrixBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "All Rates",
+                ["tierHeading"] = "Balance",
+                ["columnHeadings"] =
+                    "R 1 - R 24 999|R 25 000 - R 49 999|R 50 000 - R 99 999|R 100 000 - R 999 999|R 1 000 000+",
+                ["rows"] = BuildRatesRows([("Interest Rate", "3.50%|4.50%|5.50%|6.00%|7.00%")]).ToJsonString(),
+                ["disclaimers"] =
+                    BuildFeatureList(
+                        [
+                            "Interest rates are quoted as Nominal Annual Rates Compounded Monthly (NACM) and are valid for today only, as they are subject to change.",
+                            "Terms and conditions apply. We cannot advise you on the tax implications of investing. It is recommended that you contact your financial advisor or tax consultant."
+                        ])
+                        .ToJsonString()
+            };
+
+        var howToApplyContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = featureChecklistBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "How To Apply",
+                ["subheading"] = "",
+                ["bodyHtml"] =
+                    BuildRichText(
+                            "<ul>" +
+                            "<li><strong>Visit nearest African Bank branch — no appointment needed.</strong></li>" +
+                            "<li><strong>Visit <a href=\"https://ib.africanbank.co.za/\">www.africanbank.co.za</a></strong></li>" +
+                            "<li><strong>Call 0861 111 011 or SMS “Stokvel” to 30963</strong></li>" +
+                            "</ul>" +
+                            "<h4>Documents Required</h4>")
+                        .ToJsonString(),
+                ["features"] =
+                    BuildFeatureList(
+                        [
+                            "SA Citizen: Valid ID Document",
+                            "Non-RSA citizen: valid passport, work permit, and proof of residence",
+                            "3 Executives must be present at branch",
+                            "Copy of Stokvel Constitution (If you do not have a constitution, no worries African Bank will assist to create a constitution)"
+                        ])
+                        .ToJsonString(),
+                ["cta"] = null,
+                ["image"] = BuildMediaPicker("stokvel-imgaes2.png"),
+                ["imageAlt"] = "How To Apply",
+                ["imageOnRight"] = false
+            };
+
+        var downloadsContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = downloadsSectionBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "More to read",
+                ["items"] =
+                    BuildBlockList(
+                        downloadItemType,
+                        new[]
+                            {
+                                ("Stokvel terms and conditions", "stokvel-terms-and-conditions-202604.pdf"),
+                                ("Stokvel pricing guide", "stokvel_pricing-guide-202601.pdf")
+                            }
+                            .Select(d =>
+                                new Dictionary<string, JsonNode?>
+                                {
+                                    ["downloadTextDescription"] = d.Item1,
+                                    ["downloadButtonRedirectLink2"] = BuildMediaPicker(d.Item2),
+                                    ["downloadButtonText"] = "Download"
+                                }))
+                        .ToJsonString()
+            };
+
+        var callContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = techCallToActionBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "1 Number to call",
+                ["phoneNumber"] = "086111 1011",
+                ["phoneUrl"] = "tel:0861111011",
+                ["termsLabel"] = "",
+                ["termsUrl"] = "",
+                ["disclaimerHtml"] =
+                    BuildRichText(
+                            "<p>*Banking fees are based on Solidarity's methodology of comparing defined baskets of " +
+                            "transactions (12,17,25 and 30 transactions) across 6 biggest entry level bank accounts. " +
+                            "In this way, an average industry price was obtained.</p>")
+                        .ToJsonString()
+            };
+
+        var stokvelContentData =
+            new[]
+            {
+                heroContentData,
+                benefitsContentData,
+                ratesContentData,
+                howToApplyContentData,
+                downloadsContentData,
+                callContentData
+            };
+
+        var stokvelSections =
+            new JsonObject
+            {
+                ["layout"] =
+                    new JsonObject
+                    {
+                        ["Umbraco.BlockList"] =
+                            new JsonArray(stokvelContentData
+                                .Select(c => (JsonNode)new JsonObject { ["contentUdi"] = c["udi"]!.GetValue<string>() })
+                                .ToArray())
+                    },
+                ["contentData"] = new JsonArray(stokvelContentData.Select(c => (JsonNode)c).ToArray())
+            };
+
+        CreateOrUpdateProductLoanPage(stokvelNodeName, stokvelParentId.Value, stokvelSections);
+    }
+    }
+
+    // --------------------------------------------------------
+    // CREDIT LIFE
+    // --------------------------------------------------------
+    //
+    // Ported from the live Credit Life Insurance page (Views/
+    // productCreditLife*.cshtml / productcreditlifev2.cshtml): hero,
+    // "formally employed" cover icon cards, self-employed/pensioner cover,
+    // "Submit your claim" form, "ensure coverage" note, and the two "not
+    // covered for" checklists. Node named "Product Credit Life" so the slug
+    // is /product-credit-life/.
+    //
+    // The claim form posts to the same production contact service the
+    // legacy page does (/public/contacform/submit) - blank its Submit URL
+    // in the backoffice on an environment that mustn't create real claims.
+    //
+    // Not ported: the "Claims, Policies and Complaints" downloads, whose
+    // PDFs aren't in the media library (downloadItem's file is mandatory).
+
+    if (ShouldRunSection("credit-life"))
+    {
+    Console.WriteLine();
+    Console.WriteLine("--- credit life ---");
+
+    var (legacyCreditLife, creditLifeNodeName) =
+        FreeUpLegacyUrlOfTypes(
+            ["productCreditLife", "productCreditLifeV1", "productcreditlifev2"],
+            "Credit Life",
+            "Product Credit Life");
+
+    var creditLifeParentId =
+        legacyCreditLife?.ParentId ??
+        contentService.GetPagedOfType(productLoanPageType.Id, 0, 500, out _, null!)
+            .FirstOrDefault()?.ParentId;
+
+    if (creditLifeParentId == null)
+    {
+        Console.WriteLine(
+            "SKIP: no legacy Credit Life node and no existing productLoanPage " +
+            "sibling found to infer a parent from - nothing to migrate.");
+    }
+    else
+    {
+        JsonObject Checklist(
+            string heading, string bodyHtml, string[] features, string imageFile, bool imageOnRight) =>
+            new JsonObject
+            {
+                ["contentTypeKey"] = featureChecklistBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = heading,
+                ["subheading"] = "",
+                ["bodyHtml"] = bodyHtml.Length == 0 ? null : BuildRichText(bodyHtml).ToJsonString(),
+                ["features"] = BuildFeatureList(features).ToJsonString(),
+                ["cta"] = null,
+                ["image"] = BuildMediaPicker(imageFile),
+                ["imageAlt"] = heading,
+                ["imageOnRight"] = imageOnRight
+            };
+
+        var heroContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = heroBannerBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Credit Life Insurance",
+                ["description"] =
+                    BuildRichText(
+                            "<p>Peace of mind that your credit obligation will be covered during the term of " +
+                            "your loan, should you be affected by any of these loss of income events.</p>")
+                        .ToJsonString(),
+                ["primaryCta"] = BuildExternalLink("SUBMIT CLAIM", "#submit-claim").ToJsonString(),
+                ["secondaryCta"] = null,
+                ["image"] = BuildMediaPicker("cred-life-insure.png"),
+                ["imageAlt"] = "Credit Life Insurance"
+            };
+
+        var claimFormContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = claimFormBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Submit your claim.",
+                ["intro"] = "Please fill in your details to get started with your application.",
+                ["image"] = BuildMediaPicker("ensure-coverage.png"),
+                ["imageAlt"] = "Submit your claim",
+                ["submitUrl"] = "https://mobilev5.africanbank.co.za/public/contacform/submit",
+                ["successMessage"] =
+                    "Thank you for logging a claim. We will attend to this shortly. For any queries, please " +
+                    "contact our call centre on 0861888786.",
+                ["errorMessage"] =
+                    "An error occurred while trying to submit the information. For any queries, please contact " +
+                    "our call centre on 0861888786."
+            };
+
+        var coverContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = iconCardGridBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Credit customers who are formally employed will be covered for:",
+                ["cards"] =
+                    BuildIconCards(
+                        [
+                            ("easy-repayments.png", "Retrenchment Instalment",
+                                "We cover your credit repayment, while you are unemployed, for up to 12 months."),
+                            ("bnaking-on-move.png", "Death",
+                                "We settle your outstanding credit balance so your family will not be burdened by your debt."),
+                            ("62-days-intr-free.png", "Compulsory Unpaid Leave or Lay-off or Short Time",
+                                "We cover your credit repayment while your income is affected, for up to 12 months."),
+                            ("earn-int-on-pos-bal.png", "Temporary Disability",
+                                "We cover your credit repayment while you are disabled and unable to work or earn an income for up to 12 months"),
+                            ("62-days-intr-free.png", "Permanent Disability", "We settle your outstanding credit balance.")
+                        ])
+                        .ToJsonString()
+            };
+
+        var selfEmployedContentData =
+            Checklist(
+                "Credit is available for self-employed or pensioner customers.",
+                "<h4>Death:</h4>" +
+                "<p>We settle your outstanding credit balance so that your family will not be burdened with your debt.</p>" +
+                "<h4>Temporary Disability:</h4>" +
+                "<p>We cover your credit repayment while you are disabled and unable to work or earn an income for up to 12 months.</p>" +
+                "<h4>Permanent Disability:</h4>" +
+                "<p>We settle your outstanding credit balance.</p>",
+                [],
+                "credit-available-se-pen.png",
+                imageOnRight: true);
+
+        var ensureCoverageContentData =
+            Checklist(
+                "",
+                "<h4>Ensure coverage by keeping credit repayments current, maintaining an active credit life " +
+                "policy for potential claims.</h4>" +
+                "<p>Death We settle your outstanding credit balance so that your family will not be burdened with " +
+                "your debt. Temporary Disability: We cover your credit repayment while you are disabled and unable " +
+                "to work or earn an income for up to 12 months. Permanent Disability: We settle your outstanding " +
+                "credit balance.</p>",
+                [],
+                "ensure-coverage.png",
+                imageOnRight: false);
+
+        var retrenchmentContentData =
+            Checklist(
+                "",
+                "<h4>Retrenchment or Compulsory Unpaid Leave or Lay-off or Short Time are not covered for:</h4>",
+                [
+                    "90 day waiting period",
+                    "Dismissals / misconduct",
+                    "Suspensions",
+                    "Participation in unprotected strikes",
+                    "Employment contracts ended",
+                    "Voluntary retrenchment",
+                    "Voluntary retirement",
+                    "Resignation",
+                    "You were aware of retrenchment before taking out the credit life policy"
+                ],
+                "retrench-cl.png",
+                imageOnRight: true);
+
+        var deathDisabilityContentData =
+            Checklist(
+                "Death or Disability are not covered for:",
+                "",
+                [
+                    "Pre-existing medical conditions 12 months before commencement of credit life policy",
+                    "Participation in crime",
+                    "Wilful self-inflicted injury or suicide / alcohol abuse / drugs or narcotics",
+                    "Participation in hazardous activities"
+                ],
+                "death-and-dis.png",
+                imageOnRight: false);
+
+        var creditLifeContentData =
+            new[]
+            {
+                heroContentData,
+                coverContentData,
+                claimFormContentData,
+                selfEmployedContentData,
+                ensureCoverageContentData,
+                retrenchmentContentData,
+                deathDisabilityContentData
+            };
+
+        var creditLifeSections =
+            new JsonObject
+            {
+                ["layout"] =
+                    new JsonObject
+                    {
+                        ["Umbraco.BlockList"] =
+                            new JsonArray(creditLifeContentData
+                                .Select(c => (JsonNode)new JsonObject { ["contentUdi"] = c["udi"]!.GetValue<string>() })
+                                .ToArray())
+                    },
+                ["contentData"] = new JsonArray(creditLifeContentData.Select(c => (JsonNode)c).ToArray())
+            };
+
+        CreateOrUpdateProductLoanPage(creditLifeNodeName, creditLifeParentId.Value, creditLifeSections);
+
+        Console.WriteLine(
+            "NOTE: the claim form posts to the bank's production contact service - " +
+            "blank its Submit URL in the backoffice to stop that. The \"Claims, " +
+            "Policies and Complaints\" downloads (PDFs not in the media library) " +
+            "were not ported.");
+    }
+    }
+
+    // --------------------------------------------------------
+    // FUNERAL COVER
+    // --------------------------------------------------------
+    //
+    // Ported from the live Family Funeral Cover page (Views/
+    // productFuneralCover*.cshtml / productFuneralPlanV1.cshtml): hero
+    // (with the Family Funeral Cover checklist in its description), Funeral
+    // Calculator and "More to read" downloads. Node defaults to "Product
+    // Funeral Cover" (slug /product-funeral-cover/) unless a legacy node
+    // supplies a name.
+    //
+    // The calculator ports the legacy member/cover rules, but not its
+    // premium calculation or Call Me Back form (that code wasn't available),
+    // so Calculate shows a cover summary. The Foreign National Funeral Plan
+    // T&Cs PDF isn't in the media library, so that download is missing.
+
+    if (ShouldRunSection("funeral-cover"))
+    {
+    Console.WriteLine();
+    Console.WriteLine("--- funeral cover ---");
+
+    var (legacyFuneralCover, funeralCoverNodeName) =
+        FreeUpLegacyUrlOfTypes(
+            ["productFuneralCover", "productFuneralCover1", "productFuneralPlanV1"],
+            "Funeral",
+            "Product Funeral Cover");
+
+    var funeralCoverParentId =
+        legacyFuneralCover?.ParentId ??
+        contentService.GetPagedOfType(productLoanPageType.Id, 0, 500, out _, null!)
+            .FirstOrDefault()?.ParentId;
+
+    if (funeralCoverParentId == null)
+    {
+        Console.WriteLine(
+            "SKIP: no legacy Funeral Cover node and no existing productLoanPage " +
+            "sibling found to infer a parent from - nothing to migrate.");
+    }
+    else
+    {
+        var heroContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = heroBannerBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Protect your family’s wellbeing during times of loss",
+                ["description"] =
+                    BuildRichText(
+                            "<h4><strong>Family Funeral Cover</strong></h4>" +
+                            "<div class=\"rich-text-ticks\"><ul>" +
+                            "<li>Cover up to R100 000, for the Main member and Spouse.</li>" +
+                            "<li>Cover up to R50 000 for children</li>" +
+                            "<li>Cover up to R50 000 for parents, or in-laws, or extended family</li>" +
+                            "</ul></div>")
+                        .ToJsonString(),
+                ["primaryCta"] = BuildExternalLink("APPLY NOW", "https://ib.africanbank.co.za/").ToJsonString(),
+                ["secondaryCta"] = BuildExternalLink("Build Your Own Cover", "#funeral-calculator").ToJsonString(),
+                ["image"] = BuildMediaPicker("lr_ins2503_002_web-image.png"),
+                ["imageAlt"] = "Family Funeral Cover"
+            };
+
+        var calculatorContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = funeralCalculatorBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Funeral Calculator",
+                ["image"] = BuildMediaPicker("lr_ins2506_002_web-calculator-image.png"),
+                ["imageAlt"] = "Funeral Calculator",
+                ["applyLink"] = BuildExternalLink("Apply Now", "https://ib.africanbank.co.za/SignIn.aspx").ToJsonString()
+            };
+
+        var downloadsContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = downloadsSectionBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "More to read",
+                ["items"] =
+                    BuildBlockList(
+                        downloadItemType,
+                        new[]
+                            {
+                                ("Funeral Insurance terms and conditions", "funeral-terms-conditions-83.pdf"),
+                                ("African Bank Family Funeral Plan Terms and Conditions",
+                                    "african-bank-family-funeral-policy-terms-and-conditions-final-18-02-2025_is_clean.pdf"),
+                                ("African Bank Group Employee Family Funeral Plan Terms and Conditions",
+                                    "african-bank-group-employee-family-funeral-plan-policy-and-terms-and-conditions-final-18-02-2025_is_clean.pdf")
+                            }
+                            .Select(d =>
+                                new Dictionary<string, JsonNode?>
+                                {
+                                    ["downloadTextDescription"] = d.Item1,
+                                    ["downloadButtonRedirectLink2"] = BuildMediaPicker(d.Item2),
+                                    ["downloadButtonText"] = "Download"
+                                }))
+                        .ToJsonString()
+            };
+
+        var funeralCoverContentData = new[] { heroContentData, calculatorContentData, downloadsContentData };
+
+        var funeralCoverSections =
+            new JsonObject
+            {
+                ["layout"] =
+                    new JsonObject
+                    {
+                        ["Umbraco.BlockList"] =
+                            new JsonArray(funeralCoverContentData
+                                .Select(c => (JsonNode)new JsonObject { ["contentUdi"] = c["udi"]!.GetValue<string>() })
+                                .ToArray())
+                    },
+                ["contentData"] = new JsonArray(funeralCoverContentData.Select(c => (JsonNode)c).ToArray())
+            };
+
+        CreateOrUpdateProductLoanPage(funeralCoverNodeName, funeralCoverParentId.Value, funeralCoverSections);
+
+        Console.WriteLine(
+            "NOTE: the calculator shows a cover summary, not a premium (premium " +
+            "logic not yet ported); no Call Me Back form or Foreign National " +
+            "Funeral Plan T&Cs download yet.");
+    }
+    }
+
+    // --------------------------------------------------------
+    // AUDACIOUS REWARDS
+    // --------------------------------------------------------
+    //
+    // Ported from the live Audacious Rewards page (Views/
+    // AudaciousRewards.cshtml): welcome hero, JOIN / EARN / SPEND cards,
+    // "How to Join" and "How to Earn" partner tabs. Node named "Audacious
+    // Rewards" so the slug is /audacious-rewards/.
+    //
+    // Partial port - the source HTML supplied was truncated after the
+    // Dining tab, so the DIY / Groceries / Travel / Online-Shopping tabs,
+    // the Banking tab, the Spend section and the points calculator aren't
+    // here yet. The hero banner, Pace/Spur partner banners and the current
+    // T&Cs / FAQ PDFs aren't in the media library either: the hero is text
+    // only, the tabs have no banner, and the footnote's T&Cs/FAQ mentions
+    // aren't linked.
+
+    if (ShouldRunSection("audacious-rewards"))
+    {
+    Console.WriteLine();
+    Console.WriteLine("--- audacious rewards ---");
+
+    var (legacyRewards, rewardsNodeName) =
+        FreeUpLegacyUrlOfTypes(["AudaciousRewards", "audiousRewards"], "Audacious Rewards", "Audacious Rewards");
+
+    var rewardsParentId =
+        legacyRewards?.ParentId ??
+        contentService.GetPagedOfType(productLoanPageType.Id, 0, 500, out _, null!)
+            .FirstOrDefault()?.ParentId;
+
+    if (rewardsParentId == null)
+    {
+        Console.WriteLine(
+            "SKIP: no legacy Audacious Rewards node and no existing productLoanPage " +
+            "sibling found to infer a parent from - nothing to migrate.");
+    }
+    else
+    {
+        const string joinUrl = "https://ib.africanbank.co.za/SignIn.aspx";
+
+        const string boostedFootnote =
+            "<p>*<strong>Boosted earn rate</strong> applies when you have your <strong>salary paid into your " +
+            "primary African Bank account</strong> and <strong>maintain at least two active debit orders</strong>.</p>" +
+            "<p>Earn rate requirements, exclusions and monthly spend limits apply. Refer to our T&amp;Cs and FAQ " +
+            "for more details.</p>";
+
+        string EarnRates(string standardLabel, string standardHtml, string boostedHtml) =>
+            $"<p><strong style=\"color:#89bc44\">{standardLabel}</strong><br>{standardHtml}</p>" +
+            $"<p><strong style=\"color:#89bc44\">Boosted Earn Rate*</strong><br>{boostedHtml}</p>";
+
+        Dictionary<string, JsonNode?> Tab(
+            string label, string heading, string subheading, string description,
+            string debitHtml, string creditHtml, string closingText, string ctaLabel, string ctaUrl) =>
+            new()
+            {
+                ["label"] = label,
+                ["heading"] = heading,
+                ["subheading"] = subheading,
+                ["description"] = description,
+                ["image"] = null,
+                ["card1Title"] = "Debit Card",
+                ["card1Html"] = BuildRichText(debitHtml).ToJsonString(),
+                ["card1Link"] = BuildExternalLink("Join Now", "https://ib.africanbank.co.za/").ToJsonString(),
+                ["card2Title"] = "Credit Card",
+                ["card2Html"] = BuildRichText(creditHtml).ToJsonString(),
+                ["card2Link"] = BuildExternalLink("Join Now", "/en/home/get-a-quote").ToJsonString(),
+                ["footnoteHtml"] = BuildRichText(boostedFootnote).ToJsonString(),
+                ["closingText"] = closingText,
+                ["cta"] = BuildExternalLink(ctaLabel, ctaUrl).ToJsonString()
+            };
+
+        var bannerContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = imageBannerBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["image"] = BuildMediaPicker("ar2407_002_web-banner_grocery-benefit_p10.jpg"),
+                ["mobileImage"] = null,
+                ["imageAlt"] = "Audacious Rewards - grocery shopping now more rewarding at Checkers, Shoprite and Usave",
+                ["link"] = null
+            };
+
+        var stepsContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = stepCardsBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "",
+                ["introHtml"] =
+                    BuildRichText(
+                            "<h2>Welcome to <strong>Audacious Rewards</strong></h2>" +
+                            "<p>Audacious Rewards is African Bank’s rewards programme designed to reward you for " +
+                            "your everyday banking and positive financial behaviour. Simply earn Audacious Rewards " +
+                            "points by using your African Bank Card and enjoy spending your points on airtime, data, " +
+                            "electricity, grocery vouchers and much more.</p>")
+                        .ToJsonString(),
+                ["introCta"] = BuildExternalLink("Join Now", joinUrl).ToJsonString(),
+                ["cards"] =
+                    BuildBlockList(
+                        stepCardType,
+                        new[]
+                            {
+                                ("JOIN",
+                                    "<p><strong>Join for free</strong> in minutes</p><p><strong>Get started</strong> right away</p>" +
+                                    "<p><strong>Use our app</strong> or internet banking</p>",
+                                    "Join Now", joinUrl),
+                                ("EARN",
+                                    "<p><strong>Get rewarded</strong> everyday</p><p><strong>Pay with our card</strong> at our partners</p>" +
+                                    "<p><strong>Use our app</strong> for your banking</p>",
+                                    "Join Now", "#how-to-earn"),
+                                ("SPEND",
+                                    "<p>Enjoy vouchers from <strong>over 35 partners</strong></p><p>Convert your <strong>points to cash</strong></p>" +
+                                    "<p>Or <strong>invest your points tax-free</strong></p>",
+                                    "Explore", joinUrl)
+                            }
+                            .Select(c =>
+                                new Dictionary<string, JsonNode?>
+                                {
+                                    ["title"] = c.Item1,
+                                    ["bodyHtml"] = BuildRichText(c.Item2).ToJsonString(),
+                                    ["cta"] = BuildExternalLink(c.Item3, c.Item4).ToJsonString()
+                                }))
+                        .ToJsonString()
+            };
+
+        var howToJoinContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = featureChecklistBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "How to Join",
+                ["subheading"] = "",
+                ["bodyHtml"] =
+                    BuildRichText(
+                            "<ul>" +
+                            "<li><strong>Log into</strong> the African Bank App or Website</li>" +
+                            "<li><strong>Access</strong> “My Rewards”</li>" +
+                            "<li><strong>Tap</strong> \"Join Now\"</li>" +
+                            "</ul>")
+                        .ToJsonString(),
+                ["features"] = BuildFeatureList([]).ToJsonString(),
+                ["cta"] = BuildExternalLink("Join Now", "https://ib.africanbank.co.za").ToJsonString(),
+                ["image"] = BuildMediaPicker("abw2406_002_ar_assets_pmupdate_howtojoin2.png"),
+                ["imageAlt"] = "How to Join",
+                ["imageOnRight"] = false
+            };
+
+        var howToEarnContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = partnerTabsBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "How to Earn",
+                ["introHtml"] =
+                    BuildRichText(
+                            $"<p>Simply <a href=\"{joinUrl}\">register an online profile</a> and you can start using " +
+                            "our benefits through our card, partners and app</p>")
+                        .ToJsonString(),
+                ["tabs"] =
+                    BuildBlockList(
+                        partnerTabType,
+                        [
+                            Tab(
+                                "Car Hire",
+                                "Car Hire",
+                                "Rent a car from Pace Car Rental and earn up to 50% back in points with us",
+                                "Enjoy short-term and long term car rentals made for everyday South Africans with the best range of vehicles and no hidden costs",
+                                EarnRates(
+                                    "Standard Earn Rate",
+                                    "<strong>Earn 5% back</strong> on rentals of 6 days or less<br><strong>Earn 2.5% back</strong> on rentals between 7–29 days",
+                                    "<strong>Earn 10% back</strong> on rentals of 6 days or less<br><strong>Earn 5% back</strong> on rentals between 7–29 days<br><strong>Earn 2.5% back</strong> on rentals greater than 30 days"),
+                                EarnRates(
+                                    "Standard Earn Rate",
+                                    "<strong>Earn 10% back</strong> on rentals of 6 days or less<br><strong>Earn 5% back</strong> on rentals between 7–29 days",
+                                    "<strong>Earn 50% back</strong> on rentals of 6 days or less<br><strong>Earn 25% back</strong> on rentals between 7–29 days<br><strong>Earn 5% back</strong> on rentals greater than 30 days"),
+                                "Rent with confidence from a proudly South African car rental company with competitive rates and reliable service",
+                                "Book Now",
+                                "https://africanbank.pacecarrental.co.za/?utm_source=website&utm_medium=referral&utm_campaign=ar-pace-launch-072025&utm_content=cta-book-now"),
+                            Tab(
+                                "Dining",
+                                "Dining",
+                                "Eat-out at Spur and earn up to 50% back in Audacious Rewards points",
+                                "Enjoy family dinner with more value",
+                                EarnRates(
+                                    "Standard Earn",
+                                    "<strong>Earn 0.3% back</strong> at <strong>Spur Group restaurants:</strong> Panarottis, John Dory’s, RocoMamas, The Hussar Grill, Piza E Vino, Doppio Zero, Casa Bella <strong>and KFC.</strong>",
+                                    "<strong>Earn 10% back</strong> at <strong>Spur</strong>."),
+                                EarnRates(
+                                    "Standard Earn",
+                                    "<strong>Earn 1% back</strong> at <strong>Spur Group restaurants:</strong> Panarottis, John Dory’s, RocoMamas, The Hussar Grill, Piza E Vino, Doppio Zero, Casa Bella <strong>and KFC</strong>.",
+                                    "<strong>Earn 50% back</strong> at <strong>Spur</strong>."),
+                                "Enjoy family dining at your nearest Spur",
+                                "Find a Spur",
+                                "https://www.spursteakranches.com/za/find-a-spur")
+                        ])
+                        .ToJsonString()
+            };
+
+        // "Shop Now" / "VISIT STORE" point at internet banking (where "My
+        // Rewards" and its store live) - the legacy store URL wasn't in the
+        // HTML supplied. The TotalEnergies logo isn't in the media library.
+        var spendContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = spendCarouselBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["heading"] = "Spend with our benefit partners",
+                ["introHtml"] =
+                    BuildRichText(
+                            "<p>Redeem your Audacious Rewards points on the online store for airtime, data, " +
+                            "electricity and grocery vouchers and much more or convert your points to cash.</p>")
+                        .ToJsonString(),
+                ["slides"] =
+                    BuildBlockList(
+                        spendSlideType,
+                        [
+                            new Dictionary<string, JsonNode?>
+                            {
+                                ["image"] = null,
+                                ["title"] = "TotalEnergies Vouchers",
+                                ["bodyHtml"] =
+                                    BuildRichText(
+                                            "<p>Save on Fuel and Café Bonjour purchases.</p>" +
+                                            "<p>Redeem your Audacious Rewards points for TotalEnergies vouchers today!</p>")
+                                        .ToJsonString(),
+                                ["cta"] = BuildExternalLink("Shop Now", joinUrl).ToJsonString()
+                            }
+                        ])
+                        .ToJsonString()
+            };
+
+        var footerContentData =
+            new JsonObject
+            {
+                ["contentTypeKey"] = rewardsFooterBlockType.Key.ToString(),
+                ["udi"] = $"umb://element/{Guid.NewGuid():N}",
+                ["bandCta"] = BuildExternalLink("Visit Store", joinUrl).ToJsonString(),
+                ["headingHtml"] =
+                    BuildRichText("<p><strong>Access your rewards</strong> anytime, anywhere!</p>").ToJsonString(),
+                ["cta"] = BuildExternalLink("Join Today", joinUrl).ToJsonString(),
+                ["link1"] = null,
+                ["link2"] = null
+            };
+
+        var rewardsContentData =
+            new[]
+            {
+                bannerContentData,
+                stepsContentData,
+                howToJoinContentData,
+                howToEarnContentData,
+                spendContentData,
+                footerContentData
+            };
+
+        var rewardsSections =
+            new JsonObject
+            {
+                ["layout"] =
+                    new JsonObject
+                    {
+                        ["Umbraco.BlockList"] =
+                            new JsonArray(rewardsContentData
+                                .Select(c => (JsonNode)new JsonObject { ["contentUdi"] = c["udi"]!.GetValue<string>() })
+                                .ToArray())
+                    },
+                ["contentData"] = new JsonArray(rewardsContentData.Select(c => (JsonNode)c).ToArray())
+            };
+
+        CreateOrUpdateProductLoanPage(rewardsNodeName, rewardsParentId.Value, rewardsSections);
+
+        Console.WriteLine(
+            "NOTE: partial port - DIY / Groceries / Travel / Online-Shopping / Banking " +
+            "tabs, the Spend section and the points calculator still to come; hero " +
+            "banner, partner banners and current T&Cs/FAQ PDFs not in the media library.");
     }
     }
 
